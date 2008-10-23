@@ -1,0 +1,14 @@
+# encoding: utf-8
+
+import sys
+darwin = sys.platform.startswith('darwin')
+
+libtype = 'staticlib'
+if darwin:
+    libtype = 'shlib'
+
+obj = bld.new_task_gen('cxx', libtype)
+obj.find_sources_in_dirs('. js js/spidermonkey')
+obj.includes = ['../include']
+obj.uselib = 'JS BOOST'
+obj.target = 'templar'

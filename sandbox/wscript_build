@@ -1,0 +1,21 @@
+# encoding: utf-8
+
+obj = bld.new_task_gen('cxx', 'program')
+obj.source = 'spidermonkey.cpp'
+obj.target = 'spidermonkey'
+obj.uselib = 'JS'
+obj.includes = ['../include']
+
+obj = bld.new_task_gen('cxx', 'program')
+obj.source = 'abstract-js.cpp'
+obj.target = 'abstract-js'
+obj.uselib = 'JS BOOST'
+obj.uselib_local = 'templar'
+obj.includes = ['../include']
+
+obj = bld.new_task_gen('cxx', 'program')
+obj.source = 'jsrepl.cpp'
+obj.target = 'jsrepl'
+obj.uselib = 'JS BOOST'
+obj.uselib_local = 'templar'
+obj.includes = ['../include']

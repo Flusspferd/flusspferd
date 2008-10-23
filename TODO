@@ -1,0 +1,20 @@
+* To  Do for Templar
+
+** JS Wrapper
+
+*** To allow wrapping APIs
+ - Implement JS_NewFunction/JS_DefineFunction
+ - Handle getter/setter
+
+*** To be ready for production system
+ - Add Security Stuff (JSPrincipals)
+ - Wrap the rest of the classes
+ - Test test test
+
+*** For the Future
+ - Wrap other JS Engines
+
+; Local Variables: **
+; mode: muse **
+; coding: utf-8 **
+; End: **

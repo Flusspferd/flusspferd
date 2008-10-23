@@ -1,0 +1,13 @@
+#
+#
+#
+prefix=@PREFIX@
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: Flusspferd
+Description: JavaScript Bindings for C++
+Version: @VERSION@
+# Requires:
+Libs: -L${libdir} -ltemplar
+Cflags: -I${includedir}
