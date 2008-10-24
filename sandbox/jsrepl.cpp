@@ -35,8 +35,6 @@ THE SOFTWARE.
 
 //#include <js/jsapi.h> // DEBUG
 
-namespace js = flusspferd;
-
 bool extfile = false;
 std::string file = __FILE__;
 std::istream in(std::cin.rdbuf());
@@ -82,9 +80,9 @@ int main(int argc, char **argv) {
     return 1;
 
   try {
-    js::init::initialize();
-    js::context co = js::context::create();
-    js::current_context_scope scope(co);
+    flusspferd::init::initialize();
+    flusspferd::context co = flusspferd::context::create();
+    flusspferd::current_context_scope scope(co);
 
     co.gc();
 
@@ -94,7 +92,7 @@ int main(int argc, char **argv) {
       std::cout << "> ";
     while(std::getline(in, source)) {
       try {
-        js::value v = js::evaluate(source, file.c_str(), ++line);
+        flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
         if(!v.is_void() && !v.is_null())
           std::cout << v << '\n';
       }
