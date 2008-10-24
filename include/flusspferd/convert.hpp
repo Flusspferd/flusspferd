@@ -26,6 +26,8 @@ THE SOFTWARE.
 
 #include "value.hpp"
 #include "object.hpp"
+#include "string.hpp"
+#include "function.hpp"
 #include <boost/mpl/eval_if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <limits>
@@ -82,6 +84,32 @@ struct convert<object> {
 
   static object from_value(value const &v) {
     return v.to_object();
+  }
+};
+
+template<>
+struct convert<string> {
+  typedef convert<string> type;
+
+  static value to_value(string const &x) {
+    return value(x);
+  }
+
+  static string from_value(value const &v) {
+    return v.to_string();
+  }
+};
+
+template<>
+struct convert<function> {
+  typedef convert<function> type;
+
+  static value to_value(function const &x) {
+    return value(object(x));
+  }
+
+  static value from_value(value const &v) {
+    return function(v.to_object());
   }
 };
 
