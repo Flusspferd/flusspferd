@@ -34,24 +34,31 @@ using namespace flusspferd;
 Impl::string_impl::string_impl(char const *s)
  : str(JS_NewStringCopyZ(Impl::current_context(), s))
 {
-  if(!str)
-    throw exception("failed to create string");
+  if (!str)
+    throw exception("Could not create string");
 }
 
 Impl::string_impl::string_impl(char const *s, std::size_t n)
   : str(JS_NewStringCopyN(Impl::current_context(), s, n))
 {
-  if(!str)
-    throw exception("failed to create string");
+  if (!str)
+    throw exception("Could not create string");
+}
+
+Impl::string_impl::string_impl(char16_t const *s, std::size_t n)
+  : str(JS_NewUCStringCopyN(Impl::current_context(), s, n))
+{
+  if (!str)
+    throw exception("Could not create string");
 }
 
 Impl::string_impl::string_impl(value const &v)
   : str(JS_ValueToString(Impl::current_context(),
                          Impl::get_jsval(const_cast<value&>(v))))
 {
-  if(!str)
-    throw exception("failed to create string");
-}    
+  if (!str)
+    throw exception("Could not create string");
+}
 
 namespace {
   JSString *get_string(string const &s) {
@@ -63,6 +70,8 @@ string::string() { }
 string::string(value const &v) : Impl::string_impl(v) { }
 string::string(char const *s) : Impl::string_impl(s) { }
 string::string(std::string const &s)
+  : Impl::string_impl(s.data(), s.size()) { }
+string::string(std::basic_string<char16_t> const &s)
   : Impl::string_impl(s.data(), s.size()) { }
 string::~string() { }
 

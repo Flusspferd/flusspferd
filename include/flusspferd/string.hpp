@@ -39,6 +39,7 @@ namespace flusspferd {
     string(char const *s);
     string(value const &v);
     string(std::string const &s);
+    string(std::basic_string<char16_t> const &s);
     string(Impl::string_impl const &s)
       : Impl::string_impl(s)
     { }

@@ -44,6 +44,7 @@ namespace Impl {
     string_impl(JSString *s) : str(s) { }
     string_impl(char const *s);
     string_impl(char const *s, std::size_t n);
+    string_impl(char16_t const *s, std::size_t n);
     string_impl(value const &v);
 
     friend JSString *get_string(string_impl &s);

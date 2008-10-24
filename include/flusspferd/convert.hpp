@@ -119,6 +119,51 @@ struct convert<function> {
   }
 };
 
+template<>
+struct convert<char const *> {
+  typedef convert<char const *> type;
+
+  static value to_value(char const *x) {
+    return value(string(x));
+  }
+
+  static char const *from_value(value const &v, value &root) {
+    string s = v.to_string();
+    root = value(s);
+    return s.c_str();
+  }
+};
+
+template<>
+struct convert<std::string> {
+  typedef convert<std::string> type;
+
+  static value to_value(std::string const &x) {
+    return value(string(x));
+  }
+
+  static std::string from_value(value const &v, value &) {
+    string s = v.to_string();
+    return s.to_string();
+  }
+};
+
+template<>
+struct convert<std::basic_string<char16_t> > {
+  typedef std::basic_string<char16_t> string_t;
+
+  typedef convert<string_t> type;
+
+  static value to_value(string_t const &x) {
+    return value(string(x));
+  }
+
+  static string_t from_value(value const &v, value &) {
+    string s = v.to_string();
+    return s.to_utf16_string();
+  }
+};
+
 template<typename T>
 struct convert_arithmetic {
   typedef convert_arithmetic<T> type;
