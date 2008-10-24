@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/object.hpp"
 #include "flusspferd/spidermonkey/runtime.hpp"
 #include "flusspferd/current_context_scope.hpp"
+#include <cstring>
 
 #include <js/jsapi.h>
 
