@@ -31,8 +31,6 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-class value;
-
 namespace detail {
 
 template<typename T>
@@ -45,6 +43,32 @@ struct convert {
       typename convert_arithmetic<T>::type,
       int
     >::type type;
+};
+
+template<>
+struct convert<value> {
+  typedef convert<value> type;
+
+  static value const &to_value(value const &v) {
+    return v;
+  }
+
+  static value const &from_value(value const &v) {
+    return v;
+  }
+};
+
+template<>
+struct convert<bool> {
+  typedef convert<bool> type;
+
+  static value to_value(bool x) {
+    return value(x);
+  }
+
+  static bool from_value(value const &v) {
+    return v.to_boolean();
+  }
 };
 
 template<typename T>

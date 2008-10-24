@@ -59,6 +59,8 @@ namespace flusspferd {
     bool is_bool() const { return is_boolean(); }
 
     bool get_boolean() const;
+    bool get_bool() const { return get_boolean(); }
+
     int get_int() const;
     double get_double() const;
     object get_object() const;
@@ -69,7 +71,7 @@ namespace flusspferd {
     double to_number() const;
     double to_integral_number(int bits, bool has_negative) const;
 
-    bool get_bool() const { return get_boolean(); }
+    bool to_boolean() const;
 
     template<typename Visitor>
     inline void visit(Visitor &v) const;

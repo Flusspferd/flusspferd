@@ -116,6 +116,13 @@ double value::to_integral_number(int bits, bool signedness) const {
   return value;
 }
 
+bool value::to_boolean() const {
+  JSBool result;
+  if (!JS_ValueToBoolean(Impl::current_context(), get(), &result))
+    throw exception("Could not convert value to boolean");
+  return result != JS_FALSE;
+}
+
 void value::bind(value o) {
   setval(JSVAL_VOID);
   setp(o.getp());
