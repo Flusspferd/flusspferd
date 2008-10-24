@@ -56,7 +56,7 @@ struct convert<value> {
     return v;
   }
 
-  static value const &from_value(value const &v) {
+  static value const &from_value(value const &v, value&) {
     return v;
   }
 };
@@ -69,7 +69,7 @@ struct convert<bool> {
     return value(x);
   }
 
-  static bool from_value(value const &v) {
+  static bool from_value(value const &v, value&) {
     return v.to_boolean();
   }
 };
@@ -82,8 +82,10 @@ struct convert<object> {
     return value(o);
   }
 
-  static object from_value(value const &v) {
-    return v.to_object();
+  static object from_value(value const &v, value &root) {
+    object o = v.to_object();
+    root = value(o);
+    return o;
   }
 };
 
@@ -95,8 +97,10 @@ struct convert<string> {
     return value(x);
   }
 
-  static string from_value(value const &v) {
-    return v.to_string();
+  static string from_value(value const &v, value &root) {
+    string s = v.to_string();
+    root = value(s);
+    return s;
   }
 };
 
@@ -108,8 +112,10 @@ struct convert<function> {
     return value(object(x));
   }
 
-  static value from_value(value const &v) {
-    return function(v.to_object());
+  static function from_value(value const &v, value &root) {
+    function f(v.to_object());
+    root = value(object(f));
+    return f;
   }
 };
 
@@ -123,7 +129,7 @@ struct convert_arithmetic {
     return value(x);
   };
 
-  static T from_value(value const &v) {
+  static T from_value(value const &v, value&) {
     if (limits::is_integer)
       return v.to_integral_number(limits::digits, limits::is_signed);
     else
