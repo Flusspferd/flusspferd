@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_ARGUMENTS_HPP
-#define TEMPLAR_JS_ARGUMENTS_HPP
+#ifndef FLUSSPFERD_ARGUMENTS_HPP
+#define FLUSSPFERD_ARGUMENTS_HPP
 
 #include "implementation/arguments.hpp"
 #include <vector>
@@ -74,4 +74,4 @@ namespace flusspferd { namespace js {
   }
 }}
 
-#endif /* TEMPLAR_JS_ARGUMENTS_HPP */
+#endif /* FLUSSPFERD_ARGUMENTS_HPP */

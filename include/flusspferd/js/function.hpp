@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_FUNCTION_HPP
-#define TEMPLAR_JS_FUNCTION_HPP
+#ifndef FLUSSPFERD_FUNCTION_HPP
+#define FLUSSPFERD_FUNCTION_HPP
 
 #include "object.hpp"
 #include "implementation/function.hpp"
@@ -62,4 +62,4 @@ public:
 
 }}
 
-#endif /* TEMPLAR_JS_FUNCTION_HPP */
+#endif /* FLUSSPFERD_FUNCTION_HPP */

@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_STRING_HPP
-#define TEMPLAR_JS_STRING_HPP
+#ifndef FLUSSPFERD_STRING_HPP
+#define FLUSSPFERD_STRING_HPP
 
 #include "implementation/string.hpp"
 #include <string>
@@ -61,4 +61,4 @@ namespace flusspferd { namespace js {
   bool operator<(string const &lhs, string const &rhs);
 }}
 
-#endif /* TEMPLAR_JS_STRING_HPP */
+#endif /* FLUSSPFERD_STRING_HPP */

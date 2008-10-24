@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_STRING_IO_HPP
-#define TEMPLAR_JS_STRING_IO_HPP
+#ifndef FLUSSPFERD_STRING_IO_HPP
+#define FLUSSPFERD_STRING_IO_HPP
 
 #include <flusspferd/js/string.hpp>
 #include <ostream>
@@ -33,4 +33,4 @@ namespace flusspferd { namespace js {
   }
 }}
 
-#endif /* TEMPLAR_JS_STRING_IO_HPP */
+#endif /* FLUSSPFERD_STRING_IO_HPP */

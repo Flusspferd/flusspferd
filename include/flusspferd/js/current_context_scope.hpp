@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_CURRENT_CONTEXT_SCOPE_HPP
-#define TEMPLAR_JS_CURRENT_CONTEXT_SCOPE_HPP
+#ifndef FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
+#define FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
 
 #include "flusspferd/js/init.hpp"
 #include "flusspferd/js/context.hpp"
@@ -47,4 +47,4 @@ namespace flusspferd { namespace js {
   };
 }}
 
-#endif /* TEMPLAR_JS_CURRENT_CONTEXT_SCOPE_HPP */
+#endif /* FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP */

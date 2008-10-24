@@ -31,8 +31,8 @@ THE SOFTWARE.
 
 #include <js/jsapi.h>
 
-#ifndef TEMPLAR_JS_STACKCHUNKSIZE
-#define TEMPLAR_JS_STACKCHUNKSIZE 8192
+#ifndef FLUSSPFERD_STACKCHUNKSIZE
+#define FLUSSPFERD_STACKCHUNKSIZE 8192
 #endif
 
 namespace flusspferd { namespace js {
@@ -49,7 +49,7 @@ namespace flusspferd { namespace js {
   public:
     impl()
       : context(JS_NewContext(Impl::get_runtime(),
-                              TEMPLAR_JS_STACKCHUNKSIZE)),
+                              FLUSSPFERD_STACKCHUNKSIZE)),
         destroy(true)
     {
       if(!context)

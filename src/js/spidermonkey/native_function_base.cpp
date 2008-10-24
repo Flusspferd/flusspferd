@@ -112,7 +112,7 @@ function native_function_base::create_function() {
 JSBool native_function_base::impl::call_helper(
     JSContext *ctx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
-  TEMPLAR_JS_CALLBACK_BEGIN {
+  FLUSSPFERD_CALLBACK_BEGIN {
     current_context_scope scope(Impl::wrap_context(ctx));
 
     JSObject *function = JSVAL_TO_OBJECT(argv[-2]);
@@ -132,7 +132,7 @@ JSBool native_function_base::impl::call_helper(
     x.function = Impl::wrap_object(function);
 
     self->call(x);
-  } TEMPLAR_JS_CALLBACK_END;
+  } FLUSSPFERD_CALLBACK_END;
 }
 
 void native_function_base::impl::finalize(JSContext *ctx, JSObject *parent) {

@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_OBJECT_HPP
-#define TEMPLAR_JS_OBJECT_HPP
+#ifndef FLUSSPFERD_OBJECT_HPP
+#define FLUSSPFERD_OBJECT_HPP
 
 #include "implementation/object.hpp"
 #include "arguments.hpp"
@@ -121,4 +121,4 @@ namespace flusspferd { namespace js {
                   object::property_iterator const &rhs);
 }}
 
-#endif /* TEMPLAR_JS_OBJECT_HPP */
+#endif /* FLUSSPFERD_OBJECT_HPP */

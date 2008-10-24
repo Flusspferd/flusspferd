@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_INIT_HPP
-#define TEMPLAR_JS_INIT_HPP
+#ifndef FLUSSPFERD_INIT_HPP
+#define FLUSSPFERD_INIT_HPP
 
 #include "flusspferd/js/context.hpp"
 #include <boost/noncopyable.hpp>
@@ -70,4 +70,4 @@ namespace flusspferd { namespace js {
   object global();
 }}
 
-#endif /* TEMPLAR_JS_INIT_HPP */
+#endif /* FLUSSPFERD_INIT_HPP */

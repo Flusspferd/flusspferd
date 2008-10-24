@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_EXCEPTION_HPP
-#define TEMPLAR_JS_EXCEPTION_HPP
+#ifndef FLUSSPFERD_EXCEPTION_HPP
+#define FLUSSPFERD_EXCEPTION_HPP
 
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
@@ -41,9 +41,9 @@ namespace flusspferd { namespace js {
   };
 }}
 
-#define TEMPLAR_JS_CALLBACK_BEGIN try
+#define FLUSSPFERD_CALLBACK_BEGIN try
 
-#define TEMPLAR_JS_CALLBACK_END \
+#define FLUSSPFERD_CALLBACK_END \
     catch (::flusspferd::js::exception &e) { \
       e.throw_js(); \
       return JS_FALSE; \
@@ -54,4 +54,4 @@ namespace flusspferd { namespace js {
     } \
     return JS_TRUE
 
-#endif /* TEMPLAR_JS_EXCEPTION_HPP */
+#endif /* FLUSSPFERD_EXCEPTION_HPP */

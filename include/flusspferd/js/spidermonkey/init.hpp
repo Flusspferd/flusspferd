@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_SPIDERMONKEY_INIT_HPP
-#define TEMPLAR_JS_SPIDERMONKEY_INIT_HPP
+#ifndef FLUSSPFERD_SPIDERMONKEY_INIT_HPP
+#define FLUSSPFERD_SPIDERMONKEY_INIT_HPP
 
 #include <flusspferd/js/init.hpp>
 #include <flusspferd/js/spidermonkey/context.hpp>
@@ -33,4 +33,4 @@ namespace flusspferd { namespace js { namespace Impl {
   }
 }}}
 
-#endif /* TEMPLAR_JS_SPIDERMONKEY_INIT_HPP */
+#endif /* FLUSSPFERD_SPIDERMONKEY_INIT_HPP */

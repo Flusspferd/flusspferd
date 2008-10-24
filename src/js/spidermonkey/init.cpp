@@ -27,8 +27,8 @@ THE SOFTWARE.
 #include "flusspferd/js/object.hpp"
 #include <js/jsapi.h>
 
-#ifndef TEMPLAR_JS_MAX_BYTES
-#define TEMPLAR_JS_MAX_BYTES 8L * 1024L * 1024L // 8 MB TODO: too much?
+#ifndef FLUSSPFERD_MAX_BYTES
+#define FLUSSPFERD_MAX_BYTES 8L * 1024L * 1024L // 8 MB TODO: too much?
 #endif
 
 namespace flusspferd { namespace js {
@@ -36,7 +36,7 @@ namespace flusspferd { namespace js {
   public:
     // we use a single JS_Runtime for each process!
     impl()
-      : runtime(JS_NewRuntime( TEMPLAR_JS_MAX_BYTES ))
+      : runtime(JS_NewRuntime( FLUSSPFERD_MAX_BYTES ))
     {
       if(!runtime) {
         throw exception("Could not create Spidermonkey Runtime");
