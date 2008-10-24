@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/init.hpp"
-#include "flusspferd/js/value.hpp"
-#include "flusspferd/js/object.hpp"
-#include "flusspferd/js/context.hpp"
-#include "flusspferd/js/value_io.hpp"
-#include "flusspferd/js/evaluate.hpp"
-#include "flusspferd/js/current_context_scope.hpp"
+#include "flusspferd/init.hpp"
+#include "flusspferd/value.hpp"
+#include "flusspferd/object.hpp"
+#include "flusspferd/context.hpp"
+#include "flusspferd/value_io.hpp"
+#include "flusspferd/evaluate.hpp"
+#include "flusspferd/current_context_scope.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstring>

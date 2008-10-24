@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/tracer.hpp"
-#include "flusspferd/js/spidermonkey/init.hpp"
+#include "flusspferd/tracer.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd::js;

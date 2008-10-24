@@ -21,9 +21,9 @@ def configure(conf):
     conf.check_message('platform', '', 1, sys.platform)
 
     print '%s :' % 'Creating implementation link'.ljust(conf.line_just),
-    try: os.unlink('include/templar/js/implementation')
+    try: os.unlink('include/flusspferd/implementation')
     except OSError: pass
-    os.symlink('spidermonkey', 'include/templar/js/implementation')
+    os.symlink('spidermonkey', 'include/flusspferd/implementation')
     Utils.pprint('GREEN', 'ok')
 
     if darwin:

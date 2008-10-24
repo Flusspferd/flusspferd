@@ -21,10 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/local_root_scope.hpp"
-#include "flusspferd/js/init.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/spidermonkey/context.hpp"
+#include "flusspferd/local_root_scope.hpp"
+#include "flusspferd/init.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd::js;

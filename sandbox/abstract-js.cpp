@@ -21,19 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/convert.hpp"
-#include "flusspferd/js/native_function_base.hpp"
-#include "flusspferd/js/native_object_base.hpp"
-#include "flusspferd/js/call_context.hpp"
-#include "flusspferd/js/init.hpp"
-#include "flusspferd/js/root_value.hpp"
-#include "flusspferd/js/context.hpp"
-#include "flusspferd/js/value_io.hpp"
-#include "flusspferd/js/evaluate.hpp"
-#include "flusspferd/js/arguments.hpp"
-#include "flusspferd/js/current_context_scope.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/tracer.hpp"
+#include "flusspferd/convert.hpp"
+#include "flusspferd/native_function_base.hpp"
+#include "flusspferd/native_object_base.hpp"
+#include "flusspferd/call_context.hpp"
+#include "flusspferd/init.hpp"
+#include "flusspferd/root_value.hpp"
+#include "flusspferd/context.hpp"
+#include "flusspferd/value_io.hpp"
+#include "flusspferd/evaluate.hpp"
+#include "flusspferd/arguments.hpp"
+#include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/tracer.hpp"
 #include <iostream>
 #include <stdexcept>
 

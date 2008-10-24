@@ -21,16 +21,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_INIT_HPP
-#define FLUSSPFERD_SPIDERMONKEY_INIT_HPP
+#ifndef FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
+#define FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
 
-#include <flusspferd/js/init.hpp>
-#include <flusspferd/js/spidermonkey/context.hpp>
+#include "flusspferd/init.hpp"
+#include "flusspferd/context.hpp"
 
-namespace flusspferd { namespace js { namespace Impl {
-  inline JSContext *current_context() {
-    return get_context(get_current_context());
-  }
-}}}
+namespace flusspferd { namespace js {
+  class context;
 
-#endif /* FLUSSPFERD_SPIDERMONKEY_INIT_HPP */
+  class current_context_scope {
+    context c;
+    context old;
+  public:
+    current_context_scope(context const &c)
+      : c(c)
+    {
+      old = enter_current_context(this->c);
+    }
+
+    ~current_context_scope() {
+      if(leave_current_context(c) && old.is_valid())
+        enter_current_context(old);
+    }
+  };
+}}
+
+#endif /* FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP */

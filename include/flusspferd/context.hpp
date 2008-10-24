@@ -21,30 +21,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
-#define FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
+#ifndef FLUSSPFERD_CONTEXT_HPP
+#define FLUSSPFERD_CONTEXT_HPP
 
-#include "flusspferd/js/init.hpp"
-#include "flusspferd/js/context.hpp"
+#include <flusspferd/value.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace flusspferd { namespace js {
-  class context;
+  class object;
 
-  class current_context_scope {
-    context c;
-    context old;
+  class context {
+    class impl;
+    boost::shared_ptr<impl> p;
+
   public:
-    current_context_scope(context const &c)
-      : c(c)
-    {
-      old = enter_current_context(this->c);
+    struct detail;
+    friend struct detail;
+
+    context();
+    context(detail const&);
+    ~context();
+
+    bool is_valid() const;
+
+    bool operator==(context const &o) const {
+      return p == o.p;
     }
 
-    ~current_context_scope() {
-      if(leave_current_context(c) && old.is_valid())
-        enter_current_context(old);
-    }
+    static context create();
+
+    object global();
+
+    value evaluate(char const *source, std::size_t n,
+                   char const *file = 0x0, unsigned int line = 0);
+    value evaluate(char const *source, char const *file = 0x0,
+                   unsigned int line = 0);
+    value evaluate(std::string const &source, char const *file = 0x0,
+                   unsigned int line = 0);
+
+    void gc();
   };
+
+  inline bool operator!=(context const &a, context const &b) {
+    return !(a == b);
+  }
 }}
 
-#endif /* FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP */
+#endif /* FLUSSPFERD_CONTEXT_HPP */

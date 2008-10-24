@@ -21,16 +21,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP
-#define FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP
+#ifndef FLUSSPFERD_VALUE_IO_HPP
+#define FLUSSPFERD_VALUE_IO_HPP
 
-#include <flusspferd/js/context.hpp>
+#include <flusspferd/value.hpp>
+#include <flusspferd/string_io.hpp>
+#include <ostream>
 
-typedef struct JSContext JSContext;
+namespace flusspferd { namespace js {
+  inline std::ostream &operator<<(std::ostream &out, value const &v) {
+    return out << v.to_string();
+  }
+}}
 
-namespace flusspferd { namespace js { namespace Impl {
-  JSContext *get_context(context &co);
-  context wrap_context(JSContext *c);
-}}}
-
-#endif /* FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP */
+#endif /* FLUSSPFERD_VALUE_IO_HPP */

@@ -21,10 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/init.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/context.hpp"
-#include "flusspferd/js/object.hpp"
+#include "flusspferd/init.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/context.hpp"
+#include "flusspferd/object.hpp"
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_MAX_BYTES

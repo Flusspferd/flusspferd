@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/arguments.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/value.hpp"
+#include "flusspferd/arguments.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/value.hpp"
 #include <boost/foreach.hpp>
 #include <cassert>
 #include <js/jsapi.h>

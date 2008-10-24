@@ -21,16 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/native_object_base.hpp"
-#include "flusspferd/js/tracer.hpp"
-#include "flusspferd/js/object.hpp"
-#include "flusspferd/js/string.hpp"
-#include "flusspferd/js/call_context.hpp"
-#include "flusspferd/js/root_value.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/function.hpp"
-#include "flusspferd/js/current_context_scope.hpp"
-#include "flusspferd/js/spidermonkey/init.hpp"
+#include "flusspferd/native_object_base.hpp"
+#include "flusspferd/tracer.hpp"
+#include "flusspferd/object.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/call_context.hpp"
+#include "flusspferd/root_value.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/function.hpp"
+#include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
 #include <boost/unordered_map.hpp>
 
 using namespace flusspferd::js;

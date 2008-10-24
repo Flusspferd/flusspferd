@@ -21,11 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/root_value.hpp"
-#include "flusspferd/js/init.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/spidermonkey/context.hpp"
-#include "flusspferd/js/spidermonkey/value.hpp"
+#include "flusspferd/root_value.hpp"
+#include "flusspferd/init.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd::js;

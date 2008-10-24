@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// g++ -pedantic -Wall -W -std=c++98 -g3 sandbox/spidermonkey.cpp -I/opt/local/include/js/ -L/opt/local/lib -ljs -DXP_UNIX
+// g++ -pedantic -Wall -W -std=c++98 -g3 sandbox/spidermonkey.cpp -I/opt/local/include/ -L/opt/local/lib -ljs -DXP_UNIX
 
 #include "js/jsapi.h"
 

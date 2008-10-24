@@ -21,53 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_INIT_HPP
-#define FLUSSPFERD_INIT_HPP
+#ifndef FLUSSPFERD_STRING_IO_HPP
+#define FLUSSPFERD_STRING_IO_HPP
 
-#include "flusspferd/js/context.hpp"
-#include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <flusspferd/string.hpp>
+#include <ostream>
 
 namespace flusspferd { namespace js {
-  class context;
-  class object;
-
-  class init : boost::noncopyable {
-    init();
-    ~init();
-
-    class impl;
-    boost::scoped_ptr<impl> p;
-
-  public:
-    struct detail;
-    friend struct init::detail;
-
-    // returns pointer to old context or null
-    context enter_current_context(context const &c);
-    // returns true if c was current context
-    bool leave_current_context(context const &c);
-    context &get_current_context();
-
-    static init &initialize() {
-      static init in;
-      return in;
-    }
-  };
-
-  inline context enter_current_context(context const &c) {
-    return init::initialize().enter_current_context(c);
+  inline std::ostream &operator<<(std::ostream &out, string const &v) {
+    return out << v.c_str();
   }
-
-  inline bool leave_current_context(context const &c) {
-    return init::initialize().leave_current_context(c);
-  }
-
-  inline context &get_current_context() {
-    return init::initialize().get_current_context();
-  }
-
-  object global();
 }}
 
-#endif /* FLUSSPFERD_INIT_HPP */
+#endif /* FLUSSPFERD_STRING_IO_HPP */

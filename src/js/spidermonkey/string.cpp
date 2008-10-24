@@ -21,11 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/js/string.hpp"
-#include "flusspferd/js/exception.hpp"
-#include "flusspferd/js/spidermonkey/init.hpp"
-#include "flusspferd/js/spidermonkey/value.hpp"
-#include "flusspferd/js/spidermonkey/context.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
 #include <js/jsapi.h>
 #include <cstring>
 

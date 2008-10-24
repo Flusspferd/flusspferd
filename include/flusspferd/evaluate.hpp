@@ -21,16 +21,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_STRING_IO_HPP
-#define FLUSSPFERD_STRING_IO_HPP
+#ifndef FLUSSPFERD_EVALUATE_HPP
+#define FLUSSPFERD_EVALUATE_HPP
 
-#include <flusspferd/js/string.hpp>
-#include <ostream>
+#include <flusspferd/init.hpp>
+#include <flusspferd/context.hpp>
 
 namespace flusspferd { namespace js {
-  inline std::ostream &operator<<(std::ostream &out, string const &v) {
-    return out << v.c_str();
+  inline value evaluate(char const *source, std::size_t n,
+                        char const *file = 0x0, unsigned int line = 0)
+  {
+    return get_current_context().evaluate(source, n, file, line);
+  }
+
+  inline value evaluate(char const *source, char const *file = 0x0,
+                        unsigned int line = 0)
+  {
+    return get_current_context().evaluate(source, file, line);
+  }
+
+  inline value evaluate(std::string const &source, char const *file = 0x0,
+                        unsigned int line = 0)
+  {
+    return get_current_context().evaluate(source, file, line);
   }
 }}
 
-#endif /* FLUSSPFERD_STRING_IO_HPP */
+#endif /* FLUSSPFERD_EVALUATE_HPP */
