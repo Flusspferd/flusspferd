@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <boost/noncopyable.hpp>
 #include <memory>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 struct call_context;
 class tracer;
@@ -80,6 +80,6 @@ public:
   friend class impl;
 };
 
-}}
+}
 
 #endif

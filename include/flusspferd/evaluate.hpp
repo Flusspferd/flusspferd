@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include <flusspferd/init.hpp>
 #include <flusspferd/context.hpp>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   inline value evaluate(char const *source, std::size_t n,
                         char const *file = 0x0, unsigned int line = 0)
   {
@@ -45,6 +45,6 @@ namespace flusspferd { namespace js {
   {
     return get_current_context().evaluate(source, file, line);
   }
-}}
+}
 
 #endif /* FLUSSPFERD_EVALUATE_HPP */

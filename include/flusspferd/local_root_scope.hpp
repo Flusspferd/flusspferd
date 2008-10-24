@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "context.hpp"
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 class local_root_scope {
 public:
@@ -39,6 +39,6 @@ private:
   context &ctx;
 };
 
-}}
+}
 
 #endif

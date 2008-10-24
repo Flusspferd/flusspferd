@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/init.hpp"
 #include "flusspferd/context.hpp"
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class context;
 
   class current_context_scope {
@@ -45,6 +45,6 @@ namespace flusspferd { namespace js {
         enter_current_context(old);
     }
   };
-}}
+}
 
 #endif /* FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP */

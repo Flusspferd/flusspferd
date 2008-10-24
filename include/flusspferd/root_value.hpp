@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "context.hpp"
 #include <boost/noncopyable.hpp>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 class root_value : public value, private boost::noncopyable {
 public:
@@ -44,6 +44,6 @@ private:
   context &ctx;
 };
 
-}}
+}
 
 #endif

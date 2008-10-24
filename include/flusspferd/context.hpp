@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include <flusspferd/value.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class object;
 
   class context {
@@ -65,6 +65,6 @@ namespace flusspferd { namespace js {
   inline bool operator!=(context const &a, context const &b) {
     return !(a == b);
   }
-}}
+}
 
 #endif /* FLUSSPFERD_CONTEXT_HPP */

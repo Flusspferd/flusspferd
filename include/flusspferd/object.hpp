@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <string>
 #include <memory>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class value;
   class context;
   class function;
@@ -119,6 +119,6 @@ namespace flusspferd { namespace js {
 
   bool operator==(object::property_iterator const &lhs,
                   object::property_iterator const &rhs);
-}}
+}
 
 #endif /* FLUSSPFERD_OBJECT_HPP */

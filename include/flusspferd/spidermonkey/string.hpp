@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 #include <cstddef>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class value;
 
 namespace Impl {
@@ -58,6 +58,6 @@ namespace Impl {
     return string_impl(s);
   }
 
-}}}
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_STRING_HPP */

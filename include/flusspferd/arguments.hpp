@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "implementation/arguments.hpp"
 #include <vector>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class value;
 
   class arguments : public Impl::arguments_impl {
@@ -67,11 +67,12 @@ namespace flusspferd { namespace js {
 
   bool operator!=(arguments::iterator const &lhs,
                   arguments::iterator const &rhs);
+
   inline bool operator==(arguments::iterator const &lhs,
                          arguments::iterator const &rhs)
   {
     return !(lhs != rhs);
   }
-}}
+}
 
 #endif /* FLUSSPFERD_ARGUMENTS_HPP */

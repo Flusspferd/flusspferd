@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class exception : public std::runtime_error {
   public:
     exception(std::string const &what);
@@ -39,16 +39,16 @@ namespace flusspferd { namespace js {
     class impl;
     boost::shared_ptr<impl const> p;
   };
-}}
+}
 
 #define FLUSSPFERD_CALLBACK_BEGIN try
 
 #define FLUSSPFERD_CALLBACK_END \
-    catch (::flusspferd::js::exception &e) { \
+    catch (::flusspferd::exception &e) { \
       e.throw_js(); \
       return JS_FALSE; \
     } catch (::std::exception &e) { \
-      ::flusspferd::js::exception x(e.what()); \
+      ::flusspferd::exception x(e.what()); \
       x.throw_js(); \
       return JS_FALSE; \
     } \

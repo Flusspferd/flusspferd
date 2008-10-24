@@ -37,74 +37,72 @@ THE SOFTWARE.
 #include <iostream>
 #include <stdexcept>
 
-namespace js = flusspferd::js;
-
-struct my_object : js::native_object_base {
+struct my_object : flusspferd::native_object_base {
   my_object() { std::cout << "my_object construct" << std::endl; }
   ~my_object() { std::cout << "my_object destruct" << std::endl; }
 
-  js::value v;
+  flusspferd::value v;
 
   void post_initialize() {
     std::cout << "my_object pi" << std::endl;
     add_native_method("foo", 0U, &my_object::foo);
     add_native_method("()", 0U, 0);
-    v = js::string("test");
+    v = flusspferd::string("test");
   }
 
-  void foo(js::call_context &) {
+  void foo(flusspferd::call_context &) {
     std::cout << "my_object foo" << std::endl;
   }
 
-  void call_native_method(std::string const &name, js::call_context &x) {
+  void call_native_method(std::string const &name, flusspferd::call_context &x) {
     std::cout << "my_object call method " << name << " v:" << v << std::endl;
-    js::native_object_base::call_native_method(name, x);
+    flusspferd::native_object_base::call_native_method(name, x);
   }
 
-  void trace(js::tracer &trc) {
+  void trace(flusspferd::tracer &trc) {
     trc("v", v);
   }
 };
 
-struct my_function : js::native_function_base {
+struct my_function : flusspferd::native_function_base {
   my_function() : first(true) {}
 
   bool first;
 
-  void call(js::call_context &x) {
+  void call(flusspferd::call_context &x) {
     std::cout << "Function called!" << std::endl;
     if (first) {
       first = false;
-      js::root_value v(js::value(std::string("testtest")));
-      std::vector<js::value> arg(1, v);
+      flusspferd::root_value v(flusspferd::value(std::string("testtest")));
+      std::vector<flusspferd::value> arg(1, v);
       x.function.call(arg);
     }
     std::cout << "[\n";
-    typedef js::arguments::iterator iterator;
+    typedef flusspferd::arguments::iterator iterator;
     iterator const end = x.arg.end();
     for(iterator i = x.arg.begin(); i != end; ++i)
       std::cout << "Arg: " << *i << '\n';
     std::cout << "]\n";
-    x.result = js::value(4.2);
+    x.result = flusspferd::value(4.2);
   }
 
   ~my_function() { std::cout << "my_function destructor" << std::endl; }
 };
 
-struct function2 : js::native_function_base {
-  void call(js::call_context &) {
+struct function2 : flusspferd::native_function_base {
+  void call(flusspferd::call_context &) {
     throw std::runtime_error("boom");
   }
 };
 
 int main() {
   //try {
-    js::init::initialize();
+    flusspferd::init::initialize();
 
-    js::context co = js::context::create();
-    js::current_context_scope scope(co);
+    flusspferd::context co = flusspferd::context::create();
+    flusspferd::current_context_scope scope(co);
 
-    js::value num(-1234567891234.5678);
+    flusspferd::value num(-1234567891234.5678);
     std::cout.precision(40);
     std::cout << num.to_number() << '\n';
     std::cout << num.to_integral_number(16, false) << '\n';
@@ -114,14 +112,14 @@ int main() {
     std::cout << num.to_integral_number(64, false) << '\n';
     std::cout << num.to_integral_number(64, true) << '\n' << std::endl;
 
-    std::cout << js::convert<long long>::from_value(num) << '\n';
-    std::cout << js::convert<unsigned short>::from_value(num) << '\n' << std::endl;
+    std::cout << flusspferd::convert<long long>::from_value(num) << '\n';
+    std::cout << flusspferd::convert<unsigned short>::from_value(num) << '\n' << std::endl;
 
-    //throw js::exception("bling");
+    //throw flusspferd::exception("bling");
 
     {
-      js::root_value v(js::object::create_native(new my_object));
-      js::object o = v.get_object();
+      flusspferd::root_value v(flusspferd::object::create_native(new my_object));
+      flusspferd::object o = v.get_object();
       co.gc();
       o.call("foo");
       co.gc();
@@ -132,43 +130,44 @@ int main() {
     co.gc();
     
     char const *source0 = "var hw = 'Hello World\\n';";
-    js::evaluate(source0, __FILE__, 0);
+    flusspferd::evaluate(source0, __FILE__, 0);
   
     char const *source1 = "hw";
-    js::root_value v(js::evaluate(source1, __FILE__, 1));
+    flusspferd::root_value v(flusspferd::evaluate(source1, __FILE__, 1));
 
     std::cout << v << '\n';
 
-    js::function x = js::function::create_native(new my_function);
+    flusspferd::function x = flusspferd::function::create_native(new my_function);
 
-    js::global().set_property("fun", x);
+    flusspferd::global().set_property("fun", x);
 
     char const *source2 = "fun(1.2, \"hallo\")";
-    v = js::evaluate(source2, __FILE__, 2);
+    v = flusspferd::evaluate(source2, __FILE__, 2);
 
     std::cout << v << "\n\n";
 
-    js::global().call("fun");
+    flusspferd::global().call("fun");
 
-    js::global().define_property("abc", js::value(), js::object::read_only_property, x);
+    flusspferd::global().define_property(
+      "abc", flusspferd::value(), flusspferd::object::read_only_property, x);
 
     char const *source3 = "abc";
-    v = js::evaluate(source3, __FILE__, 3);
+    v = flusspferd::evaluate(source3, __FILE__, 3);
 
     std::cout << v << "\n\n" << std::flush;
 
     char const *source4 = "abc = 5; fun(abc)";
-    js::evaluate(source4, __FILE__, 4);
+    flusspferd::evaluate(source4, __FILE__, 4);
 
-    js::global().delete_property("fun");
-    js::global().delete_property("abc");
+    flusspferd::global().delete_property("fun");
+    flusspferd::global().delete_property("abc");
 
     co.gc();
 
     std::cout << "---------" << std::endl;
 
-    x = js::function::create_native(new function2);
-    js::root_value f_x(x);
+    x = flusspferd::function::create_native(new function2);
+    flusspferd::root_value f_x(x);
 
     x.call();
   //}

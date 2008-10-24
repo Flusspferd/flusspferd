@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include "flusspferd/spidermonkey/runtime.hpp"
@@ -35,118 +36,116 @@ THE SOFTWARE.
 #define FLUSSPFERD_STACKCHUNKSIZE 8192
 #endif
 
-namespace flusspferd { namespace js {
-  namespace {
-    static JSClass global_class = {
-      "global", JSCLASS_GLOBAL_FLAGS,
-      JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
-      JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, JS_FinalizeStub,
-      JSCLASS_NO_OPTIONAL_MEMBERS
-    };
+using namespace flusspferd;
+
+namespace {
+  static JSClass global_class = {
+    "global", JSCLASS_GLOBAL_FLAGS,
+    JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
+    JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, JS_FinalizeStub,
+    JSCLASS_NO_OPTIONAL_MEMBERS
+  };
+}
+
+class context::impl {
+public:
+  impl()
+    : context(JS_NewContext(Impl::get_runtime(),
+                            FLUSSPFERD_STACKCHUNKSIZE)),
+      destroy(true)
+  {
+    if(!context)
+      throw exception("Could not create Spidermonkey Context");
+
+    JS_SetOptions(context, JSOPTION_VAROBJFIX);
+    JS_SetOptions(context, JSOPTION_DONT_REPORT_UNCAUGHT);
+
+    JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
+    if(!global_)
+      throw exception("Could not create Global Object");
+
+    JS_SetGlobalObject(context, global_);
+
+    if(!JS_InitStandardClasses(context, global_))
+      throw exception("Could not initialize Global Object");
   }
 
-  class context::impl {
-  public:
-    impl()
-      : context(JS_NewContext(Impl::get_runtime(),
-                              FLUSSPFERD_STACKCHUNKSIZE)),
-        destroy(true)
-    {
-      if(!context)
-        throw exception("Could not create Spidermonkey Context");
+  explicit impl(JSContext *context)
+    : context(context), destroy(false)
+  { }
 
-      JS_SetOptions(context, JSOPTION_VAROBJFIX);
-      JS_SetOptions(context, JSOPTION_DONT_REPORT_UNCAUGHT);
+  ~impl() {
+    if(destroy)
+      JS_DestroyContext(context);
+  }
 
-      JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
-      if(!global_)
-        throw exception("Could not create Global Object");
+  JSContext *context;
+  bool destroy;
+};
 
-      JS_SetGlobalObject(context, global_);
+struct context::detail {
+  JSContext *c;
+  detail(JSContext *ct) : c(ct) { }
 
-      if(!JS_InitStandardClasses(context, global_))
-        throw exception("Could not initialize Global Object");
-    }
-
-    explicit impl(JSContext *context)
-      : context(context), destroy(false)
-    { }
-
-    ~impl() {
-      if(destroy)
-        JS_DestroyContext(context);
-    }
-
-    JSContext *context;
-    bool destroy;
-  };
-
-  struct context::detail {
-    JSContext *c;
-    detail(JSContext *ct) : c(ct) { }
-
-    static JSContext *get(context &co) {
+  static JSContext *get(context &co) {
       return co.p->context;
-    }
-  };
-
-  namespace Impl {
-    JSContext *get_context(context &co) {
-      return context::detail::get(co);
-    }
-
-    context wrap_context(JSContext *c) {
-      return context(c);
-    }
   }
+};
 
-  context::context()
-  { }
-  context::context(context::detail const &d)
-    : p(new impl(d.c))
-  { }
-  context::~context() { }
+JSContext *Impl::get_context(context &co) {
+  return context::detail::get(co);
+}
 
-  context context::create() {
-    context c;
-    c.p.reset(new impl);
-    return c;
-  }
+context Impl::wrap_context(JSContext *c) {
+  return context(c);
+}
 
-  bool context::is_valid() const {
-    return p;
-  }
+context::context()
+{ }
+context::context(context::detail const &d)
+  : p(new impl(d.c))
+{ }
+context::~context() { }
 
-  object context::global() {
-    return Impl::wrap_object(JS_GetGlobalObject(p->context));
-  }
+context context::create() {
+  context c;
+  c.p.reset(new impl);
+  return c;
+}
 
-  value context::evaluate(char const *source, std::size_t n,
-                          char const *file, unsigned int line)
-  {
-    current_context_scope scope(*this);
-    jsval rval;
-    JSBool ok = JS_EvaluateScript(p->context, JS_GetGlobalObject(p->context),
+bool context::is_valid() const {
+  return p;
+}
+
+object context::global() {
+  return Impl::wrap_object(JS_GetGlobalObject(p->context));
+}
+
+value context::evaluate(char const *source, std::size_t n,
+                        char const *file, unsigned int line)
+{
+  current_context_scope scope(*this);
+  jsval rval;
+  JSBool ok = JS_EvaluateScript(p->context, JS_GetGlobalObject(p->context),
                                   source, n, file, line, &rval);
-    if(!ok) {
-      throw exception("Could not evaluate script");
-    }
-    return Impl::wrap_jsval(rval);
+  if(!ok) {
+    throw exception("Could not evaluate script");
   }
+  return Impl::wrap_jsval(rval);
+}
 
-  value context::evaluate(char const *source, char const *file,
-                          unsigned int line)
-  {
-    return evaluate(source, std::strlen(source), file, line);
-  }
+value context::evaluate(char const *source, char const *file,
+                        unsigned int line)
+{
+  return evaluate(source, std::strlen(source), file, line);
+}
 
-  value context::evaluate(std::string const &source, char const *file,
-                          unsigned int line)
-  {
-    return evaluate(source.data(), source.size(), file, line);
-  }
+value context::evaluate(std::string const &source, char const *file,
+                        unsigned int line)
+{
+  return evaluate(source.data(), source.size(), file, line);
+}
 
-  void context::gc() {
-    JS_GC(p->context);
-  }
-}}
+void context::gc() {
+  JS_GC(p->context);
+}

@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "implementation/value.hpp"
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class object;
   class string;
 
@@ -92,6 +92,6 @@ namespace flusspferd { namespace js {
     else
       return;
   }
-}}
+}
 
 #endif /* FLUSSPFERD_VALUE_HPP */

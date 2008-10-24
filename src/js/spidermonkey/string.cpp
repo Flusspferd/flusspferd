@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 #include <cstring>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 Impl::string_impl::string_impl(char const *s)
  : str(JS_NewStringCopyZ(Impl::current_context(), s))

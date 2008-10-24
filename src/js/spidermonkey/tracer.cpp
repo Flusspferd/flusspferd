@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/init.hpp"
 #include <js/jsapi.h>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 class tracer::impl {
 public:

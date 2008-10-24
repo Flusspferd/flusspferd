@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <boost/foreach.hpp>
 #include <js/jsapi.h>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 class native_function_base::impl {
 public:

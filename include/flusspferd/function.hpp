@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "object.hpp"
 #include "implementation/function.hpp"
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 class native_function_base;
 
@@ -60,6 +60,6 @@ public:
   string name() const;
 };
 
-}}
+}
 
 #endif /* FLUSSPFERD_FUNCTION_HPP */

@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <cassert>
 #include <cmath>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 value::~value() { }
 value::value() : Impl::value_impl(JSVAL_NULL) { }

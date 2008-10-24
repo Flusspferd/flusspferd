@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/init.hpp"
 #include <boost/unordered_map.hpp>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 class native_object_base::impl {
 public:
@@ -129,7 +129,7 @@ void native_object_base::add_native_method(std::string const &name, unsigned ari
       0);
 
   if (!func)
-    throw js::exception("Could not create native method " + name); 
+    throw exception("Could not create native method " + name); 
 }
 
 void native_object_base::add_native_method(
@@ -171,7 +171,7 @@ JSBool native_object_base::impl::call_helper(
     std::string name = "()";
 
     try {
-      name = js::function(x.function).name().to_string();
+      name = flusspferd::function(x.function).name().to_string();
     } catch (exception&) {}
 
     self->call_native_method(name, x);

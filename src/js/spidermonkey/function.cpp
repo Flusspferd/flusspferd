@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include <boost/scoped_array.hpp>
 #include <js/jsapi.h>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 function::function() { }
 

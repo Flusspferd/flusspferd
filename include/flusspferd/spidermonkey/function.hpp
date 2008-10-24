@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 typedef struct JSFunction JSFunction;
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 class object;
 
@@ -55,6 +55,6 @@ namespace Impl {
   inline function_impl wrap_function(JSFunction *f) {
     return function_impl(f);
   }
-}}}
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_FUNCTION_HPP */

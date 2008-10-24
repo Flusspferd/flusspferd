@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <limits>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 class value;
 
@@ -70,6 +70,6 @@ struct convert_arithmetic {
 template<typename T>
 struct convert : detail::convert<T>::type {};
 
-}}
+}
 
 #endif

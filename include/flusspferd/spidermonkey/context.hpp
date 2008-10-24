@@ -28,9 +28,9 @@ THE SOFTWARE.
 
 typedef struct JSContext JSContext;
 
-namespace flusspferd { namespace js { namespace Impl {
+namespace flusspferd { namespace Impl {
   JSContext *get_context(context &co);
   context wrap_context(JSContext *c);
-}}}
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP */

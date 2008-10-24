@@ -27,10 +27,12 @@ THE SOFTWARE.
 #include <flusspferd/init.hpp>
 #include <flusspferd/spidermonkey/context.hpp>
 
-namespace flusspferd { namespace js { namespace Impl {
+namespace flusspferd { namespace Impl {
   inline JSContext *current_context() {
     return get_context(get_current_context());
   }
-}}}
+
+  JSRuntime *get_runtime();
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_INIT_HPP */

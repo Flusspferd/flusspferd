@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/value.hpp"
 #include <js/jsapi.h>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 root_value::root_value(value const &o)
 : value(o), ctx(get_current_context())

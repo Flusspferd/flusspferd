@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include <js/jsapi.h>
 
-namespace flusspferd { namespace js { namespace Impl {
+namespace flusspferd { namespace Impl {
   class value_impl {
     jsval val;
     jsval *ref;
@@ -80,6 +80,6 @@ namespace flusspferd { namespace js { namespace Impl {
   inline value_impl wrap_jsvalp(jsval *p) {
     return value_impl(p);
   }
-}}}
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_VALUE_HPP */

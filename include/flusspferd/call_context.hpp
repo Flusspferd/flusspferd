@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "arguments.hpp"
 #include "value.hpp"
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 struct call_context {
   object self;
@@ -37,6 +37,6 @@ struct call_context {
   object function;
 };
 
-}}
+}
 
 #endif

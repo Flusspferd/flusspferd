@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "value.hpp"
 #include <vector>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class value;
 namespace Impl {
   class arguments_impl {
@@ -63,6 +63,6 @@ namespace Impl {
       jsval *operator*() const { return iter; }
     };
   };
-}}}
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP */

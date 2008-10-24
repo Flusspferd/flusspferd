@@ -27,12 +27,12 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/context.hpp"
 #include <js/jsapi.h>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 local_root_scope::local_root_scope()
 : ctx(get_current_context()) {
   if (!JS_EnterLocalRootScope(Impl::get_context(ctx)))
-    throw js::exception("Could not enter local GC root scope");
+    throw exception("Could not enter local GC root scope");
 }
 
 local_root_scope::~local_root_scope() {

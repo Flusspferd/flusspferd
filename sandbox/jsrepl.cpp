@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 //#include <js/jsapi.h> // DEBUG
 
-namespace js = flusspferd::js;
+namespace js = flusspferd;
 
 bool extfile = false;
 std::string file = __FILE__;

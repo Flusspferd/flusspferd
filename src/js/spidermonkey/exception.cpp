@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <boost/lexical_cast.hpp>
 #include <js/jsapi.h>
 
-using namespace flusspferd::js;
+using namespace flusspferd;
 
 namespace {
   std::string exception_message(std::string const &what) {
@@ -71,7 +71,7 @@ exception::exception(std::string const &what)
   } else {
     try {
       arguments arg(std::vector<value>(1));
-      js::root_value message((string(what)));
+      root_value message((string(what)));
       arg[0] = message;
       p->exception_value = global().call("Error", arg);
     } catch (...) { }

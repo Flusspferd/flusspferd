@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include <js/jspubtd.h>
 #include <boost/optional.hpp>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class context;
   class object_template;
   class object;
@@ -67,6 +67,6 @@ namespace Impl {
   inline object_impl wrap_object(JSObject *o) {
     return object_impl(o);
   }
-}}}
+}}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_OBJECT_HPP */

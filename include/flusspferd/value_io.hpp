@@ -28,10 +28,10 @@ THE SOFTWARE.
 #include <flusspferd/string_io.hpp>
 #include <ostream>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   inline std::ostream &operator<<(std::ostream &out, value const &v) {
     return out << v.to_string();
   }
-}}
+}
 
 #endif /* FLUSSPFERD_VALUE_IO_HPP */

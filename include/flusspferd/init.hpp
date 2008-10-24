@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class context;
   class object;
 
@@ -68,6 +68,6 @@ namespace flusspferd { namespace js {
   }
 
   object global();
-}}
+}
 
 #endif /* FLUSSPFERD_INIT_HPP */

@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "implementation/string.hpp"
 #include <string>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
   class value;
 
   typedef Impl::char16_t char16_t;
@@ -59,6 +59,6 @@ namespace flusspferd { namespace js {
 
   bool operator==(string const &lhs, string const &rhs);
   bool operator<(string const &lhs, string const &rhs);
-}}
+}
 
 #endif /* FLUSSPFERD_STRING_HPP */

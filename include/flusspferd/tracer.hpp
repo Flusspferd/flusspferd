@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include <boost/scoped_ptr.hpp>
 #include <string>
 
-namespace flusspferd { namespace js {
+namespace flusspferd {
 
 class context;
 class value;
@@ -49,6 +49,6 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
-}}
+}
 
 #endif
