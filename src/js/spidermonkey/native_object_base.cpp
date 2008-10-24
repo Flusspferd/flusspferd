@@ -21,19 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/native_object_base.hpp"
-#include "templar/js/tracer.hpp"
-#include "templar/js/object.hpp"
-#include "templar/js/string.hpp"
-#include "templar/js/call_context.hpp"
-#include "templar/js/root_value.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/function.hpp"
-#include "templar/js/current_context_scope.hpp"
-#include "templar/js/spidermonkey/init.hpp"
+#include "flusspferd/js/native_object_base.hpp"
+#include "flusspferd/js/tracer.hpp"
+#include "flusspferd/js/object.hpp"
+#include "flusspferd/js/string.hpp"
+#include "flusspferd/js/call_context.hpp"
+#include "flusspferd/js/root_value.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/function.hpp"
+#include "flusspferd/js/current_context_scope.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
 #include <boost/unordered_map.hpp>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 class native_object_base::impl {
 public:

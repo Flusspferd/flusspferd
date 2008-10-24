@@ -21,14 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/root_value.hpp"
-#include "templar/js/init.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/spidermonkey/context.hpp"
-#include "templar/js/spidermonkey/value.hpp"
+#include "flusspferd/js/root_value.hpp"
+#include "flusspferd/js/init.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/spidermonkey/context.hpp"
+#include "flusspferd/js/spidermonkey/value.hpp"
 #include <js/jsapi.h>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 root_value::root_value(value const &o)
 : value(o), ctx(get_current_context())

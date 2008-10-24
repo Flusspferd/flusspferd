@@ -21,20 +21,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_CALL_CONTEXT_HPP
-#define TEMPLAR_JS_CALL_CONTEXT_HPP
+#ifndef TEMPLAR_JS_TRACER_HPP
+#define TEMPLAR_JS_TRACER_HPP
 
-#include "object.hpp"
-#include "arguments.hpp"
-#include "value.hpp"
+#include <boost/scoped_ptr.hpp>
+#include <string>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
 
-struct call_context {
-  object self;
-  arguments arg;
-  value result;
-  object function;
+class context;
+class value;
+
+class tracer {
+public:
+  void operator()(char const *name, value const &val);
+
+  void operator()(std::string const &name, value const &val) {
+    operator()(name.c_str(), val);
+  }
+
+public: //internal
+  tracer(void *opaque);
+  ~tracer();
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }}

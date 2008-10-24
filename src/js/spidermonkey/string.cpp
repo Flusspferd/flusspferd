@@ -21,15 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/string.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/spidermonkey/init.hpp"
-#include "templar/js/spidermonkey/value.hpp"
-#include "templar/js/spidermonkey/context.hpp"
+#include "flusspferd/js/string.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
+#include "flusspferd/js/spidermonkey/value.hpp"
+#include "flusspferd/js/spidermonkey/context.hpp"
 #include <js/jsapi.h>
 #include <cstring>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 Impl::string_impl::string_impl(char const *s)
  : str(JS_NewStringCopyZ(Impl::current_context(), s))

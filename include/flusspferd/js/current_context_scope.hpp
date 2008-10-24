@@ -24,10 +24,10 @@ THE SOFTWARE.
 #ifndef TEMPLAR_JS_CURRENT_CONTEXT_SCOPE_HPP
 #define TEMPLAR_JS_CURRENT_CONTEXT_SCOPE_HPP
 
-#include "templar/js/init.hpp"
-#include "templar/js/context.hpp"
+#include "flusspferd/js/init.hpp"
+#include "flusspferd/js/context.hpp"
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   class context;
 
   class current_context_scope {

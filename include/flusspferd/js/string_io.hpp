@@ -24,10 +24,10 @@ THE SOFTWARE.
 #ifndef TEMPLAR_JS_STRING_IO_HPP
 #define TEMPLAR_JS_STRING_IO_HPP
 
-#include <templar/js/string.hpp>
+#include <flusspferd/js/string.hpp>
 #include <ostream>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   inline std::ostream &operator<<(std::ostream &out, string const &v) {
     return out << v.c_str();
   }

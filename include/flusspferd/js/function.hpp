@@ -21,29 +21,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_ROOT_VALUE_HPP
-#define TEMPLAR_JS_ROOT_VALUE_HPP
+#ifndef TEMPLAR_JS_FUNCTION_HPP
+#define TEMPLAR_JS_FUNCTION_HPP
 
-#include "value.hpp"
-#include "context.hpp"
-#include <boost/noncopyable.hpp>
+#include "object.hpp"
+#include "implementation/function.hpp"
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
 
-class root_value : public value, private boost::noncopyable {
+class native_function_base;
+
+class function : 
+  public Impl::function_impl,
+  public object
+{
 public:
-  root_value(value const &v);
-  ~root_value();
+  function();
 
-  root_value &operator=(value const &o) {
-    value::operator=(o);
-    return *this;
-  }
+  function(Impl::function_impl const &f)
+    : Impl::function_impl(f),
+      object(Impl::function_impl::get_object())
+  { }
 
-private:
-  context &ctx;
+  function(function const &o)
+    : Impl::function_impl(o),
+      object(Impl::function_impl::get_object())
+  { }
+
+  function(object const &o);
+
+  function(Impl::object_impl const &o);
+
+public:
+  static function create_native(native_function_base *);
+
+public:
+  std::size_t arity() const;
+  string name() const;
 };
 
 }}
 
-#endif
+#endif /* TEMPLAR_JS_FUNCTION_HPP */

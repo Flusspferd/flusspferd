@@ -21,18 +21,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/exception.hpp"
-#include "templar/js/string.hpp"
-#include "templar/js/root_value.hpp"
-#include "templar/js/arguments.hpp"
-#include "templar/js/object.hpp"
-#include "templar/js/spidermonkey/value.hpp"
-#include "templar/js/spidermonkey/init.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/string.hpp"
+#include "flusspferd/js/root_value.hpp"
+#include "flusspferd/js/arguments.hpp"
+#include "flusspferd/js/object.hpp"
+#include "flusspferd/js/spidermonkey/value.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <js/jsapi.h>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 namespace {
   std::string exception_message(std::string const &what) {

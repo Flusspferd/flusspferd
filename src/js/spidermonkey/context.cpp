@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/context.hpp"
-#include "templar/js/object.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/spidermonkey/value.hpp"
-#include "templar/js/spidermonkey/object.hpp"
-#include "templar/js/spidermonkey/runtime.hpp"
-#include "templar/js/current_context_scope.hpp"
+#include "flusspferd/js/context.hpp"
+#include "flusspferd/js/object.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/spidermonkey/value.hpp"
+#include "flusspferd/js/spidermonkey/object.hpp"
+#include "flusspferd/js/spidermonkey/runtime.hpp"
+#include "flusspferd/js/current_context_scope.hpp"
 
 #include <js/jsapi.h>
 
@@ -35,7 +35,7 @@ THE SOFTWARE.
 #define TEMPLAR_JS_STACKCHUNKSIZE 8192
 #endif
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   namespace {
     static JSClass global_class = {
       "global", JSCLASS_GLOBAL_FLAGS,

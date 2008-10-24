@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/init.hpp"
-#include "templar/js/value.hpp"
-#include "templar/js/object.hpp"
-#include "templar/js/context.hpp"
-#include "templar/js/value_io.hpp"
-#include "templar/js/evaluate.hpp"
-#include "templar/js/current_context_scope.hpp"
+#include "flusspferd/js/init.hpp"
+#include "flusspferd/js/value.hpp"
+#include "flusspferd/js/object.hpp"
+#include "flusspferd/js/context.hpp"
+#include "flusspferd/js/value_io.hpp"
+#include "flusspferd/js/evaluate.hpp"
+#include "flusspferd/js/current_context_scope.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -35,7 +35,7 @@ THE SOFTWARE.
 
 //#include <js/jsapi.h> // DEBUG
 
-namespace js = templar::js;
+namespace js = flusspferd::js;
 
 bool extfile = false;
 std::string file = __FILE__;

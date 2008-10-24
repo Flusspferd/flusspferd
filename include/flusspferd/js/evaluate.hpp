@@ -24,10 +24,10 @@ THE SOFTWARE.
 #ifndef TEMPLAR_JS_EVALUATE_HPP
 #define TEMPLAR_JS_EVALUATE_HPP
 
-#include <templar/js/init.hpp>
-#include <templar/js/context.hpp>
+#include <flusspferd/js/init.hpp>
+#include <flusspferd/js/context.hpp>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   inline value evaluate(char const *source, std::size_t n,
                         char const *file = 0x0, unsigned int line = 0)
   {

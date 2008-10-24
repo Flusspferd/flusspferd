@@ -21,19 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/native_function_base.hpp"
-#include "templar/js/call_context.hpp"
-#include "templar/js/local_root_scope.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/arguments.hpp"
-#include "templar/js/spidermonkey/init.hpp"
-#include "templar/js/spidermonkey/context.hpp"
-#include "templar/js/spidermonkey/function.hpp"
-#include "templar/js/current_context_scope.hpp"
+#include "flusspferd/js/native_function_base.hpp"
+#include "flusspferd/js/call_context.hpp"
+#include "flusspferd/js/local_root_scope.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/arguments.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
+#include "flusspferd/js/spidermonkey/context.hpp"
+#include "flusspferd/js/spidermonkey/function.hpp"
+#include "flusspferd/js/current_context_scope.hpp"
 #include <boost/foreach.hpp>
 #include <js/jsapi.h>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 class native_function_base::impl {
 public:

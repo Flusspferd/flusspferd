@@ -21,11 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/tracer.hpp"
-#include "templar/js/spidermonkey/init.hpp"
+#include "flusspferd/js/tracer.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
 #include <js/jsapi.h>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 class tracer::impl {
 public:

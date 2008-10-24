@@ -21,23 +21,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/convert.hpp"
-#include "templar/js/native_function_base.hpp"
-#include "templar/js/native_object_base.hpp"
-#include "templar/js/call_context.hpp"
-#include "templar/js/init.hpp"
-#include "templar/js/root_value.hpp"
-#include "templar/js/context.hpp"
-#include "templar/js/value_io.hpp"
-#include "templar/js/evaluate.hpp"
-#include "templar/js/arguments.hpp"
-#include "templar/js/current_context_scope.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/tracer.hpp"
+#include "flusspferd/js/convert.hpp"
+#include "flusspferd/js/native_function_base.hpp"
+#include "flusspferd/js/native_object_base.hpp"
+#include "flusspferd/js/call_context.hpp"
+#include "flusspferd/js/init.hpp"
+#include "flusspferd/js/root_value.hpp"
+#include "flusspferd/js/context.hpp"
+#include "flusspferd/js/value_io.hpp"
+#include "flusspferd/js/evaluate.hpp"
+#include "flusspferd/js/arguments.hpp"
+#include "flusspferd/js/current_context_scope.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/tracer.hpp"
 #include <iostream>
 #include <stdexcept>
 
-namespace js = templar::js;
+namespace js = flusspferd::js;
 
 struct my_object : js::native_object_base {
   my_object() { std::cout << "my_object construct" << std::endl; }

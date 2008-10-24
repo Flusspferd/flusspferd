@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <boost/noncopyable.hpp>
 #include <memory>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
 
 struct call_context;
 class tracer;

@@ -21,43 +21,53 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_SPIDERMONKEY_STRING_HPP
-#define TEMPLAR_JS_SPIDERMONKEY_STRING_HPP
+#ifndef TEMPLAR_JS_INIT_HPP
+#define TEMPLAR_JS_INIT_HPP
 
-#include <js/jsapi.h>
-#include <cstddef>
+#include "flusspferd/js/context.hpp"
+#include <boost/noncopyable.hpp>
+#include <boost/scoped_ptr.hpp>
 
-namespace templar { namespace js {
-  class value;
+namespace flusspferd { namespace js {
+  class context;
+  class object;
 
-namespace Impl {
-  typedef jschar char16_t;
+  class init : boost::noncopyable {
+    init();
+    ~init();
 
-  class string_impl {
-    JSString *str;
+    class impl;
+    boost::scoped_ptr<impl> p;
 
-  protected:
-    JSString *get()       { return str; }
-    void set(JSString *s) { str = s; }
+  public:
+    struct detail;
+    friend struct init::detail;
 
-    string_impl() : str(0x0) { }
-    string_impl(JSString *s) : str(s) { }
-    string_impl(char const *s);
-    string_impl(char const *s, std::size_t n);
-    string_impl(value const &v);
+    // returns pointer to old context or null
+    context enter_current_context(context const &c);
+    // returns true if c was current context
+    bool leave_current_context(context const &c);
+    context &get_current_context();
 
-    friend JSString *get_string(string_impl &s);
-    friend string_impl wrap_string(JSString *s);
+    static init &initialize() {
+      static init in;
+      return in;
+    }
   };
 
-  inline JSString *get_string(string_impl &s) {
-    return s.get();
+  inline context enter_current_context(context const &c) {
+    return init::initialize().enter_current_context(c);
   }
 
-  inline string_impl wrap_string(JSString *s) {
-    return string_impl(s);
+  inline bool leave_current_context(context const &c) {
+    return init::initialize().leave_current_context(c);
   }
 
-}}}
+  inline context &get_current_context() {
+    return init::initialize().get_current_context();
+  }
 
-#endif /* TEMPLAR_JS_SPIDERMONKEY_STRING_HPP */
+  object global();
+}}
+
+#endif /* TEMPLAR_JS_INIT_HPP */

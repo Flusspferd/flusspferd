@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "implementation/value.hpp"
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   class object;
   class string;
 

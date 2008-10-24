@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/local_root_scope.hpp"
-#include "templar/js/init.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/spidermonkey/context.hpp"
+#include "flusspferd/js/local_root_scope.hpp"
+#include "flusspferd/js/init.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/spidermonkey/context.hpp"
 #include <js/jsapi.h>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 local_root_scope::local_root_scope()
 : ctx(get_current_context()) {

@@ -21,40 +21,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_SPIDERMONKEY_FUNCTION_HPP
-#define TEMPLAR_JS_SPIDERMONKEY_FUNCTION_HPP
+#ifndef TEMPLAR_JS_SPIDERMONKEY_OBJECT_HPP
+#define TEMPLAR_JS_SPIDERMONKEY_OBJECT_HPP
 
-typedef struct JSFunction JSFunction;
+#include <js/jspubtd.h>
+#include <boost/optional.hpp>
 
-namespace templar { namespace js {
-
-class object;
+namespace flusspferd { namespace js {
+  class context;
+  class object_template;
+  class object;
 
 namespace Impl {
-  class function_impl {
-    JSFunction *func;
+  class object_impl {
+    JSObject *obj;
 
   protected:
-    JSFunction *get() { return func; }
-    JSFunction *get_const() const { return func; }
-    void set(JSFunction *f) { func = f; }
+    JSObject *get() { return obj; }
+    JSObject *get_const() const { return obj; }
+    void set(JSObject *o) { obj = o; }
 
-    function_impl() : func(0x0) { }
-    function_impl(JSFunction *f) : func(f) { }
+    object_impl(JSObject *o) : obj(o) { }
 
-    object get_object();
+    class property_iterator_impl {
+      JSObject *iter;
+      jsid id;
+    public:
+      property_iterator_impl() : iter(0x0) { }
+      property_iterator_impl(JSObject *i) : iter(i) { ++*this; }
 
-    friend JSFunction *get_function(function_impl &f);
-    friend function_impl wrap_function(JSFunction *f);
+      jsid get_id() const { return id; }
+      JSObject *get() { return iter; }
+      JSObject *get_const() const { return iter; }
+      property_iterator_impl &operator++();
+    };
+
+    friend JSObject *get_object(object_impl &o);
+    friend object_impl wrap_object(JSObject *o);
   };
 
-  inline JSFunction *get_function(function_impl &f) {
-    return f.get();
+  inline JSObject *get_object(object_impl &o) {
+    return o.get();
   }
-
-  inline function_impl wrap_function(JSFunction *f) {
-    return function_impl(f);
+  
+  inline object_impl wrap_object(JSObject *o) {
+    return object_impl(o);
   }
 }}}
 
-#endif /* TEMPLAR_JS_SPIDERMONKEY_FUNCTION_HPP */
+#endif /* TEMPLAR_JS_SPIDERMONKEY_OBJECT_HPP */

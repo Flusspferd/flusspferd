@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <string>
 #include <memory>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   class value;
   class context;
   class function;

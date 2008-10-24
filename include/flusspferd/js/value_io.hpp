@@ -21,45 +21,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_FUNCTION_HPP
-#define TEMPLAR_JS_FUNCTION_HPP
+#ifndef TEMPLAR_JS_VALUE_IO_HPP
+#define TEMPLAR_JS_VALUE_IO_HPP
 
-#include "object.hpp"
-#include "implementation/function.hpp"
+#include <flusspferd/js/value.hpp>
+#include <flusspferd/js/string_io.hpp>
+#include <ostream>
 
-namespace templar { namespace js {
-
-class native_function_base;
-
-class function : 
-  public Impl::function_impl,
-  public object
-{
-public:
-  function();
-
-  function(Impl::function_impl const &f)
-    : Impl::function_impl(f),
-      object(Impl::function_impl::get_object())
-  { }
-
-  function(function const &o)
-    : Impl::function_impl(o),
-      object(Impl::function_impl::get_object())
-  { }
-
-  function(object const &o);
-
-  function(Impl::object_impl const &o);
-
-public:
-  static function create_native(native_function_base *);
-
-public:
-  std::size_t arity() const;
-  string name() const;
-};
-
+namespace flusspferd { namespace js {
+  inline std::ostream &operator<<(std::ostream &out, value const &v) {
+    return out << v.to_string();
+  }
 }}
 
-#endif /* TEMPLAR_JS_FUNCTION_HPP */
+#endif /* TEMPLAR_JS_VALUE_IO_HPP */

@@ -21,53 +21,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_INIT_HPP
-#define TEMPLAR_JS_INIT_HPP
+#ifndef TEMPLAR_JS_ROOT_VALUE_HPP
+#define TEMPLAR_JS_ROOT_VALUE_HPP
 
-#include "templar/js/context.hpp"
+#include "value.hpp"
+#include "context.hpp"
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_ptr.hpp>
 
-namespace templar { namespace js {
-  class context;
-  class object;
+namespace flusspferd { namespace js {
 
-  class init : boost::noncopyable {
-    init();
-    ~init();
+class root_value : public value, private boost::noncopyable {
+public:
+  root_value(value const &v);
+  ~root_value();
 
-    class impl;
-    boost::scoped_ptr<impl> p;
-
-  public:
-    struct detail;
-    friend struct init::detail;
-
-    // returns pointer to old context or null
-    context enter_current_context(context const &c);
-    // returns true if c was current context
-    bool leave_current_context(context const &c);
-    context &get_current_context();
-
-    static init &initialize() {
-      static init in;
-      return in;
-    }
-  };
-
-  inline context enter_current_context(context const &c) {
-    return init::initialize().enter_current_context(c);
+  root_value &operator=(value const &o) {
+    value::operator=(o);
+    return *this;
   }
 
-  inline bool leave_current_context(context const &c) {
-    return init::initialize().leave_current_context(c);
-  }
+private:
+  context &ctx;
+};
 
-  inline context &get_current_context() {
-    return init::initialize().get_current_context();
-  }
-
-  object global();
 }}
 
-#endif /* TEMPLAR_JS_INIT_HPP */
+#endif

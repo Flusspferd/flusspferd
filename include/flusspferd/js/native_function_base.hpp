@@ -21,32 +21,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_TRACER_HPP
-#define TEMPLAR_JS_TRACER_HPP
+#ifndef TEMPLAR_JS_NATIVE_FUNCTION_BASE_HPP
+#define TEMPLAR_JS_NATIVE_FUNCTION_BASE_HPP
 
+#include "init.hpp"
+#include "function.hpp"
 #include <boost/scoped_ptr.hpp>
+#include <boost/noncopyable.hpp>
 #include <string>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
 
-class context;
-class value;
+struct call_context;
 
-class tracer {
+class native_function_base : boost::noncopyable {
 public:
-  void operator()(char const *name, value const &val);
+  native_function_base(unsigned arity = 0);
+  native_function_base(unsigned arity, std::string const &name);
+  virtual ~native_function_base();
 
-  void operator()(std::string const &name, value const &val) {
-    operator()(name.c_str(), val);
-  }
+  void set_name(std::string const &name);
+  std::string const &get_name() const;
 
-public: //internal
-  tracer(void *opaque);
-  ~tracer();
+  void set_arity(unsigned arity);
+  unsigned get_arity() const;
+
+protected:
+  virtual void call(call_context &) = 0;
+
+private:
+  function create_function();
+
+  friend class function;
 
 private:
   class impl;
   boost::scoped_ptr<impl> p;
+
+  friend class impl;
 };
 
 }}

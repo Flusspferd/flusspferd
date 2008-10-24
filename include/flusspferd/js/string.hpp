@@ -21,46 +21,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_NATIVE_FUNCTION_BASE_HPP
-#define TEMPLAR_JS_NATIVE_FUNCTION_BASE_HPP
+#ifndef TEMPLAR_JS_STRING_HPP
+#define TEMPLAR_JS_STRING_HPP
 
-#include "init.hpp"
-#include "function.hpp"
-#include <boost/scoped_ptr.hpp>
-#include <boost/noncopyable.hpp>
+#include "implementation/string.hpp"
 #include <string>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
+  class value;
 
-struct call_context;
+  typedef Impl::char16_t char16_t;
 
-class native_function_base : boost::noncopyable {
-public:
-  native_function_base(unsigned arity = 0);
-  native_function_base(unsigned arity, std::string const &name);
-  virtual ~native_function_base();
+  class string : public Impl::string_impl {
+  public:
+    string();
+    string(string const &o);
+    string(char const *s);
+    string(value const &v);
+    string(std::string const &s);
+    string(Impl::string_impl const &s)
+      : Impl::string_impl(s)
+    { }
 
-  void set_name(std::string const &name);
-  std::string const &get_name() const;
+    ~string();
 
-  void set_arity(unsigned arity);
-  unsigned get_arity() const;
+    string &operator=(string const &o);
 
-protected:
-  virtual void call(call_context &) = 0;
+    std::size_t length() const;
 
-private:
-  function create_function();
+    std::string to_string() const;
+    char const *c_str() const;
 
-  friend class function;
+    std::basic_string<char16_t> to_utf16_string() const;
 
-private:
-  class impl;
-  boost::scoped_ptr<impl> p;
+    string substr(size_t start, size_t length);
+  };
 
-  friend class impl;
-};
-
+  bool operator==(string const &lhs, string const &rhs);
+  bool operator<(string const &lhs, string const &rhs);
 }}
 
-#endif
+#endif /* TEMPLAR_JS_STRING_HPP */

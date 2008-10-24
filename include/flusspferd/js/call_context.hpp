@@ -21,54 +21,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_CONVERT_HPP
-#define TEMPLAR_JS_CONVERT_HPP
+#ifndef TEMPLAR_JS_CALL_CONTEXT_HPP
+#define TEMPLAR_JS_CALL_CONTEXT_HPP
 
+#include "object.hpp"
+#include "arguments.hpp"
 #include "value.hpp"
-#include <boost/mpl/eval_if.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <limits>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
 
-class value;
-
-namespace detail {
-
-template<typename T>
-struct convert_arithmetic;
-
-template<typename T>
-struct convert {
-  typedef typename boost::mpl::eval_if<
-      boost::is_arithmetic<T>,
-      typename convert_arithmetic<T>::type,
-      int
-    >::type type;
+struct call_context {
+  object self;
+  arguments arg;
+  value result;
+  object function;
 };
-
-template<typename T>
-struct convert_arithmetic {
-  typedef convert_arithmetic<T> type;
-
-  typedef std::numeric_limits<T> limits;
-
-  static value to_value(T const &x) {
-    return value(x);
-  };
-
-  static T from_value(value const &v) {
-    if (limits::is_integer)
-      return v.to_integral_number(limits::digits, limits::is_signed);
-    else
-      return v.to_number();
-  }
-};
-
-}
-
-template<typename T>
-struct convert : detail::convert<T>::type {};
 
 }}
 

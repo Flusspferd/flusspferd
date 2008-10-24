@@ -21,21 +21,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/object.hpp"
-#include "templar/js/function.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/local_root_scope.hpp"
-#include "templar/js/root_value.hpp"
-#include "templar/js/arguments.hpp"
-#include "templar/js/string.hpp"
-#include "templar/js/native_object_base.hpp"
-#include "templar/js/spidermonkey/init.hpp"
-#include "templar/js/spidermonkey/value.hpp"
-#include "templar/js/spidermonkey/object.hpp"
+#include "flusspferd/js/object.hpp"
+#include "flusspferd/js/function.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/local_root_scope.hpp"
+#include "flusspferd/js/root_value.hpp"
+#include "flusspferd/js/arguments.hpp"
+#include "flusspferd/js/string.hpp"
+#include "flusspferd/js/native_object_base.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
+#include "flusspferd/js/spidermonkey/value.hpp"
+#include "flusspferd/js/spidermonkey/object.hpp"
 #include <cassert>
 #include <js/jsapi.h>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   object::object() : Impl::object_impl(0) { }
   object::~object() { }
 

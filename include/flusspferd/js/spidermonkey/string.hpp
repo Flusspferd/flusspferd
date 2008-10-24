@@ -21,52 +21,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_SPIDERMONKEY_OBJECT_HPP
-#define TEMPLAR_JS_SPIDERMONKEY_OBJECT_HPP
+#ifndef TEMPLAR_JS_SPIDERMONKEY_STRING_HPP
+#define TEMPLAR_JS_SPIDERMONKEY_STRING_HPP
 
-#include <js/jspubtd.h>
-#include <boost/optional.hpp>
+#include <js/jsapi.h>
+#include <cstddef>
 
-namespace templar { namespace js {
-  class context;
-  class object_template;
-  class object;
+namespace flusspferd { namespace js {
+  class value;
 
 namespace Impl {
-  class object_impl {
-    JSObject *obj;
+  typedef jschar char16_t;
+
+  class string_impl {
+    JSString *str;
 
   protected:
-    JSObject *get() { return obj; }
-    JSObject *get_const() const { return obj; }
-    void set(JSObject *o) { obj = o; }
+    JSString *get()       { return str; }
+    void set(JSString *s) { str = s; }
 
-    object_impl(JSObject *o) : obj(o) { }
+    string_impl() : str(0x0) { }
+    string_impl(JSString *s) : str(s) { }
+    string_impl(char const *s);
+    string_impl(char const *s, std::size_t n);
+    string_impl(value const &v);
 
-    class property_iterator_impl {
-      JSObject *iter;
-      jsid id;
-    public:
-      property_iterator_impl() : iter(0x0) { }
-      property_iterator_impl(JSObject *i) : iter(i) { ++*this; }
-
-      jsid get_id() const { return id; }
-      JSObject *get() { return iter; }
-      JSObject *get_const() const { return iter; }
-      property_iterator_impl &operator++();
-    };
-
-    friend JSObject *get_object(object_impl &o);
-    friend object_impl wrap_object(JSObject *o);
+    friend JSString *get_string(string_impl &s);
+    friend string_impl wrap_string(JSString *s);
   };
 
-  inline JSObject *get_object(object_impl &o) {
-    return o.get();
+  inline JSString *get_string(string_impl &s) {
+    return s.get();
   }
-  
-  inline object_impl wrap_object(JSObject *o) {
-    return object_impl(o);
+
+  inline string_impl wrap_string(JSString *s) {
+    return string_impl(s);
   }
+
 }}}
 
-#endif /* TEMPLAR_JS_SPIDERMONKEY_OBJECT_HPP */
+#endif /* TEMPLAR_JS_SPIDERMONKEY_STRING_HPP */

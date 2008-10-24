@@ -21,50 +21,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_CONTEXT_HPP
-#define TEMPLAR_JS_CONTEXT_HPP
+#ifndef TEMPLAR_JS_EXCEPTION_HPP
+#define TEMPLAR_JS_EXCEPTION_HPP
 
-#include <templar/js/value.hpp>
 #include <boost/shared_ptr.hpp>
+#include <stdexcept>
 
-namespace templar { namespace js {
-  class object;
-
-  class context {
-    class impl;
-    boost::shared_ptr<impl> p;
-
+namespace flusspferd { namespace js {
+  class exception : public std::runtime_error {
   public:
-    struct detail;
-    friend struct detail;
+    exception(std::string const &what);
+    ~exception() throw();
 
-    context();
-    context(detail const&);
-    ~context();
+    void throw_js();
 
-    bool is_valid() const;
-
-    bool operator==(context const &o) const {
-      return p == o.p;
-    }
-
-    static context create();
-
-    object global();
-
-    value evaluate(char const *source, std::size_t n,
-                   char const *file = 0x0, unsigned int line = 0);
-    value evaluate(char const *source, char const *file = 0x0,
-                   unsigned int line = 0);
-    value evaluate(std::string const &source, char const *file = 0x0,
-                   unsigned int line = 0);
-
-    void gc();
+  private:
+    class impl;
+    boost::shared_ptr<impl const> p;
   };
-
-  inline bool operator!=(context const &a, context const &b) {
-    return !(a == b);
-  }
 }}
 
-#endif /* TEMPLAR_JS_CONTEXT_HPP */
+#define TEMPLAR_JS_CALLBACK_BEGIN try
+
+#define TEMPLAR_JS_CALLBACK_END \
+    catch (::flusspferd::js::exception &e) { \
+      e.throw_js(); \
+      return JS_FALSE; \
+    } catch (::std::exception &e) { \
+      ::flusspferd::js::exception x(e.what()); \
+      x.throw_js(); \
+      return JS_FALSE; \
+    } \
+    return JS_TRUE
+
+#endif /* TEMPLAR_JS_EXCEPTION_HPP */

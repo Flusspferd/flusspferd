@@ -24,11 +24,11 @@ THE SOFTWARE.
 #ifndef TEMPLAR_JS_SPIDERMONKEY_CONTEXT_HPP
 #define TEMPLAR_JS_SPIDERMONKEY_CONTEXT_HPP
 
-#include <templar/js/context.hpp>
+#include <flusspferd/js/context.hpp>
 
 typedef struct JSContext JSContext;
 
-namespace templar { namespace js { namespace Impl {
+namespace flusspferd { namespace js { namespace Impl {
   JSContext *get_context(context &co);
   context wrap_context(JSContext *c);
 }}}

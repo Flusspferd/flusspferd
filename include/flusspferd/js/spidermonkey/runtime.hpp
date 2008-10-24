@@ -21,17 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_VALUE_IO_HPP
-#define TEMPLAR_JS_VALUE_IO_HPP
+#ifndef TEMPLAR_JS_SPIDERMONKEY_RUNTIME_HPP
+#define TEMPLAR_JS_SPIDERMONKEY_RUNTIME_HPP
 
-#include <templar/js/value.hpp>
-#include <templar/js/string_io.hpp>
-#include <ostream>
+typedef struct JSRuntime JSRuntime;
 
-namespace templar { namespace js {
-  inline std::ostream &operator<<(std::ostream &out, value const &v) {
-    return out << v.to_string();
-  }
-}}
+namespace flusspferd { namespace js { namespace Impl {
+  JSRuntime *get_runtime();
+}}}
 
-#endif /* TEMPLAR_JS_VALUE_IO_HPP */
+#endif /* TEMPLAR_JS_SPIDERMONKEY_RUNTIME_HPP */

@@ -21,48 +21,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_SPIDERMONKEY_ARGUMETNS_HPP
-#define TEMPLAR_JS_SPIDERMONKEY_ARGUMETNS_HPP
+#ifndef TEMPLAR_JS_ARGUMENTS_HPP
+#define TEMPLAR_JS_ARGUMENTS_HPP
 
-#include "value.hpp"
+#include "implementation/arguments.hpp"
 #include <vector>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   class value;
-namespace Impl {
-  class arguments_impl {
-    std::vector<jsval> values; // values from the user are added here
-    std::size_t n;
-    jsval *argv;
 
+  class arguments : public Impl::arguments_impl {
   public:
-    jsval const *get() const { return argv; }
-    jsval *get() { return argv; }
-    std::size_t size() const { return n; }
+    arguments() {}
+    arguments(Impl::arguments_impl const &a)
+      : Impl::arguments_impl(a)
+    { }
+    arguments(std::vector<value> const &v);
 
-    std::vector<jsval> &data() { return values; }
-    std::vector<jsval> const &data() const { return values; }
-    void reset_argv();
+    std::size_t size() const;
+    value operator[](std::size_t i);
 
-    bool is_userprovided() const { return values.size(); }
+    void push_back(value const &v);
+    value front();
+    value back();
 
-    arguments_impl() : n(0), argv(0) {}
-    arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
-    arguments_impl(std::vector<value> const &o);
-    arguments_impl(arguments_impl const &o);
-    arguments_impl &operator=(arguments_impl const &o);
-
-    class iterator_impl {
-      jsval *iter;
+    class iterator : public Impl::arguments_impl::iterator_impl {
     public:
-      iterator_impl(jsval *iter) : iter(iter) { }
-      iterator_impl &operator++() {
-        ++iter;
-        return *this;
-      }
-      jsval *operator*() const { return iter; }
-    };
-  };
-}}}
+      iterator(Impl::arguments_impl::iterator_impl const &i)
+        : Impl::arguments_impl::iterator_impl(i)
+      { }
 
-#endif /* TEMPLAR_JS_SPIDERMONKEY_ARGUMETNS_HPP */
+      iterator &operator++();
+      iterator operator++(int) {
+        iterator tmp(*this);
+        ++*this;
+        return tmp;
+      }
+
+      value operator*() const;
+    };
+
+    iterator begin();
+    iterator end();
+  };
+
+  bool operator!=(arguments::iterator const &lhs,
+                  arguments::iterator const &rhs);
+  inline bool operator==(arguments::iterator const &lhs,
+                         arguments::iterator const &rhs)
+  {
+    return !(lhs != rhs);
+  }
+}}
+
+#endif /* TEMPLAR_JS_ARGUMENTS_HPP */

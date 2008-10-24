@@ -21,17 +21,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/init.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/context.hpp"
-#include "templar/js/object.hpp"
+#include "flusspferd/js/init.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/context.hpp"
+#include "flusspferd/js/object.hpp"
 #include <js/jsapi.h>
 
 #ifndef TEMPLAR_JS_MAX_BYTES
 #define TEMPLAR_JS_MAX_BYTES 8L * 1024L * 1024L // 8 MB TODO: too much?
 #endif
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   class init::impl {
   public:
     // we use a single JS_Runtime for each process!

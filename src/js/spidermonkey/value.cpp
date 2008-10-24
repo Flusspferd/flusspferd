@@ -21,18 +21,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/value.hpp"
-#include "templar/js/object.hpp"
-#include "templar/js/string.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/spidermonkey/init.hpp"
-#include "templar/js/spidermonkey/object.hpp"
-#include "templar/js/spidermonkey/string.hpp"
+#include "flusspferd/js/value.hpp"
+#include "flusspferd/js/object.hpp"
+#include "flusspferd/js/string.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/spidermonkey/init.hpp"
+#include "flusspferd/js/spidermonkey/object.hpp"
+#include "flusspferd/js/spidermonkey/string.hpp"
 #include <js/jsapi.h>
 #include <cassert>
 #include <cmath>
 
-using namespace templar::js;
+using namespace flusspferd::js;
 
 value::~value() { }
 value::value() : Impl::value_impl(JSVAL_NULL) { }

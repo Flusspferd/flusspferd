@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include <js/jsapi.h>
 
-namespace templar { namespace js { namespace Impl {
+namespace flusspferd { namespace js { namespace Impl {
   class value_impl {
     jsval val;
     jsval *ref;

@@ -21,16 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "templar/js/arguments.hpp"
-#include "templar/js/exception.hpp"
-#include "templar/js/value.hpp"
+#include "flusspferd/js/arguments.hpp"
+#include "flusspferd/js/exception.hpp"
+#include "flusspferd/js/value.hpp"
 #include <boost/foreach.hpp>
 #include <cassert>
 #include <js/jsapi.h>
 
 #define foreach BOOST_FOREACH
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js {
   namespace Impl {
     arguments_impl::arguments_impl(std::vector<value> const &vals)
       : n(vals.size())

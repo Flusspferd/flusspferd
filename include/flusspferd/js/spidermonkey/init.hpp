@@ -21,24 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_LOCAL_ROOT_SCOPE_HPP
-#define TEMPLAR_JS_LOCAL_ROOT_SCOPE_HPP
+#ifndef TEMPLAR_JS_SPIDERMONKEY_INIT_HPP
+#define TEMPLAR_JS_SPIDERMONKEY_INIT_HPP
 
-#include "context.hpp"
+#include <flusspferd/js/init.hpp>
+#include <flusspferd/js/spidermonkey/context.hpp>
 
-namespace templar { namespace js {
+namespace flusspferd { namespace js { namespace Impl {
+  inline JSContext *current_context() {
+    return get_context(get_current_context());
+  }
+}}}
 
-class local_root_scope {
-public:
-  local_root_scope();
-  ~local_root_scope();
-
-  // void forget(???);
-
-private:
-  context &ctx;
-};
-
-}}
-
-#endif
+#endif /* TEMPLAR_JS_SPIDERMONKEY_INIT_HPP */

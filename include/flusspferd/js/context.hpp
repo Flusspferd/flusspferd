@@ -21,44 +21,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef TEMPLAR_JS_STRING_HPP
-#define TEMPLAR_JS_STRING_HPP
+#ifndef TEMPLAR_JS_CONTEXT_HPP
+#define TEMPLAR_JS_CONTEXT_HPP
 
-#include "implementation/string.hpp"
-#include <string>
+#include <flusspferd/js/value.hpp>
+#include <boost/shared_ptr.hpp>
 
-namespace templar { namespace js {
-  class value;
+namespace flusspferd { namespace js {
+  class object;
 
-  typedef Impl::char16_t char16_t;
+  class context {
+    class impl;
+    boost::shared_ptr<impl> p;
 
-  class string : public Impl::string_impl {
   public:
-    string();
-    string(string const &o);
-    string(char const *s);
-    string(value const &v);
-    string(std::string const &s);
-    string(Impl::string_impl const &s)
-      : Impl::string_impl(s)
-    { }
+    struct detail;
+    friend struct detail;
 
-    ~string();
+    context();
+    context(detail const&);
+    ~context();
 
-    string &operator=(string const &o);
+    bool is_valid() const;
 
-    std::size_t length() const;
+    bool operator==(context const &o) const {
+      return p == o.p;
+    }
 
-    std::string to_string() const;
-    char const *c_str() const;
+    static context create();
 
-    std::basic_string<char16_t> to_utf16_string() const;
+    object global();
 
-    string substr(size_t start, size_t length);
+    value evaluate(char const *source, std::size_t n,
+                   char const *file = 0x0, unsigned int line = 0);
+    value evaluate(char const *source, char const *file = 0x0,
+                   unsigned int line = 0);
+    value evaluate(std::string const &source, char const *file = 0x0,
+                   unsigned int line = 0);
+
+    void gc();
   };
 
-  bool operator==(string const &lhs, string const &rhs);
-  bool operator<(string const &lhs, string const &rhs);
+  inline bool operator!=(context const &a, context const &b) {
+    return !(a == b);
+  }
 }}
 
-#endif /* TEMPLAR_JS_STRING_HPP */
+#endif /* TEMPLAR_JS_CONTEXT_HPP */
