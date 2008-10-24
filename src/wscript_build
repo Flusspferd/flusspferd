@@ -8,7 +8,7 @@ if darwin:
     libtype = 'shlib'
 
 obj = bld.new_task_gen('cxx', libtype)
-obj.find_sources_in_dirs('. js js/spidermonkey')
+obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
 obj.uselib = 'JS BOOST'
 obj.target = 'templar'
