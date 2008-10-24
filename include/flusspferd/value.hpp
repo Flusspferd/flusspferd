@@ -67,11 +67,10 @@ namespace flusspferd {
     string get_string() const;
 
     string to_string() const;
-
     double to_number() const;
     double to_integral_number(int bits, bool has_negative) const;
-
     bool to_boolean() const;
+    object to_object() const;
 
     template<typename Visitor>
     inline void visit(Visitor &v) const;

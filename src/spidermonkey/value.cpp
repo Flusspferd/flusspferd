@@ -123,6 +123,13 @@ bool value::to_boolean() const {
   return result != JS_FALSE;
 }
 
+object value::to_object() const {
+  JSObject *result;
+  if (!JS_ValueToObject(Impl::current_context(), get(), &result))
+    throw exception("Could not convert value to object");
+  return Impl::wrap_object(result);
+}
+
 void value::bind(value o) {
   setval(JSVAL_VOID);
   setp(o.getp());

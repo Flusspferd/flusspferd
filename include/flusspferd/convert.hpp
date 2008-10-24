@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CONVERT_HPP
 
 #include "value.hpp"
+#include "object.hpp"
 #include <boost/mpl/eval_if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <limits>
@@ -68,6 +69,19 @@ struct convert<bool> {
 
   static bool from_value(value const &v) {
     return v.to_boolean();
+  }
+};
+
+template<>
+struct convert<object> {
+  typedef convert<object> type;
+
+  static value to_value(object const &o) {
+    return value(o);
+  }
+
+  static object from_value(value const &v) {
+    return v.to_object();
   }
 };
 
