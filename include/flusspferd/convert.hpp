@@ -28,6 +28,10 @@ THE SOFTWARE.
 #include "object.hpp"
 #include "string.hpp"
 #include "function.hpp"
+#include "root_value.hpp"
+#include <boost/noncopyable.hpp>
+#include <boost/optional.hpp>
+#include <boost/utility/in_place_factory.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <limits>
@@ -50,85 +54,93 @@ struct convert
 
 template<>
 struct convert<value> {
-  static value const &to_value(value const &v) {
+  value const &to_value(value const &v) {
     return v;
   }
 
-  static value const &from_value(value const &v, value&) {
+  value const &from_value(value const &v) {
     return v;
   }
 };
 
 template<>
 struct convert<bool> {
-  static value to_value(bool x) {
+  value to_value(bool x) {
     return value(x);
   }
 
-  static bool from_value(value const &v, value&) {
+  bool from_value(value const &v) {
     return v.to_boolean();
   }
 };
 
 template<>
 struct convert<object> {
-  static value to_value(object const &o) {
+  value to_value(object const &o) {
     return value(o);
   }
 
-  static object from_value(value const &v, value &root) {
+  object from_value(value const &v) {
     object o = v.to_object();
-    root = value(o);
+    root = boost::in_place(value(o));
     return o;
   }
+
+  boost::optional<root_value> root;
 };
 
 template<>
 struct convert<string> {
-  static value to_value(string const &x) {
+  value to_value(string const &x) {
     return value(x);
   }
 
-  static string from_value(value const &v, value &root) {
+  string from_value(value const &v) {
     string s = v.to_string();
-    root = value(s);
+    root = boost::in_place(value(s));
     return s;
   }
+
+  boost::optional<root_value> root;
 };
 
 template<>
 struct convert<function> {
-  static value to_value(function const &x) {
+  value to_value(function const &x) {
     return value(object(x));
   }
 
-  static function from_value(value const &v, value &root) {
+  function from_value(value const &v) {
     function f(v.to_object());
-    root = value(object(f));
+    root = boost::in_place(value(object(f)));
     return f;
   }
+
+  boost::optional<root_value> root;
 };
 
 template<>
 struct convert<char const *> {
-  static value to_value(char const *x) {
+  value to_value(char const *x) {
     return value(string(x));
   }
 
-  static char const *from_value(value const &v, value &root) {
+  char const *from_value(value const &v) {
     string s = v.to_string();
-    root = value(s);
+    root = boost::in_place(value(s));
     return s.c_str();
   }
+
+  boost::optional<root_value> root;
 };
 
 template<>
 struct convert<std::string> {
-  static value to_value(std::string const &x) {
+  value to_value(std::string const &x) {
     return value(string(x));
   }
 
-  static std::string from_value(value const &v, value &) {
+  std::string from_value(value const &v) {
     string s = v.to_string();
     return s.to_string();
   }
@@ -138,11 +150,11 @@ template<>
 struct convert<std::basic_string<char16_t> > {
   typedef std::basic_string<char16_t> string_t;
 
-  static value to_value(string_t const &x) {
+  value to_value(string_t const &x) {
     return value(string(x));
   }
 
-  static string_t from_value(value const &v, value &) {
+  string_t from_value(value const &v) {
     string s = v.to_string();
     return s.to_utf16_string();
   }
@@ -152,11 +164,11 @@ template<typename T>
 struct convert_arithmetic {
   typedef std::numeric_limits<T> limits;
 
-  static value to_value(T const &x) {
+  value to_value(T const &x) {
     return value(x);
   };
 
-  static T from_value(value const &v, value&) {
+  T from_value(value const &v) {
     if (limits::is_integer)
       return v.to_integral_number(limits::digits, limits::is_signed);
     else
@@ -167,7 +179,7 @@ struct convert_arithmetic {
 }
 
 template<typename T>
-struct convert : private detail::convert<T> {
+struct convert : private detail::convert<T>, private boost::noncopyable {
   using detail::convert<T>::to_value;
   using detail::convert<T>::from_value;
 };
