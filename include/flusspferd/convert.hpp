@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "object.hpp"
 #include "string.hpp"
 #include "function.hpp"
-#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <limits>
 
@@ -40,18 +40,16 @@ template<typename T>
 struct convert_arithmetic;
 
 template<typename T>
-struct convert {
-  typedef typename boost::mpl::eval_if<
-      boost::is_arithmetic<T>,
-      typename convert_arithmetic<T>::type,
-      int
-    >::type type;
-};
+struct convert 
+: boost::mpl::if_<
+    boost::is_arithmetic<T>,
+    convert_arithmetic<T>,
+    int
+  >::type
+{};
 
 template<>
 struct convert<value> {
-  typedef convert<value> type;
-
   static value const &to_value(value const &v) {
     return v;
   }
@@ -63,8 +61,6 @@ struct convert<value> {
 
 template<>
 struct convert<bool> {
-  typedef convert<bool> type;
-
   static value to_value(bool x) {
     return value(x);
   }
@@ -76,8 +72,6 @@ struct convert<bool> {
 
 template<>
 struct convert<object> {
-  typedef convert<object> type;
-
   static value to_value(object const &o) {
     return value(o);
   }
@@ -91,8 +85,6 @@ struct convert<object> {
 
 template<>
 struct convert<string> {
-  typedef convert<string> type;
-
   static value to_value(string const &x) {
     return value(x);
   }
@@ -106,8 +98,6 @@ struct convert<string> {
 
 template<>
 struct convert<function> {
-  typedef convert<function> type;
-
   static value to_value(function const &x) {
     return value(object(x));
   }
@@ -121,8 +111,6 @@ struct convert<function> {
 
 template<>
 struct convert<char const *> {
-  typedef convert<char const *> type;
-
   static value to_value(char const *x) {
     return value(string(x));
   }
@@ -136,8 +124,6 @@ struct convert<char const *> {
 
 template<>
 struct convert<std::string> {
-  typedef convert<std::string> type;
-
   static value to_value(std::string const &x) {
     return value(string(x));
   }
@@ -152,8 +138,6 @@ template<>
 struct convert<std::basic_string<char16_t> > {
   typedef std::basic_string<char16_t> string_t;
 
-  typedef convert<string_t> type;
-
   static value to_value(string_t const &x) {
     return value(string(x));
   }
@@ -166,8 +150,6 @@ struct convert<std::basic_string<char16_t> > {
 
 template<typename T>
 struct convert_arithmetic {
-  typedef convert_arithmetic<T> type;
-
   typedef std::numeric_limits<T> limits;
 
   static value to_value(T const &x) {
@@ -185,7 +167,10 @@ struct convert_arithmetic {
 }
 
 template<typename T>
-struct convert : detail::convert<T>::type {};
+struct convert : private detail::convert<T> {
+  using detail::convert<T>::to_value;
+  using detail::convert<T>::from_value;
+};
 
 }
 
