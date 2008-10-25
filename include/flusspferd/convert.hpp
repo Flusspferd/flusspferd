@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <boost/noncopyable.hpp>
 #include <boost/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_arithmetic.hpp>
 #include <limits>
@@ -40,20 +41,12 @@ namespace flusspferd {
 
 namespace detail {
 
-template<typename T>
-struct convert_arithmetic;
-
-template<typename T>
+template<typename T, typename Condition = void>
 struct convert 
-: boost::mpl::if_<
-    boost::is_arithmetic<T>,
-    convert_arithmetic<T>,
-    int
-  >::type
 {};
 
 template<>
-struct convert<value> {
+struct convert<value, void> {
   value const &to_value(value const &v) {
     return v;
   }
@@ -64,7 +57,7 @@ struct convert<value> {
 };
 
 template<>
-struct convert<bool> {
+struct convert<bool, void> {
   value to_value(bool x) {
     return value(x);
   }
@@ -75,7 +68,7 @@ struct convert<bool> {
 };
 
 template<>
-struct convert<object> {
+struct convert<object, void> {
   value to_value(object const &o) {
     return value(o);
   }
@@ -90,7 +83,7 @@ struct convert<object> {
 };
 
 template<>
-struct convert<string> {
+struct convert<string, void> {
   value to_value(string const &x) {
     return value(x);
   }
@@ -105,7 +98,7 @@ struct convert<string> {
 };
 
 template<>
-struct convert<function> {
+struct convert<function, void> {
   value to_value(function const &x) {
     return value(object(x));
   }
@@ -120,7 +113,7 @@ struct convert<function> {
 };
 
 template<>
-struct convert<char const *> {
+struct convert<char const *, void> {
   value to_value(char const *x) {
     return value(string(x));
   }
@@ -135,7 +128,7 @@ struct convert<char const *> {
 };
 
 template<>
-struct convert<std::string> {
+struct convert<std::string, void> {
   value to_value(std::string const &x) {
     return value(string(x));
   }
@@ -147,7 +140,7 @@ struct convert<std::string> {
 };
 
 template<>
-struct convert<std::basic_string<char16_t> > {
+struct convert<std::basic_string<char16_t>, void> {
   typedef std::basic_string<char16_t> string_t;
 
   value to_value(string_t const &x) {
@@ -161,7 +154,11 @@ struct convert<std::basic_string<char16_t> > {
 };
 
 template<typename T>
-struct convert_arithmetic {
+struct convert<
+    T,
+    typename boost::enable_if<boost::is_arithmetic<T> >::type
+  >
+{
   typedef std::numeric_limits<T> limits;
 
   value to_value(T const &x) {
