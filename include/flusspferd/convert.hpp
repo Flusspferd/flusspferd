@@ -34,7 +34,8 @@ THE SOFTWARE.
 #include <boost/utility/in_place_factory.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/if.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
+#include <boost/type_traits/is_float.hpp>
+#include <boost/type_traits/is_integral.hpp>
 #include <limits>
 
 namespace flusspferd {
@@ -42,8 +43,7 @@ namespace flusspferd {
 namespace detail {
 
 template<typename T, typename Condition = void>
-struct convert 
-{};
+struct convert;
 
 template<>
 struct convert<value, void> {
@@ -156,7 +156,7 @@ struct convert<std::basic_string<char16_t>, void> {
 template<typename T>
 struct convert<
     T,
-    typename boost::enable_if<boost::is_arithmetic<T> >::type
+    typename boost::enable_if<boost::is_integral<T> >::type
   >
 {
   typedef std::numeric_limits<T> limits;
@@ -166,10 +166,22 @@ struct convert<
   };
 
   T from_value(value const &v) {
-    if (limits::is_integer)
-      return v.to_integral_number(limits::digits, limits::is_signed);
-    else
-      return v.to_number();
+    return v.to_integral_number(limits::digits, limits::is_signed);
+  }
+};
+
+template<typename T>
+struct convert<
+    T,
+    typename boost::enable_if<boost::is_float<T> >::type
+  >
+{
+  value to_value(T const &x) {
+    return value(double(x));
+  }
+
+  T from_value(value const &v) {
+    return v.to_number();
   }
 };
 
