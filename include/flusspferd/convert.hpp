@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/remove_cv.hpp>
 //#include <boost/mpl/set.hpp>               <- may be useful soon
 //#include <boost/mpl/has_key.hpp>
 #include <limits>
@@ -44,14 +45,38 @@ namespace detail {
 template<typename T, typename Condition = void>
 struct convert;
 
-template<class T, class C = T>
+template<typename T, typename Condition = void>
+struct convert_ptr {
+  typedef boost::remove_cv<T> object_type;
+
+  struct to_value {
+    typename convert<object_type>::to_value base;
+
+    value perform(T const *p) {
+      return base.perform(*p);
+    }
+  };
+
+  struct from_value {
+    typename convert<object_type>::from_value base;
+
+    T holder;
+
+    T *perform(value const &v) {
+      holder = base.perform(v);
+      return &holder;
+    }
+  };
+};
+
+template<typename T, typename C = T>
 struct to_value_helper {
   value perform(T const &x) {
     return value(C(x));
   }
 };
 
-template<class T>
+template<typename T>
 struct to_value_helper<T, T> {
   value perform(T const &x) {
     return value(x);
@@ -161,6 +186,28 @@ struct convert<std::basic_string<char16_t>, void> {
   struct from_value {
     string_t perform(value const &v) {
       return v.to_string().to_utf16_string();
+    }
+  };
+};
+
+template<typename T>
+struct convert<T *, void> : convert_ptr<T, void> {};
+
+template<typename T>
+struct convert<T &, void> {
+  struct to_value {
+    typename convert_ptr<T>::to_value base;
+
+    value perform(T &x) {
+      return base.perform(&x);
+    }
+  };
+
+  struct from_value {
+    typename convert_ptr<T>::from_value base;
+
+    T &perform(value const &x) {
+      return *base.perform(x);
     }
   };
 };
