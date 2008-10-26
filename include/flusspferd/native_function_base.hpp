@@ -34,7 +34,7 @@ namespace flusspferd {
 
 struct call_context;
 
-class native_function_base : boost::noncopyable {
+class native_function_base : public function, private boost::noncopyable {
 public:
   native_function_base(unsigned arity = 0);
   native_function_base(unsigned arity, std::string const &name);

@@ -89,7 +89,7 @@ JSClass native_function_base::impl::function_parent_class = {
 function native_function_base::create_function() {
   JSContext *ctx = Impl::current_context();
 
-  JSFunction *function;
+  JSFunction *fun;
 
   {
     local_root_scope scope;
@@ -101,12 +101,14 @@ function native_function_base::create_function() {
 
     JS_SetPrivate(ctx, parent, this);
 
-    function = JS_NewFunction(
+    fun = JS_NewFunction(
         ctx, &impl::call_helper,
         p->arity, 0, parent, p->name.c_str());
   }
 
-  return Impl::wrap_function(function);
+  function::operator=(Impl::wrap_function(fun));
+
+  return *static_cast<function *>(this);
 }
 
 JSBool native_function_base::impl::call_helper(
