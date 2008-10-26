@@ -146,3 +146,29 @@ void native_function_base::impl::finalize(JSContext *ctx, JSObject *parent) {
 
   delete self;
 }
+
+native_function_base *native_function_base::get_native(object const &o_) {
+  JSContext *ctx = Impl::current_context();
+
+  object o = o_;
+  JSObject *p = Impl::get_object(o);
+
+  native_function_base *self =
+    (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_parent_class, 0);
+
+  if (self)
+    return self;
+
+  p = JS_GetParent(ctx, p);
+
+  if (!p)
+    throw exception("Could not get native function pointer");
+
+  self =
+    (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_parent_class, 0);
+
+  if (!self)
+    throw exception("Could not get native function pointer");
+
+  return self;
+}

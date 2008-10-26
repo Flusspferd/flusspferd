@@ -46,6 +46,8 @@ public:
   void set_arity(unsigned arity);
   unsigned get_arity() const;
 
+  static native_function_base *get_native(object const &o);
+
 protected:
   virtual void call(call_context &) = 0;
 
