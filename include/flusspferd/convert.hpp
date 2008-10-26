@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "function.hpp"
 #include "root_value.hpp"
 #include "native_object_base.hpp"
+#include "native_function_base.hpp"
 #include "exception.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -72,7 +73,7 @@ struct convert_ptr {
 };
 
 template<typename T>
-struct convert_ptr<T const, void> : convert_ptr<T> {};
+struct convert_ptr<T const> : convert_ptr<T> {};
 
 template<typename T, typename C = T>
 struct to_value_helper {
@@ -89,7 +90,7 @@ struct to_value_helper<T, T> {
 };
 
 template<>
-struct convert<value, void> {
+struct convert<value> {
   struct to_value {
     value const &perform(value const &v) {
       return v;
@@ -100,7 +101,7 @@ struct convert<value, void> {
 };
 
 template<>
-struct convert<bool, void> {
+struct convert<bool> {
   typedef to_value_helper<bool> to_value;
 
   struct from_value {
@@ -111,7 +112,7 @@ struct convert<bool, void> {
 };
 
 template<>
-struct convert<object, void>
+struct convert<object>
 {
   typedef to_value_helper<object> to_value;
 
@@ -127,7 +128,7 @@ struct convert<object, void>
 };
 
 template<>
-struct convert<string, void> {
+struct convert<string> {
   typedef to_value_helper<string> to_value;
 
   struct from_value {
@@ -142,7 +143,7 @@ struct convert<string, void> {
 };
 
 template<>
-struct convert<function, void> {
+struct convert<function> {
   typedef to_value_helper<function> to_value;
 
   struct from_value {
@@ -157,7 +158,7 @@ struct convert<function, void> {
 };
 
 template<>
-struct convert<char const *, void> {
+struct convert<char const *> {
   typedef to_value_helper<char const *, string> to_value;
 
   struct from_value {
@@ -172,7 +173,7 @@ struct convert<char const *, void> {
 };
 
 template<>
-struct convert<std::string, void> {
+struct convert<std::string> {
   typedef to_value_helper<std::string, string> to_value;
 
   struct from_value {
@@ -183,7 +184,7 @@ struct convert<std::string, void> {
 };
 
 template<>
-struct convert<std::basic_string<char16_t>, void> {
+struct convert<std::basic_string<char16_t> > {
   typedef std::basic_string<char16_t> string_t;
 
   typedef to_value_helper<string_t, string> to_value;
@@ -196,10 +197,10 @@ struct convert<std::basic_string<char16_t>, void> {
 };
 
 template<typename T>
-struct convert<T *, void> : convert_ptr<T, void> {};
+struct convert<T *> : convert_ptr<T> {};
 
 template<typename T>
-struct convert<T &, void> {
+struct convert<T &> {
   struct to_value {
     typename convert_ptr<T>::to_value base;
 
