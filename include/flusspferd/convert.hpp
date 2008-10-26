@@ -48,22 +48,24 @@ namespace detail {
 template<typename T, typename Condition = void>
 struct convert;
 
-template<typename T, typename Condition = void>
+template<
+    typename T,
+    typename O = typename boost::remove_cv<T>::type,
+    typename Condition = void
+  >
 struct convert_ptr {
-  typedef typename boost::remove_cv<T>::type object_type;
-
   struct to_value {
-    typename convert<object_type>::to_value base;
+    typename convert<O>::to_value base;
 
-    value perform(T const *p) {
+    value perform(T *p) {
       return base.perform(*p);
     }
   };
 
   struct from_value {
-    typename convert<object_type>::from_value base;
+    typename convert<O>::from_value base;
 
-    object_type holder;
+    O holder;
 
     T *perform(value const &v) {
       holder = base.perform(v);
@@ -71,9 +73,6 @@ struct convert_ptr {
     }
   };
 };
-
-template<typename T>
-struct convert_ptr<T const> : convert_ptr<T> {};
 
 template<typename T, typename C = T>
 struct to_value_helper {
@@ -250,10 +249,10 @@ struct convert<
   };
 };
 
-template<>
-struct convert_ptr<native_object_base> {
+template<typename T>
+struct convert_ptr<T, native_object_base> {
   struct to_value {
-    value perform(native_object_base const *ptr) {
+    value perform(T *ptr) {
       if (!ptr)
         return object();
       return *static_cast<object const *>(ptr);
@@ -261,7 +260,7 @@ struct convert_ptr<native_object_base> {
   };
 
   struct from_value {
-    native_object_base *perform(value const &v) {
+    T *perform(value const &v) {
       if (!v.is_object())
         throw exception("Value is no object");
       return native_object_base::get_native(v.get_object());
@@ -269,10 +268,10 @@ struct convert_ptr<native_object_base> {
   };
 };
 
-template<>
-struct convert_ptr<native_function_base> {
+template<typename T>
+struct convert_ptr<T, native_function_base> {
   struct to_value {
-    value perform(native_function_base const *ptr) {
+    value perform(T *ptr) {
       if (!ptr)
         return object();
       return *static_cast<object const *>(ptr);
@@ -280,7 +279,7 @@ struct convert_ptr<native_function_base> {
   };
 
   struct from_value {
-    native_function_base *perform(value const &v) {
+    T *perform(value const &v) {
       if (!v.is_object())
         throw exception("Value is no object");
       return native_function_base::get_native(v.get_object());
