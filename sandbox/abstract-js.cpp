@@ -124,6 +124,13 @@ int main() {
       co.gc();
       o.call("foo");
       co.gc();
+
+      flusspferd::convert<flusspferd::native_object_base *>::from_value from_value;
+      flusspferd::native_object_base *p = from_value.perform(v);
+
+      flusspferd::convert<flusspferd::native_object_base *>::to_value to_value;
+      o = to_value.perform(p).get_object();
+
       o.call();
       co.gc();
     }

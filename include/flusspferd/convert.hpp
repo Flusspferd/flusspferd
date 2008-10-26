@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "string.hpp"
 #include "function.hpp"
 #include "root_value.hpp"
+#include "native_object_base.hpp"
+#include "exception.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_float.hpp>
@@ -68,6 +70,9 @@ struct convert_ptr {
     }
   };
 };
+
+template<typename T>
+struct convert_ptr<T const, void> : convert_ptr<T> {};
 
 template<typename T, typename C = T>
 struct to_value_helper {
@@ -240,6 +245,26 @@ struct convert<
   struct from_value {
     T perform(value const &v) {
       return v.to_number();
+    }
+  };
+};
+
+template<>
+struct convert_ptr<native_object_base> {
+  struct to_value {
+    value perform(native_object_base const *ptr) {
+      if (!ptr)
+        return object();
+      return *static_cast<object const *>(ptr);
+    }
+  };
+
+  struct from_value {
+    native_object_base *perform(value const &v) {
+      if (!v.is_object())
+        throw exception("Value is no object");
+      object o = v.get_object();
+      return native_object_base::get_native(o);
     }
   };
 };
