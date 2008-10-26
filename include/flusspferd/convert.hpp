@@ -264,8 +264,26 @@ struct convert_ptr<native_object_base> {
     native_object_base *perform(value const &v) {
       if (!v.is_object())
         throw exception("Value is no object");
-      object o = v.get_object();
-      return native_object_base::get_native(o);
+      return native_object_base::get_native(v.get_object());
+    }
+  };
+};
+
+template<>
+struct convert_ptr<native_function_base> {
+  struct to_value {
+    value perform(native_function_base const *ptr) {
+      if (!ptr)
+        return object();
+      return *static_cast<object const *>(ptr);
+    }
+  };
+
+  struct from_value {
+    native_function_base *perform(value const &v) {
+      if (!v.is_object())
+        throw exception("Value is no object");
+      return native_function_base::get_native(v.get_object());
     }
   };
 };
