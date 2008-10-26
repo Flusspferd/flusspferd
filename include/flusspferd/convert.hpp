@@ -47,7 +47,7 @@ struct convert;
 
 template<typename T, typename Condition = void>
 struct convert_ptr {
-  typedef boost::remove_cv<T> object_type;
+  typedef typename boost::remove_cv<T>::type object_type;
 
   struct to_value {
     typename convert<object_type>::to_value base;
@@ -60,7 +60,7 @@ struct convert_ptr {
   struct from_value {
     typename convert<object_type>::from_value base;
 
-    T holder;
+    object_type holder;
 
     T *perform(value const &v) {
       holder = base.perform(v);
