@@ -30,12 +30,11 @@ THE SOFTWARE.
 #include "function.hpp"
 #include "root_value.hpp"
 #include <boost/noncopyable.hpp>
-#include <boost/optional.hpp>
-#include <boost/utility/in_place_factory.hpp>
 #include <boost/utility/enable_if.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
+//#include <boost/mpl/set.hpp>               <- may be useful soon
+//#include <boost/mpl/has_key.hpp>
 #include <limits>
 
 namespace flusspferd {
@@ -45,112 +44,125 @@ namespace detail {
 template<typename T, typename Condition = void>
 struct convert;
 
+template<class T, class C = T>
+struct to_value_helper {
+  value perform(T const &x) {
+    return value(C(x));
+  }
+};
+
+template<class T>
+struct to_value_helper<T, T> {
+  value perform(T const &x) {
+    return value(x);
+  }
+};
+
 template<>
 struct convert<value, void> {
-  value const &to_value(value const &v) {
-    return v;
-  }
+  struct to_value {
+    value const &perform(value const &v) {
+      return v;
+    }
+  };
 
-  value const &from_value(value const &v) {
-    return v;
-  }
+  typedef to_value from_value;
 };
 
 template<>
 struct convert<bool, void> {
-  value to_value(bool x) {
-    return value(x);
-  }
+  typedef to_value_helper<bool> to_value;
 
-  bool from_value(value const &v) {
-    return v.to_boolean();
-  }
+  struct from_value {
+    bool perform(value const &v) {
+      return v.get_boolean();
+    }
+  };
 };
 
 template<>
-struct convert<object, void> {
-  value to_value(object const &o) {
-    return value(o);
-  }
+struct convert<object, void>
+{
+  typedef to_value_helper<object> to_value;
 
-  object from_value(value const &v) {
-    object o = v.to_object();
-    root = boost::in_place(value(o));
-    return o;
-  }
+  struct from_value {
+    root_value root;
 
-  boost::optional<root_value> root;
+    object perform(value const &v) {
+      object o = v.to_object();
+      root = o;
+      return o;
+    }
+  };
 };
 
 template<>
 struct convert<string, void> {
-  value to_value(string const &x) {
-    return value(x);
-  }
+  typedef to_value_helper<string> to_value;
 
-  string from_value(value const &v) {
-    string s = v.to_string();
-    root = boost::in_place(value(s));
-    return s;
-  }
+  struct from_value {
+    root_value root;
 
-  boost::optional<root_value> root;
+    string perform(value const &v) {
+      string s = v.to_string();
+      root = s;
+      return s;
+    }
+  };
 };
 
 template<>
 struct convert<function, void> {
-  value to_value(function const &x) {
-    return value(object(x));
-  }
+  typedef to_value_helper<function> to_value;
 
-  function from_value(value const &v) {
-    function f(v.to_object());
-    root = boost::in_place(value(object(f)));
-    return f;
-  }
+  struct from_value {
+    root_value root;
 
-  boost::optional<root_value> root;
+    function perform(value const &v) {
+      function f = function(v.to_object());
+      root = object(f);
+      return f;
+    }
+  };
 };
 
 template<>
 struct convert<char const *, void> {
-  value to_value(char const *x) {
-    return value(string(x));
-  }
+  typedef to_value_helper<char const *, string> to_value;
 
-  char const *from_value(value const &v) {
-    string s = v.to_string();
-    root = boost::in_place(value(s));
-    return s.c_str();
-  }
+  struct from_value {
+    root_value root;
 
-  boost::optional<root_value> root;
+    char const *perform(value const &v) {
+      string s = v.to_string();
+      root = s;
+      return s.c_str();
+    }
+  };
 };
 
 template<>
 struct convert<std::string, void> {
-  value to_value(std::string const &x) {
-    return value(string(x));
-  }
+  typedef to_value_helper<std::string, string> to_value;
 
-  std::string from_value(value const &v) {
-    string s = v.to_string();
-    return s.to_string();
-  }
+  struct from_value {
+    std::string perform(value const &v) {
+      return v.to_string().to_string();
+    }
+  };
 };
 
 template<>
 struct convert<std::basic_string<char16_t>, void> {
   typedef std::basic_string<char16_t> string_t;
 
-  value to_value(string_t const &x) {
-    return value(string(x));
-  }
+  typedef to_value_helper<string_t, string> to_value;
 
-  string_t from_value(value const &v) {
-    string s = v.to_string();
-    return s.to_utf16_string();
-  }
+  struct from_value {
+    string_t perform(value const &v) {
+      return v.to_string().to_utf16_string();
+    }
+  };
 };
 
 template<typename T>
@@ -159,15 +171,15 @@ struct convert<
     typename boost::enable_if<boost::is_integral<T> >::type
   >
 {
-  typedef std::numeric_limits<T> limits;
+  typedef to_value_helper<T, double> to_value;
 
-  value to_value(T const &x) {
-    return value(x);
+  struct from_value {
+    typedef std::numeric_limits<T> limits;
+
+    T perform(value const &v) {
+      return v.to_integral_number(limits::digits, limits::is_signed);
+    }
   };
-
-  T from_value(value const &v) {
-    return v.to_integral_number(limits::digits, limits::is_signed);
-  }
 };
 
 template<typename T>
@@ -176,21 +188,25 @@ struct convert<
     typename boost::enable_if<boost::is_float<T> >::type
   >
 {
-  value to_value(T const &x) {
-    return value(double(x));
-  }
+  typedef to_value_helper<T, double> to_value;
 
-  T from_value(value const &v) {
-    return v.to_number();
-  }
+  struct from_value {
+    T perform(value const &v) {
+      return v.to_number();
+    }
+  };
 };
 
 }
 
 template<typename T>
-struct convert : private detail::convert<T>, private boost::noncopyable {
-  using detail::convert<T>::to_value;
-  using detail::convert<T>::from_value;
+class convert : private detail::convert<T>, private boost::noncopyable {
+private:
+  typedef detail::convert<T> base;
+
+public:
+  typedef typename base::to_value to_value;
+  typedef typename base::from_value from_value;
 };
 
 }

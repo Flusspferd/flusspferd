@@ -112,8 +112,8 @@ int main() {
     std::cout << num.to_integral_number(64, false) << '\n';
     std::cout << num.to_integral_number(64, true) << '\n' << std::endl;
 
-    std::cout << flusspferd::convert<long long>().from_value(num) << '\n';
-    std::cout << flusspferd::convert<unsigned short>().from_value(num) << '\n';
+    std::cout << flusspferd::convert<long long>::from_value().perform(num) << '\n';
+    std::cout << flusspferd::convert<unsigned short>::from_value().perform(num) << '\n';
     std::cout << std::endl;
 
     //throw flusspferd::exception("bling");
