@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "object.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/function.hpp>
 #include <memory>
 
 namespace flusspferd {
@@ -40,13 +41,21 @@ protected:
 
   virtual void post_initialize();
 
+protected:
   typedef void (native_object_base::*native_method_type)(call_context &);
+  typedef boost::function<void (call_context &)> callback_t;
 
+protected:
   void add_native_method(std::string const &name, unsigned arity = 0);
 
   void add_native_method(std::string const &name, unsigned arity, native_method_type method) {
     add_native_method(name, arity);
     register_native_method(name, method);
+  }
+
+  void add_native_method(std::string const &name, unsigned arity, callback_t const &cb) {
+    add_native_method(name, arity);
+    register_native_method(name, cb);
   }
 
   template<class T>
@@ -56,15 +65,20 @@ protected:
     add_native_method(name, arity, native_method_type(method));
   }
 
+protected:
   void register_native_method(std::string const &name, native_method_type method);
+
+  void register_native_method(std::string const &name, callback_t const &cb);
 
   template<class T>
   void register_native_method(std::string const &name, void (T::*method)(call_context&)) {
     register_native_method(name, native_method_type(method));
   }
 
+protected:
   static function create_native_method(std::string const &name, unsigned arity = 0);
 
+protected:
   virtual void call_native_method(std::string const &name, call_context &);
 
   virtual void trace(tracer &);

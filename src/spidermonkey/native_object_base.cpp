@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include <boost/unordered_map.hpp>
+#include <boost/variant.hpp>
 
 using namespace flusspferd;
 
@@ -44,7 +45,9 @@ public:
   static JSClass native_object_class;
 
 public:
-  typedef boost::unordered_map<std::string, native_method_type> native_method_map;
+  typedef boost::variant<native_method_type, callback_t> method_variant;
+
+  typedef boost::unordered_map<std::string, method_variant> native_method_map;
 
   native_method_map native_methods;
 };
@@ -73,9 +76,22 @@ void native_object_base::call_native_method(std::string const &name, call_contex
   impl::native_method_map::iterator it = p->native_methods.find(name);
 
   if (it != p->native_methods.end()) {
-    native_method_type m = it->second;
-    if (m)
-      (this->*m)(x);
+    impl::method_variant m = it->second;
+    switch (m.which()) {
+    case 0: // native_method_type
+      {
+        native_method_type native_method = boost::get<native_method_type>(m);
+        if (native_method)
+          (this->*native_method)(x);
+      }
+      break;
+    case 1: // callback_t
+      {
+        callback_t const &callback = boost::get<callback_t>(m);
+        if (callback)
+          callback(x);
+      }
+    }
   }
 }
 
@@ -118,9 +134,6 @@ object native_object_base::create_object() {
 }
 
 void native_object_base::add_native_method(std::string const &name, unsigned arity) {
-  if (name == "()")
-    return;
-
   JSContext *ctx = Impl::current_context();
 
   JSFunction *func = JS_DefineFunction(
@@ -158,6 +171,12 @@ void native_object_base::register_native_method(
   p->native_methods[name] = method;
 }
 
+void native_object_base::register_native_method(
+  std::string const &name, callback_t const &cb)
+{
+  p->native_methods[name] = cb;
+}
+
 void native_object_base::impl::finalize(JSContext *ctx, JSObject *obj) {
   current_context_scope scope(Impl::wrap_context(ctx));
   delete native_object_base::get_native(Impl::wrap_object(obj));
@@ -182,6 +201,7 @@ JSBool native_object_base::impl::call_helper(
     call_context x;
 
     x.self = Impl::wrap_object(obj);
+    x.self_native = self;
     x.arg = Impl::arguments_impl(argc, argv);
     x.result.bind(Impl::wrap_jsvalp(rval));
     x.function = Impl::wrap_object(function);

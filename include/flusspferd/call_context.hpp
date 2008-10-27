@@ -30,8 +30,13 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+class native_object_base;
+
 struct call_context {
+  call_context() : self_native(0) {}
+
   object self;
+  native_object_base *self_native;
   arguments arg;
   value result;
   object function;
