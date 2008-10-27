@@ -46,7 +46,7 @@ struct my_object : flusspferd::native_object_base {
   void post_initialize() {
     std::cout << "my_object pi" << std::endl;
     add_native_method("foo", 0U, &my_object::foo);
-    add_native_method("()", 0U, 0);
+    register_native_method("()", 0);
     v = flusspferd::string("test");
   }
 

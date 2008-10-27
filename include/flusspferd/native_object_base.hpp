@@ -43,7 +43,11 @@ protected:
   typedef void (native_object_base::*native_method_type)(call_context &);
 
   void add_native_method(std::string const &name, unsigned arity = 0);
-  void add_native_method(std::string const &name, unsigned arity, native_method_type method);
+
+  void add_native_method(std::string const &name, unsigned arity, native_method_type method) {
+    add_native_method(name, arity);
+    register_native_method(name, method);
+  }
 
   template<class T>
   void add_native_method(
@@ -51,6 +55,15 @@ protected:
   {
     add_native_method(name, arity, native_method_type(method));
   }
+
+  void register_native_method(std::string const &name, native_method_type method);
+
+  template<class T>
+  void register_native_method(std::string const &name, void (T::*method)(call_context&)) {
+    register_native_method(name, native_method_type(method));
+  }
+
+  static function create_native_method(std::string const &name, unsigned arity = 0);
 
   virtual void call_native_method(std::string const &name, call_context &);
 

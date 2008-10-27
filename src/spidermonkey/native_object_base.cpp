@@ -62,7 +62,7 @@ JSClass native_object_base::impl::native_object_class = {
   };
 
 native_object_base::native_object_base() : p(new impl) {
-  add_native_method("()", 0, &native_object_base::invalid_method);
+  register_native_method("()", &native_object_base::invalid_method);
 }
 
 native_object_base::~native_object_base() {}
@@ -118,6 +118,9 @@ object native_object_base::create_object() {
 }
 
 void native_object_base::add_native_method(std::string const &name, unsigned arity) {
+  if (name == "()")
+    return;
+
   JSContext *ctx = Impl::current_context();
 
   JSFunction *func = JS_DefineFunction(
@@ -132,12 +135,24 @@ void native_object_base::add_native_method(std::string const &name, unsigned ari
     throw exception("Could not create native method " + name); 
 }
 
-void native_object_base::add_native_method(
-  std::string const &name, unsigned arity, native_method_type method)
+function native_object_base::create_native_method(std::string const &name, unsigned arity) {
+  JSContext *ctx = Impl::current_context();
+
+  JSFunction *func = JS_NewFunction(
+      ctx,
+      &impl::call_helper,
+      arity,
+      0, // flags
+      0, // parent
+      name.c_str());
+
+  return Impl::wrap_function(func);
+}
+
+void native_object_base::register_native_method(
+  std::string const &name, native_method_type method)
 {
   p->native_methods[name] = method;
-  if (name != "()")
-    add_native_method(name, arity);
 }
 
 void native_object_base::impl::finalize(JSContext *ctx, JSObject *obj) {
