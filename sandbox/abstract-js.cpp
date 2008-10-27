@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/native_function.hpp"
 #include "flusspferd/convert.hpp"
 #include "flusspferd/native_function_base.hpp"
 #include "flusspferd/native_object_base.hpp"
@@ -89,11 +90,9 @@ struct my_function : flusspferd::native_function_base {
   ~my_function() { std::cout << "my_function destructor" << std::endl; }
 };
 
-struct function2 : flusspferd::native_function_base {
-  void call(flusspferd::call_context &) {
-    throw std::runtime_error("boom");
-  }
-};
+void function2(flusspferd::call_context &) {
+  throw std::runtime_error("boom");
+}
 
 int main() {
   //try {
@@ -174,7 +173,7 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    x = flusspferd::function::create_native(new function2);
+    x = flusspferd::function::create_native(new flusspferd::native_function(function2));
     flusspferd::root_value f_x(x);
 
     x.call();
