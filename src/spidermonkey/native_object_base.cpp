@@ -146,6 +146,9 @@ function native_object_base::create_native_method(std::string const &name, unsig
       0, // parent
       name.c_str());
 
+  if (!func)
+    throw exception("Could not create native method " + name); 
+
   return Impl::wrap_function(func);
 }
 
