@@ -69,12 +69,17 @@ arguments::arguments(std::vector<value> const &v)
   : Impl::arguments_impl(v)
 { }
 
+bool arguments::empty() const {
+  return size() == 0;
+}
+
 std::size_t arguments::size() const {
   return Impl::arguments_impl::size();
 }
 
 value arguments::operator[](std::size_t i) {
-  assert(i < size());
+  if (i >= size())
+    return value();
   return Impl::wrap_jsvalp(get() + i);
 }
 
@@ -86,12 +91,14 @@ void arguments::push_back(value const &v) {
 }
     
 value arguments::back() {
-  assert(size() > 0);
+  if (empty())
+    return value();
   return Impl::wrap_jsvalp(get() + size() - 1);
 }
 
 value arguments::front() {
-  assert(size() > 0);
+  if (empty())
+    return value();
   return Impl::wrap_jsvalp(get());
 }
 

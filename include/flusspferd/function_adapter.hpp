@@ -59,6 +59,20 @@ struct ptr_to_native_object_type<
   }
 };
 
+native_object_base *
+get_native_object_parameter(call_context &x) {
+  native_object_base *p = x.self_native;
+
+  if (p)
+    return p;
+
+  convert<native_object_base *>::from_value from_value;
+
+  p = from_value.perform(x.arg[0]);
+
+  return p;
+}
+
 template<
   typename T,
   typename R = typename T::result_type,
@@ -78,9 +92,8 @@ struct function_adapter<
     T, R, 1, typename boost::enable_if<is_native_object_type<typename T::arg1_type> >::type>
 {
   R action(T const &function, call_context &x) {
-    if (!x.self_native)
-      throw exception("Missing native object pointer");
-    return function(ptr_to_native_object_type<typename T::arg1_type>::get(x.self_native));
+    native_object_base *obj = get_native_object_parameter(x);
+    return function(ptr_to_native_object_type<typename T::arg1_type>::get(obj));
   }
 };
 

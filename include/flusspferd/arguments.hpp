@@ -39,6 +39,8 @@ namespace flusspferd {
     arguments(std::vector<value> const &v);
 
     std::size_t size() const;
+    bool empty() const;
+
     value operator[](std::size_t i);
 
     void push_back(value const &v);
