@@ -43,7 +43,7 @@ protected:
 
 protected:
   typedef void (native_object_base::*native_method_type)(call_context &);
-  typedef boost::function<void (call_context &)> callback_t;
+  typedef boost::function<void (call_context &)> callback_type;
 
 protected:
   void add_native_method(std::string const &name, unsigned arity = 0);
@@ -53,7 +53,7 @@ protected:
     register_native_method(name, method);
   }
 
-  void add_native_method(std::string const &name, unsigned arity, callback_t const &cb) {
+  void add_native_method(std::string const &name, unsigned arity, callback_type const &cb) {
     add_native_method(name, arity);
     register_native_method(name, cb);
   }
@@ -68,7 +68,7 @@ protected:
 protected:
   void register_native_method(std::string const &name, native_method_type method);
 
-  void register_native_method(std::string const &name, callback_t const &cb);
+  void register_native_method(std::string const &name, callback_type const &cb);
 
   template<class T>
   void register_native_method(std::string const &name, void (T::*method)(call_context&)) {

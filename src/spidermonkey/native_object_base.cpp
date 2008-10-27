@@ -45,7 +45,7 @@ public:
   static JSClass native_object_class;
 
 public:
-  typedef boost::variant<native_method_type, callback_t> method_variant;
+  typedef boost::variant<native_method_type, callback_type> method_variant;
 
   typedef boost::unordered_map<std::string, method_variant> native_method_map;
 
@@ -85,9 +85,9 @@ void native_object_base::call_native_method(std::string const &name, call_contex
           (this->*native_method)(x);
       }
       break;
-    case 1: // callback_t
+    case 1: // callback_type
       {
-        callback_t const &callback = boost::get<callback_t>(m);
+        callback_type const &callback = boost::get<callback_type>(m);
         if (callback)
           callback(x);
       }
@@ -172,7 +172,7 @@ void native_object_base::register_native_method(
 }
 
 void native_object_base::register_native_method(
-  std::string const &name, callback_t const &cb)
+  std::string const &name, callback_type const &cb)
 {
   p->native_methods[name] = cb;
 }

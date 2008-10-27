@@ -31,10 +31,10 @@ namespace flusspferd {
 
 class native_function : public native_function_base {
 public:
-  typedef boost::function<void (call_context &)> callback_t;
+  typedef boost::function<void (call_context &)> callback_type;
 
   native_function(
-      callback_t const &cb, unsigned arity = 0, std::string const &name = std::string())
+      callback_type const &cb, unsigned arity = 0, std::string const &name = std::string())
     : native_function_base(arity, name), cb(cb)
   {}
 
@@ -43,7 +43,7 @@ private:
     cb(x);
   }
 
-  callback_t cb;
+  callback_type cb;
 };
 
 }
