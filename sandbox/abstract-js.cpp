@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/function_adapter.hpp"
 #include "flusspferd/native_function.hpp"
 #include "flusspferd/convert.hpp"
 #include "flusspferd/native_function_base.hpp"
