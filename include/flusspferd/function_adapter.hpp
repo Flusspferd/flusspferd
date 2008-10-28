@@ -98,7 +98,13 @@ struct function_adapter<T, void, 0> {
 
 template<typename T, typename R>
 struct function_adapter<
-    T, R, 1, typename boost::enable_if<is_native_object_type<typename T::arg1_type> >::type>
+  T, R, 1,
+  typename boost::enable_if<
+    typename is_native_object_type<
+      typename T::arg1_type
+    >::type
+  >::type
+>
 {
   typename convert<R>::to_value to_value;
 
@@ -109,6 +115,33 @@ struct function_adapter<
     native_object_base *obj = get_native_object_parameter(x, offset);
     arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
     x.result = to_value.perform(function(arg1));
+  }
+};
+
+template<typename T>
+struct function_adapter<
+  T, void, 1, typename boost::enable_if<is_native_object_type<typename T::arg1_type> >::type>
+{
+  typedef typename T::arg1_type arg1_type;
+
+  void action(T const &function, call_context &x) {
+    std::size_t offset = 0;
+    native_object_base *obj = get_native_object_parameter(x, offset);
+    arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
+    function(arg1);
+  }
+};
+
+template<typename T, typename R>
+struct function_adapter<T, R, 1> {
+  typename convert<R>::to_value to_value;
+
+  typedef typename T::arg1_type arg1_type;
+
+  typename convert<arg1_type>::from_value arg1_from_value;
+
+  void action(T const &function, call_context &x) {
+    x.result = to_value.perform(function(arg1_from_value.perform(x.arg[0])));
   }
 };
 
@@ -125,8 +158,8 @@ public:
   {}
 
   void operator() (call_context &x) {
-    detail::function_adapter<function_type> helper;
-    helper.action(function, x);
+    detail::function_adapter<function_type> function_adapter_implementation;
+    function_adapter_implementation.action(function, x);
   }
 
 private:

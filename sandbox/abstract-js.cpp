@@ -91,8 +91,8 @@ struct my_function : flusspferd::native_function_base {
   ~my_function() { std::cout << "my_function destructor" << std::endl; }
 };
 
-void function2() {
-  throw std::runtime_error("boom");
+int function2(int x) {
+  return x + 1;
 }
 
 int main() {
@@ -174,11 +174,11 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    flusspferd::function_adapter<void ()> adapter(function2);
+    flusspferd::function_adapter<int (int)> adapter(function2);
     x = flusspferd::function::create_native(new flusspferd::native_function(adapter));
     flusspferd::root_value f_x(x);
 
-    x.call();
+    std::cout << "function2: " << x.call() << std::endl;
   //}
   //catch(std::exception &e) {
   //  std::cerr << "Exception: " << e.what() << '\n';
