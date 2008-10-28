@@ -87,69 +87,6 @@ get_native_object_parameter(call_context &x) {
   return ptr_to_native_object_type<typename T::arg1_type>::get(p);
 }
 
-template<
-  typename T,
-  typename R = typename T::result_type,
-  std::size_t A = T::arity,
-  typename Condition = void>
-struct function_adapter;
-
-template<typename T, typename R>
-struct function_adapter<
-  T, R, 1,
-  typename boost::enable_if<
-    typename is_native_object_type<typename T::arg1_type>::type
-  >::type
->
-{
-  typename convert<R>::to_value to_value;
-
-  void action(T const &function, call_context &x) {
-    x.result = to_value.perform(function(get_native_object_parameter<T>(x)));
-  }
-};
-
-template<typename T>
-struct function_adapter<
-  T, void, 1,
-  typename boost::enable_if<
-    typename is_native_object_type<typename T::arg1_type>::type
-  >::type
->
-{
-  void action(T const &function, call_context &x) {
-    function(get_native_object_parameter<T>(x));
-  }
-};
-
-template<typename T, typename R>
-struct function_adapter<
-  T, R, 1,
-  typename boost::enable_if<
-    typename boost::is_convertible<typename T::arg1_type, object>::type
-  >::type
->
-{
-  typename convert<R>::to_value to_value;
-
-  void action(T const &function, call_context &x) {
-    x.result = to_value.perform(function(x.self));
-  }
-};
-
-template<typename T>
-struct function_adapter<
-  T, void, 1,
-  typename boost::enable_if<
-    typename boost::is_convertible<typename T::arg1_type, object>::type
-  >::type
->
-{
-  void action(T const &function, call_context &x) {
-    function(x.self);
-  }
-};
-
 #define FLUSSPFERD_DECLARE_ARG_CONVERTER(z, i, T) \
   typename convert<typename T::BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _type)>::from_value \
   BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value); \
@@ -215,9 +152,72 @@ struct function_adapter<
     ~) \
   /**/
 
+template<
+  typename Type,
+  typename ResultType = typename Type::result_type,
+  std::size_t Arity = Type::arity,
+  typename Condition = void>
+struct function_adapter;
+
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(FLUSSPFERD_PARAM_LIMIT)
 
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS_R_VOID(FLUSSPFERD_PARAM_LIMIT)
+
+template<typename T, typename R>
+struct function_adapter<
+  T, R, 1,
+  typename boost::enable_if<
+    typename is_native_object_type<typename T::arg1_type>::type
+  >::type
+>
+{
+  typename convert<R>::to_value to_value;
+
+  void action(T const &function, call_context &x) {
+    x.result = to_value.perform(function(get_native_object_parameter<T>(x)));
+  }
+};
+
+template<typename T>
+struct function_adapter<
+  T, void, 1,
+  typename boost::enable_if<
+    typename is_native_object_type<typename T::arg1_type>::type
+  >::type
+>
+{
+  void action(T const &function, call_context &x) {
+    function(get_native_object_parameter<T>(x));
+  }
+};
+
+template<typename T, typename R>
+struct function_adapter<
+  T, R, 1,
+  typename boost::enable_if<
+    typename boost::is_convertible<typename T::arg1_type, object>::type
+  >::type
+>
+{
+  typename convert<R>::to_value to_value;
+
+  void action(T const &function, call_context &x) {
+    x.result = to_value.perform(function(x.self));
+  }
+};
+
+template<typename T>
+struct function_adapter<
+  T, void, 1,
+  typename boost::enable_if<
+    typename boost::is_convertible<typename T::arg1_type, object>::type
+  >::type
+>
+{
+  void action(T const &function, call_context &x) {
+    function(x.self);
+  }
+};
 
 }
 
