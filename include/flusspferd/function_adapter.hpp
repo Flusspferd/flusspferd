@@ -24,12 +24,15 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_FUNCTION_ADAPTER_HPP
 #define FLUSSPFERD_FUNCTION_ADAPTER_HPP
 
+#if 1
 #include "convert.hpp"
 #include "call_context.hpp"
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/function.hpp>
+#endif
+#include <boost/preprocessor.hpp>
 
 namespace flusspferd {
 
@@ -162,27 +165,50 @@ struct function_adapter<
   }
 };
 
+#define FLUSSPFERD_DECLARE_ARG_CONVERTER(z, i, T) \
+  typename convert<typename T::BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _type)>::from_value \
+  BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value); \
+  /**/
+
+#define FLUSSPFERD_DECLARE_ARG_CONVERTERS(n, T) \
+  BOOST_PP_REPEAT_FROM_TO( \
+    1, \
+    BOOST_PP_INC(n), \
+    FLUSSPFERD_DECLARE_ARG_CONVERTER, \
+    T) \
+  /**/
+
+#define FLUSSPFERD_CONVERT_ARG(z, i, x) \
+  BOOST_PP_COMMA_IF(BOOST_PP_GREATER(i, 1)) \
+  BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value) \
+  .perform((x).arg[BOOST_PP_DEC(i)]) \
+  /**/
+
+#define FLUSSPFERD_CONVERT_ARGS(n, x) \
+  BOOST_PP_REPEAT_FROM_TO( \
+    1, \
+    BOOST_PP_INC(n), \
+    FLUSSPFERD_CONVERT_ARG, \
+    x) \
+  /**/
+
 template<typename T, typename R, typename C>
 struct function_adapter<T, R, 1, C> {
   typename convert<R>::to_value to_value;
 
-  typedef typename T::arg1_type arg1_type;
-
-  typename convert<arg1_type>::from_value arg1_from_value;
+  FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, T)
 
   void action(T const &function, call_context &x) {
-    x.result = to_value.perform(function(arg1_from_value.perform(x.arg[0])));
+    x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, x));
   }
 };
 
 template<typename T, typename C>
 struct function_adapter<T, void, 1, C> {
-  typedef typename T::arg1_type arg1_type;
-
-  typename convert<arg1_type>::from_value arg1_from_value;
+  FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, T)
 
   void action(T const &function, call_context &x) {
-    function(arg1_from_value.perform(x.arg[0]));
+    function(FLUSSPFERD_CONVERT_ARGS(1, x));
   }
 };
 
