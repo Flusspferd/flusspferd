@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_FUNCTION_ADAPTER_HPP
 #define FLUSSPFERD_FUNCTION_ADAPTER_HPP
 
-#if 1
+#ifndef PREPROC_DEBUG
 #include "convert.hpp"
 #include "call_context.hpp"
 #include <boost/type_traits/is_convertible.hpp>
@@ -33,6 +33,10 @@ THE SOFTWARE.
 #include <boost/function.hpp>
 #endif
 #include <boost/preprocessor.hpp>
+
+#ifndef FLUSSPFERD_PARAM_LIMIT
+#define FLUSSPFERD_PARAM_LIMIT 5
+#endif
 
 namespace flusspferd {
 
@@ -109,12 +113,10 @@ struct function_adapter<
 {
   typename convert<R>::to_value to_value;
 
-  typedef typename T::arg1_type arg1_type;
-
   void action(T const &function, call_context &x) {
     native_object_base *obj = get_native_object_parameter(x);
-    arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
-    x.result = to_value.perform(function(arg1));
+    x.result = to_value.perform(
+      function(ptr_to_native_object_type<typename T::arg1_type>::get(obj)));
   }
 };
 
@@ -126,12 +128,9 @@ struct function_adapter<
   >::type
 >
 {
-  typedef typename T::arg1_type arg1_type;
-
   void action(T const &function, call_context &x) {
     native_object_base *obj = get_native_object_parameter(x);
-    arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
-    function(arg1);
+    function(ptr_to_native_object_type<typename T::arg1_type>::get(obj));
   }
 };
 
@@ -168,10 +167,10 @@ struct function_adapter<
   BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value); \
   /**/
 
-#define FLUSSPFERD_DECLARE_ARG_CONVERTERS(n, T) \
+#define FLUSSPFERD_DECLARE_ARG_CONVERTERS(first, last, T) \
   BOOST_PP_REPEAT_FROM_TO( \
-    1, \
-    BOOST_PP_INC(n), \
+    first, \
+    BOOST_PP_INC(last), \
     FLUSSPFERD_DECLARE_ARG_CONVERTER, \
     T) \
   /**/
@@ -182,33 +181,55 @@ struct function_adapter<
   .perform((x).arg[BOOST_PP_DEC(i)]) \
   /**/
 
-#define FLUSSPFERD_CONVERT_ARGS(n, x) \
+#define FLUSSPFERD_CONVERT_ARGS(first, last, x) \
   BOOST_PP_REPEAT_FROM_TO( \
-    1, \
-    BOOST_PP_INC(n), \
+    first, \
+    BOOST_PP_INC(last), \
     FLUSSPFERD_CONVERT_ARG, \
     x) \
   /**/
 
-template<typename T, typename R, typename C>
-struct function_adapter<T, R, 1, C> {
-  typename convert<R>::to_value to_value;
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER(z, n_args, d) \
+  template<typename T, typename R, typename C> \
+  struct function_adapter<T, R, n_args, C> { \
+    typename convert<R>::to_value to_value; \
+    FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
+    void action(T const &function, call_context &x) { \
+      x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, 1, x)); \
+    } \
+  }; \
+  /**/
 
-  FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, T)
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(n) \
+  BOOST_PP_REPEAT_FROM_TO( \
+    1, \
+    n, \
+    FLUSSPFERD_DECLARE_FUNCTION_ADAPTER, \
+    ~ \
+  ) \
+  /**/
 
-  void action(T const &function, call_context &x) {
-    x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, x));
-  }
-};
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_R_VOID(z, n_args, d) \
+  template<typename T, typename C> \
+  struct function_adapter<T, void, n_args, C> { \
+    FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
+    void action(T const &function, call_context &x) { \
+      function(FLUSSPFERD_CONVERT_ARGS(1, n_args, x)); \
+    } \
+  }; \
+  /**/
 
-template<typename T, typename C>
-struct function_adapter<T, void, 1, C> {
-  FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, T)
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS_R_VOID(n) \
+  BOOST_PP_REPEAT_FROM_TO( \
+    1, \
+    BOOST_PP_INC(n), \
+    FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_R_VOID, \
+    ~) \
+  /**/
 
-  void action(T const &function, call_context &x) {
-    function(FLUSSPFERD_CONVERT_ARGS(1, x));
-  }
-};
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(FLUSSPFERD_PARAM_LIMIT)
+
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS_R_VOID(FLUSSPFERD_PARAM_LIMIT)
 
 }
 
