@@ -100,38 +100,29 @@ get_native_object_parameter(call_context &x) {
     T) \
   /**/
 
-#define FLUSSPFERD_CONVERT_ARG(z, i, x) \
+#define FLUSSPFERD_CONVERT_ARG(z, i, offset) \
   BOOST_PP_COMMA_IF(BOOST_PP_GREATER(i, 1)) \
   BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value) \
-  .perform((x).arg[BOOST_PP_DEC(i)]) \
+  .perform((x).arg[BOOST_PP_SUB(BOOST_PP_DEC(i), offset)]) \
   /**/
 
-#define FLUSSPFERD_CONVERT_ARGS(first, last, x) \
+#define FLUSSPFERD_CONVERT_ARGS(first, last, offset) \
   BOOST_PP_REPEAT_FROM_TO( \
     first, \
     BOOST_PP_INC(last), \
     FLUSSPFERD_CONVERT_ARG, \
-    x) \
+    offset) \
   /**/
 
-#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER(z, n_args, d) \
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_(z, n_args, d) \
   template<typename T, typename R, typename C> \
   struct function_adapter<T, R, n_args, C> { \
     typename convert<R>::to_value to_value; \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
-      x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, n_args, x)); \
+      x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
     } \
   }; \
-  /**/
-
-#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(n) \
-  BOOST_PP_REPEAT_FROM_TO( \
-    0, \
-    n, \
-    FLUSSPFERD_DECLARE_FUNCTION_ADAPTER, \
-    ~ \
-  ) \
   /**/
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_R_VOID(z, n_args, d) \
@@ -139,16 +130,95 @@ get_native_object_parameter(call_context &x) {
   struct function_adapter<T, void, n_args, C> { \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
-      function(FLUSSPFERD_CONVERT_ARGS(1, n_args, x)); \
+      function(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
     } \
   }; \
   /**/
 
-#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS_R_VOID(n) \
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_NATIVE_OBJECT(z, n_args, d) \
+  template<typename T, typename R> \
+  struct function_adapter< \
+    T, R, n_args, \
+    typename boost::enable_if< \
+      typename is_native_object_type<typename T::arg1_type>::type \
+    >::type \
+  > \
+  { \
+    typename convert<R>::to_value to_value; \
+    FLUSSPFERD_DECLARE_ARG_CONVERTERS(2, n_args, T) \
+    void action(T const &function, call_context &x) { \
+      x.result = to_value.perform( \
+        function( \
+          get_native_object_parameter<T>(x) \
+          FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
+        )); \
+    } \
+  }; \
+  /**/
+
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_NATIVE_OBJECT_R_VOID(z, n_args, d) \
+  template<typename T> \
+  struct function_adapter< \
+    T, void, n_args, \
+    typename boost::enable_if< \
+      typename is_native_object_type<typename T::arg1_type>::type \
+    >::type \
+  > \
+  { \
+    FLUSSPFERD_DECLARE_ARG_CONVERTERS(2, n_args, T) \
+    void action(T const &function, call_context &x) { \
+      function( \
+        get_native_object_parameter<T>(x) \
+        FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
+      ); \
+    } \
+  }; \
+  /**/
+
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_OBJECT(z, n_args, d) \
+  template<typename T, typename R> \
+  struct function_adapter< \
+    T, R, n_args, \
+    typename boost::enable_if< \
+      typename boost::is_convertible<typename T::arg1_type, object>::type \
+    >::type \
+  > \
+  { \
+    typename convert<R>::to_value to_value; \
+    FLUSSPFERD_DECLARE_ARG_CONVERTERS(2, n_args, T) \
+    void action(T const &function, call_context &x) { \
+      x.result = to_value.perform(function( \
+          x.self \
+          FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
+        )); \
+    } \
+  }; \
+  /**/
+
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_OBJECT_R_VOID(z, n_args, d) \
+  template<typename T> \
+  struct function_adapter< \
+    T, void, n_args, \
+    typename boost::enable_if< \
+      typename boost::is_convertible<typename T::arg1_type, object>::type \
+    >::type \
+  > \
+  { \
+    FLUSSPFERD_DECLARE_ARG_CONVERTERS(2, n_args, T) \
+    void action(T const &function, call_context &x) { \
+      function( \
+        x.self \
+        FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
+      ); \
+    } \
+  }; \
+  /**/
+
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(suffix) \
   BOOST_PP_REPEAT_FROM_TO( \
     0, \
-    BOOST_PP_INC(n), \
-    FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_R_VOID, \
+    BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT), \
+    BOOST_PP_CAT(FLUSSPFERD_DECLARE_FUNCTION_ADAPTER, suffix), \
     ~) \
   /**/
 
@@ -159,65 +229,17 @@ template<
   typename Condition = void>
 struct function_adapter;
 
-FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(FLUSSPFERD_PARAM_LIMIT)
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_)
 
-FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS_R_VOID(FLUSSPFERD_PARAM_LIMIT)
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_R_VOID)
 
-template<typename T, typename R>
-struct function_adapter<
-  T, R, 1,
-  typename boost::enable_if<
-    typename is_native_object_type<typename T::arg1_type>::type
-  >::type
->
-{
-  typename convert<R>::to_value to_value;
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_NATIVE_OBJECT)
 
-  void action(T const &function, call_context &x) {
-    x.result = to_value.perform(function(get_native_object_parameter<T>(x)));
-  }
-};
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_NATIVE_OBJECT_R_VOID)
 
-template<typename T>
-struct function_adapter<
-  T, void, 1,
-  typename boost::enable_if<
-    typename is_native_object_type<typename T::arg1_type>::type
-  >::type
->
-{
-  void action(T const &function, call_context &x) {
-    function(get_native_object_parameter<T>(x));
-  }
-};
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_OBJECT)
 
-template<typename T, typename R>
-struct function_adapter<
-  T, R, 1,
-  typename boost::enable_if<
-    typename boost::is_convertible<typename T::arg1_type, object>::type
-  >::type
->
-{
-  typename convert<R>::to_value to_value;
-
-  void action(T const &function, call_context &x) {
-    x.result = to_value.perform(function(x.self));
-  }
-};
-
-template<typename T>
-struct function_adapter<
-  T, void, 1,
-  typename boost::enable_if<
-    typename boost::is_convertible<typename T::arg1_type, object>::type
-  >::type
->
-{
-  void action(T const &function, call_context &x) {
-    function(x.self);
-  }
-};
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_OBJECT_R_VOID)
 
 }
 
