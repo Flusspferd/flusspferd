@@ -100,9 +100,7 @@ template<typename T, typename R>
 struct function_adapter<
   T, R, 1,
   typename boost::enable_if<
-    typename is_native_object_type<
-      typename T::arg1_type
-    >::type
+    typename is_native_object_type<typename T::arg1_type>::type
   >::type
 >
 {
@@ -122,9 +120,7 @@ template<typename T>
 struct function_adapter<
   T, void, 1,
   typename boost::enable_if<
-    typename is_native_object_type<
-      typename T::arg1_type
-    >::type
+    typename is_native_object_type<typename T::arg1_type>::type
   >::type
 >
 {
@@ -135,6 +131,21 @@ struct function_adapter<
     native_object_base *obj = get_native_object_parameter(x, offset);
     arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
     function(arg1);
+  }
+};
+
+template<typename T, typename R>
+struct function_adapter<
+  T, R, 1,
+  typename boost::enable_if<
+    typename boost::is_convertible<typename T::arg1_type, object>::type
+  >::type
+>
+{
+  typename convert<R>::to_value to_value;
+
+  void action(T const &function, call_context &x) {
+    x.result = to_value.perform(function(x.self));
   }
 };
 
