@@ -120,7 +120,13 @@ struct function_adapter<
 
 template<typename T>
 struct function_adapter<
-  T, void, 1, typename boost::enable_if<is_native_object_type<typename T::arg1_type> >::type>
+  T, void, 1,
+  typename boost::enable_if<
+    typename is_native_object_type<
+      typename T::arg1_type
+    >::type
+  >::type
+>
 {
   typedef typename T::arg1_type arg1_type;
 
@@ -142,6 +148,17 @@ struct function_adapter<T, R, 1> {
 
   void action(T const &function, call_context &x) {
     x.result = to_value.perform(function(arg1_from_value.perform(x.arg[0])));
+  }
+};
+
+template<typename T>
+struct function_adapter<T, void, 1> {
+  typedef typename T::arg1_type arg1_type;
+
+  typename convert<arg1_type>::from_value arg1_from_value;
+
+  void action(T const &function, call_context &x) {
+    function(arg1_from_value.perform(x.arg[0]));
   }
 };
 

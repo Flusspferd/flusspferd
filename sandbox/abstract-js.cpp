@@ -174,7 +174,7 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    flusspferd::function_adapter<int (int)> adapter(function2);
+    flusspferd::function_adapter<void (int)> adapter(function2);
     x = flusspferd::function::create_native(new flusspferd::native_function(adapter));
     flusspferd::root_value f_x(x);
 
