@@ -63,7 +63,7 @@ struct ptr_to_native_object_type<
 };
 
 native_object_base *
-get_native_object_parameter(call_context &x, std::size_t &offset) {
+get_native_object_parameter(call_context &x) {
   native_object_base *p = x.self_native;
 
   if (p)
@@ -71,7 +71,7 @@ get_native_object_parameter(call_context &x, std::size_t &offset) {
 
   convert<native_object_base *>::from_value from_value;
 
-  p = from_value.perform(x.arg[offset++]);
+  p = from_value.perform(x.self);
 
   return p;
 }
@@ -112,8 +112,7 @@ struct function_adapter<
   typedef typename T::arg1_type arg1_type;
 
   void action(T const &function, call_context &x) {
-    std::size_t offset = 0;
-    native_object_base *obj = get_native_object_parameter(x, offset);
+    native_object_base *obj = get_native_object_parameter(x);
     arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
     x.result = to_value.perform(function(arg1));
   }
@@ -130,8 +129,7 @@ struct function_adapter<
   typedef typename T::arg1_type arg1_type;
 
   void action(T const &function, call_context &x) {
-    std::size_t offset = 0;
-    native_object_base *obj = get_native_object_parameter(x, offset);
+    native_object_base *obj = get_native_object_parameter(x);
     arg1_type arg1 = ptr_to_native_object_type<arg1_type>::get(obj);
     function(arg1);
   }
