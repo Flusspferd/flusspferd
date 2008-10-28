@@ -25,11 +25,31 @@ THE SOFTWARE.
 #define FLUSSPFERD_NATIVE_FUNCTION_HPP
 
 #include "native_function_base.hpp"
+#include "function_adapter.hpp"
 #include <boost/function.hpp>
 
 namespace flusspferd {
 
+template<class T = void>
 class native_function : public native_function_base {
+public:
+  typedef boost::function<T> callback_type;
+
+  native_function(
+      callback_type const &cb, unsigned arity = 0, std::string const &name = std::string())
+    : native_function_base(arity, name), adapter(cb)
+  {}
+
+private:
+  void call(call_context &x) {
+    adapter(x);
+  }
+
+  function_adapter<T> adapter;
+};
+
+template<>
+class native_function<void> : public native_function_base {
 public:
   typedef boost::function<void (call_context &)> callback_type;
 
