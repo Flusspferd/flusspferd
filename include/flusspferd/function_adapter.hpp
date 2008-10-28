@@ -67,7 +67,7 @@ struct ptr_to_native_object_type<
 };
 
 native_object_base *
-get_native_object_parameter(call_context &x) {
+get_native_object_parameter_ptr(call_context &x) {
   native_object_base *p = x.self_native;
 
   if (p)
@@ -78,6 +78,13 @@ get_native_object_parameter(call_context &x) {
   p = from_value.perform(x.self);
 
   return p;
+}
+
+template<typename T>
+typename T::arg1_type
+get_native_object_parameter(call_context &x) {
+  native_object_base *p = get_native_object_parameter_ptr(x);
+  return ptr_to_native_object_type<typename T::arg1_type>::get(p);
 }
 
 template<
@@ -98,9 +105,7 @@ struct function_adapter<
   typename convert<R>::to_value to_value;
 
   void action(T const &function, call_context &x) {
-    native_object_base *obj = get_native_object_parameter(x);
-    x.result = to_value.perform(
-      function(ptr_to_native_object_type<typename T::arg1_type>::get(obj)));
+    x.result = to_value.perform(function(get_native_object_parameter<T>(x)));
   }
 };
 
@@ -113,8 +118,7 @@ struct function_adapter<
 >
 {
   void action(T const &function, call_context &x) {
-    native_object_base *obj = get_native_object_parameter(x);
-    function(ptr_to_native_object_type<typename T::arg1_type>::get(obj));
+    function(get_native_object_parameter<T>(x));
   }
 };
 
