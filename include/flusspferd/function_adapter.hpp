@@ -88,22 +88,6 @@ template<
 struct function_adapter;
 
 template<typename T, typename R>
-struct function_adapter<T, R, 0> {
-  typename convert<R>::to_value to_value;
-
-  void action(T const &function, call_context &x) {
-    x.result = to_value.perform(function());
-  }
-};
-
-template<typename T>
-struct function_adapter<T, void, 0> {
-  void action(T const &function, call_context &) {
-    function();
-  }
-};
-
-template<typename T, typename R>
 struct function_adapter<
   T, R, 1,
   typename boost::enable_if<
@@ -195,14 +179,14 @@ struct function_adapter<
     typename convert<R>::to_value to_value; \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
-      x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, 1, x)); \
+      x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, n_args, x)); \
     } \
   }; \
   /**/
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(n) \
   BOOST_PP_REPEAT_FROM_TO( \
-    1, \
+    0, \
     n, \
     FLUSSPFERD_DECLARE_FUNCTION_ADAPTER, \
     ~ \
@@ -221,7 +205,7 @@ struct function_adapter<
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS_R_VOID(n) \
   BOOST_PP_REPEAT_FROM_TO( \
-    1, \
+    0, \
     BOOST_PP_INC(n), \
     FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_R_VOID, \
     ~) \
