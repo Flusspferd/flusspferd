@@ -149,8 +149,21 @@ struct function_adapter<
   }
 };
 
-template<typename T, typename R, typename _>
-struct function_adapter<T, R, 1, _> {
+template<typename T>
+struct function_adapter<
+  T, void, 1,
+  typename boost::enable_if<
+    typename boost::is_convertible<typename T::arg1_type, object>::type
+  >::type
+>
+{
+  void action(T const &function, call_context &x) {
+    function(x.self);
+  }
+};
+
+template<typename T, typename R, typename C>
+struct function_adapter<T, R, 1, C> {
   typename convert<R>::to_value to_value;
 
   typedef typename T::arg1_type arg1_type;
@@ -162,8 +175,8 @@ struct function_adapter<T, R, 1, _> {
   }
 };
 
-template<typename T, typename _>
-struct function_adapter<T, void, 1, _> {
+template<typename T, typename C>
+struct function_adapter<T, void, 1, C> {
   typedef typename T::arg1_type arg1_type;
 
   typename convert<arg1_type>::from_value arg1_from_value;
