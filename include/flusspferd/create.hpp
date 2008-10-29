@@ -26,6 +26,10 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "object.hpp"
+#include "function.hpp"
+#include "native_function.hpp"
+#include <boost/type_traits/is_function.hpp>
+#include <boost/utility/enable_if.hpp>
 #endif
 #include <boost/preprocessor.hpp>
 
@@ -62,6 +66,39 @@ BOOST_PP_REPEAT(
 )
 
 function create_native_function(native_function_base *);
+
+#define FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION(z, n_args, d) \
+  template< \
+    typename T \
+    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
+  > \
+  object create_native_function( \
+    BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
+    BOOST_PP_COMMA_IF(n_args) \
+    typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
+  ) { \
+    return create_native_function(new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
+  } \
+  /**/
+
+BOOST_PP_REPEAT(
+  BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
+  FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION,
+  ~
+)
+
+inline function create_native_function(
+  boost::function<void (call_context &)> const &fn)
+{
+  return create_native_function<native_function<void> >(fn);
+}
+
+template<class T>
+function create_native_function(
+  boost::function<T> const &fn)
+{
+  return create_native_function<native_function<T> >(fn);
+}
 
 }
 

@@ -159,7 +159,7 @@ int main() {
     std::cout << v << '\n';
 
     flusspferd::function x =
-      flusspferd::create_native_function(new my_function);
+      flusspferd::create_native_function<my_function>(4.3);
 
     flusspferd::global().set_property("fun", x);
 
@@ -188,8 +188,9 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    x = flusspferd::create_native_function(
-      new flusspferd::native_function<flusspferd::string (flusspferd::object)>(function2));
+    x = flusspferd::create_native_function<
+          flusspferd::string (flusspferd::object)
+        >(function2);
     flusspferd::root_value f_x(x);
 
     std::cout << "function2: " << x.call() << std::endl;

@@ -36,7 +36,9 @@ public:
   typedef boost::function<T> callback_type;
 
   native_function(
-      callback_type const &cb, unsigned arity = 0, std::string const &name = std::string())
+      callback_type const &cb, unsigned arity = 0,
+      std::string const &name = std::string()
+    )
     : native_function_base(arity, name), adapter(cb)
   {}
 
