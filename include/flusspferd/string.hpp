@@ -24,42 +24,97 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_STRING_HPP
 #define FLUSSPFERD_STRING_HPP
 
+#include "convert.hpp"
 #include "implementation/string.hpp"
 #include <string>
 
 namespace flusspferd {
-  class value;
 
-  typedef Impl::char16_t char16_t;
+class value;
 
-  class string : public Impl::string_impl {
-  public:
-    string();
-    string(string const &o);
-    string(char const *s);
-    string(value const &v);
-    string(std::string const &s);
-    string(std::basic_string<char16_t> const &s);
-    string(Impl::string_impl const &s)
-      : Impl::string_impl(s)
-    { }
+class string : public Impl::string_impl {
+public:
+  string();
+  string(string const &o);
+  string(char const *s);
+  string(value const &v);
+  string(std::string const &s);
+  string(std::basic_string<char16_t> const &s);
+  string(Impl::string_impl const &s)
+    : Impl::string_impl(s)
+  { }
 
-    ~string();
+  ~string();
 
-    string &operator=(string const &o);
+  string &operator=(string const &o);
 
-    std::size_t length() const;
+  std::size_t length() const;
 
-    std::string to_string() const;
-    char const *c_str() const;
+  std::string to_string() const;
+  char const *c_str() const;
 
-    std::basic_string<char16_t> to_utf16_string() const;
+  std::basic_string<char16_t> to_utf16_string() const;
 
-    string substr(size_t start, size_t length);
+  string substr(size_t start, size_t length);
+};
+
+bool operator==(string const &lhs, string const &rhs);
+bool operator<(string const &lhs, string const &rhs);
+
+template<>
+struct detail::convert<string> {
+  typedef to_value_helper<string> to_value;
+
+  struct from_value {
+    root_value root;
+
+    string perform(value const &v) {
+      string s = v.to_string();
+      root = s;
+      return s;
+    }
   };
+};
 
-  bool operator==(string const &lhs, string const &rhs);
-  bool operator<(string const &lhs, string const &rhs);
+template<>
+struct detail::convert<char const *> {
+  typedef to_value_helper<char const *, string> to_value;
+
+  struct from_value {
+    root_value root;
+
+    char const *perform(value const &v) {
+      string s = v.to_string();
+      root = s;
+      return s.c_str();
+    }
+  };
+};
+
+template<>
+struct detail::convert<std::string> {
+  typedef to_value_helper<std::string, string> to_value;
+
+  struct from_value {
+    std::string perform(value const &v) {
+      return v.to_string().to_string();
+    }
+  };
+};
+
+template<>
+struct detail::convert<std::basic_string<char16_t> > {
+  typedef std::basic_string<char16_t> string_t;
+
+  typedef to_value_helper<string_t, string> to_value;
+
+  struct from_value {
+    string_t perform(value const &v) {
+      return v.to_string().to_utf16_string();
+    }
+  };
+};
+
 }
 
 #endif /* FLUSSPFERD_STRING_HPP */

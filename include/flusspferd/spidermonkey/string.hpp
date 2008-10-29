@@ -30,8 +30,9 @@ THE SOFTWARE.
 namespace flusspferd {
   class value;
 
-namespace Impl {
   typedef jschar char16_t;
+
+namespace Impl {
 
   class string_impl {
     JSString *str;

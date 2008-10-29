@@ -27,94 +27,113 @@ THE SOFTWARE.
 #include "implementation/object.hpp"
 #include "arguments.hpp"
 #include "value.hpp"
+#include "convert.hpp"
 #include <string>
 #include <memory>
 
 namespace flusspferd {
-  class value;
-  class context;
-  class function;
-  class native_object_base;
 
-  class object : public Impl::object_impl {
-  public:
-    object();
-    object(Impl::object_impl const &o)
-      : Impl::object_impl(o)
-    { }
-    ~object();
+class value;
+class context;
+class function;
+class native_object_base;
 
-    bool is_valid() const;
+class object : public Impl::object_impl {
+public:
+  object();
+  object(Impl::object_impl const &o)
+    : Impl::object_impl(o)
+  { }
+  ~object();
 
-    object get_parent();
-    object get_prototype();
+  bool is_valid() const;
 
-    value apply(object const &fn, arguments const &arg = arguments());
+  object get_parent();
+  object get_prototype();
 
-    value call(char const *name, arguments const &arg = arguments());
-    value call(std::string const &name, arguments const &arg = arguments());
+  value apply(object const &fn, arguments const &arg = arguments());
 
-    value call(object obj, arguments const &arg = arguments());
-    value call(arguments const &arg = arguments());
+  value call(char const *name, arguments const &arg = arguments());
+  value call(std::string const &name, arguments const &arg = arguments());
 
-    enum {
-      dont_enumerate = 1,
-      read_only_property = 2,
-      permanent_property = 4,
-      PROPERTY_LAST = 8
-    };
+  value call(object obj, arguments const &arg = arguments());
+  value call(arguments const &arg = arguments());
 
-    void define_property(char const *name,
-                         value const &init_value = value(),
-                         unsigned flags = 0,
-                         boost::optional<function const &> getter = boost::none,
-                         boost::optional<function const &> setter = boost::none);
-
-    void define_property(std::string const &name,
-                         value const &init_value = value(),
-                         unsigned flags = 0,
-                         boost::optional<function const &> getter = boost::none,
-                         boost::optional<function const &> setter = boost::none);
-
-    void set_property(char const *name, value const &v);
-    void set_property(std::string const &name, value const &v);
-
-    value get_property(char const *name) const;
-    value get_property(std::string const &name) const;
-    
-    bool has_property(char const *name) const;
-    bool has_property(std::string const &name) const;
-
-    void delete_property(char const *name);
-    void delete_property(std::string const &name);
-
-    class property_iterator
-      : public Impl::object_impl::property_iterator_impl
-    {
-    public:
-      property_iterator(
-        Impl::object_impl::property_iterator_impl const &i
-      )
-        : Impl::object_impl::property_iterator_impl(i)
-      { }
-
-      property_iterator &operator++();
-      property_iterator operator++(int) {
-        property_iterator t(*this);
-        ++*this;
-        return t;
-      }
-
-      // returns property name
-      std::string operator*() const;
-    };
-
-    property_iterator begin() const;
-    property_iterator end() const;
+  enum {
+    dont_enumerate = 1,
+    read_only_property = 2,
+    permanent_property = 4,
+    PROPERTY_LAST = 8
   };
 
-  bool operator==(object::property_iterator const &lhs,
-                  object::property_iterator const &rhs);
+  void define_property(char const *name,
+                       value const &init_value = value(),
+                       unsigned flags = 0,
+                       boost::optional<function const &> getter = boost::none,
+                       boost::optional<function const &> setter = boost::none);
+
+  void define_property(std::string const &name,
+                       value const &init_value = value(),
+                       unsigned flags = 0,
+                       boost::optional<function const &> getter = boost::none,
+                       boost::optional<function const &> setter = boost::none);
+
+  void set_property(char const *name, value const &v);
+  void set_property(std::string const &name, value const &v);
+
+  value get_property(char const *name) const;
+  value get_property(std::string const &name) const;
+    
+  bool has_property(char const *name) const;
+  bool has_property(std::string const &name) const;
+
+  void delete_property(char const *name);
+  void delete_property(std::string const &name);
+
+  class property_iterator
+    : public Impl::object_impl::property_iterator_impl
+  {
+  public:
+    property_iterator(
+      Impl::object_impl::property_iterator_impl const &i
+    )
+      : Impl::object_impl::property_iterator_impl(i)
+    { }
+
+    property_iterator &operator++();
+    property_iterator operator++(int) {
+      property_iterator t(*this);
+      ++*this;
+      return t;
+    }
+
+    // returns property name
+    std::string operator*() const;
+  };
+
+  property_iterator begin() const;
+  property_iterator end() const;
+};
+
+bool operator==(object::property_iterator const &lhs,
+                object::property_iterator const &rhs);
+
+template<>
+struct detail::convert<object>
+{
+  typedef to_value_helper<object> to_value;
+
+  struct from_value {
+    root_value root;
+
+    object perform(value const &v) {
+      object o = v.to_object();
+      root = o;
+      return o;
+    }
+  };
+};
+
 }
 
 #endif /* FLUSSPFERD_OBJECT_HPP */

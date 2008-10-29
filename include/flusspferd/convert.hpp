@@ -25,10 +25,9 @@ THE SOFTWARE.
 #define FLUSSPFERD_CONVERT_HPP
 
 #include "value.hpp"
-#include "object.hpp"
-#include "string.hpp"
 #include "root_value.hpp"
 #include "exception.hpp"
+#include "implementation/string.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_float.hpp>
@@ -38,6 +37,9 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+class string;
+class object;
+class function;
 class native_object_base;
 class native_function_base;
 
@@ -108,79 +110,6 @@ struct convert<bool> {
   };
 };
 
-template<>
-struct convert<object>
-{
-  typedef to_value_helper<object> to_value;
-
-  struct from_value {
-    root_value root;
-
-    object perform(value const &v) {
-      object o = v.to_object();
-      root = o;
-      return o;
-    }
-  };
-};
-
-template<>
-struct convert<string> {
-  typedef to_value_helper<string> to_value;
-
-  struct from_value {
-    root_value root;
-
-    string perform(value const &v) {
-      string s = v.to_string();
-      root = s;
-      return s;
-    }
-  };
-};
-
-template<>
-struct convert<function>;
-
-template<>
-struct convert<char const *> {
-  typedef to_value_helper<char const *, string> to_value;
-
-  struct from_value {
-    root_value root;
-
-    char const *perform(value const &v) {
-      string s = v.to_string();
-      root = s;
-      return s.c_str();
-    }
-  };
-};
-
-template<>
-struct convert<std::string> {
-  typedef to_value_helper<std::string, string> to_value;
-
-  struct from_value {
-    std::string perform(value const &v) {
-      return v.to_string().to_string();
-    }
-  };
-};
-
-template<>
-struct convert<std::basic_string<char16_t> > {
-  typedef std::basic_string<char16_t> string_t;
-
-  typedef to_value_helper<string_t, string> to_value;
-
-  struct from_value {
-    string_t perform(value const &v) {
-      return v.to_string().to_utf16_string();
-    }
-  };
-};
-
 template<typename T>
 struct convert<T *> : convert_ptr<T> {};
 
@@ -234,6 +163,24 @@ struct convert<
     }
   };
 };
+
+template<>
+struct convert<object>;
+
+template<>
+struct convert<function>;
+
+template<>
+struct convert<string>;
+
+template<>
+struct convert<char const *>;
+
+template<>
+struct convert<std::string>;
+
+template<>
+struct convert<std::basic_string<char16_t> >;
 
 template<typename T>
 struct convert_ptr<T, native_object_base>;
