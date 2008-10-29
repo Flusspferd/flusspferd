@@ -54,7 +54,7 @@ protected:
 private:
   function create_function();
 
-  friend class function;
+  friend function create_native_function(native_function_base *);
 
 private:
   class impl;

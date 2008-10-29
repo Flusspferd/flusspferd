@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/create.hpp"
 #include "flusspferd/function_adapter.hpp"
 #include "flusspferd/native_function.hpp"
 #include "flusspferd/convert.hpp"
@@ -119,7 +120,7 @@ int main() {
     //throw flusspferd::exception("bling");
 
     {
-      flusspferd::root_value v(flusspferd::object::create_native(new my_object));
+      flusspferd::root_value v(flusspferd::create_native_object(new my_object));
       flusspferd::object o = v.get_object();
       co.gc();
       o.call("foo");
@@ -128,7 +129,8 @@ int main() {
       flusspferd::convert<flusspferd::native_object_base *>::from_value from_value;
       flusspferd::native_object_base *p = from_value.perform(v);
 
-      flusspferd::convert<flusspferd::native_object_base const &>::to_value to_value;
+      flusspferd::convert<flusspferd::native_object_base const &>::to_value
+          to_value;
       o = to_value.perform(*p).get_object();
 
       o.call();
@@ -145,7 +147,8 @@ int main() {
 
     std::cout << v << '\n';
 
-    flusspferd::function x = flusspferd::function::create_native(new my_function);
+    flusspferd::function x =
+      flusspferd::create_native_function(new my_function);
 
     flusspferd::global().set_property("fun", x);
 
@@ -174,7 +177,7 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    x = flusspferd::function::create_native(
+    x = flusspferd::create_native_function(
       new flusspferd::native_function<flusspferd::string (flusspferd::object)>(function2));
     flusspferd::root_value f_x(x);
 

@@ -236,32 +236,3 @@ value object::call(object o, arguments const &arg) {
 value object::call(arguments const &arg) {
   return call(global(), arg);
 }
-
-object object::create() {
-  local_root_scope scope;
-
-  JSObject *o = JS_NewObject(Impl::current_context(), 0, 0, 0);
-  if (!o)
-    throw exception("Could not create object");
-
-  return Impl::wrap_object(o);
-}
-
-object object::create_array(unsigned length) {
-  local_root_scope scope;
-
-  JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
-  if (!o)
-    throw exception("Could not create array");
-
-  return Impl::wrap_object(o);
-}
-
-object object::create_native(native_object_base *ptr) {
-  try {
-    return ptr->create_object();
-  } catch (...) {
-    delete ptr;
-    throw;
-  }
-}

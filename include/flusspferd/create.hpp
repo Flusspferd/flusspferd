@@ -21,42 +21,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_FUNCTION_HPP
-#define FLUSSPFERD_FUNCTION_HPP
-
-#include "object.hpp"
-#include "implementation/function.hpp"
+#ifndef FLUSSPFERD_CREATE_HPP
+#define FLUSSPFERD_CREATE_HPP
 
 namespace flusspferd {
 
+class object;
+class native_object_base;
+class function;
 class native_function_base;
 
-class function : 
-  public Impl::function_impl,
-  public object
-{
-public:
-  function();
+object create_object();
+object create_array(unsigned int length = 0);
+object create_native_object(native_object_base *ptr);
 
-  function(Impl::function_impl const &f)
-    : Impl::function_impl(f),
-      object(Impl::function_impl::get_object())
-  { }
-
-  function(function const &o)
-    : Impl::function_impl(o),
-      object(Impl::function_impl::get_object())
-  { }
-
-  function(object const &o);
-
-  function(Impl::object_impl const &o);
-
-public:
-  std::size_t arity() const;
-  string name() const;
-};
+function create_native_function(native_function_base *);
 
 }
 
-#endif /* FLUSSPFERD_FUNCTION_HPP */
+#endif

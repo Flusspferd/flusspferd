@@ -21,55 +21,47 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/function.hpp"
-#include "flusspferd/value.hpp"
+#include "flusspferd/create.hpp"
+#include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/string.hpp"
+#include "flusspferd/native_object_base.hpp"
 #include "flusspferd/native_function_base.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
-#include "flusspferd/spidermonkey/context.hpp"
-#include "flusspferd/current_context_scope.hpp"
-#include <boost/scoped_array.hpp>
+#include "flusspferd/spidermonkey/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;
 
-function::function() { }
+object flusspferd::create_object() {
+  JSObject *o = JS_NewObject(Impl::current_context(), 0, 0, 0);
+  if (!o)
+    throw exception("Could not create object");
 
-namespace {
-  Impl::function_impl get_function(Impl::object_impl o_) {
-    JSContext *ctx = Impl::current_context();
-    JSObject *o = Impl::get_object(o_);
+  return Impl::wrap_object(o);
+}
 
-    JSFunction *f = JS_ValueToFunction(ctx, OBJECT_TO_JSVAL(o));
+object flusspferd::create_array(unsigned length) {
+  JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
+  if (!o)
+    throw exception("Could not create array");
 
-    if (!f)
-      throw exception("Could not convert object to function");
+  return Impl::wrap_object(o);
+}
 
-    return Impl::wrap_function(f);
+object flusspferd::create_native_object(native_object_base *ptr) {
+  try {
+    return ptr->create_object();
+  } catch (...) {
+    delete ptr;
+    throw;
   }
 }
 
-function::function(object const &o)
-  : Impl::function_impl(get_function(o)),
-    object(Impl::function_impl::get_object())
-{ }
-
-function::function(Impl::object_impl const &o)
-  : Impl::function_impl(get_function(o)),
-    object(Impl::function_impl::get_object())
-{ }
-
-std::size_t function::arity() const {
-  return JS_GetFunctionArity(Impl::function_impl::get_const());
-}
-
-string function::name() const {
-  return Impl::wrap_string(
-      JS_GetFunctionId(Impl::function_impl::get_const()));
-}
-
-object Impl::function_impl::get_object() {
-  return Impl::wrap_object(JS_GetFunctionObject(get()));
+function flusspferd::create_native_function(native_function_base *ptr) {
+  try {
+    return ptr->create_function();
+  } catch (...) {
+    delete ptr;
+    throw;
+  }
 }

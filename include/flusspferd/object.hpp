@@ -44,10 +44,6 @@ namespace flusspferd {
     { }
     ~object();
 
-    static object create();
-    static object create_array(unsigned length = 0);
-    static object create_native(native_object_base *ptr);
-
     bool is_valid() const;
 
     object get_parent();

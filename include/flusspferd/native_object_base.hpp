@@ -48,12 +48,16 @@ protected:
 protected:
   void add_native_method(std::string const &name, unsigned arity = 0);
 
-  void add_native_method(std::string const &name, unsigned arity, native_method_type method) {
+  void add_native_method(
+    std::string const &name, unsigned arity, native_method_type method)
+  {
     add_native_method(name, arity);
     register_native_method(name, method);
   }
 
-  void add_native_method(std::string const &name, unsigned arity, callback_type const &cb) {
+  void add_native_method(
+    std::string const &name, unsigned arity, callback_type const &cb)
+  {
     add_native_method(name, arity);
     register_native_method(name, cb);
   }
@@ -66,17 +70,22 @@ protected:
   }
 
 protected:
-  void register_native_method(std::string const &name, native_method_type method);
+  void register_native_method(
+    std::string const &name, native_method_type method);
 
-  void register_native_method(std::string const &name, callback_type const &cb);
+  void register_native_method(
+    std::string const &name, callback_type const &cb);
 
   template<class T>
-  void register_native_method(std::string const &name, void (T::*method)(call_context&)) {
+  void register_native_method(
+    std::string const &name, void (T::*method)(call_context&))
+  {
     register_native_method(name, native_method_type(method));
   }
 
 protected:
-  static function create_native_method(std::string const &name, unsigned arity = 0);
+  static function create_native_method(
+    std::string const &name, unsigned arity = 0);
 
 protected:
   virtual void call_native_method(std::string const &name, call_context &);
@@ -98,7 +107,7 @@ private:
 private:
   object create_object();
 
-  friend class object;
+  friend object create_native_object(native_object_base *);
 
 public:
   class impl;
