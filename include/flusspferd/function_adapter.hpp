@@ -26,7 +26,6 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "convert.hpp"
-#include "native_object_base.hpp"
 #include "call_context.hpp"
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -40,6 +39,8 @@ THE SOFTWARE.
 #endif
 
 namespace flusspferd {
+
+class native_object_base;
 
 namespace detail {
 
@@ -67,19 +68,7 @@ struct ptr_to_native_object_type<
   }
 };
 
-inline native_object_base *
-get_native_object_parameter_ptr(call_context &x) {
-  native_object_base *p = x.self_native;
-
-  if (p)
-    return p;
-
-  convert<native_object_base *>::from_value from_value;
-
-  p = from_value.perform(x.self);
-
-  return p;
-}
+native_object_base *get_native_object_parameter_ptr(call_context &x);
 
 template<typename T>
 typename T::arg1_type
