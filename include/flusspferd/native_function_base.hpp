@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "init.hpp"
 #include "function.hpp"
+#include "convert.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <string>
@@ -61,6 +62,25 @@ private:
   boost::scoped_ptr<impl> p;
 
   friend class impl;
+};
+
+template<typename T>
+struct detail::convert_ptr<T, native_function_base> {
+  struct to_value {
+    value perform(T *ptr) {
+      if (!ptr)
+        return object();
+      return *static_cast<object const *>(ptr);
+    }
+  };
+
+  struct from_value {
+    T *perform(value const &v) {
+      if (!v.is_object())
+        throw exception("Value is no object");
+      return native_function_base::get_native(v.get_object());
+    }
+  };
 };
 
 }

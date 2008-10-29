@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "convert.hpp"
+#include "native_object_base.hpp"
 #include "call_context.hpp"
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/remove_reference.hpp>

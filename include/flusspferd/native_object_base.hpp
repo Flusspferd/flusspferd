@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_NATIVE_OBJECT_BASE_HPP
 
 #include "object.hpp"
+#include "convert.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
@@ -114,6 +115,25 @@ public:
   boost::scoped_ptr<impl> p;
 
   friend class impl;
+};
+
+template<typename T>
+struct detail::convert_ptr<T, native_object_base> {
+  struct to_value {
+    value perform(T *ptr) {
+      if (!ptr)
+        return object();
+      return *static_cast<object const *>(ptr);
+    }
+  };
+
+  struct from_value {
+    T *perform(value const &v) {
+      if (!v.is_object())
+        throw exception("Value is no object");
+      return native_object_base::get_native(v.get_object());
+    }
+  };
 };
 
 }

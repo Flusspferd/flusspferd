@@ -29,19 +29,17 @@ THE SOFTWARE.
 #include "string.hpp"
 #include "function.hpp"
 #include "root_value.hpp"
-#include "native_object_base.hpp"
-#include "native_function_base.hpp"
 #include "exception.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/remove_cv.hpp>
-//#include <boost/mpl/set.hpp>               <- may be useful soon
-//#include <boost/mpl/has_key.hpp>
 #include <limits>
 
 namespace flusspferd {
+
+class native_object_base;
 
 namespace detail {
 
@@ -250,42 +248,10 @@ struct convert<
 };
 
 template<typename T>
-struct convert_ptr<T, native_object_base> {
-  struct to_value {
-    value perform(T *ptr) {
-      if (!ptr)
-        return object();
-      return *static_cast<object const *>(ptr);
-    }
-  };
-
-  struct from_value {
-    T *perform(value const &v) {
-      if (!v.is_object())
-        throw exception("Value is no object");
-      return native_object_base::get_native(v.get_object());
-    }
-  };
-};
+struct convert_ptr<T, native_object_base>;
 
 template<typename T>
-struct convert_ptr<T, native_function_base> {
-  struct to_value {
-    value perform(T *ptr) {
-      if (!ptr)
-        return object();
-      return *static_cast<object const *>(ptr);
-    }
-  };
-
-  struct from_value {
-    T *perform(value const &v) {
-      if (!v.is_object())
-        throw exception("Value is no object");
-      return native_function_base::get_native(v.get_object());
-    }
-  };
-};
+struct convert_ptr<T, native_function_base>;
 
 }
 
