@@ -66,7 +66,7 @@ struct ptr_to_native_object_type<
   }
 };
 
-native_object_base *
+inline native_object_base *
 get_native_object_parameter_ptr(call_context &x) {
   native_object_base *p = x.self_native;
 
