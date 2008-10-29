@@ -104,9 +104,13 @@ void native_object_base::trace(tracer&) {}
 native_object_base *native_object_base::get_native(object const &o_) {
   object o = o_;
 
+  if (!o.is_valid())
+    throw exception("Can not interpret 'null' as native object");
+
   JSContext *ctx = Impl::current_context();
 
-  void *priv = JS_GetInstancePrivate(ctx, Impl::get_object(o), &impl::native_object_class, 0);
+  void *priv = JS_GetInstancePrivate(
+      ctx, Impl::get_object(o), &impl::native_object_class, 0);
 
   if (!priv)
     throw exception("Object is not native");
