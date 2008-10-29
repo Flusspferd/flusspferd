@@ -93,11 +93,18 @@ inline function create_native_function(
   return create_native_function<native_function<void> >(fn);
 }
 
-template<class T>
+template<typename T>
 function create_native_function(
   boost::function<T> const &fn)
 {
   return create_native_function<native_function<T> >(fn);
+}
+
+template<typename T>
+function create_native_function(
+  T *fnptr, typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
+{
+  return create_native_function<T>(boost::function<T>(fnptr));
 }
 
 }
