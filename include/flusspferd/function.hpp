@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_FUNCTION_HPP
 
 #include "object.hpp"
+#include "convert.hpp"
 #include "implementation/function.hpp"
 
 namespace flusspferd {
@@ -55,6 +56,21 @@ public:
 public:
   std::size_t arity() const;
   string name() const;
+};
+
+template<>
+struct detail::convert<function> {
+  typedef to_value_helper<function> to_value;
+
+  struct from_value {
+    root_value root;
+
+    function perform(value const &v) {
+      function f = function(v.to_object());
+      root = object(f);
+      return f;
+    }
+  };
 };
 
 }

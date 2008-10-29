@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include "value.hpp"
 #include "object.hpp"
 #include "string.hpp"
-#include "function.hpp"
 #include "root_value.hpp"
 #include "exception.hpp"
 #include <boost/noncopyable.hpp>
@@ -40,6 +39,7 @@ THE SOFTWARE.
 namespace flusspferd {
 
 class native_object_base;
+class native_function_base;
 
 namespace detail {
 
@@ -140,19 +140,7 @@ struct convert<string> {
 };
 
 template<>
-struct convert<function> {
-  typedef to_value_helper<function> to_value;
-
-  struct from_value {
-    root_value root;
-
-    function perform(value const &v) {
-      function f = function(v.to_object());
-      root = object(f);
-      return f;
-    }
-  };
-};
+struct convert<function>;
 
 template<>
 struct convert<char const *> {
