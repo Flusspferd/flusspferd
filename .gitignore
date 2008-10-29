@@ -1,0 +1,5 @@
+.configure
+build/*
+*.swp
+.lock-wscript
+.waf-1.4.9-de47bcd529b3a3cde3d72a2a4a70975d
