@@ -41,16 +41,24 @@ THE SOFTWARE.
 #include <stdexcept>
 
 struct my_object : flusspferd::native_object_base {
-  my_object() { std::cout << "my_object construct" << std::endl; }
-  ~my_object() { std::cout << "my_object destruct" << std::endl; }
+  my_object(std::string const &test)
+    : test(test)
+  {
+    std::cout << "my_object construct" << std::endl;
+  }
 
+  ~my_object() {
+    std::cout << "my_object destruct" << std::endl;
+  }
+
+  std::string test;
   flusspferd::value v;
 
   void post_initialize() {
     std::cout << "my_object pi" << std::endl;
     add_native_method("foo", 0U, &my_object::foo);
     register_native_method("()", 0);
-    v = flusspferd::string("test");
+    v = flusspferd::string(test);
   }
 
   void foo(flusspferd::call_context &) {
@@ -68,9 +76,10 @@ struct my_object : flusspferd::native_object_base {
 };
 
 struct my_function : flusspferd::native_function_base {
-  my_function() : first(true) {}
+  my_function(double x = 4.2) : first(true), x(x) {}
 
   bool first;
+  double x;
 
   void call(flusspferd::call_context &x) {
     std::cout << "Function called!" << std::endl;
@@ -86,7 +95,7 @@ struct my_function : flusspferd::native_function_base {
     for(iterator i = x.arg.begin(); i != end; ++i)
       std::cout << "Arg: " << *i << '\n';
     std::cout << "]\n";
-    x.result = flusspferd::value(4.2);
+    x.result = flusspferd::value(this->x);
   }
 
   ~my_function() { std::cout << "my_function destructor" << std::endl; }
@@ -120,13 +129,15 @@ int main() {
     //throw flusspferd::exception("bling");
 
     {
-      flusspferd::root_value v(flusspferd::create_native_object(new my_object));
+      flusspferd::root_value v(
+          flusspferd::create_native_object<my_object>("foobar"));
       flusspferd::object o = v.get_object();
       co.gc();
       o.call("foo");
       co.gc();
 
-      flusspferd::convert<flusspferd::native_object_base *>::from_value from_value;
+      flusspferd::convert<flusspferd::native_object_base *>::from_value
+          from_value;
       flusspferd::native_object_base *p = from_value.perform(v);
 
       flusspferd::convert<flusspferd::native_object_base const &>::to_value

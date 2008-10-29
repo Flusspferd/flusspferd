@@ -24,9 +24,17 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CREATE_HPP
 #define FLUSSPFERD_CREATE_HPP
 
+#ifndef PREPROC_DEBUG
+#include "object.hpp"
+#endif
+#include <boost/preprocessor.hpp>
+
+#ifndef FLUSSPFERD_PARAM_LIMIT
+#define FLUSSPFERD_PARAM_LIMIT 5
+#endif
+
 namespace flusspferd {
 
-class object;
 class native_object_base;
 class function;
 class native_function_base;
@@ -34,6 +42,24 @@ class native_function_base;
 object create_object();
 object create_array(unsigned int length = 0);
 object create_native_object(native_object_base *ptr);
+
+#define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
+  template< \
+    typename T \
+    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
+  > \
+  object create_native_object( \
+    BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
+  ) { \
+    return create_native_object(new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
+  } \
+  /**/
+
+BOOST_PP_REPEAT(
+  BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
+  FLUSSPFERD_FN_CREATE_NATIVE_OBJECT,
+  ~
+)
 
 function create_native_function(native_function_base *);
 
