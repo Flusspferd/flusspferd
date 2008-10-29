@@ -26,10 +26,13 @@ THE SOFTWARE.
 
 #include "object.hpp"
 #include "convert.hpp"
+#include "function_adapter.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <memory>
+#include <functional>
 
 namespace flusspferd {
 
@@ -63,11 +66,19 @@ protected:
     register_native_method(name, cb);
   }
 
-  template<class T>
+  template<typename T>
   void add_native_method(
     std::string const &name, unsigned arity, void (T::*method)(call_context&))
   {
     add_native_method(name, arity, native_method_type(method));
+  }
+
+  template<typename T, typename X>
+  void add_native_method(
+    std::string const &name, unsigned arity, X const &cb)
+  {
+    add_native_method(name, arity);
+    register_native_method<T>(name, cb);
   }
 
 protected:
@@ -77,12 +88,20 @@ protected:
   void register_native_method(
     std::string const &name, callback_type const &cb);
 
-  template<class T>
+  template<typename T>
   void register_native_method(
     std::string const &name, void (T::*method)(call_context&))
   {
     register_native_method(name, native_method_type(method));
   }
+
+  template<typename T, typename X>
+  void register_native_method(std::string const &name, X const &cb) {
+    boost::function<T> fun(cb);
+    function_adapter<T> adapter(fun);
+    register_native_method(name, callback_type(adapter));
+  }
+
 
 protected:
   static function create_native_method(
@@ -135,6 +154,29 @@ struct detail::convert_ptr<T, native_object_base> {
     }
   };
 };
+
+namespace detail {
+
+template<typename T, typename O>
+struct convert_ptr<
+  T, O,
+  typename boost::enable_if<
+    typename boost::is_base_of<native_object_base, O>::type
+  >::type
+>
+{
+  typedef typename convert_ptr<native_object_base>::to_value to_value;
+
+  struct from_value {
+    typename convert_ptr<native_object_base>::from_value base;
+
+    T *perform(value const &v) {
+      return &dynamic_cast<T&>(base.perform(v));
+    }
+  };
+};
+
+}
 
 }
 

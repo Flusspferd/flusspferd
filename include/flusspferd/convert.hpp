@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_float.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/remove_cv.hpp>
 #include <limits>
 
@@ -53,7 +54,7 @@ template<
     typename O = typename boost::remove_cv<T>::type,
     typename Condition = void
   >
-struct convert_ptr {
+struct convert_ptr{
   struct to_value {
     typename convert<O>::to_value base;
 

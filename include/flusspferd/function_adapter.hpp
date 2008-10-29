@@ -27,9 +27,9 @@ THE SOFTWARE.
 #ifndef PREPROC_DEBUG
 #include "convert.hpp"
 #include "call_context.hpp"
-#include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
+#include <boost/type_traits/is_base_of.hpp>
 #include <boost/function.hpp>
 #endif
 #include <boost/preprocessor.hpp>
@@ -46,16 +46,18 @@ namespace detail {
 
 template<typename T>
 struct is_native_object_type {
-  typedef typename boost::remove_reference<T>::type T2;
-  typedef typename boost::remove_pointer<T2>::type native_object_type;
+  typedef typename boost::remove_reference<T>::type T1;
+  typedef typename boost::remove_pointer<T1>::type naked_type;
 
-  typedef typename boost::is_convertible<T2, native_object_base>::type type;
+  typedef typename boost::is_base_of<native_object_base, naked_type>::type type;
 };
 
 template<typename T, typename Condition = void>
 struct ptr_to_native_object_type {
+  typedef typename is_native_object_type<T>::naked_type naked_type;
+
   static T get(native_object_base *self_native) {
-    return self_native;
+    return dynamic_cast<naked_type&>(*self_native);
   }
 };
 
@@ -63,8 +65,10 @@ template<typename T>
 struct ptr_to_native_object_type<
     T, typename boost::enable_if<typename boost::is_pointer<T>::type>::type>
 {
+  typedef typename is_native_object_type<T>::naked_type naked_type;
+
   static T get(native_object_base *self_native) {
-    return *self_native;
+    return &dynamic_cast<naked_type&>(*self_native);
   }
 };
 
