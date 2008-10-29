@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_member_function_pointer.hpp>
 #include <memory>
 #include <functional>
 
@@ -59,11 +60,11 @@ protected:
     register_native_method(name, method);
   }
 
-  void add_native_method(
+  void add_native_method_cb(
     std::string const &name, unsigned arity, callback_type const &cb)
   {
     add_native_method(name, arity);
-    register_native_method(name, cb);
+    register_native_method_cb(name, cb);
   }
 
   template<typename T>
@@ -74,18 +75,24 @@ protected:
   }
 
   template<typename T, typename X>
-  void add_native_method(
+  void add_native_method_cb(
     std::string const &name, unsigned arity, X const &cb)
   {
     add_native_method(name, arity);
-    register_native_method<T>(name, cb);
+    register_native_method_cb<T>(name, cb);
+  }
+
+  template<typename R, typename T>
+  void add_native_method(std::string const &name, unsigned arity, R T::*f) {
+    add_native_method(name, arity);
+    register_native_method(name, f);
   }
 
 protected:
   void register_native_method(
     std::string const &name, native_method_type method);
 
-  void register_native_method(
+  void register_native_method_cb(
     std::string const &name, callback_type const &cb);
 
   template<typename T>
@@ -96,12 +103,17 @@ protected:
   }
 
   template<typename T, typename X>
-  void register_native_method(std::string const &name, X const &cb) {
+  void register_native_method_cb(std::string const &name, X const &cb) {
     boost::function<T> fun(cb);
     function_adapter<T> adapter(fun);
-    register_native_method(name, callback_type(adapter));
+    register_native_method_cb(name, adapter);
   }
 
+  template<typename R, typename T>
+  void register_native_method(std::string const &name, R T::*f) {
+    function_adapter_memfn<R, T> adapter(f);
+    register_native_method_cb(name, adapter);
+  }
 
 protected:
   static function create_native_method(

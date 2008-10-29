@@ -81,6 +81,12 @@ get_native_object_parameter(call_context &x) {
   return ptr_to_native_object_type<typename T::arg1_type>::get(p);
 }
 
+template<typename T>
+T get_native_object_parameter2(call_context &x) {
+  native_object_base *p = get_native_object_parameter_ptr(x);
+  return ptr_to_native_object_type<T>::get(p);
+}
+
 #define FLUSSPFERD_DECLARE_ARG_CONVERTER(z, i, T) \
   typename convert<typename T::BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _type)>::from_value \
   BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value); \
@@ -114,7 +120,8 @@ get_native_object_parameter(call_context &x) {
     typename convert<R>::to_value to_value; \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
-      x.result = to_value.perform(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
+      x.result = to_value.perform( \
+        function(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0))); \
     } \
   }; \
   /**/
@@ -208,6 +215,50 @@ get_native_object_parameter(call_context &x) {
   }; \
   /**/
 
+#define FLUSSPFERD_DECLARE_ARG_CONVERTER_MEMFN(z, i, d) \
+  typename convert<BOOST_PP_CAT(P, i)>::from_value \
+  BOOST_PP_CAT(BOOST_PP_CAT(arg, BOOST_PP_INC(i)), _from_value);
+
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_MEMFN(z, n_args, d) \
+  template< \
+    typename T, \
+    typename R \
+    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename P) \
+  > \
+  struct function_adapter_memfn< \
+    R (BOOST_PP_ENUM_PARAMS(n_args, P)), T \
+  > \
+  { \
+    typename convert<R>::to_value to_value; \
+    BOOST_PP_REPEAT(n_args, FLUSSPFERD_DECLARE_ARG_CONVERTER_MEMFN, ~) \
+    template<typename F> \
+    void action(F fun, call_context &x) { \
+      x.result = to_value.perform( \
+        (get_native_object_parameter2<T*>(x)->*fun) \
+          (FLUSSPFERD_CONVERT_ARGS(1, n_args, 0))); \
+    } \
+  }; \
+  /**/
+
+
+#define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_MEMFN_R_VOID(z, n_args, d) \
+  template< \
+    typename T \
+    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename P) \
+  > \
+  struct function_adapter_memfn< \
+    void (BOOST_PP_ENUM_PARAMS(n_args, P)), T \
+  > \
+  { \
+    BOOST_PP_REPEAT(n_args, FLUSSPFERD_DECLARE_ARG_CONVERTER_MEMFN, ~) \
+    template<typename F> \
+    void action(F fun, call_context &x) { \
+      (get_native_object_parameter2<T*>(x)->*fun) \
+          (FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
+    } \
+  }; \
+  /**/
+
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(suffix) \
   BOOST_PP_REPEAT_FROM_TO( \
     0, \
@@ -223,6 +274,11 @@ template<
   typename Condition = void>
 struct function_adapter;
 
+template<
+  typename R,
+  typename T
+> struct function_adapter_memfn;
+
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_)
 
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_R_VOID)
@@ -234,6 +290,10 @@ FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_NATIVE_OBJECT_R_VOID)
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_OBJECT)
 
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_OBJECT_R_VOID)
+
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_MEMFN)
+
+FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_MEMFN_R_VOID)
 
 }
 
@@ -254,6 +314,22 @@ public:
 
 private:
   function_type function;
+};
+
+template<typename R, typename T>
+class function_adapter_memfn {
+public:
+  function_adapter_memfn(R T::*funptr)
+    : funptr(funptr)
+  {}
+
+  void operator() (call_context &x) {
+    detail::function_adapter_memfn<R, T> function_adapter_implementation_memfn;
+    function_adapter_implementation_memfn.action(funptr, x);
+  }
+
+private:
+  R T::*funptr;
 };
 
 }

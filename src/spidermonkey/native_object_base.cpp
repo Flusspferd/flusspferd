@@ -56,7 +56,8 @@ JSClass native_object_base::impl::native_object_class = {
     "NativeObject",
     JSCLASS_HAS_PRIVATE,
     JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
-    JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub, &native_object_base::impl::finalize,
+    JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub,
+    &native_object_base::impl::finalize,
     0, 0,
     &native_object_base::impl::call_helper,
     0, 0, 0,
@@ -137,7 +138,9 @@ object native_object_base::create_object() {
   return *this;
 }
 
-void native_object_base::add_native_method(std::string const &name, unsigned arity) {
+void native_object_base::add_native_method(
+    std::string const &name, unsigned arity)
+{
   JSContext *ctx = Impl::current_context();
 
   JSFunction *func = JS_DefineFunction(
@@ -152,7 +155,9 @@ void native_object_base::add_native_method(std::string const &name, unsigned ari
     throw exception("Could not create native method " + name); 
 }
 
-function native_object_base::create_native_method(std::string const &name, unsigned arity) {
+function native_object_base::create_native_method(
+    std::string const &name, unsigned arity)
+{
   JSContext *ctx = Impl::current_context();
 
   JSFunction *func = JS_NewFunction(
@@ -175,7 +180,7 @@ void native_object_base::register_native_method(
   p->native_methods[name] = method;
 }
 
-void native_object_base::register_native_method(
+void native_object_base::register_native_method_cb(
   std::string const &name, callback_type const &cb)
 {
   p->native_methods[name] = cb;
