@@ -85,7 +85,7 @@ bool object::has_property(std::string const &name) const {
 
 void object::delete_property(char const *name) {
   if(!JS_DeleteProperty(Impl::current_context(), get(), name))
-    throw exception("couldn't delete property");
+    throw exception("Could not delete property");
 }
 
 void object::delete_property(std::string const &name) {
@@ -95,7 +95,7 @@ void object::delete_property(std::string const &name) {
 Impl::object_impl::property_iterator_impl &
 Impl::object_impl::property_iterator_impl::operator++() {
   if(!JS_NextProperty(Impl::current_context(), iter, &id))
-    throw exception("couldn't get next property");
+    throw exception("Could not get next property");
   return *this;
 }
 
@@ -119,7 +119,7 @@ object::property_iterator object::begin() const {
   JSObject *obj = JS_NewPropertyIterator(Impl::current_context(),
                                          get_const());
   if(!obj)
-    throw exception("couldn't create property_iterator");
+    throw exception("Could not create property_iterator");
   return Impl::object_impl::property_iterator_impl(obj);
 }
 
@@ -128,15 +128,13 @@ object::property_iterator object::end() const {
     Impl::object_impl::property_iterator_impl());
 }
 
-std::string object::property_iterator::operator*() const {
+value object::property_iterator::operator*() const {
   assert(get_id() != JSVAL_VOID);
   value val;
   if(!JS_IdToValue(Impl::current_context(), get_id(), 
                    Impl::get_jsvalp(val)))
-    throw exception("couldn't convert id to value");
-  if(!val.is_string()) // TODO: could be an "index"!
-    throw exception("unexpected type");
-  return val.to_string().to_string();
+    throw exception("Could not convert id to value");
+  return val;
 }
 
 void object::define_property(char const *name,

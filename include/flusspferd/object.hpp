@@ -107,8 +107,8 @@ public:
       return t;
     }
 
-    // returns property name
-    std::string operator*() const;
+    // returns property ID
+    value operator*() const;
   };
 
   property_iterator begin() const;
