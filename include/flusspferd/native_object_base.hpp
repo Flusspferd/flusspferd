@@ -53,41 +53,6 @@ protected:
 protected:
   void add_native_method(std::string const &name, unsigned arity = 0);
 
-  void add_native_method(
-    std::string const &name, unsigned arity, native_method_type method)
-  {
-    add_native_method(name, arity);
-    register_native_method(name, method);
-  }
-
-  void add_native_method_cb(
-    std::string const &name, unsigned arity, callback_type const &cb)
-  {
-    add_native_method(name, arity);
-    register_native_method_cb(name, cb);
-  }
-
-  template<typename T>
-  void add_native_method(
-    std::string const &name, unsigned arity, void (T::*method)(call_context&))
-  {
-    add_native_method(name, arity, native_method_type(method));
-  }
-
-  template<typename T, typename X>
-  void add_native_method_cb(
-    std::string const &name, unsigned arity, X const &cb)
-  {
-    add_native_method(name, arity);
-    register_native_method_cb<T>(name, cb);
-  }
-
-  template<typename R, typename T>
-  void add_native_method(std::string const &name, unsigned arity, R T::*f) {
-    add_native_method(name, arity);
-    register_native_method(name, f);
-  }
-
 protected:
   void register_native_method(
     std::string const &name, native_method_type method);
