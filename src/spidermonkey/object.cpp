@@ -48,6 +48,16 @@ object object::get_prototype() {
   return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
 }
 
+void object::set_parent(object const &o) {
+  if (!JS_SetParent(Impl::current_context(), get(), o.get_const()))
+    throw exception("Could not set object parent");
+}
+
+void object::set_prototype(object const &o) {
+  if (!JS_SetPrototype(Impl::current_context(), get(), o.get_const()))
+    throw exception("Could not set object prototype");
+}
+
 void object::set_property(char const *name, value const &v) {
   if(!JS_SetProperty(Impl::current_context(), get(), name,
                      Impl::get_jsvalp(const_cast<value&>(v))))

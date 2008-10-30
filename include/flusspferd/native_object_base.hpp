@@ -42,7 +42,7 @@ class tracer;
 
 class native_object_base : public object, private boost::noncopyable {
 protected:
-  native_object_base();
+  native_object_base(object const &proto);
 
   virtual void post_initialize();
 

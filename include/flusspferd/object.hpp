@@ -51,6 +51,9 @@ public:
   object get_parent();
   object get_prototype();
 
+  void set_parent(object const &parent);
+  void set_prototype(object const &prototype);
+
   value apply(object const &fn, arguments const &arg = arguments());
 
   value call(char const *name, arguments const &arg = arguments());

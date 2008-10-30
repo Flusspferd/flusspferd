@@ -41,8 +41,8 @@ THE SOFTWARE.
 #include <stdexcept>
 
 struct my_object : flusspferd::native_object_base {
-  my_object(std::string const &test)
-    : test(test)
+  my_object(std::string const &test, object const &prototype)
+    : flusspferd::native_object_base(prototype), test(test)
   {
     std::cout << "my_object construct" << std::endl;
   }
@@ -57,8 +57,6 @@ struct my_object : flusspferd::native_object_base {
   void post_initialize() {
     std::cout << "my_object pi" << std::endl;
 
-    add_native_method("foo", 1U);
-    
     register_native_method("foo", &my_object::foo);
     register_native_method("()", 0);
 
@@ -77,6 +75,18 @@ struct my_object : flusspferd::native_object_base {
 
   void trace(flusspferd::tracer &trc) {
     trc("v", v);
+  }
+
+  static object create_prototype() {
+    flusspferd::object proto = flusspferd::create_object();
+    flusspferd::root_value rv(proto);
+
+    proto.define_property(
+      "foo",
+      flusspferd::native_object_base::create_native_method("foo", 1U),
+      flusspferd::object::dont_enumerate | flusspferd::object::read_only_property);
+
+    return proto;
   }
 };
 
@@ -134,8 +144,10 @@ int main() {
     //throw flusspferd::exception("bling");
 
     {
+      flusspferd::root_value proto(my_object::create_prototype());
+
       flusspferd::root_value v(
-          flusspferd::create_native_object<my_object>("foobar"));
+          flusspferd::create_native_object<my_object>("foobar", proto.get_object()));
       flusspferd::object o = v.get_object();
       co.gc();
       o.call("foo");
