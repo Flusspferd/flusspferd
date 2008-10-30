@@ -48,9 +48,9 @@ object flusspferd::create_array(unsigned length) {
   return Impl::wrap_object(o);
 }
 
-object flusspferd::create_native_object(native_object_base *ptr) {
+object flusspferd::create_native_object(native_object_base *ptr, object const &proto) {
   try {
-    return ptr->create_object();
+    return ptr->create_object(proto);
   } catch (...) {
     delete ptr;
     throw;

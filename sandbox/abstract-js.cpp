@@ -41,8 +41,8 @@ THE SOFTWARE.
 #include <stdexcept>
 
 struct my_object : flusspferd::native_object_base {
-  my_object(std::string const &test, object const &prototype)
-    : flusspferd::native_object_base(prototype), test(test)
+  my_object(std::string const &test)
+    : test(test)
   {
     std::cout << "my_object construct" << std::endl;
   }
@@ -147,7 +147,7 @@ int main() {
       flusspferd::root_value proto(my_object::create_prototype());
 
       flusspferd::root_value v(
-          flusspferd::create_native_object<my_object>("foobar", proto.get_object()));
+          flusspferd::create_native_object<my_object>(proto.get_object(), "foobar"));
       flusspferd::object o = v.get_object();
       co.gc();
       o.call("foo");

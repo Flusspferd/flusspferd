@@ -49,7 +49,6 @@ public:
 
   typedef boost::unordered_map<std::string, method_variant> native_method_map;
 
-  object prototype;
   native_method_map native_methods;
 };
 
@@ -66,8 +65,7 @@ JSClass native_object_base::impl::native_object_class = {
     0
   };
 
-native_object_base::native_object_base(object const &prototype) : p(new impl) {
-  p->prototype = prototype;
+native_object_base::native_object_base() : p(new impl) {
   register_native_method("()", &native_object_base::invalid_method);
 }
 
@@ -121,13 +119,15 @@ native_object_base *native_object_base::get_native(object const &o_) {
   return static_cast<native_object_base*>(priv);
 }
 
-object native_object_base::create_object() {
+object native_object_base::create_object(object const &prototype_) {
   JSContext *ctx = Impl::current_context();
+
+  object prototype = prototype_;
 
   JSObject *o = JS_NewObject(
       ctx,
       &impl::native_object_class,
-      Impl::get_object(p->prototype),
+      Impl::get_object(prototype),
       0);
 
   if (!o)

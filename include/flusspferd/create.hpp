@@ -45,7 +45,7 @@ class native_function_base;
 
 object create_object();
 object create_array(unsigned int length = 0);
-object create_native_object(native_object_base *ptr);
+object create_native_object(native_object_base *ptr, object const &proto);
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
   template< \
@@ -53,9 +53,10 @@ object create_native_object(native_object_base *ptr);
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
   object create_native_object( \
-    BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
+    object const &proto \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
-    return create_native_object(new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
+    return create_native_object(new T(BOOST_PP_ENUM_PARAMS(n_args, param)), proto); \
   } \
   /**/
 
