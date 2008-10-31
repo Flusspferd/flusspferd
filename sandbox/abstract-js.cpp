@@ -116,7 +116,7 @@ struct my_function : flusspferd::native_function_base {
   ~my_function() { std::cout << "my_function destructor" << std::endl; }
 };
 
-flusspferd::string function2(flusspferd::object &x) {
+flusspferd::string function2(flusspferd::object &x, int) {
   return flusspferd::value(x).to_string();
 }
 
@@ -210,6 +210,7 @@ int main() {
     flusspferd::root_value f_x(x);
 
     std::cout << "function2: " << x.call() << std::endl;
+    std::cout << "name/arity: " << x.name() << '/' << x.arity() << std::endl;
   //}
   //catch(std::exception &e) {
   //  std::cerr << "Exception: " << e.what() << '\n';
