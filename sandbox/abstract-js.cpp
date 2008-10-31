@@ -205,7 +205,8 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    x = flusspferd::create_native_function(&function2);
+    x = flusspferd::create_native_function(
+          &function2, std::string("function2"));
     flusspferd::root_value f_x(x);
 
     std::cout << "function2: " << x.call() << std::endl;

@@ -89,23 +89,28 @@ BOOST_PP_REPEAT(
 )
 
 inline function create_native_function(
-  boost::function<void (call_context &)> const &fn)
+  boost::function<void (call_context &)> const &fn,
+  unsigned arity = 0,
+  std::string const &name = std::string())
 {
-  return create_native_function<native_function<void> >(fn);
+  return create_native_function<native_function<void> >(fn, arity, name);
 }
 
 template<typename T>
 function create_native_function(
-  boost::function<T> const &fn)
+  boost::function<T> const &fn,
+  std::string const &name = std::string())
 {
-  return create_native_function<native_function<T> >(fn);
+  return create_native_function<native_function<T> >(fn, name);
 }
 
 template<typename T>
 function create_native_function(
-  T *fnptr, typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
+  T *fnptr,
+  std::string const &name = std::string(),
+  typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
 {
-  return create_native_function<T>(boost::function<T>(fnptr));
+  return create_native_function<T>(boost::function<T>(fnptr), name);
 }
 
 }

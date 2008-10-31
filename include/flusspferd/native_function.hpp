@@ -36,10 +36,10 @@ public:
   typedef boost::function<T> callback_type;
 
   native_function(
-      callback_type const &cb, unsigned arity = 0,
+      callback_type const &cb,
       std::string const &name = std::string()
     )
-    : native_function_base(arity, name), adapter(cb)
+    : native_function_base(function_adapter<T>::arity, name), adapter(cb)
   {}
 
 private:
@@ -56,7 +56,10 @@ public:
   typedef boost::function<void (call_context &)> callback_type;
 
   native_function(
-      callback_type const &cb, unsigned arity = 0, std::string const &name = std::string())
+      callback_type const &cb,
+      unsigned arity = 0,
+      std::string const &name = std::string()
+    )
     : native_function_base(arity, name), cb(cb)
   {}
 
