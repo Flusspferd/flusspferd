@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/function_adapter.hpp"
 #include "flusspferd/native_function.hpp"
@@ -41,8 +42,8 @@ THE SOFTWARE.
 #include <stdexcept>
 
 struct my_object : flusspferd::native_object_base {
-  my_object(std::string const &test)
-    : test(test)
+  my_object(flusspferd::call_context &x)
+    : test(x.arg[0].to_string().to_string())
   {
     std::cout << "my_object construct" << std::endl;
   }
@@ -84,10 +85,14 @@ struct my_object : flusspferd::native_object_base {
     proto.define_property(
       "foo",
       flusspferd::native_object_base::create_native_method("foo", 1U),
-      flusspferd::object::dont_enumerate | flusspferd::object::read_only_property);
+      flusspferd::object::dont_enumerate |
+      flusspferd::object::read_only_property);
 
     return proto;
   }
+
+  static std::size_t constructor_arity() { return 1; }
+  static char const *constructor_name() { return "MyObject"; }
 };
 
 struct my_function : flusspferd::native_function_base {
@@ -137,17 +142,20 @@ int main() {
     std::cout << num.to_integral_number(64, false) << '\n';
     std::cout << num.to_integral_number(64, true) << '\n' << std::endl;
 
-    std::cout << flusspferd::convert<long long>::from_value().perform(num) << '\n';
-    std::cout << flusspferd::convert<unsigned short const &>::from_value().perform(num);
+    std::cout << 
+      flusspferd::convert<long long>::from_value().perform(num) << '\n';
+    std::cout <<
+      flusspferd::convert<unsigned short const &>::from_value().perform(num);
     std::cout << '\n' << std::endl;
 
     //throw flusspferd::exception("bling");
 
     {
-      flusspferd::root_value proto(my_object::create_prototype());
+      //flusspferd::function mk =
+      flusspferd::load_class<my_object>();
 
-      flusspferd::root_value v(
-          flusspferd::create_native_object<my_object>(proto.get_object(), "foobar"));
+      //flusspferd::root_value v(mk.call());
+      flusspferd::root_value v(flusspferd::global().call("MyObject"));
       flusspferd::object o = v.get_object();
       co.gc();
       o.call("foo");
