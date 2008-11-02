@@ -119,7 +119,7 @@ native_object_base *native_object_base::get_native(object const &o_) {
   return static_cast<native_object_base*>(priv);
 }
 
-object native_object_base::create_object(object const &prototype_) {
+object native_object_base::do_create_object(object const &prototype_) {
   JSContext *ctx = Impl::current_context();
 
   object prototype = prototype_;

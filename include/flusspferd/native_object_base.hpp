@@ -102,7 +102,7 @@ private:
   void invalid_method(call_context &);
 
 private:
-  object create_object(object const &proto);
+  object do_create_object(object const &proto);
 
   friend object create_native_object(native_object_base *, object const &);
 
