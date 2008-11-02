@@ -42,6 +42,7 @@ private:
   void post_initialize();
 
 private: // javascript methods
+  void open(char const *name);
   void close();
 
 private:

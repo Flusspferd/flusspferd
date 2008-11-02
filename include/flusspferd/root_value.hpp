@@ -32,7 +32,7 @@ namespace flusspferd {
 
 class root_value : public value, private boost::noncopyable {
 public:
-  root_value(value const &v);
+  root_value(value const &v = value());
   ~root_value();
 
   root_value &operator=(value const &o) {

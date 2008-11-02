@@ -39,10 +39,7 @@ file_class::file_class(call_context &x)
 {
   if (!x.arg.empty()) {
     string name = x.arg[0].to_string();
-    p->stream.open(name.c_str());
-
-    if (!p->stream)
-      throw exception("Could not open file");
+    open(name.c_str());
   }
 }
 
@@ -50,6 +47,7 @@ file_class::~file_class()
 {}
 
 void file_class::post_initialize() {
+  register_native_method("open", &file_class::open);
   register_native_method("close", &file_class::close);
 }
 
@@ -66,9 +64,17 @@ object file_class::create_prototype() {
 
   object proto = create_object();
 
+  proto.define_property("open", create_native_method("open", 1));
   proto.define_property("close", create_native_method("close", 0));
 
   return proto;
+}
+
+void file_class::open(char const *name) {
+  p->stream.open(name);
+
+  if (!p->stream)
+    throw exception("Could not open file");
 }
 
 void file_class::close() {
