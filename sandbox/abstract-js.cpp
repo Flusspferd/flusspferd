@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/file_class.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/function_adapter.hpp"
@@ -131,6 +132,8 @@ int main() {
 
     flusspferd::context co = flusspferd::context::create();
     flusspferd::current_context_scope scope(co);
+
+    flusspferd::load_class<flusspferd::file_class>();
 
     flusspferd::value num(-1234567891234.5678);
     std::cout.precision(40);
