@@ -63,6 +63,9 @@ std::size_t file_class::class_info::constructor_arity() {
   return 1;
 }
 
+void file_class::class_info::augment_constructor(object constructor) {
+}
+
 object file_class::class_info::create_prototype() {
   local_root_scope scope;
 

@@ -25,7 +25,6 @@ THE SOFTWARE.
 #define FLUSSPFERD_FILE_CLASS_HPP
 
 #include "native_object_base.hpp"
-#include "class.hpp"
 
 namespace flusspferd {
 
@@ -34,11 +33,13 @@ public:
   file_class(call_context &);
   ~file_class();
 
-  struct class_info : flusspferd::class_info {
+  struct class_info {
     static char const *constructor_name();
     static std::size_t constructor_arity();
 
     static object create_prototype();
+
+    static void augment_constructor(object);
   };
 
 private:
