@@ -57,7 +57,7 @@ Impl::string_impl::string_impl(value const &v)
                          Impl::get_jsval(const_cast<value&>(v))))
 {
   if (!str)
-    throw exception("Could not create string");
+    throw exception("Could not convert value to string");
 }
 
 namespace {
