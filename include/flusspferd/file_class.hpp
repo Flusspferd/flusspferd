@@ -47,6 +47,8 @@ private: // javascript methods
 
   string read_whole();
 
+  void write(string const &);
+
 private:
   class impl;
   boost::scoped_ptr<impl> p;

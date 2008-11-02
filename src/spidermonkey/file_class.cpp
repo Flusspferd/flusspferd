@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/string_io.hpp"
 #include <fstream>
 #include <iostream>
 
@@ -51,6 +52,7 @@ void file_class::post_initialize() {
   register_native_method("open", &file_class::open);
   register_native_method("close", &file_class::close);
   register_native_method("readWhole", &file_class::read_whole);
+  register_native_method("write", &file_class::write);
 }
 
 char const *file_class::constructor_name() {
@@ -69,6 +71,7 @@ object file_class::create_prototype() {
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);
   create_native_method(proto, "readWhole", 0);
+  create_native_method(proto, "write", 1);
 
   return proto;
 }
@@ -94,4 +97,8 @@ string file_class::read_whole() {
   } while (p->stream);
 
   return string(data);
+}
+
+void file_class::write(string const &text) {
+  p->stream << text;
 }
