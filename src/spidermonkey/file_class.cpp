@@ -66,9 +66,9 @@ object file_class::create_prototype() {
 
   object proto = create_object();
 
-  proto.define_property("open", create_native_method("open", 1));
-  proto.define_property("close", create_native_method("close", 0));
-  proto.define_property("readWhole", create_native_method("readWhole", 0));
+  create_native_method(proto, "open", 1);
+  create_native_method(proto, "close", 0);
+  create_native_method(proto, "readWhole", 0);
 
   return proto;
 }

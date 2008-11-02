@@ -180,6 +180,17 @@ function native_object_base::create_native_method(
   return Impl::wrap_function(func);
 }
 
+function native_object_base::create_native_method(
+    object &container, std::string const &name, unsigned arity)
+{
+  function fun = create_native_method(name, arity);
+  container.define_property(
+      name,
+      fun,
+      object::dont_enumerate);
+  return fun;
+}
+
 void native_object_base::register_native_method(
   std::string const &name, native_method_type method)
 {

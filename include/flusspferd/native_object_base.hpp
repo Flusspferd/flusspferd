@@ -82,7 +82,10 @@ protected:
 
 protected:
   static function create_native_method(
-    std::string const &name, unsigned arity = 0);
+    std::string const &name, unsigned arity);
+
+  static function create_native_method(
+    object &container, std::string const &name, unsigned arity);
 
 protected:
   virtual void call_native_method(std::string const &name, call_context &);
