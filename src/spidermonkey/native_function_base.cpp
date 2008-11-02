@@ -48,7 +48,7 @@ public:
   unsigned arity;
   std::string name;
 
-  static JSClass function_parent_class;
+  static JSClass function_priv_class;
 };
 
 native_function_base::native_function_base(unsigned arity)
@@ -77,7 +77,7 @@ std::string const &native_function_base::get_name() const {
   return p->name;
 }
 
-JSClass native_function_base::impl::function_parent_class = {
+JSClass native_function_base::impl::function_priv_class = {
   "FunctionParent",
   JSCLASS_HAS_PRIVATE,
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
@@ -94,19 +94,27 @@ function native_function_base::create_function() {
   {
     local_root_scope scope;
 
-    JSObject *parent = JS_NewObject(ctx, &impl::function_parent_class, 0, 0);
+    JSObject *priv = JS_NewObject(ctx, &impl::function_priv_class, 0, 0);
 
-    if (!parent)
+    if (!priv)
       throw exception("Could not create native function");
 
-    JS_SetPrivate(ctx, parent, this);
+    JS_SetPrivate(ctx, priv, this);
 
     fun = JS_NewFunction(
         ctx, &impl::call_helper,
-        p->arity, 0, parent, p->name.c_str());
-  }
+        p->arity, 0, 0, p->name.c_str());
 
-  function::operator=(Impl::wrap_function(fun));
+    if (!fun)
+      throw exception("Could not create native function");
+
+    function::operator=(Impl::wrap_function(fun));
+
+    JSObject *obj = Impl::get_object(*this);
+
+    JS_SetReservedSlot(ctx, obj, 0, OBJECT_TO_JSVAL(priv));
+    JS_SetReservedSlot(ctx, obj, 1, PRIVATE_TO_JSVAL(this));
+  }
 
   return *static_cast<function *>(this);
 }
@@ -118,10 +126,14 @@ JSBool native_function_base::impl::call_helper(
     current_context_scope scope(Impl::wrap_context(ctx));
 
     JSObject *function = JSVAL_TO_OBJECT(argv[-2]);
-    JSObject *parent = JS_GetParent(ctx, function);
 
-    native_function_base *self =
-      (native_function_base *) JS_GetInstancePrivate(ctx, parent, &function_parent_class, 0);
+    jsval self_val;
+
+    if (!JS_GetReservedSlot(ctx, function, 1, &self_val))
+      throw exception("Could not call native function");
+
+    native_function_base *self = 
+      (native_function_base *) JSVAL_TO_PRIVATE(self_val);
 
     if (!self)
       throw exception("Could not call native function");
@@ -137,11 +149,11 @@ JSBool native_function_base::impl::call_helper(
   } FLUSSPFERD_CALLBACK_END;
 }
 
-void native_function_base::impl::finalize(JSContext *ctx, JSObject *parent) {
+void native_function_base::impl::finalize(JSContext *ctx, JSObject *priv) {
   current_context_scope scope(Impl::wrap_context(ctx));
 
   native_function_base *self =
-    (native_function_base *) JS_GetInstancePrivate(ctx, parent, &function_parent_class, 0);
+    (native_function_base *) JS_GetInstancePrivate(ctx, priv, &function_priv_class, 0);
 
   if (!self)
     throw exception("Could not finalize native function");
@@ -156,18 +168,26 @@ native_function_base *native_function_base::get_native(object const &o_) {
   JSObject *p = Impl::get_object(o);
 
   native_function_base *self =
-    (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_parent_class, 0);
+    (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
 
   if (self)
     return self;
 
-  p = JS_GetParent(ctx, p);
+  if (!JS_ObjectIsFunction(ctx, p))
+    throw exception("Could not get native function pointer (no function)");
+
+  jsval p_val;
+
+  if (!JS_GetReservedSlot(ctx, p, 0, &p_val))
+    throw exception("Could not get native function pointer");
+
+  p = JSVAL_TO_OBJECT(p_val);
 
   if (!p)
     throw exception("Could not get native function pointer");
 
   self =
-    (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_parent_class, 0);
+    (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
 
   if (!self)
     throw exception("Could not get native function pointer");
