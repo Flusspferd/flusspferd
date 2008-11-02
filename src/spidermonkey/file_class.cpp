@@ -49,6 +49,10 @@ file_class::file_class(call_context &x)
 file_class::~file_class()
 {}
 
+void file_class::post_initialize() {
+  register_native_method("close", &file_class::close);
+}
+
 char const *file_class::constructor_name() {
   return "File";
 }
@@ -62,5 +66,11 @@ object file_class::create_prototype() {
 
   object proto = create_object();
 
+  proto.define_property("close", create_native_method("close", 0));
+
   return proto;
+}
+
+void file_class::close() {
+  p->stream.close();
 }

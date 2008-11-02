@@ -39,6 +39,12 @@ public:
   static object create_prototype();
 
 private:
+  void post_initialize();
+
+private: // javascript methods
+  void close();
+
+private:
   class impl;
   boost::scoped_ptr<impl> p;
 };
