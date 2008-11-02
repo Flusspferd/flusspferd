@@ -79,21 +79,23 @@ struct my_object : flusspferd::native_object_base {
     trc("v", v);
   }
 
-  static object create_prototype() {
-    flusspferd::object proto = flusspferd::create_object();
-    flusspferd::root_value rv(proto);
+  struct class_info : flusspferd::class_info {
+    static object create_prototype() {
+      flusspferd::object proto = flusspferd::create_object();
+      flusspferd::root_value rv(proto);
 
-    proto.define_property(
-      "foo",
-      flusspferd::native_object_base::create_native_method("foo", 1U),
-      flusspferd::object::dont_enumerate |
-      flusspferd::object::read_only_property);
+      proto.define_property(
+        "foo",
+        flusspferd::native_object_base::create_native_method("foo", 1U),
+        flusspferd::object::dont_enumerate |
+        flusspferd::object::read_only_property);
 
-    return proto;
-  }
+      return proto;
+    }
 
-  static std::size_t constructor_arity() { return 1; }
-  static char const *constructor_name() { return "MyObject"; }
+    static std::size_t constructor_arity() { return 1; }
+    static char const *constructor_name() { return "MyObject"; }
+  };
 };
 
 struct my_function : flusspferd::native_function_base {

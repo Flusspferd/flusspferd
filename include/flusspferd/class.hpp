@@ -49,20 +49,35 @@ struct class_constructor : native_function_base {
 
 }
 
+struct class_info {
+  static std::size_t constructor_arity() {
+    return 0;
+  }
+
+  static void augment_constructor(object const &) {
+  }
+
+  static object create_prototype() {
+    return create_object();
+  }
+};
+
 template<typename T>
 function load_class(object container = global()) {
-  std::size_t const arity = T::constructor_arity();
-  std::string const name = T::constructor_name();
+  std::size_t const arity = T::class_info::constructor_arity();
+  std::string const name = T::class_info::constructor_name();
 
   function constructor =
     create_native_function<detail::class_constructor<T> >(arity, name);
   root_value root(constructor);
 
-  object prototype = T::create_prototype();
+  object prototype = T::class_info::create_prototype();
   constructor.define_property(
     "prototype",
     prototype,
     object::dont_enumerate);
+
+  T::class_info::augment_constructor(object(constructor));
 
   container.define_property(
     name,

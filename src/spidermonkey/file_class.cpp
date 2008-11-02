@@ -55,15 +55,15 @@ void file_class::post_initialize() {
   register_native_method("write", &file_class::write);
 }
 
-char const *file_class::constructor_name() {
+char const *file_class::class_info::constructor_name() {
   return "File";
 }
 
-std::size_t file_class::constructor_arity() {
-  return 0;
+std::size_t file_class::class_info::constructor_arity() {
+  return 1;
 }
 
-object file_class::create_prototype() {
+object file_class::class_info::create_prototype() {
   local_root_scope scope;
 
   object proto = create_object();
