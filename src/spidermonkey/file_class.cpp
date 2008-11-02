@@ -24,10 +24,29 @@ THE SOFTWARE.
 #include "flusspferd/file_class.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/string.hpp"
+#include <fstream>
 
 using namespace flusspferd;
 
-file_class::file_class(call_context &)
+class file_class::impl {
+public:
+  std::fstream stream;
+};
+
+file_class::file_class(call_context &x)
+  : p(new impl)
+{
+  if (!x.arg.empty()) {
+    string name = x.arg[0].to_string();
+    p->stream.open(name.c_str());
+
+    if (!p->stream)
+      throw exception("Could not open file");
+  }
+}
+
+file_class::~file_class()
 {}
 
 char const *file_class::constructor_name() {

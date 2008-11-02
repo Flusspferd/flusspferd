@@ -31,11 +31,16 @@ namespace flusspferd {
 class file_class : public native_object_base {
 public:
   file_class(call_context &);
+  ~file_class();
 
   static char const *constructor_name();
   static std::size_t constructor_arity();
 
   static object create_prototype();
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }
