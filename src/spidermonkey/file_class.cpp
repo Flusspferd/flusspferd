@@ -26,14 +26,20 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
+#include "flusspferd/create.hpp"
 #include <fstream>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 using namespace flusspferd;
 
 class file_class::impl {
 public:
   std::fstream stream;
+
+  static void create(char const *name, int mode);
 };
 
 file_class::file_class(call_context &x)
@@ -64,6 +70,9 @@ std::size_t file_class::class_info::constructor_arity() {
 }
 
 void file_class::class_info::augment_constructor(object constructor) {
+  constructor.define_property("create",
+    create_native_function(&impl::create, "create"),
+    object::dont_enumerate);
 }
 
 object file_class::class_info::create_prototype() {
@@ -104,4 +113,10 @@ string file_class::read_whole() {
 
 void file_class::write(string const &text) {
   p->stream << text;
+}
+
+void file_class::impl::create(char const *name, int mode) {
+  if (mode <= 0)
+    mode = 0666;
+  creat(name, mode);
 }
