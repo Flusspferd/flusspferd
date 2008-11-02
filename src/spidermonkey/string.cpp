@@ -75,6 +75,11 @@ string::string(std::basic_string<char16_t> const &s)
   : Impl::string_impl(s.data(), s.size()) { }
 string::~string() { }
 
+string &string::operator=(string const &o) {
+  string_impl::operator=(o);
+  return *this;
+}
+
 std::size_t string::length() const {
   assert(get_string(*this));
   return JS_GetStringLength(get_string(*this));
