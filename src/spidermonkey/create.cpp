@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/native_function_base.hpp"
+#include "flusspferd/string.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include <js/jsapi.h>
@@ -64,4 +65,11 @@ function flusspferd::create_native_function(native_function_base *ptr) {
     delete ptr;
     throw;
   }
+}
+
+function flusspferd::create_native_function(object const &o_, native_function_base *ptr) {
+  object o = o_;
+  function fun = create_native_function(ptr);
+  o.define_property(ptr->name().c_str(), fun, object::dont_enumerate);
+  return fun;
 }

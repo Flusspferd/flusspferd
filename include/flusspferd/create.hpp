@@ -68,6 +68,8 @@ BOOST_PP_REPEAT(
 
 function create_native_function(native_function_base *);
 
+function create_native_function(object const &o, native_function_base *ptr);
+
 #define FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION(z, n_args, d) \
   template< \
     typename T \
@@ -79,6 +81,19 @@ function create_native_function(native_function_base *);
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
   ) { \
     return create_native_function(new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
+  } \
+  \
+  template< \
+    typename T \
+    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
+  > \
+  object create_native_function( \
+    object const &o, \
+    BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
+    BOOST_PP_COMMA_IF(n_args) \
+    typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
+  ) { \
+    return create_native_function(o, new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
   } \
   /**/
 
@@ -96,6 +111,15 @@ inline function create_native_function(
   return create_native_function<native_function<void> >(fn, arity, name);
 }
 
+inline function create_native_function(
+  object const &o,
+  std::string const &name,
+  boost::function<void (call_context &)> const &fn,
+  unsigned arity = 0)
+{
+  return create_native_function<native_function<void> >(o, fn, arity, name);
+}
+
 template<typename T>
 function create_native_function(
   boost::function<T> const &fn,
@@ -106,11 +130,30 @@ function create_native_function(
 
 template<typename T>
 function create_native_function(
+  object const &o,
+  std::string const &name,
+  boost::function<T> const &fn)
+{
+  return create_native_function<native_function<T> >(o, fn, name);
+}
+
+template<typename T>
+function create_native_function(
   T *fnptr,
   std::string const &name = std::string(),
   typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
 {
   return create_native_function<T>(boost::function<T>(fnptr), name);
+}
+
+template<typename T>
+function create_native_function(
+  object const &o,
+  std::string const &name,
+  T *fnptr,
+  typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
+{
+  return create_native_function<T>(o, name, boost::function<T>(fnptr));
 }
 
 }

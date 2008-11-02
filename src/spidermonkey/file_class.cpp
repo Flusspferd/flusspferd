@@ -70,9 +70,7 @@ std::size_t file_class::class_info::constructor_arity() {
 }
 
 void file_class::class_info::augment_constructor(object constructor) {
-  constructor.define_property("create",
-    create_native_function(&impl::create, "create"),
-    object::dont_enumerate);
+  create_native_function(constructor, "create", &impl::create);
 }
 
 object file_class::class_info::create_prototype() {
