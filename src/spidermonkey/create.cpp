@@ -50,7 +50,7 @@ object flusspferd::create_array(unsigned length) {
 
 object flusspferd::create_native_object(native_object_base *ptr, object const &proto) {
   try {
-    return ptr->create_object(proto);
+    return ptr->do_create_object(proto);
   } catch (...) {
     delete ptr;
     throw;
