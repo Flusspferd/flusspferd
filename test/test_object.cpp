@@ -21,21 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE( void_value ) {
-  flusspferd::value void_value;
-  BOOST_CHECK(void_value.is_void());
-  BOOST_CHECK(!void_value.is_null());
-}
-
-BOOST_AUTO_TEST_CASE( null_value ) {
+BOOST_AUTO_TEST_CASE( null_object ) {
   flusspferd::object null_object;
-  BOOST_REQUIRE(!null_object.is_valid());
-
-  flusspferd::value null_value(null_object);
-  BOOST_CHECK(!null_value.is_void());
-  BOOST_CHECK(null_value.is_null());
+  BOOST_CHECK(!null_object.is_valid());
 }
+
