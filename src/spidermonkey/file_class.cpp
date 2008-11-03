@@ -39,7 +39,7 @@ class file_class::impl {
 public:
   std::fstream stream;
 
-  static void create(char const *name, int mode);
+  static void create(char const *name, boost::optional<int> mode);
 };
 
 file_class::file_class(call_context &x)
@@ -113,8 +113,6 @@ void file_class::write(string const &text) {
   p->stream << text;
 }
 
-void file_class::impl::create(char const *name, int mode) {
-  if (mode <= 0)
-    mode = 0666;
-  creat(name, mode);
+void file_class::impl::create(char const *name, boost::optional<int> mode) {
+  creat(name, mode.get_value_or(0666));
 }

@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/remove_cv.hpp>
+#include <boost/optional.hpp>
 #include <limits>
 
 namespace flusspferd {
@@ -161,6 +162,29 @@ struct convert<
   struct from_value {
     T perform(value const &v) {
       return v.to_number();
+    }
+  };
+};
+
+template<typename T>
+struct convert< boost::optional<T> > {
+  struct to_value {
+    typename convert<T>::to_value base;
+
+    value perform(boost::optional<T> const &x) {
+      if (!x)
+        return value();
+      return base.perform(x.get());
+    }
+  };
+
+  struct from_value {
+    typename convert<T>::from_value base;
+
+    boost::optional<T> perform(value const &v) {
+      if (v.is_void() || v.is_null())
+        return boost::optional<T>();
+      return base.perform(v);
     }
   };
 };
