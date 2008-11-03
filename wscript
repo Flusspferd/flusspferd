@@ -65,6 +65,7 @@ def configure(conf):
     conf.check_tool('boost')
 
     boostconf = conf.create_boost_configurator()
+    boostconf.lib = ['unit_test_framework']
     if darwin:
         boostconf.static = 'nostatic'
     else:

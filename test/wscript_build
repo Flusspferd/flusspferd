@@ -21,4 +21,10 @@
 # THE SOFTWARE.
 #
 
+obj = bld.new_task_gen('cxx', 'program')
+obj.target = 'run-tests'
+obj.find_sources_in_dirs('.')
+obj.uselib = 'JS BOOST_UNIT_TEST_FRAMEWORK BOOST'
+obj.uselib_local = 'templar'
+obj.includes = ['../include']
 
