@@ -35,7 +35,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 value::~value() { }
-value::value() : Impl::value_impl(JSVAL_NULL) { }
+value::value() : Impl::value_impl(JSVAL_VOID) { }
 value::value(bool b) : Impl::value_impl(BOOLEAN_TO_JSVAL(b)) { }
 value::value(int i) : Impl::value_impl(INT_TO_JSVAL(i)) { }
 
