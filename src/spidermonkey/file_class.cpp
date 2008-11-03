@@ -114,5 +114,6 @@ void file_class::write(string const &text) {
 }
 
 void file_class::impl::create(char const *name, boost::optional<int> mode) {
-  creat(name, mode.get_value_or(0666));
+  if (creat(name, mode.get_value_or(0666)) < 0)
+    throw exception("Could not create file");
 }
