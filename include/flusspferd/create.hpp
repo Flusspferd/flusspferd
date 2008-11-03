@@ -88,9 +88,8 @@ function create_native_function(object const &o, native_function_base *ptr);
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
   object create_native_function( \
-    object const &o, \
-    BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
-    BOOST_PP_COMMA_IF(n_args) \
+    object const &o \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
   ) { \
     return create_native_function(o, new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
