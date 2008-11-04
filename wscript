@@ -64,6 +64,9 @@ def configure(conf):
     conf.check_tool('misc')
     conf.check_tool('boost')
 
+    conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
+    conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
+
     boostconf = conf.create_boost_configurator()
     boostconf.lib = ['unit_test_framework']
     if darwin:

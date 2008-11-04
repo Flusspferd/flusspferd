@@ -33,3 +33,9 @@ obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
 obj.uselib = 'JS BOOST'
 obj.target = 'templar'
+
+obj = bld.new_task_gen('cxx', libtype)
+obj.find_sources_in_dirs('. spidermonkey')
+obj.includes = ['../include']
+obj.uselib = 'GCOV JS BOOST'
+obj.target = 'templar-coverage'
