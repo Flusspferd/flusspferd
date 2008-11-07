@@ -22,4 +22,9 @@
 # THE SOFTWARE.
 #
 
-lcov ${LCOV_MODE:-"-c"} -b build -d build -o build/coverage.info
+lcov ${LCOV_MODE:="-c"} -b ./build -d ./build -o ./build/coverage.info
+
+if [ "$LCOV_MODE" = "-z" ]
+then
+  find ./build -name '*.gcda' -exec rm {} \+
+fi
