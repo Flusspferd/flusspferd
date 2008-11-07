@@ -22,4 +22,4 @@
 # THE SOFTWARE.
 #
 
-genhtml build/coverage.info -o html/coverage
+genhtml build/coverage.info -o html/coverage -q

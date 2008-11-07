@@ -28,7 +28,11 @@ then
   exit 2
 fi
 
+echo "PROGRESS: Clearing test coverage counters"
+
 LCOV_MODE=-z ./util/lcov.sh
+
+echo "PROGRESS: Running tests"
 
 for prog in ./build/default/test/test_*
 do
@@ -39,6 +43,10 @@ do
   fi
 done
 
+echo "PROGRESS: Analyzing test coverage"
+
 ./util/lcov.sh
+
+echo "PROGRESS: Visualizing test coverage"
 
 ./util/genhtml.sh
