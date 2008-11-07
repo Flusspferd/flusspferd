@@ -47,7 +47,7 @@ echo "PROGRESS: Analyzing test coverage"
 
 ./util/lcov.sh
 
-lcov -q -r ./build/coverage.info '/usr*' -o ./build/coverage.info
+lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
 
 echo "PROGRESS: Visualizing test coverage"
 
