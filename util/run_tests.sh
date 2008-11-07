@@ -22,4 +22,17 @@
 # THE SOFTWARE.
 #
 
-lcov ${LCOV_MODE:-"-c"} -b build -d build -o build/coverage.info
+LCOV_MODE=-z ./util/lcov.sh
+
+for prog in ./build/default/test/test_*
+do
+  if [ -x $prog ]
+  then
+    echo "Testing '$prog'"
+    $prog
+  fi
+done
+
+./util/lcov.sh
+
+./util/genhtml.sh
