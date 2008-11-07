@@ -43,3 +43,13 @@ BOOST_AUTO_TEST_CASE( null_value ) {
   BOOST_CHECK(!null_value.is_void());
   BOOST_CHECK(null_value.is_null());
 }
+
+BOOST_AUTO_TEST_CASE( boolean_value ) {
+  flusspferd::value boolean_value(false);
+  BOOST_CHECK(boolean_value.is_boolean());
+  BOOST_CHECK(!boolean_value.get_boolean());
+
+  boolean_value = true;
+  BOOST_CHECK(boolean_value.is_boolean());
+  BOOST_CHECK(boolean_value.get_boolean());
+}
