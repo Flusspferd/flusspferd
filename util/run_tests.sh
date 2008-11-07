@@ -22,6 +22,12 @@
 # THE SOFTWARE.
 #
 
+if [ ! -d ./build ]
+then
+  echo "ERROR: Must be in global project directory!"
+  exit 2
+fi
+
 LCOV_MODE=-z ./util/lcov.sh
 
 for prog in ./build/default/test/test_*
