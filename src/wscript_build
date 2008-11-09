@@ -37,3 +37,4 @@ obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
 obj.uselib = 'GCOV JS BOOST'
 obj.target = 'templar-coverage'
+obj.install_path = None
