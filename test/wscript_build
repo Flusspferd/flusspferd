@@ -28,6 +28,7 @@ for source in glob.glob(bld.path.abspath() + '/test_*.cpp'):
   obj = bld.new_task_gen('cxx', 'program')
   obj.target = source.replace('.cpp', '')
   obj.source = source
+  obj.install_path = None
   obj.uselib = 'JS BOOST_UNIT_TEST_FRAMEWORK BOOST'
   obj.defines = 'BOOST_TEST_DYN_LINK BOOST_TEST_MAIN'
   obj.uselib_local = 'templar-coverage'
