@@ -49,10 +49,7 @@ namespace flusspferd {
     bool leave_current_context(context const &c);
     context &get_current_context();
 
-    static init &initialize() {
-      static init in;
-      return in;
-    }
+    static init &initialize();
   };
 
   inline context enter_current_context(context const &c) {

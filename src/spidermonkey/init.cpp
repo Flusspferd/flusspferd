@@ -34,6 +34,8 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
+__thread init *p_instance;
+
 class init::impl {
 public:
   // we use a single JS_Runtime for each process!
@@ -60,6 +62,12 @@ struct init::detail {
 
 JSRuntime *Impl::get_runtime() {
   return init::detail::get(init::initialize());
+}
+
+init &init::initialize() {
+  if (!p_instance)
+    p_instance = new init;
+  return *p_instance;
 }
 
 init::init() : p(new impl) { }

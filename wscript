@@ -55,8 +55,6 @@ def configure(conf):
     #u('CXXFLAGS', '-O3 -DNDEBUG')
     u('CXXFLAGS', '-O0 -g -DDEBUG')
 
-    u('CXXDEFINES', 'BOOST_SP_DISABLE_THREADS')
-
     conf.check_tool('compiler_cxx')
     conf.check_tool('misc')
     conf.check_tool('boost')
