@@ -24,9 +24,7 @@
 import sys
 darwin = sys.platform.startswith('darwin')
 
-libtype = 'staticlib'
-if darwin:
-    libtype = 'shlib'
+libtype = 'shlib'
 
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('. spidermonkey')

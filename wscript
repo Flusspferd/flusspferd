@@ -55,9 +55,6 @@ def configure(conf):
     #u('CXXFLAGS', '-O3 -DNDEBUG')
     u('CXXFLAGS', '-O0 -g -DDEBUG')
 
-    if not darwin:
-        conf.env['FULLSTATIC'] = True
-
     u('CXXDEFINES', 'BOOST_SP_DISABLE_THREADS')
 
     conf.check_tool('compiler_cxx')
@@ -69,10 +66,7 @@ def configure(conf):
 
     boostconf = conf.create_boost_configurator()
     boostconf.lib = ['unit_test_framework']
-    if darwin:
-        boostconf.static = 'nostatic'
-    else:
-        boostconf.static = 'onlystatic'
+    boostconf.static = 'nostatic'
     boostconf.threadingtag = 'st'
     boostconf.run()
     
@@ -83,8 +77,6 @@ def configure(conf):
     libconf.name = 'js'
     libconf.path = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/sw/lib']
     libconf.mandatory = True
-    if not darwin:
-        libconf.static = True
     libconf.run()
 
     headconf = conf.create_header_configurator()

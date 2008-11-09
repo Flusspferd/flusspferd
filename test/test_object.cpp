@@ -24,10 +24,6 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include <boost/test/unit_test.hpp>
 
-boost::unit_test::test_suite *init_unit_test_suite(int, char **) {
-  return 0;
-}
-
 BOOST_AUTO_TEST_CASE( null_object ) {
   flusspferd::object null_object;
   BOOST_CHECK(!null_object.is_valid());

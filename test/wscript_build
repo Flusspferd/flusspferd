@@ -29,6 +29,7 @@ for source in glob.glob(bld.path.abspath() + '/test_*.cpp'):
   obj.target = source.replace('.cpp', '')
   obj.source = source
   obj.uselib = 'JS BOOST_UNIT_TEST_FRAMEWORK BOOST'
+  obj.defines = 'BOOST_TEST_DYN_LINK BOOST_TEST_MAIN'
   obj.uselib_local = 'templar-coverage'
   obj.includes = ['../include']
 
