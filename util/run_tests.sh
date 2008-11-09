@@ -39,7 +39,7 @@ do
   if [ -x $prog ]
   then
     echo "Testing '$prog'"
-    $prog
+    LD_LIBRARY_PATH="./build/default/src:$LD_LIBRARY_PATH" $prog
   fi
 done
 
