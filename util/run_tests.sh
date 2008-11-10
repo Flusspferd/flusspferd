@@ -24,31 +24,31 @@
 
 if [ ! -d ./build ]
 then
-  echo "ERROR: Must be in global project directory!"
+  echo "ERROR: Must be in global project directory!" 1>&2
   exit 2
 fi
 
-echo "PROGRESS: Clearing test coverage counters"
+echo "PROGRESS: Clearing test coverage counters" 1>&2
 
 LCOV_MODE=-z ./util/lcov.sh
 
-echo "PROGRESS: Running tests"
+echo "PROGRESS: Running tests" 1>&2
 
 for prog in ./build/default/test/test_*
 do
   if [ -x $prog ]
   then
-    echo "Testing '$prog'"
-    LD_LIBRARY_PATH="./build/default/src:$LD_LIBRARY_PATH" $prog
+    echo "Testing '$prog'" 1>&2
+    LD_LIBRARY_PATH="./build/default/src:$LD_LIBRARY_PATH" $prog 2>&1
   fi
 done
 
-echo "PROGRESS: Analyzing test coverage"
+echo "PROGRESS: Analyzing test coverage" 1>&2
 
 ./util/lcov.sh
 
 lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
 
-echo "PROGRESS: Visualizing test coverage"
+echo "PROGRESS: Visualizing test coverage" 1>&2
 
 ./util/genhtml.sh
