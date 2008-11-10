@@ -80,6 +80,10 @@ public:
       JS_DestroyContext(context);
   }
 
+  bool is_valid() {
+    return context;
+  }
+
   JSContext *context;
   bool destroy;
 };
@@ -105,7 +109,10 @@ context::context()
 { }
 context::context(context::detail const &d)
   : p(new impl(d.c))
-{ }
+{
+  if (!p->is_valid())
+    p.reset();
+}
 context::~context() { }
 
 context context::create() {
