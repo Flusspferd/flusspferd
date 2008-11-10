@@ -38,14 +38,21 @@ BOOST_AUTO_TEST_CASE( copy_null_context ) {
 }
 
 BOOST_AUTO_TEST_CASE( create_context ) {
-  flusspferd::context context(flusspferd::context::create());
+  flusspferd::context const &context = flusspferd::context::create();
+  BOOST_CHECK(context.is_valid());
+}
+
+BOOST_AUTO_TEST_CASE( copy_create_context ) {
+  flusspferd::context const &original_context = flusspferd::context::create();
+  BOOST_REQUIRE(original_context.is_valid());
+  flusspferd::context context(original_context);
   BOOST_CHECK(context.is_valid());
 }
 
 BOOST_AUTO_TEST_SUITE( spidermonkey )
 
 BOOST_AUTO_TEST_CASE( direct_null_context ) {
-  flusspferd::context null_context(flusspferd::Impl::wrap_context(0));
+  flusspferd::context const &null_context = flusspferd::Impl::wrap_context(0);
   BOOST_CHECK(!null_context.is_valid());
 }
 
