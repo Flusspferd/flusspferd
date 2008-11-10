@@ -22,10 +22,27 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/context.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE( null_context ) {
   flusspferd::context null_context;
   BOOST_CHECK(!null_context.is_valid());
 }
+
+BOOST_AUTO_TEST_CASE( copy_null_context ) {
+  flusspferd::context original_null_context;
+  BOOST_REQUIRE(!original_null_context.is_valid());
+  flusspferd::context null_context;
+  BOOST_CHECK(!null_context.is_valid());
+}
+
+BOOST_AUTO_TEST_SUITE( spidermonkey )
+
+BOOST_AUTO_TEST_CASE( direct_null_context ) {
+  flusspferd::context null_context(flusspferd::Impl::wrap_context(0));
+  BOOST_CHECK(!null_context.is_valid());
+}
+
+BOOST_AUTO_TEST_SUITE_END()
 
