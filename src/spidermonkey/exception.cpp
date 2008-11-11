@@ -67,10 +67,8 @@ exception::exception(std::string const &what)
 
   boost::shared_ptr<impl> p(new impl);
 
-  if (!p->exception_value) {
-    p->exception_value.reset(new root_value);
-    p->ctx = Impl::wrap_context(ctx);
-  }
+  p->exception_value.reset(new root_value);
+  p->ctx = Impl::wrap_context(ctx);
 
   value &v = *p->exception_value;
   if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
