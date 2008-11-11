@@ -24,8 +24,8 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_SPIDERMONKEY_INIT_HPP
 #define FLUSSPFERD_SPIDERMONKEY_INIT_HPP
 
-#include <flusspferd/init.hpp>
-#include <flusspferd/spidermonkey/context.hpp>
+#include "../init.hpp"
+#include "context.hpp"
 
 namespace flusspferd { namespace Impl {
   inline JSContext *current_context() {

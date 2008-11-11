@@ -26,9 +26,9 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/arguments.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
-#include "flusspferd/spidermonkey/context.hpp"
-#include "flusspferd/spidermonkey/function.hpp"
+#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/implementation/context.hpp"
+#include "flusspferd/implementation/function.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/foreach.hpp>
 #include <js/jsapi.h>

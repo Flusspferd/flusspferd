@@ -26,9 +26,9 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/native_function_base.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
-#include "flusspferd/spidermonkey/object.hpp"
-#include "flusspferd/spidermonkey/context.hpp"
+#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/implementation/object.hpp"
+#include "flusspferd/implementation/context.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/scoped_array.hpp>
 #include <js/jsapi.h>

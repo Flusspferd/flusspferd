@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/function.hpp"
 #include "flusspferd/current_context_scope.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/implementation/init.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/variant.hpp>
 

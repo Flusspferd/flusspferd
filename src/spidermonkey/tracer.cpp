@@ -22,7 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/tracer.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/implementation/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;

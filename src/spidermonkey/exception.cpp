@@ -26,8 +26,8 @@ THE SOFTWARE.
 #include "flusspferd/root_value.hpp"
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/object.hpp"
-#include "flusspferd/spidermonkey/value.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/implementation/value.hpp"
+#include "flusspferd/implementation/init.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <js/jsapi.h>

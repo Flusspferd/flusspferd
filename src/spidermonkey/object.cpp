@@ -29,9 +29,9 @@ THE SOFTWARE.
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/native_object_base.hpp"
-#include "flusspferd/spidermonkey/init.hpp"
-#include "flusspferd/spidermonkey/value.hpp"
-#include "flusspferd/spidermonkey/object.hpp"
+#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/implementation/value.hpp"
+#include "flusspferd/implementation/object.hpp"
 #include <cassert>
 #include <js/jsapi.h>
 

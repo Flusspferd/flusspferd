@@ -24,8 +24,8 @@ THE SOFTWARE.
 #include "flusspferd/root_value.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/spidermonkey/context.hpp"
-#include "flusspferd/spidermonkey/value.hpp"
+#include "flusspferd/implementation/context.hpp"
+#include "flusspferd/implementation/value.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;

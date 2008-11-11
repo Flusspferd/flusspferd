@@ -24,7 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/spidermonkey/context.hpp"
+#include "flusspferd/implementation/context.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;

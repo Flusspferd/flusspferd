@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
-#include "flusspferd/spidermonkey/context.hpp"
+#include "flusspferd/implementation/context.hpp"
 #include <boost/test/unit_test.hpp>
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
