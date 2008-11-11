@@ -22,7 +22,7 @@
 #
 
 import sys, os
-import Utils
+import Utils, Options
 
 VERSION = 'dev'
 APPNAME = 'flusspferd'
@@ -35,6 +35,8 @@ def init(): pass
 def set_options(opt):
     opt.tool_options('compiler_cxx')
     opt.tool_options('boost')
+    opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
+                   help='Set non-standard CXXFLAGS')
 
 def configure(conf):
     u = conf.env.append_unique
@@ -50,10 +52,12 @@ def configure(conf):
     if darwin:
         u('CXXDEFINES', 'APPLE')
 
-    u('CXXFLAGS', '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
-
-    #u('CXXFLAGS', '-O3 -DNDEBUG')
-    u('CXXFLAGS', '-O0 -g -DDEBUG')
+    if Options.options.cxxflags:
+        conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
+    else:
+        u('CXXFLAGS', '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
+        #u('CXXFLAGS', '-O3 -DNDEBUG')
+        u('CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
     conf.check_tool('misc')
