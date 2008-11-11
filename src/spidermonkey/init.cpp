@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/implementation/init.hpp"
+#include <boost/thread/tss.hpp>
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_MAX_BYTES
@@ -34,7 +35,7 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-__thread init *p_instance;
+static boost::thread_specific_ptr<init> p_instance;
 
 class init::impl {
 public:
@@ -52,6 +53,7 @@ public:
 
   JSRuntime *runtime;
   context current_context;
+
 };
 
 struct init::detail {
@@ -65,8 +67,8 @@ JSRuntime *Impl::get_runtime() {
 }
 
 init &init::initialize() {
-  if (!p_instance)
-    p_instance = new init;
+  if (!p_instance.get())
+    p_instance.reset(new init);
   return *p_instance;
 }
 

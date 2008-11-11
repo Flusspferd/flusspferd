@@ -29,12 +29,12 @@ libtype = 'shlib'
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
-obj.uselib = 'JS BOOST'
+obj.uselib = 'JS BOOST_THREAD BOOST'
 obj.target = 'templar'
 
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
-obj.uselib = 'GCOV JS BOOST'
+obj.uselib = 'GCOV JS BOOST_THREAD BOOST'
 obj.target = 'templar-coverage'
 obj.install_path = None

@@ -63,7 +63,7 @@ def configure(conf):
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
 
     boostconf = conf.create_boost_configurator()
-    boostconf.lib = ['unit_test_framework']
+    boostconf.lib = ['unit_test_framework', 'thread']
     boostconf.static = 'nostatic'
     boostconf.threadingtag = 'st'
     boostconf.run()

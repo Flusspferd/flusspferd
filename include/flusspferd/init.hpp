@@ -34,12 +34,13 @@ namespace flusspferd {
 
   class init : boost::noncopyable {
     init();
-    ~init();
 
     class impl;
     boost::scoped_ptr<impl> p;
 
   public:
+    ~init();
+
     struct detail;
     friend struct init::detail;
 
