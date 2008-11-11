@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/context.hpp"
+#include "flusspferd/object.hpp"
 #include "flusspferd/spidermonkey/context.hpp"
 #include <boost/test/unit_test.hpp>
 
@@ -105,6 +106,16 @@ BOOST_AUTO_TEST_CASE( gc ) {
   BOOST_REQUIRE(context.is_valid());
   BOOST_CHECK_NO_THROW(context.gc());
   BOOST_REQUIRE(context.is_valid());
+}
+
+BOOST_AUTO_TEST_CASE( global ) {
+  flusspferd::context context(flusspferd::context::create());
+  BOOST_REQUIRE(context.is_valid());
+
+  flusspferd::object global;
+  BOOST_CHECK_NO_THROW(global = context.global());
+
+  BOOST_CHECK(global.is_valid());
 }
 
 BOOST_AUTO_TEST_SUITE( spidermonkey )

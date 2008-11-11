@@ -93,7 +93,7 @@ struct context::detail {
   detail(JSContext *ct) : c(ct) { }
 
   static JSContext *get(context &co) {
-      return co.p->context;
+    return co.p->context;
   }
 };
 
