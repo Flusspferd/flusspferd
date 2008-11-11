@@ -25,6 +25,8 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/context.hpp"
 #include <boost/test/unit_test.hpp>
 
+BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
+
 BOOST_AUTO_TEST_CASE( null_context ) {
   flusspferd::context null_context;
   BOOST_CHECK(!null_context.is_valid());
@@ -47,6 +49,62 @@ BOOST_AUTO_TEST_CASE( copy_create_context ) {
   BOOST_REQUIRE(original_context.is_valid());
   flusspferd::context context(original_context);
   BOOST_CHECK(context.is_valid());
+}
+
+BOOST_AUTO_TEST_CASE( equality ) {
+  flusspferd::context const &context1 = flusspferd::context::create();
+  BOOST_REQUIRE(context1.is_valid());
+  flusspferd::context const &context2 = flusspferd::context::create();
+  BOOST_REQUIRE(context2.is_valid());
+  flusspferd::context context3;
+  BOOST_REQUIRE(!context3.is_valid());
+
+  BOOST_CHECK_EQUAL(context1, context1);
+  BOOST_CHECK(!(context1 != context1));
+
+  BOOST_CHECK_EQUAL(context2, context2);
+  BOOST_CHECK(!(context2 != context2));
+
+  BOOST_CHECK_EQUAL(context3, context3);
+  BOOST_CHECK(!(context3 != context3));
+
+  BOOST_CHECK_NE(context1, context2);
+  BOOST_CHECK(!(context1 == context2));
+
+  BOOST_CHECK_NE(context1, context3);
+  BOOST_CHECK(!(context1 == context3));
+
+  BOOST_CHECK_NE(context3, context2);
+  BOOST_CHECK(!(context3 == context2));
+
+  flusspferd::context copy_context1(context1);
+
+  BOOST_CHECK_EQUAL(context1, copy_context1);
+  BOOST_CHECK_EQUAL(copy_context1, context1);
+
+  BOOST_CHECK_NE(copy_context1, context2);
+  BOOST_CHECK_NE(context2, copy_context1);
+
+  BOOST_CHECK_NE(copy_context1, context3);
+  BOOST_CHECK_NE(context3, copy_context1);
+
+  flusspferd::context copy_context3(context3);
+
+  BOOST_CHECK_EQUAL(context3, copy_context3);
+  BOOST_CHECK_EQUAL(copy_context3, context3);
+
+  BOOST_CHECK_NE(copy_context3, context1);
+  BOOST_CHECK_NE(context1, copy_context3);
+
+  BOOST_CHECK_NE(copy_context3, context2);
+  BOOST_CHECK_NE(context2, copy_context3);
+}
+
+BOOST_AUTO_TEST_CASE( gc ) {
+  flusspferd::context context(flusspferd::context::create());
+  BOOST_REQUIRE(context.is_valid());
+  BOOST_CHECK_NO_THROW(context.gc());
+  BOOST_REQUIRE(context.is_valid());
 }
 
 BOOST_AUTO_TEST_SUITE( spidermonkey )
