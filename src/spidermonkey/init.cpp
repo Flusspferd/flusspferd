@@ -73,9 +73,7 @@ init &init::initialize() {
 }
 
 init::init() : p(new impl) { }
-init::~init() {
-  JS_ShutDown();
-}
+init::~init() {}
 
 context init::enter_current_context(context const &c) {
   context old = p->current_context;
