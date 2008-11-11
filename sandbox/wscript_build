@@ -33,7 +33,7 @@ obj.source = 'abstract-js.cpp'
 obj.target = 'abstract-js'
 obj.install_path = None
 obj.uselib = 'JS BOOST'
-obj.uselib_local = 'templar'
+obj.uselib_local = 'flusspferd'
 obj.includes = ['../include']
 
 obj = bld.new_task_gen('cxx', 'program')
@@ -41,5 +41,5 @@ obj.source = 'jsrepl.cpp'
 obj.target = 'jsrepl'
 obj.install_path = None
 obj.uselib = 'JS BOOST'
-obj.uselib_local = 'templar'
+obj.uselib_local = 'flusspferd'
 obj.includes = ['../include']

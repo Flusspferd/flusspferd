@@ -105,7 +105,8 @@ def build_pkgconfig(bld):
 def build(bld):
     bld.add_subdirs('src test sandbox')
     build_pkgconfig(bld)
-    bld.install_files('${PREFIX}/include/templar', 'include/templar/*.hpp')
-    bld.install_files('${PREFIX}/lib/pkgconfig', 'flusspferd.pc')
+    bld.install_files('${PREFIX}/include/flusspferd/', 'include/flusspferd/*.hpp')
+    bld.install_files('${PREFIX}/include/flusspferd/implementation/', 'include/flusspferd/implementation/*.hpp')
+    bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
 def shutdown(): pass

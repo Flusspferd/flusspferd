@@ -33,6 +33,6 @@ for source in glob.glob(bld.path.abspath() + '/test_*.cpp'):
   obj.install_path = None
   obj.uselib = 'JS BOOST_UNIT_TEST_FRAMEWORK BOOST'
   obj.defines = 'BOOST_TEST_DYN_LINK BOOST_TEST_MODULE=' + name
-  obj.uselib_local = 'templar-coverage'
+  obj.uselib_local = 'flusspferd-coverage'
   obj.includes = ['../include']
 
