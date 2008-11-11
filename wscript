@@ -71,7 +71,6 @@ def configure(conf):
     # spidermonkey
     u('CXXDEFINES', 'XP_UNIX') # TODO
     u('CXXDEFINES', 'JS_C_STRINGS_ARE_UTF8')
-    #u('CXXDEFINES', 'JS_THREADSAFE') # TODO
     libconf = conf.create_library_configurator()
     libconf.name = 'js'
     libconf.path = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/sw/lib']
