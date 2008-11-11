@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include <boost/test/unit_test.hpp>
+#include<iostream>//FIXME
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
 
@@ -125,6 +126,10 @@ BOOST_AUTO_TEST_CASE( evaluate ) {
   BOOST_CHECK(context.evaluate("null", 4, __FILE__, 0).is_null());
   BOOST_CHECK(context.evaluate("null", __FILE__, 0).is_null());
   BOOST_CHECK(context.evaluate(std::string("null"), __FILE__, 0).is_null());
+
+  BOOST_CHECK_THROW(
+    context.evaluate("throw undefined", __FILE__, 0)
+    , flusspferd::exception);
 }
 
 BOOST_AUTO_TEST_SUITE( spidermonkey )
