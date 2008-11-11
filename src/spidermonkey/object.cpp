@@ -69,9 +69,10 @@ void object::set_property(std::string const &name, value const &v) {
 }
 
 value object::get_property(char const *name) const {
+  if (!is_valid())
+    throw exception("Could not get property (object is null)");
   value result;
-  object &self = *const_cast<object*>(this);
-  if (!JS_GetProperty(Impl::current_context(), self.get(),
+  if (!JS_GetProperty(Impl::current_context(), get_const(),
                       name, Impl::get_jsvalp(result)))
     throw exception("Could not get property");
   return result;
@@ -82,6 +83,8 @@ value object::get_property(std::string const &name) const {
 }
 
 bool object::has_property(char const *name) const {
+  if (!is_valid())
+    throw exception("Could not check property (object is null)");
   JSBool foundp;
   if(!JS_HasProperty(Impl::current_context(), get_const(), name,
                      &foundp))
@@ -94,6 +97,8 @@ bool object::has_property(std::string const &name) const {
 }
 
 void object::delete_property(char const *name) {
+  if (!is_valid())
+    throw exception("Could not delete property (object is null)");
   if(!JS_DeleteProperty(Impl::current_context(), get(), name))
     throw exception("Could not delete property");
 }
@@ -126,6 +131,8 @@ bool operator==(object::property_iterator const &lhs,
 }
 
 object::property_iterator object::begin() const {
+  if (!is_valid())
+    throw exception("Could not create property iterator (object is null)");
   JSObject *obj = JS_NewPropertyIterator(Impl::current_context(),
                                          get_const());
   if(!obj)
@@ -153,6 +160,9 @@ void object::define_property(char const *name,
                              boost::optional<function const &> getter_,
                              boost::optional<function const &> setter_)
 {
+  if (!is_valid())
+    throw exception("Could not define property (object is null)");
+
   value v;
   v = init_value;
 
@@ -195,6 +205,9 @@ bool object::is_valid() const {
 }
 
 value object::apply(object const &fn, arguments const &arg_) {
+  if (!is_valid())
+    throw exception("Could not apply function (object is null)");
+
   value fnv(fn);
   root_value result((value()));
 
@@ -215,6 +228,9 @@ value object::apply(object const &fn, arguments const &arg_) {
 }
 
 value object::call(char const *fn, arguments const &arg_) {
+  if (!is_valid())
+    throw exception("Could not call function (object is null)");
+
   root_value result((value()));
 
   arguments arg(arg_);
