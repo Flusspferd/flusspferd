@@ -37,7 +37,7 @@ namespace flusspferd {
 
   private:
     class impl;
-    boost::shared_ptr<impl const> p;
+    boost::shared_ptr<impl> p;
   };
 }
 

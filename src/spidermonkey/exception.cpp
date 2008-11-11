@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/root_value.hpp"
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/object.hpp"
+#include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include <boost/noncopyable.hpp>
@@ -53,9 +54,10 @@ namespace {
 
 class exception::impl {
 public:
-  impl() : exception_value(value()) {}
+  impl() {}
 
-  root_value exception_value;
+  context ctx;
+  boost::scoped_ptr<root_value> exception_value;
 };
 
 exception::exception(std::string const &what)
@@ -65,7 +67,12 @@ exception::exception(std::string const &what)
 
   boost::shared_ptr<impl> p(new impl);
 
-  value &v = p->exception_value;
+  if (!p->exception_value) {
+    p->exception_value.reset(new root_value);
+    p->ctx = Impl::wrap_context(ctx);
+  }
+
+  value &v = *p->exception_value;
   if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
     JS_ClearPendingException(ctx);
   } else {
@@ -73,7 +80,7 @@ exception::exception(std::string const &what)
       arguments arg(std::vector<value>(1));
       root_value message((string(what)));
       arg[0] = message;
-      p->exception_value = global().call("Error", arg);
+      v = global().call("Error", arg);
     } catch (...) { }
   }
 
@@ -81,8 +88,13 @@ exception::exception(std::string const &what)
 }
 
 exception::~exception() throw()
-{ }
+{
+  if (p->exception_value) {
+    current_context_scope scope(p->ctx);
+    p->exception_value.reset();
+  }
+}
 
 void exception::throw_js() {
-  JS_SetPendingException(Impl::current_context(), Impl::get_jsval(p->exception_value));
+  JS_SetPendingException(Impl::current_context(), Impl::get_jsval(*p->exception_value));
 }
