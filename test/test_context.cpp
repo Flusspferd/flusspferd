@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE( evaluate ) {
   flusspferd::context context(flusspferd::context::create());
   BOOST_REQUIRE(context.is_valid());
 
-  BOOST_CHECK(context.evaluate("null", 0, __FILE__, 0).is_null());
+  BOOST_CHECK(context.evaluate("null", 4, __FILE__, 0).is_null());
   BOOST_CHECK(context.evaluate("null", __FILE__, 0).is_null());
   BOOST_CHECK(context.evaluate(std::string("null"), __FILE__, 0).is_null());
 }
