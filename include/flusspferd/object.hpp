@@ -62,14 +62,14 @@ public:
   value call(object obj, arguments const &arg = arguments());
   value call(arguments const &arg = arguments());
 
-  enum {
+  enum property_flag {
     dont_enumerate = 1,
     read_only_property = 2,
     permanent_property = 4,
     PROPERTY_LAST = 8
   };
 
-  void define_property(char const *name,
+  void define_property(string const &name,
                        value const &init_value = value(),
                        unsigned flags = 0,
                        boost::optional<function const &> getter = boost::none,
@@ -81,17 +81,27 @@ public:
                        boost::optional<function const &> getter = boost::none,
                        boost::optional<function const &> setter = boost::none);
 
+  void define_property(char const *name,
+                       value const &init_value = value(),
+                       unsigned flags = 0,
+                       boost::optional<function const &> getter = boost::none,
+                       boost::optional<function const &> setter = boost::none);
+
   void set_property(char const *name, value const &v);
   void set_property(std::string const &name, value const &v);
+  void set_property(value const &id, value const &v);
 
   value get_property(char const *name) const;
   value get_property(std::string const &name) const;
+  value get_property(value const &id) const;
     
   bool has_property(char const *name) const;
   bool has_property(std::string const &name) const;
+  bool has_property(value const &id) const;
 
   void delete_property(char const *name);
   void delete_property(std::string const &name);
+  void delete_property(value const &id);
 
   class property_iterator
     : public Impl::object_impl::property_iterator_impl

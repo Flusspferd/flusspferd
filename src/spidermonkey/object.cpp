@@ -41,31 +41,54 @@ object::object() : Impl::object_impl(0) { }
 object::~object() { }
 
 object object::get_parent() {
+  if (!is_valid())
+    throw exception("Could not get object parent (object is null)");
   return Impl::wrap_object(JS_GetParent(Impl::current_context(), get()));
 }
 
 object object::get_prototype() {
+  if (!is_valid())
+    throw exception("Could not get object prototype (object is null)");
   return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
 }
 
 void object::set_parent(object const &o) {
+  if (!is_valid())
+    throw exception("Could not set parent (object is null)");
   if (!JS_SetParent(Impl::current_context(), get(), o.get_const()))
     throw exception("Could not set object parent");
 }
 
 void object::set_prototype(object const &o) {
+  if (!is_valid())
+    throw exception("Could not set object prototype (object is null)");
   if (!JS_SetPrototype(Impl::current_context(), get(), o.get_const()))
     throw exception("Could not set object prototype");
 }
 
-void object::set_property(char const *name, value const &v) {
-  if(!JS_SetProperty(Impl::current_context(), get(), name,
-                     Impl::get_jsvalp(const_cast<value&>(v))))
+void object::set_property(char const *name, value const &v_) {
+  if (!is_valid())
+    throw exception("Could not set property (object is null)");
+  value v = v_;
+  if (!JS_SetProperty(Impl::current_context(), get(), name,
+                      Impl::get_jsvalp(v)))
     throw exception("Could not set property");
 }
 
 void object::set_property(std::string const &name, value const &v) {
   set_property(name.c_str(), v);
+}
+
+void object::set_property(value const &id, value const &v_) {
+  if (!is_valid())
+    throw exception("Could not set property (object is null)");
+  local_root_scope scope;
+  value v = v_;
+  string name = id.to_string();
+  if (!JS_SetUCProperty(Impl::current_context(), get(),
+                        name.data(), name.length(),
+                        Impl::get_jsvalp(v)))
+    throw exception("Could not set property");
 }
 
 value object::get_property(char const *name) const {
@@ -82,12 +105,25 @@ value object::get_property(std::string const &name) const {
   return get_property(name.c_str());
 }
 
+value object::get_property(value const &id) const {
+  if (!is_valid())
+    throw exception("Could not get property (object is null)");
+  value result;
+  local_root_scope scope;
+  string name = id.to_string();
+  if (!JS_GetUCProperty(Impl::current_context(), get_const(),
+                        name.data(), name.length(),
+                        Impl::get_jsvalp(result)))
+    throw exception("Could not get property");
+  return result;
+}
+
 bool object::has_property(char const *name) const {
   if (!is_valid())
     throw exception("Could not check property (object is null)");
   JSBool foundp;
-  if(!JS_HasProperty(Impl::current_context(), get_const(), name,
-                     &foundp))
+  if (!JS_HasProperty(Impl::current_context(), get_const(), name,
+                      &foundp))
     throw exception("Could not check property");
   return foundp;
 }
@@ -96,15 +132,39 @@ bool object::has_property(std::string const &name) const {
   return has_property(name.c_str());
 }
 
+bool object::has_property(value const &id) const {
+  if (!is_valid())
+    throw exception("Could not check property (object is null)");
+  local_root_scope scope;
+  string name = id.to_string();
+  JSBool foundp;
+  if (!JS_HasUCProperty(Impl::current_context(), get_const(),
+                        name.data(), name.length(),
+                        &foundp))
+    throw exception("Could not check property");
+  return foundp;
+}
+
 void object::delete_property(char const *name) {
   if (!is_valid())
     throw exception("Could not delete property (object is null)");
-  if(!JS_DeleteProperty(Impl::current_context(), get(), name))
+  if (!JS_DeleteProperty(Impl::current_context(), get(), name))
     throw exception("Could not delete property");
 }
 
 void object::delete_property(std::string const &name) {
   delete_property(name.c_str());
+}
+
+void object::delete_property(value const &id) {
+  if (!is_valid())
+    throw exception("Could not delete property (object is null)");
+  local_root_scope scope;
+  string name = id.to_string();
+  jsval dummy;
+  if (!JS_DeleteUCProperty2(Impl::current_context(), get(),
+                            name.data(), name.length(), &dummy))
+    throw exception("Could not delete property");
 }
 
 Impl::object_impl::property_iterator_impl &
@@ -154,11 +214,10 @@ value object::property_iterator::operator*() const {
   return val;
 }
 
-void object::define_property(char const *name,
-                             value const &init_value,
-                             unsigned flags,
-                             boost::optional<function const &> getter_,
-                             boost::optional<function const &> setter_)
+void object::define_property(
+  string const &name, value const &init_value, unsigned flags,
+  boost::optional<function const &> getter_,
+  boost::optional<function const &> setter_)
 {
   if (!is_valid())
     throw exception("Could not define property (object is null)");
@@ -183,21 +242,33 @@ void object::define_property(char const *name,
   if (getter_o) sm_flags |= JSPROP_GETTER;
   if (setter_o) sm_flags |= JSPROP_SETTER;
 
-  if(!JS_DefineProperty(Impl::current_context(), get_const(),
-                        name, Impl::get_jsval(v),
-                        (JSPropertyOp) getter_o,
-                        (JSPropertyOp) setter_o,
-                        sm_flags))
+  if(!JS_DefineUCProperty(Impl::current_context(), get_const(),
+                          name.data(), name.length(),
+                          Impl::get_jsval(v),
+                          (JSPropertyOp) getter_o,
+                          (JSPropertyOp) setter_o,
+                          sm_flags))
     throw exception("Could not define property");
 }
 
-void object::define_property(std::string const &name,
-                             value const &init_value,
-                             unsigned flags,
-                             boost::optional<function const &> getter,
-                             boost::optional<function const &> setter)
+void object::define_property(
+  std::string const &name_, value const &init_value, unsigned flags,
+  boost::optional<function const &> getter,
+  boost::optional<function const &> setter)
 {
-  define_property(name.c_str(), init_value, flags, getter, setter);
+  local_root_scope scope;
+  string name(name_);
+  define_property(name, init_value, flags, getter, setter);
+}
+
+void object::define_property(
+  char const *name_, value const &init_value, unsigned flags,
+  boost::optional<function const &> getter,
+  boost::optional<function const &> setter)
+{
+  local_root_scope scope;
+  string name(name_);
+  define_property(name, init_value, flags, getter, setter);
 }
 
 bool object::is_valid() const {

@@ -85,6 +85,11 @@ std::size_t string::length() const {
   return JS_GetStringLength(get_string(*this));
 }
 
+char16_t const *string::data() const {
+  assert(get_string(*this));
+  return JS_GetStringChars(get_string(*this));
+}
+
 char const *string::c_str() const {
   assert(get_string(*this));
   return JS_GetStringBytes(get_string(*this));

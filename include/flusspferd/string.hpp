@@ -54,6 +54,7 @@ public:
   char const *c_str() const;
 
   std::basic_string<char16_t> to_utf16_string() const;
+  char16_t const *data() const;
 
   string substr(size_t start, size_t length);
 };
