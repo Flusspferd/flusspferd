@@ -39,14 +39,13 @@ public:
     : id(JSVAL_VOID) 
   {}
 
-  boost::optional<root_value> root_iterator;
+  root_value root_iterator;
   object iterator;
   jsid id;
-  boost::optional<root_value> root_cache;
+  root_value root_cache;
 };
 
 property_iterator::property_iterator()
-  : p(new impl)
 {}
 
 property_iterator::property_iterator(object const &o_)
@@ -65,20 +64,21 @@ property_iterator::property_iterator(object const &o_)
     throw exception("Could not create property iterator");
 
   p->iterator = Impl::wrap_object(iterator);
-  p->root_iterator = boost::in_place(p->iterator);
-
-  p->root_cache = boost::in_place(value());
+  p->root_iterator = p->iterator;
 
   increment();
 }
 
 property_iterator::property_iterator(property_iterator const &o)
-  : p(new impl)
+  : p(o.p ? new impl : 0)
 {
+  if (!p)
+    return;
+
   if (o.p->iterator.is_valid()) {
     p->iterator = o.p->iterator;
-    p->root_iterator = boost::in_place(p->iterator);
-    p->root_cache = boost::in_place(value(o.p->root_cache.get()));
+    p->root_iterator = p->iterator;
+    p->root_cache = value(o.p->root_cache);
   }
   p->id = o.p->id;
 }
@@ -90,16 +90,20 @@ void property_iterator::increment() {
   if (!JS_NextProperty(Impl::current_context(), Impl::get_object(p->iterator), &p->id))
     throw exception("Could not load / increment property iterator");
 
-  value &cache = p->root_cache.get();
-
-  if (!JS_IdToValue(Impl::current_context(), p->id, Impl::get_jsvalp(cache)))
-    throw exception("Could not load / increment property iterator");
+  if (p->id != JSVAL_VOID) {
+    if (!JS_IdToValue(Impl::current_context(), p->id, Impl::get_jsvalp(p->root_cache)))
+      throw exception("Could not load / increment property iterator");
+  } else {
+    p.reset();
+  }
 }
 
 bool property_iterator::equal(property_iterator const &o) const {
+  if (!p || !o.p)
+    return !p && !o.p;
   return p->id == o.p->id;
 }
 
 value const &property_iterator::dereference() const {
-  return p->root_cache.get();
+  return p->root_cache;
 }
