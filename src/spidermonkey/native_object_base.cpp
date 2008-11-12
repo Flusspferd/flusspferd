@@ -243,8 +243,6 @@ JSBool native_object_base::impl::call_helper(
 }
 
 uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *thing) {
-  // TODO: callback?
-
   current_context_scope scope(Impl::wrap_context(ctx));
 
   native_object_base *self =
