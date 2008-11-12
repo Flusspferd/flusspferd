@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/exception.hpp"
 #include "flusspferd/string.hpp"
-#include "flusspferd/root_value.hpp"
+#include "flusspferd/root.hpp"
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/init.hpp"

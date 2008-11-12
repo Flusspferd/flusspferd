@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/call_context.hpp"
 #include "flusspferd/init.hpp"
-#include "flusspferd/root_value.hpp"
+#include "flusspferd/root.hpp"
 #include "flusspferd/context.hpp"
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/evaluate.hpp"

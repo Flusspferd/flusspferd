@@ -22,7 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/property_iterator.hpp"
-#include "flusspferd/root_value.hpp"
+#include "flusspferd/root.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/implementation/init.hpp"

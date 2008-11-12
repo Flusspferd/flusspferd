@@ -26,7 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/function.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/root_value.hpp"
+#include "flusspferd/root.hpp"
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/native_object_base.hpp"

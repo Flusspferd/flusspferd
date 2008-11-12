@@ -25,7 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CLASS_HPP
 
 #include "native_function_base.hpp"
-#include "root_value.hpp"
+#include "root.hpp"
 #include "create.hpp"
 #include "init.hpp"
 #include <boost/ref.hpp>

@@ -25,7 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CONVERT_HPP
 
 #include "value.hpp"
-#include "root_value.hpp"
+#include "root.hpp"
 #include "exception.hpp"
 #include "implementation/string.hpp"
 #include <boost/noncopyable.hpp>
