@@ -41,7 +41,7 @@ public:
   }
 
 private:
-  context &ctx;
+  context ctx;
 };
 
 }

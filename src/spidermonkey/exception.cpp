@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/root_value.hpp"
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/object.hpp"
+#include "flusspferd/init.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include "flusspferd/implementation/init.hpp"
@@ -63,12 +64,12 @@ public:
 exception::exception(std::string const &what)
   : std::runtime_error(exception_message(what))
 {
-  JSContext *ctx = Impl::current_context();
-
   boost::shared_ptr<impl> p(new impl);
 
   p->exception_value.reset(new root_value);
-  p->ctx = Impl::wrap_context(ctx);
+  p->ctx = get_current_context();
+
+  JSContext *ctx = Impl::get_context(p->ctx);
 
   value &v = *p->exception_value;
   if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
