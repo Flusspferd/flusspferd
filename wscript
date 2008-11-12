@@ -37,6 +37,10 @@ def set_options(opt):
     opt.tool_options('boost')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
                    help='Set non-standard CXXFLAGS')
+    opt.add_option('--enable-tests', action='store_true',
+                   help='Enable tests')
+    opt.add_option('--enable-sandbox', action='store_true',
+                   help='Enable sandbox tests')
 
 def configure(conf):
     u = conf.env.append_unique
@@ -67,7 +71,9 @@ def configure(conf):
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
 
     boostconf = conf.create_boost_configurator()
-    boostconf.lib = ['unit_test_framework', 'thread']
+    boostconf.lib = ['thread']
+    if Options.options.enable_tests:
+      boostconf.lib += ['unit_test_framework']
     boostconf.static = 'nostatic'
     boostconf.threadingtag = 'st'
     boostconf.run()
@@ -89,6 +95,9 @@ def configure(conf):
     headconf.uselib_store = 'JS'
     headconf.run()
 
+    conf.env['ENABLE_TESTS'] = Options.options.enable_tests
+    conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
+
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
     obj.source = 'flusspferd.pc.in'
@@ -103,7 +112,11 @@ def build_pkgconfig(bld):
     obj.apply()
 
 def build(bld):
-    bld.add_subdirs('src test sandbox')
+    bld.add_subdirs('src')
+    if bld.env['ENABLE_TESTS']:
+      bld.add_subdirs('test')
+    if bld.env['ENABLE_SANDBOX']:
+      bld.add_subdirs('sandbox')
     build_pkgconfig(bld)
     bld.install_files('${PREFIX}/include/flusspferd/', 'include/flusspferd/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/implementation/', 'include/flusspferd/implementation/*.hpp')
