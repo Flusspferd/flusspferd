@@ -25,9 +25,9 @@ THE SOFTWARE.
 #define FLUSSPFERD_CLASS_HPP
 
 #include "native_function_base.hpp"
-#include "root.hpp"
 #include "create.hpp"
 #include "init.hpp"
+#include "local_root_scope.hpp"
 #include <boost/ref.hpp>
 
 namespace flusspferd {
@@ -67,9 +67,10 @@ function load_class(object container = global()) {
   std::size_t const arity = T::class_info::constructor_arity();
   std::string const name = T::class_info::constructor_name();
 
-  function constructor =
-    create_native_function<detail::class_constructor<T> >(arity, name);
-  root_value root(constructor);
+  local_root_scope scope;
+
+  function constructor(
+    create_native_function<detail::class_constructor<T> >(arity, name));
 
   object prototype = T::class_info::create_prototype();
   constructor.define_property(

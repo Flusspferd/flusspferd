@@ -134,7 +134,7 @@ object native_object_base::do_create_object(object const &prototype_) {
     throw exception("Could not create native object");
 
   object::operator=(Impl::wrap_object(o));
-  root_value r(get_object());
+  root_object r(get_object());
 
   if (!JS_SetPrivate(ctx, o, this))
     throw exception("Could not create native object (private data)");
@@ -247,7 +247,8 @@ uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *th
 
   current_context_scope scope(Impl::wrap_context(ctx));
 
-  native_object_base *self = native_object_base::get_native(Impl::wrap_object(obj));
+  native_object_base *self =
+    native_object_base::get_native(Impl::wrap_object(obj));
 
   tracer trc(thing);
   self->trace(trc);
