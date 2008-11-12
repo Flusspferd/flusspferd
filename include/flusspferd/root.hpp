@@ -24,25 +24,35 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ROOT_VALUE_HPP
 #define FLUSSPFERD_ROOT_VALUE_HPP
 
-#include "value.hpp"
 #include "context.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace flusspferd {
 
-class root_value : public value, private boost::noncopyable {
-public:
-  root_value(value const &v = value());
-  ~root_value();
+class context;
 
-  root_value &operator=(value const &o) {
-    value::operator=(o);
+namespace detail {
+
+template<class T>
+class root : public T, private boost::noncopyable {
+public:
+  root(T const &x = T());
+  ~root();
+
+  root &operator=(T const &o) {
+    T::operator=(o);
     return *this;
   }
 
 private:
+  void *get_gcptr();
+
   context ctx;
 };
+
+}
+
+typedef detail::root<value> root_value;
 
 }
 
