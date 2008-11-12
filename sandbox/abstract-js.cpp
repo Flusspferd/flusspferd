@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/tracer.hpp"
+#include "flusspferd/property_iterator.hpp"
 #include <iostream>
 #include <stdexcept>
 
@@ -210,6 +211,11 @@ int main() {
 
     char const *source4 = "abc = 5; fun(abc)";
     flusspferd::evaluate(source4, __FILE__, 4);
+
+    flusspferd::object glob = flusspferd::global();
+    for (flusspferd::property_iterator it = glob.begin(); it != glob.end(); ++it) {
+      std::cout << "glob: " << *it << std::endl;
+    }
 
     flusspferd::global().delete_property("fun");
     flusspferd::global().delete_property("abc");

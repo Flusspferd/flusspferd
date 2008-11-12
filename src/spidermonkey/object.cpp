@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/object.hpp"
+#include "flusspferd/property_iterator.hpp"
 #include "flusspferd/function.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
@@ -167,51 +168,12 @@ void object::delete_property(value const &id) {
     throw exception("Could not delete property");
 }
 
-Impl::object_impl::property_iterator_impl &
-Impl::object_impl::property_iterator_impl::operator++() {
-  if(!JS_NextProperty(Impl::current_context(), iter, &id))
-    throw exception("Could not get next property");
-  return *this;
+property_iterator object::begin() const {
+  return property_iterator(*this);
 }
 
-object::property_iterator &object::property_iterator::operator++() {
-  ++*static_cast<Impl::object_impl::property_iterator_impl*>(this);
-  return *this;
-}
-
-bool flusspferd::operator==(
-  object::property_iterator const &lhs, object::property_iterator const &rhs)
-{
-  if(!lhs.get_const() && rhs.get_const())
-    return rhs.get_id() == JSVAL_VOID;
-  else if(!rhs.get_const() && lhs.get_const())
-    return rhs.get_id() == JSVAL_VOID;
-  else
-    return rhs.get_const() == lhs.get_const();
-}
-
-object::property_iterator object::begin() const {
-  if (!is_valid())
-    throw exception("Could not create property iterator (object is null)");
-  JSObject *obj = JS_NewPropertyIterator(Impl::current_context(),
-                                         get_const());
-  if(!obj)
-    throw exception("Could not create property_iterator");
-  return Impl::object_impl::property_iterator_impl(obj);
-}
-
-object::property_iterator object::end() const {
-  return property_iterator(
-    Impl::object_impl::property_iterator_impl());
-}
-
-value object::property_iterator::operator*() const {
-  assert(get_id() != JSVAL_VOID);
-  value val;
-  if(!JS_IdToValue(Impl::current_context(), get_id(), 
-                   Impl::get_jsvalp(val)))
-    throw exception("Could not convert id to value");
-  return val;
+property_iterator object::end() const {
+  return property_iterator();
 }
 
 void object::define_property(

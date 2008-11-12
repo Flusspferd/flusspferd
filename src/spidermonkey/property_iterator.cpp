@@ -1,0 +1,105 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+/*
+Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+#include "flusspferd/property_iterator.hpp"
+#include "flusspferd/root_value.hpp"
+#include "flusspferd/local_root_scope.hpp"
+#include "flusspferd/exception.hpp"
+#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/implementation/object.hpp"
+#include <boost/optional.hpp>
+#include <boost/utility/in_place_factory.hpp>
+#include <js/jsapi.h>
+
+using namespace flusspferd;
+
+class property_iterator::impl {
+public:
+  impl()
+    : id(JSVAL_VOID) 
+  {}
+
+  boost::optional<root_value> root_iterator;
+  object iterator;
+  jsid id;
+  boost::optional<root_value> root_cache;
+};
+
+property_iterator::property_iterator()
+  : p(new impl)
+{}
+
+property_iterator::property_iterator(object const &o_)
+  : p(new impl)
+{
+  object o = o_;
+
+  local_root_scope scope;
+
+  if (!o.is_valid())
+    throw exception("Could not create property iterator (object is null)");
+
+  JSObject *iterator = JS_NewPropertyIterator(Impl::current_context(), Impl::get_object(o));
+
+  if (!iterator)
+    throw exception("Could not create property iterator");
+
+  p->iterator = Impl::wrap_object(iterator);
+  p->root_iterator = boost::in_place(p->iterator);
+
+  p->root_cache = boost::in_place(value());
+
+  increment();
+}
+
+property_iterator::property_iterator(property_iterator const &o)
+  : p(new impl)
+{
+  if (o.p->iterator.is_valid()) {
+    p->iterator = o.p->iterator;
+    p->root_iterator = boost::in_place(p->iterator);
+    p->root_cache = boost::in_place(value(o.p->root_cache.get()));
+  }
+  p->id = o.p->id;
+}
+
+property_iterator::~property_iterator()
+{}
+
+void property_iterator::increment() {
+  if (!JS_NextProperty(Impl::current_context(), Impl::get_object(p->iterator), &p->id))
+    throw exception("Could not load / increment property iterator");
+
+  value &cache = p->root_cache.get();
+
+  if (!JS_IdToValue(Impl::current_context(), p->id, Impl::get_jsvalp(cache)))
+    throw exception("Could not load / increment property iterator");
+}
+
+bool property_iterator::equal(property_iterator const &o) const {
+  return p->id == o.p->id;
+}
+
+value const &property_iterator::dereference() const {
+  return p->root_cache.get();
+}

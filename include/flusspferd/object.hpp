@@ -37,6 +37,7 @@ class value;
 class context;
 class function;
 class native_object_base;
+class property_iterator;
 
 class object : public Impl::object_impl {
 public:
@@ -103,40 +104,9 @@ public:
   void delete_property(std::string const &name);
   void delete_property(value const &id);
 
-  class property_iterator
-    : public Impl::object_impl::property_iterator_impl
-  {
-  public:
-    property_iterator(
-      Impl::object_impl::property_iterator_impl const &i
-    )
-      : Impl::object_impl::property_iterator_impl(i)
-    { }
-
-    property_iterator &operator++();
-    property_iterator operator++(int) {
-      property_iterator t(*this);
-      ++*this;
-      return t;
-    }
-
-    // returns property ID
-    value operator*() const;
-    value operator->() const { return operator*(); }
-  };
-
   property_iterator begin() const;
   property_iterator end() const;
 };
-
-bool operator==(
-  object::property_iterator const &lhs, object::property_iterator const &rhs);
-
-inline bool operator!=(
-  object::property_iterator const &lhs, object::property_iterator const &rhs)
-{
-  return !(lhs == rhs);
-}
 
 template<>
 struct detail::convert<object>
