@@ -27,72 +27,73 @@ THE SOFTWARE.
 #include "implementation/value.hpp"
 
 namespace flusspferd {
-  class object;
-  class string;
 
-  class value : public Impl::value_impl {
-  public:
-    value();
-    value(bool b);
-    value(int i);
-    value(double d);
-    value(object const &o);
-    value(string const &s);
-    ~value();
+class object;
+class string;
 
-    value(Impl::value_impl const &v)
-      : Impl::value_impl(v)
-    { }
+class value : public Impl::value_impl {
+public:
+  value();
+  value(bool b);
+  value(int i);
+  value(double d);
+  value(object const &o);
+  value(string const &s);
+  ~value();
 
-    void bind(value o);
-    void unbind();
+  value(Impl::value_impl const &v)
+    : Impl::value_impl(v)
+  { }
 
-    bool is_null() const;
-    bool is_void() const;
-    bool is_int() const;
-    bool is_double() const;
-    bool is_number() const;
-    bool is_boolean() const;
-    bool is_string() const;
-    bool is_object() const;
+  void bind(value o);
+  void unbind();
 
-    bool is_bool() const { return is_boolean(); }
+  bool is_null() const;
+  bool is_void() const;
+  bool is_int() const;
+  bool is_double() const;
+  bool is_number() const;
+  bool is_boolean() const;
+  bool is_string() const;
+  bool is_object() const;
 
-    bool get_boolean() const;
-    bool get_bool() const { return get_boolean(); }
+  bool is_bool() const { return is_boolean(); }
 
-    int get_int() const;
-    double get_double() const;
-    object get_object() const;
-    string get_string() const;
+  bool get_boolean() const;
+  bool get_bool() const { return get_boolean(); }
 
-    string to_string() const;
-    double to_number() const;
-    double to_integral_number(int bits, bool has_negative) const;
-    bool to_boolean() const;
-    object to_object() const;
+  int get_int() const;
+  double get_double() const;
+  object get_object() const;
+  string get_string() const;
 
-    template<typename Visitor>
-    inline void visit(Visitor &v) const;
-  };
+  string to_string() const;
+  double to_number() const;
+  double to_integral_number(int bits, bool has_negative) const;
+  bool to_boolean() const;
+  object to_object() const;
 
-
-  // implementation
   template<typename Visitor>
-  void value::visit(Visitor &v) const {
-    if(is_int())
-      v(get_int());
-    else if(is_double())
-      v(get_double());
-    else if(is_string())
-      v(get_string());
-    else if(is_object())
-      v(get_object());
-    else if(is_boolean())
-      v(get_boolean());
-    else
-      return;
-  }
+  inline void visit(Visitor &v) const;
+};
+
+// implementation
+template<typename Visitor>
+void value::visit(Visitor &v) const {
+  if(is_int())
+    v(get_int());
+  else if(is_double())
+    v(get_double());
+  else if(is_string())
+    v(get_string());
+  else if(is_object())
+    v(get_object());
+  else if(is_boolean())
+    v(get_boolean());
+  else
+    return;
+}
+
 }
 
 #endif /* FLUSSPFERD_VALUE_HPP */
