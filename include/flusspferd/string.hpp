@@ -35,7 +35,6 @@ class value;
 class string : public Impl::string_impl {
 public:
   string();
-  string(string const &o);
   string(char const *s);
   string(value const &v);
   string(std::string const &s);
