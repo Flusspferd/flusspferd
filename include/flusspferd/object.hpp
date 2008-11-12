@@ -112,6 +112,7 @@ public:
 
     // returns property ID
     value operator*() const;
+    value operator->() const { return operator*(); }
   };
 
   property_iterator begin() const;
