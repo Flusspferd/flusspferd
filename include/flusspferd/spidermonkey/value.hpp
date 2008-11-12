@@ -63,6 +63,10 @@ namespace flusspferd { namespace Impl {
       *ref = *o.ref;
       return *this;
     }
+
+    void *get_gcptr() {
+      return getp();
+    }
   };
 
   inline jsval get_jsval(value_impl const &v) {

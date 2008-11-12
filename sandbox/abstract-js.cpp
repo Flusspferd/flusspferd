@@ -161,11 +161,13 @@ int main() {
       flusspferd::load_class<my_object>();
 
       //flusspferd::root_value v(mk.call());
-      flusspferd::root_value v(flusspferd::global().call("MyObject"));
-      flusspferd::object o = v.get_object();
+      flusspferd::root_object o(
+        flusspferd::global().call("MyObject").to_object());
       co.gc();
       o.call("foo");
       co.gc();
+
+      flusspferd::value v(o);
 
       flusspferd::convert<flusspferd::native_object_base *>::from_value
           from_value;
@@ -213,7 +215,10 @@ int main() {
     flusspferd::evaluate(source4, __FILE__, 4);
 
     flusspferd::object glob = flusspferd::global();
-    for (flusspferd::property_iterator it = glob.begin(); it != glob.end(); ++it) {
+    for (flusspferd::property_iterator it = glob.begin();
+        it != glob.end();
+        ++it)
+    {
       std::cout << "glob: " << *it << std::endl;
     }
 
@@ -224,12 +229,12 @@ int main() {
 
     std::cout << "---------" << std::endl;
 
-    x = flusspferd::create_native_function(
-          &function2, std::string("function2"));
-    flusspferd::root_value f_x(x);
+    flusspferd::root_function f_x(flusspferd::create_native_function(
+          &function2, std::string("function2")));
 
-    std::cout << "function2: " << x.call() << std::endl;
-    std::cout << "name/arity: " << x.name() << '/' << x.arity() << std::endl;
+    std::cout << "function2: " << f_x.call() << std::endl;
+    std::cout << "name/arity: " <<
+        f_x.name() << '/' << f_x.arity() << std::endl;
   //}
   //catch(std::exception &e) {
   //  std::cerr << "Exception: " << e.what() << '\n';

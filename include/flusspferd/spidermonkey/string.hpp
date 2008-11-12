@@ -50,6 +50,11 @@ namespace Impl {
 
     friend JSString *get_string(string_impl &s);
     friend string_impl wrap_string(JSString *s);
+
+  public:
+    void *get_gcptr() {
+      return &str;
+    }
   };
 
   inline JSString *get_string(string_impl &s) {

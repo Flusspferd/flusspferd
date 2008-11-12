@@ -30,6 +30,10 @@ THE SOFTWARE.
 namespace flusspferd {
 
 class context;
+class value;
+class object;
+class string;
+class function;
 
 namespace detail {
 
@@ -53,6 +57,9 @@ private:
 }
 
 typedef detail::root<value> root_value;
+typedef detail::root<object> root_object;
+typedef detail::root<string> root_string;
+typedef detail::root<function> root_function;
 
 }
 

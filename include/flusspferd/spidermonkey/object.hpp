@@ -58,6 +58,11 @@ namespace Impl {
 
     friend JSObject *get_object(object_impl &o);
     friend object_impl wrap_object(JSObject *o);
+
+  public:
+    void *get_gcptr() {
+      return &obj;
+    }
   };
 
   inline JSObject *get_object(object_impl &o) {

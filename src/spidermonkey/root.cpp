@@ -25,6 +25,9 @@ THE SOFTWARE.
 #include "flusspferd/init.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/value.hpp"
+#include "flusspferd/object.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/function.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include <js/jsapi.h>
@@ -33,13 +36,13 @@ namespace flusspferd { namespace detail {
 
 template<typename T>
 root<T>::root(T const &o)
-: value(o), ctx(get_current_context())
+: T(o), ctx(get_current_context())
 {
   JSBool status;
   
   status = JS_AddRoot(
     Impl::get_context(ctx),
-    get_gcptr());
+    T::get_gcptr());
 
   if (status == JS_FALSE) {
     throw exception("Cannot root Javascript value");
@@ -50,14 +53,12 @@ template<typename T>
 root<T>::~root() {
   JS_RemoveRoot(
     Impl::get_context(ctx),
-    get_gcptr());
-}
-
-template<>
-void *root<value>::get_gcptr() {
-  return Impl::get_jsvalp(*this);
+    T::get_gcptr());
 }
 
 template class root<value>;
+template class root<object>;
+template class root<string>;
+template class root<function>;
 
 }}
