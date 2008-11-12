@@ -179,8 +179,8 @@ object::property_iterator &object::property_iterator::operator++() {
   return *this;
 }
 
-bool operator==(object::property_iterator const &lhs,
-                object::property_iterator const &rhs)
+bool flusspferd::operator==(
+  object::property_iterator const &lhs, object::property_iterator const &rhs)
 {
   if(!lhs.get_const() && rhs.get_const())
     return rhs.get_id() == JSVAL_VOID;

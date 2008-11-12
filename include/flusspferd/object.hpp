@@ -129,8 +129,14 @@ public:
   property_iterator end() const;
 };
 
-bool operator==(object::property_iterator const &lhs,
-                object::property_iterator const &rhs);
+bool operator==(
+  object::property_iterator const &lhs, object::property_iterator const &rhs);
+
+inline bool operator!=(
+  object::property_iterator const &lhs, object::property_iterator const &rhs)
+{
+  return !(lhs == rhs);
+}
 
 template<>
 struct detail::convert<object>
