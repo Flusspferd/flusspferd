@@ -24,47 +24,49 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CONTEXT_HPP
 #define FLUSSPFERD_CONTEXT_HPP
 
-#include <flusspferd/value.hpp>
 #include <boost/shared_ptr.hpp>
 
 namespace flusspferd {
-  class object;
 
-  class context {
-    class impl;
-    boost::shared_ptr<impl> p;
+class value;
+class object;
 
-  public:
-    struct detail;
-    friend struct detail;
+class context {
+  class impl;
+  boost::shared_ptr<impl> p;
 
-    context();
-    context(detail const&);
-    ~context();
+public:
+  struct detail;
+  friend struct detail;
 
-    bool is_valid() const;
+  context();
+  context(detail const&);
+  ~context();
 
-    bool operator==(context const &o) const {
-      return p == o.p;
-    }
+  bool is_valid() const;
 
-    static context create();
-
-    object global();
-
-    value evaluate(char const *source, std::size_t n,
-                   char const *file = 0x0, unsigned int line = 0);
-    value evaluate(char const *source, char const *file = 0x0,
-                   unsigned int line = 0);
-    value evaluate(std::string const &source, char const *file = 0x0,
-                   unsigned int line = 0);
-
-    void gc();
-  };
-
-  inline bool operator!=(context const &a, context const &b) {
-    return !(a == b);
+  bool operator==(context const &o) const {
+    return p == o.p;
   }
+
+  static context create();
+
+  object global();
+
+  value evaluate(char const *source, std::size_t n,
+                 char const *file = 0x0, unsigned int line = 0);
+  value evaluate(char const *source, char const *file = 0x0,
+                 unsigned int line = 0);
+  value evaluate(std::string const &source, char const *file = 0x0,
+                 unsigned int line = 0);
+
+  void gc();
+};
+
+inline bool operator!=(context const &a, context const &b) {
+  return !(a == b);
+}
+
 }
 
 #endif /* FLUSSPFERD_CONTEXT_HPP */
