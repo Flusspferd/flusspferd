@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/init.hpp"
+#include "flusspferd/current_context_scope.hpp"
 #include <boost/test/unit_test.hpp>
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
@@ -51,6 +52,24 @@ BOOST_AUTO_TEST_CASE( enter_leave ) {
   BOOST_CHECK(!init.leave_current_context(old_context));
 
   BOOST_CHECK(init.leave_current_context(context));
+
+  BOOST_CHECK_EQUAL(old_context, init.get_current_context());
+}
+
+BOOST_AUTO_TEST_CASE( current_context_scope ) {
+  flusspferd::init &init = flusspferd::init::initialize();
+
+  flusspferd::context old_context(init.get_current_context());
+
+  flusspferd::context context(flusspferd::context::create());
+
+  BOOST_CHECK_NE(context, init.get_current_context());
+
+  {
+    flusspferd::current_context_scope scope(context);
+
+    BOOST_CHECK_EQUAL(context, init.get_current_context());
+  }
 
   BOOST_CHECK_EQUAL(old_context, init.get_current_context());
 }
