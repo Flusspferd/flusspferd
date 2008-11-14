@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_TEST_ENVIRONMENT_HPP
 
 #include "flusspferd/current_context_scope.hpp"
+#include <boost/test/unit_test.hpp>
 
 class context_fixture {
 public:
