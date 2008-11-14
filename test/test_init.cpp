@@ -69,6 +69,16 @@ BOOST_AUTO_TEST_CASE( current_context_scope ) {
     flusspferd::current_context_scope scope(context);
 
     BOOST_CHECK_EQUAL(context, init.get_current_context());
+
+    {
+      flusspferd::context context2(flusspferd::context::create());
+
+      flusspferd::current_context_scope scope(context2);
+
+      BOOST_CHECK_EQUAL(context2, init.get_current_context());
+    }
+
+    BOOST_CHECK_EQUAL(context, init.get_current_context());
   }
 
   BOOST_CHECK_EQUAL(old_context, init.get_current_context());
