@@ -21,21 +21,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/init.hpp"
+#include "flusspferd/current_context_scope.hpp"
 #include <boost/test/unit_test.hpp>
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
 
-BOOST_AUTO_TEST_CASE( initialize ) {
-  flusspferd::init *init = 0;
-  BOOST_CHECK_NO_THROW(init = &flusspferd::init::initialize());
-  BOOST_CHECK_NE(init, (flusspferd::init*) 0);
-
-  flusspferd::context &context = init->get_current_context();
-  BOOST_CHECK(!context.is_valid());
-}
-
-BOOST_AUTO_TEST_CASE( enter_leave ) {
+BOOST_AUTO_TEST_CASE( current_context_scope ) {
   flusspferd::init &init = flusspferd::init::initialize();
 
   flusspferd::context old_context(init.get_current_context());
@@ -44,14 +35,21 @@ BOOST_AUTO_TEST_CASE( enter_leave ) {
 
   BOOST_CHECK_NE(context, init.get_current_context());
 
-  BOOST_CHECK_EQUAL(init.enter_current_context(context), old_context);
+  {
+    flusspferd::current_context_scope scope(context);
 
-  BOOST_CHECK_EQUAL(context, init.get_current_context());
+    BOOST_CHECK_EQUAL(context, init.get_current_context());
 
-  BOOST_CHECK(!init.leave_current_context(old_context));
+    {
+      flusspferd::context context2(flusspferd::context::create());
 
-  BOOST_CHECK(init.leave_current_context(context));
+      flusspferd::current_context_scope scope(context2);
+
+      BOOST_CHECK_EQUAL(context2, init.get_current_context());
+    }
+
+    BOOST_CHECK_EQUAL(context, init.get_current_context());
+  }
 
   BOOST_CHECK_EQUAL(old_context, init.get_current_context());
 }
-
