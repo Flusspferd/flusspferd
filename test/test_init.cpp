@@ -44,11 +44,13 @@ BOOST_AUTO_TEST_CASE( enter_leave ) {
 
   BOOST_CHECK_NE(context, init.get_current_context());
 
-  init.enter_current_context(context);
+  BOOST_CHECK_EQUAL(init.enter_current_context(context), old_context);
 
   BOOST_CHECK_EQUAL(context, init.get_current_context());
 
-  init.leave_current_context(context);
+  BOOST_CHECK(!init.leave_current_context(old_context));
+
+  BOOST_CHECK(init.leave_current_context(context));
 
   BOOST_CHECK_EQUAL(old_context, init.get_current_context());
 }
