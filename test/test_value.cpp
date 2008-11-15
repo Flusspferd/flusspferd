@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
-#include <boost/test/unit_test.hpp>
+#include "test_environment.hpp"
 
 BOOST_AUTO_TEST_CASE( void_value ) {
   flusspferd::value void_value;
@@ -49,3 +49,18 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
   BOOST_CHECK(boolean_value.is_boolean());
   BOOST_CHECK(boolean_value.get_boolean());
 }
+
+
+BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
+
+BOOST_AUTO_TEST_CASE( number_value ) {
+  flusspferd::value number_value(4.5);
+  BOOST_CHECK(number_value.is_number());
+  BOOST_CHECK(number_value.is_double());
+  BOOST_CHECK(!number_value.is_int());
+
+  BOOST_CHECK_EQUAL(number_value.get_double(), 4.5);
+}
+
+BOOST_AUTO_TEST_SUITE_END()
+
