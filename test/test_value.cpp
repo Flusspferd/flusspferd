@@ -25,6 +25,8 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "test_environment.hpp"
 
+BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
+
 BOOST_AUTO_TEST_CASE( void_value ) {
   flusspferd::value void_value;
   BOOST_CHECK(void_value.is_void());
@@ -50,16 +52,28 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
   BOOST_CHECK(boolean_value.get_boolean());
 }
 
+BOOST_AUTO_TEST_CASE( int_value ) {
+  int const X = 4;
 
-BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
+  flusspferd::value int_value(X);
+  BOOST_CHECK(int_value.is_number());
+  BOOST_CHECK(int_value.is_int());
+  BOOST_CHECK(!int_value.is_double());
 
-BOOST_AUTO_TEST_CASE( number_value ) {
-  flusspferd::value number_value(4.5);
-  BOOST_CHECK(number_value.is_number());
-  BOOST_CHECK(number_value.is_double());
-  BOOST_CHECK(!number_value.is_int());
+  BOOST_CHECK_EQUAL(int_value.get_int(), X);
+  BOOST_CHECK_EQUAL(int_value.to_number(), double(X));
+}
 
-  BOOST_CHECK_EQUAL(number_value.get_double(), 4.5);
+BOOST_AUTO_TEST_CASE( double_value ) {
+  double const X = 4.5;
+
+  flusspferd::value double_value(X);
+  BOOST_CHECK(double_value.is_number());
+  BOOST_CHECK(double_value.is_double());
+  BOOST_CHECK(!double_value.is_int());
+
+  BOOST_CHECK_EQUAL(double_value.get_double(), X);
+  BOOST_CHECK_EQUAL(double_value.to_number(), X);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
