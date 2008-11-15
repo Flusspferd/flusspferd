@@ -17,7 +17,7 @@ IUSE=""
 
 RDEPEND="
 	>=dev-lang/spidermonkey-1.7
-	>=dev-libs/boost-1.35"
+	>=dev-libs/boost-1.36"
 DEPEND="${RDEPEND}
 	dev-lang/python"
 
