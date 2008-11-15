@@ -31,6 +31,8 @@ BOOST_AUTO_TEST_CASE( void_value ) {
   flusspferd::value void_value;
   BOOST_CHECK(void_value.is_void());
   BOOST_CHECK(!void_value.is_null());
+
+  BOOST_CHECK_NE(void_value.to_number(), void_value.to_number());
 }
 
 BOOST_AUTO_TEST_CASE( null_value ) {
@@ -40,6 +42,8 @@ BOOST_AUTO_TEST_CASE( null_value ) {
   flusspferd::value null_value(null_object);
   BOOST_CHECK(!null_value.is_void());
   BOOST_CHECK(null_value.is_null());
+
+  BOOST_CHECK_EQUAL(null_value.to_number(), 0);
 }
 
 BOOST_AUTO_TEST_CASE( boolean_value ) {
@@ -47,9 +51,13 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
   BOOST_CHECK(boolean_value.is_boolean());
   BOOST_CHECK(!boolean_value.get_boolean());
 
+  BOOST_CHECK_EQUAL(boolean_value.to_number(), 0);
+
   boolean_value = true;
   BOOST_CHECK(boolean_value.is_boolean());
   BOOST_CHECK(boolean_value.get_boolean());
+
+  BOOST_CHECK_EQUAL(boolean_value.to_number(), 1);
 }
 
 BOOST_AUTO_TEST_CASE( int_value ) {
