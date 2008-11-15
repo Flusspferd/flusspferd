@@ -1,2 +1,2 @@
 #!/bin/sh
-./waf configure "$*" && touch .configure
+./waf configure $* && touch .configure
