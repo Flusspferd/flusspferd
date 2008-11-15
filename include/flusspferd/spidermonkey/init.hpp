@@ -27,6 +27,9 @@ THE SOFTWARE.
 #include "../init.hpp"
 #include "context.hpp"
 
+typedef struct JSContext JSContext;
+typedef struct JSRuntime JSRuntime;
+
 namespace flusspferd { namespace Impl {
   inline JSContext *current_context() {
     return get_context(get_current_context());
