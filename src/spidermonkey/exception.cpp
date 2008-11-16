@@ -94,6 +94,8 @@ exception::~exception() throw()
   }
 }
 
-void exception::throw_js() {
-  JS_SetPendingException(Impl::current_context(), Impl::get_jsval(*p->exception_value));
+void exception::throw_js_INTERNAL() {
+  JS_SetPendingException(
+      Impl::current_context(),
+      Impl::get_jsval(*p->exception_value));
 }

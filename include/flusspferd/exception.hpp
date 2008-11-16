@@ -33,7 +33,8 @@ namespace flusspferd {
     exception(std::string const &what);
     ~exception() throw();
 
-    void throw_js();
+  public:
+    void throw_js_INTERNAL();
 
   private:
     class impl;
@@ -45,11 +46,11 @@ namespace flusspferd {
 
 #define FLUSSPFERD_CALLBACK_END \
     catch (::flusspferd::exception &e) { \
-      e.throw_js(); \
+      e.throw_js_INTERNAL(); \
       return JS_FALSE; \
     } catch (::std::exception &e) { \
       ::flusspferd::exception x(e.what()); \
-      x.throw_js(); \
+      x.throw_js_INTERNAL(); \
       return JS_FALSE; \
     } \
     return JS_TRUE
