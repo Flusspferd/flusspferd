@@ -41,7 +41,7 @@ namespace Impl {
     JSString *get()       { return str; }
     void set(JSString *s) { str = s; }
 
-    string_impl() : str(0x0) { }
+    string_impl();
     string_impl(JSString *s) : str(s) { }
     string_impl(char const *s);
     string_impl(char const *s, std::size_t n);

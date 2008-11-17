@@ -31,6 +31,10 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
+Impl::string_impl::string_impl()
+  : str(JSVAL_TO_STRING(JS_GetEmptyStringValue(Impl::current_context())))
+{ }
+
 Impl::string_impl::string_impl(char const *s)
  : str(JS_NewStringCopyZ(Impl::current_context(), s))
 {

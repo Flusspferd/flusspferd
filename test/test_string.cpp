@@ -35,9 +35,9 @@ BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( empty_string ) {
   flusspferd::string s, t;
-  //BOOST_CHECK(s.length() == 0);
-  //BOOST_CHECK(s.to_string().empty());
-  //BOOST_CHECK(std::strlen(s.c_str()) == 0);
+  BOOST_CHECK(s.length() == 0);
+  BOOST_CHECK(s.to_string().empty());
+  BOOST_CHECK(std::strlen(s.c_str()) == 0);
   BOOST_CHECK_EQUAL(s, t);
 }
 
