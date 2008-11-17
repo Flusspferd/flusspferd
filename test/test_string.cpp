@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
+#include "flusspferd/exception.hpp"
 
 #include <iostream>
 #include <cstring>
@@ -53,6 +54,29 @@ BOOST_AUTO_TEST_CASE( std_string ) {
   BOOST_CHECK_EQUAL(s.length(), test.length());
   BOOST_CHECK_EQUAL(s.to_string(), test);
   BOOST_CHECK(std::strcmp(s.c_str(), test.c_str()) == 0);
+}
+
+BOOST_AUTO_TEST_CASE( copy_op ) {
+  flusspferd::string const a("Hallo Welt!\n");
+  flusspferd::string b;
+  b = a;
+  BOOST_CHECK_EQUAL(a, b);
+}
+
+BOOST_AUTO_TEST_CASE( op_less ) {
+  std::string const ss1 = "aaa";
+  std::string const ss2 = "aab";
+  flusspferd::string fs1 = ss1;
+  flusspferd::string fs2 = ss2;
+
+  BOOST_CHECK( (fs1 < fs2) == (ss1 < ss2) );
+  BOOST_CHECK( (fs2 < fs1) == (ss2 < ss1) );
+}
+
+BOOST_AUTO_TEST_CASE( string_substr ) {
+  std::string const str = "Ba bo bu bi bo bz";
+  flusspferd::string s = str;
+  BOOST_CHECK_EQUAL(s.substr(3, 5), str.substr(3, 5));
 }
 
 BOOST_AUTO_TEST_CASE( string_io ) {
