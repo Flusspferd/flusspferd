@@ -61,7 +61,8 @@ Impl::arguments_impl &Impl::arguments_impl::operator=(arguments_impl const &o) {
 }
 
 void Impl::arguments_impl::reset_argv() {
-  assert(is_userprovided());
+  //assert(is_userprovided());
+  n = values.size();
   argv = &values[0];
 }
 

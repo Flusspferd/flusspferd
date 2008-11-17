@@ -32,7 +32,7 @@ namespace flusspferd {
 
   class arguments : public Impl::arguments_impl {
   public:
-    arguments() {}
+    arguments() { }
     arguments(Impl::arguments_impl const &a)
       : Impl::arguments_impl(a)
     { }

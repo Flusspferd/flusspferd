@@ -44,9 +44,9 @@ namespace Impl {
     std::vector<jsval> const &data() const { return values; }
     void reset_argv();
 
-    bool is_userprovided() const { return values.size(); }
+    bool is_userprovided() const { return values.size() == n; } // TODO does this fix the problem?
 
-    arguments_impl() : n(0), argv(0) {}
+    arguments_impl() : n(0), argv(0x0) {}
     arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
     arguments_impl(std::vector<value> const &o);
     arguments_impl(arguments_impl const &o);
