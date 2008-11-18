@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_FILE_CLASS_HPP
 #define FLUSSPFERD_FILE_CLASS_HPP
 
-#include "native_object_base.hpp"
+#include "../native_object_base.hpp"
 
 namespace flusspferd {
 

@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/file_class.hpp"
+#include "flusspferd/io/file_class.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/function_adapter.hpp"

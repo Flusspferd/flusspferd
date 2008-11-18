@@ -32,6 +32,13 @@ obj.includes = ['../include']
 obj.uselib = 'JS BOOST_THREAD BOOST'
 obj.target = 'flusspferd'
 
+obj = bld.new_task_gen('cxx', libtype)
+obj.find_sources_in_dirs('io')
+obj.includes = ['../include']
+obj.uselib_local = 'flusspferd'
+obj.uselib = 'BOOST'
+obj.target = 'flusspferd-io'
+
 if bld.env['ENABLE_TESTS']:
   obj = bld.new_task_gen('cxx', libtype)
   obj.find_sources_in_dirs('. spidermonkey')
