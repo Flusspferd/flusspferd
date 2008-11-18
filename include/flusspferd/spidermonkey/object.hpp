@@ -28,50 +28,48 @@ THE SOFTWARE.
 #include <boost/optional.hpp>
 
 namespace flusspferd {
-  class context;
-  class object_template;
-  class object;
+
+class context;
+class object_template;
+class object;
 
 namespace Impl {
-  class object_impl {
-    JSObject *obj;
 
-  protected:
-    JSObject *get() { return obj; }
-    JSObject *get_const() const { return obj; }
-    void set(JSObject *o) { obj = o; }
+class object_impl {
+  JSObject *obj;
 
-    object_impl(JSObject *o) : obj(o) { }
+protected:
+  JSObject *get() { return obj; }
+  JSObject *get_const() const { return obj; }
+  void set(JSObject *o) { obj = o; }
 
-    class property_iterator_impl {
-      JSObject *iter;
-      jsid id;
-    public:
-      property_iterator_impl() : iter(0x0) { }
-      property_iterator_impl(JSObject *i) : iter(i) { ++*this; }
+  object_impl(JSObject *o) : obj(o) { }
 
-      jsid get_id() const { return id; }
-      JSObject *get() { return iter; }
-      JSObject *get_const() const { return iter; }
-      property_iterator_impl &operator++();
-    };
+  friend JSObject *get_object(object_impl const &o);
+  friend object_impl wrap_object(JSObject *o);
 
-    friend JSObject *get_object(object_impl &o);
-    friend object_impl wrap_object(JSObject *o);
-
-  public:
-    void *get_gcptr() {
-      return &obj;
-    }
-  };
-
-  inline JSObject *get_object(object_impl &o) {
-    return o.get();
+public:
+  void *get_gcptr() {
+    return &obj;
   }
+};
+
+inline JSObject *get_object(object_impl const &o) {
+  return o.get_const();
+}
   
-  inline object_impl wrap_object(JSObject *o) {
-    return object_impl(o);
-  }
+inline object_impl wrap_object(JSObject *o) {
+  return object_impl(o);
+}
+
+inline bool operator==(object_impl const &a, object_impl const &b) {
+  return get_object(a) == get_object(b);
+}
+
+inline bool operator!=(object_impl const &a, object_impl const &b) {
+  return !(a == b);
+}
+
 }}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_OBJECT_HPP */

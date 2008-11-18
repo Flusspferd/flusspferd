@@ -57,6 +57,9 @@ BOOST_AUTO_TEST_CASE( null_value ) {
   BOOST_CHECK(null_value.is_object());
   BOOST_CHECK(!null_value.is_boolean());
   BOOST_CHECK(!null_value.is_string());
+  BOOST_CHECK(!null_value.is_number());
+  BOOST_CHECK(!null_value.is_int());
+  BOOST_CHECK(!null_value.is_double());
 
   BOOST_CHECK_EQUAL(null_value.to_number(), 0);
 }
@@ -65,6 +68,14 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
   flusspferd::value boolean_value(false);
   BOOST_CHECK(boolean_value.is_boolean());
   BOOST_CHECK(!boolean_value.get_boolean());
+
+  BOOST_CHECK(!boolean_value.is_void());
+  BOOST_CHECK(!boolean_value.is_null());
+  BOOST_CHECK(!boolean_value.is_number());
+  BOOST_CHECK(!boolean_value.is_int());
+  BOOST_CHECK(!boolean_value.is_double());
+  BOOST_CHECK(!boolean_value.is_object());
+  BOOST_CHECK(!boolean_value.is_string());
 
   BOOST_CHECK_EQUAL(boolean_value.to_number(), 0);
 
@@ -94,6 +105,8 @@ BOOST_AUTO_TEST_CASE( int_value ) {
   BOOST_CHECK(!int_value.is_void());
   BOOST_CHECK(!int_value.is_null());
   BOOST_CHECK(!int_value.is_boolean());
+  BOOST_CHECK(!int_value.is_object());
+  BOOST_CHECK(!int_value.is_string());
 
   BOOST_CHECK_EQUAL(int_value.get_int(), X);
   BOOST_CHECK_EQUAL(int_value.to_number(), double(X));
@@ -109,6 +122,8 @@ BOOST_AUTO_TEST_CASE( double_value ) {
   BOOST_CHECK(!double_value.is_void());
   BOOST_CHECK(!double_value.is_null());
   BOOST_CHECK(!double_value.is_boolean());
+  BOOST_CHECK(!double_value.is_object());
+  BOOST_CHECK(!double_value.is_string());
 
   BOOST_CHECK_EQUAL(double_value.get_double(), X);
   BOOST_CHECK_EQUAL(double_value.to_number(), X);
