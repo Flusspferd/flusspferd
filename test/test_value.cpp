@@ -22,7 +22,13 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/value.hpp"
+#include "flusspferd/value_io.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/string_io.hpp"
 #include "flusspferd/object.hpp"
+
+#include <sstream>
+
 #include "test_environment.hpp"
 
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
@@ -69,6 +75,15 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
   BOOST_CHECK_EQUAL(boolean_value.to_number(), 1);
 }
 
+BOOST_AUTO_TEST_CASE( value_to_boolean ) {
+  flusspferd::value v(12);
+  BOOST_CHECK(v.is_number());
+  BOOST_CHECK(v.to_boolean());
+  v = 0;
+  BOOST_CHECK(v.is_number());
+  BOOST_CHECK(!v.to_boolean());
+}
+
 BOOST_AUTO_TEST_CASE( int_value ) {
   int const X = 4;
 
@@ -97,6 +112,28 @@ BOOST_AUTO_TEST_CASE( double_value ) {
 
   BOOST_CHECK_EQUAL(double_value.get_double(), X);
   BOOST_CHECK_EQUAL(double_value.to_number(), X);
+}
+
+BOOST_AUTO_TEST_CASE( string_value ) {
+  flusspferd::string s = "Hallo";
+  flusspferd::value v(s);
+  BOOST_CHECK(v.is_string());
+  BOOST_CHECK(!v.is_object());
+  BOOST_CHECK(!v.is_number());
+  BOOST_CHECK(!v.is_double());
+  BOOST_CHECK(!v.is_int());
+  BOOST_CHECK(!v.is_void());
+  BOOST_CHECK(!v.is_null());
+  BOOST_CHECK(!v.is_boolean());
+
+  BOOST_CHECK_EQUAL(v.get_string(), s);
+  BOOST_CHECK_EQUAL(v.to_string(), s);
+
+  std::stringstream ss1;
+  ss1 << v;
+  std::stringstream ss2;
+  ss2 << s;
+  BOOST_CHECK_EQUAL(ss1.str(), ss2.str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
