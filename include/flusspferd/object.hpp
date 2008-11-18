@@ -108,6 +108,14 @@ public:
   property_iterator end() const;
 };
 
+inline bool operator==(object const &a, object const &b) {
+  return Impl::operator==(a, b);
+}
+
+inline bool operator!=(object const &a, object const &b) {
+  return Impl::operator!=(a, b);
+}
+
 template<>
 struct detail::convert<object>
 {

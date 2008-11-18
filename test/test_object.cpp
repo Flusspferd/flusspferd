@@ -25,22 +25,36 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "test_environment.hpp"
 
+BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
+
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( null_object ) {
   flusspferd::object null_object;
   BOOST_CHECK(!null_object.is_valid());
 
+  BOOST_CHECK_EQUAL(null_object, null_object);
+
   flusspferd::object object_copy(null_object);
   BOOST_CHECK(!null_object.is_valid());
+
+  BOOST_CHECK_EQUAL(null_object, object_copy);
 }
 
 BOOST_AUTO_TEST_CASE( plain_object ) {
   flusspferd::object const &plain_object = flusspferd::create_object();
   BOOST_CHECK(plain_object.is_valid());
 
+  BOOST_CHECK_EQUAL(plain_object, plain_object);
+  BOOST_CHECK_NE(plain_object, flusspferd::object());
+
   flusspferd::object object_copy(plain_object);
   BOOST_CHECK(object_copy.is_valid());
+
+  BOOST_CHECK_EQUAL(plain_object, object_copy);
+
+  flusspferd::object const &plain_object2 = flusspferd::create_object();
+  BOOST_CHECK_NE(plain_object, plain_object2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
