@@ -348,4 +348,6 @@ private:
 
 }
 
+#include "native_object_base.hpp"
+
 #endif
