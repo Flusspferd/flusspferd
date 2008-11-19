@@ -63,11 +63,16 @@ struct class_info {
 };
 
 template<typename T>
-function load_class(object container = global()) {
+object load_class(object container = global()) {
   std::size_t const arity = T::class_info::constructor_arity();
   std::string const name = T::class_info::constructor_name();
 
   local_root_scope scope;
+
+  value previous = container.get_property(name);
+
+  if (previous.is_object())
+    return previous.get_object();
 
   function constructor(
     create_native_function<detail::class_constructor<T> >(arity, name));
