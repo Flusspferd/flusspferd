@@ -29,27 +29,27 @@ libtype = 'shlib'
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
-obj.uselib = 'JS BOOST_THREAD BOOST'
+obj.uselib = 'JS JS_H BOOST_THREAD BOOST'
 obj.target = 'flusspferd'
 
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('io')
 obj.includes = ['../include']
 obj.uselib_local = 'flusspferd'
-obj.uselib = 'BOOST'
+obj.uselib = 'JS_H BOOST'
 obj.target = 'flusspferd-io'
 
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('xml')
 obj.includes = ['../include']
 obj.uselib_local = 'flusspferd'
-obj.uselib = 'BOOST'
+obj.uselib = 'JS_H BOOST'
 obj.target = 'flusspferd-xml'
 
 if bld.env['ENABLE_TESTS']:
   obj = bld.new_task_gen('cxx', libtype)
   obj.find_sources_in_dirs('. spidermonkey')
   obj.includes = ['../include']
-  obj.uselib = 'GCOV JS BOOST_THREAD BOOST'
+  obj.uselib = 'GCOV JS JS_H BOOST_THREAD BOOST'
   obj.target = 'flusspferd-coverage'
   obj.install_path = None

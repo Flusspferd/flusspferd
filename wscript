@@ -70,30 +70,18 @@ def configure(conf):
     conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
 
-    boostconf = conf.create_boost_configurator()
-    boostconf.lib = ['thread']
+    boostlib = ['thread']
     if Options.options.enable_tests:
-      boostconf.lib += ['unit_test_framework']
-    boostconf.static = 'nostatic'
-    boostconf.threadingtag = 'st'
-    boostconf.run()
-    
-    # spidermonkey
-    u('CXXDEFINES', 'XP_UNIX') # TODO
-    u('CXXDEFINES', 'JS_C_STRINGS_ARE_UTF8')
-    libconf = conf.create_library_configurator()
-    libconf.name = 'js'
-    libconf.path = ['/usr/lib', '/usr/local/lib', '/opt/local/lib', '/sw/lib']
-    libconf.mandatory = True
-    libconf.run()
+      boostlib += ['unit_test_framework']
 
-    headconf = conf.create_header_configurator()
-    headconf.name = 'js/jsapi.h'
-    headconf.mandatory = True
-    headconf.path = ['/usr/include', '/usr/local/include', '/opt/local/include',
-                     '/sw/include']
-    headconf.uselib_store = 'JS'
-    headconf.run()
+    # boost
+    conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
+
+    # spidermonkey
+    conf.check_cxx(lib = 'js', uselib_store='JS', mandatory=1)
+    conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
+                   uselib_store='JS_H',
+                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox

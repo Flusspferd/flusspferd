@@ -24,8 +24,9 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_SPIDERMONKEY_OBJECT_HPP
 #define FLUSSPFERD_SPIDERMONKEY_OBJECT_HPP
 
-#include <js/jspubtd.h>
 #include <boost/optional.hpp>
+
+typedef struct JSObject JSObject;
 
 namespace flusspferd {
 
