@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE( object_property ) {
 
 BOOST_AUTO_TEST_CASE( object_property_value ) {
   flusspferd::object obj = flusspferd::create_object();
-  flusspferd::value const name = "foobar";
+  flusspferd::value const name = flusspferd::string("foobar");
   flusspferd::value const v(409);
   obj.set_property(name, v);
   BOOST_CHECK(obj.has_property(name));
