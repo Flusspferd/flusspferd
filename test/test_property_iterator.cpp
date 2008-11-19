@@ -27,8 +27,6 @@ THE SOFTWARE.
 #include "flusspferd/value_io.hpp"
 #include "test_environment.hpp"
 
-//#include <iostream>
-
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::property_iterator) //FIXME?
 
@@ -36,7 +34,7 @@ BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( property_iterator ) {
   flusspferd::object obj = flusspferd::create_object();
-  flusspferd::value const name = "foobar";
+  flusspferd::value const name(flusspferd::string("foobar"));
   flusspferd::value const v(409);
   obj.set_property(name, v);
 
@@ -53,8 +51,8 @@ BOOST_AUTO_TEST_CASE( property_iterator ) {
   BOOST_CHECK_EQUAL(k, i);
   BOOST_CHECK_EQUAL(l, j);
 
-  //std::cout << *i << ' ' << v << '\n';
-  BOOST_CHECK_EQUAL(*i, v);
+  BOOST_CHECK_NE(*i, v);
+  BOOST_CHECK_EQUAL(*i, name);
 
   BOOST_CHECK_EQUAL(++i, j);
 }
