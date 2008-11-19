@@ -32,6 +32,10 @@ class object;
 class string;
 
 class value : public Impl::value_impl {
+private:
+  template<typename T>
+  value(T *);
+
 public:
   value();
   value(bool b);
