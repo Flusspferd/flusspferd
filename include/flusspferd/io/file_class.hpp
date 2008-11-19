@@ -50,6 +50,7 @@ private: // javascript methods
   void close();
 
   string read_whole();
+  string read(unsigned max_size);
 
   void write(string const &);
 

@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"
+#include <boost/scoped_array.hpp>
 #include <fstream>
 #include <iostream>
 #include <sys/types.h>
@@ -59,6 +60,7 @@ void file_class::post_initialize() {
   register_native_method("open", &file_class::open);
   register_native_method("close", &file_class::close);
   register_native_method("readWhole", &file_class::read_whole);
+  register_native_method("read", &file_class::read);
   register_native_method("write", &file_class::write);
 }
 
@@ -82,6 +84,7 @@ object file_class::class_info::create_prototype() {
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);
   create_native_method(proto, "readWhole", 0);
+  create_native_method(proto, "read", 1);
   create_native_method(proto, "write", 1);
 
   return proto;
@@ -108,6 +111,18 @@ string file_class::read_whole() {
   } while (p->stream);
 
   return string(data);
+}
+
+string file_class::read(unsigned size) {
+  if (!size)
+    size = 4096;
+
+  boost::scoped_array<char> buf(new char[size + 1]);
+
+  p->stream.read(buf.get(), size);
+  buf[p->stream.gcount()] = '\0';
+
+  return string(buf.get());
 }
 
 void file_class::write(string const &text) {
