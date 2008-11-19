@@ -22,9 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/xml.hpp"
-#include "flusspferd/io/file_class.hpp"
-#include "flusspferd/class.hpp"
-#include "flusspferd/init.hpp"
+#include "flusspferd/io/io.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/context.hpp"
@@ -88,7 +86,7 @@ int main(int argc, char **argv) {
     flusspferd::current_context_scope scope(co);
 
     flusspferd::xml::load_xml();
-    flusspferd::load_class<flusspferd::io::file_class>();
+    flusspferd::io::load_io();
 
     co.gc();
 
