@@ -39,6 +39,13 @@ obj.uselib_local = 'flusspferd'
 obj.uselib = 'BOOST'
 obj.target = 'flusspferd-io'
 
+obj = bld.new_task_gen('cxx', libtype)
+obj.find_sources_in_dirs('xml')
+obj.includes = ['../include']
+obj.uselib_local = 'flusspferd'
+obj.uselib = 'BOOST'
+obj.target = 'flusspferd-xml'
+
 if bld.env['ENABLE_TESTS']:
   obj = bld.new_task_gen('cxx', libtype)
   obj.find_sources_in_dirs('. spidermonkey')
