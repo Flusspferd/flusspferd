@@ -21,38 +21,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_IO_FILE_CLASS_HPP
-#define FLUSSPFERD_IO_FILE_CLASS_HPP
+#ifndef FLUSSPFERD_IO_STREAM_BASE_HPP
+#define FLUSSPFERD_IO_STREAM_BASE_HPP
 
-#include "stream_base.hpp"
+#include "../native_object_base.hpp"
+#include <streambuf>
 
 namespace flusspferd { namespace io {
 
-class file_class : public stream_base {
+class stream_base : public native_object_base {
 public:
-  file_class(call_context &);
-  ~file_class();
+  stream_base(std::streambuf * = 0);
+  ~stream_base();
+
+  void set_streambuf(std::streambuf *buf);
 
   struct class_info {
-    static char const *constructor_name();
-    static std::size_t constructor_arity();
-
     static object create_prototype();
-
-    static void augment_constructor(object);
   };
 
-private:
+protected:
   void post_initialize();
 
 private: // javascript methods
-  void open(char const *name);
   void close();
 
+  string read_whole();
+  string read(unsigned max_size);
+
+  void write(string const &);
+
 private:
-  class impl;
-  boost::scoped_ptr<impl> p;
+  std::streambuf *streambuf;
 };
+
 
 }}
 

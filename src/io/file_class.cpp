@@ -47,6 +47,7 @@ public:
 file_class::file_class(call_context &x)
   : p(new impl)
 {
+  set_streambuf(p->stream.rdbuf());
   if (!x.arg.empty()) {
     string name = x.arg[0].to_string();
     open(name.c_str());
@@ -57,11 +58,10 @@ file_class::~file_class()
 {}
 
 void file_class::post_initialize() {
+  stream_base::post_initialize();
+
   register_native_method("open", &file_class::open);
   register_native_method("close", &file_class::close);
-  register_native_method("readWhole", &file_class::read_whole);
-  register_native_method("read", &file_class::read);
-  register_native_method("write", &file_class::write);
 }
 
 char const *file_class::class_info::constructor_name() {
@@ -79,13 +79,10 @@ void file_class::class_info::augment_constructor(object constructor) {
 object file_class::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object();
+  object proto = stream_base::class_info::create_prototype();
 
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);
-  create_native_method(proto, "readWhole", 0);
-  create_native_method(proto, "read", 1);
-  create_native_method(proto, "write", 1);
 
   return proto;
 }
@@ -99,34 +96,6 @@ void file_class::open(char const *name) {
 
 void file_class::close() {
   p->stream.close();
-}
-
-string file_class::read_whole() {
-  std::string data;
-  char buf[4096];
-
-  do { 
-    p->stream.read(buf, sizeof(buf));
-    data.append(buf, p->stream.gcount());
-  } while (p->stream);
-
-  return string(data);
-}
-
-string file_class::read(unsigned size) {
-  if (!size)
-    size = 4096;
-
-  boost::scoped_array<char> buf(new char[size + 1]);
-
-  p->stream.read(buf.get(), size);
-  buf[p->stream.gcount()] = '\0';
-
-  return string(buf.get());
-}
-
-void file_class::write(string const &text) {
-  p->stream << text;
 }
 
 void file_class::impl::create(char const *name, boost::optional<int> mode) {
