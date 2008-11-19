@@ -41,5 +41,5 @@ obj.source = 'jsrepl.cpp'
 obj.target = 'jsrepl'
 obj.install_path = None
 obj.uselib = 'JS BOOST'
-obj.uselib_local = 'flusspferd flusspferd-io'
+obj.uselib_local = 'flusspferd flusspferd-io flusspferd-xml'
 obj.includes = ['../include']

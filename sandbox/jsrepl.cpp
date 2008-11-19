@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/xml/xml.hpp"
 #include "flusspferd/io/file_class.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/init.hpp"
@@ -86,6 +87,7 @@ int main(int argc, char **argv) {
     flusspferd::context co = flusspferd::context::create();
     flusspferd::current_context_scope scope(co);
 
+    flusspferd::xml::load_xml();
     flusspferd::load_class<flusspferd::io::file_class>();
 
     co.gc();

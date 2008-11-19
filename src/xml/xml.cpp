@@ -22,3 +22,18 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/xml.hpp"
+#include "flusspferd/local_root_scope.hpp"
+#include "flusspferd/create.hpp"
+
+using namespace flusspferd;
+using namespace flusspferd::xml;
+
+object flusspferd::xml::load_xml(object container) {
+  local_root_scope scope;
+
+  object XML = flusspferd::create_object();
+
+  container.define_property("XML", XML, object::read_only_property | object::dont_enumerate);
+
+  return XML;
+}
