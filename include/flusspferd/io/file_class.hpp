@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 
-namespace flusspferd {
+namespace flusspferd { namespace io {
 
 class file_class : public native_object_base {
 public:
@@ -58,6 +58,6 @@ private:
   boost::scoped_ptr<impl> p;
 };
 
-}
+}}
 
 #endif

@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     flusspferd::context co = flusspferd::context::create();
     flusspferd::current_context_scope scope(co);
 
-    flusspferd::load_class<flusspferd::file_class>();
+    flusspferd::load_class<flusspferd::io::file_class>();
 
     co.gc();
 

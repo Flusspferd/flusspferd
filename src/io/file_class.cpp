@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include <fcntl.h>
 
 using namespace flusspferd;
+using namespace flusspferd::io;
 
 class file_class::impl {
 public:
