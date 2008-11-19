@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/object.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/value_io.hpp"
 #include "test_environment.hpp"
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
@@ -55,6 +56,32 @@ BOOST_AUTO_TEST_CASE( plain_object ) {
 
   flusspferd::object const &plain_object2 = flusspferd::create_object();
   BOOST_CHECK_NE(plain_object, plain_object2);
+}
+
+BOOST_AUTO_TEST_CASE( object_property ) {
+  flusspferd::object obj = flusspferd::create_object();
+  std::string const name = "foobar";
+  flusspferd::value const v(409);
+  obj.set_property(name, v);
+  BOOST_CHECK(obj.has_property(name));
+  BOOST_CHECK_EQUAL(obj.get_property(name), v);
+  obj.delete_property(name);
+  BOOST_CHECK(!obj.has_property(name));
+  flusspferd::value const empty;
+  BOOST_CHECK_EQUAL(obj.get_property(name), empty);
+}
+
+BOOST_AUTO_TEST_CASE( object_property_value ) {
+  flusspferd::object obj = flusspferd::create_object();
+  flusspferd::value const name = "foobar";
+  flusspferd::value const v(409);
+  obj.set_property(name, v);
+  BOOST_CHECK(obj.has_property(name));
+  BOOST_CHECK_EQUAL(obj.get_property(name), v);
+  obj.delete_property(name);
+  BOOST_CHECK(!obj.has_property(name));
+  flusspferd::value const empty;
+  BOOST_CHECK_EQUAL(obj.get_property(name), empty);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
