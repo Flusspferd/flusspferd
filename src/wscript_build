@@ -50,6 +50,6 @@ if bld.env['ENABLE_TESTS']:
   obj = bld.new_task_gen('cxx', libtype)
   obj.find_sources_in_dirs('. spidermonkey io xml')
   obj.includes = ['../include']
-  obj.uselib = 'GCOV JS JS_H BOOST_THREAD BOOST'
+  obj.uselib = 'LIBXML2 GCOV JS JS_H BOOST_THREAD BOOST'
   obj.target = 'flusspferd-coverage'
   obj.install_path = None
