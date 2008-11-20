@@ -44,6 +44,9 @@ public:
   document(xmlDocPtr doc);
   ~document();
 
+protected:
+  void post_initialize();
+
 private:
   xmlDocPtr ptr;
 };

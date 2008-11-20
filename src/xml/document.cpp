@@ -34,20 +34,22 @@ document::document(xmlDocPtr ptr)
 
 document::document(call_context &x) {
   value version = x.arg[0];
-  ptr = xmlNewDoc((xmlChar const *)
-    (version.is_void() ? "1.0" : version.to_string().c_str()));
+  ptr = xmlNewDoc((xmlChar const *) "1.0");
 }
 
 document::~document() {
   xmlFreeDoc(ptr);
 }
 
+void document::post_initialize() {
+}
+
 object document::class_info::create_prototype() {
   local_root_scope scope;
 
-  object obj = create_object();
+  object proto = create_object();
 
-  return obj;
+  return proto;
 }
 
 char const *document::class_info::constructor_name() {
@@ -55,5 +57,6 @@ char const *document::class_info::constructor_name() {
 }
 
 std::size_t document::class_info::constructor_arity() {
-  return 1;
+  return 0;
 }
+
