@@ -83,6 +83,10 @@ def configure(conf):
                    uselib_store='JS_H',
                    defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
 
+    # xml
+    conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2', atleast_version='2.6.0',
+                   args = '--cflags --libs')
+
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
 

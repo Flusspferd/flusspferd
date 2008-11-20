@@ -43,7 +43,7 @@ obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('xml')
 obj.includes = ['../include']
 obj.uselib_local = 'flusspferd'
-obj.uselib = 'JS_H BOOST'
+obj.uselib = 'LIBXML2 JS_H BOOST'
 obj.target = 'flusspferd-xml'
 
 if bld.env['ENABLE_TESTS']:
