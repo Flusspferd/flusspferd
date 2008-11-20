@@ -58,8 +58,13 @@ public:
     if(!context)
       throw exception("Could not create Spidermonkey Context");
 
-    JS_SetOptions(context, JSOPTION_VAROBJFIX);
-    JS_SetOptions(context, JSOPTION_DONT_REPORT_UNCAUGHT);
+    uint32 options = JS_GetOptions(context);
+
+    options |= JSOPTION_VAROBJFIX;
+    options |= JSOPTION_DONT_REPORT_UNCAUGHT;
+    options &= ~JSOPTION_XML;
+
+    JS_SetOptions(context, options);
 
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
     if(!global_)
@@ -69,6 +74,8 @@ public:
 
     if(!JS_InitStandardClasses(context, global_))
       throw exception("Could not initialize Global Object");
+
+    JS_DeleteProperty(context, global_, "XML");
   }
 
   explicit impl(JSContext *context)

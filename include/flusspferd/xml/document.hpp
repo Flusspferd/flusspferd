@@ -25,12 +25,22 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_DOCUMENT_HPP
 
 #include "../native_object_base.hpp"
+#include "../class.hpp"
+#include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class document : public native_object_base {
+class document : public native_object_base, private boost::noncopyable {
 public:
+  struct class_info : flusspferd::class_info {
+    static char const *constructor_name();
+    static std::size_t constructor_arity();
+
+    static object create_prototype();
+  };
+
+  document(call_context &);
   document(xmlDocPtr doc);
   ~document();
 

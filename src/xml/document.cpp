@@ -22,6 +22,8 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/document.hpp"
+#include "flusspferd/local_root_scope.hpp"
+#include "flusspferd/string.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -30,6 +32,28 @@ document::document(xmlDocPtr ptr)
   : ptr(ptr)
 {}
 
+document::document(call_context &x) {
+  value version = x.arg[0];
+  ptr = xmlNewDoc((xmlChar const *)
+    (version.is_void() ? "1.0" : version.to_string().c_str()));
+}
+
 document::~document() {
   xmlFreeDoc(ptr);
+}
+
+object document::class_info::create_prototype() {
+  local_root_scope scope;
+
+  object obj = create_object();
+
+  return obj;
+}
+
+char const *document::class_info::constructor_name() {
+  return "Document";
+}
+
+std::size_t document::class_info::constructor_arity() {
+  return 1;
 }
