@@ -32,11 +32,19 @@ using namespace flusspferd::io;
 object flusspferd::io::load_io(object container) {
   local_root_scope scope;
 
+  value previous = container.get_property("IO");
+
+  if (previous.is_object())
+    return previous.to_object();
+
   object IO = flusspferd::create_object();
 
   load_class<file_class>(IO);
 
-  container.define_property("IO", IO, object::read_only_property | object::dont_enumerate);
+  container.define_property(
+    "IO",
+    IO,
+    object::read_only_property | object::dont_enumerate);
 
   return IO;
 }
