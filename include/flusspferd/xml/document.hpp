@@ -49,6 +49,7 @@ protected:
 
 private: // JS methods
   string dump();
+  object copy(bool recursive);
 
 private:
   xmlDocPtr ptr;

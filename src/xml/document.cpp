@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -32,8 +33,11 @@ document::document(xmlDocPtr ptr)
   : ptr(ptr)
 {}
 
-document::document(call_context &x) {
+document::document(call_context &) {
   ptr = xmlNewDoc((xmlChar const *) "1.0");
+
+  if (!ptr)
+    throw exception("Could not create empty XML document");
 }
 
 document::~document() {
@@ -42,6 +46,7 @@ document::~document() {
 
 void document::post_initialize() {
   register_native_method("dump", &document::dump);
+  register_native_method("copy", &document::copy);
 }
 
 object document::class_info::create_prototype() {
@@ -50,6 +55,7 @@ object document::class_info::create_prototype() {
   object proto = create_object();
 
   create_native_method(proto, "dump", 0);
+  create_native_method(proto, "copy", 1);
 
   return proto;
 }
@@ -81,4 +87,13 @@ string document::dump() {
   xmlFree(doc_txt);
 
   return str;
+}
+
+object document::copy(bool recursive) {
+  xmlDocPtr copy = xmlCopyDoc(ptr, recursive);
+
+  if (!copy)
+    throw exception("Could not copy XML document");
+
+  return create_native_object<document>(get_prototype(), copy);
 }
