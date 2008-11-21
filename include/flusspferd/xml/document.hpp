@@ -47,6 +47,9 @@ public:
 protected:
   void post_initialize();
 
+private: // JS methods
+  string dump();
+
 private:
   xmlDocPtr ptr;
 };

@@ -33,7 +33,6 @@ document::document(xmlDocPtr ptr)
 {}
 
 document::document(call_context &x) {
-  value version = x.arg[0];
   ptr = xmlNewDoc((xmlChar const *) "1.0");
 }
 
@@ -42,12 +41,15 @@ document::~document() {
 }
 
 void document::post_initialize() {
+  register_native_method("dump", &document::dump);
 }
 
 object document::class_info::create_prototype() {
   local_root_scope scope;
 
   object proto = create_object();
+
+  create_native_method(proto, "dump", 0);
 
   return proto;
 }
@@ -60,3 +62,22 @@ std::size_t document::class_info::constructor_arity() {
   return 0;
 }
 
+string document::dump() {
+  xmlChar *doc_txt;
+  int doc_txt_len;
+  xmlDocDumpFormatMemoryEnc(ptr, &doc_txt, &doc_txt_len, "UTF-16", 1);
+
+  char16_t *txt = (char16_t *) doc_txt;
+  int txt_len = doc_txt_len / sizeof(char16_t);
+
+  if (txt_len > 0 && *txt == 0xFEFF) {
+    ++txt;
+    --txt_len;
+  }
+
+  std::basic_string<char16_t> str(txt, txt_len );
+
+  xmlFree(doc_txt);
+
+  return string(str);
+}

@@ -30,14 +30,14 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 object flusspferd::xml::load_xml(object container) {
-  LIBXML_TEST_VERSION
-
   local_root_scope scope;
 
   value previous = container.get_property("XML");
 
   if (previous.is_object())
     return previous.to_object();
+
+  LIBXML_TEST_VERSION
 
   object XML = flusspferd::create_object();
 
