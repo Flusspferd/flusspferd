@@ -24,6 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_TRACER_HPP
 #define FLUSSPFERD_TRACER_HPP
 
+#include "value.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <string>
 
@@ -34,7 +35,15 @@ class value;
 
 class tracer {
 public:
-  void operator()(char const *name, value const &val);
+  void operator()(char const *name, void *gcptr);
+
+  void operator()(std::string const &name, void *gcptr) {
+    operator()(name.c_str(), gcptr);
+  }
+
+  void operator()(char const *name, value val) {
+    operator()(name, val.get_gcptr());
+  }
 
   void operator()(std::string const &name, value const &val) {
     operator()(name.c_str(), val);

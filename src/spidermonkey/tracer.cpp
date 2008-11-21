@@ -41,8 +41,10 @@ tracer::tracer(void *x) : p(new impl(Impl::current_context(), x)) { }
 
 tracer::~tracer() {}
 
-void tracer::operator() (char const *name, value const &val) {
-  jsval v = Impl::get_jsval(val);
+void tracer::operator() (char const *name, void *gcthing) {
+  if (!gcthing)
+    return;
+  jsval v = * (jsval *) gcthing;
   if (!JSVAL_IS_GCTHING(v))
     return;
   JS_MarkGCThing(p->cx, JSVAL_TO_GCTHING(v), name, p->x);

@@ -39,7 +39,7 @@ root<T>::root(T const &o)
 : T(o), ctx(get_current_context())
 {
   JSBool status;
-  
+
   status = JS_AddRoot(
     Impl::get_context(ctx),
     T::get_gcptr());

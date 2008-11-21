@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/tracer.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -38,6 +39,8 @@ document::document(call_context &) {
 
   if (!ptr)
     throw exception("Could not create empty XML document");
+
+  ptr->_private = get_gcptr();
 }
 
 document::~document() {
@@ -66,6 +69,10 @@ char const *document::class_info::constructor_name() {
 
 std::size_t document::class_info::constructor_arity() {
   return 0;
+}
+
+void document::trace(tracer &trc) {
+  trc("parent", ptr->_private);
 }
 
 string document::dump() {
