@@ -65,6 +65,7 @@ std::size_t document::class_info::constructor_arity() {
 string document::dump() {
   xmlChar *doc_txt;
   int doc_txt_len;
+
   xmlDocDumpFormatMemoryEnc(ptr, &doc_txt, &doc_txt_len, "UTF-16", 1);
 
   char16_t *txt = (char16_t *) doc_txt;
@@ -75,9 +76,9 @@ string document::dump() {
     --txt_len;
   }
 
-  std::basic_string<char16_t> str(txt, txt_len );
+  string str(txt, txt_len);
 
   xmlFree(doc_txt);
 
-  return string(str);
+  return str;
 }

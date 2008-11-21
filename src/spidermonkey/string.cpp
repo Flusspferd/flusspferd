@@ -72,7 +72,10 @@ namespace {
 
 string::string() { }
 string::string(value const &v) : Impl::string_impl(v) { }
-string::string(char const *s) : Impl::string_impl(s) { }
+string::string(char const *s, std::size_t n)
+  : Impl::string_impl(s, n ? n : std::strlen(s)) { }
+string::string(char16_t const *s, std::size_t n)
+  : Impl::string_impl(s, n) { }
 string::string(std::string const &s)
   : Impl::string_impl(s.data(), s.size()) { }
 string::string(std::basic_string<char16_t> const &s)

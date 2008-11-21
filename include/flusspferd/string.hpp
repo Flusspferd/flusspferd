@@ -35,8 +35,9 @@ class value;
 class string : public Impl::string_impl {
 public:
   string();
-  string(char const *s);
   string(value const &v);
+  string(char const *str, std::size_t length = 0);
+  string(char16_t const *str, std::size_t length);
   string(std::string const &s);
   string(std::basic_string<char16_t> const &s);
   string(Impl::string_impl const &s)
