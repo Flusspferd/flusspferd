@@ -107,7 +107,7 @@ struct convert<bool> {
 
   struct from_value {
     bool perform(value const &v) {
-      return v.get_boolean();
+      return v.to_boolean();
     }
   };
 };
