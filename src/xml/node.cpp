@@ -55,7 +55,7 @@ node::node(call_context &x) {
 
 node::~node() {
   std::cout << "DESTROY XML NODE " << ptr << std::endl;
-  if (ptr->_private == get_gcptr())
+  if (!ptr->doc && ptr->_private == get_gcptr())
     xmlFreeNode(ptr);
 }
 
@@ -91,15 +91,18 @@ static void trace_children(tracer &trc, xmlNodePtr ptr) {
   }
 }
 
-void node::trace(tracer &trc) {
-  trace_children(trc, ptr->children);
-
-  xmlNodePtr p = ptr;
-
-  while (p->parent) {
-    trc(p == ptr ? "node-self" : "node-parent", p->_private);
-    p = p->parent;
+static void trace_parents(tracer &trc, xmlNodePtr ptr) {
+  while (ptr) {
+    trc("node-parent", ptr->_private);
+    ptr = ptr->parent;
   }
+}
+
+void node::trace(tracer &trc) {
+  trc("node-self", ptr->_private);
+
+  trace_children(trc, ptr->children);
+  trace_parents(trc, ptr->parent);
 
   if (ptr->doc)
     trc("node-doc", ptr->doc->_private);

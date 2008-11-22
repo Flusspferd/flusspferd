@@ -96,10 +96,6 @@ void document::trace(tracer &trc) {
   trc("doc-self", ptr->_private);
 
   trace_children(trc, ptr->children);
-
-  xmlNodePtr root = xmlDocGetRootElement(ptr);
-  if (root)
-    trc("doc-root", root->_private);
 }
 
 string document::dump() {
@@ -138,8 +134,6 @@ void document::set_root_element(node &nd) {
   xmlNodePtr old = xmlDocSetRootElement(ptr, node);
   if (old && !old->_private)
     xmlFreeNode(old);
-
-  node->_private = 0;
 }
 
 object document::get_root_element() {
