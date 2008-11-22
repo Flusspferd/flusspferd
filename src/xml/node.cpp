@@ -49,13 +49,15 @@ node::node(call_context &x) {
 
 node::~node() {
   std::cout << "DESTROY XML NODE " << ptr << std::endl;
-  xmlFreeNode(ptr);
+  if (ptr->_private == get_gcptr())
+    xmlFreeNode(ptr);
 }
 
 void node::post_initialize() {
   std::cout << "CREATE XML NODE " << ptr << std::endl;
 
-  ptr->_private = get_gcptr();
+  if (!ptr->_private)
+    ptr->_private = get_gcptr();
 
   register_native_method("copy", &node::copy);
 }
@@ -80,7 +82,6 @@ void node::trace(tracer &trc) {
   if (ptr->doc)
     trc("doc", ptr->doc->_private);
 
-  xmlNodePtr ptr = this->ptr->parent;
   while (ptr->parent) {
     trc("parent", ptr->_private);
     ptr = ptr->parent;

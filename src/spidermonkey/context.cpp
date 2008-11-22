@@ -29,8 +29,8 @@ THE SOFTWARE.
 #include "flusspferd/implementation/object.hpp"
 #include "flusspferd/implementation/runtime.hpp"
 #include "flusspferd/current_context_scope.hpp"
+#include <map>
 #include <cstring>
-
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_STACKCHUNKSIZE
@@ -47,6 +47,10 @@ namespace {
     JSCLASS_NO_OPTIONAL_MEMBERS
   };
 }
+
+struct context::context_private {
+  std::map<std::string, object> prototypes;
+};
 
 class context::impl {
 public:
@@ -76,6 +80,8 @@ public:
       throw exception("Could not initialize Global Object");
 
     JS_DeleteProperty(context, global_, "XML");
+
+    JS_SetContextPrivate(context, static_cast<void*>(new context_private));
   }
 
   explicit impl(JSContext *context)
@@ -83,12 +89,18 @@ public:
   { }
 
   ~impl() {
-    if(destroy)
+    if (destroy) {
+      delete get_private();
       JS_DestroyContext(context);
+    }
   }
 
   bool is_valid() {
     return context;
+  }
+
+  context_private *get_private() {
+    return static_cast<context_private*>(JS_GetContextPrivate(context));
   }
 
   JSContext *context;
@@ -147,6 +159,14 @@ value context::evaluate(char const *source, std::size_t n,
     throw exception("Could not evaluate script");
   }
   return Impl::wrap_jsval(rval);
+}
+
+void context::add_prototype(std::string const &name, object const &proto) {
+  p->get_private()->prototypes[name] = proto;
+}
+
+object const &context::get_prototype(std::string const &name) const {
+  return p->get_private()->prototypes[name];
 }
 
 value context::evaluate(char const *source, char const *file,

@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/document.hpp"
+#include "flusspferd/xml/node.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
@@ -54,6 +55,8 @@ void document::post_initialize() {
 
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
+  register_native_method("setRootElement", &document::set_root_element);
+  register_native_method("getRootElement", &document::get_root_element);
 }
 
 object document::class_info::create_prototype() {
@@ -63,6 +66,8 @@ object document::class_info::create_prototype() {
 
   create_native_method(proto, "dump", 0);
   create_native_method(proto, "copy", 1);
+  create_native_method(proto, "setRootElement", 1);
+  create_native_method(proto, "getRootElement", 0);
 
   return proto;
 }
@@ -106,4 +111,23 @@ object document::copy(bool recursive) {
     throw exception("Could not copy XML document");
 
   return create_native_object<document>(get_prototype(), copy);
+}
+
+void document::set_root_element(node &nd) {
+  xmlNodePtr node = nd.c_obj();
+
+  xmlNodePtr old = xmlDocSetRootElement(ptr, node);
+  if (old && !old->_private)
+    xmlFreeNode(old);
+
+  node->_private = 0;
+}
+
+object document::get_root_element() {
+  xmlNodePtr root = xmlDocGetRootElement(ptr);
+
+  if (!root)
+    return object();
+
+  return create_native_object<node>(object(), root);
 }

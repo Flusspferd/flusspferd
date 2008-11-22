@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CONTEXT_HPP
 
 #include <boost/shared_ptr.hpp>
+#include <string>
 
 namespace flusspferd {
 
@@ -34,6 +35,8 @@ class object;
 class context {
   class impl;
   boost::shared_ptr<impl> p;
+
+  struct context_private;
 
 public:
   struct detail;
@@ -61,6 +64,19 @@ public:
                  unsigned int line = 0);
 
   void gc();
+
+  void add_prototype(std::string const &name, object const &proto);
+  object const &get_prototype(std::string const &name) const;
+
+  template<typename T>
+  void add_prototype(object const &proto) {
+    add_prototype(typeid(T).name(), proto);
+  }
+
+  template<typename T>
+  object const &get_prototype() const {
+    return get_prototype(typeid(T).name());
+  }
 };
 
 inline bool operator!=(context const &a, context const &b) {

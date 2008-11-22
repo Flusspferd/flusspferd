@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace xml {
 
+class node;
+
 class document : public native_object_base {
 public:
   struct class_info : flusspferd::class_info {
@@ -52,6 +54,9 @@ protected:
 private: // JS methods
   string dump();
   object copy(bool recursive);
+
+  void set_root_element(node &);
+  object get_root_element();
 
 private:
   xmlDocPtr ptr;

@@ -37,6 +37,10 @@ public:
   node(call_context &x);
   ~node();
 
+  xmlNodePtr c_obj() const {
+    return ptr;
+  }
+
   struct class_info : flusspferd::class_info {
     static char const *constructor_name();
     static std::size_t constructor_arity();

@@ -145,13 +145,13 @@ struct convert_ptr<
   >::type
 >
 {
-  typedef typename convert_ptr<native_object_base>::to_value to_value;
+  typedef typename convert_ptr<T, native_object_base>::to_value to_value;
 
   struct from_value {
     typename convert_ptr<native_object_base>::from_value base;
 
     T *perform(value const &v) {
-      return &dynamic_cast<T&>(base.perform(v));
+      return &dynamic_cast<T&>(*base.perform(v));
     }
   };
 };

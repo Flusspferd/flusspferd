@@ -53,10 +53,13 @@ object create_native_object(native_object_base *ptr, object const &proto);
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
   object create_native_object( \
-    object const &proto \
+    object proto \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
-    return create_native_object(new T(BOOST_PP_ENUM_PARAMS(n_args, param)), proto); \
+    if (!proto.is_valid()) \
+      proto = get_current_context().get_prototype<T>(); \
+    return create_native_object( \
+      new T(BOOST_PP_ENUM_PARAMS(n_args, param)), proto); \
   } \
   /**/
 

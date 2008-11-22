@@ -78,6 +78,9 @@ object load_class(object container = global()) {
     create_native_function<detail::class_constructor<T> >(arity, name));
 
   object prototype = T::class_info::create_prototype();
+
+  get_current_context().add_prototype<T>(prototype);
+
   constructor.define_property(
     "prototype",
     prototype,
