@@ -50,6 +50,10 @@ public:
 
   std::size_t length() const;
 
+  bool empty() const {
+    return !length();
+  }
+
   std::string to_string() const;
   char const *c_str() const;
 
