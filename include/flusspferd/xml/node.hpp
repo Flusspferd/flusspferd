@@ -56,6 +56,8 @@ protected:
 private: // JS methods
   object copy(bool recursive);
 
+  object get_document();
+
 private:
   xmlNodePtr ptr;
 };

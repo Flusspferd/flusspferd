@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/node.hpp"
+#include "flusspferd/xml/document.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
@@ -34,7 +35,10 @@ using namespace flusspferd::xml;
 
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
-{}
+{
+  if (!ptr->_private)
+    ptr->_private = get_gcptr();
+}
 
 node::node(call_context &x) {
   local_root_scope scope;
@@ -45,6 +49,8 @@ node::node(call_context &x) {
 
   if (!ptr)
     throw exception("Could not create XML node");
+
+  ptr->_private = get_gcptr();
 }
 
 node::~node() {
@@ -56,10 +62,17 @@ node::~node() {
 void node::post_initialize() {
   std::cout << "CREATE XML NODE " << ptr << std::endl;
 
-  if (!ptr->_private)
-    ptr->_private = get_gcptr();
-
   register_native_method("copy", &node::copy);
+  register_native_method("getDocument", &node::get_document);
+}
+
+object node::class_info::create_prototype() {
+  object proto = create_object();
+
+  create_native_method(proto, "copy", 1);
+  create_native_method(proto, "getDocument", 0);
+
+  return proto;
 }
 
 char const *node::class_info::constructor_name() {
@@ -70,22 +83,32 @@ std::size_t node::class_info::constructor_arity() {
   return 1;
 }
 
-object node::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "copy", 1);
-
-  return proto;
+static void trace_children(tracer &trc, xmlNodePtr ptr) {
+  while (ptr) {
+    trc("node-children", ptr->_private);
+    trace_children(trc, ptr->children);
+    ptr = ptr->next;
+  }
 }
 
 void node::trace(tracer &trc) {
-  if (ptr->doc)
-    trc("doc", ptr->doc->_private);
+  trace_children(trc, ptr->children);
 
-  while (ptr->parent) {
-    trc("parent", ptr->_private);
-    ptr = ptr->parent;
+  xmlNodePtr p = ptr;
+
+  while (p->parent) {
+    trc(p == ptr ? "node-self" : "node-parent", p->_private);
+    p = p->parent;
   }
+
+  if (ptr->doc)
+    trc("node-doc", ptr->doc->_private);
+
+  if (ptr->next)
+    trc("node-next", ptr->next->_private);
+
+  if (ptr->prev)
+    trc("node-prev", ptr->prev->_private);
 }
 
 object node::copy(bool recursive) {
@@ -95,4 +118,11 @@ object node::copy(bool recursive) {
     throw exception("Could not copy XML node");
 
   return create_native_object<node>(get_prototype(), copy);
+}
+
+object node::get_document() {
+  if (!ptr->doc)
+    return object();
+
+  return create_native_object<document>(object(), ptr->doc);
 }

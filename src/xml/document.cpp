@@ -34,24 +34,28 @@ using namespace flusspferd::xml;
 
 document::document(xmlDocPtr ptr)
   : ptr(ptr)
-{}
+{
+  if (!ptr->_private)
+    ptr->_private = get_gcptr();
+}
 
 document::document(call_context &) {
   ptr = xmlNewDoc((xmlChar const *) "1.0");
 
   if (!ptr)
     throw exception("Could not create empty XML document");
+
+  ptr->_private = get_gcptr();
 }
 
 document::~document() {
   std::cout << "DESTROY DOCUMENT " << ptr << std::endl;
-  xmlFreeDoc(ptr);
+  if (ptr && ptr->_private == get_gcptr())
+    xmlFreeDoc(ptr);
 }
 
 void document::post_initialize() {
   std::cout << "CREATE DOCUMENT " << ptr << std::endl;
-
-  ptr->_private = get_gcptr();
 
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
@@ -80,7 +84,22 @@ std::size_t document::class_info::constructor_arity() {
   return 0;
 }
 
-void document::trace(tracer &) {
+static void trace_children(tracer &trc, xmlNodePtr ptr) {
+  while (ptr) {
+    trc("doc-children", ptr->_private);
+    trace_children(trc, ptr->children);
+    ptr = ptr->next;
+  }
+}
+
+void document::trace(tracer &trc) {
+  trc("doc-self", ptr->_private);
+
+  trace_children(trc, ptr->children);
+
+  xmlNodePtr root = xmlDocGetRootElement(ptr);
+  if (root)
+    trc("doc-root", root->_private);
 }
 
 string document::dump() {
