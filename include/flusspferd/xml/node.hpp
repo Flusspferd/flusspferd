@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_DOCUMENT_HPP
 
 #include "../native_object_base.hpp"
+#include "../class.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
@@ -35,12 +36,17 @@ public:
   node(xmlNodePtr doc);
   ~node();
 
+  struct class_info : flusspferd::class_info {
+    static object create_prototype();
+  };
+
 protected:
   void post_initialize();
 
   void trace(tracer &);
 
 private: // JS methods
+  object copy(bool recursive);
 
 private:
   xmlNodePtr ptr;

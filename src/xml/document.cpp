@@ -26,13 +26,14 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/tracer.hpp"
+#include <iostream>//FIXME
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
 document::document(xmlDocPtr ptr)
   : ptr(ptr)
-{ }
+{}
 
 document::document(call_context &) {
   ptr = xmlNewDoc((xmlChar const *) "1.0");
@@ -42,10 +43,13 @@ document::document(call_context &) {
 }
 
 document::~document() {
+  std::cout << "DESTROY DOCUMENT " << ptr << std::endl;
   xmlFreeDoc(ptr);
 }
 
 void document::post_initialize() {
+  std::cout << "CREATE DOCUMENT " << ptr << std::endl;
+
   ptr->_private = get_gcptr();
 
   register_native_method("dump", &document::dump);

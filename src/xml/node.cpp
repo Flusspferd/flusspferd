@@ -22,7 +22,10 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/node.hpp"
+#include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
+#include "flusspferd/exception.hpp"
+#include <iostream>//FIXME
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -32,22 +35,42 @@ node::node(xmlNodePtr ptr)
 {}
 
 node::~node() {
+  std::cout << "DESTROY XML NODE " << ptr << std::endl;
   xmlFreeNode(ptr);
 }
 
 void node::post_initialize() {
+  std::cout << "CREATE XML NODE " << ptr << std::endl;
+
   ptr->_private = get_gcptr();
+
+  register_native_method("copy", &node::copy);
+}
+
+object node::class_info::create_prototype() {
+  object proto = create_object();
+
+  create_native_method(proto, "copy", 1);
+
+  return proto;
 }
 
 void node::trace(tracer &trc) {
-  if (ptr->doc) {
+  if (ptr->doc)
     trc("doc", ptr->doc->_private);
-  } else {
+
+  xmlNodePtr ptr = this->ptr->parent;
+  while (ptr->parent) {
+    trc("parent", ptr->_private);
     ptr = ptr->parent;
-    while (ptr->parent) {
-      trc("parent", ptr->_private);
-      ptr = ptr->parent;
-    }
   }
 }
 
+object node::copy(bool recursive) {
+  xmlNodePtr copy = xmlCopyNode(ptr, recursive);
+
+  if (!copy)
+    throw exception("Could not copy XML node");
+
+  return create_native_object<node>(get_prototype(), copy);
+}
