@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_DOCUMENT_HPP
-#define FLUSSPFERD_XML_DOCUMENT_HPP
+#ifndef FLUSSPFERD_XML_NODE_HPP
+#define FLUSSPFERD_XML_NODE_HPP
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
@@ -31,12 +31,16 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace xml {
 
-class node : public native_object_base, private boost::noncopyable {
+class node : public native_object_base {
 public:
   node(xmlNodePtr doc);
+  node(call_context &x);
   ~node();
 
   struct class_info : flusspferd::class_info {
+    static char const *constructor_name();
+    static std::size_t constructor_arity();
+
     static object create_prototype();
   };
 

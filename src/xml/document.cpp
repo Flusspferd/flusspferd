@@ -75,7 +75,7 @@ std::size_t document::class_info::constructor_arity() {
   return 0;
 }
 
-void document::trace(tracer &trc) {
+void document::trace(tracer &) {
 }
 
 string document::dump() {

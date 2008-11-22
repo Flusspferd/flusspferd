@@ -22,9 +22,11 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/node.hpp"
+#include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include <iostream>//FIXME
 
 using namespace flusspferd;
@@ -33,6 +35,17 @@ using namespace flusspferd::xml;
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {}
+
+node::node(call_context &x) {
+  local_root_scope scope;
+
+  string name(x.arg[0]);
+
+  ptr = xmlNewNode(0, (xmlChar const *) name.c_str());
+
+  if (!ptr)
+    throw exception("Could not create XML node");
+}
 
 node::~node() {
   std::cout << "DESTROY XML NODE " << ptr << std::endl;
@@ -45,6 +58,14 @@ void node::post_initialize() {
   ptr->_private = get_gcptr();
 
   register_native_method("copy", &node::copy);
+}
+
+char const *node::class_info::constructor_name() {
+  return "Node";
+}
+
+std::size_t node::class_info::constructor_arity() {
+  return 1;
 }
 
 object node::class_info::create_prototype() {

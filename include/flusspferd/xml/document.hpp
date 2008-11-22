@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace xml {
 
-class document : public native_object_base, private boost::noncopyable {
+class document : public native_object_base {
 public:
   struct class_info : flusspferd::class_info {
     static char const *constructor_name();
