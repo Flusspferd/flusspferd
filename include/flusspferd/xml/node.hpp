@@ -65,6 +65,7 @@ private: // JS properties
   void prop_lang(property_mode mode, value &data);
   void prop_document(property_mode mode, value &data);
   void prop_parent(property_mode mode, value &data);
+  void prop_next(property_mode mode, value &data);
   void prop_type(property_mode mode, value &data);
 
 private:

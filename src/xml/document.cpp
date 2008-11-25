@@ -138,16 +138,10 @@ void document::prop_root_element(property_mode mode, value &data) {
     }
 
     if (node) {
-      xmlNodePtr old = xmlDocSetRootElement(c_obj(), node);
-      if (old && !old->_private)
-        xmlFreeNode(old);
+      xmlDocSetRootElement(c_obj(), node);
     } else {
       xmlNodePtr old = xmlDocGetRootElement(c_obj());
-      if (!old)
-        break;
       xmlUnlinkNode(old);
-      if (!old->_private)
-        xmlFreeNode(old);
     }
     break;
   case property_get:
