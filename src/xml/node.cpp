@@ -55,7 +55,7 @@ node::node(call_context &x) {
 
 node::~node() {
   std::cout << "DESTROY XML NODE " << ptr << std::endl;
-  if (!ptr->doc && ptr->_private == get_gcptr())
+  if (!ptr->parent && ptr->_private == get_gcptr())
     xmlFreeNode(ptr);
 }
 
