@@ -33,6 +33,9 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 object node::create(xmlNodePtr ptr) {
+  if (ptr->_private)
+    return value::from_permanent_ptr(ptr->_private).to_object();
+
   switch (ptr->type) {
   case XML_DOCUMENT_NODE:
     return create_native_object<document>(object(), xmlDocPtr(ptr));
@@ -57,8 +60,6 @@ xmlNodePtr node::c_from_js(object const &obj) {
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {
-  if (!ptr->_private)
-    ptr->_private = get_gcptr();
 }
 
 node::node(call_context &x) {
@@ -70,17 +71,19 @@ node::node(call_context &x) {
 
   if (!ptr)
     throw exception("Could not create XML node");
-
-  ptr->_private = get_gcptr();
 }
 
 node::~node() {
-  if (ptr && !ptr->parent && ptr->_private == get_gcptr()) {
+  if (ptr && !ptr->parent &&
+      (ptr->_private == value(*this).permanent_ptr() || !ptr->_private))
+  {
     xmlFreeNode(ptr);
   }
 }
 
 void node::post_initialize() {
+  ptr->_private = value(*this).permanent_ptr();
+
   register_native_method("copy", &node::copy);
 
   define_native_property("name", permanent_property, &node::prop_name);
@@ -111,7 +114,7 @@ std::size_t node::class_info::constructor_arity() {
 
 static void trace_children(tracer &trc, xmlNodePtr ptr) {
   while (ptr) {
-    trc("node-children", ptr->_private);
+    trc("node-children", value::from_permanent_ptr(ptr->_private));
     trace_children(trc, ptr->children);
     ptr = ptr->next;
   }
@@ -119,25 +122,25 @@ static void trace_children(tracer &trc, xmlNodePtr ptr) {
 
 static void trace_parents(tracer &trc, xmlNodePtr ptr) {
   while (ptr) {
-    trc("node-parent", ptr->_private);
+    trc("node-parent", value::from_permanent_ptr(ptr->_private));
     ptr = ptr->parent;
   }
 }
 
 void node::trace(tracer &trc) {
-  trc("node-self", ptr->_private);
+  trc("node-self", value::from_permanent_ptr(ptr->_private));
 
   trace_children(trc, ptr->children);
   trace_parents(trc, ptr->parent);
 
   if (ptr->doc)
-    trc("node-doc", ptr->doc->_private);
+    trc("node-doc", value::from_permanent_ptr(ptr->doc->_private));
 
   if (ptr->next)
-    trc("node-next", ptr->next->_private);
+    trc("node-next", value::from_permanent_ptr(ptr->next->_private));
 
   if (ptr->prev)
-    trc("node-prev", ptr->prev->_private);
+    trc("node-prev", value::from_permanent_ptr(ptr->prev->_private));
 }
 
 void node::prop_name(property_mode mode, value &data) {
@@ -243,7 +246,7 @@ void node::prop_document(property_mode mode, value &data) {
   if (!ptr->doc)
     data = object();
   else
-    data = create_native_object<document>(object(), ptr->doc);
+    data = create(xmlNodePtr(ptr->doc));
 }
 
 void node::prop_type(property_mode mode, value &data) {
