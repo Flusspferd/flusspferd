@@ -66,6 +66,7 @@ void node::post_initialize() {
   register_native_method("getDocument", &node::get_document);
 
   add_property_op("name", &node::prop_name);
+  add_property_op("lang", &node::prop_lang);
 }
 
 object node::class_info::create_prototype() {
@@ -123,6 +124,24 @@ void node::prop_name(property_mode mode, value &data) {
     break;
   case property_set:
     xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
+    break;
+  default: break;
+  };
+}
+
+void node::prop_lang(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    {
+      xmlChar const *lang = xmlNodeGetLang(ptr);
+      if (!lang)
+        data = value();
+      else
+        data = string((char const *) lang);
+    }
+    break;
+  case property_set:
+    xmlNodeSetLang(ptr, (xmlChar const *) data.to_string().c_str());
     break;
   default: break;
   };
