@@ -132,18 +132,27 @@ void document::prop_root_element(property_mode mode, value &data) {
       break;
     }
 
-    if (node->type != XML_ELEMENT_NODE) {
+    if (node && node->type != XML_ELEMENT_NODE) {
       data = object();
       break;
     }
 
-    {
+    if (node) {
       xmlNodePtr old = xmlDocSetRootElement(c_obj(), node);
       if (old && !old->_private)
+        xmlFreeNode(old);
+    } else {
+      xmlNodePtr old = xmlDocGetRootElement(c_obj());
+      if (!old)
+        break;
+      xmlUnlinkNode(old);
+      if (!old->_private)
         xmlFreeNode(old);
     }
     break;
   case property_get:
+    if (!data.is_void())
+      return;
     node = xmlDocGetRootElement(c_obj());
     if (!node)
       data = object();
