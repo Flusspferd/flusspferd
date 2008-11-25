@@ -60,6 +60,7 @@ xmlNodePtr node::c_from_js(object const &obj) {
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {
+  ptr->_private = permanent_ptr();
 }
 
 node::node(call_context &x) {
@@ -71,18 +72,18 @@ node::node(call_context &x) {
 
   if (!ptr)
     throw exception("Could not create XML node");
+
+  ptr->_private = permanent_ptr();
 }
 
 node::~node() {
-  if (ptr && !ptr->parent &&
-      (ptr->_private == value(*this).permanent_ptr() || !ptr->_private))
-  {
+  if (ptr && !ptr->parent && ptr->_private == permanent_ptr()) {
     xmlFreeNode(ptr);
   }
 }
 
 void node::post_initialize() {
-  ptr->_private = value(*this).permanent_ptr();
+  ptr->_private = permanent_ptr();
 
   register_native_method("copy", &node::copy);
 

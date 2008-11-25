@@ -49,7 +49,7 @@ document::document(call_context &x)
 }
 
 document::~document() {
-  if (c_obj()->_private == value(*this).permanent_ptr() || !c_obj()->_private) {
+  if (c_obj()->_private == permanent_ptr()) {
     xmlFreeDoc(c_obj());
     set_c_obj(0);
   }
