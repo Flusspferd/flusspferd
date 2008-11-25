@@ -42,10 +42,8 @@ public:
   static JSBool call_helper(JSContext *, JSObject *, uintN, jsval *, jsval *);
   static uint32 mark_op(JSContext *, JSObject *, void *);
 
-  static JSBool property_add(JSContext *, JSObject *, jsval, jsval *);
-  static JSBool property_get(JSContext *, JSObject *, jsval, jsval *);
-  static JSBool property_set(JSContext *, JSObject *, jsval, jsval *);
-  static JSBool property_delete(JSContext *, JSObject *, jsval, jsval *);
+  template<property_mode>
+  static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
 
   static JSClass native_object_class;
 
@@ -55,15 +53,20 @@ public:
   typedef boost::unordered_map<std::string, method_variant> native_method_map;
 
   native_method_map native_methods;
+
+public:
+  typedef boost::unordered_map<std::string, property_callback> property_callback_map;
+
+  property_callback_map property_callbacks;
 };
 
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
   JSCLASS_HAS_PRIVATE,
-  &native_object_base::impl::property_add,
-  &native_object_base::impl::property_delete,
-  &native_object_base::impl::property_get,
-  &native_object_base::impl::property_set,
+  &native_object_base::impl::property_op<native_object_base::property_add>,
+  &native_object_base::impl::property_op<native_object_base::property_delete>,
+  &native_object_base::impl::property_op<native_object_base::property_get>,
+  &native_object_base::impl::property_op<native_object_base::property_set>,
   JS_EnumerateStub,
   JS_ResolveStub,
   JS_ConvertStub,
@@ -189,6 +192,12 @@ void native_object_base::register_native_method_cb(
   p->native_methods[name] = cb;
 }
 
+void native_object_base::add_property_op(
+  std::string const &name, property_callback callback)
+{
+  p->property_callbacks[name] = callback;
+}
+
 void native_object_base::impl::finalize(JSContext *ctx, JSObject *obj) {
   current_context_scope scope(Impl::wrap_context(ctx));
   delete native_object_base::get_native(Impl::wrap_object(obj));
@@ -228,7 +237,8 @@ JSBool native_object_base::impl::call_helper(
   } FLUSSPFERD_CALLBACK_END;
 }
 
-JSBool native_object_base::impl::property_add(
+template<native_object_base::property_mode mode>
+JSBool native_object_base::impl::property_op(
     JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
 {
   FLUSSPFERD_CALLBACK_BEGIN {
@@ -238,49 +248,7 @@ JSBool native_object_base::impl::property_add(
       native_object_base::get_native(Impl::wrap_object(obj));
 
     value data(Impl::wrap_jsvalp(vp));
-    self->property_add(Impl::wrap_jsval(id), data);
-  } FLUSSPFERD_CALLBACK_END;
-}
-
-JSBool native_object_base::impl::property_get(
-    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
-{
-  FLUSSPFERD_CALLBACK_BEGIN {
-    current_context_scope scope(Impl::wrap_context(ctx));
-
-    native_object_base *self =
-      native_object_base::get_native(Impl::wrap_object(obj));
-
-    value data(Impl::wrap_jsvalp(vp));
-    self->property_get(Impl::wrap_jsval(id), data);
-  } FLUSSPFERD_CALLBACK_END;
-}
-
-JSBool native_object_base::impl::property_set(
-    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
-{
-  FLUSSPFERD_CALLBACK_BEGIN {
-    current_context_scope scope(Impl::wrap_context(ctx));
-
-    native_object_base *self =
-      native_object_base::get_native(Impl::wrap_object(obj));
-
-    value data(Impl::wrap_jsvalp(vp));
-    self->property_set(Impl::wrap_jsval(id), data);
-  } FLUSSPFERD_CALLBACK_END;
-}
-
-JSBool native_object_base::impl::property_delete(
-    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
-{
-  FLUSSPFERD_CALLBACK_BEGIN {
-    current_context_scope scope(Impl::wrap_context(ctx));
-
-    native_object_base *self =
-      native_object_base::get_native(Impl::wrap_object(obj));
-
-    value data(Impl::wrap_jsvalp(vp));
-    data = bool(self->property_delete(Impl::wrap_jsval(id)));
+    self->property_op(mode, Impl::wrap_jsval(id), data);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -319,11 +287,18 @@ void native_object_base::call_native_method(std::string const &name, call_contex
   }
 }
 
+void native_object_base::property_op(property_mode mode, value const &id, value &data) {
+  std::string name = id.to_string().to_string();
+  impl::property_callback_map::iterator it = p->property_callbacks.find(name);
+
+  if (it != p->property_callbacks.end()) {
+    property_callback callback = it->second;
+
+    if (callback)
+      (this->*callback)(mode, data);
+  }
+}
+
 void native_object_base::post_initialize() {}
 
 void native_object_base::trace(tracer&) {}
-
-void native_object_base::property_add(value const &, value &) {}
-bool native_object_base::property_delete(value const &) { return true; }
-void native_object_base::property_get(value const &, value &) {}
-void native_object_base::property_set(value const &, value &) {}

@@ -64,6 +64,8 @@ void node::post_initialize() {
 
   register_native_method("copy", &node::copy);
   register_native_method("getDocument", &node::get_document);
+
+  add_property_op("name", &node::prop_name);
 }
 
 object node::class_info::create_prototype() {
@@ -114,14 +116,16 @@ void node::trace(tracer &trc) {
     trc("node-prev", ptr->prev->_private);
 }
 
-void node::property_get(value const &id, value &data) {
-  if (id.to_string() == string("name"))
+void node::prop_name(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
     data = string((char const *) ptr->name);
-}
-
-void node::property_set(value const &id, value &data) {
-  if (id.to_string() == string("name"))
+    break;
+  case property_set:
     xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
+    break;
+  default: break;
+  };
 }
 
 object node::copy(bool recursive) {

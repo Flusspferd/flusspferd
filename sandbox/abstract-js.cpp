@@ -66,21 +66,8 @@ struct my_object : flusspferd::native_object_base {
     v = flusspferd::string(test);
   }
 
-  void property_add(flusspferd::value const &id, flusspferd::value &v) {
-    std::cout << "my_object add " << id << " = " << v << std::endl;
-  }
-
-  void property_get(flusspferd::value const &id, flusspferd::value &v) {
-    std::cout << "my_object get " << id << " = " << v << std::endl;
-  }
-
-  void property_set(flusspferd::value const &id, flusspferd::value &v) {
-    std::cout << "my_object set " << id << " = " << v << std::endl;
-  }
-
-  bool property_delete(flusspferd::value const &id) {
-    std::cout << "my_object delete " << id << std::endl;
-    return true;
+  void property_op(property_mode mode, flusspferd::value const &id, flusspferd::value &v) {
+    std::cout << "my_object property " << mode << ' ' << id << " = " << v << std::endl;
   }
 
   void foo(int i) {

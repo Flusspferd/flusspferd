@@ -92,10 +92,24 @@ protected:
 
   virtual void trace(tracer &);
 
-  virtual void property_add(value const &id, value &data);
-  virtual void property_get(value const &id, value &data);
-  virtual void property_set(value const &id, value &data);
-  virtual bool property_delete(value const &id);
+protected:
+  enum property_mode { 
+    property_add = 0,
+    property_delete = -1,
+    property_get = 1,
+    property_set = 2
+  };
+
+  virtual void property_op(property_mode mode, value const &id, value &data);
+
+  typedef void (native_object_base::*property_callback)(property_mode mode, value &data);
+
+  void add_property_op(std::string const &id, property_callback cb);
+
+  template<typename T>
+  void add_property_op(std::string const &id, void (T::*cb)(property_mode, value &)) {
+    add_property_op(id, property_callback(cb));
+  }
 
 public:
   virtual ~native_object_base() = 0;
