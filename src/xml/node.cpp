@@ -41,6 +41,15 @@ object node::create(xmlNodePtr ptr) {
   }
 }
 
+xmlNodePtr node::c_from_js(object const &obj) {
+  if (!obj.is_valid())
+    return 0;
+  xml::node *p = dynamic_cast<xml::node*>(native_object_base::get_native(obj));
+  if (!p)
+    return 0;
+  return p->c_obj();
+}
+
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {
@@ -72,6 +81,7 @@ void node::post_initialize() {
 
   define_native_property("name", permanent_property, &node::prop_name);
   define_native_property("lang", permanent_property, &node::prop_lang);
+  define_native_property("parent", permanent_property, &node::prop_parent);
   define_native_property(
     "document", permanent_property | read_only_property, &node::prop_document);
   define_native_property(
@@ -156,6 +166,35 @@ void node::prop_lang(property_mode mode, value &data) {
     break;
   default: break;
   };
+}
+
+void node::prop_parent(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    if (!ptr->parent)
+      data = object();
+    else
+      data = create(ptr->parent);
+    break;
+  case property_set:
+    if (data.is_void() || data.is_null()) {
+      xmlUnlinkNode(ptr);
+      data = object();
+    } else if (!data.is_object()) {
+      data = value();
+    } else {
+      xmlNodePtr parent = c_from_js(data.get_object());
+      if (!parent) {
+        data = value();
+        break;
+      }
+      if (ptr->parent)
+        xmlUnlinkNode(ptr);
+      xmlAddChild(parent, ptr);
+    }
+    break;
+  default: break;
+  }
 }
 
 void node::prop_document(property_mode mode, value &data) {

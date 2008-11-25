@@ -122,13 +122,11 @@ void document::prop_root_element(property_mode mode, value &data) {
       node = 0;
       data = object();
     } else if (data.is_object()) {
-      object obj = data.get_object();
-      xml::node *p = dynamic_cast<xml::node*>(native_object_base::get_native(obj));
-      if (!p) {
+      node = c_from_js(data.get_object());
+      if (!node) {
         data = value();
         break;
       }
-      node = p->c_obj();
     } else {
       data = value();
       break;

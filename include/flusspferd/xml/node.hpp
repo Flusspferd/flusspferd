@@ -49,6 +49,8 @@ public:
   };
 
 protected:
+  static xmlNodePtr c_from_js(object const &v);
+
   void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
 protected:
@@ -62,6 +64,7 @@ private: // JS properties
   void prop_name(property_mode mode, value &data);
   void prop_lang(property_mode mode, value &data);
   void prop_document(property_mode mode, value &data);
+  void prop_parent(property_mode mode, value &data);
   void prop_type(property_mode mode, value &data);
 
 private:
