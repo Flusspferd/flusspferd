@@ -79,7 +79,7 @@ JSClass native_object_base::impl::native_object_class = {
 };
 
 native_object_base::native_object_base() : p(new impl) {
-  register_native_method("()", &native_object_base::invalid_method);
+  register_native_method("", &native_object_base::invalid_method);
 }
 
 native_object_base::~native_object_base() {}
@@ -218,7 +218,7 @@ JSBool native_object_base::impl::call_helper(
     x.result.bind(Impl::wrap_jsvalp(rval));
     x.function = Impl::wrap_object(function);
 
-    std::string name = "()";
+    std::string name;
 
     try {
       name = flusspferd::function(x.function).name().to_string();
