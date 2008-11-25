@@ -111,6 +111,14 @@ protected:
     add_property_op(id, property_callback(cb));
   }
 
+  template<typename T>
+  void define_native_property(
+      std::string const &id, unsigned flags, void (T::*cb)(property_mode, value &))
+  {
+    add_property_op(id, cb);
+    define_property(id, value(), flags);
+  }
+
 public:
   virtual ~native_object_base() = 0;
 
