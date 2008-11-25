@@ -151,8 +151,6 @@ void document::prop_root_element(property_mode mode, value &data) {
     }
     break;
   case property_get:
-    if (!data.is_void())
-      return;
     node = xmlDocGetRootElement(c_obj());
     if (!node)
       data = object();
