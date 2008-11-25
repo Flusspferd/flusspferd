@@ -50,8 +50,10 @@ public:
 
 protected:
   void post_initialize();
-
   void trace(tracer &);
+
+  void property_get(value const &id, value &data);
+  void property_set(value const &id, value &data);
 
 private: // JS methods
   object copy(bool recursive);

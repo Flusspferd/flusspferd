@@ -114,6 +114,16 @@ void node::trace(tracer &trc) {
     trc("node-prev", ptr->prev->_private);
 }
 
+void node::property_get(value const &id, value &data) {
+  if (id.to_string() == string("name"))
+    data = string((char const *) ptr->name);
+}
+
+void node::property_set(value const &id, value &data) {
+  if (id.to_string() == string("name"))
+    xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
+}
+
 object node::copy(bool recursive) {
   xmlNodePtr copy = xmlCopyNode(ptr, recursive);
 
