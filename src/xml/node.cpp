@@ -74,6 +74,8 @@ void node::post_initialize() {
   define_native_property("lang", permanent_property, &node::prop_lang);
   define_native_property(
     "document", permanent_property | read_only_property, &node::prop_document);
+  define_native_property(
+    "type", permanent_property | read_only_property, &node::prop_type);
 }
 
 object node::class_info::create_prototype() {
@@ -164,6 +166,77 @@ void node::prop_document(property_mode mode, value &data) {
     data = object();
   else
     data = create_native_object<document>(object(), ptr->doc);
+}
+
+void node::prop_type(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  switch (ptr->type) {
+  case XML_ELEMENT_NODE:
+    data = string("ELEMENT");
+    break;
+  case XML_ATTRIBUTE_NODE:
+    data = string("ATTRIBUTE");
+    break;
+  case XML_TEXT_NODE:
+    data = string("TEXT");
+    break;
+  case XML_CDATA_SECTION_NODE:
+    data = string("CDATA-SECTION");
+    break;
+  case XML_ENTITY_REF_NODE:
+    data = string("ENTITY-REFERENCE");
+    break;
+  case XML_ENTITY_NODE:
+    data = string("ENTITY");
+    break;
+  case XML_PI_NODE:
+    data = string("PI");
+    break;
+  case XML_COMMENT_NODE:
+    data = string("COMMENT");
+    break;
+  case XML_DOCUMENT_NODE:
+    data = string("DOCUMENT");
+    break;
+  case XML_DOCUMENT_TYPE_NODE:
+    data = string("DOCUMENT-TYPE");
+    break;
+  case XML_DOCUMENT_FRAG_NODE:
+    data = string("DOCUMENT-FRAGMENT");
+    break;
+  case XML_NOTATION_NODE:
+    data = string("NOTATION");
+    break;
+  case XML_HTML_DOCUMENT_NODE:
+    data = string("HTML-DOCUMENT");
+    break;
+  case XML_DTD_NODE:
+    data = string("DTD");
+    break;
+  case XML_ELEMENT_DECL:
+    data = string("ELEMENT-DECLARATION");
+    break;
+  case XML_ATTRIBUTE_DECL:
+    data = string("ATTRIBUTE-DECLARATION");
+    break;
+  case XML_ENTITY_DECL:
+    data = string("ENTITY-DECLARATION");
+    break;
+  case XML_NAMESPACE_DECL:
+    data = string("NAMESPACE-DECLARATION");
+    break;
+  case XML_XINCLUDE_START:
+    data = string("XINCLUDE-START");
+    break;
+  case XML_XINCLUDE_END:
+    data = string("XINCLUDE-END");
+    break;
+  default:
+    data = string("OTHER");
+    break;
+  }
 }
 
 object node::copy(bool recursive) {

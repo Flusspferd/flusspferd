@@ -62,6 +62,7 @@ private: // JS properties
   void prop_name(property_mode mode, value &data);
   void prop_lang(property_mode mode, value &data);
   void prop_document(property_mode mode, value &data);
+  void prop_type(property_mode mode, value &data);
 
 private:
   xmlNodePtr ptr;
