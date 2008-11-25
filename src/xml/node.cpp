@@ -34,7 +34,7 @@ using namespace flusspferd::xml;
 
 object node::create(xmlNodePtr ptr) {
   if (ptr->_private)
-    return value::from_permanent_ptr(ptr->_private).to_object();
+    return from_permanent_ptr(ptr->_private);
 
   switch (ptr->type) {
   case XML_DOCUMENT_NODE:
