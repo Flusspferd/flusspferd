@@ -293,3 +293,11 @@ value object::call(object o, arguments const &arg) {
 value object::call(arguments const &arg) {
   return call(global(), arg);
 }
+
+void *object::permanent_ptr() const {
+  return get_const();
+}
+
+object object::from_permanent_ptr(void *ptr) {
+  return Impl::wrap_object((JSObject*) ptr);
+}
