@@ -35,18 +35,18 @@ class value;
 
 class tracer {
 public:
-  void operator()(char const *name, void *gcptr);
+  void trace_gcptr(char const *name, void *gcptr);
 
-  void operator()(std::string const &name, void *gcptr) {
-    operator()(name.c_str(), gcptr);
+  void trace_gctr(std::string const &name, void *gcptr) {
+    trace_gcptr(name.c_str(), gcptr);
   }
 
   void operator()(char const *name, value val) {
-    operator()(name, val.get_gcptr());
+    trace_gcptr(name, val.get_gcptr());
   }
 
-  void operator()(std::string const &name, value const &val) {
-    operator()(name.c_str(), val);
+  void operator()(std::string const &name, value val) {
+    trace_gcptr(name.c_str(), val.get_gcptr());
   }
 
 public: //internal

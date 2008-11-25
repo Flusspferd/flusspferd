@@ -41,7 +41,7 @@ tracer::tracer(void *x) : p(new impl(Impl::current_context(), x)) { }
 
 tracer::~tracer() {}
 
-void tracer::operator() (char const *name, void *gcthing) {
+void tracer::trace_gcptr(char const *name, void *gcthing) {
   if (!gcthing)
     return;
   jsval v = * (jsval *) gcthing;
