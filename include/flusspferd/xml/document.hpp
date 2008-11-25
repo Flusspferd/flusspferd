@@ -24,18 +24,15 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_XML_DOCUMENT_HPP
 #define FLUSSPFERD_XML_DOCUMENT_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
+#include "node.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class node;
-
-class document : public native_object_base {
+class document : public node, private boost::noncopyable {
 public:
-  struct class_info : flusspferd::class_info {
+  struct class_info : node::class_info {
     static char const *constructor_name();
     static std::size_t constructor_arity();
 
@@ -46,10 +43,12 @@ public:
   document(xmlDocPtr doc);
   ~document();
 
+  xmlDocPtr c_obj() const {
+    return xmlDocPtr(node::c_obj());
+  }
+
 protected:
   void post_initialize();
-
-  void trace(tracer &);
 
 private: // JS methods
   string dump();
@@ -57,9 +56,6 @@ private: // JS methods
 
   void set_root_element(node &);
   object get_root_element();
-
-private:
-  xmlDocPtr ptr;
 };
 
 }}

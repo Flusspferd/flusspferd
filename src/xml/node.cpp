@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include <iostream>//FIXME
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -54,14 +53,12 @@ node::node(call_context &x) {
 }
 
 node::~node() {
-  std::cout << "DESTROY XML NODE " << ptr << std::endl;
-  if (!ptr->parent && ptr->_private == get_gcptr())
+  if (ptr && !ptr->parent && ptr->_private == get_gcptr()) {
     xmlFreeNode(ptr);
+  }
 }
 
 void node::post_initialize() {
-  std::cout << "CREATE XML NODE " << ptr << std::endl;
-
   register_native_method("copy", &node::copy);
   register_native_method("getDocument", &node::get_document);
 
@@ -120,7 +117,10 @@ void node::trace(tracer &trc) {
 void node::prop_name(property_mode mode, value &data) {
   switch (mode) {
   case property_get:
-    data = string((char const *) ptr->name);
+    if (!ptr->name)
+      data = value();
+    else
+      data = string((char const *) ptr->name);
     break;
   case property_set:
     xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());

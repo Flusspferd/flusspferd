@@ -27,35 +27,36 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/tracer.hpp"
-#include <iostream>//FIXME
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
 document::document(xmlDocPtr ptr)
-  : ptr(ptr)
+  : node(xmlNodePtr(ptr))
 {
-  if (!ptr->_private)
-    ptr->_private = get_gcptr();
 }
 
-document::document(call_context &) {
-  ptr = xmlNewDoc((xmlChar const *) "1.0");
-
+static xmlDocPtr new_doc(call_context &) {
+  xmlDocPtr ptr = xmlNewDoc((xmlChar const *) "1.0");
   if (!ptr)
     throw exception("Could not create empty XML document");
+  return ptr;
+}
 
-  ptr->_private = get_gcptr();
+document::document(call_context &x)
+  : node(xmlNodePtr(new_doc(x)))
+{
 }
 
 document::~document() {
-  std::cout << "DESTROY DOCUMENT " << ptr << std::endl;
-  if (ptr && ptr->_private == get_gcptr())
-    xmlFreeDoc(ptr);
+  if (c_obj()->_private == get_gcptr()) {
+    xmlFreeDoc(c_obj());
+    set_c_obj(0);
+  }
 }
 
 void document::post_initialize() {
-  std::cout << "CREATE DOCUMENT " << ptr << std::endl;
+  node::post_initialize();
 
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
@@ -66,7 +67,7 @@ void document::post_initialize() {
 object document::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object();
+  object proto = node::class_info::create_prototype();
 
   create_native_method(proto, "dump", 0);
   create_native_method(proto, "copy", 1);
@@ -84,25 +85,11 @@ std::size_t document::class_info::constructor_arity() {
   return 0;
 }
 
-static void trace_children(tracer &trc, xmlNodePtr ptr) {
-  while (ptr) {
-    trc("doc-children", ptr->_private);
-    trace_children(trc, ptr->children);
-    ptr = ptr->next;
-  }
-}
-
-void document::trace(tracer &trc) {
-  trc("doc-self", ptr->_private);
-
-  trace_children(trc, ptr->children);
-}
-
 string document::dump() {
   xmlChar *doc_txt;
   int doc_txt_len;
 
-  xmlDocDumpFormatMemoryEnc(ptr, &doc_txt, &doc_txt_len, "UTF-16", 1);
+  xmlDocDumpFormatMemoryEnc(c_obj(), &doc_txt, &doc_txt_len, "UTF-16", 1);
 
   char16_t *txt = (char16_t *) doc_txt;
   int txt_len = doc_txt_len / sizeof(char16_t);
@@ -120,7 +107,7 @@ string document::dump() {
 }
 
 object document::copy(bool recursive) {
-  xmlDocPtr copy = xmlCopyDoc(ptr, recursive);
+  xmlDocPtr copy = xmlCopyDoc(c_obj(), recursive);
 
   if (!copy)
     throw exception("Could not copy XML document");
@@ -131,13 +118,13 @@ object document::copy(bool recursive) {
 void document::set_root_element(node &nd) {
   xmlNodePtr node = nd.c_obj();
 
-  xmlNodePtr old = xmlDocSetRootElement(ptr, node);
+  xmlNodePtr old = xmlDocSetRootElement(c_obj(), node);
   if (old && !old->_private)
     xmlFreeNode(old);
 }
 
 object document::get_root_element() {
-  xmlNodePtr root = xmlDocGetRootElement(ptr);
+  xmlNodePtr root = xmlDocGetRootElement(c_obj());
 
   if (!root)
     return object();

@@ -37,9 +37,7 @@ public:
   node(call_context &x);
   ~node();
 
-  xmlNodePtr c_obj() const {
-    return ptr;
-  }
+  xmlNodePtr c_obj() const { return ptr; }
 
   struct class_info : flusspferd::class_info {
     static char const *constructor_name();
@@ -47,6 +45,9 @@ public:
 
     static object create_prototype();
   };
+
+protected:
+  void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
 protected:
   void post_initialize();

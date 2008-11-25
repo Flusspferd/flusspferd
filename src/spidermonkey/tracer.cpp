@@ -26,7 +26,6 @@ THE SOFTWARE.
 #include "flusspferd/implementation/init.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include <js/jsapi.h>
-#include <iostream>//FIXME
 
 using namespace flusspferd;
 
@@ -43,7 +42,6 @@ tracer::tracer(void *x) : p(new impl(Impl::current_context(), x)) { }
 tracer::~tracer() {}
 
 void tracer::operator() (char const *name, void *gcthing) {
-  std::cout << "TRACE " << name << " => " << gcthing << std::endl;
   if (!gcthing)
     return;
   jsval v = * (jsval *) gcthing;
