@@ -60,17 +60,17 @@ node::~node() {
 
 void node::post_initialize() {
   register_native_method("copy", &node::copy);
-  register_native_method("getDocument", &node::get_document);
 
-  add_property_op("name", &node::prop_name);
-  add_property_op("lang", &node::prop_lang);
+  define_native_property("name", permanent_property, &node::prop_name);
+  define_native_property("lang", permanent_property, &node::prop_lang);
+  define_native_property(
+    "document", permanent_property | read_only_property, &node::prop_document);
 }
 
 object node::class_info::create_prototype() {
   object proto = create_object();
 
   create_native_method(proto, "copy", 1);
-  create_native_method(proto, "getDocument", 0);
 
   return proto;
 }
@@ -147,6 +147,16 @@ void node::prop_lang(property_mode mode, value &data) {
   };
 }
 
+void node::prop_document(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  if (!ptr->doc)
+    data = object();
+  else
+    data = create_native_object<document>(object(), ptr->doc);
+}
+
 object node::copy(bool recursive) {
   xmlNodePtr copy = xmlCopyNode(ptr, recursive);
 
@@ -156,9 +166,3 @@ object node::copy(bool recursive) {
   return create_native_object<node>(get_prototype(), copy);
 }
 
-object node::get_document() {
-  if (!ptr->doc)
-    return object();
-
-  return create_native_object<document>(object(), ptr->doc);
-}
