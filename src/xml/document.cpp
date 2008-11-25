@@ -60,8 +60,8 @@ void document::post_initialize() {
 
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
-  register_native_method("setRootElement", &document::set_root_element);
-  register_native_method("getRootElement", &document::get_root_element);
+
+  define_native_property("rootElement", permanent_property, &document::prop_root_element);
 }
 
 object document::class_info::create_prototype() {
@@ -71,8 +71,6 @@ object document::class_info::create_prototype() {
 
   create_native_method(proto, "dump", 0);
   create_native_method(proto, "copy", 1);
-  create_native_method(proto, "setRootElement", 1);
-  create_native_method(proto, "getRootElement", 0);
 
   return proto;
 }
@@ -115,19 +113,37 @@ object document::copy(bool recursive) {
   return create_native_object<document>(get_prototype(), copy);
 }
 
-void document::set_root_element(node &nd) {
-  xmlNodePtr node = nd.c_obj();
+void document::prop_root_element(property_mode mode, value &data) {
+  xmlNodePtr node;
 
-  xmlNodePtr old = xmlDocSetRootElement(c_obj(), node);
-  if (old && !old->_private)
-    xmlFreeNode(old);
+  switch (mode) {
+  case property_set:
+    if (data.is_null() || data.is_void()) {
+      node = 0;
+    } else if (data.is_object()) {
+      object obj = data.get_object();
+      xml::node *p = dynamic_cast<xml::node*>(native_object_base::get_native(obj));
+      if (!p)
+        break;
+      node = p->c_obj();
+    } else {
+      break;
+    }
+
+    {
+      xmlNodePtr old = xmlDocSetRootElement(c_obj(), node);
+      if (old && !old->_private)
+        xmlFreeNode(old);
+    }
+    break;
+  case property_get:
+    node = xmlDocGetRootElement(c_obj());
+    if (!node)
+      data = object();
+    else
+      data = create_native_object<xml::node>(object(), node);
+    break;
+  default: break;
+  }
 }
 
-object document::get_root_element() {
-  xmlNodePtr root = xmlDocGetRootElement(c_obj());
-
-  if (!root)
-    return object();
-
-  return create_native_object<node>(object(), root);
-}

@@ -54,8 +54,8 @@ private: // JS methods
   string dump();
   object copy(bool recursive);
 
-  void set_root_element(node &);
-  object get_root_element();
+private:
+  void prop_root_element(property_mode mode, value &data);
 };
 
 }}
