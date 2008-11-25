@@ -92,6 +92,11 @@ protected:
 
   virtual void trace(tracer &);
 
+  virtual void property_add(value const &id, value &data);
+  virtual void property_get(value const &id, value &data);
+  virtual void property_set(value const &id, value &data);
+  virtual bool property_delete(value const &id);
+
 public:
   virtual ~native_object_base() = 0;
 

@@ -42,6 +42,11 @@ public:
   static JSBool call_helper(JSContext *, JSObject *, uintN, jsval *, jsval *);
   static uint32 mark_op(JSContext *, JSObject *, void *);
 
+  static JSBool property_add(JSContext *, JSObject *, jsval, jsval *);
+  static JSBool property_get(JSContext *, JSObject *, jsval, jsval *);
+  static JSBool property_set(JSContext *, JSObject *, jsval, jsval *);
+  static JSBool property_delete(JSContext *, JSObject *, jsval, jsval *);
+
   static JSClass native_object_class;
 
 public:
@@ -53,17 +58,25 @@ public:
 };
 
 JSClass native_object_base::impl::native_object_class = {
-    "NativeObject",
-    JSCLASS_HAS_PRIVATE,
-    JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
-    JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub,
-    &native_object_base::impl::finalize,
-    0, 0,
-    &native_object_base::impl::call_helper,
-    0, 0, 0,
-    &native_object_base::impl::mark_op,
-    0
-  };
+  "NativeObject",
+  JSCLASS_HAS_PRIVATE,
+  &native_object_base::impl::property_add,
+  &native_object_base::impl::property_delete,
+  &native_object_base::impl::property_get,
+  &native_object_base::impl::property_set,
+  JS_EnumerateStub,
+  JS_ResolveStub,
+  JS_ConvertStub,
+  &native_object_base::impl::finalize,
+  0,
+  0,
+  &native_object_base::impl::call_helper,
+  0,
+  0,
+  0,
+  &native_object_base::impl::mark_op,
+  0
+};
 
 native_object_base::native_object_base() : p(new impl) {
   register_native_method("()", &native_object_base::invalid_method);
@@ -71,36 +84,9 @@ native_object_base::native_object_base() : p(new impl) {
 
 native_object_base::~native_object_base() {}
 
-void native_object_base::post_initialize() {}
-
-void native_object_base::call_native_method(std::string const &name, call_context &x) {
-  impl::native_method_map::iterator it = p->native_methods.find(name);
-
-  if (it != p->native_methods.end()) {
-    impl::method_variant m = it->second;
-    switch (m.which()) {
-    case 0: // native_method_type
-      {
-        native_method_type native_method = boost::get<native_method_type>(m);
-        if (native_method)
-          (this->*native_method)(x);
-      }
-      break;
-    case 1: // callback_type
-      {
-        callback_type const &callback = boost::get<callback_type>(m);
-        if (callback)
-          callback(x);
-      }
-    }
-  }
-}
-
 void native_object_base::invalid_method(call_context &) {
   throw exception("Invalid method");
 }
-
-void native_object_base::trace(tracer&) {}
 
 native_object_base *native_object_base::get_native(object const &o_) {
   object o = o_;
@@ -242,6 +228,62 @@ JSBool native_object_base::impl::call_helper(
   } FLUSSPFERD_CALLBACK_END;
 }
 
+JSBool native_object_base::impl::property_add(
+    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base *self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    value data(Impl::wrap_jsvalp(vp));
+    self->property_add(Impl::wrap_jsval(id), data);
+  } FLUSSPFERD_CALLBACK_END;
+}
+
+JSBool native_object_base::impl::property_get(
+    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base *self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    value data(Impl::wrap_jsvalp(vp));
+    self->property_get(Impl::wrap_jsval(id), data);
+  } FLUSSPFERD_CALLBACK_END;
+}
+
+JSBool native_object_base::impl::property_set(
+    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base *self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    value data(Impl::wrap_jsvalp(vp));
+    self->property_set(Impl::wrap_jsval(id), data);
+  } FLUSSPFERD_CALLBACK_END;
+}
+
+JSBool native_object_base::impl::property_delete(
+    JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base *self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    value data(Impl::wrap_jsvalp(vp));
+    data = bool(self->property_delete(Impl::wrap_jsval(id)));
+  } FLUSSPFERD_CALLBACK_END;
+}
+
 uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *thing) {
   current_context_scope scope(Impl::wrap_context(ctx));
 
@@ -253,3 +295,35 @@ uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *th
 
   return 0;
 }
+
+void native_object_base::call_native_method(std::string const &name, call_context &x) {
+  impl::native_method_map::iterator it = p->native_methods.find(name);
+
+  if (it != p->native_methods.end()) {
+    impl::method_variant m = it->second;
+    switch (m.which()) {
+    case 0: // native_method_type
+      {
+        native_method_type native_method = boost::get<native_method_type>(m);
+        if (native_method)
+          (this->*native_method)(x);
+      }
+      break;
+    case 1: // callback_type
+      {
+        callback_type const &callback = boost::get<callback_type>(m);
+        if (callback)
+          callback(x);
+      }
+    }
+  }
+}
+
+void native_object_base::post_initialize() {}
+
+void native_object_base::trace(tracer&) {}
+
+void native_object_base::property_add(value const &, value &) {}
+bool native_object_base::property_delete(value const &) { return true; }
+void native_object_base::property_get(value const &, value &) {}
+void native_object_base::property_set(value const &, value &) {}
