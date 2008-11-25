@@ -120,6 +120,7 @@ void document::prop_root_element(property_mode mode, value &data) {
   case property_set:
     if (data.is_null() || data.is_void()) {
       node = 0;
+      data = object();
     } else if (data.is_object()) {
       object obj = data.get_object();
       xml::node *p = dynamic_cast<xml::node*>(native_object_base::get_native(obj));
@@ -127,6 +128,12 @@ void document::prop_root_element(property_mode mode, value &data) {
         break;
       node = p->c_obj();
     } else {
+      data = value();
+      break;
+    }
+
+    if (node->type != XML_ELEMENT_NODE) {
+      data = object();
       break;
     }
 
@@ -141,7 +148,7 @@ void document::prop_root_element(property_mode mode, value &data) {
     if (!node)
       data = object();
     else
-      data = create_native_object<xml::node>(object(), node);
+      data = node::create(node);
     break;
   default: break;
   }

@@ -33,9 +33,11 @@ namespace flusspferd { namespace xml {
 
 class node : public native_object_base {
 public:
-  node(xmlNodePtr doc);
+  node(xmlNodePtr ptr);
   node(call_context &x);
   ~node();
+
+  static object create(xmlNodePtr ptr);
 
   xmlNodePtr c_obj() const { return ptr; }
 

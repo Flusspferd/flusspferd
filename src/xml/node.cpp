@@ -32,6 +32,15 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
+object node::create(xmlNodePtr ptr) {
+  switch (ptr->type) {
+  case XML_DOCUMENT_NODE:
+    return create_native_object<document>(object(), xmlDocPtr(ptr));
+  default:
+    return create_native_object<node>(object(), ptr);
+  }
+}
+
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {
@@ -163,6 +172,6 @@ object node::copy(bool recursive) {
   if (!copy)
     throw exception("Could not copy XML node");
 
-  return create_native_object<node>(get_prototype(), copy);
+  return create(copy);
 }
 
