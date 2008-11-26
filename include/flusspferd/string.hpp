@@ -61,6 +61,8 @@ public:
   char16_t const *data() const;
 
   string substr(size_t start, size_t length);
+
+  static string concat(string const &a, string const &b);
 };
 
 bool operator==(string const &lhs, string const &rhs);
