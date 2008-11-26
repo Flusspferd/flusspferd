@@ -50,6 +50,13 @@ document::document(call_context &x)
 
 document::~document() {
   if (c_obj()->_private == static_cast<object*>(this)) {
+    xmlNodePtr x = c_obj()->children;
+    while (x) {
+      x->parent = 0;
+      x = x->next;
+    }
+    c_obj()->children = 0;
+    c_obj()->last = 0;
     xmlFreeDoc(c_obj());
     set_c_obj(0);
   }

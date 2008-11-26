@@ -81,9 +81,6 @@ namespace_::namespace_(call_context &x) {
   if (!ptr)
     throw exception("Could not create XML namespace");
 
-  if (node_p)
-    ptr->context = node_p->doc;
-
   ptr->_private = static_cast<object *>(this);
 }
 

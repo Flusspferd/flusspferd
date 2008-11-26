@@ -88,10 +88,29 @@ node::node(call_context &x) {
     throw exception("Could not create XML node");
 
   ptr->_private = static_cast<object*>(this);
+
+  if (ns_v.is_string()) {
+    ns = xmlNewNs(ptr, (xmlChar const *) ns_v.get_string().c_str(), 0);
+    namespace_::create(ns);
+    ptr->ns = ns;
+  }
 }
 
 node::~node() {
-  if (ptr && !ptr->parent && ptr->_private == static_cast<object*>(this)) {
+  if (ptr && ptr->_private == static_cast<object*>(this)) {
+    xmlUnlinkNode(ptr);
+
+    xmlNodePtr x = ptr->children;
+    while (x) {
+      x->parent = 0;
+      x = x->next;
+    }
+    ptr->children = 0;
+    ptr->last = 0;
+
+    ptr->ns = 0;
+    ptr->nsDef = 0;
+
     xmlFreeNode(ptr);
   }
 }
@@ -171,10 +190,17 @@ void node::trace(tracer &trc) {
   if (ptr->prev)
     trc("node-prev", *static_cast<object*>(ptr->prev->_private));
 
-  xmlNsPtr nsDef = ptr->nsDef;
-  while (nsDef) {
-    trc("node-nsDef", *static_cast<object*>(nsDef->_private));
-    nsDef = nsDef->next;
+  if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
+    if (ptr->ns)
+      trc("node-ns", *static_cast<object*>(ptr->ns->_private));
+  }
+
+  if (ptr->type == XML_ELEMENT_NODE) {
+    xmlNsPtr nsDef = ptr->nsDef;
+    while (nsDef) {
+      trc("node-nsDef", *static_cast<object*>(nsDef->_private));
+      nsDef = nsDef->next;
+    }
   }
 }
 
