@@ -98,26 +98,21 @@ void node::post_initialize() {
   register_native_method("addChild", &node::add_child);
   register_native_method("toString", &node::to_string);
 
-  define_native_property("name", permanent_property, &node::prop_name);
-  define_native_property("lang", permanent_property, &node::prop_lang);
-  define_native_property("content", permanent_property, &node::prop_content);
-  define_native_property("parent", permanent_property, &node::prop_parent);
-  define_native_property("next", permanent_property, &node::prop_next);
-  define_native_property("prev", permanent_property, &node::prop_prev);
-  define_native_property(
-    "firstChild", permanent_property, &node::prop_first_child);
-  define_native_property(
-    "lastChild", permanent_property|read_only_property, &node::prop_last_child);
-  define_native_property(
-    "firstSibling", permanent_property|read_only_property,
-    &node::prop_first_sibling);
-  define_native_property(
-    "lastSibling", permanent_property|read_only_property,
-    &node::prop_last_sibling);
-  define_native_property(
-    "document", permanent_property|read_only_property, &node::prop_document);
-  define_native_property(
-    "type", permanent_property|read_only_property, &node::prop_type);
+  unsigned const RW = permanent_property | dont_enumerate;
+  unsigned const RO = permanent_property | dont_enumerate | read_only_property;
+
+  define_native_property("name", RW, &node::prop_name);
+  define_native_property("lang", RW, &node::prop_lang);
+  define_native_property("content", RW, &node::prop_content);
+  define_native_property("parent", RW, &node::prop_parent);
+  define_native_property("next", RW, &node::prop_next);
+  define_native_property("prev", RW, &node::prop_prev);
+  define_native_property("firstChild", RW, &node::prop_first_child);
+  define_native_property("lastChild", RO, &node::prop_last_child);
+  define_native_property("firstSibling", RO, &node::prop_first_sibling);
+  define_native_property("lastSibling", RO, &node::prop_last_sibling);
+  define_native_property("document", RO, &node::prop_document);
+  define_native_property("type", RO, &node::prop_type);
 }
 
 object node::class_info::create_prototype() {

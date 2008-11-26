@@ -62,8 +62,11 @@ void document::post_initialize() {
   register_native_method("copy", &document::copy);
   register_native_method("toString", &document::to_string);
 
+  unsigned const RW = permanent_property | dont_enumerate;
+  //unsigned const RO = permanent_property | dont_enumerate |read_only_property;
+
   define_native_property(
-    "rootElement", permanent_property, &document::prop_root_element);
+    "rootElement", RW, &document::prop_root_element);
 }
 
 object document::class_info::create_prototype() {
