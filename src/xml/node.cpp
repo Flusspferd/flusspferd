@@ -48,7 +48,8 @@ xmlNodePtr node::c_from_js(object const &obj) {
   if (!obj.is_valid())
     return 0;
   try {
-    xml::node *p = dynamic_cast<xml::node*>(native_object_base::get_native(obj));
+    xml::node *p =
+      dynamic_cast<xml::node*>(native_object_base::get_native(obj));
     if (!p)
       return 0;
     return p->c_obj();
@@ -91,6 +92,7 @@ void node::post_initialize() {
   define_native_property("lang", permanent_property, &node::prop_lang);
   define_native_property("parent", permanent_property, &node::prop_parent);
   define_native_property("next", permanent_property, &node::prop_next);
+  define_native_property("prev", permanent_property, &node::prop_prev);
   define_native_property(
     "document", permanent_property | read_only_property, &node::prop_document);
   define_native_property(
@@ -209,13 +211,15 @@ void node::prop_parent(property_mode mode, value &data) {
 void node::prop_next(property_mode mode, value &data) {
   switch (mode) {
   case property_get:
-    if (!ptr->parent)
+    if (!ptr->next)
       data = object();
     else
       data = create(ptr->next);
     break;
   case property_set:
     if (data.is_void() || data.is_null()) {
+      if (ptr->parent)
+        ptr->parent->last = ptr;
       ptr->next = 0;
       data = object();
     } else if (!data.is_object()) {
@@ -227,13 +231,61 @@ void node::prop_next(property_mode mode, value &data) {
         break;
       }
       ptr->next = next;
+      if (next->prev) {
+        if (next->prev->parent)
+          next->prev->parent->last = next->prev;
+        next->prev->next = 0;
+      }
+      next->prev = ptr;
       while (next) {
         next->parent = ptr->parent;
-        if (!next->next)
+        if (!next->next && next->parent)
           next->parent->last = next;
         next = next->next;
       }
       xmlSetListDoc(ptr->next, ptr->doc);
+    }
+    break;
+  default: break;
+  }
+}
+
+void node::prop_prev(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    if (!ptr->prev)
+      data = object();
+    else
+      data = create(ptr->prev);
+    break;
+  case property_set:
+    if (data.is_void() || data.is_null()) {
+      if (ptr->parent)
+        ptr->parent->children = ptr;
+      ptr->prev = 0;
+      data = object();
+    } else if (!data.is_object()) {
+      data = value();
+    } else {
+      xmlNodePtr prev = c_from_js(data.get_object());
+      if (!prev) {
+        data = value();
+        break;
+      }
+      ptr->prev = prev;
+      if (prev->next) {
+        if (prev->next->parent)
+          prev->next->parent->children = prev->next;
+        prev->next->prev = 0;
+      }
+      prev->next = ptr;
+      while (prev) {
+        xmlSetTreeDoc(prev, ptr->doc);
+        prev->parent = ptr->parent;
+        if (!prev->prev && prev->parent) 
+          prev->parent->children = prev;
+        prev = prev->prev;
+      }
     }
     break;
   default: break;
