@@ -90,6 +90,7 @@ void node::post_initialize() {
   ptr->_private = permanent_ptr();
 
   register_native_method("copy", &node::copy);
+  register_native_method("unlink", &node::unlink);
 
   define_native_property("name", permanent_property, &node::prop_name);
   define_native_property("lang", permanent_property, &node::prop_lang);
@@ -110,6 +111,7 @@ object node::class_info::create_prototype() {
   object proto = create_object();
 
   create_native_method(proto, "copy", 1);
+  create_native_method(proto, "unlink", 0);
 
   return proto;
 }
@@ -431,3 +433,6 @@ object node::copy(bool recursive) {
   return create(copy);
 }
 
+void node::unlink() {
+  xmlUnlinkNode(ptr);
+}
