@@ -49,9 +49,6 @@ public:
 
   bool is_valid() const;
 
-  void *permanent_ptr() const;
-  static object from_permanent_ptr(void *ptr);
-
   object get_parent();
   object get_prototype();
 

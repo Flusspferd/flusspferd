@@ -49,7 +49,7 @@ document::document(call_context &x)
 }
 
 document::~document() {
-  if (c_obj()->_private == permanent_ptr()) {
+  if (c_obj()->_private == static_cast<object*>(this)) {
     xmlFreeDoc(c_obj());
     set_c_obj(0);
   }

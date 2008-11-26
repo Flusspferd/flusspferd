@@ -49,7 +49,7 @@ object namespace_::create(xmlNsPtr ptr) {
   if (!ptr)
     return object();
   if (ptr->_private)
-    return from_permanent_ptr(ptr->_private);
+    return *static_cast<object *>(ptr->_private);
   return create_native_object<namespace_>(object(), ptr);
 }
 
@@ -57,7 +57,7 @@ namespace_::namespace_(xmlNsPtr ptr)
   : ptr(ptr)
 {
   if (!ptr->_private)
-    ptr->_private = permanent_ptr();
+    ptr->_private = static_cast<object *>(this);
 }
 
 namespace_::namespace_(call_context &x) {
@@ -84,11 +84,11 @@ namespace_::namespace_(call_context &x) {
   if (node_p)
     ptr->context = node_p->doc;
 
-  ptr->_private = permanent_ptr();
+  ptr->_private = static_cast<object *>(this);
 }
 
 namespace_::~namespace_() {
-  if (ptr && !ptr->context && ptr->_private == permanent_ptr()) {
+  if (ptr && !ptr->context && ptr->_private == static_cast<object *>(this)) {
     xmlFreeNs(ptr);
   }
 }
@@ -110,16 +110,13 @@ std::size_t namespace_::class_info::constructor_arity() {
 }
 
 void namespace_::post_initialize() {
-  if (!ptr->_private)
-    ptr->_private = permanent_ptr();
-
   register_native_method("toString", &namespace_::to_string);
 }
 
 void namespace_::trace(tracer &trc) {
-  trc("namespace-self", from_permanent_ptr(ptr->_private));
+  trc("namespace-self", *static_cast<object*>(ptr->_private));
   if (ptr->context)
-    trc("namespace-context", from_permanent_ptr(ptr->context->_private));
+    trc("namespace-context", *static_cast<object*>(ptr->context->_private));
 }
 
 string namespace_::to_string() {

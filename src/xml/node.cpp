@@ -39,7 +39,7 @@ object node::create(xmlNodePtr ptr) {
     return object();
 
   if (ptr->_private)
-    return from_permanent_ptr(ptr->_private);
+    return *static_cast<object*>(ptr->_private);
 
   switch (ptr->type) {
   case XML_DOCUMENT_NODE:
@@ -68,7 +68,7 @@ xmlNodePtr node::c_from_js(object const &obj) {
 node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {
-  ptr->_private = permanent_ptr();
+  ptr->_private = static_cast<object*>(this);
 }
 
 node::node(call_context &x) {
@@ -87,18 +87,16 @@ node::node(call_context &x) {
   if (!ptr)
     throw exception("Could not create XML node");
 
-  ptr->_private = permanent_ptr();
+  ptr->_private = static_cast<object*>(this);
 }
 
 node::~node() {
-  if (ptr && !ptr->parent && ptr->_private == permanent_ptr()) {
+  if (ptr && !ptr->parent && ptr->_private == static_cast<object*>(this)) {
     xmlFreeNode(ptr);
   }
 }
 
 void node::post_initialize() {
-  ptr->_private = permanent_ptr();
-
   register_native_method("copy", &node::copy);
   register_native_method("unlink", &node::unlink);
   register_native_method("addContent", &node::add_content);
@@ -145,7 +143,7 @@ std::size_t node::class_info::constructor_arity() {
 
 static void trace_children(tracer &trc, xmlNodePtr ptr) {
   while (ptr) {
-    trc("node-children", value::from_permanent_ptr(ptr->_private));
+    trc("node-children", *static_cast<object*>(ptr->_private));
     trace_children(trc, ptr->children);
     ptr = ptr->next;
   }
@@ -153,29 +151,29 @@ static void trace_children(tracer &trc, xmlNodePtr ptr) {
 
 static void trace_parents(tracer &trc, xmlNodePtr ptr) {
   while (ptr) {
-    trc("node-parent", value::from_permanent_ptr(ptr->_private));
+    trc("node-parent", *static_cast<object*>(ptr->_private));
     ptr = ptr->parent;
   }
 }
 
 void node::trace(tracer &trc) {
-  trc("node-self", value::from_permanent_ptr(ptr->_private));
+  trc("node-self", *static_cast<object*>(ptr->_private));
 
   trace_children(trc, ptr->children);
   trace_parents(trc, ptr->parent);
 
   if (ptr->doc)
-    trc("node-doc", value::from_permanent_ptr(ptr->doc->_private));
+    trc("node-doc", *static_cast<object*>(ptr->doc->_private));
 
   if (ptr->next)
-    trc("node-next", value::from_permanent_ptr(ptr->next->_private));
+    trc("node-next", *static_cast<object*>(ptr->next->_private));
 
   if (ptr->prev)
-    trc("node-prev", value::from_permanent_ptr(ptr->prev->_private));
+    trc("node-prev", *static_cast<object*>(ptr->prev->_private));
 
   xmlNsPtr nsDef = ptr->nsDef;
   while (nsDef) {
-    trc("node-nsDef", value::from_permanent_ptr(nsDef->_private));
+    trc("node-nsDef", *static_cast<object*>(nsDef->_private));
     nsDef = nsDef->next;
   }
 }

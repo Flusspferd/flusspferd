@@ -140,12 +140,3 @@ void value::unbind() {
   setp(getvalp());
 }
 
-void *value::permanent_ptr() const {
-  return (void*) get();
-}
-
-value value::from_permanent_ptr(void *p) {
-  value result;
-  result.set((jsval) p);
-  return result;
-}

@@ -52,9 +52,6 @@ public:
   void bind(value o);
   void unbind();
 
-  void *permanent_ptr() const;
-  static value from_permanent_ptr(void *ptr);
-
   bool is_null() const;
   bool is_void() const;
   bool is_int() const;
