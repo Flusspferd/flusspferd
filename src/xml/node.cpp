@@ -91,6 +91,7 @@ void node::post_initialize() {
 
   register_native_method("copy", &node::copy);
   register_native_method("unlink", &node::unlink);
+  register_native_method("toString", &node::to_string);
 
   define_native_property("name", permanent_property, &node::prop_name);
   define_native_property("lang", permanent_property, &node::prop_lang);
@@ -112,6 +113,7 @@ object node::class_info::create_prototype() {
 
   create_native_method(proto, "copy", 1);
   create_native_method(proto, "unlink", 0);
+  create_native_method(proto, "toString", 0);
 
   return proto;
 }
@@ -453,13 +455,20 @@ void node::prop_type(property_mode mode, value &data) {
 
 object node::copy(bool recursive) {
   xmlNodePtr copy = xmlCopyNode(ptr, recursive);
-
   if (!copy)
     throw exception("Could not copy XML node");
-
   return create(copy);
 }
 
 void node::unlink() {
   xmlUnlinkNode(ptr);
+}
+
+string node::to_string() {
+  local_root_scope scope;
+
+  string type = get_property("type").to_string();
+  string name = get_property("name").to_string();
+
+  return string::concat(string::concat(type, " : "), name);
 }

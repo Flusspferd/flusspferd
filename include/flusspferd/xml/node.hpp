@@ -60,6 +60,7 @@ protected:
 private: // JS methods
   object copy(bool recursive);
   void unlink();
+  string to_string();
 
 private: // JS properties
   void prop_name(property_mode mode, value &data);

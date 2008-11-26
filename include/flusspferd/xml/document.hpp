@@ -53,6 +53,7 @@ protected:
 private: // JS methods
   string dump();
   object copy(bool recursive);
+  string to_string();
 
 private:
   void prop_root_element(property_mode mode, value &data);

@@ -60,8 +60,10 @@ void document::post_initialize() {
 
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
+  register_native_method("toString", &document::to_string);
 
-  define_native_property("rootElement", permanent_property, &document::prop_root_element);
+  define_native_property(
+    "rootElement", permanent_property, &document::prop_root_element);
 }
 
 object document::class_info::create_prototype() {
@@ -71,6 +73,7 @@ object document::class_info::create_prototype() {
 
   create_native_method(proto, "dump", 0);
   create_native_method(proto, "copy", 1);
+  create_native_method(proto, "toString", 0);
 
   return proto;
 }
@@ -111,6 +114,10 @@ object document::copy(bool recursive) {
     throw exception("Could not copy XML document");
 
   return create_native_object<document>(get_prototype(), copy);
+}
+
+string document::to_string() {
+  return dump();
 }
 
 void document::prop_root_element(property_mode mode, value &data) {
