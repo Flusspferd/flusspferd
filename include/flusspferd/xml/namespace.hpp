@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_NAMESPACE_HPP
 
 #include "../native_object_base.hpp"
+#include "../class.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
@@ -32,17 +33,22 @@ namespace flusspferd { namespace xml {
 
 class namespace_ : public native_object_base {
 public:
-  struct class_info {
+  struct class_info : flusspferd::class_info {
+    static char const *constructor_name();
+    static std::size_t constructor_arity();
+
     static object create_prototype();
   };
 
-  namespace_(xmlNsPtr doc);
+  namespace_(call_context &);
+  namespace_(xmlNsPtr ptr);
   ~namespace_();
 
 protected:
   void post_initialize();
 
 private: // JS methods
+  string to_string();
 
 private: // JS properties
 
