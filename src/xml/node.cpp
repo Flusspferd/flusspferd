@@ -195,7 +195,17 @@ void node::prop_parent(property_mode mode, value &data) {
     break;
   case property_set:
     if (data.is_void() || data.is_null()) {
-      xmlUnlinkNode(ptr);
+      if (ptr->parent) {
+        ptr->parent->last = ptr->prev;
+        if (!ptr->prev) {
+          ptr->parent->children = 0;
+        } else {
+          ptr->prev->next = 0;
+          ptr->prev = 0;
+        }
+        ptr->parent = 0;
+        xmlSetListDoc(ptr, 0);
+      }
       data = object();
     } else if (!data.is_object()) {
       data = value();
@@ -205,9 +215,26 @@ void node::prop_parent(property_mode mode, value &data) {
         data = value();
         break;
       }
-      if (ptr->parent)
-        xmlUnlinkNode(ptr);
-      xmlAddChild(parent, ptr);
+      if (ptr->parent) {
+        ptr->parent->last = ptr->prev;
+        if (!ptr->prev) 
+          ptr->parent->children = 0;
+      }
+      if (ptr->prev)
+        ptr->prev->next = 0;
+      ptr->parent = parent;
+      if (parent->last) {
+        ptr->prev = parent->last;
+        parent->last->next = ptr;
+      } else {
+        ptr->prev = 0;
+        parent->children = ptr;
+        parent->last = ptr;
+      }
+      while (parent->last->next) {
+        parent->last = parent->last->next;
+        parent->last->parent = parent;
+      }
     }
     break;
   default: break;
