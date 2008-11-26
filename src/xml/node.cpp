@@ -470,5 +470,5 @@ string node::to_string() {
   string type = get_property("type").to_string();
   string name = get_property("name").to_string();
 
-  return string::concat(string::concat(type, " : "), name);
+  return string::concat(string::concat(type, ":"), name);
 }
