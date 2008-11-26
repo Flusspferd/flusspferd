@@ -111,6 +111,11 @@ std::size_t namespace_::class_info::constructor_arity() {
 
 void namespace_::post_initialize() {
   register_native_method("toString", &namespace_::to_string);
+
+  unsigned const RW = permanent_property | dont_enumerate;
+
+  define_native_property("href", RW, &namespace_::prop_href);
+  define_native_property("prefix", RW, &namespace_::prop_prefix);
 }
 
 void namespace_::trace(tracer &trc) {
@@ -134,4 +139,44 @@ string namespace_::to_string() {
   }
 
   return string(text);
+}
+
+void namespace_::prop_href(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    if (ptr->href)
+      data = string((char const *) ptr->href);
+    else
+      data = value();
+    break;
+  case property_set:
+    if (ptr->href)
+      xmlFree((xmlChar *) ptr->href);
+    if (data.is_void() || data.is_null())
+      ptr->href = 0;
+    else
+      ptr->href = xmlStrdup((xmlChar const *) data.to_string().c_str());
+    break;
+  default: break;
+  }
+}
+
+void namespace_::prop_prefix(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    if (ptr->prefix)
+      data = string((char const *) ptr->prefix);
+    else
+      data = value();
+    break;
+  case property_set:
+    if (ptr->prefix)
+      xmlFree((xmlChar *) ptr->prefix);
+    if (data.is_void() || data.is_null())
+      ptr->prefix = 0;
+    else
+      ptr->prefix = xmlStrdup((xmlChar const *) data.to_string().c_str());
+    break;
+  default: break;
+  }
 }

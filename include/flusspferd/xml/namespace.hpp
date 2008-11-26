@@ -61,6 +61,8 @@ private: // JS methods
   string to_string();
 
 private: // JS properties
+  void prop_href(property_mode mode, value &data);
+  void prop_prefix(property_mode mode, value &data);
 
 private:
   xmlNsPtr ptr;
