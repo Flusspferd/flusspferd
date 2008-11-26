@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/namespace.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/tracer.hpp"
 #include "flusspferd/local_root_scope.hpp"
 
 using namespace flusspferd;
@@ -81,6 +82,12 @@ void namespace_::post_initialize() {
     ptr->_private = permanent_ptr();
 
   register_native_method("toString", &namespace_::to_string);
+}
+
+void namespace_::trace(tracer &trc) {
+  trc("self", from_permanent_ptr(ptr->_private));
+  if (ptr->context)
+    trc("context", from_permanent_ptr(ptr->context->_private));
 }
 
 string namespace_::to_string() {
