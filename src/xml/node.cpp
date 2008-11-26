@@ -120,6 +120,7 @@ void node::post_initialize() {
   define_native_property("lastSibling", RO, &node::prop_last_sibling);
   define_native_property("document", RO, &node::prop_document);
   define_native_property("type", RO, &node::prop_type);
+  define_native_property("namespace", RW, &node::prop_namespace);
 }
 
 object node::class_info::create_prototype() {
@@ -472,6 +473,31 @@ void node::prop_type(property_mode mode, value &data) {
   case XML_XINCLUDE_START:     data = string("XINCLUDE-START");        break;
   case XML_XINCLUDE_END:       data = string("XINCLUDE-END");          break;
   default:                     data = string("OTHER");                 break;
+  }
+}
+
+void node::prop_namespace(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    data = namespace_::create(ptr->ns);
+    break;
+  case property_set:
+    if (data.is_void() || data.is_null()) {
+      ptr->ns->context = 0;
+      ptr->ns = 0;
+      data = object();
+    } else if (data.is_object()) {
+      xmlNsPtr ns = namespace_::c_from_js(data.get_object());
+      if (!ns) {
+        data = value();
+        break;
+      }
+      ptr->ns = ns;
+    } else {
+      data = value();
+    }
+    break;
+  default: break;
   }
 }
 

@@ -44,6 +44,8 @@ public:
   namespace_(xmlNsPtr ptr);
   ~namespace_();
 
+  static object create(xmlNsPtr ptr);
+
   xmlNsPtr c_obj() const {
     return ptr;
   }

@@ -45,6 +45,14 @@ xmlNsPtr namespace_::c_from_js(object const &obj) {
   }
 }
 
+object namespace_::create(xmlNsPtr ptr) {
+  if (!ptr)
+    return object();
+  if (ptr->_private)
+    return from_permanent_ptr(ptr->_private);
+  return create_native_object<namespace_>(object(), ptr);
+}
+
 namespace_::namespace_(xmlNsPtr ptr)
   : ptr(ptr)
 {
@@ -73,7 +81,8 @@ namespace_::namespace_(call_context &x) {
   if (!ptr)
     throw exception("Could not create XML namespace");
 
-  ptr->context = node_p->doc;
+  if (node_p)
+    ptr->context = node_p->doc;
 
   ptr->_private = permanent_ptr();
 }
