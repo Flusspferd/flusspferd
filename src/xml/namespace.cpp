@@ -21,38 +21,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/xml.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/text.hpp"
 #include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-object flusspferd::xml::load_xml(object container) {
-  local_root_scope scope;
+namespace_::namespace_(xmlNsPtr ptr)
+  : ptr(ptr)
+{}
 
-  value previous = container.get_property("XML");
+namespace_::~namespace_()
+{}
 
-  if (previous.is_object())
-    return previous.to_object();
+object namespace_::class_info::create_prototype() {
+  object proto = create_object();
 
-  LIBXML_TEST_VERSION
+  return proto;
+}
 
-  object XML = flusspferd::create_object();
-
-  load_class<document>(XML);
-  load_class<text>(XML);
-  load_class<node>(XML);
-  load_internal_class<namespace_>();
-
-  container.define_property(
-    "XML",
-    XML,
-    object::read_only_property | object::dont_enumerate);
-
-  return XML;
+void namespace_::post_initialize() {
 }

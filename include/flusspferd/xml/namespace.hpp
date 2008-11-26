@@ -21,38 +21,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/xml.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
+#ifndef FLUSSPFERD_XML_NAMESPACE_HPP
+#define FLUSSPFERD_XML_NAMESPACE_HPP
 
-using namespace flusspferd;
-using namespace flusspferd::xml;
+#include "../native_object_base.hpp"
+#include <boost/noncopyable.hpp>
+#include <libxml/tree.h>
 
-object flusspferd::xml::load_xml(object container) {
-  local_root_scope scope;
+namespace flusspferd { namespace xml {
 
-  value previous = container.get_property("XML");
+class namespace_ : public native_object_base {
+public:
+  struct class_info {
+    static object create_prototype();
+  };
 
-  if (previous.is_object())
-    return previous.to_object();
+  namespace_(xmlNsPtr doc);
+  ~namespace_();
 
-  LIBXML_TEST_VERSION
+protected:
+  void post_initialize();
 
-  object XML = flusspferd::create_object();
+private: // JS methods
 
-  load_class<document>(XML);
-  load_class<text>(XML);
-  load_class<node>(XML);
-  load_internal_class<namespace_>();
+private: // JS properties
 
-  container.define_property(
-    "XML",
-    XML,
-    object::read_only_property | object::dont_enumerate);
+private:
+  xmlNsPtr ptr;
+};
 
-  return XML;
-}
+}}
+
+#endif
