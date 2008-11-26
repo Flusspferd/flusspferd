@@ -235,6 +235,9 @@ void node::prop_next(property_mode mode, value &data) {
         if (next->prev->parent)
           next->prev->parent->last = next->prev;
         next->prev->next = 0;
+      } else if (next->parent) {
+        next->parent->children = 0;
+        next->parent->last = 0;
       }
       next->prev = ptr;
       while (next) {
@@ -277,6 +280,9 @@ void node::prop_prev(property_mode mode, value &data) {
         if (prev->next->parent)
           prev->next->parent->children = prev->next;
         prev->next->prev = 0;
+      } else if (prev->parent) {
+        prev->parent->children = 0;
+        prev->parent->last = 0;
       }
       prev->next = ptr;
       while (prev) {
