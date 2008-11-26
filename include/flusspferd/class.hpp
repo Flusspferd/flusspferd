@@ -96,6 +96,24 @@ object load_class(object container = global()) {
   return constructor;
 }
 
+template<typename T>
+bool load_internal_class() {
+  local_root_scope scope;
+
+  context ctx = get_current_context();
+
+  object proto = ctx.get_prototype<T>();
+  
+  if (proto.is_valid())
+    return false;
+
+  proto = T::class_info::create_prototype();
+
+  ctx.add_prototype<T>(proto);
+
+  return true;
+}
+
 }
 
 #endif
