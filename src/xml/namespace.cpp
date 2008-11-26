@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/namespace.hpp"
+#include "flusspferd/xml/node.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"
@@ -29,6 +30,20 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
+
+xmlNsPtr namespace_::c_from_js(object const &obj) {
+  if (!obj.is_valid())
+    return 0;
+  try {
+    namespace_ *p =
+      dynamic_cast<namespace_*>(native_object_base::get_native(obj));
+    if (!p)
+      return 0;
+    return p->c_obj();
+  } catch (std::exception&) {
+    return 0;
+  }
+}
 
 namespace_::namespace_(xmlNsPtr ptr)
   : ptr(ptr)
@@ -40,8 +55,9 @@ namespace_::namespace_(xmlNsPtr ptr)
 namespace_::namespace_(call_context &x) {
   local_root_scope scope;
 
-  value href_v = x.arg[0];
-  value prefix_v = x.arg[1];
+  value node = x.arg[0];
+  value href_v = x.arg[1];
+  value prefix_v = x.arg[2];
 
   xmlChar const *href_p = 0;
   if (!href_v.is_void() && !href_v.is_null())
@@ -50,7 +66,14 @@ namespace_::namespace_(call_context &x) {
   if (!prefix_v.is_void() && !prefix_v.is_null())
     prefix_p = (xmlChar const *) prefix_v.to_string().c_str();
 
-  ptr = xmlNewNs(0, href_p, prefix_p);
+  xmlNodePtr node_p = node::c_from_js(node.to_object());
+
+  ptr = xmlNewNs(node_p, href_p, prefix_p);
+
+  if (!ptr)
+    throw exception("Could not create XML namespace");
+
+  ptr->context = node_p->doc;
 
   ptr->_private = permanent_ptr();
 }
@@ -74,7 +97,7 @@ char const *namespace_::class_info::constructor_name() {
 }
 
 std::size_t namespace_::class_info::constructor_arity() {
-  return 2;
+  return 3;
 }
 
 void namespace_::post_initialize() {
@@ -85,9 +108,9 @@ void namespace_::post_initialize() {
 }
 
 void namespace_::trace(tracer &trc) {
-  trc("self", from_permanent_ptr(ptr->_private));
+  trc("namespace-self", from_permanent_ptr(ptr->_private));
   if (ptr->context)
-    trc("context", from_permanent_ptr(ptr->context->_private));
+    trc("namespace-context", from_permanent_ptr(ptr->context->_private));
 }
 
 string namespace_::to_string() {

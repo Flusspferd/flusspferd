@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/xml/text.hpp"
+#include "flusspferd/xml/namespace.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
@@ -74,8 +75,14 @@ node::node(call_context &x) {
   local_root_scope scope;
 
   string name(x.arg[0]);
+  value ns_v(x.arg[1]);
 
-  ptr = xmlNewNode(0, (xmlChar const *) name.c_str());
+  xmlNsPtr ns = 0;
+  if (ns_v.is_object()) {
+    ns = namespace_::c_from_js(ns_v.get_object());
+  }
+
+  ptr = xmlNewNode(ns, (xmlChar const *) name.c_str());
 
   if (!ptr)
     throw exception("Could not create XML node");
@@ -132,7 +139,7 @@ char const *node::class_info::constructor_name() {
 }
 
 std::size_t node::class_info::constructor_arity() {
-  return 1;
+  return 2;
 }
 
 static void trace_children(tracer &trc, xmlNodePtr ptr) {
@@ -164,6 +171,12 @@ void node::trace(tracer &trc) {
 
   if (ptr->prev)
     trc("node-prev", value::from_permanent_ptr(ptr->prev->_private));
+
+  xmlNsPtr nsDef = ptr->nsDef;
+  while (nsDef) {
+    trc("node-nsDef", value::from_permanent_ptr(nsDef->_private));
+    nsDef = nsDef->next;
+  }
 }
 
 void node::prop_name(property_mode mode, value &data) {

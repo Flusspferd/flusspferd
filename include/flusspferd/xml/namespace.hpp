@@ -44,6 +44,12 @@ public:
   namespace_(xmlNsPtr ptr);
   ~namespace_();
 
+  xmlNsPtr c_obj() const {
+    return ptr;
+  }
+
+  static xmlNsPtr c_from_js(object const &o);
+
 protected:
   void post_initialize();
 

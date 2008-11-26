@@ -48,9 +48,10 @@ public:
     static object create_prototype();
   };
 
-protected:
+public:
   static xmlNodePtr c_from_js(object const &v);
 
+protected:
   void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
 protected:
