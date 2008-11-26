@@ -267,6 +267,7 @@ void node::prop_parent(property_mode mode, value &data) {
         parent->last = parent->last->next;
         parent->last->parent = parent;
       }
+      xmlSetListDoc(ptr, parent->doc);
     }
     break;
   default: break;
