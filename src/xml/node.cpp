@@ -95,6 +95,7 @@ void node::post_initialize() {
   register_native_method("copy", &node::copy);
   register_native_method("unlink", &node::unlink);
   register_native_method("addContent", &node::add_content);
+  register_native_method("addChild", &node::add_child);
   register_native_method("toString", &node::to_string);
 
   define_native_property("name", permanent_property, &node::prop_name);
@@ -119,6 +120,7 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "copy", 1);
   create_native_method(proto, "unlink", 0);
   create_native_method(proto, "addContent", 1);
+  create_native_method(proto, "addChild", 1);
   create_native_method(proto, "toString", 0);
 
   return proto;
@@ -452,6 +454,12 @@ void node::unlink() {
 void node::add_content(string const &content) {
   xmlChar const *text = (xmlChar const *) content.c_str();
   xmlNodeAddContent(ptr, text);
+}
+
+object node::add_child(node &nd) {
+  nd.unlink();
+  xmlNodePtr child = xmlAddChild(ptr, nd.c_obj());
+  return create(child);
 }
 
 string node::to_string() {
