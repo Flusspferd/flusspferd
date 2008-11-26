@@ -197,6 +197,11 @@ void node::prop_lang(property_mode mode, value &data) {
 void node::prop_content(property_mode mode, value &data) {
   xmlChar *content;
   switch (mode) {
+  case property_set:
+    xmlNodeSetContent(ptr, (xmlChar const *) "");
+    if (!data.is_void() && !data.is_null())
+      xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
+    // !! fall thru !!
   case property_get:
     content = xmlNodeGetContent(ptr);
     if (!content) {
@@ -206,14 +211,6 @@ void node::prop_content(property_mode mode, value &data) {
       xmlFree(content);
     }
     break;
-  case property_set:
-    {
-      xmlChar const *unencoded = reinterpret_cast<xmlChar const *>(
-        (data.is_void() || data.is_null()) ? "" : data.to_string().c_str());
-      content = xmlEncodeEntitiesReentrant(ptr->doc, unencoded);
-      xmlNodeSetContent(ptr, content);
-      xmlFree(content);
-    }
   default: break;
   }
 }
