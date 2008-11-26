@@ -109,6 +109,12 @@ void node::post_initialize() {
   define_native_property(
     "lastChild", permanent_property|read_only_property, &node::prop_last_child);
   define_native_property(
+    "firstSibling", permanent_property|read_only_property,
+    &node::prop_first_sibling);
+  define_native_property(
+    "lastSibling", permanent_property|read_only_property,
+    &node::prop_last_sibling);
+  define_native_property(
     "document", permanent_property|read_only_property, &node::prop_document);
   define_native_property(
     "type", permanent_property|read_only_property, &node::prop_type);
@@ -401,7 +407,27 @@ void node::prop_last_child(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
-  data = create(xmlNodePtr(ptr->last));
+  data = create(ptr->last);
+}
+
+void node::prop_first_sibling(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  xmlNodePtr ptr = this->ptr;
+  while (ptr->prev)
+    ptr = ptr->prev;
+  data = create(ptr);
+}
+
+void node::prop_last_sibling(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  xmlNodePtr ptr = this->ptr;
+  while (ptr->next)
+    ptr = ptr->next;
+  data = create(ptr);
 }
 
 void node::prop_document(property_mode mode, value &data) {
