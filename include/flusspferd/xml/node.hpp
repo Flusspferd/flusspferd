@@ -67,6 +67,8 @@ private: // JS properties
   void prop_parent(property_mode mode, value &data);
   void prop_next(property_mode mode, value &data);
   void prop_prev(property_mode mode, value &data);
+  void prop_first_child(property_mode mode, value &data);
+  void prop_last_child(property_mode mode, value &data);
   void prop_type(property_mode mode, value &data);
 
 private:

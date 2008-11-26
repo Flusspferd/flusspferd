@@ -33,6 +33,9 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 object node::create(xmlNodePtr ptr) {
+  if (!ptr)
+    return object();
+
   if (ptr->_private)
     return from_permanent_ptr(ptr->_private);
 
@@ -94,9 +97,13 @@ void node::post_initialize() {
   define_native_property("next", permanent_property, &node::prop_next);
   define_native_property("prev", permanent_property, &node::prop_prev);
   define_native_property(
-    "document", permanent_property | read_only_property, &node::prop_document);
+    "firstChild", permanent_property, &node::prop_first_child);
   define_native_property(
-    "type", permanent_property | read_only_property, &node::prop_type);
+    "lastChild", permanent_property|read_only_property, &node::prop_last_child);
+  define_native_property(
+    "document", permanent_property|read_only_property, &node::prop_document);
+  define_native_property(
+    "type", permanent_property|read_only_property, &node::prop_type);
 }
 
 object node::class_info::create_prototype() {
@@ -182,10 +189,7 @@ void node::prop_lang(property_mode mode, value &data) {
 void node::prop_parent(property_mode mode, value &data) {
   switch (mode) {
   case property_get:
-    if (!ptr->parent)
-      data = object();
-    else
-      data = create(ptr->parent);
+    data = create(ptr->parent);
     break;
   case property_set:
     if (data.is_void() || data.is_null()) {
@@ -211,10 +215,7 @@ void node::prop_parent(property_mode mode, value &data) {
 void node::prop_next(property_mode mode, value &data) {
   switch (mode) {
   case property_get:
-    if (!ptr->next)
-      data = object();
-    else
-      data = create(ptr->next);
+    data = create(ptr->next);
     break;
   case property_set:
     if (data.is_void() || data.is_null()) {
@@ -256,10 +257,7 @@ void node::prop_next(property_mode mode, value &data) {
 void node::prop_prev(property_mode mode, value &data) {
   switch (mode) {
   case property_get:
-    if (!ptr->prev)
-      data = object();
-    else
-      data = create(ptr->prev);
+    data = create(ptr->prev);
     break;
   case property_set:
     if (data.is_void() || data.is_null()) {
@@ -298,14 +296,59 @@ void node::prop_prev(property_mode mode, value &data) {
   }
 }
 
+void node::prop_first_child(property_mode mode, value &data) {
+  switch (mode) {
+  case property_get:
+    data = create(ptr->children);
+    break;
+  case property_set:
+    if (data.is_void() || data.is_null()) {
+      xmlNodePtr old = ptr->children;
+      while (old) {
+        old->parent = 0;
+        old = old->next;
+      }
+      ptr->children = 0;
+      ptr->last = 0;
+      data = object();
+    } else if (!data.is_object()) {
+      data = value();
+    } else {
+      xmlNodePtr child = c_from_js(data.get_object());
+      if (!child) {
+        data = value();
+        break;
+      }
+      xmlNodePtr old = ptr->children;
+      while (old) {
+        old->parent = 0;
+        old = old->next;
+      }
+      ptr->children = child;
+      child->parent = ptr;
+      while (child->next) {
+        child = child->next;
+        child->parent = ptr;
+      }
+      ptr->last = child;
+    }
+    break;
+  default: break;
+  }
+}
+
+void node::prop_last_child(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  data = create(xmlNodePtr(ptr->last));
+}
+
 void node::prop_document(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
-  if (!ptr->doc)
-    data = object();
-  else
-    data = create(xmlNodePtr(ptr->doc));
+  data = create(xmlNodePtr(ptr->doc));
 }
 
 void node::prop_type(property_mode mode, value &data) {
