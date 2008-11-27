@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/create.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -76,6 +77,10 @@ bool parse_cmd(int argc, char **argv) {
   return true;
 }
 
+void js_print(flusspferd::string const &v) {
+  std::cout << v << std::endl;
+}
+
 int main(int argc, char **argv) {
   if(!parse_cmd(argc, argv))
     return 1;
@@ -88,6 +93,9 @@ int main(int argc, char **argv) {
     flusspferd::xml::load_xml();
     flusspferd::io::load_io();
 
+    co.global().define_property("print",
+      flusspferd::create_native_function(&js_print));
+
     co.gc();
 
     std::string source;
@@ -98,7 +106,8 @@ int main(int argc, char **argv) {
       try {
         flusspferd::value v =
           flusspferd::evaluate(source, file.c_str(), ++line);
-        std::cout << v << '\n';
+        if (!v.is_void())
+          std::cout << v << '\n';
       }
       catch(std::exception &e) {
         std::cerr << "ERROR: " << e.what() << '\n';
