@@ -96,9 +96,9 @@ int main(int argc, char **argv) {
       std::cout << "> ";
     while(std::getline(in, source)) {
       try {
-        flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
-        if(!v.is_void() && !v.is_null())
-          std::cout << v << '\n';
+        flusspferd::value v =
+          flusspferd::evaluate(source, file.c_str(), ++line);
+        std::cout << v << '\n';
       }
       catch(std::exception &e) {
         std::cerr << "ERROR: " << e.what() << '\n';
