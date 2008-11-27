@@ -137,7 +137,9 @@ void node::post_initialize() {
   define_native_property("lastSibling", RO, &node::prop_last_sibling);
   define_native_property("document", RO, &node::prop_document);
   define_native_property("type", RO, &node::prop_type);
-  define_native_property("namespace", RW, &node::prop_namespace);
+
+  if (ptr->type  == XML_ELEMENT_NODE)
+    define_native_property("namespace", RW, &node::prop_namespace);
 }
 
 object node::class_info::create_prototype() {
