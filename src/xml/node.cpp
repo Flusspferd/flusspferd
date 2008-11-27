@@ -137,7 +137,9 @@ void node::post_initialize() {
   define_native_property("content", RW, &node::prop_content);
   define_native_property("parent", RW, &node::prop_parent);
   define_native_property("next", RW, &node::prop_next);
+  define_native_property("nextSibling", RW, &node::prop_next);
   define_native_property("prev", RW, &node::prop_prev);
+  define_native_property("previousSibling", RW, &node::prop_prev);
   define_native_property("firstChild", RW, &node::prop_first_child);
   define_native_property("lastChild", RO, &node::prop_last_child);
   define_native_property("firstSibling", RO, &node::prop_first_sibling);
