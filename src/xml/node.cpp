@@ -539,12 +539,15 @@ void node::unlink() {
 void node::add_content(string const &content) {
   xmlChar const *text = (xmlChar const *) content.c_str();
   xmlNodeAddContent(ptr, text);
+  for (xmlNodePtr child = ptr->children; child; child = child->next)
+    create(child);
 }
 
-object node::add_child(node &nd) {
+void node::add_child(node &nd) {
   nd.unlink();
-  xmlNodePtr child = xmlAddChild(ptr, nd.c_obj());
-  return create(child);
+  nd.ptr = xmlAddChild(ptr, nd.ptr);
+  if (!nd.ptr->_private)
+    nd.ptr->_private = static_cast<object*>(&nd);
 }
 
 string node::to_string() {

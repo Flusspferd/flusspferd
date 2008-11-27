@@ -62,7 +62,7 @@ private: // JS methods
   object copy(bool recursive);
   void unlink();
   void add_content(string const &);
-  object add_child(node &child);
+  void add_child(node &child);
   string to_string();
 
 private: // JS properties
