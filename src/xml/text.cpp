@@ -26,7 +26,6 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/tracer.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
