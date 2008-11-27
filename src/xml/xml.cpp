@@ -46,6 +46,7 @@ object flusspferd::xml::load_xml(object container) {
 
   load_class<document>(XML);
   load_class<text>(XML);
+  load_class<comment>(XML);
   load_class<node>(XML);
   load_class<namespace_>(XML);
 

@@ -30,7 +30,16 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace xml {
 
-class text : public node {
+#define FLUSSPFERD_XML_TAG(id, text) \
+  struct id { static char const *name() { return text; } }
+
+FLUSSPFERD_XML_TAG(text_tag, "Text");
+FLUSSPFERD_XML_TAG(comment_tag, "Comment");
+
+#undef FLUSSPFERD_XML_TAG
+
+template<typename Tag>
+class general_text : public node {
 public:
   struct class_info : node::class_info {
     static char const *constructor_name();
@@ -39,9 +48,9 @@ public:
     static object create_prototype();
   };
 
-  text(call_context &);
-  text(xmlNodePtr doc);
-  ~text();
+  general_text(call_context &);
+  general_text(xmlNodePtr doc);
+  ~general_text();
 
 protected:
   void post_initialize();
@@ -50,6 +59,9 @@ private: // JS methods
 
 private: // JS properties
 };
+
+typedef general_text<text_tag> text;
+typedef general_text<comment_tag> comment;
 
 }}
 

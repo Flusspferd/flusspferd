@@ -31,32 +31,45 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-text::text(xmlNodePtr ptr)
+template<typename Tag>
+general_text<Tag>::general_text(xmlNodePtr ptr)
   : node(ptr)
 {}
 
-static xmlNodePtr new_text(call_context &x) {
+static xmlNodePtr new_text(text_tag, xmlChar const *text) {
+  return xmlNewText(text);
+}
+
+static xmlNodePtr new_text(comment_tag, xmlChar const *text) {
+  return xmlNewComment(text);
+}
+
+template<typename Tag>
+static xmlNodePtr new_text(Tag tag, call_context &x) {
   value text_v = x.arg[0];
   string text;
   if (!text_v.is_void() && !text_v.is_null())
     text = text_v.to_string();
   xmlChar const *unencoded = (xmlChar const *) text.c_str();
-  xmlNodePtr node = xmlNewText(unencoded);
-  return node;
+  return new_text(tag, unencoded);
 }
 
-text::text(call_context &x)
-  : node(new_text(x))
+template<typename Tag>
+general_text<Tag>::general_text(call_context &x)
+  : node(new_text(Tag(), x))
 {}
 
-text::~text()
+template<typename Tag>
+general_text<Tag>::~general_text()
 {}
 
-void text::post_initialize() {
+template<typename Tag>
+void general_text<Tag>::post_initialize() {
   node::post_initialize();
 }
 
-object text::class_info::create_prototype() {
+template<typename Tag>
+object general_text<Tag>::class_info::create_prototype() {
   local_root_scope scope;
 
   object proto = node::class_info::create_prototype();
@@ -64,11 +77,15 @@ object text::class_info::create_prototype() {
   return proto;
 }
 
-char const *text::class_info::constructor_name() {
-  return "Text";
+template<typename Tag>
+char const *general_text<Tag>::class_info::constructor_name() {
+  return Tag::name();
 }
 
-std::size_t text::class_info::constructor_arity() {
+template<typename Tag>
+std::size_t general_text<Tag>::class_info::constructor_arity() {
   return 1;
 }
 
+template class general_text<text_tag>;
+template class general_text<comment_tag>;
