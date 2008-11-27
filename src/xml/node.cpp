@@ -46,6 +46,10 @@ object node::create(xmlNodePtr ptr) {
     return create_native_object<document>(object(), xmlDocPtr(ptr));
   case XML_TEXT_NODE:
     return create_native_object<text>(object(), ptr);
+  case XML_COMMENT_NODE:
+    return create_native_object<comment>(object(), ptr);
+  case XML_CDATA_SECTION_NODE:
+    return create_native_object<cdata_section>(object(), ptr);
   default:
     return create_native_object<node>(object(), ptr);
   }
