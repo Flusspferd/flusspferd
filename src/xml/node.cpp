@@ -450,6 +450,11 @@ void node::prop_first_sibling(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
+  if (ptr->parent) {
+    data = create(ptr->parent->children);
+    return;
+  }
+
   xmlNodePtr ptr = this->ptr;
   while (ptr->prev)
     ptr = ptr->prev;
@@ -459,6 +464,11 @@ void node::prop_first_sibling(property_mode mode, value &data) {
 void node::prop_last_sibling(property_mode mode, value &data) {
   if (mode != property_get)
     return;
+
+  if (ptr->parent) {
+    data = create(ptr->parent->last);
+    return;
+  }
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->next)
