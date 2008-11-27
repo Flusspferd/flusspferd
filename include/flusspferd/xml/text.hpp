@@ -35,6 +35,7 @@ namespace flusspferd { namespace xml {
 
 FLUSSPFERD_XML_TAG(text_tag, "Text");
 FLUSSPFERD_XML_TAG(comment_tag, "Comment");
+FLUSSPFERD_XML_TAG(cdata_section_tag, "CDataSection");
 
 #undef FLUSSPFERD_XML_TAG
 
@@ -62,6 +63,7 @@ private: // JS properties
 
 typedef general_text<text_tag> text;
 typedef general_text<comment_tag> comment;
+typedef general_text<cdata_section_tag> cdata_section;
 
 }}
 

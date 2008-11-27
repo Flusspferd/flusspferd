@@ -44,6 +44,12 @@ static xmlNodePtr new_text(comment_tag, xmlChar const *text) {
   return xmlNewComment(text);
 }
 
+static xmlNodePtr new_text(cdata_section_tag, xmlChar const *text) {
+  xmlNodePtr node = xmlNewCDataBlock(0, text, xmlStrlen(text));
+  node->name = xmlStrdup((xmlChar const *) "cdata");
+  return node;
+}
+
 template<typename Tag>
 static xmlNodePtr new_text(Tag tag, call_context &x) {
   value text_v = x.arg[0];
@@ -89,3 +95,4 @@ std::size_t general_text<Tag>::class_info::constructor_arity() {
 
 template class general_text<text_tag>;
 template class general_text<comment_tag>;
+template class general_text<cdata_section_tag>;
