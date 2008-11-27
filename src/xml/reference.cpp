@@ -1,0 +1,94 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+/*
+Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+#include "flusspferd/xml/reference.hpp"
+#include "flusspferd/xml/node.hpp"
+#include "flusspferd/xml/document.hpp"
+#include "flusspferd/local_root_scope.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/exception.hpp"
+
+using namespace flusspferd;
+using namespace flusspferd::xml;
+
+reference_::reference_(xmlNodePtr ptr)
+  : node(ptr)
+{}
+
+static xmlNodePtr new_reference(call_context &x) {
+  local_root_scope scope;
+
+  object doc_o = x.arg[0].to_object();
+  string text = x.arg[1].to_string();
+
+  document *doc_ = 0;
+  try {
+    doc_ = dynamic_cast<document*>(native_object_base::get_native(doc_o));
+  } catch (std::exception&) {}
+  xmlDocPtr doc = doc_ ? doc_->c_obj() : 0;
+
+  if (!doc && x.arg[0].is_string())
+    text = x.arg[0].to_string();
+
+  xmlChar const *data = (xmlChar const *) text.c_str();
+
+  xmlNodePtr result = 0;
+
+  if (text.substr(0, 1) == "#" || text.substr(0, 2) == "&#")
+    result = xmlNewCharRef(doc, data);
+  else
+    result = xmlNewReference(doc, data);
+
+  if (!result)
+    throw exception("Could not create XML entity reference");
+
+  return result;
+}
+
+reference_::reference_(call_context &x)
+  : node(new_reference(x))
+{}
+
+reference_::~reference_()
+{}
+
+void reference_::post_initialize() {
+  node::post_initialize();
+}
+
+object reference_::class_info::create_prototype() {
+  local_root_scope scope;
+
+  object proto = node::class_info::create_prototype();
+
+  return proto;
+}
+
+char const *reference_::class_info::constructor_name() {
+  return "Reference";
+}
+
+std::size_t reference_::class_info::constructor_arity() {
+  return 2;
+}
+

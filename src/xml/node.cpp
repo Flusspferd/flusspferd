@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/xml/text.hpp"
 #include "flusspferd/xml/namespace.hpp"
+#include "flusspferd/xml/reference.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
@@ -50,6 +51,8 @@ object node::create(xmlNodePtr ptr) {
     return create_native_object<comment>(object(), ptr);
   case XML_CDATA_SECTION_NODE:
     return create_native_object<cdata_section>(object(), ptr);
+  case XML_ENTITY_REF_NODE:
+    return create_native_object<reference_>(object(), ptr);
   default:
     return create_native_object<node>(object(), ptr);
   }
@@ -169,7 +172,6 @@ std::size_t node::class_info::constructor_arity() {
 static void trace_children(tracer &trc, xmlNodePtr ptr) {
   while (ptr) {
     trc("node-children", *static_cast<object*>(ptr->_private));
-    trace_children(trc, ptr->children);
     ptr = ptr->next;
   }
 }
@@ -184,7 +186,9 @@ static void trace_parents(tracer &trc, xmlNodePtr ptr) {
 void node::trace(tracer &trc) {
   trc("node-self", *static_cast<object*>(ptr->_private));
 
-  trace_children(trc, ptr->children);
+  if (ptr->type != XML_ENTITY_REF_NODE)
+    trace_children(trc, ptr->children);
+
   trace_parents(trc, ptr->parent);
 
   if (ptr->doc)
