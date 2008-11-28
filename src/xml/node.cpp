@@ -213,7 +213,7 @@ char const *node::class_info::constructor_name() {
 }
 
 std::size_t node::class_info::constructor_arity() {
-  return 2;
+  return 3;
 }
 
 static void trace_children(tracer &trc, xmlNodePtr ptr) {

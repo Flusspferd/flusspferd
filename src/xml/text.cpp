@@ -102,7 +102,7 @@ char const *general_text<Tag>::class_info::constructor_name() {
 
 template<typename Tag>
 std::size_t general_text<Tag>::class_info::constructor_arity() {
-  return 1;
+  return 2;
 }
 
 template class general_text<text_tag>;

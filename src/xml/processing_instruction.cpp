@@ -84,6 +84,6 @@ char const *processing_instruction::class_info::constructor_name() {
 }
 
 std::size_t processing_instruction::class_info::constructor_arity() {
-  return 2;
+  return 3;
 }
 
