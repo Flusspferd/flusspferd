@@ -85,7 +85,11 @@ node::node(call_context &x) {
 
   std::size_t offset = !doc ? 0 : 1;
 
-  string name(x.arg[offset + 0]);
+  value name_v(x.arg[offset + 0]);
+  if (!name_v.is_string())
+    throw exception("Could not create XML node: name has to be a string");
+  xmlChar const *name = (xmlChar const *) name_v.to_string().c_str();
+
   value ns_v(x.arg[offset + 1]);
 
   xmlNsPtr ns = 0;
@@ -93,7 +97,7 @@ node::node(call_context &x) {
     ns = namespace_::c_from_js(ns_v.get_object());
   }
 
-  ptr = xmlNewDocNode(doc, ns, (xmlChar const *) name.c_str(), 0);
+  ptr = xmlNewDocNode(doc, ns, name, 0);
 
   if (!ptr)
     throw exception("Could not create XML node");
