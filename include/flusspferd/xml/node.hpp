@@ -38,6 +38,7 @@ public:
   ~node();
 
   static object create(xmlNodePtr ptr);
+  static void create_all_children(xmlNodePtr ptr);
 
   xmlNodePtr c_obj() const { return ptr; }
 

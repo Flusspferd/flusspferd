@@ -61,6 +61,13 @@ object node::create(xmlNodePtr ptr) {
   }
 }
 
+void node::create_all_children(xmlNodePtr ptr) {
+  if (ptr->type == XML_ENTITY_REF_NODE)
+    return;
+  for (xmlNodePtr child = ptr->children; child; child = child->next)
+    create(child);
+}
+
 xmlNodePtr node::c_from_js(object const &obj) {
   if (!obj.is_valid())
     return 0;
@@ -79,6 +86,7 @@ node::node(xmlNodePtr ptr)
   : ptr(ptr)
 {
   ptr->_private = static_cast<object*>(this);
+  create_all_children(ptr);
 }
 
 node::node(call_context &x) {
@@ -293,8 +301,7 @@ void node::prop_content(property_mode mode, value &data) {
     xmlNodeSetContent(ptr, (xmlChar const *) "");
     if (!data.is_void() && !data.is_null())
       xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
-    for (xmlNodePtr child = ptr->children; child; child = child->next)
-      create(child);
+    create_all_children(ptr);
     // !! fall thru !!
   case property_get:
     content = xmlNodeGetContent(ptr);
@@ -600,8 +607,7 @@ void node::unlink() {
 void node::add_content(string const &content) {
   xmlChar const *text = (xmlChar const *) content.c_str();
   xmlNodeAddContent(ptr, text);
-  for (xmlNodePtr child = ptr->children; child; child = child->next)
-    create(child);
+  create_all_children(ptr);
 }
 
 void node::add_child(node &nd) {
