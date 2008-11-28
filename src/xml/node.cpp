@@ -93,25 +93,45 @@ node::node(call_context &x) {
     throw exception("Could not create XML node: name has to be a string");
   xmlChar const *name = (xmlChar const *) name_v.to_string().c_str();
 
-  value ns_v(x.arg[offset + 1]);
+  xmlChar *prefix = 0;
 
-  xmlNsPtr ns = 0;
-  if (ns_v.is_object()) {
-    ns = namespace_::c_from_js(ns_v.get_object());
+  if (xmlChar const *colon = xmlStrchr(name, ':')) {
+    std::size_t len = colon - name;
+    prefix = xmlStrsub(name, 0, len);
+    name += len + 1;
   }
 
-  ptr = xmlNewDocNode(doc, ns, name, 0);
+  try {
+    value ns_v(x.arg[offset + 1]);
 
-  if (!ptr)
-    throw exception("Could not create XML node");
+    xmlNsPtr ns = 0;
+    if (ns_v.is_object()) {
+      ns = namespace_::c_from_js(ns_v.get_object());
+      if (prefix) {
+        if (ns->prefix) xmlFree((xmlChar*) ns->prefix);
+        ns->prefix = prefix;
+        prefix = 0; // don't free
+      }
+    }
 
-  ptr->_private = static_cast<object*>(this);
+    ptr = xmlNewDocNode(doc, ns, name, 0);
 
-  if (ns_v.is_string()) {
-    ns = xmlNewNs(ptr, (xmlChar const *) ns_v.get_string().c_str(), 0);
-    namespace_::create(ns);
-    ptr->ns = ns;
+    if (!ptr)
+      throw exception("Could not create XML node");
+
+    ptr->_private = static_cast<object*>(this);
+
+    if (ns_v.is_string()) {
+      ns = xmlNewNs(ptr, (xmlChar const *) ns_v.get_string().c_str(), prefix);
+      namespace_::create(ns);
+      ptr->ns = ns;
+    }
+  } catch (...) {
+    if (prefix) xmlFree(prefix);
+    throw;
   }
+
+  if (prefix) xmlFree(prefix);
 }
 
 node::~node() {
