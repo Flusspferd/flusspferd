@@ -21,44 +21,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/xml.hpp"
+#include "flusspferd/xml/processing_instruction.hpp"
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/reference.hpp"
-#include "flusspferd/xml/processing_instruction.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-object flusspferd::xml::load_xml(object container) {
+processing_instruction::processing_instruction(xmlNodePtr ptr)
+  : node(ptr)
+{}
+
+static xmlNodePtr new_processing_instruction(call_context &x) {
   local_root_scope scope;
 
-  value previous = container.get_property("XML");
+  string name = x.arg[0].to_string();
+  string text = x.arg[1].to_string();
 
-  if (previous.is_object())
-    return previous.to_object();
+  xmlChar const *name_ = (xmlChar const *) name.c_str();
+  xmlChar const *text_ = (xmlChar const *) text.c_str();
 
-  LIBXML_TEST_VERSION
+  xmlNodePtr result = xmlNewPI(name_, text_);
 
-  object XML = flusspferd::create_object();
+  if (!result)
+    throw exception("Could not create XML entity processing_instruction");
 
-  load_class<node>(XML);
-  load_class<document>(XML);
-  load_class<text>(XML);
-  load_class<comment>(XML);
-  load_class<cdata_section>(XML);
-  load_class<reference_>(XML);
-  load_class<processing_instruction>(XML);
-  load_class<namespace_>(XML);
-
-  container.define_property(
-    "XML",
-    XML,
-    object::read_only_property | object::dont_enumerate);
-
-  return XML;
+  return result;
 }
+
+processing_instruction::processing_instruction(call_context &x)
+  : node(new_processing_instruction(x))
+{}
+
+processing_instruction::~processing_instruction()
+{}
+
+void processing_instruction::post_initialize() {
+  node::post_initialize();
+}
+
+object processing_instruction::class_info::create_prototype() {
+  local_root_scope scope;
+
+  object proto = node::class_info::create_prototype();
+
+  return proto;
+}
+
+char const *processing_instruction::class_info::constructor_name() {
+  return "ProcessingInstruction";
+}
+
+std::size_t processing_instruction::class_info::constructor_arity() {
+  return 2;
+}
+
