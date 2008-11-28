@@ -411,7 +411,7 @@ void node::prop_prev(property_mode mode, value &data) {
 void node::prop_first_child(property_mode mode, value &data) {
   switch (mode) {
   case property_get:
-    data = create(ptr->children);
+    data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
     break;
   case property_set:
     if (data.is_void() || data.is_null()) {
@@ -453,7 +453,7 @@ void node::prop_last_child(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
-  data = create(ptr->last);
+  data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->last : 0);
 }
 
 void node::prop_first_sibling(property_mode mode, value &data) {
