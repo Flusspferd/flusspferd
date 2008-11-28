@@ -333,10 +333,16 @@ void node::prop_parent(property_mode mode, value &data) {
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent) {
-        ptr->parent->last = ptr->prev;
-        if (!ptr->prev) {
-          ptr->parent->children = 0;
+        if (ptr->type == XML_ATTRIBUTE_NODE) {
+          if (!ptr->prev)
+            ptr->parent->properties = 0;
         } else {
+          ptr->parent->last = ptr->prev;
+          if (!ptr->prev)
+            ptr->parent->children = 0;
+        }
+        
+        if (ptr->prev) {
           ptr->prev->next = 0;
           ptr->prev = 0;
         }
@@ -344,11 +350,7 @@ void node::prop_parent(property_mode mode, value &data) {
         xmlSetListDoc(ptr, 0);
       }
     } else if (xmlNodePtr parent = c_from_js(data.to_object())) {
-      if (ptr->parent) {
-        ptr->parent->last = ptr->prev;
-        if (!ptr->prev) 
-          ptr->parent->children = 0;
-      }
+      xmlNodePtr old_parent = ptr->parent;
       if (ptr->prev)
         ptr->prev->next = 0;
       ptr->parent = parent;
@@ -361,8 +363,18 @@ void node::prop_parent(property_mode mode, value &data) {
           ptr->prev = last;
         } else {
           parent->properties = ptr;
+          ptr->prev = 0;
+        }
+        while (ptr->next) {
+          ptr = ptr->next;
+          ptr->parent = parent;
         }
       } else {
+        if (old_parent) {
+          old_parent->last = ptr->prev;
+          if (!ptr->prev) 
+            old_parent->children = 0;
+        }
         if (parent->last) {
           ptr->prev = parent->last;
           parent->last->next = ptr;
