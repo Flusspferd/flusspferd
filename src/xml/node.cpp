@@ -275,14 +275,14 @@ void node::trace(tracer &trc) {
 
 void node::prop_name(property_mode mode, value &data) {
   switch (mode) {
+  case property_set:
+    xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
+    // !! fall thru !!
   case property_get:
     if (!ptr->name)
       data = value();
     else
       data = string((char const *) ptr->name);
-    break;
-  case property_set:
-    xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
     break;
   default: break;
   };
@@ -290,6 +290,9 @@ void node::prop_name(property_mode mode, value &data) {
 
 void node::prop_lang(property_mode mode, value &data) {
   switch (mode) {
+  case property_set:
+    xmlNodeSetLang(ptr, (xmlChar const *) data.to_string().c_str());
+    // !! fall thru !!
   case property_get:
     {
       xmlChar const *lang = xmlNodeGetLang(ptr);
@@ -298,9 +301,6 @@ void node::prop_lang(property_mode mode, value &data) {
       else
         data = string((char const *) lang);
     }
-    break;
-  case property_set:
-    xmlNodeSetLang(ptr, (xmlChar const *) data.to_string().c_str());
     break;
   default: break;
   };
@@ -330,9 +330,6 @@ void node::prop_content(property_mode mode, value &data) {
 
 void node::prop_parent(property_mode mode, value &data) {
   switch (mode) {
-  case property_get:
-    data = create(ptr->parent);
-    break;
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent) {
@@ -346,15 +343,7 @@ void node::prop_parent(property_mode mode, value &data) {
         ptr->parent = 0;
         xmlSetListDoc(ptr, 0);
       }
-      data = object();
-    } else if (!data.is_object()) {
-      data = value();
-    } else {
-      xmlNodePtr parent = c_from_js(data.get_object());
-      if (!parent) {
-        data = value();
-        break;
-      }
+    } else if (xmlNodePtr parent = c_from_js(data.to_object())) {
       if (ptr->parent) {
         ptr->parent->last = ptr->prev;
         if (!ptr->prev) 
@@ -377,6 +366,9 @@ void node::prop_parent(property_mode mode, value &data) {
       }
       xmlSetListDoc(ptr, parent->doc);
     }
+    // !! fall thru !!
+  case property_get:
+    data = create(ptr->parent);
     break;
   default: break;
   }
@@ -384,23 +376,12 @@ void node::prop_parent(property_mode mode, value &data) {
 
 void node::prop_next(property_mode mode, value &data) {
   switch (mode) {
-  case property_get:
-    data = create(ptr->next);
-    break;
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent)
         ptr->parent->last = ptr;
       ptr->next = 0;
-      data = object();
-    } else if (!data.is_object()) {
-      data = value();
-    } else {
-      xmlNodePtr next = c_from_js(data.get_object());
-      if (!next) {
-        data = value();
-        break;
-      }
+    } else if (xmlNodePtr next = c_from_js(data.to_object())) {
       ptr->next = next;
       if (next->prev) {
         if (next->prev->parent)
@@ -419,6 +400,9 @@ void node::prop_next(property_mode mode, value &data) {
       }
       xmlSetListDoc(ptr->next, ptr->doc);
     }
+    // !! fall thru !!
+  case property_get:
+    data = create(ptr->next);
     break;
   default: break;
   }
@@ -426,23 +410,12 @@ void node::prop_next(property_mode mode, value &data) {
 
 void node::prop_prev(property_mode mode, value &data) {
   switch (mode) {
-  case property_get:
-    data = create(ptr->prev);
-    break;
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent)
         ptr->parent->children = ptr;
       ptr->prev = 0;
-      data = object();
-    } else if (!data.is_object()) {
-      data = value();
-    } else {
-      xmlNodePtr prev = c_from_js(data.get_object());
-      if (!prev) {
-        data = value();
-        break;
-      }
+    } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
       ptr->prev = prev;
       if (prev->next) {
         if (prev->next->parent)
@@ -461,6 +434,9 @@ void node::prop_prev(property_mode mode, value &data) {
         prev = prev->prev;
       }
     }
+    // !! fall thru !!
+  case property_get:
+    data = create(ptr->prev);
     break;
   default: break;
   }
@@ -468,9 +444,6 @@ void node::prop_prev(property_mode mode, value &data) {
 
 void node::prop_first_child(property_mode mode, value &data) {
   switch (mode) {
-  case property_get:
-    data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
-    break;
   case property_set:
     if (data.is_void() || data.is_null()) {
       xmlNodePtr old = ptr->children;
@@ -481,14 +454,7 @@ void node::prop_first_child(property_mode mode, value &data) {
       ptr->children = 0;
       ptr->last = 0;
       data = object();
-    } else if (!data.is_object()) {
-      data = value();
-    } else {
-      xmlNodePtr child = c_from_js(data.get_object());
-      if (!child) {
-        data = value();
-        break;
-      }
+    } else if (xmlNodePtr child = c_from_js(data.get_object())) {
       xmlNodePtr old = ptr->children;
       while (old) {
         old->parent = 0;
@@ -502,6 +468,9 @@ void node::prop_first_child(property_mode mode, value &data) {
       }
       ptr->last = child;
     }
+    // !! fall thru !!
+  case property_get:
+    data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
     break;
   default: break;
   }
@@ -582,9 +551,6 @@ void node::prop_type(property_mode mode, value &data) {
 
 void node::prop_namespace(property_mode mode, value &data) {
   switch (mode) {
-  case property_get:
-    data = namespace_::create(ptr->ns);
-    break;
   case property_set:
     if (data.is_void() || data.is_null()) {
       ptr->ns->context = 0;
@@ -600,6 +566,9 @@ void node::prop_namespace(property_mode mode, value &data) {
     } else {
       data = value();
     }
+    // !! fall thru !!
+  case property_get:
+    data = namespace_::create(ptr->ns);
     break;
   default: break;
   }
@@ -612,10 +581,10 @@ void node::prop_first_attr(property_mode mode, value &data) {
       ptr->properties = 0;
     } else if (data.is_object()) {
       xmlNodePtr attr = c_from_js(data.get_object());
-      if (!attr || attr->type != XML_ATTRIBUTE_NODE)
-        break;
-      ptr->properties = xmlAttrPtr(attr);
-      attr->parent = ptr;
+      if (attr && attr->type == XML_ATTRIBUTE_NODE) {
+        ptr->properties = xmlAttrPtr(attr);
+        attr->parent = ptr;
+      }
     }
     // !! fall thru !!
   case property_get:
