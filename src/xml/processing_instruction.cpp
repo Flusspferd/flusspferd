@@ -38,16 +38,24 @@ processing_instruction::processing_instruction(xmlNodePtr ptr)
 static xmlNodePtr new_processing_instruction(call_context &x) {
   local_root_scope scope;
 
-  string name = x.arg[0].to_string();
-  string text = x.arg[1].to_string();
+  xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
+
+  std::size_t offset = !doc ? 0 : 1;
+
+  if (!x.arg[offset].is_string() || !x.arg[offset + 1].is_string())
+    throw exception("Could not create XML processing instruction: "
+                    "name and content have to be strings");
+
+  string name = x.arg[offset].get_string();
+  string text = x.arg[offset + 1].get_string();
 
   xmlChar const *name_ = (xmlChar const *) name.c_str();
   xmlChar const *text_ = (xmlChar const *) text.c_str();
 
-  xmlNodePtr result = xmlNewPI(name_, text_);
+  xmlNodePtr result = xmlNewDocPI(doc, name_, text_);
 
   if (!result)
-    throw exception("Could not create XML entity processing_instruction");
+    throw exception("Could not create XML processing instruction");
 
   return result;
 }
