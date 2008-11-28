@@ -352,17 +352,29 @@ void node::prop_parent(property_mode mode, value &data) {
       if (ptr->prev)
         ptr->prev->next = 0;
       ptr->parent = parent;
-      if (parent->last) {
-        ptr->prev = parent->last;
-        parent->last->next = ptr;
+      if (ptr->type == XML_ATTRIBUTE_NODE) {
+        xmlAttrPtr ptr = xmlAttrPtr(this->ptr);
+        if (xmlAttrPtr last = parent->properties) {
+          while (last->next)
+            last = last->next;
+          last->next = ptr;
+          ptr->prev = last;
+        } else {
+          parent->properties = ptr;
+        }
       } else {
-        ptr->prev = 0;
-        parent->children = ptr;
-        parent->last = ptr;
-      }
-      while (parent->last->next) {
-        parent->last = parent->last->next;
-        parent->last->parent = parent;
+        if (parent->last) {
+          ptr->prev = parent->last;
+          parent->last->next = ptr;
+        } else {
+          ptr->prev = 0;
+          parent->children = ptr;
+          parent->last = ptr;
+        }
+        while (parent->last->next) {
+          parent->last = parent->last->next;
+          parent->last->parent = parent;
+        }
       }
       xmlSetListDoc(ptr, parent->doc);
     }
