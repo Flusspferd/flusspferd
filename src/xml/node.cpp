@@ -199,6 +199,8 @@ void node::post_initialize() {
 
   if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE)
     define_native_property("namespace", RW, &node::prop_namespace);
+
+  define_native_property("firstAttribute", RW, &node::prop_first_attr);
 }
 
 object node::class_info::create_prototype() {
@@ -598,6 +600,26 @@ void node::prop_namespace(property_mode mode, value &data) {
     } else {
       data = value();
     }
+    break;
+  default: break;
+  }
+}
+
+void node::prop_first_attr(property_mode mode, value &data) {
+  switch (mode) {
+  case property_set:
+    if (data.is_void_or_null()) {
+      ptr->properties = 0;
+    } else if (data.is_object()) {
+      xmlNodePtr attr = c_from_js(data.get_object());
+      if (!attr || attr->type != XML_ATTRIBUTE_NODE)
+        break;
+      ptr->properties = xmlAttrPtr(attr);
+      attr->parent = ptr;
+    }
+    // !! fall thru !!
+  case property_get:
+    data = create(xmlNodePtr(ptr->properties));
     break;
   default: break;
   }

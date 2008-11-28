@@ -82,6 +82,7 @@ private: // JS properties
   void prop_last_sibling (property_mode mode, value &data);
   void prop_type         (property_mode mode, value &data);
   void prop_namespace    (property_mode mode, value &data);
+  void prop_first_attr   (property_mode mode, value &data);
 
 private:
   xmlNodePtr ptr;
