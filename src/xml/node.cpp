@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/text.hpp"
 #include "flusspferd/xml/namespace.hpp"
 #include "flusspferd/xml/reference.hpp"
+#include "flusspferd/xml/processing_instruction.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
@@ -53,6 +54,8 @@ object node::create(xmlNodePtr ptr) {
     return create_native_object<cdata_section>(object(), ptr);
   case XML_ENTITY_REF_NODE:
     return create_native_object<reference_>(object(), ptr);
+  case XML_PI_NODE:
+    return create_native_object<processing_instruction>(object(), ptr);
   default:
     return create_native_object<node>(object(), ptr);
   }
