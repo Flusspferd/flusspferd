@@ -69,6 +69,8 @@ void node::create_all_children(xmlNodePtr ptr) {
     return;
   for (xmlNodePtr child = ptr->children; child; child = child->next)
     create(child);
+  for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
+    create(xmlNodePtr(prop));
 }
 
 xmlNodePtr node::c_from_js(object const &obj) {
@@ -156,6 +158,8 @@ node::~node() {
     }
     ptr->children = 0;
     ptr->last = 0;
+
+    ptr->properties = 0;
 
     ptr->ns = 0;
     ptr->nsDef = 0;
@@ -249,6 +253,9 @@ void node::trace(tracer &trc) {
 
   if (ptr->prev)
     trc("node-prev", *static_cast<object*>(ptr->prev->_private));
+
+  if (ptr->properties)
+    trc("node-properties", *static_cast<object*>(ptr->properties->_private));
 
   if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     if (ptr->ns)
