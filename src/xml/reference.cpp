@@ -39,16 +39,15 @@ static xmlNodePtr new_reference(call_context &x) {
   local_root_scope scope;
 
   object doc_o = x.arg[0].to_object();
-  string text = x.arg[1].to_string();
+  xmlDocPtr doc = document::c_from_js(doc_o);
 
-  document *doc_ = 0;
-  try {
-    doc_ = dynamic_cast<document*>(native_object_base::get_native(doc_o));
-  } catch (std::exception&) {}
-  xmlDocPtr doc = doc_ ? doc_->c_obj() : 0;
+  value text_v = x.arg[!doc ? 0 : 1];
 
-  if (!doc && x.arg[0].is_string())
-    text = x.arg[0].to_string();
+  if (!text_v.is_string())
+    throw exception("Could not create XML entity reference: "
+                    "name has to be a string");
+
+  string text = text_v.get_string();
 
   xmlChar const *data = (xmlChar const *) text.c_str();
 

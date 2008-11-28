@@ -54,6 +54,8 @@ static xmlNodePtr new_text(
 
 template<typename Tag>
 static xmlNodePtr new_text(Tag tag, call_context &x) {
+  local_root_scope scope;
+
   xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
 
   value text_v = x.arg[!doc ? 0 : 1];
