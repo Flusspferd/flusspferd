@@ -63,6 +63,8 @@ private: // JS methods
   void unlink();
   void add_content(string const &);
   void add_child(node &child);
+  object search_namespace_by_prefix(value const &);
+  object search_namespace_by_uri(string const &);
   string to_string();
 
 private: // JS properties

@@ -71,9 +71,15 @@ document::~document() {
     }
     c_obj()->children = 0;
     c_obj()->last = 0;
+    c_obj()->oldNs = 0;
     xmlFreeDoc(c_obj());
     set_c_obj(0);
   }
+}
+
+void document::trace(tracer &trc) {
+  if (c_obj()->oldNs)
+    trc("doc-oldns", *static_cast<object*>(c_obj()->oldNs->_private));
 }
 
 void document::post_initialize() {

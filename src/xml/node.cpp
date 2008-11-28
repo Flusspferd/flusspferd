@@ -139,6 +139,10 @@ void node::post_initialize() {
   register_native_method("addContent", &node::add_content);
   register_native_method("addChild", &node::add_child);
   register_native_method("toString", &node::to_string);
+  register_native_method("searchNamespaceByPrefix",
+                         &node::search_namespace_by_prefix);
+  register_native_method("searchNamespaceByURI",
+                         &node::search_namespace_by_uri);
 
   unsigned const RW = permanent_property | dont_enumerate;
   unsigned const RO = permanent_property | dont_enumerate | read_only_property;
@@ -169,6 +173,8 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "unlink", 0);
   create_native_method(proto, "addContent", 1);
   create_native_method(proto, "addChild", 1);
+  create_native_method(proto, "searchNamespaceByPrefix", 1);
+  create_native_method(proto, "searchNamespaceByURI", 1);
   create_native_method(proto, "toString", 0);
 
   return proto;
@@ -592,4 +598,21 @@ string node::to_string() {
   string name = get_property("name").to_string();
 
   return string::concat(string::concat(type, ":"), name);
+}
+
+object node::search_namespace_by_prefix(value const &prefix_) {
+  local_root_scope scope;
+  xmlChar const *prefix = 0; 
+  if (!prefix_.is_string() && !prefix_.is_void() && !prefix_.is_null())
+    throw exception("Could not search for non-string namespace prefix");
+  if (prefix_.is_string())
+    prefix = (xmlChar const *) prefix_.get_string().c_str();
+  xmlNsPtr ns = xmlSearchNs(ptr->doc, ptr, prefix);
+  return namespace_::create(ns);
+}
+
+object node::search_namespace_by_uri(string const &uri_) {
+  xmlChar const *uri = (xmlChar const *) uri_.c_str();
+  xmlNsPtr ns = xmlSearchNsByHref(ptr->doc, ptr, uri);
+  return namespace_::create(ns);
 }

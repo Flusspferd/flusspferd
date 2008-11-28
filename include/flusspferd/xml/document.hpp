@@ -51,6 +51,7 @@ public:
 
 protected:
   void post_initialize();
+  void trace(tracer &);
 
 private: // JS methods
   string dump();
