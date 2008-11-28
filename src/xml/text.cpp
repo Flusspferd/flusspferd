@@ -60,14 +60,14 @@ static xmlNodePtr new_text(Tag tag, call_context &x) {
 
   value text_v = x.arg[!doc ? 0 : 1];
   if (!text_v.is_string())
-    throw exception("Could not create text node: text has to be a string");
+    throw exception("Could not create XML text node: text has to be a string");
 
   xmlChar const *unencoded = (xmlChar const *) text_v.get_string().c_str();
 
   xmlNodePtr ptr = new_text(tag, doc, unencoded);
 
   if (!ptr)
-    throw exception("Could not create text node");
+    throw exception("Could not create XML text node");
 
   return ptr;
 }

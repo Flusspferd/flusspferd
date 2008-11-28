@@ -67,14 +67,31 @@ namespace_::namespace_(call_context &x) {
   value href_v = x.arg[1];
   value prefix_v = x.arg[2];
 
+  if (!node.is_object())
+    throw exception("Could not create XML namespace: "
+                    "node has to be an object");
+
+  xmlNodePtr node_p = node::c_from_js(node.get_object());
+
+  if (!node_p && !node.is_null())
+    throw exception("Could not create XML namespace: "
+                    "node has to be null or an XML node");
+
   xmlChar const *href_p = 0;
   if (!href_v.is_void() && !href_v.is_null())
-    href_p = (xmlChar const *) href_v.to_string().c_str();
+    if (href_v.is_string())
+      href_p = (xmlChar const *) href_v.get_string().c_str();
+    else
+      throw exception("Could not create XML namespace: "
+                      "href has to be a string");
+
   xmlChar const *prefix_p = 0;
   if (!prefix_v.is_void() && !prefix_v.is_null())
-    prefix_p = (xmlChar const *) prefix_v.to_string().c_str();
-
-  xmlNodePtr node_p = node::c_from_js(node.to_object());
+    if (prefix_v.is_string())
+      prefix_p = (xmlChar const *) prefix_v.get_string().c_str();
+    else
+      throw exception("Could not create XML namespace: "
+                      "prefix has to be a string");
 
   ptr = xmlNewNs(node_p, href_p, prefix_p);
 
