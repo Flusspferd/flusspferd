@@ -60,6 +60,7 @@ private: // JS methods
 
 private:
   void prop_root_element(property_mode mode, value &data);
+  void prop_xml_namespace(property_mode mode, value &data);
 };
 
 }}

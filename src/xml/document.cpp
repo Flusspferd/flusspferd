@@ -90,10 +90,10 @@ void document::post_initialize() {
   register_native_method("toString", &document::to_string);
 
   unsigned const RW = permanent_property | dont_enumerate;
-  //unsigned const RO = permanent_property | dont_enumerate |read_only_property;
+  unsigned const RO = permanent_property | dont_enumerate |read_only_property;
 
-  define_native_property(
-    "rootElement", RW, &document::prop_root_element);
+  define_native_property("rootElement", RW, &document::prop_root_element);
+  define_native_property("xmlNamespace", RO, &document::prop_xml_namespace);
 }
 
 object document::class_info::create_prototype() {
@@ -192,3 +192,14 @@ void document::prop_root_element(property_mode mode, value &data) {
   }
 }
 
+void document::prop_xml_namespace(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  if (data.is_void()) {
+    local_root_scope scope;
+    arguments arg;
+    arg.push_back(string("xml"));
+    data = call("searchNamespaceByPrefix", arg);
+  }
+}
