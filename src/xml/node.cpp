@@ -256,6 +256,8 @@ void node::prop_content(property_mode mode, value &data) {
     xmlNodeSetContent(ptr, (xmlChar const *) "");
     if (!data.is_void() && !data.is_null())
       xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
+    for (xmlNodePtr child = ptr->children; child; child = child->next)
+      create(child);
     // !! fall thru !!
   case property_get:
     content = xmlNodeGetContent(ptr);
