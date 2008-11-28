@@ -54,6 +54,7 @@ public:
 
   bool is_null() const;
   bool is_void() const;
+  bool is_void_or_null() const { return is_null() || is_void(); }
   bool is_int() const;
   bool is_double() const;
   bool is_number() const;
