@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/xml/text.hpp"
 #include "flusspferd/xml/node.hpp"
+#include "flusspferd/xml/document.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
@@ -35,28 +36,38 @@ general_text<Tag>::general_text(xmlNodePtr ptr)
   : node(ptr)
 {}
 
-static xmlNodePtr new_text(text_tag, xmlChar const *text) {
-  return xmlNewText(text);
+static xmlNodePtr new_text(text_tag, xmlDocPtr doc, xmlChar const *text) {
+  return xmlNewDocText(doc, text);
 }
 
-static xmlNodePtr new_text(comment_tag, xmlChar const *text) {
-  return xmlNewComment(text);
+static xmlNodePtr new_text(comment_tag, xmlDocPtr doc, xmlChar const *text) {
+  return xmlNewDocComment(doc, text);
 }
 
-static xmlNodePtr new_text(cdata_section_tag, xmlChar const *text) {
-  xmlNodePtr node = xmlNewCDataBlock(0, text, xmlStrlen(text));
+static xmlNodePtr new_text(
+    cdata_section_tag, xmlDocPtr doc, xmlChar const *text)
+{
+  xmlNodePtr node = xmlNewCDataBlock(doc, text, xmlStrlen(text));
   node->name = xmlStrdup((xmlChar const *) "cdata");
   return node;
 }
 
 template<typename Tag>
 static xmlNodePtr new_text(Tag tag, call_context &x) {
-  value text_v = x.arg[0];
-  string text;
-  if (!text_v.is_void() && !text_v.is_null())
-    text = text_v.to_string();
-  xmlChar const *unencoded = (xmlChar const *) text.c_str();
-  return new_text(tag, unencoded);
+  xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
+
+  value text_v = x.arg[!doc ? 0 : 1];
+  if (!text_v.is_string())
+    throw exception("Could not create text node: text has to be a string");
+
+  xmlChar const *unencoded = (xmlChar const *) text_v.get_string().c_str();
+
+  xmlNodePtr ptr = new_text(tag, doc, unencoded);
+
+  if (!ptr)
+    throw exception("Could not create text node");
+
+  return ptr;
 }
 
 template<typename Tag>
