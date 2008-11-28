@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/namespace.hpp"
 #include "flusspferd/xml/reference.hpp"
 #include "flusspferd/xml/processing_instruction.hpp"
+#include "flusspferd/xml/attribute.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"
@@ -56,6 +57,8 @@ object node::create(xmlNodePtr ptr) {
     return create_native_object<reference_>(object(), ptr);
   case XML_PI_NODE:
     return create_native_object<processing_instruction>(object(), ptr);
+  case XML_ATTRIBUTE_NODE:
+    return create_native_object<attribute_>(object(), xmlAttrPtr(ptr));
   default:
     return create_native_object<node>(object(), ptr);
   }
@@ -190,7 +193,7 @@ void node::post_initialize() {
   define_native_property("document", RO, &node::prop_document);
   define_native_property("type", RO, &node::prop_type);
 
-  if (ptr->type  == XML_ELEMENT_NODE)
+  if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE)
     define_native_property("namespace", RW, &node::prop_namespace);
 }
 
@@ -298,7 +301,7 @@ void node::prop_content(property_mode mode, value &data) {
   xmlChar *content;
   switch (mode) {
   case property_set:
-    xmlNodeSetContent(ptr, (xmlChar const *) "");
+    xmlNodeSetContent(ptr, 0);
     if (!data.is_void() && !data.is_null())
       xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
     create_all_children(ptr);

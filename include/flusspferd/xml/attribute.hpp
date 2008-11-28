@@ -21,46 +21,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/xml.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/reference.hpp"
-#include "flusspferd/xml/attribute.hpp"
-#include "flusspferd/xml/processing_instruction.hpp"
-#include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
+#ifndef FLUSSPFERD_XML_ATTRIBUTE_HPP
+#define FLUSSPFERD_XML_ATTRIBUTE_HPP
 
-using namespace flusspferd;
-using namespace flusspferd::xml;
+#include "node.hpp"
+#include <boost/noncopyable.hpp>
+#include <libxml/tree.h>
 
-object flusspferd::xml::load_xml(object container) {
-  local_root_scope scope;
+namespace flusspferd { namespace xml {
 
-  value previous = container.get_property("XML");
+class attribute_ : public node {
+public:
+  struct class_info : node::class_info {
+    static char const *constructor_name();
+    static std::size_t constructor_arity();
 
-  if (previous.is_object())
-    return previous.to_object();
+    static object create_prototype();
+  };
 
-  LIBXML_TEST_VERSION
+  attribute_(call_context &);
+  attribute_(xmlAttrPtr attr);
+  ~attribute_();
 
-  object XML = flusspferd::create_object();
+  xmlAttrPtr c_obj() const {
+    return xmlAttrPtr(node::c_obj());
+  }
 
-  load_class<node>(XML);
-  load_class<document>(XML);
-  load_class<text>(XML);
-  load_class<comment>(XML);
-  load_class<cdata_section>(XML);
-  load_class<reference_>(XML);
-  load_class<processing_instruction>(XML);
-  load_class<attribute_>(XML);
-  load_class<namespace_>(XML);
+protected:
+  void post_initialize();
 
-  container.define_property(
-    "XML",
-    XML,
-    object::read_only_property | object::dont_enumerate);
+private: // JS methods
+  void add_content(string const &);
 
-  return XML;
-}
+private: // JS properties
+  void prop_content(property_mode mode, value &data);
+};
+
+}}
+
+#endif
