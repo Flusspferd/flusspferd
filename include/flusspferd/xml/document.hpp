@@ -47,6 +47,10 @@ public:
     return xmlDocPtr(node::c_obj());
   }
 
+  static xmlDocPtr c_from_js(object const &o) {
+    return xmlDocPtr(node::c_from_js(o));
+  }
+
 protected:
   void post_initialize();
 

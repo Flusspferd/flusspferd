@@ -139,7 +139,7 @@ void document::prop_root_element(property_mode mode, value &data) {
       node = 0;
       data = object();
     } else if (data.is_object()) {
-      node = c_from_js(data.get_object());
+      node = node::c_from_js(data.get_object());
       if (!node) {
         data = value();
         break;

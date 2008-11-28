@@ -81,15 +81,19 @@ node::node(xmlNodePtr ptr)
 node::node(call_context &x) {
   local_root_scope scope;
 
-  string name(x.arg[0]);
-  value ns_v(x.arg[1]);
+  xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
+
+  std::size_t offset = !doc ? 0 : 1;
+
+  string name(x.arg[offset + 0]);
+  value ns_v(x.arg[offset + 1]);
 
   xmlNsPtr ns = 0;
   if (ns_v.is_object()) {
     ns = namespace_::c_from_js(ns_v.get_object());
   }
 
-  ptr = xmlNewNode(ns, (xmlChar const *) name.c_str());
+  ptr = xmlNewDocNode(doc, ns, (xmlChar const *) name.c_str(), 0);
 
   if (!ptr)
     throw exception("Could not create XML node");
