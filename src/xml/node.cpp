@@ -189,6 +189,7 @@ void node::post_initialize() {
   register_native_method("addChild", &node::add_child);
   register_native_method("addChildList", &node::add_child_list);
   register_native_method("addNode", &node::add_node);
+  register_native_method("addNamespace", &node::add_namespace);
   register_native_method("toString", &node::to_string);
   register_native_method("searchNamespaceByPrefix",
                          &node::search_namespace_by_prefix);
@@ -229,6 +230,7 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "addChild", 1);
   create_native_method(proto, "addChildList", 1);
   create_native_method(proto, "addNode", 2);
+  create_native_method(proto, "addNamespace", 2);
   create_native_method(proto, "searchNamespaceByPrefix", 1);
   create_native_method(proto, "searchNamespaceByURI", 1);
   create_native_method(proto, "toString", 0);
@@ -682,14 +684,26 @@ void node::add_content(string const &content) {
 
 void node::add_node(call_context &x) {
   local_root_scope scope;
-  arguments arg;
-  if (ptr->doc)
+  if (ptr->doc) {
+    arguments arg;
     arg.push_back(create(xmlNodePtr(ptr->doc)));
+    for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
+      arg.push_back(*it);
+    x.arg = arg;
+  }
+  object obj = create_native_object<node>(object(), boost::ref(x));
+  obj.set_property("parent", *this);
+  x.result = obj;
+}
+
+void node::add_namespace(call_context &x) {
+  local_root_scope scope;
+  arguments arg;
+  arg.push_back(*this);
   for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
     arg.push_back(*it);
   x.arg = arg;
-  object obj = create_native_object<node>(object(), boost::ref(x));
-  obj.set_property("parent", *this);
+  object obj = create_native_object<namespace_>(object(), boost::ref(x));
   x.result = obj;
 }
 
