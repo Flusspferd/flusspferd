@@ -184,6 +184,7 @@ node::~node() {
 void node::post_initialize() {
   register_native_method("copy", &node::copy);
   register_native_method("unlink", &node::unlink);
+  register_native_method("purge", &node::purge);
   register_native_method("addContent", &node::add_content);
   register_native_method("addChild", &node::add_child);
   register_native_method("addChildList", &node::add_child_list);
@@ -223,6 +224,7 @@ object node::class_info::create_prototype() {
 
   create_native_method(proto, "copy", 1);
   create_native_method(proto, "unlink", 0);
+  create_native_method(proto, "purge", 0);
   create_native_method(proto, "addContent", 1);
   create_native_method(proto, "addChild", 1);
   create_native_method(proto, "addChildList", 1);
@@ -724,4 +726,23 @@ object node::search_namespace_by_uri(string const &uri_) {
   xmlChar const *uri = (xmlChar const *) uri_.c_str();
   xmlNsPtr ns = xmlSearchNsByHref(ptr->doc, ptr, uri);
   return namespace_::create(ns);
+}
+
+void node::purge() {
+  for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
+    for (xmlAttrPtr prop2 = prop->next; prop2; prop2 = prop2 ->next) {
+      if (prop->name == 0 || prop2->name == 0)
+        continue;
+      if (xmlStrcmp(prop->name, prop2->name) == 0)
+        xmlUnlinkNode(xmlNodePtr(prop));
+    }
+  }
+  for (xmlNodePtr child = ptr->children; child; child = child->next) {
+    if (child->type == XML_TEXT_NODE && child->next &&
+        child->next->type == XML_TEXT_NODE)
+    {
+      xmlNodeAddContent(child, child->next->content);
+      xmlUnlinkNode(child->next);
+    }
+  }
 }

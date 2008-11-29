@@ -63,6 +63,7 @@ protected:
 private: // JS methods
   object copy(bool recursive);
   void unlink();
+  void purge();
   void add_content(string const &);
   void add_child(node &child);
   void add_child_list(node &child);
