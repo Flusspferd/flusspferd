@@ -423,24 +423,32 @@ void node::prop_next(property_mode mode, value &data) {
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent)
-        ptr->parent->last = ptr;
+        if (ptr->type != XML_ATTRIBUTE_NODE)
+          ptr->parent->last = ptr;
       ptr->next = 0;
     } else if (xmlNodePtr next = c_from_js(data.to_object())) {
       ptr->next = next;
-      if (next->prev) {
-        if (next->prev->parent)
-          next->prev->parent->last = next->prev;
-        next->prev->next = 0;
+      if (xmlNodePtr np = next->prev) {
+        if (np->parent)
+          if (np->type != XML_ATTRIBUTE_NODE)
+            np->parent->last = np;
+        np->next = 0;
       } else if (next->parent) {
-        next->parent->children = 0;
-        next->parent->last = 0;
+        if (next->type == XML_ATTRIBUTE_NODE) {
+          next->parent->properties = 0;
+        } else {
+          next->parent->children = 0;
+          next->parent->last = 0;
+        }
       }
       next->prev = ptr;
-      while (next) {
-        next->parent = ptr->parent;
-        if (!next->next && next->parent)
-          next->parent->last = next;
-        next = next->next;
+      if (next->type != XML_ATTRIBUTE_NODE) {
+        while (next) {
+          next->parent = ptr->parent;
+          if (!next->next && next->parent)
+            next->parent->last = next;
+          next = next->next;
+        }
       }
       xmlSetListDoc(ptr->next, ptr->doc);
     }
@@ -457,24 +465,37 @@ void node::prop_prev(property_mode mode, value &data) {
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent)
-        ptr->parent->children = ptr;
+        if (ptr->type == XML_ATTRIBUTE_NODE)
+          ptr->parent->properties = xmlAttrPtr(ptr);
+        else
+          ptr->parent->children = ptr;
       ptr->prev = 0;
     } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
       ptr->prev = prev;
-      if (prev->next) {
-        if (prev->next->parent)
-          prev->next->parent->children = prev->next;
-        prev->next->prev = 0;
+      if (xmlNodePtr pn = prev->next) {
+        if (pn->parent)
+          if (pn->type == XML_ATTRIBUTE_NODE)
+            ptr->parent->properties = xmlAttrPtr(pn);
+          else
+            pn->parent->children = pn;
+        pn->prev = 0;
       } else if (prev->parent) {
-        prev->parent->children = 0;
-        prev->parent->last = 0;
+        if (prev->type != XML_ATTRIBUTE_NODE) {
+          prev->parent->children = 0;
+          prev->parent->last = 0;
+        } else {
+          prev->parent->properties = 0;
+        }
       }
       prev->next = ptr;
       while (prev) {
         xmlSetTreeDoc(prev, ptr->doc);
         prev->parent = ptr->parent;
         if (!prev->prev && prev->parent) 
-          prev->parent->children = prev;
+          if (prev->type == XML_ATTRIBUTE_NODE)
+            prev->parent->properties = xmlAttrPtr(prev);
+          else
+            prev->parent->children = prev;
         prev = prev->prev;
       }
     }
