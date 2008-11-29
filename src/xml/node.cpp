@@ -183,21 +183,6 @@ node::~node() {
 }
 
 void node::post_initialize() {
-  register_native_method("copy", &node::copy);
-  register_native_method("unlink", &node::unlink);
-  register_native_method("purge", &node::purge);
-  register_native_method("addContent", &node::add_content);
-  register_native_method("addChild", &node::add_child);
-  register_native_method("addChildList", &node::add_child_list);
-  register_native_method("addNode", &node::add_node);
-  register_native_method("addNamespace", &node::add_namespace);
-  register_native_method("addAttribute", &node::add_attribute);
-  register_native_method("toString", &node::to_string);
-  register_native_method("searchNamespaceByPrefix",
-                         &node::search_namespace_by_prefix);
-  register_native_method("searchNamespaceByURI",
-                         &node::search_namespace_by_uri);
-
   unsigned const RW = permanent_property | dont_enumerate;
   unsigned const RO = permanent_property | dont_enumerate | read_only_property;
 
@@ -220,6 +205,24 @@ void node::post_initialize() {
     define_native_property("namespace", RW, &node::prop_namespace);
 
   define_native_property("firstAttribute", RW, &node::prop_first_attr);
+
+  register_native_method("copy", &node::copy);
+  register_native_method("unlink", &node::unlink);
+  register_native_method("purge", &node::purge);
+  register_native_method("addContent", &node::add_content);
+  register_native_method("addChild", &node::add_child);
+  register_native_method("addChildList", &node::add_child_list);
+  register_native_method("addNode", &node::add_node);
+  register_native_method("addNamespace", &node::add_namespace);
+  register_native_method("addAttribute", &node::add_attribute);
+  register_native_method("setAttribute", &node::set_attribute);
+  register_native_method("unsetAttribute", &node::unset_attribute);
+  register_native_method("findAttribute", &node::find_attribute);
+  register_native_method("toString", &node::to_string);
+  register_native_method("searchNamespaceByPrefix",
+                         &node::search_namespace_by_prefix);
+  register_native_method("searchNamespaceByURI",
+                         &node::search_namespace_by_uri);
 }
 
 object node::class_info::create_prototype() {
@@ -234,6 +237,9 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "addNode", 2);
   create_native_method(proto, "addNamespace", 2);
   create_native_method(proto, "addAttribute", 3);
+  create_native_method(proto, "setAttribute", 3);
+  create_native_method(proto, "unsetAttribute", 2);
+  create_native_method(proto, "findAttribute", 2);
   create_native_method(proto, "searchNamespaceByPrefix", 1);
   create_native_method(proto, "searchNamespaceByURI", 1);
   create_native_method(proto, "toString", 0);
@@ -732,6 +738,50 @@ void node::add_attribute(call_context &x) {
   x.arg = arg;
   x.result = create_native_object<attribute_>(object(), boost::ref(x));
   purge();
+}
+
+void node::set_attribute(call_context &x) {
+  find_attribute(x);
+
+  if (x.result.is_null()) {
+    add_attribute(x);
+  } else {
+    object o = x.result.to_object();
+    o.set_property("content", x.arg.back());
+  }
+}
+
+void node::unset_attribute(call_context &x) {
+  find_attribute(x);
+
+  if (!x.result.is_null() && x.result.is_object())
+    x.result.get_object().call("unlink");
+
+  x.result = value();
+}
+
+void node::find_attribute(call_context &x) {
+  local_root_scope scope;
+
+  if (!x.arg[0].is_string())
+    throw exception("Could not find XML attribute: name has to be a string");
+
+  xmlChar const *name = (xmlChar const *) x.arg[0].get_string().c_str();
+
+  xmlChar const *ns_href = 0;
+  if (x.arg[1].is_string()) {
+    ns_href = (xmlChar const *) x.arg[1].get_string().c_str();
+  } else if (!x.arg[1].is_void_or_null()) {
+    xmlNsPtr ns = namespace_::c_from_js(x.arg[1].to_object());
+    if (!ns)
+      throw exception("Could not find XML attribute: "
+                      "no valid namespace specified");
+    ns_href = ns->href;
+  }
+
+  xmlAttrPtr prop = xmlHasNsProp(ptr, name, ns_href);
+
+  x.result = create(xmlNodePtr(prop));
 }
 
 void node::add_child(node &nd) {
