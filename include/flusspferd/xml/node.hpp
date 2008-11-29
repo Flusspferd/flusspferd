@@ -66,6 +66,7 @@ private: // JS methods
   void add_content(string const &);
   void add_child(node &child);
   void add_child_list(node &child);
+  void add_node(call_context &x);
   object search_namespace_by_prefix(value const &);
   object search_namespace_by_uri(string const &);
   string to_string();
