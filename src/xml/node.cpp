@@ -774,7 +774,11 @@ void node::purge() {
   if (ptr->type == XML_ELEMENT_NODE) {
     for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
       for (xmlAttrPtr prop2 = prop->next; prop2; prop2 = prop2 ->next) {
-        if (prop->ns != prop2->ns)
+        xmlChar const *href1 = prop->ns ? prop->ns->href : 0;
+        xmlChar const *href2 = prop2->ns ? prop2->ns->href : 0;
+        if (bool(href1) != bool(href2))
+          continue;
+        if (href1 && href1 != href2 && xmlStrcmp(href1, href2))
           continue;
         if (prop->name == 0 || prop2->name == 0)
           continue;
