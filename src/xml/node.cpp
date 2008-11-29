@@ -64,13 +64,26 @@ object node::create(xmlNodePtr ptr) {
   }
 }
 
-void node::create_all_children(xmlNodePtr ptr) {
+void node::create_all_children(
+    xmlNodePtr ptr, bool children, bool properties)
+{
   if (ptr->type == XML_ENTITY_REF_NODE)
     return;
-  for (xmlNodePtr child = ptr->children; child; child = child->next)
-    create(child);
-  for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
-    create(xmlNodePtr(prop));
+
+  if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
+    if (ptr->ns)
+      namespace_::create(ptr->ns);
+  }
+
+  if (children) {
+    for (xmlNodePtr child = ptr->children; child; child = child->next)
+      create(child);
+  }
+
+  if (properties) {
+    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
+      create(xmlNodePtr(prop));
+  }
 }
 
 xmlNodePtr node::c_from_js(object const &obj) {
@@ -292,6 +305,7 @@ void node::prop_lang(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
     xmlNodeSetLang(ptr, (xmlChar const *) data.to_string().c_str());
+    create_all_children(ptr, false, true);
     // !! fall thru !!
   case property_get:
     {
@@ -313,7 +327,7 @@ void node::prop_content(property_mode mode, value &data) {
     xmlNodeSetContent(ptr, 0);
     if (!data.is_void() && !data.is_null())
       xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
-    create_all_children(ptr);
+    create_all_children(ptr, true, false);
     // !! fall thru !!
   case property_get:
     content = xmlNodeGetContent(ptr);
@@ -632,7 +646,7 @@ void node::unlink() {
 void node::add_content(string const &content) {
   xmlChar const *text = (xmlChar const *) content.c_str();
   xmlNodeAddContent(ptr, text);
-  create_all_children(ptr);
+  create_all_children(ptr, true, false);
 }
 
 void node::add_child(node &nd) {
