@@ -714,6 +714,7 @@ void node::add_child(node &nd) {
 
 void node::add_child_list(node &nd) {
   nd.set_property("parent", *this);
+  purge();
 }
 
 string node::to_string() {
@@ -745,6 +746,8 @@ object node::search_namespace_by_uri(string const &uri_) {
 void node::purge() {
   for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
     for (xmlAttrPtr prop2 = prop->next; prop2; prop2 = prop2 ->next) {
+      if (prop->ns != prop2->ns)
+        continue;
       if (prop->name == 0 || prop2->name == 0)
         continue;
       if (xmlStrcmp(prop->name, prop2->name) == 0)
