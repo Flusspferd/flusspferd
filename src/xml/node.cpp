@@ -741,13 +741,20 @@ void node::add_attribute(call_context &x) {
 }
 
 void node::set_attribute(call_context &x) {
+  if (x.arg.size() < 3)
+    throw exception("Could not set XML attribute: too few parameters");
+
+  if (!x.arg[1].is_object())
+    throw exception("Could not set XML attribute: "
+                    "namespace has to be an object");
+
   find_attribute(x);
 
   if (x.result.is_null()) {
     add_attribute(x);
   } else {
     object o = x.result.to_object();
-    o.set_property("content", x.arg.back());
+    o.set_property("content", x.arg[2]);
   }
 }
 
