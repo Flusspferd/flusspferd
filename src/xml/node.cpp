@@ -186,6 +186,7 @@ void node::post_initialize() {
   register_native_method("unlink", &node::unlink);
   register_native_method("addContent", &node::add_content);
   register_native_method("addChild", &node::add_child);
+  register_native_method("addChildList", &node::add_child_list);
   register_native_method("toString", &node::to_string);
   register_native_method("searchNamespaceByPrefix",
                          &node::search_namespace_by_prefix);
@@ -223,6 +224,7 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "unlink", 0);
   create_native_method(proto, "addContent", 1);
   create_native_method(proto, "addChild", 1);
+  create_native_method(proto, "addChildList", 1);
   create_native_method(proto, "searchNamespaceByPrefix", 1);
   create_native_method(proto, "searchNamespaceByURI", 1);
   create_native_method(proto, "toString", 0);
@@ -348,7 +350,7 @@ void node::prop_parent(property_mode mode, value &data) {
     if (data.is_void() || data.is_null()) {
       if (ptr->parent) {
         if (ptr->type == XML_ATTRIBUTE_NODE) {
-          if (!ptr->prev)
+          if (ptr->parent->type == XML_ELEMENT_NODE && !ptr->prev)
             ptr->parent->properties = 0;
         } else {
           ptr->parent->last = ptr->prev;
@@ -367,23 +369,27 @@ void node::prop_parent(property_mode mode, value &data) {
       xmlNodePtr old_parent = ptr->parent;
       if (ptr->prev)
         ptr->prev->next = 0;
-      ptr->parent = parent;
+      ptr->prev = 0;
       if (ptr->type == XML_ATTRIBUTE_NODE) {
-        xmlAttrPtr ptr = xmlAttrPtr(this->ptr);
-        if (xmlAttrPtr last = parent->properties) {
-          while (last->next)
-            last = last->next;
-          last->next = ptr;
-          ptr->prev = last;
-        } else {
-          parent->properties = ptr;
-          ptr->prev = 0;
-        }
-        while (ptr->next) {
-          ptr = ptr->next;
+        if (parent->type == XML_ELEMENT_NODE) {
           ptr->parent = parent;
+          xmlAttrPtr ptr = xmlAttrPtr(this->ptr);
+          if (xmlAttrPtr last = parent->properties) {
+            while (last->next)
+              last = last->next;
+            last->next = ptr;
+            ptr->prev = last;
+          } else {
+            parent->properties = ptr;
+            ptr->prev = 0;
+          }
+          while (ptr->next) {
+            ptr = ptr->next;
+            ptr->parent = parent;
+          }
         }
       } else {
+        ptr->parent = parent;
         if (old_parent) {
           old_parent->last = ptr->prev;
           if (!ptr->prev) 
@@ -651,9 +657,11 @@ void node::add_content(string const &content) {
 
 void node::add_child(node &nd) {
   nd.unlink();
-  nd.ptr = xmlAddChild(ptr, nd.ptr);
-  if (!nd.ptr->_private)
-    nd.ptr->_private = static_cast<object*>(&nd);
+  add_child_list(nd);
+}
+
+void node::add_child_list(node &nd) {
+  nd.set_property("parent", *this);
 }
 
 string node::to_string() {

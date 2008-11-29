@@ -78,6 +78,7 @@ document::~document() {
 }
 
 void document::trace(tracer &trc) {
+  node::trace(trc);
   if (c_obj()->oldNs)
     trc("doc-oldns", *static_cast<object*>(c_obj()->oldNs->_private));
 }
