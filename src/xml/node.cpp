@@ -737,12 +737,16 @@ void node::purge() {
         xmlUnlinkNode(xmlNodePtr(prop));
     }
   }
-  for (xmlNodePtr child = ptr->children; child; child = child->next) {
-    if (child->type == XML_TEXT_NODE && child->next &&
-        child->next->type == XML_TEXT_NODE)
+  if (!ptr->children)
+    return;
+  for (xmlNodePtr child = ptr->children->next; child;) {
+    xmlNodePtr next = child->next;
+    if (child->type == XML_TEXT_NODE && child->prev &&
+        child->prev->type == XML_TEXT_NODE)
     {
-      xmlNodeAddContent(child, child->next->content);
-      xmlUnlinkNode(child->next);
+      xmlNodeAddContent(child->prev, child->content);
+      xmlUnlinkNode(child);
     }
+    child = next;
   }
 }
