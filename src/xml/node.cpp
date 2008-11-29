@@ -80,7 +80,7 @@ void node::create_all_children(
       create(child);
   }
 
-  if (properties) {
+  if (properties && ptr->type == XML_ELEMENT_NODE) {
     for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
       create(xmlNodePtr(prop));
   }
@@ -172,7 +172,8 @@ node::~node() {
     ptr->children = 0;
     ptr->last = 0;
 
-    ptr->properties = 0;
+    if (ptr->type == XML_ELEMENT_NODE)
+      ptr->properties = 0;
 
     ptr->ns = 0;
     ptr->nsDef = 0;
@@ -279,7 +280,7 @@ void node::trace(tracer &trc) {
   if (ptr->prev)
     trc("node-prev", *static_cast<object*>(ptr->prev->_private));
 
-  if (ptr->properties)
+  if (ptr->type == XML_ELEMENT_NODE && ptr->properties)
     trc("node-properties", *static_cast<object*>(ptr->properties->_private));
 
   if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
@@ -438,12 +439,13 @@ void node::prop_next(property_mode mode, value &data) {
       ptr->next = next;
       if (xmlNodePtr np = next->prev) {
         if (np->parent)
-          if (np->type != XML_ATTRIBUTE_NODE)
+          if (next->type != XML_ATTRIBUTE_NODE)
             np->parent->last = np;
         np->next = 0;
       } else if (next->parent) {
         if (next->type == XML_ATTRIBUTE_NODE) {
-          next->parent->properties = 0;
+          if (next->parent->type == XML_ELEMENT_NODE)
+            next->parent->properties = 0;
         } else {
           next->parent->children = 0;
           next->parent->last = 0;
@@ -473,37 +475,45 @@ void node::prop_prev(property_mode mode, value &data) {
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent)
-        if (ptr->type == XML_ATTRIBUTE_NODE)
-          ptr->parent->properties = xmlAttrPtr(ptr);
-        else
+        if (ptr->type == XML_ATTRIBUTE_NODE) {
+          if (ptr->parent->type == XML_ELEMENT_NODE)
+            ptr->parent->properties = xmlAttrPtr(ptr);
+        } else {
           ptr->parent->children = ptr;
+        }
       ptr->prev = 0;
     } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
       ptr->prev = prev;
       if (xmlNodePtr pn = prev->next) {
         if (pn->parent)
-          if (pn->type == XML_ATTRIBUTE_NODE)
-            ptr->parent->properties = xmlAttrPtr(pn);
-          else
+          if (pn->type == XML_ATTRIBUTE_NODE) {
+            if (ptr->parent->type == XML_ELEMENT_NODE)
+              ptr->parent->properties = xmlAttrPtr(pn);
+          } else {
             pn->parent->children = pn;
+          }
         pn->prev = 0;
       } else if (prev->parent) {
         if (prev->type != XML_ATTRIBUTE_NODE) {
           prev->parent->children = 0;
           prev->parent->last = 0;
         } else {
-          prev->parent->properties = 0;
+          if (ptr->parent->type == XML_ELEMENT_NODE)
+            prev->parent->properties = 0;
         }
       }
       prev->next = ptr;
       while (prev) {
         xmlSetTreeDoc(prev, ptr->doc);
         prev->parent = ptr->parent;
-        if (!prev->prev && prev->parent) 
-          if (prev->type == XML_ATTRIBUTE_NODE)
-            prev->parent->properties = xmlAttrPtr(prev);
-          else
+        if (!prev->prev && prev->parent)  {
+          if (prev->type == XML_ATTRIBUTE_NODE) {
+            if (prev->parent->type == XML_ELEMENT_NODE)
+              prev->parent->properties = xmlAttrPtr(prev);
+          } else {
             prev->parent->children = prev;
+          }
+        }
         prev = prev->prev;
       }
     }
@@ -650,18 +660,22 @@ void node::prop_namespace(property_mode mode, value &data) {
 void node::prop_first_attr(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void_or_null()) {
-      ptr->properties = 0;
-    } else if (data.is_object()) {
-      xmlNodePtr attr = c_from_js(data.get_object());
-      if (attr && attr->type == XML_ATTRIBUTE_NODE) {
-        ptr->properties = xmlAttrPtr(attr);
-        attr->parent = ptr;
+    if (ptr->type == XML_ELEMENT_NODE) {
+      if (data.is_void_or_null()) {
+        ptr->properties = 0;
+      } else if (data.is_object()) {
+        xmlNodePtr attr = c_from_js(data.get_object());
+        if (attr && attr->type == XML_ATTRIBUTE_NODE) {
+          ptr->properties = xmlAttrPtr(attr);
+          attr->parent = ptr;
+        }
       }
     }
     // !! fall thru !!
   case property_get:
-    data = create(xmlNodePtr(ptr->properties));
+    data = create(ptr->type == XML_ELEMENT_NODE
+                  ? xmlNodePtr(ptr->properties)
+                  : 0);
     break;
   default: break;
   }
@@ -757,18 +771,22 @@ object node::search_namespace_by_uri(string const &uri_) {
 }
 
 void node::purge() {
-  for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
-    for (xmlAttrPtr prop2 = prop->next; prop2; prop2 = prop2 ->next) {
-      if (prop->ns != prop2->ns)
-        continue;
-      if (prop->name == 0 || prop2->name == 0)
-        continue;
-      if (xmlStrcmp(prop->name, prop2->name) == 0)
-        xmlUnlinkNode(xmlNodePtr(prop));
+  if (ptr->type == XML_ELEMENT_NODE) {
+    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
+      for (xmlAttrPtr prop2 = prop->next; prop2; prop2 = prop2 ->next) {
+        if (prop->ns != prop2->ns)
+          continue;
+        if (prop->name == 0 || prop2->name == 0)
+          continue;
+        if (xmlStrcmp(prop->name, prop2->name) == 0)
+          xmlUnlinkNode(xmlNodePtr(prop));
+      }
     }
   }
+
   if (!ptr->children)
     return;
+
   for (xmlNodePtr child = ptr->children->next; child;) {
     xmlNodePtr next = child->next;
     if (child->type == XML_TEXT_NODE && child->prev &&
