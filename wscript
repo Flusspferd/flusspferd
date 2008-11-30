@@ -29,6 +29,7 @@ APPNAME = 'flusspferd'
 
 srcdir = '.'
 blddir = 'build'
+darwin = sys.platform.startswith('darwin')
 
 def init(): pass
 
@@ -45,10 +46,12 @@ def set_options(opt):
                    help='Enable IO support')
     opt.add_option('--enable-xml', action='store_true',
                    help='Enable XML support')
+    if darwin:
+      opt.add_option('--libxml-framework', action='store', nargs=1, dest='libxml_framework',
+                     help='libxml framework name')
 
 def configure(conf):
     u = conf.env.append_unique
-    darwin = sys.platform.startswith('darwin')
     conf.check_message('platform', '', 1, sys.platform)
 
     print '%s :' % 'Creating implementation link'.ljust(conf.line_just),
@@ -59,6 +62,8 @@ def configure(conf):
 
     if darwin:
         u('CXXDEFINES', 'APPLE')
+        # Is there a better way of doing this?
+        u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
 
     if Options.options.cxxflags:
         conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
@@ -70,6 +75,8 @@ def configure(conf):
     conf.check_tool('compiler_cxx')
     conf.check_tool('misc')
     conf.check_tool('boost')
+    if darwin:
+      conf.check_tool('osx')
 
     conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
@@ -84,6 +91,7 @@ def configure(conf):
     # spidermonkey
     ret = conf.check_cxx(lib = 'js', uselib_store='JS')
     if ret == None:
+        conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1)
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
@@ -91,8 +99,41 @@ def configure(conf):
 
     # xml
     if Options.options.enable_xml:
-        conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
-                       atleast_version='2.6.0', args = '--cflags --libs')
+        ret = None
+        if darwin and Options.options.libxml_framework:
+          u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
+          # TODO: check the version of this framework via XMLVERSION define
+          ret = conf.check_cxx( uselib_store='LIBXML2',
+                          framework_name=Options.options.libxml_framework, 
+                          execute=1,
+                          errmsg='framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
+                          fragment='''
+#include <libxml/xmlversion.h>
+#include <stdio.h>
+int main() { 
+  LIBXML_TEST_VERSION;
+  if (LIBXML_VERSION < 20600) {
+    // This error message doesn't actually get used
+    printf("Need libxml-2.0 version 2.6.0 minimum, we have %s\\n", LIBXML_DOTTED_VERSION);
+    return 1;
+  } else {
+    return 0;
+  }
+} ''')
+        # This faffing is less than ideal really.
+        conf.env['FRAMEWORK'] = []
+        conf.env['FRAMEWORK_LIBXML2'] = ['-framework ' + Options.options.libxml_framework ]
+
+        # Non darwin, or framework failed
+        if ret == None:
+          ret = conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
+                               atleast_version='2.6.0', args = '--cflags --libs')
+        if ret == None:
+          conf.check_message_2('No suitable libxml-2.0 found, disabaling', color='PINK')
+          Options.options.enable_xml = None
+        else:
+          conf.env.append_value('CXXDEFINES', 'ENABLE_XML')
+
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
