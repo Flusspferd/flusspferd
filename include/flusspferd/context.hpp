@@ -77,6 +77,19 @@ public:
   object const &get_prototype() const {
     return get_prototype(typeid(T).name());
   }
+
+  void add_constructor(std::string const &name, object const &ctor);
+  object const &get_constructor(std::string const &name) const;
+
+  template<typename T>
+  void add_constructor(object const &ctor) {
+    add_constructor(typeid(T).name(), ctor);
+  }
+
+  template<typename T>
+  object const &get_constructor() const {
+    return get_constructor(typeid(T).name());
+  }
 };
 
 inline bool operator!=(context const &a, context const &b) {

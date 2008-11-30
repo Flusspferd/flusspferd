@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/implementation/object.hpp"
 #include "flusspferd/implementation/runtime.hpp"
 #include "flusspferd/current_context_scope.hpp"
-#include <map>
+#include <boost/unordered_map.hpp>
 #include <cstring>
 #include <js/jsapi.h>
 
@@ -49,7 +49,8 @@ namespace {
 }
 
 struct context::context_private {
-  std::map<std::string, object> prototypes;
+  boost::unordered_map<std::string, object> prototypes;
+  boost::unordered_map<std::string, object> constructors;
 };
 
 class context::impl {
@@ -167,6 +168,14 @@ void context::add_prototype(std::string const &name, object const &proto) {
 
 object const &context::get_prototype(std::string const &name) const {
   return p->get_private()->prototypes[name];
+}
+
+void context::add_constructor(std::string const &name, object const &ctor) {
+  p->get_private()->constructors[name] = ctor;
+}
+
+object const &context::get_constructor(std::string const &name) const {
+  return p->get_private()->constructors[name];
 }
 
 value context::evaluate(char const *source, char const *file,

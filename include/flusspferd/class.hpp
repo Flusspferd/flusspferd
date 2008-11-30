@@ -68,6 +68,8 @@ object load_class(object container = global()) {
 
   local_root_scope scope;
 
+  context ctx = get_current_context();
+
   value previous = container.get_property(name);
 
   if (previous.is_object())
@@ -76,9 +78,11 @@ object load_class(object container = global()) {
   function constructor(
     create_native_function<detail::class_constructor<T> >(arity, name));
 
+  ctx.add_constructor<T>(constructor);
+
   object prototype = T::class_info::create_prototype();
 
-  get_current_context().add_prototype<T>(prototype);
+  ctx.add_prototype<T>(prototype);
 
   constructor.define_property(
     "prototype",
