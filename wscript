@@ -78,12 +78,6 @@ def configure(conf):
     if Options.options.enable_tests:
       boostlib += ['unit_test_framework']
 
-    # isfinite
-    conf.check_cxx(function_name = 'isfinite', header_name='math.h',
-                   defines='FLUSSPFERD_HAVE_ISFINITE', uselib_store='ISFINITE')
-    conf.check_cxx(function_name = '__finitel', header_name='math.h',
-                   defines='FLUSSPFERD_HAVE_FINITEL', uselib_store='ISFINITE')
-
     # boost
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
