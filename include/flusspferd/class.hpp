@@ -37,6 +37,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+// Everything in this namespace is 'private'
 namespace detail {
 
 BOOST_MPL_HAS_XXX_TRAIT_DEF(constructible)
@@ -91,16 +92,84 @@ object load_class(object &container, char const *name) {
 
 }
 
+/**
+ * Title: Creating Classes
+ *
+ * Functions and types related to exposing C++ classes to javascript space.
+ *
+ * Section: Types
+ *
+ * Struct: flusspferd::class_info
+ *
+ * Information about classes exposed to javascript. Expose a class to 
+ * javascript, you will need to define a <class_info> struct as a public member
+ * of your class, as shown in the example below
+ *
+ * (code)
+ * class MyClass : public native_object_base {
+ *   public:
+ *     struct class_info : flusspferd::class_info {
+ *       static char const *constructor_name() { return "MyJSClass"; }
+ *       typedef boost:mpl:size_t<2> constructor_arity;
+ *       static object create_prototype() { ... }
+ *     }
+ * }
+ * (end)
+ *
+ * Inheriting from <flusspferd::class_info> gives you default behaviour of 0
+ * constructor arity, no augmentation and an empty prototype. You will always
+ * have to define the C<constructor_name> yourself.
+ */
 struct class_info {
+  /**
+   * typedef: class_info::constructor_arity
+   *
+   * How many paremeters the constructor expects from JS.
+   *
+   * > typedef boost::mpl::size_t<2> constructor_arity;
+   *
+   * for will mean your constructor will always have at least 2 values passed to it.
+   */
   typedef boost::mpl::size_t<0> constructor_arity;
 
-  static void augment_constructor(object const &) {}
+#if 0
+  /**
+   * Function: constructor_name
+   *
+   * A function that returns the name of the constructor. 
+   */
+   static char const* constructor_name();
+#endif
 
+  /**
+   * Function: augment_constructor 
+   *
+   * Hook to add properties to the constructor object. Most commonly used to add static methods or properties
+   */
+  static void augment_constructor(object const &ctor) {}
+
+  /**
+   * Function: create_prototype 
+   *
+   * Return the prototype for this class. Defaults to an empty object.
+   */
   static object create_prototype() {
     return create_object();
   }
 };
 
+/**
+ * Section: Functions
+ *
+ * Function: load_class
+ *
+ * Expose a class with a native constructor to Javascript.
+ *
+ * Parameters:
+ *  container - object in which to define the constructor
+ *
+ * The class name is pulled from the class's <class_info> struct.
+*/
 template<typename T>
 object load_class(
   object container = global(),
@@ -127,6 +196,16 @@ object load_class(
   return detail::load_class<T>(container, name);
 }
 
+/**
+ * Function: load_class
+ *
+ * Expose a class without a native constructor to Javascript.
+ *
+ * Parameters:
+ *  container - object in which to define the constructor
+ *
+ * Create a class/constructor on container without 
+*/
 template<typename T>
 bool load_class(
   object container = global(),
