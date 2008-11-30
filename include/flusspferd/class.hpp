@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "create.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
+#include <boost/mpl/size_t.hpp>
 #include <boost/ref.hpp>
 
 namespace flusspferd {
@@ -50,9 +51,7 @@ struct class_constructor : native_function_base {
 }
 
 struct class_info {
-  static std::size_t constructor_arity() {
-    return 0;
-  }
+  typedef boost::mpl::size_t<0> constructor_arity;
 
   static void augment_constructor(object const &) {
   }
