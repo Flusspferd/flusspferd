@@ -128,7 +128,8 @@ struct class_info {
    *
    * > typedef boost::mpl::size_t<2> constructor_arity;
    *
-   * for will mean your constructor will always have at least 2 values passed to it.
+   * for will mean your constructor will always have at least 2 values passed
+   * to it.
    */
   typedef boost::mpl::size_t<0> constructor_arity;
 
@@ -144,7 +145,8 @@ struct class_info {
   /**
    * Function: augment_constructor 
    *
-   * Hook to add properties to the constructor object. Most commonly used to add static methods or properties
+   * Hook to add properties to the constructor object. Most commonly used to
+   * add static methods or properties
    */
   static void augment_constructor(object const &ctor) {}
 
