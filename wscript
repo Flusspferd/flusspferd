@@ -93,6 +93,10 @@ def configure(conf):
     if Options.options.enable_xml:
         conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
                        atleast_version='2.6.0', args = '--cflags --libs')
+        u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
+
+    if Options.options.enable_io:
+        u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
