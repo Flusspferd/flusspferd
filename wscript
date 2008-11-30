@@ -132,8 +132,10 @@ int main() {
           conf.check_message_2('No suitable libxml-2.0 found, disabaling', color='PINK')
           Options.options.enable_xml = None
         else:
-          conf.env.append_value('CXXDEFINES', 'ENABLE_XML')
+          u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
 
+    if Options.options.enable_io:
+        u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox

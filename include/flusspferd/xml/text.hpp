@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "node.hpp"
 #include <boost/noncopyable.hpp>
+#include <boost/mpl/size_t.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
@@ -43,8 +44,8 @@ template<typename Tag>
 class general_text : public node {
 public:
   struct class_info : node::class_info {
-    static char const *constructor_name();
-    static std::size_t constructor_arity();
+    static char const *constructor_name() { return Tag::name(); }
+    typedef boost::mpl::size_t<2> constructor_arity;
 
     static object create_prototype();
   };

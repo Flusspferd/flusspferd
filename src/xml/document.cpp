@@ -109,14 +109,6 @@ object document::class_info::create_prototype() {
   return proto;
 }
 
-char const *document::class_info::constructor_name() {
-  return "Document";
-}
-
-std::size_t document::class_info::constructor_arity() {
-  return 0;
-}
-
 string document::dump() {
   xmlChar *doc_txt;
   int doc_txt_len;

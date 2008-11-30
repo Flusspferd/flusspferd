@@ -33,7 +33,9 @@ obj.source = 'abstract-js.cpp'
 obj.target = 'abstract-js'
 obj.install_path = None
 obj.uselib = 'BOOST JS_H'
-obj.uselib_local = 'flusspferd flusspferd-io'
+obj.uselib_local = ['flusspferd']
+if bld.env['ENABLE_IO']:
+  obj.uselib_local += ['flusspferd-io']
 obj.includes = ['../include']
 
 obj = bld.new_task_gen('cxx', 'program')
@@ -41,5 +43,9 @@ obj.source = 'jsrepl.cpp'
 obj.target = 'jsrepl'
 obj.install_path = None
 obj.uselib = 'BOOST JS_H'
-obj.uselib_local = 'flusspferd flusspferd-io flusspferd-xml'
+obj.uselib_local = ['flusspferd']
+if bld.env['ENABLE_IO']:
+  obj.uselib_local += ['flusspferd-io']
+if bld.env['ENABLE_XML']:
+  obj.uselib_local += ['flusspferd-xml']
 obj.includes = ['../include']

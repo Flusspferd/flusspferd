@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_IO_FILE_CLASS_HPP
 
 #include "stream_base.hpp"
+#include <boost/mpl/size_t.hpp>
 
 namespace flusspferd { namespace io {
 
@@ -35,7 +36,8 @@ public:
 
   struct class_info {
     static char const *constructor_name();
-    static std::size_t constructor_arity();
+
+    typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
 

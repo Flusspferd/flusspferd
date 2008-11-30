@@ -95,16 +95,6 @@ object general_text<Tag>::class_info::create_prototype() {
   return proto;
 }
 
-template<typename Tag>
-char const *general_text<Tag>::class_info::constructor_name() {
-  return Tag::name();
-}
-
-template<typename Tag>
-std::size_t general_text<Tag>::class_info::constructor_arity() {
-  return 2;
-}
-
 template class general_text<text_tag>;
 template class general_text<comment_tag>;
 template class general_text<cdata_section_tag>;

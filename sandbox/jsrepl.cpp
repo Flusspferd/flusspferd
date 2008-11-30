@@ -90,8 +90,13 @@ int main(int argc, char **argv) {
     flusspferd::context co = flusspferd::context::create();
     flusspferd::current_context_scope scope(co);
 
+    #ifdef FLUSSPFERD_HAVE_XML
     flusspferd::xml::load_xml();
+    #endif
+
+    #ifdef FLUSSPFERD_HAVE_IO
     flusspferd::io::load_io();
+    #endif
 
     co.global().define_property("print",
       flusspferd::create_native_function(&js_print));

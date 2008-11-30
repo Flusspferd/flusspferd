@@ -251,14 +251,6 @@ object node::class_info::create_prototype() {
   return proto;
 }
 
-char const *node::class_info::constructor_name() {
-  return "Node";
-}
-
-std::size_t node::class_info::constructor_arity() {
-  return 3;
-}
-
 static void trace_children(tracer &trc, xmlNodePtr ptr) {
   while (ptr) {
     trc("node-children", *static_cast<object*>(ptr->_private));
