@@ -120,7 +120,8 @@ def build(bld):
       bld.add_subdirs('sandbox')
     build_pkgconfig(bld)
     bld.install_files('${PREFIX}/include/flusspferd/', 'include/flusspferd/*.hpp')
-    bld.install_files('${PREFIX}/include/flusspferd/implementation/', 'include/flusspferd/implementation/*.hpp')
+    bld.install_files('${PREFIX}/include/flusspferd/implementation/',
+                      'include/flusspferd/implementation/*.hpp')
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
 def shutdown(): pass

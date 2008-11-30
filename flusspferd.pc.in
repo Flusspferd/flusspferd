@@ -9,5 +9,5 @@ Name: Flusspferd
 Description: JavaScript Bindings for C++
 Version: @VERSION@
 # Requires:
-Libs: -L${libdir} -ltemplar
+Libs: -L${libdir} -lflusspferd
 Cflags: -I${includedir}
