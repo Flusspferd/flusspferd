@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "../native_object_base.hpp"
 #include "../class.hpp"
 #include <boost/noncopyable.hpp>
+#include <boost/mpl/size_t.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
@@ -44,8 +45,8 @@ public:
   xmlNodePtr c_obj() const { return ptr; }
 
   struct class_info : flusspferd::class_info {
-    static char const *constructor_name();
-    static std::size_t constructor_arity();
+    static char const *constructor_name() { return "Node"; }
+    typedef boost::mpl::size_t<3> constructor_arity;
 
     static object create_prototype();
   };

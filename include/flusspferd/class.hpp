@@ -36,7 +36,7 @@ namespace detail {
 
 template<typename T>
 struct class_constructor : native_function_base {
-  class_constructor(unsigned arity, std::string const &name)
+  class_constructor(unsigned arity, char const *name)
     : native_function_base(arity, name)
   {}
 
@@ -64,8 +64,8 @@ struct class_info {
 
 template<typename T>
 object load_class(object container = global()) {
-  std::size_t const arity = T::class_info::constructor_arity();
-  std::string const name = T::class_info::constructor_name();
+  std::size_t const arity = T::class_info::constructor_arity::value;
+  char const *name = T::class_info::constructor_name();
 
   local_root_scope scope;
 

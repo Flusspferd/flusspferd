@@ -68,10 +68,6 @@ char const *file_class::class_info::constructor_name() {
   return "File";
 }
 
-std::size_t file_class::class_info::constructor_arity() {
-  return 1;
-}
-
 void file_class::class_info::augment_constructor(object constructor) {
   create_native_function(constructor, "create", &impl::create);
 }

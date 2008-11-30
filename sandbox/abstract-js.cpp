@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/property_iterator.hpp"
+#include <boost/mpl/size_t.hpp>
 #include <iostream>
 #include <stdexcept>
 
@@ -66,8 +67,11 @@ struct my_object : flusspferd::native_object_base {
     v = flusspferd::string(test);
   }
 
-  void property_op(property_mode mode, flusspferd::value const &id, flusspferd::value &v) {
-    std::cout << "my_object property " << mode << ' ' << id << " = " << v << std::endl;
+  void property_op(
+      property_mode mode, flusspferd::value const &id, flusspferd::value &v)
+  {
+    std::cout << "my_object property " << mode << ' ';
+    std::cout << id << " = " << v << std::endl;
   }
 
   void foo(int i) {
@@ -98,7 +102,7 @@ struct my_object : flusspferd::native_object_base {
       return proto;
     }
 
-    static std::size_t constructor_arity() { return 1; }
+    typedef boost::mpl::size_t<1> constructor_arity;
     static char const *constructor_name() { return "MyObject"; }
   };
 };

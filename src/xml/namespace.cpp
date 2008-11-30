@@ -115,14 +115,6 @@ object namespace_::class_info::create_prototype() {
   return proto;
 }
 
-char const *namespace_::class_info::constructor_name() {
-  return "Namespace";
-}
-
-std::size_t namespace_::class_info::constructor_arity() {
-  return 3;
-}
-
 void namespace_::post_initialize() {
   register_native_method("toString", &namespace_::to_string);
 

@@ -103,14 +103,6 @@ object attribute_::class_info::create_prototype() {
   return proto;
 }
 
-char const *attribute_::class_info::constructor_name() {
-  return "Attribute";
-}
-
-std::size_t attribute_::class_info::constructor_arity() {
-  return 4;
-}
-
 void attribute_::add_content(string const &content) {
   if (content.empty())
     return;
