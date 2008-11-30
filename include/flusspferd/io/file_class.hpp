@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "stream_base.hpp"
 #include <boost/mpl/size_t.hpp>
+#include <boost/mpl/bool.hpp>
 
 namespace flusspferd { namespace io {
 
@@ -35,8 +36,8 @@ public:
   ~file_class();
 
   struct class_info {
+    typedef boost::mpl::bool_<true> constructible;
     static char const *constructor_name();
-
     typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();

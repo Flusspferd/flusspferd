@@ -28,10 +28,8 @@ THE SOFTWARE.
 #include "create.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
-#include <boost/mpl/has_xxx.hpp>
-#include <boost/mpl/or.hpp>
-#include <boost/mpl/not.hpp>
 #include <boost/mpl/size_t.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/ref.hpp>
 
@@ -39,21 +37,6 @@ namespace flusspferd {
 
 // Everything in this namespace is 'private'
 namespace detail {
-
-BOOST_MPL_HAS_XXX_TRAIT_DEF(constructible)
-
-template<typename T>
-struct get_constructible {
-  typedef typename T::constructible type;
-};
-
-template<typename T>
-struct is_constructible :
-  boost::mpl::or_<
-    boost::mpl::not_<has_constructible<T> >,
-    get_constructible<T>
-  >::type
-{};
 
 template<typename T>
 struct class_constructor : native_function_base {
@@ -121,6 +104,8 @@ object load_class(object &container, char const *name) {
  * have to define the C<constructor_name> yourself.
  */
 struct class_info {
+  typedef boost::mpl::bool_<true> constructible;
+
   /**
    * typedef: class_info::constructor_arity
    *
@@ -148,7 +133,9 @@ struct class_info {
    * Hook to add properties to the constructor object. Most commonly used to
    * add static methods or properties
    */
-  static void augment_constructor(object const &ctor) {}
+  static void augment_constructor(object const &ctor) {
+    (void) ctor;
+  }
 
   /**
    * Function: create_prototype 
@@ -176,7 +163,7 @@ template<typename T>
 object load_class(
   object container = global(),
   typename boost::enable_if<
-    detail::is_constructible<typename T::class_info>
+    typename T::class_info::constructible
   >::type * = 0)
 {
   std::size_t const arity = T::class_info::constructor_arity::value;
@@ -212,7 +199,7 @@ template<typename T>
 bool load_class(
   object container = global(),
   typename boost::enable_if<
-    boost::mpl::not_<detail::is_constructible<typename T::class_info> >
+    boost::mpl::not_<typename T::class_info::constructible>
   >::type * = 0)
 {
   char const *name = T::class_info::constructor_name();
