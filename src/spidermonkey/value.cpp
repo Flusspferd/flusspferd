@@ -99,13 +99,17 @@ double value::to_number() const {
   return value;
 }
 
-#ifdef APPLE
-#define __finitel std::isfinite
+#if defined(FLUSSPFERD_HAVE_ISFINITE)
+#define ISFINITE isfinite
+#elif defined(FLUSSPFERD_HAVE_FINITEL)
+#define ISFINITE __finitel
+#else
+#error "Need isfinite or __finitel"
 #endif
 
 double value::to_integral_number(int bits, bool signedness) const {
   long double value = to_number();
-  if (!__finitel(value))
+  if (!ISFINITE(value))
     return 0;
   long double maxU = powl(2, bits);
   value = truncl(value);
