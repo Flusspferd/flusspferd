@@ -28,12 +28,31 @@ THE SOFTWARE.
 #include "create.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
+#include <boost/mpl/has_xxx.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/mpl/not.hpp>
 #include <boost/mpl/size_t.hpp>
+#include <boost/utility/enable_if.hpp>
 #include <boost/ref.hpp>
 
 namespace flusspferd {
 
 namespace detail {
+
+BOOST_MPL_HAS_XXX_TRAIT_DEF(constructible)
+
+template<typename T>
+struct get_constructible {
+  typedef typename T::constructible type;
+};
+
+template<typename T>
+struct is_constructible :
+  boost::mpl::or_<
+    boost::mpl::not_<has_constructible<T> >,
+    get_constructible<T>
+  >::type
+{};
 
 template<typename T>
 struct class_constructor : native_function_base {
@@ -48,37 +67,11 @@ struct class_constructor : native_function_base {
   }
 };
 
-}
-
-struct class_info {
-  typedef boost::mpl::size_t<0> constructor_arity;
-
-  static void augment_constructor(object const &) {
-  }
-
-  static object create_prototype() {
-    return create_object();
-  }
-};
-
 template<typename T>
-object load_class(object container = global()) {
-  std::size_t const arity = T::class_info::constructor_arity::value;
-  char const *name = T::class_info::constructor_name();
-
-  local_root_scope scope;
-
+object load_class(object &container, char const *name) {
   context ctx = get_current_context();
 
-  value previous = container.get_property(name);
-
-  if (previous.is_object())
-    return previous.get_object();
-
-  function constructor(
-    create_native_function<detail::class_constructor<T> >(arity, name));
-
-  ctx.add_constructor<T>(constructor);
+  object constructor(ctx.get_constructor<T>());
 
   object prototype = T::class_info::create_prototype();
 
@@ -91,30 +84,71 @@ object load_class(object container = global()) {
 
   T::class_info::augment_constructor(object(constructor));
 
-  container.define_property(
-    name,
-    constructor,
-    object::dont_enumerate);
+  container.define_property(name, constructor, object::dont_enumerate);
 
   return constructor;
 }
 
+}
+
+struct class_info {
+  typedef boost::mpl::size_t<0> constructor_arity;
+
+  static void augment_constructor(object const &) {}
+
+  static object create_prototype() {
+    return create_object();
+  }
+};
+
 template<typename T>
-bool load_internal_class() {
+object load_class(
+  object container = global(),
+  typename boost::enable_if<
+    detail::is_constructible<typename T::class_info>
+  >::type * = 0)
+{
+  std::size_t const arity = T::class_info::constructor_arity::value;
+  char const *name = T::class_info::constructor_name();
+
   local_root_scope scope;
 
   context ctx = get_current_context();
 
-  object proto = ctx.get_prototype<T>();
-  
-  if (proto.is_valid())
-    return false;
+  value previous = container.get_property(name);
 
-  proto = T::class_info::create_prototype();
+  if (previous.is_object())
+    return previous.get_object();
 
-  ctx.add_prototype<T>(proto);
+  if (!ctx.get_constructor<T>().is_valid())
+    ctx.add_constructor<T>(
+      create_native_function<detail::class_constructor<T> >(arity, name));
 
-  return true;
+  return detail::load_class<T>(container, name);
+}
+
+template<typename T>
+bool load_class(
+  object container = global(),
+  typename boost::enable_if<
+    boost::mpl::not_<detail::is_constructible<typename T::class_info> >
+  >::type * = 0)
+{
+  char const *name = T::class_info::constructor_name();
+
+  local_root_scope scope;
+
+  context ctx = get_current_context();
+
+  value previous = container.get_property(name);
+
+  if (previous.is_object())
+    return previous.get_object();
+
+  if (!ctx.get_constructor<T>().is_valid())
+    ctx.add_constructor<T>(create_object());
+
+  return detail::load_class<T>(container, name);
 }
 
 }
