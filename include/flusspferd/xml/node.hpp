@@ -72,6 +72,7 @@ private: // JS methods
   void add_attribute(call_context &x);
   void set_attribute(call_context &x);
   void find_attribute(call_context &x);
+  void get_attribute(call_context &x);
   void unset_attribute(call_context &x);
   object search_namespace_by_prefix(value const &prefix);
   object search_namespace_by_uri(string const &href);

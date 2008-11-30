@@ -218,6 +218,7 @@ void node::post_initialize() {
   register_native_method("setAttribute", &node::set_attribute);
   register_native_method("unsetAttribute", &node::unset_attribute);
   register_native_method("findAttribute", &node::find_attribute);
+  register_native_method("getAttribute", &node::get_attribute);
   register_native_method("toString", &node::to_string);
   register_native_method("searchNamespaceByPrefix",
                          &node::search_namespace_by_prefix);
@@ -240,6 +241,7 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "setAttribute", 3);
   create_native_method(proto, "unsetAttribute", 2);
   create_native_method(proto, "findAttribute", 2);
+  create_native_method(proto, "getAttribute", 2);
   create_native_method(proto, "searchNamespaceByPrefix", 1);
   create_native_method(proto, "searchNamespaceByURI", 1);
   create_native_method(proto, "toString", 0);
@@ -789,6 +791,17 @@ void node::find_attribute(call_context &x) {
   xmlAttrPtr prop = xmlHasNsProp(ptr, name, ns_href);
 
   x.result = create(xmlNodePtr(prop));
+}
+
+void node::get_attribute(call_context &x) {
+  find_attribute(x);
+
+  if (x.result.is_object() && !x.result.is_null()) {
+    object o = x.result.get_object();
+    x.result = o.get_property("content");
+  } else {
+    x.result = value();
+  }
 }
 
 void node::add_child(node &nd) {
