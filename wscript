@@ -41,6 +41,10 @@ def set_options(opt):
                    help='Enable tests')
     opt.add_option('--enable-sandbox', action='store_true',
                    help='Enable sandbox tests')
+    opt.add_option('--enable-io', action='store_true',
+                   help='Enable IO support')
+    opt.add_option('--enable-xml', action='store_true',
+                   help='Enable XML support')
 
 def configure(conf):
     u = conf.env.append_unique
@@ -78,17 +82,22 @@ def configure(conf):
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
     # spidermonkey
-    conf.check_cxx(lib = 'js', uselib_store='JS', mandatory=1)
+    ret = conf.check_cxx(lib = 'js', uselib_store='JS')
+    if ret == None:
+        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1)
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
                    defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
 
     # xml
-    conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2', atleast_version='2.6.0',
-                   args = '--cflags --libs')
+    if Options.options.enable_xml:
+        conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
+                       atleast_version='2.6.0', args = '--cflags --libs')
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
+    conf.env['ENABLE_XML'] = Options.options.enable_xml
+    conf.env['ENABLE_IO'] = Options.options.enable_io
 
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
