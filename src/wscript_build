@@ -32,24 +32,32 @@ obj.includes = ['../include']
 obj.uselib = 'JS JS_H BOOST_THREAD BOOST'
 obj.target = 'flusspferd'
 
-obj = bld.new_task_gen('cxx', libtype)
-obj.find_sources_in_dirs('io')
-obj.includes = ['../include']
-obj.uselib_local = 'flusspferd'
-obj.uselib = 'JS_H BOOST'
-obj.target = 'flusspferd-io'
+if bld.env['ENABLE_IO']:
+  obj = bld.new_task_gen('cxx', libtype)
+  obj.find_sources_in_dirs('io')
+  obj.includes = ['../include']
+  obj.uselib_local = 'flusspferd'
+  obj.uselib = 'JS_H BOOST'
+  obj.target = 'flusspferd-io'
 
-obj = bld.new_task_gen('cxx', libtype)
-obj.find_sources_in_dirs('xml')
-obj.includes = ['../include']
-obj.uselib_local = 'flusspferd'
-obj.uselib = 'LIBXML2 JS_H BOOST'
-obj.target = 'flusspferd-xml'
+if bld.env['ENABLE_XML']:
+  obj = bld.new_task_gen('cxx', libtype)
+  obj.find_sources_in_dirs('xml')
+  obj.includes = ['../include']
+  obj.uselib_local = 'flusspferd'
+  obj.uselib = 'LIBXML2 JS_H BOOST'
+  obj.target = 'flusspferd-xml'
 
 if bld.env['ENABLE_TESTS']:
   obj = bld.new_task_gen('cxx', libtype)
-  obj.find_sources_in_dirs('. spidermonkey io xml')
+  obj.find_sources_in_dirs('. spidermonkey')
+  if bld.env['ENABLE_IO']:
+    obj.find_sources_in_dirs('io')
+  if bld.env['ENABLE_XML']:
+    obj.find_sources_in_dirs('xml')
   obj.includes = ['../include']
-  obj.uselib = 'LIBXML2 GCOV JS JS_H BOOST_THREAD BOOST'
+  obj.uselib = ['GCOV', 'JS', 'JS_H', 'BOOST_THREAD', 'BOOST']
+  if bld.env['ENABLE_XML']:
+    obj.uselib += ['LIBXML2']
   obj.target = 'flusspferd-coverage'
   obj.install_path = None

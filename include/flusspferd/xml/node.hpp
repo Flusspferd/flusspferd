@@ -63,12 +63,19 @@ protected:
 private: // JS methods
   object copy(bool recursive);
   void unlink();
-  void add_content(string const &);
+  void purge();
+  void add_content(string const &data);
   void add_child(node &child);
   void add_child_list(node &child);
   void add_node(call_context &x);
-  object search_namespace_by_prefix(value const &);
-  object search_namespace_by_uri(string const &);
+  void add_namespace(call_context &x);
+  void add_attribute(call_context &x);
+  void set_attribute(call_context &x);
+  void find_attribute(call_context &x);
+  void get_attribute(call_context &x);
+  void unset_attribute(call_context &x);
+  object search_namespace_by_prefix(value const &prefix);
+  object search_namespace_by_uri(string const &href);
   string to_string();
 
 private: // JS properties
@@ -85,6 +92,7 @@ private: // JS properties
   void prop_last_sibling (property_mode mode, value &data);
   void prop_type         (property_mode mode, value &data);
   void prop_namespace    (property_mode mode, value &data);
+  void prop_namespaces   (property_mode mode, value &data);
   void prop_first_attr   (property_mode mode, value &data);
 
 private:

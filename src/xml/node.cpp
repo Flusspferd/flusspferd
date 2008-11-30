@@ -80,7 +80,7 @@ void node::create_all_children(
       create(child);
   }
 
-  if (properties) {
+  if (properties && ptr->type == XML_ELEMENT_NODE) {
     for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
       create(xmlNodePtr(prop));
   }
@@ -172,7 +172,8 @@ node::~node() {
     ptr->children = 0;
     ptr->last = 0;
 
-    ptr->properties = 0;
+    if (ptr->type == XML_ELEMENT_NODE)
+      ptr->properties = 0;
 
     ptr->ns = 0;
     ptr->nsDef = 0;
@@ -182,18 +183,6 @@ node::~node() {
 }
 
 void node::post_initialize() {
-  register_native_method("copy", &node::copy);
-  register_native_method("unlink", &node::unlink);
-  register_native_method("addContent", &node::add_content);
-  register_native_method("addChild", &node::add_child);
-  register_native_method("addChildList", &node::add_child_list);
-  register_native_method("addNode", &node::add_node);
-  register_native_method("toString", &node::to_string);
-  register_native_method("searchNamespaceByPrefix",
-                         &node::search_namespace_by_prefix);
-  register_native_method("searchNamespaceByURI",
-                         &node::search_namespace_by_uri);
-
   unsigned const RW = permanent_property | dont_enumerate;
   unsigned const RO = permanent_property | dont_enumerate | read_only_property;
 
@@ -212,10 +201,31 @@ void node::post_initialize() {
   define_native_property("document", RO, &node::prop_document);
   define_native_property("type", RO, &node::prop_type);
 
-  if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE)
+  if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     define_native_property("namespace", RW, &node::prop_namespace);
+    define_native_property("namespaces", RO, &node::prop_namespaces);
+  }
 
   define_native_property("firstAttribute", RW, &node::prop_first_attr);
+
+  register_native_method("copy", &node::copy);
+  register_native_method("unlink", &node::unlink);
+  register_native_method("purge", &node::purge);
+  register_native_method("addContent", &node::add_content);
+  register_native_method("addChild", &node::add_child);
+  register_native_method("addChildList", &node::add_child_list);
+  register_native_method("addNode", &node::add_node);
+  register_native_method("addNamespace", &node::add_namespace);
+  register_native_method("addAttribute", &node::add_attribute);
+  register_native_method("setAttribute", &node::set_attribute);
+  register_native_method("unsetAttribute", &node::unset_attribute);
+  register_native_method("findAttribute", &node::find_attribute);
+  register_native_method("getAttribute", &node::get_attribute);
+  register_native_method("toString", &node::to_string);
+  register_native_method("searchNamespaceByPrefix",
+                         &node::search_namespace_by_prefix);
+  register_native_method("searchNamespaceByURI",
+                         &node::search_namespace_by_uri);
 }
 
 object node::class_info::create_prototype() {
@@ -223,10 +233,17 @@ object node::class_info::create_prototype() {
 
   create_native_method(proto, "copy", 1);
   create_native_method(proto, "unlink", 0);
+  create_native_method(proto, "purge", 0);
   create_native_method(proto, "addContent", 1);
   create_native_method(proto, "addChild", 1);
   create_native_method(proto, "addChildList", 1);
   create_native_method(proto, "addNode", 2);
+  create_native_method(proto, "addNamespace", 2);
+  create_native_method(proto, "addAttribute", 3);
+  create_native_method(proto, "setAttribute", 3);
+  create_native_method(proto, "unsetAttribute", 2);
+  create_native_method(proto, "findAttribute", 2);
+  create_native_method(proto, "getAttribute", 2);
   create_native_method(proto, "searchNamespaceByPrefix", 1);
   create_native_method(proto, "searchNamespaceByURI", 1);
   create_native_method(proto, "toString", 0);
@@ -273,7 +290,7 @@ void node::trace(tracer &trc) {
   if (ptr->prev)
     trc("node-prev", *static_cast<object*>(ptr->prev->_private));
 
-  if (ptr->properties)
+  if (ptr->type == XML_ELEMENT_NODE && ptr->properties)
     trc("node-properties", *static_cast<object*>(ptr->properties->_private));
 
   if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
@@ -432,12 +449,13 @@ void node::prop_next(property_mode mode, value &data) {
       ptr->next = next;
       if (xmlNodePtr np = next->prev) {
         if (np->parent)
-          if (np->type != XML_ATTRIBUTE_NODE)
+          if (next->type != XML_ATTRIBUTE_NODE)
             np->parent->last = np;
         np->next = 0;
       } else if (next->parent) {
         if (next->type == XML_ATTRIBUTE_NODE) {
-          next->parent->properties = 0;
+          if (next->parent->type == XML_ELEMENT_NODE)
+            next->parent->properties = 0;
         } else {
           next->parent->children = 0;
           next->parent->last = 0;
@@ -467,37 +485,45 @@ void node::prop_prev(property_mode mode, value &data) {
   case property_set:
     if (data.is_void() || data.is_null()) {
       if (ptr->parent)
-        if (ptr->type == XML_ATTRIBUTE_NODE)
-          ptr->parent->properties = xmlAttrPtr(ptr);
-        else
+        if (ptr->type == XML_ATTRIBUTE_NODE) {
+          if (ptr->parent->type == XML_ELEMENT_NODE)
+            ptr->parent->properties = xmlAttrPtr(ptr);
+        } else {
           ptr->parent->children = ptr;
+        }
       ptr->prev = 0;
     } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
       ptr->prev = prev;
       if (xmlNodePtr pn = prev->next) {
         if (pn->parent)
-          if (pn->type == XML_ATTRIBUTE_NODE)
-            ptr->parent->properties = xmlAttrPtr(pn);
-          else
+          if (pn->type == XML_ATTRIBUTE_NODE) {
+            if (ptr->parent->type == XML_ELEMENT_NODE)
+              ptr->parent->properties = xmlAttrPtr(pn);
+          } else {
             pn->parent->children = pn;
+          }
         pn->prev = 0;
       } else if (prev->parent) {
         if (prev->type != XML_ATTRIBUTE_NODE) {
           prev->parent->children = 0;
           prev->parent->last = 0;
         } else {
-          prev->parent->properties = 0;
+          if (ptr->parent->type == XML_ELEMENT_NODE)
+            prev->parent->properties = 0;
         }
       }
       prev->next = ptr;
       while (prev) {
         xmlSetTreeDoc(prev, ptr->doc);
         prev->parent = ptr->parent;
-        if (!prev->prev && prev->parent) 
-          if (prev->type == XML_ATTRIBUTE_NODE)
-            prev->parent->properties = xmlAttrPtr(prev);
-          else
+        if (!prev->prev && prev->parent)  {
+          if (prev->type == XML_ATTRIBUTE_NODE) {
+            if (prev->parent->type == XML_ELEMENT_NODE)
+              prev->parent->properties = xmlAttrPtr(prev);
+          } else {
             prev->parent->children = prev;
+          }
+        }
         prev = prev->prev;
       }
     }
@@ -641,21 +667,51 @@ void node::prop_namespace(property_mode mode, value &data) {
   }
 }
 
+void node::prop_namespaces(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  xmlNsPtr *nsList = xmlGetNsList(ptr->doc, ptr);
+
+  try {
+    object array = create_array();
+    data = array;
+
+    if (!nsList)
+      return;
+
+    arguments arg(std::vector<value>(1));
+
+    for (xmlNsPtr *p = nsList; *p; ++p) {
+      arg[0] = namespace_::create(*p);
+      array.call("push", arg);
+    }
+  } catch (...) {
+    if (nsList) xmlFree(nsList);
+    throw;
+  }
+  if (nsList) xmlFree(nsList);
+}
+
 void node::prop_first_attr(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void_or_null()) {
-      ptr->properties = 0;
-    } else if (data.is_object()) {
-      xmlNodePtr attr = c_from_js(data.get_object());
-      if (attr && attr->type == XML_ATTRIBUTE_NODE) {
-        ptr->properties = xmlAttrPtr(attr);
-        attr->parent = ptr;
+    if (ptr->type == XML_ELEMENT_NODE) {
+      if (data.is_void_or_null()) {
+        ptr->properties = 0;
+      } else if (data.is_object()) {
+        xmlNodePtr attr = c_from_js(data.get_object());
+        if (attr && attr->type == XML_ATTRIBUTE_NODE) {
+          ptr->properties = xmlAttrPtr(attr);
+          attr->parent = ptr;
+        }
       }
     }
     // !! fall thru !!
   case property_get:
-    data = create(xmlNodePtr(ptr->properties));
+    data = create(ptr->type == XML_ELEMENT_NODE
+                  ? xmlNodePtr(ptr->properties)
+                  : 0);
     break;
   default: break;
   }
@@ -680,15 +736,100 @@ void node::add_content(string const &content) {
 
 void node::add_node(call_context &x) {
   local_root_scope scope;
-  arguments arg;
-  if (ptr->doc)
+  if (ptr->doc) {
+    arguments arg;
     arg.push_back(create(xmlNodePtr(ptr->doc)));
-  for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
-    arg.push_back(*it);
-  x.arg = arg;
+    for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
+      arg.push_back(*it);
+    x.arg = arg;
+  }
   object obj = create_native_object<node>(object(), boost::ref(x));
   obj.set_property("parent", *this);
   x.result = obj;
+}
+
+void node::add_namespace(call_context &x) {
+  local_root_scope scope;
+  arguments arg;
+  arg.push_back(*this);
+  for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
+    arg.push_back(*it);
+  x.arg = arg;
+  object obj = create_native_object<namespace_>(object(), boost::ref(x));
+  x.result = obj;
+}
+
+void node::add_attribute(call_context &x) {
+  local_root_scope scope;
+  arguments arg;
+  arg.push_back(*this);
+  for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
+    arg.push_back(*it);
+  x.arg = arg;
+  x.result = create_native_object<attribute_>(object(), boost::ref(x));
+  purge();
+}
+
+void node::set_attribute(call_context &x) {
+  if (x.arg.size() < 3)
+    throw exception("Could not set XML attribute: too few parameters");
+
+  if (!x.arg[1].is_object())
+    throw exception("Could not set XML attribute: "
+                    "namespace has to be an object");
+
+  find_attribute(x);
+
+  if (x.result.is_null()) {
+    add_attribute(x);
+  } else {
+    object o = x.result.to_object();
+    o.set_property("content", x.arg[2]);
+  }
+}
+
+void node::unset_attribute(call_context &x) {
+  find_attribute(x);
+
+  if (!x.result.is_null() && x.result.is_object())
+    x.result.get_object().call("unlink");
+
+  x.result = value();
+}
+
+void node::find_attribute(call_context &x) {
+  local_root_scope scope;
+
+  if (!x.arg[0].is_string())
+    throw exception("Could not find XML attribute: name has to be a string");
+
+  xmlChar const *name = (xmlChar const *) x.arg[0].get_string().c_str();
+
+  xmlChar const *ns_href = 0;
+  if (x.arg[1].is_string()) {
+    ns_href = (xmlChar const *) x.arg[1].get_string().c_str();
+  } else if (!x.arg[1].is_void_or_null()) {
+    xmlNsPtr ns = namespace_::c_from_js(x.arg[1].to_object());
+    if (!ns)
+      throw exception("Could not find XML attribute: "
+                      "no valid namespace specified");
+    ns_href = ns->href;
+  }
+
+  xmlAttrPtr prop = xmlHasNsProp(ptr, name, ns_href);
+
+  x.result = create(xmlNodePtr(prop));
+}
+
+void node::get_attribute(call_context &x) {
+  find_attribute(x);
+
+  if (x.result.is_object() && !x.result.is_null()) {
+    object o = x.result.get_object();
+    x.result = o.get_property("content");
+  } else {
+    x.result = value();
+  }
 }
 
 void node::add_child(node &nd) {
@@ -698,6 +839,7 @@ void node::add_child(node &nd) {
 
 void node::add_child_list(node &nd) {
   nd.set_property("parent", *this);
+  purge();
 }
 
 string node::to_string() {
@@ -724,4 +866,37 @@ object node::search_namespace_by_uri(string const &uri_) {
   xmlChar const *uri = (xmlChar const *) uri_.c_str();
   xmlNsPtr ns = xmlSearchNsByHref(ptr->doc, ptr, uri);
   return namespace_::create(ns);
+}
+
+void node::purge() {
+  if (ptr->type == XML_ELEMENT_NODE) {
+    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
+      for (xmlAttrPtr prop2 = prop->next; prop2; prop2 = prop2 ->next) {
+        xmlChar const *href1 = prop->ns ? prop->ns->href : 0;
+        xmlChar const *href2 = prop2->ns ? prop2->ns->href : 0;
+        if (bool(href1) != bool(href2))
+          continue;
+        if (href1 && href1 != href2 && xmlStrcmp(href1, href2))
+          continue;
+        if (prop->name == 0 || prop2->name == 0)
+          continue;
+        if (xmlStrcmp(prop->name, prop2->name) == 0)
+          xmlUnlinkNode(xmlNodePtr(prop));
+      }
+    }
+  }
+
+  if (!ptr->children)
+    return;
+
+  for (xmlNodePtr child = ptr->children->next; child;) {
+    xmlNodePtr next = child->next;
+    if (child->type == XML_TEXT_NODE && child->prev &&
+        child->prev->type == XML_TEXT_NODE)
+    {
+      xmlNodeAddContent(child->prev, child->content);
+      xmlUnlinkNode(child);
+    }
+    child = next;
+  }
 }
