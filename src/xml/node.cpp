@@ -201,8 +201,10 @@ void node::post_initialize() {
   define_native_property("document", RO, &node::prop_document);
   define_native_property("type", RO, &node::prop_type);
 
-  if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE)
+  if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     define_native_property("namespace", RW, &node::prop_namespace);
+    define_native_property("namespaces", RO, &node::prop_namespaces);
+  }
 
   define_native_property("firstAttribute", RW, &node::prop_first_attr);
 
@@ -663,6 +665,32 @@ void node::prop_namespace(property_mode mode, value &data) {
     break;
   default: break;
   }
+}
+
+void node::prop_namespaces(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  xmlNsPtr *nsList = xmlGetNsList(ptr->doc, ptr);
+
+  try {
+    object array = create_array();
+    data = array;
+
+    if (!nsList)
+      return;
+
+    arguments arg(std::vector<value>(1));
+
+    for (xmlNsPtr *p = nsList; *p; ++p) {
+      arg[0] = namespace_::create(*p);
+      array.call("push", arg);
+    }
+  } catch (...) {
+    if (nsList) xmlFree(nsList);
+    throw;
+  }
+  if (nsList) xmlFree(nsList);
 }
 
 void node::prop_first_attr(property_mode mode, value &data) {
