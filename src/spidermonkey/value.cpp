@@ -99,6 +99,10 @@ double value::to_number() const {
   return value;
 }
 
+#ifdef APPLE
+#define __finitel std::isfinite
+#endif
+
 double value::to_integral_number(int bits, bool signedness) const {
   long double value = to_number();
   if (!__finitel(value))
