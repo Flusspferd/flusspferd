@@ -21,55 +21,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/create.hpp"
-#include "flusspferd/object.hpp"
+#include "flusspferd/array.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/native_object_base.hpp"
-#include "flusspferd/native_function_base.hpp"
-#include "flusspferd/string.hpp"
-#include "flusspferd/implementation/object.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;
 
-object flusspferd::create_object() {
-  JSObject *o = JS_NewObject(Impl::current_context(), 0, 0, 0);
-  if (!o)
-    throw exception("Could not create object");
+array::array() : object() {}
 
-  return Impl::wrap_object(o);
+array::array(object const &o) : object(o) {
+  check();
 }
 
-array flusspferd::create_array(unsigned length) {
-  JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
-  if (!o)
-    throw exception("Could not create array");
-
-  return Impl::wrap_object(o);
+array::array(object_impl const &o) : object(o) {
+  check();
 }
 
-object flusspferd::create_native_object(native_object_base *ptr, object const &proto) {
-  try {
-    return ptr->do_create_object(proto);
-  } catch (...) {
-    delete ptr;
-    throw;
-  }
+array &array::operator=(object const &o) {
+  object::operator=(o);
+  check();
+  return *this;
 }
 
-function flusspferd::create_native_function(native_function_base *ptr) {
-  try {
-    return ptr->create_function();
-  } catch (...) {
-    delete ptr;
-    throw;
-  }
+void array::check() {
+  if (!JS_IsArrayObject(Impl::current_context(), get()))
+    throw exception("Object is no array");
 }
 
-function flusspferd::create_native_function(object const &o_, native_function_base *ptr) {
-  object o = o_;
-  function fun = create_native_function(ptr);
-  o.define_property(ptr->name().c_str(), fun, object::dont_enumerate);
-  return fun;
+std::size_t array::get_length() const {
+  jsuint length;
+  if (!JS_GetArrayLength(Impl::current_context(), get_const(), &length))
+    throw exception("Could not get array length");
+  return length;
+}
+
+void array::set_length(std::size_t length) {
+  if (!JS_SetArrayLength(Impl::current_context(), get(), length))
+    throw exception("Could not set array length");
+}
+
+value array::get_element(std::size_t index) const {
+  value result;
+  if (!JS_GetElement(Impl::current_context(),
+                     get_const(), index,
+                     Impl::get_jsvalp(result)))
+    throw exception("Could not get array element");
+  return result;
+}
+
+void array::set_element(std::size_t index, value const &v_) {
+  value v(v_);
+  if (!JS_SetElement(Impl::current_context(),
+                     get(), index, Impl::get_jsvalp(v)))
+    throw exception("Could not set array element");
 }

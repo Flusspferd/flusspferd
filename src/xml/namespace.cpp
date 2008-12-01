@@ -118,7 +118,7 @@ object namespace_::class_info::create_prototype() {
 void namespace_::post_initialize() {
   register_native_method("toString", &namespace_::to_string);
 
-  unsigned const RW = permanent_property | dont_enumerate;
+  unsigned const RW = permanent_shared_property;
 
   define_native_property("href", RW, &namespace_::prop_href);
   define_native_property("prefix", RW, &namespace_::prop_prefix);

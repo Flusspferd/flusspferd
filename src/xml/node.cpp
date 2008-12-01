@@ -183,16 +183,14 @@ node::~node() {
 }
 
 void node::post_initialize() {
-  unsigned const RW = permanent_property | dont_enumerate;
-  unsigned const RO = permanent_property | dont_enumerate | read_only_property;
+  unsigned const RW = permanent_shared_property;
+  unsigned const RO = RW | read_only_property;
 
   define_native_property("name", RW, &node::prop_name);
   define_native_property("lang", RW, &node::prop_lang);
   define_native_property("content", RW, &node::prop_content);
   define_native_property("parent", RW, &node::prop_parent);
-  define_native_property("next", RW, &node::prop_next);
   define_native_property("nextSibling", RW, &node::prop_next);
-  define_native_property("prev", RW, &node::prop_prev);
   define_native_property("previousSibling", RW, &node::prop_prev);
   define_native_property("firstChild", RW, &node::prop_first_child);
   define_native_property("lastChild", RO, &node::prop_last_child);

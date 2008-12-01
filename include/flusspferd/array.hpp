@@ -21,54 +21,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP
-#define FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP
+#ifndef FLUSSPFERD_ARRAY_HPP
+#define FLUSSPFERD_ARRAY_HPP
 
-#include <vector>
-#include <js/jsapi.h>
+#include "object.hpp"
 
 namespace flusspferd {
 
-class value;
+class array : public object {
+public:
+  array();
+  array(object const &o);
+  array(object_impl const &o);
 
-namespace Impl {
-
-class arguments_impl {
-  std::vector<jsval> values; // values from the user are added here
-  std::size_t n;
-  jsval *argv;
+  array &operator=(object const &o);
 
 public:
-  jsval const *get() const { return argv; }
-  jsval *get() { return argv; }
-  std::size_t size() const { return n; }
+  std::size_t get_length() const;
+  void set_length(std::size_t);
 
-  std::vector<jsval> &data() { return values; }
-  std::vector<jsval> const &data() const { return values; }
-  void reset_argv();
+  value get_element(std::size_t n) const;
+  void set_element(std::size_t n, value const &x);
 
-  bool is_userprovided() const {
-    return values.size() == n; // TODO does this fix the problem?
-  }
-
-  arguments_impl() : n(0), argv(0x0) {}
-  arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
-  arguments_impl(std::vector<value> const &o);
-  arguments_impl(arguments_impl const &o);
-  arguments_impl &operator=(arguments_impl const &o);
-
-  class iterator_impl {
-    jsval *iter;
-  public:
-    iterator_impl(jsval *iter) : iter(iter) { }
-    iterator_impl &operator++() {
-      ++iter;
-      return *this;
-    }
-    jsval *operator*() const { return iter; }
-  };
+private:
+  void check();
 };
 
-}}
+}
 
-#endif /* FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP */
+#endif

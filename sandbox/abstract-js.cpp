@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/array.hpp"
 #include "flusspferd/io/file_class.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
@@ -249,6 +250,12 @@ int main() {
     std::cout << "function2: " << f_x.call() << std::endl;
     std::cout << "name/arity: " <<
         f_x.name() << '/' << f_x.arity() << std::endl;
+
+    {
+      flusspferd::array x;
+      x = flusspferd::create_array();
+      //x = flusspferd::value(flusspferd::string("foo")).to_object();
+    }
   //}
   //catch(std::exception &e) {
   //  std::cerr << "Exception: " << e.what() << '\n';
