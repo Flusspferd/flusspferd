@@ -38,7 +38,10 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 static boost::thread_specific_ptr<init> p_instance;
+
+#if JS_VERSION >= 180
 static boost::once_flag runtime_created = BOOST_ONCE_INIT;
+#endif
 
 class init::impl {
 public:
@@ -48,12 +51,13 @@ public:
 #if JS_VERSION >= 180
     // TODO: We should really only call this once.
     boost::call_once(runtime_created, JS_SetCStringsAreUTF8);
-#else
-    assert(JS_CStringsAreUTF8());
 #endif
 
+    if (!JS_CStringsAreUTF8())
+      throw exception("UTF8 support in Spidermonkey required");
+
     runtime = JS_NewRuntime( FLUSSPFERD_MAX_BYTES );
-    if(!runtime) {
+    if (!runtime) {
       throw exception("Could not create Spidermonkey Runtime");
     }
   }
