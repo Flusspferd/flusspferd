@@ -1,4 +1,4 @@
-# vim:ts=2:sw=2:expandtab:autoindent:filetype=python:
+# vim:ts=4:sw=4:expandtab:autoindent:filetype=python:
 #
 # Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
 #
@@ -76,7 +76,7 @@ def configure(conf):
     conf.check_tool('misc')
     conf.check_tool('boost')
     if darwin:
-      conf.check_tool('osx')
+        conf.check_tool('osx')
 
     conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
@@ -101,13 +101,13 @@ def configure(conf):
     if Options.options.enable_xml:
         ret = None
         if darwin and Options.options.libxml_framework:
-          u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
-          # TODO: check the version of this framework via XMLVERSION define
-          ret = conf.check_cxx( uselib_store='LIBXML2',
-                          framework_name=Options.options.libxml_framework, 
-                          execute=1,
-                          errmsg='framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
-                          fragment='''
+            u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
+            # TODO: check the version of this framework via XMLVERSION define
+            ret = conf.check_cxx(uselib_store='LIBXML2',
+                                 framework_name=Options.options.libxml_framework, 
+                                 execute=1,
+                                 errmsg='framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
+                                 fragment='''
 #include <libxml/xmlversion.h>
 #include <stdio.h>
 int main() { 
@@ -120,16 +120,17 @@ int main() {
     return 0;
   }
 } ''')
-        # This faffing is less than ideal really.
-        conf.env['FRAMEWORK'] = []
-        conf.env['FRAMEWORK_LIBXML2'] = ['-framework ' + Options.options.libxml_framework ]
+            # This faffing is less than ideal really.
+            conf.env['FRAMEWORK'] = []
+            conf.env['FRAMEWORK_LIBXML2'] = \
+                ['-framework ' + Options.options.libxml_framework ]
 
         # Non darwin, or framework failed
         if ret == None:
           ret = conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
                                atleast_version='2.6.0', args = '--cflags --libs')
         if ret == None:
-          conf.check_message_2('No suitable libxml-2.0 found, disabaling', color='PINK')
+          conf.check_message_2('No suitable libxml-2.0 found, disabling', color='PINK')
           Options.options.enable_xml = None
         else:
           u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
