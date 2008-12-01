@@ -200,6 +200,7 @@ void object::define_property(
   if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
   if (flags & read_only_property) sm_flags |= JSPROP_READONLY;
   if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
+  if (flags & shared_property) sm_flags |= JSPROP_SHARED;
 
   if (getter_o) sm_flags |= JSPROP_GETTER;
   if (setter_o) sm_flags |= JSPROP_SETTER;
