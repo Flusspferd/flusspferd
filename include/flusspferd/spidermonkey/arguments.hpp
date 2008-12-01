@@ -24,45 +24,51 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP
 #define FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP
 
-#include "value.hpp"
 #include <vector>
+#include <js/jsapi.h>
 
 namespace flusspferd {
-  class value;
+
+class value;
+
 namespace Impl {
-  class arguments_impl {
-    std::vector<jsval> values; // values from the user are added here
-    std::size_t n;
-    jsval *argv;
 
+class arguments_impl {
+  std::vector<jsval> values; // values from the user are added here
+  std::size_t n;
+  jsval *argv;
+
+public:
+  jsval const *get() const { return argv; }
+  jsval *get() { return argv; }
+  std::size_t size() const { return n; }
+
+  std::vector<jsval> &data() { return values; }
+  std::vector<jsval> const &data() const { return values; }
+  void reset_argv();
+
+  bool is_userprovided() const {
+    return values.size() == n; // TODO does this fix the problem?
+  }
+
+  arguments_impl() : n(0), argv(0x0) {}
+  arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
+  arguments_impl(std::vector<value> const &o);
+  arguments_impl(arguments_impl const &o);
+  arguments_impl &operator=(arguments_impl const &o);
+
+  class iterator_impl {
+    jsval *iter;
   public:
-    jsval const *get() const { return argv; }
-    jsval *get() { return argv; }
-    std::size_t size() const { return n; }
-
-    std::vector<jsval> &data() { return values; }
-    std::vector<jsval> const &data() const { return values; }
-    void reset_argv();
-
-    bool is_userprovided() const { return values.size() == n; } // TODO does this fix the problem?
-
-    arguments_impl() : n(0), argv(0x0) {}
-    arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
-    arguments_impl(std::vector<value> const &o);
-    arguments_impl(arguments_impl const &o);
-    arguments_impl &operator=(arguments_impl const &o);
-
-    class iterator_impl {
-      jsval *iter;
-    public:
-      iterator_impl(jsval *iter) : iter(iter) { }
-      iterator_impl &operator++() {
-        ++iter;
-        return *this;
-      }
-      jsval *operator*() const { return iter; }
-    };
+    iterator_impl(jsval *iter) : iter(iter) { }
+    iterator_impl &operator++() {
+      ++iter;
+      return *this;
+    }
+    jsval *operator*() const { return iter; }
   };
+};
+
 }}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP */

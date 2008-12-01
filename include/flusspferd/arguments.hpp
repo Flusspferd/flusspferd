@@ -28,53 +28,52 @@ THE SOFTWARE.
 #include <vector>
 
 namespace flusspferd {
-  class value;
 
-  class arguments : public Impl::arguments_impl {
+class arguments : public Impl::arguments_impl {
+public:
+  arguments() { }
+  arguments(Impl::arguments_impl const &a)
+    : Impl::arguments_impl(a)
+  { }
+  arguments(std::vector<value> const &v);
+
+  std::size_t size() const;
+  bool empty() const;
+
+  value operator[](std::size_t i);
+
+  void push_back(value const &v);
+  value front();
+  value back();
+
+  class iterator : public Impl::arguments_impl::iterator_impl {
   public:
-    arguments() { }
-    arguments(Impl::arguments_impl const &a)
-      : Impl::arguments_impl(a)
+    iterator(Impl::arguments_impl::iterator_impl const &i)
+      : Impl::arguments_impl::iterator_impl(i)
     { }
-    arguments(std::vector<value> const &v);
 
-    std::size_t size() const;
-    bool empty() const;
+    iterator &operator++();
+    iterator operator++(int) {
+      iterator tmp(*this);
+      ++*this;
+      return tmp;
+    }
 
-    value operator[](std::size_t i);
-
-    void push_back(value const &v);
-    value front();
-    value back();
-
-    class iterator : public Impl::arguments_impl::iterator_impl {
-    public:
-      iterator(Impl::arguments_impl::iterator_impl const &i)
-        : Impl::arguments_impl::iterator_impl(i)
-      { }
-
-      iterator &operator++();
-      iterator operator++(int) {
-        iterator tmp(*this);
-        ++*this;
-        return tmp;
-      }
-
-      value operator*() const;
-    };
-
-    iterator begin();
-    iterator end();
+    value operator*() const;
   };
 
-  bool operator!=(arguments::iterator const &lhs,
-                  arguments::iterator const &rhs);
+  iterator begin();
+  iterator end();
+};
 
-  inline bool operator==(arguments::iterator const &lhs,
-                         arguments::iterator const &rhs)
-  {
-    return !(lhs != rhs);
-  }
+bool operator==(arguments::iterator const &lhs, arguments::iterator const &rhs);
+
+inline bool operator!=(arguments::iterator const &lhs,
+                       arguments::iterator const &rhs)
+{
+  return !(lhs == rhs);
+}
+
 }
 
 #endif /* FLUSSPFERD_ARGUMENTS_HPP */
