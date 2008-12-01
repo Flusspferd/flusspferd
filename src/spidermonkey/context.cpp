@@ -149,6 +149,10 @@ object context::global() {
   return Impl::wrap_object(JS_GetGlobalObject(p->context));
 }
 
+object context::scope_chain() {
+  return Impl::wrap_object(JS_GetScopeChain(p->context));
+}
+
 value context::evaluate(char const *source, std::size_t n,
                         char const *file, unsigned int line)
 {
