@@ -89,7 +89,7 @@ void attribute_::post_initialize() {
   register_native_method("addContent", &attribute_::add_content);
 
   define_native_property("content",
-      dont_enumerate | permanent_shared_property,
+      permanent_shared_property,
       &attribute_::prop_content);
 }
 

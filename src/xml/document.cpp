@@ -90,7 +90,7 @@ void document::post_initialize() {
   register_native_method("copy", &document::copy);
   register_native_method("toString", &document::to_string);
 
-  unsigned const RW = permanent_shared_property | dont_enumerate;
+  unsigned const RW = permanent_shared_property;
   unsigned const RO = RW |read_only_property;
 
   define_native_property("rootElement", RW, &document::prop_root_element);

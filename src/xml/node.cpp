@@ -183,7 +183,7 @@ node::~node() {
 }
 
 void node::post_initialize() {
-  unsigned const RW = permanent_shared_property | dont_enumerate;
+  unsigned const RW = permanent_shared_property;
   unsigned const RO = RW | read_only_property;
 
   define_native_property("name", RW, &node::prop_name);
