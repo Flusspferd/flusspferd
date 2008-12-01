@@ -32,8 +32,19 @@ class array : public object {
 public:
   array();
   array(object const &o);
+  array(object_impl const &o);
+
+  array &operator=(object const &o);
 
 public:
+  std::size_t get_length() const;
+  void set_length(std::size_t);
+
+  value get_element(std::size_t n) const;
+  void set_element(std::size_t n, value const &x);
+
+private:
+  void check();
 };
 
 }

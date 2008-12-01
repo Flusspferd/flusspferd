@@ -27,6 +27,7 @@ THE SOFTWARE.
 #ifndef PREPROC_DEBUG
 #include "object.hpp"
 #include "function.hpp"
+#include "array.hpp"
 #include "native_function.hpp"
 #include <boost/type_traits/is_function.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -44,7 +45,7 @@ class function;
 class native_function_base;
 
 object create_object();
-object create_array(unsigned int length = 0);
+array create_array(unsigned int length = 0);
 object create_native_object(native_object_base *ptr, object const &proto);
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
