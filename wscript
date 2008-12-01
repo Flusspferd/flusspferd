@@ -97,6 +97,9 @@ def configure(conf):
                    uselib_store='JS_H',
                    defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
 
+    # dl
+    ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
+
     # xml
     if Options.options.enable_xml:
         ret = None
