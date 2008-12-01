@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 // Wrap the windows calls to the *nix equivalents
 #ifndef _WIN32
@@ -104,7 +105,12 @@ value importer::load(string const &name, bool binary_only) {
   }
 
   // We probably want to throw an exception here.
-  return value();
+  std::stringstream ss;
+  ss << "Unable to find library '";
+  ss << name.c_str();
+  ss << "' in [";
+  ss << paths_v.to_string().c_str() << "]";
+  throw exception(ss.str());
 }
 
 std::string importer::process_name(string const &name, bool for_script) {
@@ -137,4 +143,18 @@ std::string importer::process_name(string const &name, bool for_script) {
 
   return p;
 
+}
+
+value importer::load_so(const char* fname) {
+  void *handle = dlopen(fname, RTLD_LAZY);
+  if (!handle) {
+    std::stringstream ss;
+    ss << "can't open '" << fname << "': " << dlerror();
+    throw exception(ss.str());
+  }
+
+  // TODO: Decide on the name and prototype of the function we load.
+  // maybe just: value instantiate(); (not extern "C")
+
+  return value();
 }

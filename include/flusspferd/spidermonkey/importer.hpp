@@ -25,6 +25,7 @@ protected:
   void post_initialize();
 
   static std::string process_name(string const &name, bool for_script = false);
+  value load_so(const char* fname);
 private: // JS methods
   value load(string const &name, bool binary_only); 
 };
