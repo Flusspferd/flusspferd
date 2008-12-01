@@ -35,6 +35,9 @@ THE SOFTWARE.
 #include <cstring>
 #include <string>
 
+#include "flusspferd/class.hpp"
+#include "flusspferd/spidermonkey/importer.hpp"
+
 //#include <js/jsapi.h> // DEBUG
 
 bool extfile = false;
@@ -98,8 +101,11 @@ int main(int argc, char **argv) {
     flusspferd::io::load_io();
     #endif
 
+    flusspferd::load_class<flusspferd::importer>(co.global());
+
     co.global().define_property("print",
       flusspferd::create_native_function(&js_print));
+
 
     co.gc();
 
