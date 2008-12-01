@@ -1,47 +1,54 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
-
-#include "flusspferd/spidermonkey/importer.hpp"
+#include "flusspferd/importer.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <errno.h>
 
 // Wrap the windows calls to the *nix equivalents
 #ifndef _WIN32
-# include <dlfcn.h>
-# define DIRSEP1 "/"
-# define DIRSEP2 "\0"
-# define SHLIBPREFIX "lib"
-# ifdef APPLE
-#  define SHLIBSUFFIX ".dylib"
-# else
-#  define SHLIBSUFFIX ".so"
-# endif
+#include <dlfcn.h>
+
+#define DIRSEP1 "/"
+#define DIRSEP2 ""
+#define SHLIBPREFIX "lib"
+
+#ifdef APPLE
+#define SHLIBSUFFIX ".dylib"
 #else
-# define DIRSEP1 "\\"
-# define DIRSEP2 "/"
-# define SHLIBPREFIX 0
-# define SHLIBSUFFIX ".dll"
-# include <windows.h>
-# include <errno.h>
-# define dlopen(x,y) (void*)LoadLibrary(x)
-# define dlsym(x,y) (void*)GetProcAddress((HMODULE)x,y)
-# define dlclose(x) FreeLibrary((HMODULE)x)
-const char* dlerror() {
-    static char szMsgBuf[256];
-    ::FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            ::GetLastError(),
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            szMsgBuf,
-            sizeof szMsgBuf,
-            NULL);
-    return szMsgBuf;
+#define SHLIBSUFFIX ".so"
+#endif
+
+#else
+
+#include <windows.h>
+
+#define DIRSEP1 "\\"
+#define DIRSEP2 "/"
+#define SHLIBPREFIX 0
+#define SHLIBSUFFIX ".dll"
+
+#define dlopen(x,y) (void*)LoadLibrary(x)
+#define dlsym(x,y) (void*)GetProcAddress((HMODULE)x,y)
+#define dlclose(x) FreeLibrary((HMODULE)x)
+
+// FIXME - not thread safe?
+const char *dlerror() {
+  static char szMsgBuf[256];
+  ::FormatMessage(
+      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+      NULL,
+      ::GetLastError(),
+      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+      szMsgBuf,
+      sizeof szMsgBuf,
+      NULL);
+  return szMsgBuf;
 }
+
 #endif
 
 using namespace flusspferd;
@@ -54,14 +61,13 @@ object importer::class_info::create_prototype() {
   return proto;
 }
 
-importer::importer(call_context &x) {
+importer::importer(call_context &) {
 }
 
 importer::~importer() {
 }
 
 void importer::post_initialize() {
-
   register_native_method("load", &importer::load);
 
   // Store search paths
@@ -84,19 +90,19 @@ value importer::load(string const &name, bool binary_only) {
   int len = paths.get_property("length").to_number();
   for (int i=0; i < len; i++) {
     std::string path = paths.get_property(i).to_string().to_string();
+    std::string fullpath = path + js_name;
 
     if (!binary_only) {
-      std::ifstream file( (path + js_name).c_str(), std::ios::in | std::ios::binary );
+      std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
       if (file.good()) {
         // Execute the file
         return string(js_name);
       }
-
     }
 
     // Load the .so
-    std::ifstream file( (path + so_name).c_str(), std::ios::in | std::ios::binary );
+    std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
     if (file.good()) {
       // Execute the file
@@ -118,7 +124,7 @@ std::string importer::process_name(string const &name, bool for_script) {
 
   if (p.find(DIRSEP1, 0) != std::string::npos &&
       p.find(DIRSEP2, 0) != std::string::npos) {
-    throw exception("path seperator allowed in module name");
+    throw exception("Path seperator not allowed in module name");
   }
 
   unsigned int pos = 0;
@@ -149,7 +155,7 @@ value importer::load_so(const char* fname) {
   void *handle = dlopen(fname, RTLD_LAZY);
   if (!handle) {
     std::stringstream ss;
-    ss << "can't open '" << fname << "': " << dlerror();
+    ss << "Cannot open '" << fname << "': " << dlerror();
     throw exception(ss.str());
   }
 

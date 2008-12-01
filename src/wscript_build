@@ -1,4 +1,4 @@
-# vim:ts=2:sw=2:expandtab:autoindent:filetype=python:
+# vim:ts=4:sw=4:expandtab:autoindent:filetype=python:
 #
 # Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
 #
@@ -29,35 +29,35 @@ libtype = 'shlib'
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
-obj.uselib = 'JS JS_H BOOST_THREAD BOOST ISFINITE'
+obj.uselib = 'JS JS_H BOOST_THREAD BOOST DL ISFINITE'
 obj.target = 'flusspferd'
 
 if bld.env['ENABLE_IO']:
-  obj = bld.new_task_gen('cxx', libtype)
-  obj.find_sources_in_dirs('io')
-  obj.includes = ['../include']
-  obj.uselib_local = 'flusspferd'
-  obj.uselib = 'JS_H BOOST'
-  obj.target = 'flusspferd-io'
+    obj = bld.new_task_gen('cxx', libtype)
+    obj.find_sources_in_dirs('io')
+    obj.includes = ['../include']
+    obj.uselib_local = 'flusspferd'
+    obj.uselib = 'JS_H BOOST'
+    obj.target = 'flusspferd-io'
 
 if bld.env['ENABLE_XML']:
-  obj = bld.new_task_gen('cxx', libtype)
-  obj.find_sources_in_dirs('xml')
-  obj.includes = ['../include']
-  obj.uselib_local = 'flusspferd'
-  obj.uselib = 'LIBXML2 JS_H BOOST'
-  obj.target = 'flusspferd-xml'
+    obj = bld.new_task_gen('cxx', libtype)
+    obj.find_sources_in_dirs('xml')
+    obj.includes = ['../include']
+    obj.uselib_local = 'flusspferd'
+    obj.uselib = 'LIBXML2 JS_H BOOST'
+    obj.target = 'flusspferd-xml'
 
 if bld.env['ENABLE_TESTS']:
-  obj = bld.new_task_gen('cxx', libtype)
-  obj.find_sources_in_dirs('. spidermonkey')
-  if bld.env['ENABLE_IO']:
-    obj.find_sources_in_dirs('io')
-  if bld.env['ENABLE_XML']:
-    obj.find_sources_in_dirs('xml')
-  obj.includes = ['../include']
-  obj.uselib = ['GCOV', 'JS', 'JS_H', 'BOOST_THREAD', 'BOOST', 'ISFINITE']
-  if bld.env['ENABLE_XML']:
-    obj.uselib += ['LIBXML2']
-  obj.target = 'flusspferd-coverage'
-  obj.install_path = None
+    obj = bld.new_task_gen('cxx', libtype)
+    obj.find_sources_in_dirs('. spidermonkey')
+    if bld.env['ENABLE_IO']:
+      obj.find_sources_in_dirs('io')
+    if bld.env['ENABLE_XML']:
+      obj.find_sources_in_dirs('xml')
+    obj.includes = ['../include']
+    obj.uselib = 'GCOV JS JS_H BOOST_THREAD BOOST DL ISFINITE'
+    if bld.env['ENABLE_XML']:
+      obj.uselib += ' LIBXML2'
+    obj.target = 'flusspferd-coverage'
+    obj.install_path = None

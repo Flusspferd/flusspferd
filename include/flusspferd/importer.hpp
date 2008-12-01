@@ -3,15 +3,15 @@
 #ifndef FLUSSPFERD_IMPORTER_HPP
 #define FLUSSPFERD_IMPORTER_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
+#include "native_object_base.hpp"
+#include "class.hpp"
 
 namespace flusspferd { 
 
 class importer : public native_object_base {
 
 public:
-  struct class_info : public flusspferd::class_info {
+  struct class_info : flusspferd::class_info {
     typedef boost::mpl::bool_<true> constructible;
     static char const* constructor_name() { return "Importer"; }
     static object create_prototype();

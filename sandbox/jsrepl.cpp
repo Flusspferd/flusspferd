@@ -23,6 +23,8 @@ THE SOFTWARE.
 
 #include "flusspferd/xml/xml.hpp"
 #include "flusspferd/io/io.hpp"
+#include "flusspferd/importer.hpp"
+#include "flusspferd/class.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/context.hpp"
@@ -34,11 +36,6 @@ THE SOFTWARE.
 #include <fstream>
 #include <cstring>
 #include <string>
-
-#include "flusspferd/class.hpp"
-#include "flusspferd/spidermonkey/importer.hpp"
-
-//#include <js/jsapi.h> // DEBUG
 
 bool extfile = false;
 std::string file = __FILE__;
@@ -52,31 +49,33 @@ void print_help(char const *argv0) {
 }
 
 bool parse_cmd(int argc, char **argv) {
-  if(argc > 1) {
-    for(int i = 1; i < argc; ++i) {
-      if(std::strcmp(argv[i], "-h") == 0 ||
-         std::strcmp(argv[i], "--help"))
-      {
+  if (argc <= 1)
+    return true;
+
+  for (int i = 1; i < argc; ++i) {
+    if (std::strcmp(argv[i], "-h") == 0 ||
+        std::strcmp(argv[i], "--help"))
+    {
+      print_help(argv[0]);
+      return false;
+    }
+    else if (std::strcmp(argv[i], "-f") == 0 ||
+             std::strcmp(argv[i], "--file") == 0)
+    {
+      ++i;
+      if (i == argc) {
         print_help(argv[0]);
+        std::cerr << "ERROR: expected filename after " << argv[i-1]
+                  << " option\n";
         return false;
       }
-      else if(std::strcmp(argv[i], "-f") == 0 ||
-              std::strcmp(argv[i], "--file") == 0)
-      {
-        ++i;
-        if(i == argc) {
-          print_help(argv[0]);
-          std::cerr << "ERROR: expected filename after " << argv[i-1]
-                    << " option\n";
-          return false;
-        }
-        file = argv[i];
-        std::ifstream fin(file.c_str());
-        in.rdbuf(fin.rdbuf());
-        extfile = true;
-      }
+      file = argv[i];
+      std::ifstream fin(file.c_str());
+      in.rdbuf(fin.rdbuf());
+      extfile = true;
     }
   }
+
   return true;
 }
 
