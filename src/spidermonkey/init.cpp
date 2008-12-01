@@ -27,7 +27,9 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include <boost/thread/tss.hpp>
+#include <boost/thread/once.hpp>
 #include <js/jsapi.h>
+#include <cassert>
 
 #ifndef FLUSSPFERD_MAX_BYTES
 #define FLUSSPFERD_MAX_BYTES 8L * 1024L * 1024L // 8 MB TODO: too much?
@@ -36,13 +38,21 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 static boost::thread_specific_ptr<init> p_instance;
+static boost::once_flag runtime_created = BOOST_ONCE_INIT;
 
 class init::impl {
 public:
   // we use a single JS_Runtime for each process!
   impl()
-    : runtime(JS_NewRuntime( FLUSSPFERD_MAX_BYTES ))
   {
+#if JS_VERSION >= 180
+    // TODO: We should really only call this once.
+    boost::call_once(runtime_created, JS_SetCStringsAreUTF8);
+#else
+    assert(JS_CStringsAreUTF8());
+#endif
+
+    runtime = JS_NewRuntime( FLUSSPFERD_MAX_BYTES );
     if(!runtime) {
       throw exception("Could not create Spidermonkey Runtime");
     }
