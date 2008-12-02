@@ -100,14 +100,18 @@ xmlNodePtr node::c_from_js(object const &obj) {
   }
 }
 
-node::node(xmlNodePtr ptr)
-  : ptr(ptr)
+node::node(object const &obj, xmlNodePtr ptr)
+  : native_object_base(obj), ptr(ptr)
 {
   ptr->_private = static_cast<object*>(this);
   create_all_children(ptr);
+
+  init();
 }
 
-node::node(call_context &x) {
+node::node(object const &obj, call_context &x)
+  : native_object_base(obj)
+{
   local_root_scope scope;
 
   xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
@@ -158,6 +162,8 @@ node::node(call_context &x) {
   }
 
   if (prefix) xmlFree(prefix);
+
+  init();
 }
 
 node::~node() {
@@ -182,7 +188,7 @@ node::~node() {
   }
 }
 
-void node::post_initialize() {
+void node::init() {
   unsigned const RW = permanent_shared_property;
   unsigned const RO = RW | read_only_property;
 

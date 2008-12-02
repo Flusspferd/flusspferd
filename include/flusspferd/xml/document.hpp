@@ -40,8 +40,8 @@ public:
     static object create_prototype();
   };
 
-  document(call_context &);
-  document(xmlDocPtr doc);
+  document(object const &, call_context &);
+  document(object const &, xmlDocPtr doc);
   ~document();
 
   xmlDocPtr c_obj() const {
@@ -51,8 +51,10 @@ public:
   static xmlDocPtr c_from_js(object const &o);
 
 protected:
-  void post_initialize();
   void trace(tracer &);
+
+private:
+  void init();
 
 private: // JS methods
   string dump();

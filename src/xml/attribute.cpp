@@ -32,9 +32,11 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-attribute_::attribute_(xmlAttrPtr ptr)
-  : node(xmlNodePtr(ptr))
-{}
+attribute_::attribute_(object const &obj, xmlAttrPtr ptr)
+  : node(obj, xmlNodePtr(ptr))
+{
+  init();
+}
 
 static xmlAttrPtr new_attribute_(call_context &x) {
   local_root_scope scope;
@@ -76,16 +78,16 @@ static xmlAttrPtr new_attribute_(call_context &x) {
   return result;
 }
 
-attribute_::attribute_(call_context &x)
-  : node(xmlNodePtr(new_attribute_(x)))
-{}
+attribute_::attribute_(object const &obj, call_context &x)
+  : node(obj, xmlNodePtr(new_attribute_(x)))
+{
+  init();
+}
 
 attribute_::~attribute_()
 {}
 
-void attribute_::post_initialize() {
-  node::post_initialize();
-
+void attribute_::init() {
   register_native_method("addContent", &attribute_::add_content);
 
   define_native_property("content",

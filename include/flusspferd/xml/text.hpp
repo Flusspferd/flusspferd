@@ -50,12 +50,9 @@ public:
     static object create_prototype();
   };
 
-  general_text(call_context &);
-  general_text(xmlNodePtr doc);
+  general_text(object const &, call_context &);
+  general_text(object const &, xmlNodePtr doc);
   ~general_text();
-
-protected:
-  void post_initialize();
 
 private: // JS methods
 

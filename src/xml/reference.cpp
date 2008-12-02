@@ -31,8 +31,8 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-reference_::reference_(xmlNodePtr ptr)
-  : node(ptr)
+reference_::reference_(object const &obj, xmlNodePtr ptr)
+  : node(obj, ptr)
 {}
 
 static xmlNodePtr new_reference(call_context &x) {
@@ -64,16 +64,12 @@ static xmlNodePtr new_reference(call_context &x) {
   return result;
 }
 
-reference_::reference_(call_context &x)
-  : node(new_reference(x))
+reference_::reference_(object const &obj, call_context &x)
+  : node(obj, new_reference(x))
 {}
 
 reference_::~reference_()
 {}
-
-void reference_::post_initialize() {
-  node::post_initialize();
-}
 
 object reference_::class_info::create_prototype() {
   local_root_scope scope;

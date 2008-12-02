@@ -40,16 +40,16 @@ public:
     static object create_prototype();
   };
 
-  attribute_(call_context &);
-  attribute_(xmlAttrPtr attr);
+  attribute_(object const &, call_context &);
+  attribute_(object const &, xmlAttrPtr attr);
   ~attribute_();
 
   xmlAttrPtr c_obj() const {
     return xmlAttrPtr(node::c_obj());
   }
 
-protected:
-  void post_initialize();
+private:
+  void init();
 
 private: // JS methods
   void add_content(string const &);

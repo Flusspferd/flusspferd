@@ -31,8 +31,10 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-processing_instruction::processing_instruction(xmlNodePtr ptr)
-  : node(ptr)
+processing_instruction::processing_instruction(
+    object const &obj, xmlNodePtr ptr
+  )
+  : node(obj, ptr)
 {}
 
 static xmlNodePtr new_processing_instruction(call_context &x) {
@@ -60,16 +62,12 @@ static xmlNodePtr new_processing_instruction(call_context &x) {
   return result;
 }
 
-processing_instruction::processing_instruction(call_context &x)
-  : node(new_processing_instruction(x))
+processing_instruction::processing_instruction(object const &o, call_context &x)
+  : node(o, new_processing_instruction(x))
 {}
 
 processing_instruction::~processing_instruction()
 {}
-
-void processing_instruction::post_initialize() {
-  node::post_initialize();
-}
 
 object processing_instruction::class_info::create_prototype() {
   local_root_scope scope;
@@ -77,13 +75,5 @@ object processing_instruction::class_info::create_prototype() {
   object proto = node::class_info::create_prototype();
 
   return proto;
-}
-
-char const *processing_instruction::class_info::constructor_name() {
-  return "ProcessingInstruction";
-}
-
-std::size_t processing_instruction::class_info::constructor_arity() {
-  return 3;
 }
 

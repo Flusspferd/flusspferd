@@ -39,8 +39,8 @@ public:
     static object create_prototype();
   };
 
-  reference_(call_context &);
-  reference_(xmlNodePtr doc);
+  reference_(object const &, call_context &);
+  reference_(object const &, xmlNodePtr doc);
   ~reference_();
 
 protected:

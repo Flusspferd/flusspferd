@@ -53,14 +53,17 @@ object namespace_::create(xmlNsPtr ptr) {
   return create_native_object<namespace_>(object(), ptr);
 }
 
-namespace_::namespace_(xmlNsPtr ptr)
-  : ptr(ptr)
+namespace_::namespace_(object const &obj, xmlNsPtr ptr)
+  : native_object_base(obj), ptr(ptr)
 {
   if (!ptr->_private)
     ptr->_private = static_cast<object *>(this);
+  init();
 }
 
-namespace_::namespace_(call_context &x) {
+namespace_::namespace_(object const &obj, call_context &x)
+  : native_object_base(obj)
+{
   local_root_scope scope;
 
   value node = x.arg[0];
@@ -99,6 +102,8 @@ namespace_::namespace_(call_context &x) {
     throw exception("Could not create XML namespace");
 
   ptr->_private = static_cast<object *>(this);
+
+  init();
 }
 
 namespace_::~namespace_() {
@@ -115,7 +120,7 @@ object namespace_::class_info::create_prototype() {
   return proto;
 }
 
-void namespace_::post_initialize() {
+void namespace_::init() {
   register_native_method("toString", &namespace_::to_string);
 
   unsigned const RW = permanent_shared_property;

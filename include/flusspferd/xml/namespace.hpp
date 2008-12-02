@@ -40,8 +40,8 @@ public:
     static object create_prototype();
   };
 
-  namespace_(call_context &);
-  namespace_(xmlNsPtr ptr);
+  namespace_(object const &, call_context &);
+  namespace_(object const &, xmlNsPtr ptr);
   ~namespace_();
 
   static object create(xmlNsPtr ptr);
@@ -53,9 +53,10 @@ public:
   static xmlNsPtr c_from_js(object const &o);
 
 protected:
-  void post_initialize();
-
   void trace(tracer &);
+
+private:
+  void init();
 
 private: // JS methods
   string to_string();

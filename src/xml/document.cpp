@@ -45,9 +45,10 @@ xmlDocPtr document::c_from_js(object const &obj) {
   }
 }
 
-document::document(xmlDocPtr ptr)
-  : node(xmlNodePtr(ptr))
+document::document(object const &obj, xmlDocPtr ptr)
+  : node(obj, xmlNodePtr(ptr))
 {
+  init();
 }
 
 static xmlDocPtr new_doc(call_context &) {
@@ -57,9 +58,10 @@ static xmlDocPtr new_doc(call_context &) {
   return ptr;
 }
 
-document::document(call_context &x)
-  : node(xmlNodePtr(new_doc(x)))
+document::document(object const &obj, call_context &x)
+  : node(obj, xmlNodePtr(new_doc(x)))
 {
+  init();
 }
 
 document::~document() {
@@ -83,9 +85,7 @@ void document::trace(tracer &trc) {
     trc("doc-oldns", *static_cast<object*>(c_obj()->oldNs->_private));
 }
 
-void document::post_initialize() {
-  node::post_initialize();
-
+void document::init() {
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
   register_native_method("toString", &document::to_string);
