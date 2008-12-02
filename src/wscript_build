@@ -29,7 +29,7 @@ libtype = 'shlib'
 obj = bld.new_task_gen('cxx', libtype)
 obj.find_sources_in_dirs('. spidermonkey')
 obj.includes = ['../include']
-obj.uselib = 'JS JS_H BOOST_THREAD BOOST DL ISFINITE'
+obj.uselib = 'JS JS_H BOOST_THREAD BOOST DL ISFINITE BOOST_FILESYSTEM BOOST_SYSTEM'
 obj.target = 'flusspferd'
 
 if bld.env['ENABLE_IO']:
@@ -56,7 +56,7 @@ if bld.env['ENABLE_TESTS']:
     if bld.env['ENABLE_XML']:
       obj.find_sources_in_dirs('xml')
     obj.includes = ['../include']
-    obj.uselib = 'GCOV JS JS_H BOOST_THREAD BOOST DL ISFINITE'
+    obj.uselib = 'GCOV JS JS_H BOOST_THREAD BOOST_FILESYSTEM BOOST_SYSTEM BOOST DL ISFINITE'
     if bld.env['ENABLE_XML']:
       obj.uselib += ' LIBXML2'
     obj.target = 'flusspferd-coverage'

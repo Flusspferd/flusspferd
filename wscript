@@ -81,7 +81,7 @@ def configure(conf):
     conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
 
-    boostlib = ['thread']
+    boostlib = ['thread', 'filesystem', 'system']
     if Options.options.enable_tests:
       boostlib += ['unit_test_framework']
 
