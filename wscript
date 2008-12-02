@@ -35,6 +35,7 @@ def init(): pass
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
+    opt.tool_options('compiler_cc')
     opt.tool_options('boost')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
                    help='Set non-standard CXXFLAGS')
@@ -73,6 +74,7 @@ def configure(conf):
         u('CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
+    conf.check_tool('compiler_cc')
     conf.check_tool('misc')
     conf.check_tool('boost')
     if darwin:
@@ -161,6 +163,7 @@ def build_pkgconfig(bld):
 
 def build(bld):
     bld.add_subdirs('src')
+    bld.add_subdirs('plugins/sqlite')
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['ENABLE_SANDBOX']:
