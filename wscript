@@ -166,7 +166,7 @@ def build_pkgconfig(bld):
 
 def build(bld):
     bld.add_subdirs('src')
-    bld.add_subdirs('plugins/sqlite')
+    bld.add_subdirs('plugins/sqlite3')
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['ENABLE_SANDBOX']:

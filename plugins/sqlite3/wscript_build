@@ -31,6 +31,6 @@ obj.source = ['sqlite3.c', 'sqlite_plugin.cpp']
 obj.includes = ['../../include', '.']
 obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H'
-obj.target = 'sqlite'
+obj.target = 'sqlite3'
 obj.features.append('cc')
 
