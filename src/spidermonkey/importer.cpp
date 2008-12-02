@@ -85,6 +85,15 @@ object importer::class_info::create_prototype() {
 
 void importer::class_info::augment_constructor(object &ctor) {
   ctor.define_property("preload", create_object());
+
+  ctor.define_property("defaultPaths", create_array(), read_only_property);
+
+  create_native_function(ctor, "lockPaths", &importer::lock_paths);
+}
+
+void importer::lock_paths(object &ctor) {
+  ctor.define_property("pathsLocked", true, read_only_property);
+  //TODO: seal defaultPaths
 }
 
 class importer::impl {
@@ -108,6 +117,7 @@ importer::importer(object const &obj, call_context &)
   register_native_method("load", &importer::load);
 
   // Store search paths
+  // TODO use defaultPaths
   set_property("paths", create_array());
 
   // Create a context object, which is the object on which all modules are
