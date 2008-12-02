@@ -124,7 +124,7 @@ sqlite3::sqlite3(object const &obj, call_context &x)
 ///////////////////////////
 sqlite3::~sqlite3()
 {
-  if (db)i = new Importer(); i.paths = ['build/default/plugins/sqlite']; i.load('sqlite')
+  if (db)
     sqlite3_close(db);
 }
 
