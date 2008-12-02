@@ -2,6 +2,7 @@
 #include "flusspferd/importer.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -56,7 +57,6 @@ using namespace flusspferd;
 object importer::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "load", 2);
 
   return proto;
 }
@@ -68,10 +68,28 @@ importer::~importer() {
 }
 
 void importer::post_initialize() {
+  // Create the load method on the actual object itself, not on the prototype
+  // That way the following works:
+  // 
+  // i.load('foo'); // Assume foo module defines this.foo = 'abc'
+  // print(i.foo); // abc
+  //
+  // without the problem of load being overridden to do bad things
+  add_native_method( "load", 2);
   register_native_method("load", &importer::load);
 
   // Store search paths
   set_property("paths", create_array());
+
+  // Create a context object, which is the object on which all modules are
+  // evaluated
+  object context = create_object();
+  set_property("context", context);
+
+  // this.contexnt.__proto__ = this.__proto__; 
+  // Not sure we actually want to do this, but we can for now.
+  context.set_property("__proto__", get_property("__proto__"));
+  set_property("__proto__", context);
 }
 
 value importer::load(string const &name, bool binary_only) {
@@ -84,12 +102,12 @@ value importer::load(string const &name, bool binary_only) {
   if (!paths_v.is_object())
     throw exception("Unable to get search paths or its not an object");
 
-  object paths = paths_v.get_object();
+  array paths = paths_v.get_object();
 
   // TODO: We could probably do with an array class.
-  int len = paths.get_property("length").to_number();
-  for (int i=0; i < len; i++) {
-    std::string path = paths.get_property(i).to_string().to_string();
+  size_t len = paths.get_length();
+  for (size_t i=0; i < len; i++) {
+    std::string path = paths.get_element(i).to_string().to_string();
     std::string fullpath = path + js_name;
 
     if (!binary_only) {
@@ -97,16 +115,25 @@ value importer::load(string const &name, bool binary_only) {
 
       if (file.good()) {
         // Execute the file
-        return string(js_name);
+        std::stringstream cbuf;
+        cbuf << file.rdbuf();
+        if (!file)
+          // TODO: Is the information (fullpath) leak bad?
+          throw exception( std::string("Error reading from ") + fullpath );
+
+        // Execute the file
+        std::string contents = cbuf.str();
+        return get_current_context().evaluateInScope(contents.data(), 
+            contents.size(), fullpath.c_str(), 1, 
+            get_property("context").to_object());
       }
     }
 
+    fullpath = path + so_name;
     // Load the .so
     std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
     if (file.good()) {
-      // Execute the file
-      return string(so_name);
     }
   }
 
@@ -119,6 +146,8 @@ value importer::load(string const &name, bool binary_only) {
   throw exception(ss.str());
 }
 
+// Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
+// return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
 std::string importer::process_name(string const &name, bool for_script) {
   std::string p = name.to_string();
 
