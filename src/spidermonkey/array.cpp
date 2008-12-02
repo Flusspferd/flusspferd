@@ -46,7 +46,7 @@ array &array::operator=(object const &o) {
 
 void array::check() {
   if (!JS_IsArrayObject(Impl::current_context(), get()))
-    throw exception("Object is no array");
+    throw exception("Object is not array");
 }
 
 std::size_t array::get_length() const {
