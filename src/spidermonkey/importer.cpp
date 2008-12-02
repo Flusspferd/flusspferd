@@ -65,12 +65,9 @@ void importer::class_info::augment_constructor(object &ctor) {
   ctor.define_property("preload", create_object());
 }
 
-importer::importer(call_context &) {
-}
-
-importer::~importer() {}
-
-void importer::post_initialize() {
+importer::importer(object const &obj, call_context &)
+  : native_object_base(obj)
+{
   // Create the load method on the actual object itself, not on the prototype
   // That way the following works:
   // 
@@ -94,6 +91,8 @@ void importer::post_initialize() {
   context.set_prototype(get_prototype());
   set_prototype(context);
 }
+
+importer::~importer() {}
 
 value importer::load(string const &name, bool binary_only) {
   context ctx = get_current_context();

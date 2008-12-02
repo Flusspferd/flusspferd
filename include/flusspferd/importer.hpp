@@ -18,13 +18,10 @@ public:
     static void augment_constructor(object &);
   };
 
-  importer(call_context &x);
+  importer(object const &obj, call_context &x);
   ~importer();
 
 protected:
-
-  void post_initialize();
-
   static std::string process_name(string const &name, bool for_script = false);
 
 private: // JS methods

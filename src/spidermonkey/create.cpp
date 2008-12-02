@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/native_function_base.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/implementation/object.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include <js/jsapi.h>
@@ -49,11 +50,19 @@ array flusspferd::create_array(unsigned length) {
   return Impl::wrap_object(o);
 }
 
+object flusspferd::detail::create_native_object(object const &proto) {
+  return native_object_base::do_create_object(proto);
+}
+
 object flusspferd::create_native_object(
     native_object_base *ptr, object const &proto)
 {
   try {
-    return ptr->do_create_object(proto);
+    local_root_scope scope;
+    object obj = detail::create_native_object(proto);
+    ptr->load_into(obj);
+    ptr->late_load();
+    return *ptr;
   } catch (...) {
     delete ptr;
     throw;

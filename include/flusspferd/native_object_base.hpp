@@ -40,11 +40,26 @@ namespace flusspferd {
 struct call_context;
 class tracer;
 
-class native_object_base : public object, private boost::noncopyable {
-protected:
-  native_object_base();
+namespace detail {
+  object create_native_object(object const &proto);
+}
 
-  virtual void post_initialize();
+class native_object_base : public object, private boost::noncopyable {
+public:
+  virtual ~native_object_base() = 0;
+
+  object get_object() {
+    return *static_cast<object*>(this);
+  }
+
+  static native_object_base *get_native(object const &o);
+
+  void load_into(object const &);
+
+  virtual void late_load();
+
+protected:
+  native_object_base(object const &o);
 
 protected:
   typedef void (native_object_base::*native_method_type)(call_context &);
@@ -55,10 +70,10 @@ protected:
 
 protected:
   void register_native_method(
-    std::string const &name, native_method_type method);
+      std::string const &name, native_method_type method);
 
   void register_native_method_cb(
-    std::string const &name, callback_type const &cb);
+      std::string const &name, callback_type const &cb);
 
   template<typename T>
   void register_native_method(
@@ -102,41 +117,37 @@ protected:
 
   virtual void property_op(property_mode mode, value const &id, value &data);
 
-  typedef void (native_object_base::*property_callback)(property_mode mode, value &data);
+  typedef void (native_object_base::*property_callback)(
+      property_mode mode, value &data);
 
   void add_property_op(std::string const &id, property_callback cb);
 
   template<typename T>
-  void add_property_op(std::string const &id, void (T::*cb)(property_mode, value &)) {
+  void add_property_op(
+      std::string const &id, void (T::*cb)(property_mode, value &))
+  {
     add_property_op(id, property_callback(cb));
   }
 
   template<typename T>
   void define_native_property(
-      std::string const &id, unsigned flags, void (T::*cb)(property_mode, value &))
+      std::string const &id,
+      unsigned flags,
+      void (T::*cb)(property_mode, value &))
   {
     add_property_op(id, cb);
     define_property(id, value(), flags);
   }
 
-public:
-  virtual ~native_object_base() = 0;
-
-  object get_object() {
-    return *static_cast<object*>(this);
-  }
-
-  static native_object_base *get_native(object const &o);
-
 private:
   void invalid_method(call_context &);
 
 private:
-  object do_create_object(object const &proto);
+  static object do_create_object(object const &proto);
 
-  friend object create_native_object(native_object_base *, object const &);
+  friend object detail::create_native_object(object const &proto);
 
-public:
+private:
   class impl;
   boost::scoped_ptr<impl> p;
 

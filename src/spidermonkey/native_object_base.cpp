@@ -81,11 +81,23 @@ JSClass native_object_base::impl::native_object_class = {
   0
 };
 
-native_object_base::native_object_base() : p(new impl) {
-  register_native_method("", &native_object_base::invalid_method);
+native_object_base::native_object_base(object const &o) : p(new impl) {
+  load_into(o);
 }
 
 native_object_base::~native_object_base() {}
+
+void native_object_base::load_into(object const &o) {
+  if (is_valid())
+    throw exception("Cannot load native_object data into more than one object");
+
+  object::operator=(o);
+
+  if (is_valid()) {
+    if (!JS_SetPrivate(Impl::current_context(), Impl::get_object(o), this))
+      throw exception("Could not create native object (private data)");
+  }
+}
 
 void native_object_base::invalid_method(call_context &) {
   throw exception("Invalid method");
@@ -122,15 +134,7 @@ object native_object_base::do_create_object(object const &prototype_) {
   if (!o)
     throw exception("Could not create native object");
 
-  object::operator=(Impl::wrap_object(o));
-  root_object r(get_object());
-
-  if (!JS_SetPrivate(ctx, o, this))
-    throw exception("Could not create native object (private data)");
-
-  post_initialize();
-
-  return *this;
+  return Impl::wrap_object(o);
 }
 
 void native_object_base::add_native_method(
@@ -252,7 +256,9 @@ JSBool native_object_base::impl::property_op(
   } FLUSSPFERD_CALLBACK_END;
 }
 
-uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *thing) {
+uint32 native_object_base::impl::mark_op(
+    JSContext *ctx, JSObject *obj, void *thing)
+{
   current_context_scope scope(Impl::wrap_context(ctx));
 
   native_object_base *self =
@@ -264,7 +270,9 @@ uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *th
   return 0;
 }
 
-void native_object_base::call_native_method(std::string const &name, call_context &x) {
+void native_object_base::call_native_method(
+    std::string const &name, call_context &x)
+{
   impl::native_method_map::iterator it = p->native_methods.find(name);
 
   if (it != p->native_methods.end()) {
@@ -287,7 +295,9 @@ void native_object_base::call_native_method(std::string const &name, call_contex
   }
 }
 
-void native_object_base::property_op(property_mode mode, value const &id, value &data) {
+void native_object_base::property_op(
+    property_mode mode, value const &id, value &data)
+{
   std::string name = id.to_string().to_string();
   impl::property_callback_map::iterator it = p->property_callbacks.find(name);
 
@@ -299,6 +309,5 @@ void native_object_base::property_op(property_mode mode, value const &id, value 
   }
 }
 
-void native_object_base::post_initialize() {}
-
 void native_object_base::trace(tracer&) {}
+void native_object_base::late_load() {}

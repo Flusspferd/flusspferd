@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "function.hpp"
 #include "array.hpp"
 #include "native_function.hpp"
+#include "local_root_scope.hpp"
 #include <boost/type_traits/is_function.hpp>
 #include <boost/utility/enable_if.hpp>
 #endif
@@ -43,6 +44,12 @@ namespace flusspferd {
 class native_object_base;
 class function;
 class native_function_base;
+
+namespace detail {
+
+object create_native_object(object const &proto);
+
+}
 
 object create_object();
 array create_array(unsigned int length = 0);
@@ -59,8 +66,9 @@ object create_native_object(native_object_base *ptr, object const &proto);
   ) { \
     if (!proto.is_valid()) \
       proto = get_current_context().get_prototype<T>(); \
-    return create_native_object( \
-      new T(BOOST_PP_ENUM_PARAMS(n_args, param)), proto); \
+    local_root_scope scope; \
+    object obj = detail::create_native_object(proto); \
+    return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
   } \
   /**/
 
