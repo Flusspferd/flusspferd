@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
     std::string source;
     unsigned int line = 0;
 
-    while( getline(source) ) {
+    while (getline(source)) {
       try {
         flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
         if (!v.is_void())
@@ -149,7 +149,6 @@ int main(int argc, char **argv) {
         std::cerr << "ERROR: " << e.what() << '\n';
       }
       co.gc();
-
     }
   }
   catch(std::exception &e) {
