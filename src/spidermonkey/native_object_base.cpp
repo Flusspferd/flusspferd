@@ -55,7 +55,8 @@ public:
   native_method_map native_methods;
 
 public:
-  typedef boost::unordered_map<std::string, property_callback> property_callback_map;
+  typedef 
+    boost::unordered_map<std::string, property_callback> property_callback_map;
 
   property_callback_map property_callbacks;
 };
@@ -85,7 +86,11 @@ native_object_base::native_object_base(object const &o) : p(new impl) {
   load_into(o);
 }
 
-native_object_base::~native_object_base() {}
+native_object_base::~native_object_base() {
+  if (is_valid()) {
+    JS_SetPrivate(Impl::current_context(), get(), 0);
+  }
+}
 
 void native_object_base::load_into(object const &o) {
   if (is_valid())
