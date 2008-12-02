@@ -32,7 +32,7 @@ namespace flusspferd { namespace io {
 
 class file_class : public stream_base {
 public:
-  file_class(call_context &);
+  file_class(object const &, call_context &);
   ~file_class();
 
   struct class_info {
@@ -44,9 +44,6 @@ public:
 
     static void augment_constructor(object);
   };
-
-private:
-  void post_initialize();
 
 private: // javascript methods
   void open(char const *name);

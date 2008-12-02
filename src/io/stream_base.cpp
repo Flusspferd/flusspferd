@@ -33,21 +33,19 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
-stream_base::stream_base(std::streambuf *p)
-  : streambuf(p)
-{}
+stream_base::stream_base(object const &o, std::streambuf *p)
+  : native_object_base(o), streambuf(p)
+{
+  register_native_method("readWhole", &stream_base::read_whole);
+  register_native_method("read", &stream_base::read);
+  register_native_method("write", &stream_base::write);
+}
 
 stream_base::~stream_base()
 {}
 
 void stream_base::set_streambuf(std::streambuf *p) {
   streambuf = p;
-}
-
-void stream_base::post_initialize() {
-  register_native_method("readWhole", &stream_base::read_whole);
-  register_native_method("read", &stream_base::read);
-  register_native_method("write", &stream_base::write);
 }
 
 object stream_base::class_info::create_prototype() {

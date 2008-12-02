@@ -31,7 +31,7 @@ namespace flusspferd { namespace io {
 
 class stream_base : public native_object_base {
 public:
-  stream_base(std::streambuf * = 0);
+  stream_base(object const &o, std::streambuf *b);
   ~stream_base();
 
   void set_streambuf(std::streambuf *buf);
@@ -39,9 +39,6 @@ public:
   struct class_info {
     static object create_prototype();
   };
-
-protected:
-  void post_initialize();
 
 private: // javascript methods
   void close();

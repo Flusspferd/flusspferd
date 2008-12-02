@@ -44,25 +44,21 @@ public:
   static void create(char const *name, boost::optional<int> mode);
 };
 
-file_class::file_class(call_context &x)
-  : p(new impl)
+file_class::file_class(object const &obj, call_context &x)
+  : stream_base(obj, 0), p(new impl)
 {
   set_streambuf(p->stream.rdbuf());
   if (!x.arg.empty()) {
     string name = x.arg[0].to_string();
     open(name.c_str());
   }
-}
-
-file_class::~file_class()
-{}
-
-void file_class::post_initialize() {
-  stream_base::post_initialize();
 
   register_native_method("open", &file_class::open);
   register_native_method("close", &file_class::close);
 }
+
+file_class::~file_class()
+{}
 
 char const *file_class::class_info::constructor_name() {
   return "File";
