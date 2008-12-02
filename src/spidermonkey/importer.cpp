@@ -2,9 +2,8 @@
 #include "flusspferd/importer.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
-
 #include <boost/filesystem.hpp>
-
+#include <boost/unordered_map.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -65,6 +64,17 @@ void importer::class_info::augment_constructor(object &ctor) {
   ctor.define_property("preload", create_object());
 }
 
+class importer::impl {
+public:
+  struct cache_item {
+    void *module;
+    void *symbol;
+  };
+
+  typedef boost::unordered_map<std::string, cache_item> module_cache_map;
+  module_cache_map module_cache;
+};
+
 importer::importer(object const &obj, call_context &)
   : native_object_base(obj)
 {
@@ -111,66 +121,81 @@ value importer::load(string const &name, bool binary_only) {
     }
   }
 
-  std::string so_name, js_name;
-  so_name = process_name(name);
-  js_name = process_name(name, true);
+  value paths_v;
+
+  if (p->module_cache.find(name.to_string()) == p->module_cache.end()) {
+    std::string so_name, js_name;
+    so_name = process_name(name);
+    js_name = process_name(name, true);
   
-  //TODO: I'd like a version that throws an exception instead of assert traps
-  value paths_v = get_property("paths").to_object();
-  if (!paths_v.is_object())
-    throw exception("Unable to get search paths or its not an object");
+    //TODO: I'd like a version that throws an exception instead of assert traps
+    paths_v = get_property("paths").to_object();
+    if (!paths_v.is_object())
+      throw exception("Unable to get search paths or its not an object");
 
-  array paths = paths_v.get_object();
+    array paths = paths_v.get_object();
 
-  // TODO: We could probably do with an array class.
-  size_t len = paths.get_length();
-  for (size_t i=0; i < len; i++) {
-    std::string path = paths.get_element(i).to_string().to_string();
-    std::string fullpath = path + js_name;
+    // TODO: We could probably do with an array class.
+    size_t len = paths.get_length();
+    for (size_t i=0; i < len; i++) {
+      std::string path = paths.get_element(i).to_string().to_string();
+      std::string fullpath = path + js_name;
 
-    if (!binary_only) {
-      std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
+      if (!binary_only) {
+        std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
-      if (file.good()) {
-        // Slurp in the file
-        std::stringstream cbuf;
-        cbuf << file.rdbuf();
-        if (!file)
-          // TODO: Is the information (fullpath) leak bad?
-          throw exception( std::string("Error reading from ") + fullpath );
+        if (file.good()) {
+          // Slurp in the file
+          std::stringstream cbuf;
+          cbuf << file.rdbuf();
+          if (!file)
+            // TODO: Is the information (fullpath) leak bad?
+            throw exception( std::string("Error reading from ") + fullpath );
 
-        // Execute the file
-        std::string const &contents = cbuf.str();
-        return get_current_context().evaluateInScope(contents.data(), 
-            contents.size(), fullpath.c_str(), 1, 
-            get_property("context").to_object());
+          // Execute the file
+          std::string const &contents = cbuf.str();
+          return get_current_context().evaluateInScope(contents.data(), 
+              contents.size(), fullpath.c_str(), 1, 
+              get_property("context").to_object());
+        }
+      }
+
+      fullpath = path + so_name;
+
+      if (boost::filesystem::exists(fullpath)) {
+        impl::cache_item item;
+
+        // Load the .so
+        item.module = dlopen(fullpath.c_str(), RTLD_LAZY);
+        if (!item.module) {
+          std::stringstream ss;
+          ss << "Unable to load library '" << fullpath.c_str()
+             << "': " << dlerror();
+          throw exception(ss.str());
+        }
+
+        item.symbol = dlsym(item.module, "flusspferd_load");
+
+        if (!item.symbol) {
+          std::stringstream ss;
+          ss << "Unable to load library '" << fullpath.c_str() 
+             << "': " << dlerror();
+          throw exception(ss.str());
+        }
+
+        p->module_cache.insert(std::make_pair(name.to_string(), item));
+        break;
       }
     }
+  }
 
-    fullpath = path + so_name;
+  impl::module_cache_map::iterator it = p->module_cache.find(name.to_string());
 
-    if (boost::filesystem::exists(fullpath)) {
-      // Load the .so
-      void *handle = dlopen(fullpath.c_str(), RTLD_LAZY);
-      if (!handle) {
-        std::stringstream ss;
-        ss << "Unable to load library '" << fullpath.c_str()
-           << "': " << dlerror();
-        throw exception(ss.str());
-      }
+  if (it != p->module_cache.end()) {
+    value (*func)(object container);
+    func = (value (*)(object)) it->second.symbol;
 
-      value (*func)(object container);
-      func = (value (*)(object)) dlsym(handle, "flusspferd_load");
-      if (func) {
-        std::stringstream ss;
-        ss << "Unable to load library '" << fullpath.c_str() 
-           << "': " << dlerror();
-        throw exception(ss.str());
-      }
-
-      // TODO: We should probably track and close the dlopen
-      return func(get_property("context").to_object());
-    }
+    return func(get_property("context").to_object());
   }
 
   // We probably want to throw an exception here.

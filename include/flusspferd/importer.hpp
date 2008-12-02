@@ -5,6 +5,7 @@
 
 #include "native_object_base.hpp"
 #include "class.hpp"
+#include <boost/scoped_ptr.hpp>
 
 namespace flusspferd { 
 
@@ -26,6 +27,10 @@ protected:
 
 private: // JS methods
   value load(string const &name, bool binary_only); 
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
 };
 
 }
