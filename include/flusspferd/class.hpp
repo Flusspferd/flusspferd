@@ -52,7 +52,7 @@ struct class_constructor : native_function_base {
 };
 
 template<typename T>
-object load_class(
+void load_class(
     context &ctx, object &container, char const *name, object &constructor) 
 {
   object prototype = T::class_info::create_prototype();
@@ -66,8 +66,6 @@ object load_class(
   T::class_info::augment_constructor(constructor);
 
   container.define_property(name, constructor, object::dont_enumerate);
-
-  return constructor;
 }
 
 }
