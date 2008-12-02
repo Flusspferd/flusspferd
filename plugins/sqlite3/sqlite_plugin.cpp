@@ -61,7 +61,7 @@ private: // JS methods
   ::sqlite3 *db;
 
   void close();
-  object cursor(call_context &x);
+  void cursor(call_context &x);
 };
 
 class sqlite3_cursor : public native_object_base {
@@ -128,10 +128,9 @@ sqlite3::sqlite3(object const &obj, call_context &x)
       throw std::bad_alloc(); // out of memory. better way to signal this?
   }
 
-  //register_native_method("cursor", &sqlite3::cursor);
+  register_native_method("cursor", &sqlite3::cursor);
   register_native_method("close", &sqlite3::close);
 }
-
 ///////////////////////////
 sqlite3::~sqlite3()
 {
@@ -141,12 +140,14 @@ sqlite3::~sqlite3()
 ///////////////////////////
 void sqlite3::close()
 {
-  if (db)
+  if (db) {
     sqlite3_close(db);
+    db = NULL;
+  }
 }
 
 ///////////////////////////
-object sqlite3::cursor(call_context &x) {
+void sqlite3::cursor(call_context &x) {
   local_root_scope scope;
   if (!db)
     throw exception("SQLite3.cursor called on closed dbh");
@@ -167,7 +168,7 @@ object sqlite3::cursor(call_context &x) {
   // TODO: remove tail and set it seperately
   cursor.define_property("sql", sql);
 
-  return cursor;
+  x.result = cursor;
 }
 
 ///////////////////////////
