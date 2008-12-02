@@ -52,13 +52,10 @@ struct class_constructor : native_function_base {
 };
 
 template<typename T>
-object load_class(object &container, char const *name) {
-  context ctx = get_current_context();
-
-  object constructor(ctx.get_constructor<T>());
-
+object load_class(
+    context &ctx, object &container, char const *name, object &constructor) 
+{
   object prototype = T::class_info::create_prototype();
-
   ctx.add_prototype<T>(prototype);
 
   constructor.define_property(
@@ -108,15 +105,20 @@ object load_class(
   if (previous.is_object())
     return previous.get_object();
 
-  if (!ctx.get_constructor<T>().is_valid())
-    ctx.add_constructor<T>(
-      create_native_function<detail::class_constructor<T> >(arity, name));
+  object constructor = ctx.get_constructor<T>();
 
-  return detail::load_class<T>(container, name);
+  if (!constructor.is_valid()) {
+    constructor =
+      create_native_function<detail::class_constructor<T> >(arity, name);
+    ctx.add_constructor<T>(constructor);
+    detail::load_class<T>(ctx, container, name, constructor);
+  }
+
+  return constructor;
 }
 
 template<typename T>
-bool load_class(
+object load_class(
   object container = global(),
   typename boost::enable_if<
     boost::mpl::not_<typename T::class_info::constructible>
@@ -133,10 +135,15 @@ bool load_class(
   if (previous.is_object())
     return previous.get_object();
 
-  if (!ctx.get_constructor<T>().is_valid())
-    ctx.add_constructor<T>(create_object());
+  object constructor = ctx.get_constructor<T>();
 
-  return detail::load_class<T>(container, name);
+  if (!constructor.is_valid()) {
+    constructor = create_object();
+    ctx.add_constructor<T>(constructor);
+    detail::load_class<T>(ctx, container, name, constructor);
+  }
+
+  return constructor;
 }
 
 }

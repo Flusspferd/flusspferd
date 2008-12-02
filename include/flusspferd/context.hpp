@@ -24,6 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CONTEXT_HPP
 #define FLUSSPFERD_CONTEXT_HPP
 
+#include "object.hpp"
 #include <boost/shared_ptr.hpp>
 #include <string>
 
@@ -73,7 +74,7 @@ public:
   void gc();
 
   void add_prototype(std::string const &name, object const &proto);
-  object const &get_prototype(std::string const &name) const;
+  object get_prototype(std::string const &name) const;
 
   template<typename T>
   void add_prototype(object const &proto) {
@@ -81,12 +82,12 @@ public:
   }
 
   template<typename T>
-  object const &get_prototype() const {
+  object get_prototype() const {
     return get_prototype(typeid(T).name());
   }
 
   void add_constructor(std::string const &name, object const &ctor);
-  object const &get_constructor(std::string const &name) const;
+  object get_constructor(std::string const &name) const;
 
   template<typename T>
   void add_constructor(object const &ctor) {
@@ -94,7 +95,7 @@ public:
   }
 
   template<typename T>
-  object const &get_constructor() const {
+  object get_constructor() const {
     return get_constructor(typeid(T).name());
   }
 };

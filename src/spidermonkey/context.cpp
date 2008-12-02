@@ -49,8 +49,9 @@ namespace {
 }
 
 struct context::context_private {
-  boost::unordered_map<std::string, object> prototypes;
-  boost::unordered_map<std::string, object> constructors;
+  typedef boost::shared_ptr<root_object> root_object_ptr;
+  boost::unordered_map<std::string, root_object_ptr> prototypes;
+  boost::unordered_map<std::string, root_object_ptr> constructors;
 };
 
 class context::impl {
@@ -91,7 +92,10 @@ public:
 
   ~impl() {
     if (destroy) {
-      delete get_private();
+      {
+        current_context_scope scope(Impl::wrap_context(context));
+        delete get_private();
+      }
       JS_DestroyContext(context);
     }
   }
@@ -175,19 +179,23 @@ value context::evaluateInScope(char const* source, std::size_t n,
 }
 
 void context::add_prototype(std::string const &name, object const &proto) {
-  p->get_private()->prototypes[name] = proto;
+  p->get_private()->prototypes[name] =
+    context_private::root_object_ptr(new root_object(proto));
 }
 
-object const &context::get_prototype(std::string const &name) const {
-  return p->get_private()->prototypes[name];
+object context::get_prototype(std::string const &name) const {
+  context_private::root_object_ptr ptr = p->get_private()->prototypes[name];
+  return ptr ? *ptr : object();
 }
 
 void context::add_constructor(std::string const &name, object const &ctor) {
-  p->get_private()->constructors[name] = ctor;
+  p->get_private()->constructors[name] =
+    context_private::root_object_ptr(new root_object(ctor));
 }
 
-object const &context::get_constructor(std::string const &name) const {
-  return p->get_private()->constructors[name];
+object context::get_constructor(std::string const &name) const {
+  context_private::root_object_ptr ptr = p->get_private()->constructors[name];
+  return ptr ? *ptr : object();
 }
 
 value context::evaluate(char const *source, char const *file,

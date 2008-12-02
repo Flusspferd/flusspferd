@@ -24,7 +24,6 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ROOT_VALUE_HPP
 #define FLUSSPFERD_ROOT_VALUE_HPP
 
-#include "context.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace flusspferd {
@@ -50,8 +49,6 @@ public:
 
 private:
   void *get_gcptr();
-
-  context ctx;
 };
 
 }
