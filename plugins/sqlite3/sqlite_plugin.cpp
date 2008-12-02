@@ -60,7 +60,8 @@ protected:
 private: // JS methods
   ::sqlite3 *db;
 
-  object cursor(string sql);
+  void close();
+  object cursor(call_context &x);
 };
 
 class sqlite3_cursor : public native_object_base {
@@ -68,10 +69,11 @@ public:
   struct class_info : public flusspferd::class_info {
     static char const *full_name() { return "SQLite3.Cursor"; }
     typedef boost::mpl::bool_<true> constructible;
-    static char const* constructor_name() { return "SQLite3.Cursor"; }
+    static char const* constructor_name() { return "Cursor"; }
   };
 
   sqlite3_cursor(object const &obj, call_context &x);
+  sqlite3_cursor(object const &obj, sqlite3_stmt *sth);
   ~sqlite3_cursor();
 
 private: // JS methods
@@ -102,6 +104,9 @@ void sqlite3::class_info::augment_constructor(object &ctor)
 object sqlite3::class_info::create_prototype()
 {
   object proto = create_object();
+
+  create_native_method(proto, "cursor", 1);
+  create_native_method(proto, "close", 0);
   return proto;  
 }
 
@@ -111,8 +116,7 @@ sqlite3::sqlite3(object const &obj, call_context &x)
     db(NULL)
 {
   if (x.arg.size() == 0)
-    // This syntax probably isn't the best
-    throw exception("Usage: new SQLite3(dsn, [options])");
+    throw exception ("SQLite3 requires more than 0 arguments");
 
   string dsn = x.arg[0];
 
@@ -123,19 +127,63 @@ sqlite3::sqlite3(object const &obj, call_context &x)
     else
       throw std::bad_alloc(); // out of memory. better way to signal this?
   }
+
+  //register_native_method("cursor", &sqlite3::cursor);
+  register_native_method("close", &sqlite3::close);
 }
 
 ///////////////////////////
 sqlite3::~sqlite3()
+{
+  close();
+}
+
+///////////////////////////
+void sqlite3::close()
 {
   if (db)
     sqlite3_close(db);
 }
 
 ///////////////////////////
+object sqlite3::cursor(call_context &x) {
+  local_root_scope scope;
+  if (!db)
+    throw exception("SQLite3.cursor called on closed dbh");
+
+  if (x.arg.size() < 1)
+    throw exception ("cursor requires more than 0 arguments");
+
+  string sql = x.arg[0].to_string();
+  size_t n_bytes = sql.length() * 2;
+  sqlite3_stmt *sth;
+  char16_t *tail; // uncompiled part of the sql (when multiple stmts)
+  if (sqlite3_prepare16_v2(db, sql.data(), n_bytes, &sth, (const void**)&tail) != SQLITE_OK)
+  {
+    raise_sqlite_error(db);
+  }
+  object cursor = create_native_object<sqlite3_cursor>(object(), sth);
+
+  // TODO: remove tail and set it seperately
+  cursor.define_property("sql", sql);
+
+  return cursor;
+}
+
+///////////////////////////
+// 'Private' constructor that is called from sqlite3::cursor
+sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
+  : native_object_base(obj),
+    sth(_sth)
+{
+}
+
+///////////////////////////
+// 'Public' JS exposed constructor, dies cos its created without a sth.
 sqlite3_cursor::sqlite3_cursor(object const &obj, call_context &)
   : native_object_base(obj)
 {
+  throw exception("Use sqlite3.cursor to create cursors");
 }
 
 ///////////////////////////
