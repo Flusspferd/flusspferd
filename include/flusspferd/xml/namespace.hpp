@@ -34,6 +34,8 @@ namespace flusspferd { namespace xml {
 class namespace_ : public native_object_base {
 public:
   struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "XML.Namespace"; }
+
     static char const *constructor_name() { return "Namespace"; }
     typedef boost::mpl::size_t<3> constructor_arity;
 

@@ -42,8 +42,9 @@ using namespace flusspferd;
 class sqlite3 : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
+    static char const *full_name() { return "SQLite3"; }
     typedef boost::mpl::bool_<true> constructible;
-    static char const* constructor_name() { return "SQLite3"; }
+    static char const *constructor_name() { return "SQLite3"; }
     static void augment_constructor(object &ctor);
     static object create_prototype();
   };
@@ -63,6 +64,7 @@ private: // JS methods
 class sqlite3_cursor : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
+    static char const *full_name() { return "SQLite3.Cursor"; }
     typedef boost::mpl::bool_<true> constructible;
     static char const* constructor_name() { return "SQLite3.Cursor"; }
   };

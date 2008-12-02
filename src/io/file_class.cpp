@@ -60,10 +60,6 @@ file_class::file_class(object const &obj, call_context &x)
 file_class::~file_class()
 {}
 
-char const *file_class::class_info::constructor_name() {
-  return "File";
-}
-
 void file_class::class_info::augment_constructor(object constructor) {
   create_native_function(constructor, "create", &impl::create);
 }

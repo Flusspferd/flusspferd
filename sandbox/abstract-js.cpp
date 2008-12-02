@@ -102,6 +102,7 @@ struct my_object : flusspferd::native_object_base {
 
     typedef boost::mpl::size_t<1> constructor_arity;
     static char const *constructor_name() { return "MyObject"; }
+    static char const *full_name() { return "Local.MyObject"; }
   };
 };
 
