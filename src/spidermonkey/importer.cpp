@@ -116,9 +116,13 @@ importer::importer(object const &obj, call_context &)
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
+  context ctx = get_current_context();
+  object constructor = ctx.get_constructor<importer>();
+
   // Store search paths
-  // TODO use defaultPaths
-  set_property("paths", create_array());
+  array arr = constructor.get_property("defaultPaths").to_object();
+  set_property("paths", arr.call("concat"));
+  //TODO seal if necessaey
 
   // Create a context object, which is the object on which all modules are
   // evaluated
