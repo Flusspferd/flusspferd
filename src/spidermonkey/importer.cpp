@@ -210,8 +210,7 @@ value importer::load(string const &name, bool binary_only) {
         throw exception(ss.str());
       }
 
-      typedef value func_type(object container);
-      func_type *func = *(func_type**) &symbol;
+      flusspferd_load_t func = (flusspferd_load_t)symbol;
 
       return func(get_property("context").to_object());
     }
