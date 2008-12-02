@@ -203,8 +203,10 @@ void native_object_base::add_property_op(
 }
 
 void native_object_base::impl::finalize(JSContext *ctx, JSObject *obj) {
-  current_context_scope scope(Impl::wrap_context(ctx));
-  delete native_object_base::get_native(Impl::wrap_object(obj));
+  void *p = JS_GetPrivate(ctx, obj);
+
+  if (p)
+    delete static_cast<native_object_base*>(p);
 }
 
 JSBool native_object_base::impl::call_helper(
