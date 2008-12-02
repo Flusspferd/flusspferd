@@ -208,8 +208,8 @@ void object::define_property(
   if(!JS_DefineUCProperty(Impl::current_context(), get_const(),
                           name.data(), name.length(),
                           Impl::get_jsval(v),
-                          (JSPropertyOp) getter_o,
-                          (JSPropertyOp) setter_o,
+                          *(JSPropertyOp*) &getter_o,
+                          *(JSPropertyOp*) &setter_o,
                           sm_flags))
     throw exception("Could not define property");
 }

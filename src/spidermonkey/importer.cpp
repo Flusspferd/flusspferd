@@ -210,7 +210,7 @@ value importer::load(string const &name, bool binary_only) {
         throw exception(ss.str());
       }
 
-      flusspferd_load_t func = (flusspferd_load_t)symbol;
+      flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
       return func(get_property("context").to_object());
     }
