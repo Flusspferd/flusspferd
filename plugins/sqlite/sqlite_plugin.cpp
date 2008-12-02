@@ -47,6 +47,7 @@ public:
     typedef boost::mpl::bool_<true> constructible;
     static char const* constructor_name() { return "SQLite3"; }
     static void augment_constructor(object &ctor);
+    static object create_prototype();
   };
 
   sqlite3(object const &obj, call_context &x);
@@ -99,7 +100,6 @@ void sqlite3::class_info::augment_constructor(object &ctor)
 object sqlite3::class_info::create_prototype()
 {
   object proto = create_object();
-  proto.set_property("constructor",
   return proto;  
 }
 
