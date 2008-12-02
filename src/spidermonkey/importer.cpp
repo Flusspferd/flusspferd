@@ -61,6 +61,10 @@ object importer::class_info::create_prototype() {
   return proto;
 }
 
+void importer::class_info::augment_constructor(object &ctor) {
+  ctor.define_property("preload", create_object());
+}
+
 importer::importer(call_context &) {
 }
 
@@ -92,6 +96,22 @@ void importer::post_initialize() {
 }
 
 value importer::load(string const &name, bool binary_only) {
+  context ctx = get_current_context();
+  object constructor = ctx.get_constructor<importer>();
+  value preload = constructor.get_property("preload");
+
+  if (preload.is_object()) {
+    value loader = preload.get_object().get_property(name);
+    if (loader.is_object()) {
+      value result;
+      if (!loader.is_null()) {
+        local_root_scope scope;
+        result = loader.get_object().apply(get_property("context").to_object());
+      }
+      return result;
+    }
+  }
+
   std::string so_name, js_name;
   so_name = process_name(name);
   js_name = process_name(name, true);

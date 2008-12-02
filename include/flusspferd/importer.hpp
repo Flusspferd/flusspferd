@@ -15,6 +15,7 @@ public:
     typedef boost::mpl::bool_<true> constructible;
     static char const* constructor_name() { return "Importer"; }
     static object create_prototype();
+    static void augment_constructor(object &);
   };
 
   importer(call_context &x);
