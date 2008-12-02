@@ -58,6 +58,13 @@ void load_class(
   object prototype = T::class_info::create_prototype();
   ctx.add_prototype<T>(prototype);
 
+  prototype.define_property(
+    "constructor",
+    constructor,
+    object::permanent_property |
+    object::read_only_property |
+    object::dont_enumerate);
+
   constructor.define_property(
     "prototype",
     prototype,
