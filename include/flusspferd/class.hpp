@@ -66,7 +66,7 @@ object load_class(object &container, char const *name) {
     prototype,
     object::dont_enumerate);
 
-  T::class_info::augment_constructor(object(constructor));
+  T::class_info::augment_constructor(constructor);
 
   container.define_property(name, constructor, object::dont_enumerate);
 
@@ -80,7 +80,7 @@ struct class_info {
 
   typedef boost::mpl::size_t<0> constructor_arity;
 
-  static void augment_constructor(object const &ctor) {
+  static void augment_constructor(object &ctor) {
     (void) ctor;
   }
 
