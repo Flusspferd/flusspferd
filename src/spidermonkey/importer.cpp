@@ -2,6 +2,7 @@
 #include "flusspferd/importer.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/tracer.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 #include <iostream>
@@ -66,12 +67,8 @@ void importer::class_info::augment_constructor(object &ctor) {
 
 class importer::impl {
 public:
-  struct cache_item {
-    void *module;
-    void *symbol;
-  };
-
-  typedef boost::unordered_map<std::string, cache_item> module_cache_map;
+  typedef std::pair<std::string, bool> key_type;
+  typedef boost::unordered_map<key_type, value> module_cache_map;
   module_cache_map module_cache;
 };
 
@@ -104,7 +101,20 @@ importer::importer(object const &obj, call_context &)
 
 importer::~importer() {}
 
+void importer::trace(tracer &trc) {
+  for (impl::module_cache_map::iterator it = p->module_cache.begin();
+      it != p->module_cache.end();
+      ++it)
+    trc("module-cache-item", it->second);
+}
+
 value importer::load(string const &name, bool binary_only) {
+  impl::key_type key(name.to_string(), binary_only);
+
+  impl::module_cache_map::iterator it = p->module_cache.find(key);
+  if (it != p->module_cache.end())
+    return it->second;
+
   context ctx = get_current_context();
   object constructor = ctx.get_constructor<importer>();
   value preload = constructor.get_property("preload");
@@ -121,82 +131,69 @@ value importer::load(string const &name, bool binary_only) {
     }
   }
 
-  value paths_v;
-
-  if (p->module_cache.find(name.to_string()) == p->module_cache.end()) {
-    std::string so_name, js_name;
-    so_name = process_name(name);
-    js_name = process_name(name, true);
+  std::string so_name, js_name;
+  so_name = process_name(name);
+  js_name = process_name(name, true);
   
-    //TODO: I'd like a version that throws an exception instead of assert traps
-    paths_v = get_property("paths").to_object();
-    if (!paths_v.is_object())
-      throw exception("Unable to get search paths or its not an object");
+  //TODO: I'd like a version that throws an exception instead of assert traps
+  value paths_v = get_property("paths").to_object();
+  if (!paths_v.is_object())
+    throw exception("Unable to get search paths or its not an object");
 
-    array paths = paths_v.get_object();
+  array paths = paths_v.get_object();
 
-    // TODO: We could probably do with an array class.
-    size_t len = paths.get_length();
-    for (size_t i=0; i < len; i++) {
-      std::string path = paths.get_element(i).to_string().to_string();
-      std::string fullpath = path + js_name;
+  // TODO: We could probably do with an array class.
+  size_t len = paths.get_length();
+  for (size_t i=0; i < len; i++) {
+    std::string path = paths.get_element(i).to_string().to_string();
+    std::string fullpath = path + js_name;
 
-      if (!binary_only) {
-        std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
+    if (!binary_only) {
+      std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
-        if (file.good()) {
-          // Slurp in the file
-          std::stringstream cbuf;
-          cbuf << file.rdbuf();
-          if (!file)
-            // TODO: Is the information (fullpath) leak bad?
-            throw exception( std::string("Error reading from ") + fullpath );
+      if (file.good()) {
+        // Slurp in the file
+        std::stringstream cbuf;
+        cbuf << file.rdbuf();
+        if (!file)
+          // TODO: Is the information (fullpath) leak bad?
+          throw exception( std::string("Error reading from ") + fullpath );
 
-          // Execute the file
-          std::string const &contents = cbuf.str();
-          return get_current_context().evaluateInScope(contents.data(), 
-              contents.size(), fullpath.c_str(), 1, 
-              get_property("context").to_object());
-        }
-      }
-
-      fullpath = path + so_name;
-
-      if (boost::filesystem::exists(fullpath)) {
-        impl::cache_item item;
-
-        // Load the .so
-        item.module = dlopen(fullpath.c_str(), RTLD_LAZY);
-        if (!item.module) {
-          std::stringstream ss;
-          ss << "Unable to load library '" << fullpath.c_str()
-             << "': " << dlerror();
-          throw exception(ss.str());
-        }
-
-        item.symbol = dlsym(item.module, "flusspferd_load");
-
-        if (!item.symbol) {
-          std::stringstream ss;
-          ss << "Unable to load library '" << fullpath.c_str() 
-             << "': " << dlerror();
-          throw exception(ss.str());
-        }
-
-        p->module_cache.insert(std::make_pair(name.to_string(), item));
-        break;
+        // Execute the file
+        std::string const &contents = cbuf.str();
+        return get_current_context().evaluateInScope(contents.data(), 
+            contents.size(), fullpath.c_str(), 1, 
+            get_property("context").to_object());
       }
     }
-  }
 
-  impl::module_cache_map::iterator it = p->module_cache.find(name.to_string());
+    fullpath = path + so_name;
 
-  if (it != p->module_cache.end()) {
-    value (*func)(object container);
-    func = (value (*)(object)) it->second.symbol;
+    if (boost::filesystem::exists(fullpath)) {
+      // Load the .so
+      void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
+      if (!module) {
+        std::stringstream ss;
+        ss << "Unable to load library '" << fullpath.c_str()
+           << "': " << dlerror();
+        throw exception(ss.str());
+      }
 
-    return func(get_property("context").to_object());
-  }
+      void *symbol = dlsym(module, "flusspferd_load");
+
+      if (!symbol) {
+        std::stringstream ss;
+        ss << "Unable to load library '" << fullpath.c_str() 
+           << "': " << dlerror();
+        throw exception(ss.str());
+      }
+
+      typedef value func_type(object container);
+      func_type *func = *(func_type**) &symbol;
+
+      return func(get_property("context").to_object());
+    }
+  } 
 
   // We probably want to throw an exception here.
   std::stringstream ss;

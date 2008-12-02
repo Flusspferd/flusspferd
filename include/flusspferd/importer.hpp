@@ -23,6 +23,8 @@ public:
   ~importer();
 
 protected:
+  void trace(tracer &);
+
   static std::string process_name(string const &name, bool for_script = false);
 
 private: // JS methods
