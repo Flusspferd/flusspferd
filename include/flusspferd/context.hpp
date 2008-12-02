@@ -58,6 +58,11 @@ public:
 
   value evaluate(char const *source, std::size_t n,
                  char const *file = 0x0, unsigned int line = 0);
+
+  value evaluateInScope(char const* source, std::size_t n,
+                       char const* file, unsigned int line,
+                       object scope);
+
   value evaluate(char const *source, char const *file = 0x0,
                  unsigned int line = 0);
   value evaluate(std::string const &source, char const *file = 0x0,

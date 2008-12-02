@@ -152,9 +152,17 @@ object context::global() {
 value context::evaluate(char const *source, std::size_t n,
                         char const *file, unsigned int line)
 {
-  current_context_scope scope(*this);
+  return evaluateInScope(source, n, file, line, global());
+}
+
+value context::evaluateInScope(char const* source, std::size_t n,
+                                char const* file, unsigned int line,
+                                object scope)
+{
+  current_context_scope cxt_scope(*this);
+  
   jsval rval;
-  JSBool ok = JS_EvaluateScript(p->context, JS_GetGlobalObject(p->context),
+  JSBool ok = JS_EvaluateScript(p->context, Impl::get_object(scope),
                                   source, n, file, line, &rval);
   if(!ok) {
     throw exception("Could not evaluate script");
