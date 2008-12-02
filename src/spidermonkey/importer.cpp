@@ -121,7 +121,7 @@ value importer::load(string const &name, bool binary_only) {
           throw exception( std::string("Error reading from ") + fullpath );
 
         // Execute the file
-        std::string contents = cbuf.str();
+        std::string const &contents = cbuf.str();
         return get_current_context().evaluateInScope(contents.data(), 
             contents.size(), fullpath.c_str(), 1, 
             get_property("context").to_object());
@@ -135,7 +135,8 @@ value importer::load(string const &name, bool binary_only) {
       void *handle = dlopen(fullpath.c_str(), RTLD_LAZY);
       if (!handle) {
         std::stringstream ss;
-        ss << "Unable to load library '" << fullpath.c_str() << "': " << dlerror();
+        ss << "Unable to load library '" << fullpath.c_str()
+           << "': " << dlerror();
         throw exception(ss.str());
       }
 
