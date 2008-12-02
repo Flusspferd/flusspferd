@@ -30,10 +30,12 @@ THE SOFTWARE.
 
 #include "sqlite3.h"
 
-void raise_sqlite_error(sqlite3* db);
-
-
 using namespace flusspferd;
+
+// Put everything in an anon-namespace so typeid wont clash ever.
+namespace {
+
+void raise_sqlite_error(sqlite3* db);
 
 ///////////////////////////
 // Classes
@@ -45,7 +47,6 @@ public:
     typedef boost::mpl::bool_<true> constructible;
     static char const* constructor_name() { return "SQLite3"; }
     static void augment_constructor(object &ctor);
-    static object create_prototype();
   };
 
   sqlite3(object const &obj, call_context &x);
@@ -55,7 +56,7 @@ protected:
   //void trace(tracer &);
 
 private: // JS methods
-  sqlite3 *db;
+  ::sqlite3 *db;
 
   object cursor(string sql);
 };
@@ -98,6 +99,7 @@ void sqlite3::class_info::augment_constructor(object &ctor)
 object sqlite3::class_info::create_prototype()
 {
   object proto = create_object();
+  proto.set_property("constructor",
   return proto;  
 }
 
@@ -124,7 +126,7 @@ sqlite3::sqlite3(object const &obj, call_context &x)
 ///////////////////////////
 sqlite3::~sqlite3()
 {
-  if (db)i = new Importer(); i.paths = ['build/default/plugins/sqlite']; i.load('sqlite')
+  if (db)
     sqlite3_close(db);
 }
 
@@ -141,10 +143,12 @@ sqlite3_cursor::~sqlite3_cursor()
 
 
 // Helper function
-void raise_sqlite_error(sqlite3* db)
+void raise_sqlite_error(::sqlite3* db)
 {
   std::string s = "SQLite3 Error: ";
   s += sqlite3_errmsg(db);
   throw exception(s);
+}
+
 }
 
