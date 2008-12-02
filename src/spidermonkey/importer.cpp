@@ -134,6 +134,25 @@ value importer::load(string const &name, bool binary_only) {
     std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
     if (file.good()) {
+      // Use file open as an exists check
+      file.close();
+
+      void *handle = dlopen(fullpath.c_str(), RTLD_LAZY);
+      if (!handle) {
+        std::stringstream ss;
+        ss << "Unable to load library '" << fullpath.c_str() << "': " << dlerror();
+        throw exception(ss.str());
+      }
+
+      value (*func)(object container);
+      if (!(func = reinterpret_cast<value (*)(object)>(dlsym(handle, "flusspferd_load")))) {
+        std::stringstream ss;
+        ss << "Unable to load library '" << fullpath.c_str() << "': " << dlerror();
+        throw exception(ss.str());
+      }
+
+      // TODO: We should probably track and close the dlopen
+      return func(get_property("context").to_object());
     }
   }
 
@@ -180,16 +199,3 @@ std::string importer::process_name(string const &name, bool for_script) {
 
 }
 
-value importer::load_so(const char* fname) {
-  void *handle = dlopen(fname, RTLD_LAZY);
-  if (!handle) {
-    std::stringstream ss;
-    ss << "Cannot open '" << fname << "': " << dlerror();
-    throw exception(ss.str());
-  }
-
-  // TODO: Decide on the name and prototype of the function we load.
-  // maybe just: value instantiate(); (not extern "C")
-
-  return value();
-}
