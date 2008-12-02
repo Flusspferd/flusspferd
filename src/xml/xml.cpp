@@ -32,8 +32,14 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 
+
 using namespace flusspferd;
 using namespace flusspferd::xml;
+
+extern "C" value flusspferd_load(object container)
+{
+  return load_xml(container);
+}
 
 object flusspferd::xml::load_xml(object container) {
   local_root_scope scope;
