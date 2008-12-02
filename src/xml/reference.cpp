@@ -79,11 +79,3 @@ object reference_::class_info::create_prototype() {
   return proto;
 }
 
-char const *reference_::class_info::constructor_name() {
-  return "Reference";
-}
-
-std::size_t reference_::class_info::constructor_arity() {
-  return 2;
-}
-

@@ -78,12 +78,12 @@ public:
 
   template<typename T>
   void add_prototype(object const &proto) {
-    add_prototype(typeid(T).name(), proto);
+    add_prototype(T::class_info::full_name(), proto);
   }
 
   template<typename T>
   object get_prototype() const {
-    return get_prototype(typeid(T).name());
+    return get_prototype(T::class_info::full_name());
   }
 
   void add_constructor(std::string const &name, object const &ctor);
@@ -91,12 +91,12 @@ public:
 
   template<typename T>
   void add_constructor(object const &ctor) {
-    add_constructor(typeid(T).name(), ctor);
+    add_constructor(T::class_info::full_name(), ctor);
   }
 
   template<typename T>
   object get_constructor() const {
-    return get_constructor(typeid(T).name());
+    return get_constructor(T::class_info::full_name());
   }
 };
 

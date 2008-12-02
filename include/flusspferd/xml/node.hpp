@@ -45,6 +45,8 @@ public:
   xmlNodePtr c_obj() const { return ptr; }
 
   struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "XML.Node"; }
+
     static char const *constructor_name() { return "Node"; }
     typedef boost::mpl::size_t<3> constructor_arity;
 
