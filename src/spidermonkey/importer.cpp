@@ -56,16 +56,13 @@ using namespace flusspferd;
 
 object importer::class_info::create_prototype() {
   object proto = create_object();
-
-
   return proto;
 }
 
 importer::importer(call_context &) {
 }
 
-importer::~importer() {
-}
+importer::~importer() {}
 
 void importer::post_initialize() {
   // Create the load method on the actual object itself, not on the prototype
@@ -75,7 +72,7 @@ void importer::post_initialize() {
   // print(i.foo); // abc
   //
   // without the problem of load being overridden to do bad things
-  add_native_method( "load", 2);
+  add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
   // Store search paths
@@ -145,9 +142,11 @@ value importer::load(string const &name, bool binary_only) {
       }
 
       value (*func)(object container);
-      if (!(func = reinterpret_cast<value (*)(object)>(dlsym(handle, "flusspferd_load")))) {
+      func = (value (*)(object)) dlsym(handle, "flusspferd_load");
+      if (func) {
         std::stringstream ss;
-        ss << "Unable to load library '" << fullpath.c_str() << "': " << dlerror();
+        ss << "Unable to load library '" << fullpath.c_str() 
+           << "': " << dlerror();
         throw exception(ss.str());
       }
 
@@ -196,6 +195,5 @@ std::string importer::process_name(string const &name, bool for_script) {
     p += SHLIBSUFFIX;
 
   return p;
-
 }
 
