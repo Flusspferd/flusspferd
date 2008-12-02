@@ -30,10 +30,12 @@ THE SOFTWARE.
 
 #include "sqlite3.h"
 
-void raise_sqlite_error(sqlite3* db);
-
-
 using namespace flusspferd;
+
+// Put everything in an anon-namespace so typeid wont clash ever.
+namespace {
+
+void raise_sqlite_error(sqlite3* db);
 
 ///////////////////////////
 // Classes
@@ -56,7 +58,7 @@ protected:
   //void trace(tracer &);
 
 private: // JS methods
-  sqlite3 *db;
+  ::sqlite3 *db;
 
   object cursor(string sql);
 };
@@ -143,10 +145,12 @@ sqlite3_cursor::~sqlite3_cursor()
 
 
 // Helper function
-void raise_sqlite_error(sqlite3* db)
+void raise_sqlite_error(::sqlite3* db)
 {
   std::string s = "SQLite3 Error: ";
   s += sqlite3_errmsg(db);
   throw exception(s);
+}
+
 }
 
