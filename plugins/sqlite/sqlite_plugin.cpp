@@ -26,18 +26,26 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"
+#include <new>
 
 #include "sqlite3.h"
+
+void raise_sqlite_error(sqlite3* db);
+
 
 using namespace flusspferd;
 
 ///////////////////////////
+// Classes
+///////////////////////////
+
 class sqlite3 : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
     typedef boost::mpl::bool_<true> constructible;
     static char const* constructor_name() { return "SQLite3"; }
     static void augment_constructor(object &ctor);
+    static object create_prototype();
   };
 
   sqlite3(object const &obj, call_context &x);
@@ -47,7 +55,23 @@ protected:
   //void trace(tracer &);
 
 private: // JS methods
+  sqlite3 *db;
+
   object cursor(string sql);
+};
+
+class sqlite3_cursor : public native_object_base {
+public:
+  struct class_info : public flusspferd::class_info {
+    typedef boost::mpl::bool_<true> constructible;
+    static char const* constructor_name() { return "SQLite3.Cursor"; }
+  };
+
+  sqlite3_cursor(object const &obj, call_context &x);
+  ~sqlite3_cursor();
+
+private: // JS methods
+  sqlite3_stmt *sth;
 };
 
 ///////////////////////////
@@ -62,19 +86,65 @@ extern "C" value flusspferd_load(object container)
 void sqlite3::class_info::augment_constructor(object &ctor)
 {
   // Set static properties on the constructor
-  ctor.define_property("version", SQLITE_VERSION_NUMBER, object::read_only_property | object::permanent_property);
-  ctor.define_property("versionStr", string(SQLITE_VERSION), object::read_only_property | object::permanent_property);
+  ctor.define_property("version", SQLITE_VERSION_NUMBER, 
+      object::read_only_property | object::permanent_property);
+  ctor.define_property("versionStr", string(SQLITE_VERSION), 
+      object::read_only_property | object::permanent_property);
+
+  load_class<sqlite3_cursor>(ctor);
 }
 
 ///////////////////////////
-sqlite3::sqlite3(object const &obj, call_context &)
-  : native_object_base(obj)
+object sqlite3::class_info::create_prototype()
 {
+  object proto = create_object();
+  return proto;  
+}
+
+///////////////////////////
+sqlite3::sqlite3(object const &obj, call_context &x)
+  : native_object_base(obj), 
+    db(NULL)
+{
+  if (x.arg.size() == 0)
+    // This syntax probably isn't the best
+    throw exception("Usage: new SQLite3(dsn, [options])");
+
+  string dsn = x.arg[0];
+
+  // TODO: pull arguments from 2nd/options argument
+  if (sqlite3_open(dsn.c_str(), &db) != SQLITE_OK) {
+    if (db)
+      raise_sqlite_error(db);
+    else
+      throw std::bad_alloc(); // out of memory. better way to signal this?
+  }
 }
 
 ///////////////////////////
 sqlite3::~sqlite3()
 {
+  if (db)i = new Importer(); i.paths = ['build/default/plugins/sqlite']; i.load('sqlite')
+    sqlite3_close(db);
 }
 
+///////////////////////////
+sqlite3_cursor::sqlite3_cursor(object const &obj, call_context &)
+  : native_object_base(obj)
+{
+}
+
+///////////////////////////
+sqlite3_cursor::~sqlite3_cursor()
+{
+}
+
+
+// Helper function
+void raise_sqlite_error(sqlite3* db)
+{
+  std::string s = "SQLite3 Error: ";
+  s += sqlite3_errmsg(db);
+  throw exception(s);
+}
 
