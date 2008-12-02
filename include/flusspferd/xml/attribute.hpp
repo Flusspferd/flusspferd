@@ -34,6 +34,8 @@ namespace flusspferd { namespace xml {
 class attribute_ : public node {
 public:
   struct class_info : node::class_info {
+    static char const *full_name() { return "XML.Attribute"; }
+
     static char const *constructor_name() { return "Attribute"; }
     typedef boost::mpl::size_t<4> constructor_arity;
 

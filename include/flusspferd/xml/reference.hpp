@@ -33,8 +33,10 @@ namespace flusspferd { namespace xml {
 class reference_ : public node {
 public:
   struct class_info : node::class_info {
-    static char const *constructor_name();
-    static std::size_t constructor_arity();
+    static char const *full_name() { return "XML.Reference"; }
+
+    static char const *constructor_name() { return "Reference"; }
+    typedef boost::mpl::size_t<2> constructor_arity;
 
     static object create_prototype();
   };

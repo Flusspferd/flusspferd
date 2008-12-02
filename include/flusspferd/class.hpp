@@ -100,6 +100,7 @@ object load_class(
 {
   std::size_t const arity = T::class_info::constructor_arity::value;
   char const *name = T::class_info::constructor_name();
+  char const *full_name = T::class_info::full_name();
 
   local_root_scope scope;
 
@@ -114,7 +115,7 @@ object load_class(
 
   if (!constructor.is_valid()) {
     constructor =
-      create_native_function<detail::class_constructor<T> >(arity, name);
+      create_native_function<detail::class_constructor<T> >(arity, full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, container, name, constructor);
   }

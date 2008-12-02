@@ -38,8 +38,9 @@ public:
   typedef value (*flusspferd_load_t)(object container);
 
   struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "Importer"; }
     typedef boost::mpl::bool_<true> constructible;
-    static char const* constructor_name() { return "Importer"; }
+    static char const *constructor_name() { return "Importer"; }
     static object create_prototype();
     static void augment_constructor(object &);
   };

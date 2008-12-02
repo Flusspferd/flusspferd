@@ -33,6 +33,8 @@ namespace flusspferd { namespace xml {
 class processing_instruction : public node {
 public:
   struct class_info : node::class_info {
+    static char const *full_name() { return "XML.ProcessingInstruction"; }
+
     static char const *constructor_name() { return "ProcessingInstruction"; }
     typedef boost::mpl::size_t<3> constructor_arity;
 

@@ -36,8 +36,11 @@ public:
   ~file_class();
 
   struct class_info {
+    static char const *full_name() { return "IO.File"; }
+
     typedef boost::mpl::bool_<true> constructible;
-    static char const *constructor_name();
+
+    static char const *constructor_name() { return "File"; }
     typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
