@@ -49,6 +49,8 @@ public:
 
   bool is_valid() const;
 
+  void seal(bool deep);
+
   object get_parent();
   object get_prototype();
 

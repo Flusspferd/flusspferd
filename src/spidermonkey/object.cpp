@@ -41,6 +41,11 @@ using namespace flusspferd;
 object::object() : Impl::object_impl(0) { }
 object::~object() { }
 
+void object::seal(bool deep) {
+  if (!JS_SealObject(Impl::current_context(), get(), deep))
+    throw exception("Could not seal object");
+}
+
 object object::get_parent() {
   if (!is_valid())
     throw exception("Could not get object parent (object is null)");
