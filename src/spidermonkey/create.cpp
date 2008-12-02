@@ -49,7 +49,9 @@ array flusspferd::create_array(unsigned length) {
   return Impl::wrap_object(o);
 }
 
-object flusspferd::create_native_object(native_object_base *ptr, object const &proto) {
+object flusspferd::create_native_object(
+    native_object_base *ptr, object const &proto)
+{
   try {
     return ptr->do_create_object(proto);
   } catch (...) {
@@ -67,7 +69,9 @@ function flusspferd::create_native_function(native_function_base *ptr) {
   }
 }
 
-function flusspferd::create_native_function(object const &o_, native_function_base *ptr) {
+function flusspferd::create_native_function(
+    object const &o_, native_function_base *ptr)
+{
   object o = o_;
   function fun = create_native_function(ptr);
   o.define_property(ptr->name().c_str(), fun, object::dont_enumerate);
