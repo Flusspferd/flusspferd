@@ -95,7 +95,7 @@ public:
 };
 
 importer::importer(object const &obj, call_context &)
-  : native_object_base(obj)
+  : native_object_base(obj), p(new impl)
 {
   // Create the load method on the actual object itself, not on the prototype
   // That way the following works:
