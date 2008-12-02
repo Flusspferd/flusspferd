@@ -92,8 +92,10 @@ void importer::class_info::augment_constructor(object &ctor) {
 }
 
 void importer::lock_paths(object &ctor) {
+  local_root_scope scope;
   ctor.define_property("pathsLocked", true, read_only_property);
-  //TODO: seal defaultPaths
+  object paths = ctor.get_property("defaultPaths").to_object();
+  paths.seal(false);
 }
 
 class importer::impl {
@@ -121,8 +123,11 @@ importer::importer(object const &obj, call_context &)
 
   // Store search paths
   array arr = constructor.get_property("defaultPaths").to_object();
-  set_property("paths", arr.call("concat"));
-  //TODO seal if necessaey
+  arr = arr.call("concat").to_object();
+  set_property("paths", arr);
+  if (constructor.get_property("pathsLocked").to_boolean()) {
+    arr.seal(false);
+  }
 
   // Create a context object, which is the object on which all modules are
   // evaluated
