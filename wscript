@@ -102,6 +102,9 @@ def configure(conf):
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
+    if conf.check_cc(lib = 'readline', uselib_store='READLINE') != None:
+        u('CXXDEFINES', 'HAVE_READLINE')
+
     # xml
     if Options.options.enable_xml:
         ret = None

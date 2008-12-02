@@ -37,6 +37,11 @@ THE SOFTWARE.
 #include <cstring>
 #include <string>
 
+#ifdef HAVE_READLINE
+#  include <readline/readline.h>
+#  include <readline/history.h>
+#endif
+
 bool extfile = false;
 std::string file = __FILE__;
 std::istream in(std::cin.rdbuf());
@@ -83,6 +88,29 @@ void js_print(flusspferd::string const &v) {
   std::cout << v << std::endl;
 }
 
+bool getline(std::string &source, const char* prompt = "> ") {
+#ifdef HAVE_READLINE
+  if (!extfile) {
+    char* linep = readline(prompt);
+    if (!linep) {
+      std::cout << std::endl;
+      return false;
+    }
+    if (linep[0] != '\0')
+        add_history(linep);
+    source = linep;
+    source += '\n';
+    return true;
+  } 
+  else
+#endif
+  {
+
+    std::cout << prompt;
+    return std::getline(in, source);
+  }
+}
+
 int main(int argc, char **argv) {
   if(!parse_cmd(argc, argv))
     return 1;
@@ -110,12 +138,10 @@ int main(int argc, char **argv) {
 
     std::string source;
     unsigned int line = 0;
-    if(!extfile)
-      std::cout << "> ";
-    while(std::getline(in, source)) {
+
+    while( getline(source) ) {
       try {
-        flusspferd::value v =
-          flusspferd::evaluate(source, file.c_str(), ++line);
+        flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
         if (!v.is_void())
           std::cout << v << '\n';
       }
@@ -123,8 +149,7 @@ int main(int argc, char **argv) {
         std::cerr << "ERROR: " << e.what() << '\n';
       }
       co.gc();
-      if(!extfile)
-        std::cout << "> ";
+
     }
   }
   catch(std::exception &e) {

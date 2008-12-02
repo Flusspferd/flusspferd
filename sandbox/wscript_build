@@ -42,7 +42,7 @@ obj = bld.new_task_gen('cxx', 'program')
 obj.source = 'jsrepl.cpp'
 obj.target = 'jsrepl'
 obj.install_path = None
-obj.uselib = 'BOOST JS_H'
+obj.uselib = 'BOOST JS_H READLINE'
 obj.uselib_local = ['flusspferd']
 if bld.env['ENABLE_IO']:
   obj.uselib_local += ['flusspferd-io']
