@@ -88,8 +88,8 @@ void importer::post_initialize() {
 
   // this.contexnt.__proto__ = this.__proto__; 
   // Not sure we actually want to do this, but we can for now.
-  context.set_property("__proto__", get_property("__proto__"));
-  set_property("__proto__", context);
+  context.set_prototype(get_prototype());
+  set_prototype(context);
 }
 
 value importer::load(string const &name, bool binary_only) {
