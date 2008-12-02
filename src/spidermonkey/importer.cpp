@@ -3,6 +3,8 @@
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 
+#include <boost/filesystem.hpp>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -111,7 +113,7 @@ value importer::load(string const &name, bool binary_only) {
       std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
       if (file.good()) {
-        // Execute the file
+        // Slurp in the file
         std::stringstream cbuf;
         cbuf << file.rdbuf();
         if (!file)
@@ -127,13 +129,9 @@ value importer::load(string const &name, bool binary_only) {
     }
 
     fullpath = path + so_name;
-    // Load the .so
-    std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
 
-    if (file.good()) {
-      // Use file open as an exists check
-      file.close();
-
+    if (boost::filesystem::exists(fullpath)) {
+      // Load the .so
       void *handle = dlopen(fullpath.c_str(), RTLD_LAZY);
       if (!handle) {
         std::stringstream ss;
