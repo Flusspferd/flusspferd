@@ -85,6 +85,17 @@ object importer::class_info::create_prototype() {
 
 void importer::class_info::augment_constructor(object &ctor) {
   ctor.define_property("preload", create_object());
+
+  ctor.define_property("defaultPaths", create_array(), read_only_property);
+
+  create_native_function(ctor, "lockPaths", &importer::lock_paths);
+}
+
+void importer::lock_paths(object &ctor) {
+  local_root_scope scope;
+  ctor.define_property("pathsLocked", true, read_only_property);
+  object paths = ctor.get_property("defaultPaths").to_object();
+  paths.seal(false);
 }
 
 class importer::impl {
@@ -97,6 +108,8 @@ public:
 importer::importer(object const &obj, call_context &)
   : native_object_base(obj), p(new impl)
 {
+  local_root_scope scope;
+
   // Create the load method on the actual object itself, not on the prototype
   // That way the following works:
   // 
@@ -107,8 +120,16 @@ importer::importer(object const &obj, call_context &)
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
+  context ctx = get_current_context();
+  object constructor = ctx.get_constructor<importer>();
+
   // Store search paths
-  set_property("paths", create_array());
+  array arr = constructor.get_property("defaultPaths").to_object();
+  arr = arr.call("concat").to_object();
+  set_property("paths", arr);
+  if (constructor.get_property("pathsLocked").to_boolean()) {
+    arr.seal(false);
+  }
 
   // Create a context object, which is the object on which all modules are
   // evaluated

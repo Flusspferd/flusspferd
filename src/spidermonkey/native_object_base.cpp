@@ -284,22 +284,23 @@ void native_object_base::call_native_method(
 {
   impl::native_method_map::iterator it = p->native_methods.find(name);
 
-  if (it != p->native_methods.end()) {
-    impl::method_variant m = it->second;
-    switch (m.which()) {
-    case 0: // native_method_type
-      {
-        native_method_type native_method = boost::get<native_method_type>(m);
-        if (native_method)
-          (this->*native_method)(x);
-      }
-      break;
-    case 1: // callback_type
-      {
-        callback_type const &callback = boost::get<callback_type>(m);
-        if (callback)
-          callback(x);
-      }
+  if (it == p->native_methods.end())
+    throw exception("No such method: " + name);
+
+  impl::method_variant m = it->second;
+  switch (m.which()) {
+  case 0: // native_method_type
+    {
+      native_method_type native_method = boost::get<native_method_type>(m);
+      if (native_method)
+        (this->*native_method)(x);
+    }
+    break;
+  case 1: // callback_type
+    {
+      callback_type const &callback = boost::get<callback_type>(m);
+      if (callback)
+        callback(x);
     }
   }
 }
