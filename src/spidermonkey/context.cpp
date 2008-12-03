@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/blob.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include "flusspferd/implementation/object.hpp"
@@ -142,6 +143,10 @@ context::~context() { }
 context context::create() {
   context c;
   c.p.reset(new impl);
+  {
+    current_context_scope scope(c);
+    load_class<blob>(c.global());
+  }
   return c;
 }
 
