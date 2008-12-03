@@ -92,6 +92,20 @@ void importer::class_info::augment_constructor(object &ctor) {
   create_native_function(ctor, "lockPaths", &importer::lock_paths);
 }
 
+void importer::add_preloaded(std::string const &name, object const &obj) {
+  local_root_scope scope;
+  object ctor = get_constructor<importer>();
+  object preload = ctor.get_property("preload").to_object();
+  preload.set_property(name, obj);
+}
+
+void importer::add_preloaded(
+  std::string const &name,
+  boost::function<object (object const &)> const &fun)
+{
+  add_preloaded(name, create_native_function(fun, name));
+}
+
 void importer::lock_paths(object &ctor) {
   local_root_scope scope;
   ctor.define_property("pathsLocked", true,
@@ -168,7 +182,9 @@ value importer::load(string const &name, bool binary_only) {
       value result;
       if (!loader.is_null()) {
         local_root_scope scope;
-        result = loader.get_object().apply(get_property("context").to_object());
+        object x = loader.get_object();
+        object cx = get_property("context").to_object();
+        result = x.call(cx);
       }
       return result;
     }

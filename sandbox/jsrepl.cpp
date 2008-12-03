@@ -126,6 +126,8 @@ int main(int argc, char **argv) {
     flusspferd::load_class<flusspferd::blob>();
     flusspferd::load_class<flusspferd::importer>();
 
+    flusspferd::importer::add_preloaded("IO", &flusspferd::io::load_io);
+
     flusspferd::load_properties_functions();
 
     co.execute("prelude.js");

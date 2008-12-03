@@ -67,7 +67,7 @@ struct class_constructor : native_function_base {
 
 template<typename T>
 void load_class(
-    context &ctx, object &container, char const *name, object &constructor) 
+    context &ctx, object &constructor) 
 {
   object prototype = T::class_info::create_prototype();
   ctx.add_prototype<T>(prototype);
@@ -85,8 +85,6 @@ void load_class(
     object::dont_enumerate);
 
   T::class_info::augment_constructor(constructor);
-
-  container.define_property(name, constructor, object::dont_enumerate);
 }
 
 }
@@ -131,8 +129,10 @@ object load_class(
     constructor =
       create_native_function<detail::class_constructor<T> >(arity, full_name);
     ctx.add_constructor<T>(constructor);
-    detail::load_class<T>(ctx, container, name, constructor);
+    detail::load_class<T>(ctx, constructor);
   }
+
+  container.define_property(name, constructor, object::dont_enumerate);
 
   return constructor;
 }
@@ -163,8 +163,10 @@ object load_class(
       create_native_function<detail::unconstructible_class_constructor<T> >
         (full_name);
     ctx.add_constructor<T>(constructor);
-    detail::load_class<T>(ctx, container, name, constructor);
+    detail::load_class<T>(ctx, constructor);
   }
+
+  container.define_property(name, constructor, object::dont_enumerate);
 
   return constructor;
 }

@@ -31,7 +31,6 @@ THE SOFTWARE.
 namespace flusspferd { 
 
 class importer : public native_object_base {
-
 public:
   // The type of function which we look for in loaded .so modules
   // extern "C" value flusspferd_load(object container);
@@ -47,6 +46,11 @@ public:
 
   importer(object const &obj, call_context &x);
   ~importer();
+
+  static void add_preloaded(std::string const &name, object const &obj);
+  static void add_preloaded(
+    std::string const &name,
+    boost::function<object (object const &)> const &fun);
 
 protected:
   void trace(tracer &);

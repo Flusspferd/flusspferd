@@ -38,22 +38,28 @@ object flusspferd::io::load_io(object container) {
   if (previous.is_object())
     return previous.to_object();
 
-  object IO = flusspferd::create_object();
+  object IO = get_current_context().get_constructor("IO");
 
-  load_class<stream_base>(IO);
-  load_class<file_class>(IO);
+  if (!IO.is_valid()) {
+    IO = flusspferd::create_object();
 
-  IO.define_property(
-    "stdout",
-    create_native_object<stream_base>(object(), std::cout.rdbuf()));
+    load_class<stream_base>(IO);
+    load_class<file_class>(IO);
 
-  IO.define_property(
-    "stderr",
-    create_native_object<stream_base>(object(), std::cerr.rdbuf()));
+    IO.define_property(
+      "stdout",
+      create_native_object<stream_base>(object(), std::cout.rdbuf()));
 
-  IO.define_property(
-    "stdin",
-    create_native_object<stream_base>(object(), std::cin.rdbuf()));
+    IO.define_property(
+      "stderr",
+      create_native_object<stream_base>(object(), std::cerr.rdbuf()));
+
+    IO.define_property(
+      "stdin",
+      create_native_object<stream_base>(object(), std::cin.rdbuf()));
+
+    get_current_context().add_constructor("IO", IO);
+  }
 
   container.define_property(
     "IO",
