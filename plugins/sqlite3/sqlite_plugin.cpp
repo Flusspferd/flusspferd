@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"
 #include <new>
+#include <sstream>
 
 #include "sqlite3.h"
 
@@ -79,13 +80,20 @@ public:
 private:
   sqlite3_stmt *sth;
   
+  enum  {
+    CursorState_Init = 0,
+    CursorState_InProgress = 1,
+    CursorState_Finished = 2,
+    CursorState_Errored = 3
+  } state;
+
   // Methods that help wiht binding
   void bind_array(array &a, size_t num_binds);
   void bind_dict(object &o, size_t num_binds);
   void do_bind_param(int n, value v);
 
 private: // JS methods
-  void finish();
+  void close();
   void reset();
   object next();
   void bind(call_context &x);
@@ -186,7 +194,7 @@ void sqlite3::cursor(call_context &x) {
 object sqlite3_cursor::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "finish", 0);
+  create_native_method(proto, "close", 0);
   create_native_method(proto, "reset", 0);
   create_native_method(proto, "next", 0);
   create_native_method(proto, "bind", 0);
@@ -198,9 +206,10 @@ object sqlite3_cursor::class_info::create_prototype() {
 // 'Private' constructor that is called from sqlite3::cursor
 sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
   : native_object_base(obj),
-    sth(_sth)
+    sth(_sth),
+    state(CursorState_Init)
 {
-  register_native_method("finish", &sqlite3_cursor::finish);
+  register_native_method("close", &sqlite3_cursor::close);
   register_native_method("reset", &sqlite3_cursor::reset);
   register_native_method("next", &sqlite3_cursor::next);
   register_native_method("bind", &sqlite3_cursor::bind);
@@ -210,11 +219,11 @@ sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
 ///////////////////////////
 sqlite3_cursor::~sqlite3_cursor()
 {
-  finish();
+  close();
 }
 
 ///////////////////////////
-void sqlite3_cursor::finish() {
+void sqlite3_cursor::close() {
   if (sth) {
     sqlite3_finalize(sth);
     sth = NULL;
@@ -223,11 +232,84 @@ void sqlite3_cursor::finish() {
 
 ///////////////////////////
 void sqlite3_cursor::reset() {
+  sqlite3_reset(sth);
+  state = CursorState_Init;
 }
 
 ///////////////////////////
 object sqlite3_cursor::next() {
-  return object();
+  local_root_scope scope;
+
+  if (!sth)
+    throw exception("SQLite3.Cursor.next called on closed cursor");
+
+  switch (state) {
+    case CursorState_Finished:
+      // We've seen the last row, remember it and return the EOF indicator
+      return object();
+    case CursorState_Errored:
+      throw exception("SQLite3.Cursor: This cursor has seen an error and "
+                      "needs to be reset");
+    default:
+      break;    
+  }
+
+  int code = sqlite3_step(sth);
+
+  if (code == SQLITE_DONE) {
+    state = CursorState_Finished;
+    return object();
+  } else if (code != SQLITE_ROW) {
+    if (sqlite3_errcode( sqlite3_db_handle(sth) ) != SQLITE_OK) {
+      state = CursorState_Errored;
+      raise_sqlite_error( sqlite3_db_handle(sth) );
+    } else {
+      throw exception("SQLite3.Cursor: database reported misuse error. "
+                      "Please try again");
+    }
+  }
+
+  state = CursorState_InProgress;
+
+  // Build up the row object.
+  array row = create_array();
+  int cols = sqlite3_column_count(sth);
+
+  for (int i=0; i < cols; i++)
+  {
+    int type = sqlite3_column_type(sth, i);
+    value col;
+    
+    switch (type) {
+      case SQLITE_INTEGER:
+        col = sqlite3_column_int(sth, i);
+        break;
+      case SQLITE_FLOAT:
+        col = sqlite3_column_double(sth, i);
+        break;
+      case SQLITE_NULL:
+        col = object();
+        break;
+      //case SQLITE_BLOB:
+        // TODO: Support binary data!
+      case SQLITE_TEXT:
+        char16_t *bytes  = (char16_t*)sqlite3_column_text16(sth, i);
+
+        if (!bytes)
+          throw std::bad_alloc();
+
+        // Its actualy num of *bytes* not chars
+        size_t nbytes = sqlite3_column_bytes16(sth, i)/2; 
+        col = string(bytes, nbytes);
+        break;
+      default:
+        std::stringstream ss;
+        ss << "SQLite3.Cursor.next: Unknown column type " << type;
+        throw exception(ss.str());
+    }
+    row.set_element(i, col);
+  }
+  return row;
 }
 
 ///////////////////////////
