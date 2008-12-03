@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/xml.hpp"
 #include "flusspferd/io/io.hpp"
 #include "flusspferd/importer.hpp"
+#include "flusspferd/blob.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
@@ -105,7 +106,6 @@ bool getline(std::string &source, const char* prompt = "> ") {
   else
 #endif
   {
-
     std::cout << prompt;
     return std::getline(in, source);
   }
@@ -124,31 +124,32 @@ int main(int argc, char **argv) {
     flusspferd::xml::load_xml();
     #endif
 
-    #ifdef FLUSSPFERD_HAVE_IO
     flusspferd::io::load_io();
-    #endif
 
-    flusspferd::load_class<flusspferd::importer>(co.global());
+    flusspferd::load_class<flusspferd::blob>();
+    flusspferd::load_class<flusspferd::importer>();
 
-    co.global().define_property("print",
+    flusspferd::object global = flusspferd::global();
+
+    global.define_property("print",
       flusspferd::create_native_function(&js_print));
 
-
-    co.gc();
+    flusspferd::gc();
 
     std::string source;
     unsigned int line = 0;
 
     while (getline(source)) {
       try {
-        flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
+        flusspferd::value v =
+          flusspferd::evaluate(source, file.c_str(), ++line);
         if (!v.is_void())
           std::cout << v << '\n';
       }
       catch(std::exception &e) {
         std::cerr << "ERROR: " << e.what() << '\n';
       }
-      co.gc();
+      flusspferd::gc();
     }
   }
   catch(std::exception &e) {
