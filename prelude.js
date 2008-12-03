@@ -21,11 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Function.bound = function (obj, name) {
-  var fun = obj[name];
-  return function () {
-      fun.apply(obj, arguments);
+Function.prototype.bind = function (obj) {
+  var fun = this;
+  return function() {
+      return fun.apply(obj, arguments);
     };
+};
+
+Function.bind = function(obj, name) {
+  return obj[name].bind(obj);
 }
 
-print = Function.bound(IO.stdout, 'print');
+print = Function.bind(IO.stdout, 'print');
