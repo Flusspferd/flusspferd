@@ -98,7 +98,9 @@ void attribute_::init() {
 object attribute_::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = node::class_info::create_prototype();
+  object proto = create_object();
+  
+  proto.set_prototype(get_current_context().get_prototype<node>());
 
   create_native_method(proto, "addContent", 1);
 
