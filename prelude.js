@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Array.from = function(iterable) {
+Array.from = function (iterable) {
   if (!iterable)
     return [];
   if (iterable.toArray)
     return iterable.toArray();
   return Array.slice(iterable, 0);
-}
+};
 
 String.prototype.toArray = function () {
   return this.split(/\s+/);
@@ -37,11 +37,22 @@ Function.prototype.bind = function (obj) {
   var fun = this;
   return function() {
       return fun.apply(obj, arguments);
-    };
+    }
 };
 
-Function.bind = function(obj, name) {
-  return obj[name].bind(obj);
-}
+Function.bind = function (obj, name) {
+  var fun = obj[name];
+  if (!fun)
+    throw new Error("Object has no function '" + name + "'");
+  return fun.bind(obj);
+};
 
-print = Function.bind(IO.stdout, 'print');
+(function () {
+  var i = new Importer;
+
+  i.load('IO');
+
+  this.print = Function.bind(i.IO.stdout, 'print');
+
+  this.IO = i.IO;
+})();
