@@ -1,0 +1,7 @@
+flusspferd TODO list:
+
+- really make Importer secure (including maybe white/blacklisting of modules,
+  and restricting search paths)
+
+- Produce code coverage figures for JS (use JS debugger API to trace execution
+  and work out at least which lines have or haven't been run)
