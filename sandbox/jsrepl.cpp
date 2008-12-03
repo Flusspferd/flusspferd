@@ -121,8 +121,6 @@ int main(int argc, char **argv) {
     flusspferd::xml::load_xml();
     #endif
 
-    flusspferd::io::load_io();
-
     flusspferd::load_class<flusspferd::blob>();
     flusspferd::load_class<flusspferd::importer>();
 
