@@ -39,6 +39,20 @@ namespace flusspferd {
 namespace detail {
 
 template<typename T>
+struct unconstructable_class_constructor : native_function_base {
+  unconstructable_class_constructor(char const *name)
+    : native_function_base(0, name)
+  {}
+
+  void call(call_context &) {
+    std::string msg = "Instances of " 
+                    + get_name() 
+                    + " cannot be created directly";
+    throw exception(msg);
+  }
+};
+
+template<typename T>
 struct class_constructor : native_function_base {
   class_constructor(unsigned arity, char const *name)
     : native_function_base(arity, name)
@@ -144,7 +158,10 @@ object load_class(
   object constructor = ctx.get_constructor<T>();
 
   if (!constructor.is_valid()) {
-    constructor = create_object();
+    char const *full_name = T::class_info::full_name();
+    constructor =
+      create_native_function<detail::unconstructable_class_constructor<T> >
+        (full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, container, name, constructor);
   }
