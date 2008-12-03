@@ -299,3 +299,7 @@ value object::call(object o, arguments const &arg) {
 value object::call(arguments const &arg) {
   return call(global(), arg);
 }
+
+bool object::is_array() const {
+  return JS_IsArrayObject(Impl::current_context(), get_const());
+}

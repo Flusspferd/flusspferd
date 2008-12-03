@@ -109,6 +109,8 @@ public:
 
   property_iterator begin() const;
   property_iterator end() const;
+
+  bool is_array() const;
 };
 
 inline bool operator==(object const &a, object const &b) {
