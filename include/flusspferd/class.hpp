@@ -39,8 +39,8 @@ namespace flusspferd {
 namespace detail {
 
 template<typename T>
-struct unconstructable_class_constructor : native_function_base {
-  unconstructable_class_constructor(char const *name)
+struct unconstructible_class_constructor : native_function_base {
+  unconstructible_class_constructor(char const *name)
     : native_function_base(0, name)
   {}
 
@@ -160,7 +160,7 @@ object load_class(
   if (!constructor.is_valid()) {
     char const *full_name = T::class_info::full_name();
     constructor =
-      create_native_function<detail::unconstructable_class_constructor<T> >
+      create_native_function<detail::unconstructible_class_constructor<T> >
         (full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, container, name, constructor);
