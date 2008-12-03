@@ -67,13 +67,12 @@ private: // JS methods
 class sqlite3_cursor : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
-    typedef boost::mpl::bool_<true> constructible;
+    typedef boost::mpl::bool_<false> constructible;
     static char const *full_name() { return "SQLite3.Cursor"; }
     static char const* constructor_name() { return "Cursor"; }
     static object create_prototype();
   };
 
-  sqlite3_cursor(object const &obj, call_context &x);
   sqlite3_cursor(object const &obj, sqlite3_stmt *sth);
   ~sqlite3_cursor();
 
@@ -201,13 +200,6 @@ sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
   register_native_method("bind", &sqlite3_cursor::bind);
 }
 
-///////////////////////////
-// 'Public' JS exposed constructor, dies cos its created without a sth.
-sqlite3_cursor::sqlite3_cursor(object const &obj, call_context &)
-  : native_object_base(obj)
-{
-  throw exception("Use sqlite3.cursor to create cursors");
-}
 
 ///////////////////////////
 sqlite3_cursor::~sqlite3_cursor()
