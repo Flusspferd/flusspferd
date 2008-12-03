@@ -85,9 +85,7 @@ template<typename Tag>
 object general_text<Tag>::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object();
-  
-  proto.set_prototype(flusspferd::get_prototype<node>());
+  object proto = create_object(flusspferd::get_prototype<node>());
 
   return proto;
 }

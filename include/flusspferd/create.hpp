@@ -51,8 +51,10 @@ object create_native_object(object const &proto);
 
 }
 
-object create_object();
+object create_object(object const &proto = object());
+
 array create_array(unsigned int length = 0);
+
 object create_native_object(native_object_base *ptr, object const &proto);
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
