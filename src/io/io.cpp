@@ -39,6 +39,7 @@ object flusspferd::io::load_io(object container) {
 
   object IO = flusspferd::create_object();
 
+  load_class<stream_base>(IO);
   load_class<file_class>(IO);
 
   container.define_property(

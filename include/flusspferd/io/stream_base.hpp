@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_IO_STREAM_BASE_HPP
 
 #include "../native_object_base.hpp"
+#include "../class.hpp"
 #include <streambuf>
 
 namespace flusspferd { namespace io {
@@ -36,7 +37,10 @@ public:
 
   void set_streambuf(std::streambuf *buf);
 
-  struct class_info {
+  struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "IO.Stream"; }
+    typedef boost::mpl::bool_<false> constructible;
+    static char const *constructor_name() { return "Stream"; }
     static object create_prototype();
   };
 
