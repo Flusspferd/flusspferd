@@ -41,6 +41,9 @@ stream_base::stream_base(object const &o, std::streambuf *p)
   register_native_method("write", &stream_base::write);
   register_native_method("print", &stream_base::print);
   register_native_method("flush", &stream_base::flush);
+
+  define_property("fieldSeparator", string(" "));
+  define_property("recordSeparator", string("\n"));
 }
 
 stream_base::~stream_base()
@@ -101,14 +104,23 @@ void stream_base::write(string const &text) {
 
 void stream_base::print(call_context &x) {
   local_root_scope scope;
-  string delim(", ");
+
+  value delim_v = get_property("fieldSeparator");
+  string delim;
+  if (!delim_v.is_void_or_null())
+    delim = delim_v.to_string();
+
   std::size_t n = x.arg.size();
   for (std::size_t i = 0; i < n; ++i) {
     write(x.arg[i].to_string());
     if (i < n - 1)
       write(delim);
   }
-  streambuf->sputn("\n", 1);
+
+  value record_v = get_property("recordSeparator");
+  if (!record_v.is_void_or_null())
+    write(record_v.to_string());
+
   flush();
 }
 
