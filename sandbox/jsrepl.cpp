@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/properties_functions.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -124,6 +125,8 @@ int main(int argc, char **argv) {
 
     flusspferd::load_class<flusspferd::blob>();
     flusspferd::load_class<flusspferd::importer>();
+
+    flusspferd::load_properties_functions();
 
     co.execute("prelude.js");
 
