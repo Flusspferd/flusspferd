@@ -74,7 +74,7 @@ object processing_instruction::class_info::create_prototype() {
 
   object proto = create_object();
   
-  proto.set_prototype(node::class_info::create_prototype());
+  proto.set_prototype(flusspferd::get_prototype<node>());
 
   return proto;
 }

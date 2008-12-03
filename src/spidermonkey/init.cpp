@@ -108,6 +108,3 @@ context &init::get_current_context() {
   return p->current_context;
 }
 
-object flusspferd::global() {
-  return get_current_context().global();
-}

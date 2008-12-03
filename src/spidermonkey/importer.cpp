@@ -120,8 +120,7 @@ importer::importer(object const &obj, call_context &)
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
-  context ctx = get_current_context();
-  object constructor = ctx.get_constructor<importer>();
+  object constructor = get_constructor<importer>();
 
   // Store search paths
   array arr = constructor.get_property("defaultPaths").to_object();
@@ -158,8 +157,7 @@ value importer::load(string const &name, bool binary_only) {
   if (it != p->module_cache.end())
     return it->second;
 
-  context ctx = get_current_context();
-  object constructor = ctx.get_constructor<importer>();
+  object constructor = get_constructor<importer>();
   value preload = constructor.get_property("preload");
 
   if (preload.is_object()) {

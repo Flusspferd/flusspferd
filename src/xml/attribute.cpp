@@ -100,7 +100,7 @@ object attribute_::class_info::create_prototype() {
 
   object proto = create_object();
   
-  proto.set_prototype(get_current_context().get_prototype<node>());
+  proto.set_prototype(flusspferd::get_prototype<node>());
 
   create_native_method(proto, "addContent", 1);
 
