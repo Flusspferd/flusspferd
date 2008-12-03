@@ -85,10 +85,6 @@ bool parse_cmd(int argc, char **argv) {
   return true;
 }
 
-void js_print(flusspferd::string const &v) {
-  std::cout << v << std::endl;
-}
-
 bool getline(std::string &source, const char* prompt = "> ") {
 #ifdef HAVE_READLINE
   if (!extfile) {
@@ -128,11 +124,6 @@ int main(int argc, char **argv) {
 
     flusspferd::load_class<flusspferd::blob>();
     flusspferd::load_class<flusspferd::importer>();
-
-    flusspferd::object global = flusspferd::global();
-
-    global.define_property("print",
-      flusspferd::create_native_function(&js_print));
 
     flusspferd::gc();
 

@@ -51,6 +51,9 @@ private: // javascript methods
   string read(unsigned max_size);
 
   void write(string const &);
+  void print(call_context &);
+
+  void flush();
 
 private:
   std::streambuf *streambuf;

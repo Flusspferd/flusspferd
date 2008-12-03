@@ -39,6 +39,8 @@ stream_base::stream_base(object const &o, std::streambuf *p)
   register_native_method("readWhole", &stream_base::read_whole);
   register_native_method("read", &stream_base::read);
   register_native_method("write", &stream_base::write);
+  register_native_method("print", &stream_base::print);
+  register_native_method("flush", &stream_base::flush);
 }
 
 stream_base::~stream_base()
@@ -56,6 +58,8 @@ object stream_base::class_info::create_prototype() {
   create_native_method(proto, "readWhole", 0);
   create_native_method(proto, "read", 1);
   create_native_method(proto, "write", 1);
+  create_native_method(proto, "print", 0);
+  create_native_method(proto, "flush", 0);
 
   return proto;
 }
@@ -95,3 +99,19 @@ void stream_base::write(string const &text) {
   streambuf->sputn(text.c_str(), std::strlen(str));
 }
 
+void stream_base::print(call_context &x) {
+  local_root_scope scope;
+  string delim(", ");
+  std::size_t n = x.arg.size();
+  for (std::size_t i = 0; i < n; ++i) {
+    write(x.arg[i].to_string());
+    if (i < n - 1)
+      write(delim);
+  }
+  streambuf->sputn("\n", 1);
+  flush();
+}
+
+void stream_base::flush() {
+  streambuf->pubsync();
+}
