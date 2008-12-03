@@ -71,7 +71,7 @@ public:
   value evaluate(std::string const &source, char const *file = 0x0,
                  unsigned int line = 0);
 
-  value execute(char const *file, object const &scope);
+  value execute(char const *file, object const &scope = object());
 
   void gc();
 
