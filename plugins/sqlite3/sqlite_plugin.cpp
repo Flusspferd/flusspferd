@@ -78,6 +78,12 @@ public:
 
 private:
   sqlite3_stmt *sth;
+  
+  // Methods that help wiht binding
+  void bind_array(array &a, size_t num_binds);
+  void bind_dict(object &o, size_t num_binds);
+  void do_bind_param(int n, value v);
+
 private: // JS methods
   void finish();
   void reset();
@@ -225,7 +231,92 @@ object sqlite3_cursor::next() {
 }
 
 ///////////////////////////
-void sqlite3_cursor::bind(call_context &) {
+// JS method
+void sqlite3_cursor::bind(call_context &x) {
+  local_root_scope scope;
+
+  size_t num_binds = sqlite3_bind_parameter_count(sth);
+
+  if (!num_binds)
+    return;
+
+  if (x.arg[0].is_object()) {
+    object o = x.arg[0].get_object();
+
+    if (o.is_array()) {
+      array a = o;
+      bind_array(a, num_binds);
+    }
+    else
+      bind_dict(o, num_binds);
+  } else if (num_binds == 1) {
+    // Dont document that we accept a single param
+    do_bind_param(1, x.arg[0]);
+    
+  } else {
+    throw exception("SQLite3.Cursor.bind requires an array or an object as its only argument");
+  }
+}
+
+///////////////////////////
+// bind numbered params
+void sqlite3_cursor::bind_array(array &a, size_t num_binds) {
+
+  // Pull bind param 1 (the first) from array index 0 (also the first)
+  for (size_t n = 1; n <= num_binds; n++) {
+    value bind = a.get_element(n-1);
+
+    if (!bind.is_void())
+      do_bind_param(n, bind);
+
+  }
+}
+
+///////////////////////////
+// bind named or numbered params
+void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
+
+  for (size_t n = 1; n <= num_binds; n++) {
+    const char* name = sqlite3_bind_parameter_name(sth, n);
+
+    value bind;
+
+    if (!name) {
+      // Possibly a '?' unnnamed param
+      // TODO: This will break when n is > 2^31.
+      bind = o.get_property( value( int(n) ) );
+    } else {
+      // Named param
+      bind = o.get_property(name);
+    }
+
+    if (!bind.is_void())
+      do_bind_param(n, bind);
+
+  }
+
+}
+
+#include <stdio.h>
+///////////////////////////
+// Bind the actual para
+void sqlite3_cursor::do_bind_param(int n, value v) {
+  int ok;
+  printf("Binding %d to value %s\n", n, v.to_string().c_str());
+  if (v.is_int()) {
+      ok = sqlite3_bind_int(sth, n, v.get_int());
+  } else if (v.is_double()) {
+    ok = sqlite3_bind_double(sth, n, v.get_double());
+  } else if (v.is_null()) {
+    ok = sqlite3_bind_null(sth, n);
+  } else {
+    // Default, stringify the object
+    string bind = v.to_string();
+    ok = sqlite3_bind_text16(sth, n, bind.data(), bind.length()*2, SQLITE_TRANSIENT);
+  }
+
+  if (ok != SQLITE_OK)
+    raise_sqlite_error( sqlite3_db_handle(sth) ); 
 }
 
 ///////////////////////////
