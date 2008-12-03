@@ -125,6 +125,8 @@ int main(int argc, char **argv) {
     flusspferd::load_class<flusspferd::blob>();
     flusspferd::load_class<flusspferd::importer>();
 
+    co.execute("prelude.js");
+
     flusspferd::gc();
 
     std::string source;
