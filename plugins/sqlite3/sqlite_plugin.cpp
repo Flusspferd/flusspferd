@@ -297,12 +297,10 @@ void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
 
 }
 
-#include <stdio.h>
 ///////////////////////////
 // Bind the actual para
 void sqlite3_cursor::do_bind_param(int n, value v) {
   int ok;
-  printf("Binding %d to value %s\n", n, v.to_string().c_str());
   if (v.is_int()) {
       ok = sqlite3_bind_int(sth, n, v.get_int());
   } else if (v.is_double()) {
