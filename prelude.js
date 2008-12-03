@@ -56,3 +56,6 @@ Function.bind = function (obj, name) {
 
   this.IO = i.IO;
 })();
+
+// Set default paths to the plugin dirs
+Importer.defaultPaths = ['build/default/plugins/sqlite3', 'build/default/plugins/curl'];

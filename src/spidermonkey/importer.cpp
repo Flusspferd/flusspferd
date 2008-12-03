@@ -86,8 +86,8 @@ object importer::class_info::create_prototype() {
 void importer::class_info::augment_constructor(object &ctor) {
   ctor.define_property("preload", create_object(), permanent_property);
 
-  ctor.define_property("defaultPaths", create_array(),
-    read_only_property | permanent_property);
+  // Only make read-only in lockPahts
+  ctor.define_property("defaultPaths", create_array(), permanent_property);
 
   create_native_function(ctor, "lockPaths", &importer::lock_paths);
 }
@@ -110,8 +110,12 @@ void importer::lock_paths(object &ctor) {
   local_root_scope scope;
   ctor.define_property("pathsLocked", true,
     read_only_property | permanent_property);
+
   object paths = ctor.get_property("defaultPaths").to_object();
   paths.seal(false);
+
+  ctor.define_property("defaultPaths", paths,
+    read_only_property | permanent_property);
 }
 
 class importer::impl {
