@@ -192,22 +192,10 @@ value importer::load(string const &name, bool binary_only) {
     std::string fullpath = path + js_name;
 
     if (!binary_only) {
-      std::ifstream file(fullpath.c_str(), std::ios::in | std::ios::binary);
-
-      if (file.good()) {
-        // Slurp in the file
-        std::stringstream cbuf;
-        cbuf << file.rdbuf();
-        if (!file)
-          // TODO: Is the information (fullpath) leak bad?
-          throw exception( std::string("Error reading from ") + fullpath );
-
-        // Execute the file
-        std::string const &contents = cbuf.str();
-        return get_current_context().evaluateInScope(contents.data(), 
-            contents.size(), fullpath.c_str(), 1, 
+      if (boost::filesystem::exists(fullpath))
+        return get_current_context().execute(
+            fullpath.c_str(),
             get_property("context").to_object());
-      }
     }
 
     fullpath = path + so_name;

@@ -64,12 +64,14 @@ public:
 
   value evaluateInScope(char const* source, std::size_t n,
                        char const* file, unsigned int line,
-                       object scope);
+                       object const &scope);
 
   value evaluate(char const *source, char const *file = 0x0,
                  unsigned int line = 0);
   value evaluate(std::string const &source, char const *file = 0x0,
                  unsigned int line = 0);
+
+  value execute(char const *file, object const &scope);
 
   void gc();
 

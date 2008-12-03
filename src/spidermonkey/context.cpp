@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include "flusspferd/implementation/object.hpp"
@@ -31,6 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/unordered_map.hpp>
 #include <cstring>
+#include <cstdio>
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_STACKCHUNKSIZE
@@ -164,8 +166,8 @@ value context::evaluate(char const *source, std::size_t n,
 }
 
 value context::evaluateInScope(char const* source, std::size_t n,
-                                char const* file, unsigned int line,
-                                object scope)
+                               char const* file, unsigned int line,
+                               object const &scope)
 {
   current_context_scope cxt_scope(*this);
   
@@ -176,6 +178,64 @@ value context::evaluateInScope(char const* source, std::size_t n,
     throw exception("Could not evaluate script");
   }
   return Impl::wrap_jsval(rval);
+}
+
+value context::execute(char const *filename, object const &scope_) {
+  current_context_scope ctx_scope(*this);
+  JSContext *cx = p->context;
+
+  local_root_scope root_scope;
+
+  FILE *file = fopen(filename, "r");
+  if (!file) {
+    throw exception(std::string("Could not open '") + filename + "'");
+  }
+ 
+  /*
+   * It's not interactive - just execute it.
+   *
+   * Support the UNIX #! shell hack; gobble the first line if it starts
+   * with '#'. TODO - this isn't quite compatible with sharp variables,
+   * as a legal js program (using sharp variables) might start with '#'.
+   * But that would require multi-character lookahead.
+   */
+  int ch = fgetc(file);
+  if (ch == '#') {
+      while((ch = fgetc(file)) != EOF) {
+          if (ch == '\n' || ch == '\r')
+              break;
+      }
+  }
+  ungetc(ch, file);
+
+  JSObject *scope = Impl::get_object(scope_);
+
+  if (!scope)
+    scope = Impl::get_object(this->global());
+ 
+  int oldopts = JS_GetOptions(cx);
+  JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
+  JSScript *script = JS_CompileFileHandle(cx, scope, filename, file);
+  JS_SetOptions(cx, oldopts);
+ 
+  if (!script) {
+    throw exception("Could not compile script");
+  }
+
+  JSObject *rootable = JS_NewScriptObject(cx, script);
+  if (!rootable) {
+    JS_DestroyScript(cx, script);
+    return JS_FALSE;
+  }
+
+  value result;
+ 
+  JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
+ 
+  if (!ok)
+    throw exception("Script execution failed");
+
+  return result;
 }
 
 void context::add_prototype(std::string const &name, object const &proto) {
