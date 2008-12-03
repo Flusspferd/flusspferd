@@ -292,20 +292,26 @@ object sqlite3_cursor::next() {
         break;
       //case SQLITE_BLOB:
         // TODO: Support binary data!
+        //break;
       case SQLITE_TEXT:
-        char16_t *bytes  = (char16_t*)sqlite3_column_text16(sth, i);
+        {
+          char16_t *text  = (char16_t*)sqlite3_column_text16(sth, i);
 
-        if (!bytes)
-          throw std::bad_alloc();
+          if (!text)
+            throw std::bad_alloc();
 
-        // Its actualy num of *bytes* not chars
-        size_t nbytes = sqlite3_column_bytes16(sth, i)/2; 
-        col = string(bytes, nbytes);
+          // Its actually num of *bytes* not chars
+          size_t length = sqlite3_column_bytes16(sth, i) / 2;
+          col = string(text, length);
+        }
         break;
       default:
-        std::stringstream ss;
-        ss << "SQLite3.Cursor.next: Unknown column type " << type;
-        throw exception(ss.str());
+        {
+          std::stringstream ss;
+          ss << "SQLite3.Cursor.next: Unknown column type " << type;
+          throw exception(ss.str());
+        }
+        break;
     }
     row.set_element(i, col);
   }
