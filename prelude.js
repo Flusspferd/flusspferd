@@ -21,6 +21,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+Array.from = function(iterable) {
+  if (!iterable)
+    return [];
+  if (iterable.toArray)
+    return iterable.toArray();
+  return Array.slice(iterable, 0);
+}
+
+String.prototype.toArray = function () {
+  return this.split(/\s+/);
+};
+
 Function.prototype.bind = function (obj) {
   var fun = this;
   return function() {
