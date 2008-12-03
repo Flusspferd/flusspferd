@@ -21,6 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-function print() {
-  IO.stdout.print.apply(IO.stdout, arguments);
+Function.bound = function (obj, name) {
+  var fun = obj[name];
+  return function () {
+      fun.apply(obj, arguments);
+    };
 }
+
+print = Function.bound(IO.stdout, 'print');
