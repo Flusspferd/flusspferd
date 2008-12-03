@@ -47,6 +47,8 @@ def set_options(opt):
                    help='Enable IO support')
     opt.add_option('--enable-xml', action='store_true',
                    help='Enable XML support')
+    opt.add_option('--enable-curl', action='store_true',
+                   help='Build cURL extension')
     if darwin:
       opt.add_option('--libxml-framework', action='store', nargs=1, dest='libxml_framework',
                      help='libxml framework name')
@@ -146,6 +148,13 @@ int main() {
     if Options.options.enable_io:
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
+    if Options.options.enable_curl:
+      if (conf.check_cxx(lib = 'curl', 
+                        uselib_store='CURL') != None and 
+         conf.check_cxx(header_name = 'curl/curl.h',
+                        uselib_store='CURL') != None):
+        conf.env['ENABLE_CURL'] = True
+
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
     conf.env['ENABLE_XML'] = Options.options.enable_xml
@@ -167,6 +176,8 @@ def build_pkgconfig(bld):
 def build(bld):
     bld.add_subdirs('src')
     bld.add_subdirs('plugins/sqlite3')
+    if bld.env['ENABLE_CURL']:
+        bld.add_subdirs('plugins/curl')
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['ENABLE_SANDBOX']:
