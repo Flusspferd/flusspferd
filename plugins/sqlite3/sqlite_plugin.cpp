@@ -67,17 +67,23 @@ private: // JS methods
 class sqlite3_cursor : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
-    static char const *full_name() { return "SQLite3.Cursor"; }
     typedef boost::mpl::bool_<true> constructible;
+    static char const *full_name() { return "SQLite3.Cursor"; }
     static char const* constructor_name() { return "Cursor"; }
+    static object create_prototype();
   };
 
   sqlite3_cursor(object const &obj, call_context &x);
   sqlite3_cursor(object const &obj, sqlite3_stmt *sth);
   ~sqlite3_cursor();
 
-private: // JS methods
+private:
   sqlite3_stmt *sth;
+private: // JS methods
+  void finish();
+  void reset();
+  object next();
+  void bind(call_context &x);
 };
 
 ///////////////////////////
@@ -172,11 +178,27 @@ void sqlite3::cursor(call_context &x) {
 }
 
 ///////////////////////////
+object sqlite3_cursor::class_info::create_prototype() {
+  object proto = create_object();
+
+  create_native_method(proto, "finish", 0);
+  create_native_method(proto, "reset", 0);
+  create_native_method(proto, "next", 0);
+  create_native_method(proto, "bind", 0);
+
+  return proto;
+}
+
+///////////////////////////
 // 'Private' constructor that is called from sqlite3::cursor
 sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
   : native_object_base(obj),
     sth(_sth)
 {
+  register_native_method("finish", &sqlite3_cursor::finish);
+  register_native_method("reset", &sqlite3_cursor::reset);
+  register_native_method("next", &sqlite3_cursor::next);
+  register_native_method("bind", &sqlite3_cursor::bind);
 }
 
 ///////////////////////////
@@ -190,9 +212,31 @@ sqlite3_cursor::sqlite3_cursor(object const &obj, call_context &)
 ///////////////////////////
 sqlite3_cursor::~sqlite3_cursor()
 {
+  finish();
 }
 
+///////////////////////////
+void sqlite3_cursor::finish() {
+  if (sth) {
+    sqlite3_finalize(sth);
+    sth = NULL;
+  }
+}
 
+///////////////////////////
+void sqlite3_cursor::reset() {
+}
+
+///////////////////////////
+object sqlite3_cursor::next() {
+  return object();
+}
+
+///////////////////////////
+void sqlite3_cursor::bind(call_context &) {
+}
+
+///////////////////////////
 // Helper function
 void raise_sqlite_error(::sqlite3* db)
 {
