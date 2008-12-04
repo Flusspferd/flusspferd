@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/blob.hpp"
 
 #include <curl/curl.h>
 
@@ -62,10 +63,11 @@ protected:
   // Data is needed by curl (i.e. upload/request body)
   size_t handle_curl_data_needed( void* buff, size_t size );
 
+  // TODO: Support setting CURLOPT_INFILESIZE for PUT methods
+
 private: // JS methods
-  void set_url(string url);
-  void set_method(string meth);
-  int perform();
+  void set_method(string &meth);
+  int perform(string &url);
 };
 
 
@@ -111,7 +113,6 @@ void curl::class_info::augment_constructor(object &ctor)
 object curl::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method( proto, "setURL", 1);
   create_native_method( proto, "setMethod", 1);
   create_native_method( proto, "perform", 0);
 
@@ -123,7 +124,6 @@ curl::curl(object const &obj, call_context &)
   : native_object_base(obj),
     error_buffer(NULL)
 {
-  register_native_method("setURL", &curl::set_url);
   register_native_method("setMethod", &curl::set_method);
   register_native_method("perform", &curl::perform);
 
@@ -156,24 +156,59 @@ curl::~curl() {
 }
 
 ///////////////////////////
-void curl::set_url(string url ) {
+void curl::set_method(string &f_meth) {
+  int ok = CURLE_OK;
+  std::string meth = f_meth.to_string();
+
+  if (meth == "GET")
+    ok = curl_easy_setopt(curlHandle, CURLOPT_HTTPGET, 1);
+  else if (meth == "POST")
+    ok = curl_easy_setopt(curlHandle, CURLOPT_POST, 1);
+  else if (meth == "PUT")
+    ok = curl_easy_setopt(curlHandle, CURLOPT_UPLOAD, 1);
+  else if (meth == "HEAD")
+    ok = curl_easy_setopt(curlHandle, CURLOPT_NOBODY, 1);
+  else
+    throw exception("Unkown request method " + meth);
+
+  if (ok != CURLE_OK)
+    throw exception(std::string(error_buffer));
 }
 
 ///////////////////////////
-void curl::set_method(string f_meth) {
+int curl::perform(string &url) {
+
+  if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
+    throw exception(std::string(error_buffer));
+
+  if (curl_easy_perform(curlHandle) != CURLE_OK)
+    throw exception(error_buffer);
+
+  long code = 0;
+  curl_easy_getinfo(curlHandle, CURLINFO_RESPONSE_CODE, &code);
+  // Return value is status code
+  return code;
 }
 
-///////////////////////////
-int curl::perform() {
-  return 0;
-}
 
+size_t curl::handle_curl_data( void *data, size_t nbytes) {
+  // See if we have a 'dataReceived' callback defined 
+  value cb = get_property("dataReceived");
 
-size_t curl::handle_curl_data( void*, size_t ) {
-  return 0;
+  if (cb.is_function()) {
+    object obj = cb.to_object();
+    arguments args;
+    // Create the blob;
+    object a = create_native_object<blob>(object(), (unsigned char const *)data, nbytes);
+    args.push_back(a);
+
+    apply(obj, args);
+  }
+
+  return nbytes;
 }
-size_t curl::handle_curl_header( void*, size_t ) {
-  return 0;
+size_t curl::handle_curl_header( void*, size_t nbytes ) {
+  return nbytes;
 }
 size_t curl::handle_curl_data_needed( void*, size_t ) {
   return 0;
