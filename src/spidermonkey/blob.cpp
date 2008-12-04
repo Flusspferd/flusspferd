@@ -49,20 +49,21 @@ blob::blob(object const &obj, call_context &x)
       array arr = data;
       std::size_t length = arr.get_length();
       this->data.reserve(length);
-      for (std::size_t i = 0; i < length; ++i) {
-        value v = arr.get_element(i);
-        if (!v.is_int())
-          throw exception("Could not create Blob");
-        int x = v.get_int();
-        if (x < 0 || x > std::numeric_limits<unsigned char>::max())
-          throw exception("Could not create Blob");
-        unsigned char ch = x;
-        this->data.push_back(ch);
-      }
+      for (std::size_t i = 0; i < length; ++i)
+        this->data.push_back(el_from_value(arr.get_element(i)));
       return;
     }
   }
   throw exception("Could not create Blob");
+}
+
+unsigned char blob::el_from_value(value const &v) {
+  if (!v.is_int())
+    throw exception("Value cannot be a Blob element");
+  int x = v.get_int();
+  if (x < 0 || x > std::numeric_limits<unsigned char>::max())
+    throw exception("Value cannot be a Blob element");
+  return (unsigned char) x;
 }
 
 void blob::init() {
@@ -101,6 +102,23 @@ void blob::prop_length(property_mode mode, value &data) {
     break;
   default: break;
   }
+}
+
+void blob::property_op(property_mode mode, value const &id, value &x) {
+  if (id.is_int()) {
+    int index = id.get_int();
+    switch (mode) {
+    case property_get:
+      x = int(data[index]);
+      break;
+    case property_set:
+      data[index] = el_from_value(x);
+      break;
+    default: break;
+    };
+    return;
+  }
+  this->native_object_base::property_op(mode, id, x);
 }
 
 void blob::append(blob const &o) {

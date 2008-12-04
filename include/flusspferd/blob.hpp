@@ -44,6 +44,9 @@ public:
     static object create_prototype();
   };
 
+protected:
+  void property_op(property_mode mode, value const &id, value &data);
+
 private: // JS methos
   void append(blob const &o);
   object to_array();
@@ -53,6 +56,8 @@ private: // JS properties
 
 private:
   std::vector<unsigned char> data;
+
+  static unsigned char el_from_value(value const &);
 
   void init();
 };
