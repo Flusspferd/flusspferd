@@ -139,8 +139,11 @@ int main(int argc, char **argv) {
     flusspferd::gc();
 
     // if extfile is true, we've run it already, and aren't going to interactive
-    if(!parse_cmd(co, argc, argv) || extfile == true)
+    if (!parse_cmd(co, argc, argv))
       return 1;
+
+    if (extfile)
+      return 0;
 
     std::string source;
     unsigned int line = 0;
