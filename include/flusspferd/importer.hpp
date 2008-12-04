@@ -60,8 +60,6 @@ protected:
 private: // JS methods
   value load(string const &name, bool binary_only); 
 
-  static void lock_paths(object &);
-
 private:
   class impl;
   boost::scoped_ptr<impl> p;

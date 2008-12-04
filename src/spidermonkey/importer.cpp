@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"
+#include "flusspferd/security.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 #include <iostream>
@@ -85,11 +86,7 @@ object importer::class_info::create_prototype() {
 
 void importer::class_info::augment_constructor(object &ctor) {
   ctor.define_property("preload", create_object(), permanent_property);
-
-  // Only make read-only in lockPahts
   ctor.define_property("defaultPaths", create_array(), permanent_property);
-
-  create_native_function(ctor, "lockPaths", &importer::lock_paths);
 }
 
 void importer::add_preloaded(std::string const &name, object const &obj) {
@@ -104,18 +101,6 @@ void importer::add_preloaded(
   boost::function<object (object const &)> const &fun)
 {
   add_preloaded(name, create_native_function(fun, name));
-}
-
-void importer::lock_paths(object &ctor) {
-  local_root_scope scope;
-  ctor.define_property("pathsLocked", true,
-    read_only_property | permanent_property);
-
-  object paths = ctor.get_property("defaultPaths").to_object();
-  paths.seal(false);
-
-  ctor.define_property("defaultPaths", paths,
-    read_only_property | permanent_property);
 }
 
 class importer::impl {
@@ -146,9 +131,6 @@ importer::importer(object const &obj, call_context &)
   array arr = constructor.get_property("defaultPaths").to_object();
   arr = arr.call("concat").to_object();
   set_property("paths", arr);
-  if (constructor.get_property("pathsLocked").to_boolean()) {
-    arr.seal(false);
-  }
 
   // Create a context object, which is the object on which all modules are
   // evaluated
@@ -171,6 +153,10 @@ void importer::trace(tracer &trc) {
 }
 
 value importer::load(string const &name, bool binary_only) {
+  security &sec = security::get();
+
+  //TODO use security
+
   impl::key_type key(name.to_string(), binary_only);
 
   impl::module_cache_map::iterator it = p->module_cache.find(key);
