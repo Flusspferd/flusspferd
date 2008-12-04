@@ -197,14 +197,17 @@ value importer::load(string const &name, bool binary_only) {
     std::string path = paths.get_element(i).to_string().to_string();
     std::string fullpath = path + js_name;
 
-    if (!binary_only) {
-      if (boost::filesystem::exists(fullpath))
-        return get_current_context().execute(
-            fullpath.c_str(),
-            get_property("context").to_object());
-    }
+    if (!binary_only)
+      if (sec.check_path(fullpath))
+        if (boost::filesystem::exists(fullpath))
+          return get_current_context().execute(
+              fullpath.c_str(),
+              get_property("context").to_object());
 
     fullpath = path + so_name;
+
+    if (!sec.check_path(fullpath))
+      continue;
 
     if (boost::filesystem::exists(fullpath)) {
       // Load the .so

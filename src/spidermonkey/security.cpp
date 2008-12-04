@@ -64,3 +64,7 @@ security::security(object const &obj)
 
 security::~security()
 {}
+
+bool security::check_path(std::string const &pathname) {
+  return true;
+}

@@ -40,6 +40,8 @@ public:
   security(object const &);
   ~security();
 
+  bool check_path(std::string const &filename);
+
 private:
   class impl;
   boost::scoped_ptr<impl> p;
