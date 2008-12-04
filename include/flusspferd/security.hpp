@@ -41,6 +41,7 @@ public:
   ~security();
 
   bool check_path(std::string const &filename);
+  bool check_url(std::string const &url);
 
 private:
   class impl;

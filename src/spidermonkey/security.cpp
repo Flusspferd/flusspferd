@@ -66,5 +66,11 @@ security::~security()
 {}
 
 bool security::check_path(std::string const &pathname) {
+  // TODO
+  return true;
+}
+
+bool security::check_url(std::string const &url) {
+  // TODO
   return true;
 }
