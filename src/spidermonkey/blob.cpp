@@ -107,6 +107,8 @@ void blob::prop_length(property_mode mode, value &data) {
 void blob::property_op(property_mode mode, value const &id, value &x) {
   if (id.is_int()) {
     int index = id.get_int();
+    if (index < 0 || index >= data.size())
+      throw exception("Out of bounds of Blob");
     switch (mode) {
     case property_get:
       x = int(data[index]);
