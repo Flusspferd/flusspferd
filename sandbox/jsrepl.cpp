@@ -121,14 +121,13 @@ int main(int argc, char **argv) {
     flusspferd::context co = flusspferd::context::create();
     flusspferd::current_context_scope scope(co);
 
-    #ifdef FLUSSPFERD_HAVE_XML
-    flusspferd::xml::load_xml();
-    #endif
-
     flusspferd::load_class<flusspferd::blob>();
     flusspferd::load_class<flusspferd::importer>();
 
-    flusspferd::importer::add_preloaded("IO", &flusspferd::io::load_io);
+    flusspferd::importer::add_preloaded("io", &flusspferd::io::load_io);
+    #ifdef FLUSSPFERD_HAVE_XML
+    flusspferd::importer::add_preloaded("xml", &flusspferd::xml::load_xml);
+    #endif
 
     flusspferd::load_properties_functions();
 

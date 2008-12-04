@@ -50,7 +50,7 @@ Function.bind = function (obj, name) {
 (function () {
   var i = new Importer;
 
-  i.load('IO');
+  i.load('io');
 
   this.print = Function.bind(i.IO.stdout, 'print');
 
