@@ -48,7 +48,7 @@ blob::blob(object const &obj, call_context &x)
     if (data.is_array()) {
       array arr = data;
       std::size_t length = arr.get_length();
-      this->data.resize(length);
+      this->data.reserve(length);
       for (std::size_t i = 0; i < length; ++i) {
         value v = arr.get_element(i);
         if (!v.is_int())
