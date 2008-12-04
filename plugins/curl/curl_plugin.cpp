@@ -37,11 +37,43 @@ class curl : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
     static char const *full_name() { return "cURL"; }
-    typedef boost::mpl::bool_<false> constructible;
+    typedef boost::mpl::bool_<true> constructible;
     static char const *constructor_name() { return "cURL"; }
     static void augment_constructor(object &ctor);
+    static object create_prototype();
   };
+
+  curl(object const &obj, call_context &x);
+  virtual ~curl();
+
+protected:
+  CURL *curlHandle;
+  char* error_buffer;
+
+  typedef size_t (*curl_callback_t)(void *, size_t, size_t, void *);
+
+  template<size_t (curl::*Method)(void*, size_t)>
+  static size_t c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream);
+
+  // Data is avilable
+  size_t handle_curl_data( void* data, size_t size );
+  // Header is available
+  size_t handle_curl_header( void* data, size_t size );
+  // Data is needed by curl (i.e. upload/request body)
+  size_t handle_curl_data_needed( void* buff, size_t size );
+
+private: // JS methods
+  void set_url(string url);
+  void set_method(string meth);
+  int perform();
 };
+
+
+template<size_t (curl::*Method)(void*, size_t)>
+size_t curl::c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream) {
+  curl *self = static_cast<curl*>(stream);
+  return (self->*Method)(ptr, size * nmemb);
+}
 
 ///////////////////////////
 // import hook
@@ -73,6 +105,78 @@ void curl::class_info::augment_constructor(object &ctor)
   ctor.define_property("versionHex", (int)data->version_num, read_only_property);
   ctor.define_property("versionStr", string( (const char*)data->version), read_only_property);
 
+}
+
+///////////////////////////
+object curl::class_info::create_prototype() {
+  object proto = create_object();
+
+  create_native_method( proto, "setURL", 1);
+  create_native_method( proto, "setMethod", 1);
+  create_native_method( proto, "perform", 0);
+
+  return proto;
+}
+
+///////////////////////////
+curl::curl(object const &obj, call_context &) 
+  : native_object_base(obj),
+    error_buffer(NULL)
+{
+  register_native_method("setURL", &curl::set_url);
+  register_native_method("setMethod", &curl::set_method);
+  register_native_method("perform", &curl::perform);
+
+  curlHandle = curl_easy_init();
+
+  if (!curlHandle)
+    throw exception("curl_easy_init() failed");
+
+  error_buffer = new char[CURL_ERROR_SIZE];
+  
+  curl_callback_t fn_ptr =  &curl::c_handle_curl<&curl::handle_curl_data>;
+  curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, fn_ptr);
+
+  fn_ptr =  &curl::c_handle_curl<&curl::handle_curl_header>;
+  curl_easy_setopt(curlHandle, CURLOPT_HEADERFUNCTION, fn_ptr);
+
+  fn_ptr =  &curl::c_handle_curl<&curl::handle_curl_data_needed>;
+  curl_easy_setopt(curlHandle, CURLOPT_READFUNCTION, fn_ptr);
+
+  curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, this);
+  curl_easy_setopt(curlHandle, CURLOPT_HEADERDATA, this);
+  curl_easy_setopt(curlHandle, CURLOPT_READDATA, this);
+  curl_easy_setopt(curlHandle, CURLOPT_ERRORBUFFER, error_buffer);
+  curl_easy_setopt(curlHandle, CURLOPT_ENCODING, "");
+}
+
+///////////////////////////
+curl::~curl() {
+  delete [] error_buffer;
+}
+
+///////////////////////////
+void curl::set_url(string url ) {
+}
+
+///////////////////////////
+void curl::set_method(string f_meth) {
+}
+
+///////////////////////////
+int curl::perform() {
+  return 0;
+}
+
+
+size_t curl::handle_curl_data( void*, size_t ) {
+  return 0;
+}
+size_t curl::handle_curl_header( void*, size_t ) {
+  return 0;
+}
+size_t curl::handle_curl_data_needed( void*, size_t ) {
+  return 0;
 }
 
 } // End of anon namespace
