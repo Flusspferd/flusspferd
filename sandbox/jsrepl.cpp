@@ -51,21 +51,27 @@ std::istream in(std::cin.rdbuf());
 
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
-    " -h -f <file>\n\n"
+    " -h -f <file> -i\n\n"
     "\t-h         displays this message\n"
-    "\t-f <file>  open file as input\n\n";
+    "\t-f <file>  open file as input\n"
+    "\t-i         enter interactive mode (after running a file)\n\n";
 }
 
-bool parse_cmd(int argc, char **argv) {
+bool parse_cmd(flusspferd::context &co, int argc, char **argv) {
   if (argc <= 1)
     return true;
 
   for (int i = 1; i < argc; ++i) {
     if (std::strcmp(argv[i], "-h") == 0 ||
-        std::strcmp(argv[i], "--help"))
+        std::strcmp(argv[i], "--help") == 0)
     {
       print_help(argv[0]);
       return false;
+    }
+    else if (std::strcmp(argv[i], "-i") == 0 ||
+             std::strcmp(argv[i], "--interactive") == 0)
+    {
+      extfile = false;
     }
     else if (std::strcmp(argv[i], "-f") == 0 ||
              std::strcmp(argv[i], "--file") == 0)
@@ -78,9 +84,8 @@ bool parse_cmd(int argc, char **argv) {
         return false;
       }
       file = argv[i];
-      std::ifstream fin(file.c_str());
-      in.rdbuf(fin.rdbuf());
       extfile = true;
+      co.execute(file.c_str());
     }
   }
 
@@ -110,8 +115,6 @@ bool getline(std::string &source, const char* prompt = "> ") {
 }
 
 int main(int argc, char **argv) {
-  if(!parse_cmd(argc, argv))
-    return 1;
 
   try {
     flusspferd::init::initialize();
@@ -135,6 +138,10 @@ int main(int argc, char **argv) {
     co.execute("prelude.js");
 
     flusspferd::gc();
+
+    // if extfile is true, we've run it already, and aren't going to interactive
+    if(!parse_cmd(co, argc, argv) || extfile == true)
+      return 1;
 
     std::string source;
     unsigned int line = 0;
