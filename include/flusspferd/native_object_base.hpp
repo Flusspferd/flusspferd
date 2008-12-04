@@ -108,6 +108,16 @@ protected:
   virtual void trace(tracer &);
 
 protected:
+  enum property_access {
+    property_qualified = 1,
+    property_assigning = 2,
+    property_detecting = 4,
+    property_declaring = 8,
+    property_classname = 16
+  };
+
+  virtual bool property_resolve(value const &id, unsigned access);
+
   enum property_mode { 
     property_add = 0,
     property_delete = -1,

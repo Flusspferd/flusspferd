@@ -45,6 +45,9 @@ public:
   template<property_mode>
   static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
 
+  static JSBool new_resolve(JSContext *, JSObject *, jsval, uintN, JSObject **);
+
+public:
   static JSClass native_object_class;
 
 public:
@@ -63,13 +66,13 @@ public:
 
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
-  JSCLASS_HAS_PRIVATE,
+  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE,
   &native_object_base::impl::property_op<native_object_base::property_add>,
   &native_object_base::impl::property_op<native_object_base::property_delete>,
   &native_object_base::impl::property_op<native_object_base::property_get>,
   &native_object_base::impl::property_op<native_object_base::property_set>,
   JS_EnumerateStub,
-  JS_ResolveStub,
+  (JSResolveOp) &native_object_base::impl::new_resolve,
   JS_ConvertStub,
   &native_object_base::impl::finalize,
   0,
@@ -265,6 +268,34 @@ JSBool native_object_base::impl::property_op(
   } FLUSSPFERD_CALLBACK_END;
 }
 
+JSBool native_object_base::impl::new_resolve(
+    JSContext *ctx, JSObject *obj, jsval id, uintN sm_flags, JSObject **objp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base *self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    unsigned flags = 0;
+
+    if (sm_flags & JSRESOLVE_QUALIFIED)
+      flags |= property_qualified;
+    if (sm_flags & JSRESOLVE_ASSIGNING)
+      flags |= property_assigning;
+    if (sm_flags & JSRESOLVE_DETECTING)
+      flags |= property_detecting;
+    if (sm_flags & JSRESOLVE_DECLARING)
+      flags |= property_declaring;
+    if (sm_flags & JSRESOLVE_CLASSNAME)
+      flags |= property_classname;
+
+    *objp = 0;
+    if (self->property_resolve(Impl::wrap_jsval(id), flags))
+      *objp = Impl::get_object(*self);
+  } FLUSSPFERD_CALLBACK_END;
+}
+
 uint32 native_object_base::impl::mark_op(
     JSContext *ctx, JSObject *obj, void *thing)
 {
@@ -317,6 +348,10 @@ void native_object_base::property_op(
     if (callback)
       (this->*callback)(mode, data);
   }
+}
+
+bool native_object_base::property_resolve(value const &, unsigned) {
+  return false;
 }
 
 void native_object_base::trace(tracer&) {}
