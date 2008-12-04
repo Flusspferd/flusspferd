@@ -44,8 +44,12 @@ public:
     static object create_prototype();
   };
 
+private: // JS properties
+  void prop_length       (property_mode mode, value &data);
 private:
   std::vector<unsigned char> data;
+
+  void init();
 };
 
 }

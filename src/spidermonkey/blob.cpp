@@ -30,11 +30,14 @@ using namespace flusspferd;
 blob::blob(object const &obj, unsigned char const *data, std::size_t length)
   : native_object_base(obj), data(data, data+length)
 {
+  init();
 }
 
 blob::blob(object const &obj, call_context &x)
   : native_object_base(obj)
 {
+  init();
+
   local_root_scope scope;
   if (x.arg[0].is_int()) {
     std::size_t length = x.arg[0].get_int();
@@ -62,9 +65,33 @@ blob::blob(object const &obj, call_context &x)
   throw exception("Could not create Blob");
 }
 
+void blob::init() {
+  unsigned const RW = permanent_shared_property;
+
+  define_native_property("length", RW, &blob::prop_length);
+}
+
 blob::~blob() {}
 
 object blob::class_info::create_prototype() {
   object proto = create_object();
   return proto;
+}
+
+void blob::prop_length(property_mode mode, value &data) {
+  switch (mode) {
+  case property_set:
+  {
+    int new_len = data.get_int();
+    if (new_len < 0)
+      new_len = 0;
+    this->data.resize(new_len);
+    data = new_len;
+    break;
+  }
+  case property_get:
+    data = (int)this->data.size();
+    break;
+  default: break;
+  }
 }
