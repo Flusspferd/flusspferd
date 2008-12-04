@@ -79,7 +79,7 @@ object file_class::class_info::create_prototype() {
 void file_class::open(char const *name) {
   security &sec = security::get();
 
-  if (!sec.check_path(name))
+  if (!sec.check_path(name, security::READ_WRITE))
     throw exception("Could not open file (security)");
 
   p->stream.open(name);
@@ -93,6 +93,11 @@ void file_class::close() {
 }
 
 void file_class::impl::create(char const *name, boost::optional<int> mode) {
+  security &sec = security::get();
+
+  if (!sec.check_path(name, security::CREATE))
+    throw exception("Could not create file (security)");
+
   if (creat(name, mode.get_value_or(0666)) < 0)
     throw exception("Could not create file");
 }

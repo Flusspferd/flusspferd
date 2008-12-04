@@ -198,7 +198,7 @@ value importer::load(string const &name, bool binary_only) {
     std::string fullpath = path + js_name;
 
     if (!binary_only)
-      if (sec.check_path(fullpath))
+      if (sec.check_path(fullpath, security::READ))
         if (boost::filesystem::exists(fullpath))
           return get_current_context().execute(
               fullpath.c_str(),
@@ -206,7 +206,7 @@ value importer::load(string const &name, bool binary_only) {
 
     fullpath = path + so_name;
 
-    if (!sec.check_path(fullpath))
+    if (!sec.check_path(fullpath, security::READ))
       continue;
 
     if (boost::filesystem::exists(fullpath)) {

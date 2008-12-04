@@ -40,8 +40,15 @@ public:
   security(object const &);
   ~security();
 
-  bool check_path(std::string const &filename);
-  bool check_url(std::string const &url);
+  enum mode_t { 
+    READ = 1,
+    WRITE = 2,
+    READ_WRITE = READ|WRITE,
+    CREATE = 4
+  };
+
+  bool check_path(std::string const &filename, unsigned mode);
+  bool check_url(std::string const &url, unsigned mode);
 
 private:
   class impl;
