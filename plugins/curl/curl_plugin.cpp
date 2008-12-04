@@ -67,7 +67,7 @@ protected:
 
 private: // JS methods
   void set_method(string &meth);
-  int perform(string &url);
+  int perform();
 };
 
 
@@ -176,7 +176,14 @@ void curl::set_method(string &f_meth) {
 }
 
 ///////////////////////////
-int curl::perform(string &url) {
+int curl::perform() {
+
+  local_root_scope scope;
+  // Create a copy of URL so that it lives as long as the perform call does
+  // curl doesn't copy the CURLOPT_URL param, so it disapearing form under
+  // it probably isn't very good
+  string url = get_property("url").to_string();
+  url = url.substr(0, url.length());
 
   if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
     throw exception(std::string(error_buffer));
@@ -207,9 +214,22 @@ size_t curl::handle_curl_data( void *data, size_t nbytes) {
 
   return nbytes;
 }
-size_t curl::handle_curl_header( void*, size_t nbytes ) {
+
+size_t curl::handle_curl_header( void *hdr, size_t nbytes ) {
+  value cb = get_property("headerReceived");
+
+  if (cb.is_function()) {
+    object obj = cb.to_object();
+    arguments args;
+    // Headers for HTTP at least should be ascii. Should we use a blob hear
+    // instead
+    args.push_back(string((const char*)hdr, nbytes));
+
+    apply(obj, args);
+  }
   return nbytes;
 }
+
 size_t curl::handle_curl_data_needed( void*, size_t ) {
   return 0;
 }
