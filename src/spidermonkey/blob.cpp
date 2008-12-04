@@ -69,12 +69,17 @@ void blob::init() {
   unsigned const RW = permanent_shared_property;
 
   define_native_property("length", RW, &blob::prop_length);
+
+  register_native_method("append", &blob::append);
 }
 
 blob::~blob() {}
 
 object blob::class_info::create_prototype() {
   object proto = create_object();
+
+  create_native_method(proto, "append", 1);
+
   return proto;
 }
 
@@ -94,4 +99,9 @@ void blob::prop_length(property_mode mode, value &data) {
     break;
   default: break;
   }
+}
+
+void blob::append(blob const &o) {
+  data.reserve(data.size() + o.data.size());
+  data.insert(data.end(), o.data.begin(), o.data.end());
 }
