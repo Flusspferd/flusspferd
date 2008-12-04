@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/io/file_class.hpp"
+#include "flusspferd/security.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
@@ -76,6 +77,11 @@ object file_class::class_info::create_prototype() {
 }
 
 void file_class::open(char const *name) {
+  security &sec = security::get();
+
+  if (!sec.check_path(name))
+    throw exception("Could not open file (security)");
+
   p->stream.open(name);
 
   if (!p->stream)
