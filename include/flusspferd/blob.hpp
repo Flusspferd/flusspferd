@@ -46,6 +46,7 @@ public:
 
 private: // JS methos
   void append(blob const &o);
+  object to_array();
 
 private: // JS properties
   void prop_length(property_mode mode, value &data);

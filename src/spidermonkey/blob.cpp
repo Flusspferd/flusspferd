@@ -71,6 +71,7 @@ void blob::init() {
   define_native_property("length", RW, &blob::prop_length);
 
   register_native_method("append", &blob::append);
+  register_native_method("toArray", &blob::to_array);
 }
 
 blob::~blob() {}
@@ -79,6 +80,7 @@ object blob::class_info::create_prototype() {
   object proto = create_object();
 
   create_native_method(proto, "append", 1);
+  create_native_method(proto, "toArray", 0);
 
   return proto;
 }
@@ -104,4 +106,11 @@ void blob::prop_length(property_mode mode, value &data) {
 void blob::append(blob const &o) {
   data.reserve(data.size() + o.data.size());
   data.insert(data.end(), o.data.begin(), o.data.end());
+}
+
+object blob::to_array() {
+  array arr = create_array(data.size());
+  for (std::size_t i = 0; i < data.size(); ++i)
+    arr.set_element(i, int(data[i]));
+  return arr;
 }
