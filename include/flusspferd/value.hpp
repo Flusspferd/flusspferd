@@ -61,6 +61,7 @@ public:
   bool is_boolean() const;
   bool is_string() const;
   bool is_object() const;
+  bool is_function() const;
 
   bool is_bool() const { return is_boolean(); }
 
