@@ -21,44 +21,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_IMPORTER_HPP
-#define FLUSSPFERD_IMPORTER_HPP
+#ifndef FLUSSPFERD_SECURITY_HPP
+#define FLUSSPFERD_SECURITY_HPP
 
 #include "native_object_base.hpp"
-#include "class.hpp"
-#include <boost/scoped_ptr.hpp>
 
-namespace flusspferd { 
+namespace flusspferd {
 
-class importer : public native_object_base {
+class security : public native_object_base {
 public:
-  // The type of function which we look for in loaded .so modules
-  // extern "C" value flusspferd_load(object container);
-  typedef value (*flusspferd_load_t)(object container);
-
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "Importer"; }
-    typedef boost::mpl::bool_<true> constructible;
-    static char const *constructor_name() { return "Importer"; }
-    static object create_prototype();
-    static void augment_constructor(object &);
+  struct class_info {
+    static char const *full_name() { return "$security"; }
   };
 
-  importer(object const &obj, call_context &x);
-  ~importer();
+  static security &create(object container);
+  static security &get();
 
-  static void add_preloaded(std::string const &name, object const &obj);
-  static void add_preloaded(
-    std::string const &name,
-    boost::function<object (object const &)> const &fun);
+  security(object const &);
+  ~security();
 
-protected:
-  void trace(tracer &);
+  enum mode_t { 
+    READ = 1,
+    WRITE = 2,
+    READ_WRITE = READ|WRITE,
+    CREATE = 4
+  };
 
-  static std::string process_name(string const &name, bool for_script = false);
-
-private: // JS methods
-  value load(string const &name, bool binary_only); 
+  bool check_path(std::string const &filename, unsigned mode);
+  bool check_url(std::string const &url, unsigned mode);
 
 private:
   class impl;

@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/security.hpp"
 #include "flusspferd/xml/xml.hpp"
 #include "flusspferd/io/io.hpp"
 #include "flusspferd/importer.hpp"
@@ -127,6 +128,9 @@ int main(int argc, char **argv) {
     flusspferd::importer::add_preloaded("IO", &flusspferd::io::load_io);
 
     flusspferd::load_properties_functions();
+
+    flusspferd::security &security =
+      flusspferd::security::create(flusspferd::global());
 
     co.execute("prelude.js");
 
