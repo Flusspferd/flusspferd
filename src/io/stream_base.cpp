@@ -47,6 +47,7 @@ stream_base::stream_base(object const &o, std::streambuf *p)
 
   define_property("fieldSeparator", string(" "));
   define_property("recordSeparator", string("\n"));
+  define_property("autoflush", false);
 }
 
 stream_base::~stream_base()
@@ -147,6 +148,9 @@ void stream_base::write(value const &data) {
     blob &b = dynamic_cast<blob&>(*ptr);
     streambuf->sputn((char const*) b.get_data(), b.size());
   }
+  //TODO slow?
+  if (get_property("autoflush").to_boolean())
+    flush();
 }
 
 void stream_base::print(call_context &x) {
