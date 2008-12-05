@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/string.hpp"
 #include <limits>
+#include <cstring>
 
 using namespace flusspferd;
 
@@ -65,6 +66,10 @@ unsigned char blob::el_from_value(value const &v) {
   if (x < 0 || x > std::numeric_limits<unsigned char>::max())
     throw exception("Value cannot be a Blob element");
   return (unsigned char) x;
+}
+
+void blob::class_info::augment_constructor(object &ctor) {
+  create_native_function(ctor, "fromUtf8", &blob::from_utf8);
 }
 
 void blob::init() {
@@ -150,4 +155,10 @@ string blob::as_utf8() {
     if (!data[strlen])
       break;
   return string((char*) get_data(), strlen);
+}
+
+object blob::from_utf8(string const &text) {
+  char const *str = text.c_str();
+  return create_native_object<blob>(
+    object(), (unsigned char const *) str, std::strlen(str));
 }

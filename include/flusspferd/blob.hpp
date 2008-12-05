@@ -42,6 +42,7 @@ public:
     typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
+    static void augment_constructor(object &);
   };
 
   unsigned char *get_data() { return &data[0]; }
@@ -60,6 +61,9 @@ private: // JS methos
 
 private: // JS properties
   void prop_length(property_mode mode, value &data);
+
+private: // JS constructor methods
+  static object from_utf8(string const &);
 
 private:
   std::vector<unsigned char> data;
