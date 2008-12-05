@@ -47,15 +47,21 @@ Function.bind = function (obj, name) {
   return fun.bind(obj);
 };
 
-(function () {
+(function (g) {
   var i = new Importer;
 
   i.load('io');
 
-  this.print = Function.bind(i.IO.stdout, 'print');
+  g.print = Function.bind(i.IO.stdout, 'print');
 
-  this.IO = i.IO;
-})();
+  g.IO = i.IO;
+
+  i.load('xml');
+
+  g.XML = i.XML;
+})(this);
 
 // Set default paths to the plugin dirs
 Importer.defaultPaths = ['build/default/plugins/sqlite3', 'build/default/plugins/curl'];
+
+true;
