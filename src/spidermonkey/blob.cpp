@@ -138,5 +138,5 @@ object blob::to_array() {
 }
 
 object blob::copy() {
-  return create_native_object<blob>(object(), &data[0], data.size());
+  return create_native_object<blob>(get_prototype(), &data[0], data.size());
 }
