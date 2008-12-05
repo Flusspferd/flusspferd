@@ -44,6 +44,9 @@ public:
     static object create_prototype();
   };
 
+  unsigned char *get_data() { return &data[0]; }
+  std::size_t size() { return data.size(); }
+
 protected:
   void property_op(property_mode mode, value const &id, value &data);
 

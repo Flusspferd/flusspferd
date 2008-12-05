@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/blob.hpp"
 #include <boost/scoped_array.hpp>
 #include <cstdlib>
 
@@ -97,9 +98,16 @@ string stream_base::read(unsigned size) {
   return string(buf.get());
 }
 
-void stream_base::write(string const &text) {
-  char const *str = text.c_str();
-  streambuf->sputn(text.c_str(), std::strlen(str));
+void stream_base::write(value const &data) {
+  if (data.is_string()) {
+    string text = data.get_string();
+    char const *str = text.c_str();
+    streambuf->sputn(text.c_str(), std::strlen(str));
+  } else if (data.is_object()) {
+    native_object_base *ptr = native_object_base::get_native(data.get_object());
+    blob &b = dynamic_cast<blob&>(*ptr);
+    streambuf->sputn((char const*) b.get_data(), b.size());
+  }
 }
 
 void stream_base::print(call_context &x) {
