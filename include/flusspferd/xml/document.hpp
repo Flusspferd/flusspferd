@@ -34,14 +34,16 @@ namespace flusspferd { namespace xml {
 class document : public node {
 public:
   struct class_info : node::class_info {
+    static char const *full_name() { return "XML.Document"; }
+
     static char const *constructor_name() { return "Document"; }
     typedef boost::mpl::size_t<0> constructor_arity;
 
     static object create_prototype();
   };
 
-  document(call_context &);
-  document(xmlDocPtr doc);
+  document(object const &, call_context &);
+  document(object const &, xmlDocPtr doc);
   ~document();
 
   xmlDocPtr c_obj() const {
@@ -51,8 +53,10 @@ public:
   static xmlDocPtr c_from_js(object const &o);
 
 protected:
-  void post_initialize();
   void trace(tracer &);
+
+private:
+  void init();
 
 private: // JS methods
   string dump();

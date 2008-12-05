@@ -39,38 +39,52 @@ namespace flusspferd {
 namespace detail {
 
 template<typename T>
+struct unconstructible_class_constructor : native_function_base {
+  unconstructible_class_constructor(char const *name)
+    : native_function_base(0, name)
+  {}
+
+  void call(call_context &) {
+    std::string msg = "Instances of " 
+                    + get_name() 
+                    + " cannot be created directly";
+    throw exception(msg);
+  }
+};
+
+template<typename T>
 struct class_constructor : native_function_base {
   class_constructor(unsigned arity, char const *name)
     : native_function_base(arity, name)
   {}
 
   void call(call_context &x) {
-    x.result = create_native_object<T>(
+    x.result = flusspferd::create_native_object<T>(
         x.function.get_property("prototype").to_object(),
         boost::ref(x));
   }
 };
 
 template<typename T>
-object load_class(object &container, char const *name) {
-  context ctx = get_current_context();
-
-  object constructor(ctx.get_constructor<T>());
-
+void load_class(
+    context &ctx, object &constructor) 
+{
   object prototype = T::class_info::create_prototype();
-
   ctx.add_prototype<T>(prototype);
+
+  prototype.define_property(
+    "constructor",
+    constructor,
+    object::permanent_property |
+    object::read_only_property |
+    object::dont_enumerate);
 
   constructor.define_property(
     "prototype",
     prototype,
     object::dont_enumerate);
 
-  T::class_info::augment_constructor(object(constructor));
-
-  container.define_property(name, constructor, object::dont_enumerate);
-
-  return constructor;
+  T::class_info::augment_constructor(constructor);
 }
 
 }
@@ -127,11 +141,6 @@ struct class_info {
     (void) ctor;
   }
 
-  /**
-   * Function: create_prototype 
-   *
-   * Return the prototype for this class. Defaults to an empty object.
-   */
   static object create_prototype() {
     return create_object();
   }
@@ -155,6 +164,7 @@ object load_class(
 {
   std::size_t const arity = T::class_info::constructor_arity::value;
   char const *name = T::class_info::constructor_name();
+  char const *full_name = T::class_info::full_name();
 
   local_root_scope scope;
 
@@ -165,22 +175,30 @@ object load_class(
   if (previous.is_object())
     return previous.get_object();
 
-  if (!ctx.get_constructor<T>().is_valid())
-    ctx.add_constructor<T>(
-      create_native_function<detail::class_constructor<T> >(arity, name));
+  object constructor = ctx.get_constructor<T>();
 
-  return detail::load_class<T>(container, name);
+  if (!constructor.is_valid()) {
+    constructor =
+      create_native_function<detail::class_constructor<T> >(arity, full_name);
+    ctx.add_constructor<T>(constructor);
+    detail::load_class<T>(ctx, constructor);
+  }
+
+  container.define_property(name, constructor, object::dont_enumerate);
+
+  return constructor;
 }
 
 /**
- * Expose a class without a native constructor to Javascript.
+ * Expose a class that is unconstructible in Javascript. Trying to create an
+ * instance of the class will throw an error
  *
  * @param container Object in which to define the constructor.
  *
  * Create a class/constructor on container without constructor.
 */
 template<typename T>
-bool load_class(
+object load_class(
   object container = global(),
   typename boost::enable_if<
     boost::mpl::not_<typename T::class_info::constructible>
@@ -197,10 +215,20 @@ bool load_class(
   if (previous.is_object())
     return previous.get_object();
 
-  if (!ctx.get_constructor<T>().is_valid())
-    ctx.add_constructor<T>(create_object());
+  object constructor = ctx.get_constructor<T>();
 
-  return detail::load_class<T>(container, name);
+  if (!constructor.is_valid()) {
+    char const *full_name = T::class_info::full_name();
+    constructor =
+      create_native_function<detail::unconstructible_class_constructor<T> >
+        (full_name);
+    ctx.add_constructor<T>(constructor);
+    detail::load_class<T>(ctx, constructor);
+  }
+
+  container.define_property(name, constructor, object::dont_enumerate);
+
+  return constructor;
 }
 
 }

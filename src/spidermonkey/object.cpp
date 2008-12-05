@@ -41,6 +41,11 @@ using namespace flusspferd;
 object::object() : Impl::object_impl(0) { }
 object::~object() { }
 
+void object::seal(bool deep) {
+  if (!JS_SealObject(Impl::current_context(), get(), deep))
+    throw exception("Could not seal object");
+}
+
 object object::get_parent() {
   if (!is_valid())
     throw exception("Could not get object parent (object is null)");
@@ -200,6 +205,7 @@ void object::define_property(
   if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
   if (flags & read_only_property) sm_flags |= JSPROP_READONLY;
   if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
+  if (flags & shared_property) sm_flags |= JSPROP_SHARED;
 
   if (getter_o) sm_flags |= JSPROP_GETTER;
   if (setter_o) sm_flags |= JSPROP_SETTER;
@@ -207,8 +213,8 @@ void object::define_property(
   if(!JS_DefineUCProperty(Impl::current_context(), get_const(),
                           name.data(), name.length(),
                           Impl::get_jsval(v),
-                          (JSPropertyOp) getter_o,
-                          (JSPropertyOp) setter_o,
+                          *(JSPropertyOp*) &getter_o,
+                          *(JSPropertyOp*) &setter_o,
                           sm_flags))
     throw exception("Could not define property");
 }
@@ -292,4 +298,8 @@ value object::call(object o, arguments const &arg) {
 
 value object::call(arguments const &arg) {
   return call(global(), arg);
+}
+
+bool object::is_array() const {
+  return JS_IsArrayObject(Impl::current_context(), get_const());
 }

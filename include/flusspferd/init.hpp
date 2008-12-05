@@ -29,43 +29,61 @@ THE SOFTWARE.
 #include <boost/scoped_ptr.hpp>
 
 namespace flusspferd {
-  class context;
-  class object;
 
-  class init : boost::noncopyable {
-    init();
+class context;
+class object;
 
-    class impl;
-    boost::scoped_ptr<impl> p;
+class init : boost::noncopyable {
+  init();
 
-  public:
-    ~init();
+  class impl;
+  boost::scoped_ptr<impl> p;
 
-    struct detail;
-    friend struct init::detail;
+public:
+  ~init();
 
-    // returns pointer to old context or null
-    context enter_current_context(context const &c);
-    // returns true if c was current context
-    bool leave_current_context(context const &c);
-    context &get_current_context();
+  struct detail;
+  friend struct init::detail;
 
-    static init &initialize();
-  };
+  // returns pointer to old context or null
+  context enter_current_context(context const &c);
+  // returns true if c was current context
+  bool leave_current_context(context const &c);
+  context &get_current_context();
 
-  inline context enter_current_context(context const &c) {
-    return init::initialize().enter_current_context(c);
-  }
+  static init &initialize();
+};
 
-  inline bool leave_current_context(context const &c) {
-    return init::initialize().leave_current_context(c);
-  }
+inline context enter_current_context(context const &c) {
+  return init::initialize().enter_current_context(c);
+}
 
-  inline context &get_current_context() {
-    return init::initialize().get_current_context();
-  }
+inline bool leave_current_context(context const &c) {
+  return init::initialize().leave_current_context(c);
+}
 
-  object global();
+inline context &get_current_context() {
+  return init::initialize().get_current_context();
+}
+
+inline object global() {
+  return get_current_context().global();
+}
+
+inline void gc() {
+  return get_current_context().gc();
+}
+
+template<typename T>
+object get_prototype() {
+  return get_current_context().get_prototype<T>();
+}
+
+template<typename T>
+object get_constructor() {
+  return get_current_context().get_constructor<T>();
+}
+
 }
 
 #endif /* FLUSSPFERD_INIT_HPP */

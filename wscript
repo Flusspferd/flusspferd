@@ -1,4 +1,4 @@
-# vim:ts=2:sw=2:expandtab:autoindent:filetype=python:
+# vim:ts=4:sw=4:expandtab:autoindent:filetype=python:
 #
 # Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
 #
@@ -35,6 +35,7 @@ def init(): pass
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
+    opt.tool_options('compiler_cc')
     opt.tool_options('boost')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
                    help='Set non-standard CXXFLAGS')
@@ -46,6 +47,8 @@ def set_options(opt):
                    help='Enable IO support')
     opt.add_option('--enable-xml', action='store_true',
                    help='Enable XML support')
+    opt.add_option('--enable-curl', action='store_true',
+                   help='Build cURL extension')
     if darwin:
       opt.add_option('--libxml-framework', action='store', nargs=1, dest='libxml_framework',
                      help='libxml framework name')
@@ -73,15 +76,16 @@ def configure(conf):
         u('CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
+    conf.check_tool('compiler_cc')
     conf.check_tool('misc')
     conf.check_tool('boost')
     if darwin:
-      conf.check_tool('osx')
+        conf.check_tool('osx')
 
     conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
     conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
 
-    boostlib = ['thread']
+    boostlib = ['thread', 'filesystem', 'system']
     if Options.options.enable_tests:
       boostlib += ['unit_test_framework']
 
@@ -97,17 +101,23 @@ def configure(conf):
                    uselib_store='JS_H',
                    defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
 
+    # dl
+    ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
+
+    if conf.check_cc(lib = 'readline', uselib_store='READLINE') != None:
+        u('CXXDEFINES', 'HAVE_READLINE')
+
     # xml
     if Options.options.enable_xml:
         ret = None
         if darwin and Options.options.libxml_framework:
-          u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
-          # TODO: check the version of this framework via XMLVERSION define
-          ret = conf.check_cxx( uselib_store='LIBXML2',
-                          framework_name=Options.options.libxml_framework, 
-                          execute=1,
-                          errmsg='framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
-                          fragment='''
+            u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
+            # TODO: check the version of this framework via XMLVERSION define
+            ret = conf.check_cxx(uselib_store='LIBXML2',
+                                 framework_name=Options.options.libxml_framework, 
+                                 execute=1,
+                                 errmsg='framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
+                                 fragment='''
 #include <libxml/xmlversion.h>
 #include <stdio.h>
 int main() { 
@@ -120,22 +130,30 @@ int main() {
     return 0;
   }
 } ''')
-        # This faffing is less than ideal really.
-        conf.env['FRAMEWORK'] = []
-        conf.env['FRAMEWORK_LIBXML2'] = ['-framework ' + Options.options.libxml_framework ]
+            # This faffing is less than ideal really.
+            conf.env['FRAMEWORK'] = []
+            conf.env['FRAMEWORK_LIBXML2'] = \
+                ['-framework ' + Options.options.libxml_framework ]
 
         # Non darwin, or framework failed
         if ret == None:
           ret = conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
                                atleast_version='2.6.0', args = '--cflags --libs')
         if ret == None:
-          conf.check_message_2('No suitable libxml-2.0 found, disabaling', color='PINK')
+          conf.check_message_2('No suitable libxml-2.0 found, disabling', color='PINK')
           Options.options.enable_xml = None
         else:
           u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
 
     if Options.options.enable_io:
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
+
+    if Options.options.enable_curl:
+      if (conf.check_cxx(lib = 'curl', 
+                        uselib_store='CURL') != None and 
+         conf.check_cxx(header_name = 'curl/curl.h',
+                        uselib_store='CURL') != None):
+        conf.env['ENABLE_CURL'] = True
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
@@ -157,6 +175,9 @@ def build_pkgconfig(bld):
 
 def build(bld):
     bld.add_subdirs('src')
+    bld.add_subdirs('plugins/sqlite3')
+    if bld.env['ENABLE_CURL']:
+        bld.add_subdirs('plugins/curl')
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['ENABLE_SANDBOX']:

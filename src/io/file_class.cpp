@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/io/file_class.hpp"
+#include "flusspferd/security.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
@@ -44,29 +45,21 @@ public:
   static void create(char const *name, boost::optional<int> mode);
 };
 
-file_class::file_class(call_context &x)
-  : p(new impl)
+file_class::file_class(object const &obj, call_context &x)
+  : stream_base(obj, 0), p(new impl)
 {
   set_streambuf(p->stream.rdbuf());
   if (!x.arg.empty()) {
     string name = x.arg[0].to_string();
     open(name.c_str());
   }
-}
-
-file_class::~file_class()
-{}
-
-void file_class::post_initialize() {
-  stream_base::post_initialize();
 
   register_native_method("open", &file_class::open);
   register_native_method("close", &file_class::close);
 }
 
-char const *file_class::class_info::constructor_name() {
-  return "File";
-}
+file_class::~file_class()
+{}
 
 void file_class::class_info::augment_constructor(object constructor) {
   create_native_function(constructor, "create", &impl::create);
@@ -75,7 +68,7 @@ void file_class::class_info::augment_constructor(object constructor) {
 object file_class::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = stream_base::class_info::create_prototype();
+  object proto = create_object(flusspferd::get_prototype<stream_base>());
 
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);
@@ -84,6 +77,11 @@ object file_class::class_info::create_prototype() {
 }
 
 void file_class::open(char const *name) {
+  security &sec = security::get();
+
+  if (!sec.check_path(name, security::READ_WRITE))
+    throw exception("Could not open file (security)");
+
   p->stream.open(name);
 
   if (!p->stream)
@@ -95,6 +93,11 @@ void file_class::close() {
 }
 
 void file_class::impl::create(char const *name, boost::optional<int> mode) {
+  security &sec = security::get();
+
+  if (!sec.check_path(name, security::CREATE))
+    throw exception("Could not create file (security)");
+
   if (creat(name, mode.get_value_or(0666)) < 0)
     throw exception("Could not create file");
 }

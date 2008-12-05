@@ -100,14 +100,18 @@ xmlNodePtr node::c_from_js(object const &obj) {
   }
 }
 
-node::node(xmlNodePtr ptr)
-  : ptr(ptr)
+node::node(object const &obj, xmlNodePtr ptr)
+  : native_object_base(obj), ptr(ptr)
 {
   ptr->_private = static_cast<object*>(this);
   create_all_children(ptr);
+
+  init();
 }
 
-node::node(call_context &x) {
+node::node(object const &obj, call_context &x)
+  : native_object_base(obj)
+{
   local_root_scope scope;
 
   xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
@@ -158,6 +162,8 @@ node::node(call_context &x) {
   }
 
   if (prefix) xmlFree(prefix);
+
+  init();
 }
 
 node::~node() {
@@ -182,17 +188,15 @@ node::~node() {
   }
 }
 
-void node::post_initialize() {
-  unsigned const RW = permanent_property | dont_enumerate;
-  unsigned const RO = permanent_property | dont_enumerate | read_only_property;
+void node::init() {
+  unsigned const RW = permanent_shared_property;
+  unsigned const RO = RW | read_only_property;
 
   define_native_property("name", RW, &node::prop_name);
   define_native_property("lang", RW, &node::prop_lang);
   define_native_property("content", RW, &node::prop_content);
   define_native_property("parent", RW, &node::prop_parent);
-  define_native_property("next", RW, &node::prop_next);
   define_native_property("nextSibling", RW, &node::prop_next);
-  define_native_property("prev", RW, &node::prop_prev);
   define_native_property("previousSibling", RW, &node::prop_prev);
   define_native_property("firstChild", RW, &node::prop_first_child);
   define_native_property("lastChild", RO, &node::prop_last_child);
@@ -727,10 +731,9 @@ void node::add_content(string const &content) {
 }
 
 void node::add_node(call_context &x) {
-  local_root_scope scope;
   if (ptr->doc) {
     arguments arg;
-    arg.push_back(create(xmlNodePtr(ptr->doc)));
+    arg.push_root(create(xmlNodePtr(ptr->doc)));
     for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
       arg.push_back(*it);
     x.arg = arg;
@@ -741,22 +744,20 @@ void node::add_node(call_context &x) {
 }
 
 void node::add_namespace(call_context &x) {
-  local_root_scope scope;
   arguments arg;
   arg.push_back(*this);
   for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
-    arg.push_back(*it);
+    arg.push_root(*it);
   x.arg = arg;
   object obj = create_native_object<namespace_>(object(), boost::ref(x));
   x.result = obj;
 }
 
 void node::add_attribute(call_context &x) {
-  local_root_scope scope;
   arguments arg;
   arg.push_back(*this);
   for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
-    arg.push_back(*it);
+    arg.push_root(*it);
   x.arg = arg;
   x.result = create_native_object<attribute_>(object(), boost::ref(x));
   purge();

@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 
+#ifdef FLUSSPFERD_HAVE_IO
+
 BOOST_AUTO_TEST_SUITE( io )
 
 BOOST_AUTO_TEST_CASE( test_file_read ) {
@@ -54,3 +56,4 @@ BOOST_AUTO_TEST_CASE( test_file_read ) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
+#endif

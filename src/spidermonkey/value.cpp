@@ -64,6 +64,9 @@ bool value::is_number() const { return JSVAL_IS_NUMBER(get()); }
 bool value::is_boolean() const { return JSVAL_IS_BOOLEAN(get()); }
 bool value::is_string() const { return JSVAL_IS_STRING(get()); }
 bool value::is_object() const { return JSVAL_IS_OBJECT(get()); }
+bool value::is_function() const {
+  return JS_TypeOfValue(Impl::current_context(), get()) == JSTYPE_FUNCTION;
+}
 
 bool value::get_boolean() const {
   assert(is_boolean());

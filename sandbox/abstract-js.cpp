@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/array.hpp"
 #include "flusspferd/io/file_class.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
@@ -45,27 +46,24 @@ THE SOFTWARE.
 #include <stdexcept>
 
 struct my_object : flusspferd::native_object_base {
-  my_object(flusspferd::call_context &x)
-    : test(x.arg[0].to_string().to_string())
+  my_object(object const &o, flusspferd::call_context &x)
+    : flusspferd::native_object_base(o),
+      v(
+        x.arg[0].is_void()
+        ? flusspferd::string("test")
+        : x.arg[0].to_string())
   {
     std::cout << "my_object construct" << std::endl;
+
+    register_native_method("foo", &my_object::foo);
+    register_native_method("", 0);
   }
 
   ~my_object() {
     std::cout << "my_object destruct" << std::endl;
   }
 
-  std::string test;
   flusspferd::value v;
-
-  void post_initialize() {
-    std::cout << "my_object pi" << std::endl;
-
-    register_native_method("foo", &my_object::foo);
-    register_native_method("", 0);
-
-    v = flusspferd::string(test);
-  }
 
   void property_op(
       property_mode mode, flusspferd::value const &id, flusspferd::value &v)
@@ -80,7 +78,7 @@ struct my_object : flusspferd::native_object_base {
 
   void call_native_method(std::string const &name, flusspferd::call_context &x)
   {
-    std::cout << "my_object call method " << name << " v:" << v << std::endl;
+    std::cout << "my_object call method '" << name << "' v:" << v << std::endl;
     flusspferd::native_object_base::call_native_method(name, x);
   }
 
@@ -104,6 +102,7 @@ struct my_object : flusspferd::native_object_base {
 
     typedef boost::mpl::size_t<1> constructor_arity;
     static char const *constructor_name() { return "MyObject"; }
+    static char const *full_name() { return "Local.MyObject"; }
   };
 };
 
@@ -249,6 +248,12 @@ int main() {
     std::cout << "function2: " << f_x.call() << std::endl;
     std::cout << "name/arity: " <<
         f_x.name() << '/' << f_x.arity() << std::endl;
+
+    {
+      flusspferd::array x;
+      x = flusspferd::create_array();
+      //x = flusspferd::value(flusspferd::string("foo")).to_object();
+    }
   //}
   //catch(std::exception &e) {
   //  std::cerr << "Exception: " << e.what() << '\n';

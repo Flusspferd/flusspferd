@@ -49,6 +49,8 @@ public:
 
   bool is_valid() const;
 
+  void seal(bool deep);
+
   object get_parent();
   object get_prototype();
 
@@ -67,7 +69,8 @@ public:
     dont_enumerate = 1,
     read_only_property = 2,
     permanent_property = 4,
-    PROPERTY_LAST = 8
+    shared_property = 8,
+    permanent_shared_property = 12
   };
 
   void define_property(string const &name,
@@ -106,6 +109,8 @@ public:
 
   property_iterator begin() const;
   property_iterator end() const;
+
+  bool is_array() const;
 };
 
 inline bool operator==(object const &a, object const &b) {

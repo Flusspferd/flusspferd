@@ -45,6 +45,9 @@ public:
   template<property_mode>
   static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
 
+  static JSBool new_resolve(JSContext *, JSObject *, jsval, uintN, JSObject **);
+
+public:
   static JSClass native_object_class;
 
 public:
@@ -55,20 +58,21 @@ public:
   native_method_map native_methods;
 
 public:
-  typedef boost::unordered_map<std::string, property_callback> property_callback_map;
+  typedef 
+    boost::unordered_map<std::string, property_callback> property_callback_map;
 
   property_callback_map property_callbacks;
 };
 
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
-  JSCLASS_HAS_PRIVATE,
+  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE,
   &native_object_base::impl::property_op<native_object_base::property_add>,
   &native_object_base::impl::property_op<native_object_base::property_delete>,
   &native_object_base::impl::property_op<native_object_base::property_get>,
   &native_object_base::impl::property_op<native_object_base::property_set>,
   JS_EnumerateStub,
-  JS_ResolveStub,
+  (JSResolveOp) &native_object_base::impl::new_resolve,
   JS_ConvertStub,
   &native_object_base::impl::finalize,
   0,
@@ -81,11 +85,27 @@ JSClass native_object_base::impl::native_object_class = {
   0
 };
 
-native_object_base::native_object_base() : p(new impl) {
-  register_native_method("", &native_object_base::invalid_method);
+native_object_base::native_object_base(object const &o) : p(new impl) {
+  load_into(o);
 }
 
-native_object_base::~native_object_base() {}
+native_object_base::~native_object_base() {
+  if (is_valid()) {
+    JS_SetPrivate(Impl::current_context(), get(), 0);
+  }
+}
+
+void native_object_base::load_into(object const &o) {
+  if (is_valid())
+    throw exception("Cannot load native_object data into more than one object");
+
+  object::operator=(o);
+
+  if (is_valid()) {
+    if (!JS_SetPrivate(Impl::current_context(), Impl::get_object(o), this))
+      throw exception("Could not create native object (private data)");
+  }
+}
 
 void native_object_base::invalid_method(call_context &) {
   throw exception("Invalid method");
@@ -122,15 +142,7 @@ object native_object_base::do_create_object(object const &prototype_) {
   if (!o)
     throw exception("Could not create native object");
 
-  object::operator=(Impl::wrap_object(o));
-  root_object r(get_object());
-
-  if (!JS_SetPrivate(ctx, o, this))
-    throw exception("Could not create native object (private data)");
-
-  post_initialize();
-
-  return *this;
+  return Impl::wrap_object(o);
 }
 
 void native_object_base::add_native_method(
@@ -199,8 +211,12 @@ void native_object_base::add_property_op(
 }
 
 void native_object_base::impl::finalize(JSContext *ctx, JSObject *obj) {
-  current_context_scope scope(Impl::wrap_context(ctx));
-  delete native_object_base::get_native(Impl::wrap_object(obj));
+  void *p = JS_GetPrivate(ctx, obj);
+
+  if (p) {
+    current_context_scope scope(Impl::wrap_context(ctx));
+    delete static_cast<native_object_base*>(p);
+  }
 }
 
 JSBool native_object_base::impl::call_helper(
@@ -252,7 +268,37 @@ JSBool native_object_base::impl::property_op(
   } FLUSSPFERD_CALLBACK_END;
 }
 
-uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *thing) {
+JSBool native_object_base::impl::new_resolve(
+    JSContext *ctx, JSObject *obj, jsval id, uintN sm_flags, JSObject **objp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base *self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    unsigned flags = 0;
+
+    if (sm_flags & JSRESOLVE_QUALIFIED)
+      flags |= property_qualified;
+    if (sm_flags & JSRESOLVE_ASSIGNING)
+      flags |= property_assigning;
+    if (sm_flags & JSRESOLVE_DETECTING)
+      flags |= property_detecting;
+    if (sm_flags & JSRESOLVE_DECLARING)
+      flags |= property_declaring;
+    if (sm_flags & JSRESOLVE_CLASSNAME)
+      flags |= property_classname;
+
+    *objp = 0;
+    if (self->property_resolve(Impl::wrap_jsval(id), flags))
+      *objp = Impl::get_object(*self);
+  } FLUSSPFERD_CALLBACK_END;
+}
+
+uint32 native_object_base::impl::mark_op(
+    JSContext *ctx, JSObject *obj, void *thing)
+{
   current_context_scope scope(Impl::wrap_context(ctx));
 
   native_object_base *self =
@@ -264,30 +310,35 @@ uint32 native_object_base::impl::mark_op(JSContext *ctx, JSObject *obj, void *th
   return 0;
 }
 
-void native_object_base::call_native_method(std::string const &name, call_context &x) {
+void native_object_base::call_native_method(
+    std::string const &name, call_context &x)
+{
   impl::native_method_map::iterator it = p->native_methods.find(name);
 
-  if (it != p->native_methods.end()) {
-    impl::method_variant m = it->second;
-    switch (m.which()) {
-    case 0: // native_method_type
-      {
-        native_method_type native_method = boost::get<native_method_type>(m);
-        if (native_method)
-          (this->*native_method)(x);
-      }
-      break;
-    case 1: // callback_type
-      {
-        callback_type const &callback = boost::get<callback_type>(m);
-        if (callback)
-          callback(x);
-      }
+  if (it == p->native_methods.end())
+    throw exception("No such method: " + name);
+
+  impl::method_variant m = it->second;
+  switch (m.which()) {
+  case 0: // native_method_type
+    {
+      native_method_type native_method = boost::get<native_method_type>(m);
+      if (native_method)
+        (this->*native_method)(x);
+    }
+    break;
+  case 1: // callback_type
+    {
+      callback_type const &callback = boost::get<callback_type>(m);
+      if (callback)
+        callback(x);
     }
   }
 }
 
-void native_object_base::property_op(property_mode mode, value const &id, value &data) {
+void native_object_base::property_op(
+    property_mode mode, value const &id, value &data)
+{
   std::string name = id.to_string().to_string();
   impl::property_callback_map::iterator it = p->property_callbacks.find(name);
 
@@ -299,6 +350,9 @@ void native_object_base::property_op(property_mode mode, value const &id, value 
   }
 }
 
-void native_object_base::post_initialize() {}
+bool native_object_base::property_resolve(value const &, unsigned) {
+  return false;
+}
 
 void native_object_base::trace(tracer&) {}
+void native_object_base::late_load() {}

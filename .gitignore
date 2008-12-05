@@ -1,6 +1,7 @@
 .configure
 build/*
 html/*
+include/flusspferd/implementation
 *.swp
 .lock-wscript
 .waf-*

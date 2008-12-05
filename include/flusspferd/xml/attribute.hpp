@@ -34,22 +34,24 @@ namespace flusspferd { namespace xml {
 class attribute_ : public node {
 public:
   struct class_info : node::class_info {
+    static char const *full_name() { return "XML.Attribute"; }
+
     static char const *constructor_name() { return "Attribute"; }
     typedef boost::mpl::size_t<4> constructor_arity;
 
     static object create_prototype();
   };
 
-  attribute_(call_context &);
-  attribute_(xmlAttrPtr attr);
+  attribute_(object const &, call_context &);
+  attribute_(object const &, xmlAttrPtr attr);
   ~attribute_();
 
   xmlAttrPtr c_obj() const {
     return xmlAttrPtr(node::c_obj());
   }
 
-protected:
-  void post_initialize();
+private:
+  void init();
 
 private: // JS methods
   void add_content(string const &);

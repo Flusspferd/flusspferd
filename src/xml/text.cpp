@@ -32,8 +32,8 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 template<typename Tag>
-general_text<Tag>::general_text(xmlNodePtr ptr)
-  : node(ptr)
+general_text<Tag>::general_text(object const &obj, xmlNodePtr ptr)
+  : node(obj, ptr)
 {}
 
 static xmlNodePtr new_text(text_tag, xmlDocPtr doc, xmlChar const *text) {
@@ -73,8 +73,8 @@ static xmlNodePtr new_text(Tag tag, call_context &x) {
 }
 
 template<typename Tag>
-general_text<Tag>::general_text(call_context &x)
-  : node(new_text(Tag(), x))
+general_text<Tag>::general_text(object const &obj, call_context &x)
+  : node(obj, new_text(Tag(), x))
 {}
 
 template<typename Tag>
@@ -82,15 +82,10 @@ general_text<Tag>::~general_text()
 {}
 
 template<typename Tag>
-void general_text<Tag>::post_initialize() {
-  node::post_initialize();
-}
-
-template<typename Tag>
 object general_text<Tag>::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = node::class_info::create_prototype();
+  object proto = create_object(flusspferd::get_prototype<node>());
 
   return proto;
 }

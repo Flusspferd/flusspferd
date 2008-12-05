@@ -33,22 +33,17 @@ namespace flusspferd { namespace xml {
 class processing_instruction : public node {
 public:
   struct class_info : node::class_info {
-    static char const *constructor_name();
-    static std::size_t constructor_arity();
+    static char const *full_name() { return "XML.ProcessingInstruction"; }
+
+    static char const *constructor_name() { return "ProcessingInstruction"; }
+    typedef boost::mpl::size_t<3> constructor_arity;
 
     static object create_prototype();
   };
 
-  processing_instruction(call_context &);
-  processing_instruction(xmlNodePtr doc);
+  processing_instruction(object const &, call_context &);
+  processing_instruction(object const &, xmlNodePtr pi);
   ~processing_instruction();
-
-protected:
-  void post_initialize();
-
-private: // JS methods
-
-private: // JS properties
 };
 
 }}

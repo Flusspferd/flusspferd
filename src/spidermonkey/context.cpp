@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include "flusspferd/implementation/value.hpp"
 #include "flusspferd/implementation/object.hpp"
@@ -31,6 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/unordered_map.hpp>
 #include <cstring>
+#include <cstdio>
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_STACKCHUNKSIZE
@@ -49,8 +51,9 @@ namespace {
 }
 
 struct context::context_private {
-  boost::unordered_map<std::string, object> prototypes;
-  boost::unordered_map<std::string, object> constructors;
+  typedef boost::shared_ptr<root_object> root_object_ptr;
+  boost::unordered_map<std::string, root_object_ptr> prototypes;
+  boost::unordered_map<std::string, root_object_ptr> constructors;
 };
 
 class context::impl {
@@ -91,8 +94,11 @@ public:
 
   ~impl() {
     if (destroy) {
-      delete get_private();
-      JS_DestroyContext(context);
+      {
+        current_context_scope scope(Impl::wrap_context(context));
+        delete get_private();
+        JS_DestroyContext(context);
+      }
     }
   }
 
@@ -149,12 +155,24 @@ object context::global() {
   return Impl::wrap_object(JS_GetGlobalObject(p->context));
 }
 
+object context::scope_chain() {
+  return Impl::wrap_object(JS_GetScopeChain(p->context));
+}
+
 value context::evaluate(char const *source, std::size_t n,
                         char const *file, unsigned int line)
 {
-  current_context_scope scope(*this);
+  return evaluateInScope(source, n, file, line, global());
+}
+
+value context::evaluateInScope(char const* source, std::size_t n,
+                               char const* file, unsigned int line,
+                               object const &scope)
+{
+  current_context_scope cxt_scope(*this);
+  
   jsval rval;
-  JSBool ok = JS_EvaluateScript(p->context, JS_GetGlobalObject(p->context),
+  JSBool ok = JS_EvaluateScript(p->context, Impl::get_object(scope),
                                   source, n, file, line, &rval);
   if(!ok) {
     throw exception("Could not evaluate script");
@@ -162,20 +180,82 @@ value context::evaluate(char const *source, std::size_t n,
   return Impl::wrap_jsval(rval);
 }
 
-void context::add_prototype(std::string const &name, object const &proto) {
-  p->get_private()->prototypes[name] = proto;
+value context::execute(char const *filename, object const &scope_) {
+  current_context_scope ctx_scope(*this);
+  JSContext *cx = p->context;
+
+  local_root_scope root_scope;
+
+  FILE *file = fopen(filename, "r");
+  if (!file) {
+    throw exception(std::string("Could not open '") + filename + "'");
+  }
+ 
+  /*
+   * It's not interactive - just execute it.
+   *
+   * Support the UNIX #! shell hack; gobble the first line if it starts
+   * with '#'. TODO - this isn't quite compatible with sharp variables,
+   * as a legal js program (using sharp variables) might start with '#'.
+   * But that would require multi-character lookahead.
+   */
+  int ch = fgetc(file);
+  if (ch == '#') {
+      while((ch = fgetc(file)) != EOF) {
+          if (ch == '\n' || ch == '\r')
+              break;
+      }
+  }
+  ungetc(ch, file);
+
+  JSObject *scope = Impl::get_object(scope_);
+
+  if (!scope)
+    scope = Impl::get_object(this->global());
+ 
+  int oldopts = JS_GetOptions(cx);
+  JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
+  JSScript *script = JS_CompileFileHandle(cx, scope, filename, file);
+  JS_SetOptions(cx, oldopts);
+ 
+  if (!script) {
+    throw exception("Could not compile script");
+  }
+
+  JSObject *rootable = JS_NewScriptObject(cx, script);
+  if (!rootable) {
+    JS_DestroyScript(cx, script);
+    return JS_FALSE;
+  }
+
+  value result;
+ 
+  JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
+ 
+  if (!ok)
+    throw exception("Script execution failed");
+
+  return result;
 }
 
-object const &context::get_prototype(std::string const &name) const {
-  return p->get_private()->prototypes[name];
+void context::add_prototype(std::string const &name, object const &proto) {
+  p->get_private()->prototypes[name] =
+    context_private::root_object_ptr(new root_object(proto));
+}
+
+object context::get_prototype(std::string const &name) const {
+  context_private::root_object_ptr ptr = p->get_private()->prototypes[name];
+  return ptr ? *ptr : object();
 }
 
 void context::add_constructor(std::string const &name, object const &ctor) {
-  p->get_private()->constructors[name] = ctor;
+  p->get_private()->constructors[name] =
+    context_private::root_object_ptr(new root_object(ctor));
 }
 
-object const &context::get_constructor(std::string const &name) const {
-  return p->get_private()->constructors[name];
+object context::get_constructor(std::string const &name) const {
+  context_private::root_object_ptr ptr = p->get_private()->constructors[name];
+  return ptr ? *ptr : object();
 }
 
 value context::evaluate(char const *source, char const *file,

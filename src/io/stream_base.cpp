@@ -27,15 +27,28 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/blob.hpp"
 #include <boost/scoped_array.hpp>
 #include <cstdlib>
 
 using namespace flusspferd;
 using namespace flusspferd::io;
 
-stream_base::stream_base(std::streambuf *p)
-  : streambuf(p)
-{}
+stream_base::stream_base(object const &o, std::streambuf *p)
+  : native_object_base(o), streambuf(p)
+{
+  register_native_method("readWhole", &stream_base::read_whole);
+  register_native_method("read", &stream_base::read);
+  register_native_method("readWholeBlob", &stream_base::read_whole_blob);
+  register_native_method("readBlob", &stream_base::read_blob);
+  register_native_method("write", &stream_base::write);
+  register_native_method("print", &stream_base::print);
+  register_native_method("flush", &stream_base::flush);
+
+  define_property("fieldSeparator", string(" "));
+  define_property("recordSeparator", string("\n"));
+  define_property("autoflush", false);
+}
 
 stream_base::~stream_base()
 {}
@@ -44,10 +57,8 @@ void stream_base::set_streambuf(std::streambuf *p) {
   streambuf = p;
 }
 
-void stream_base::post_initialize() {
-  register_native_method("readWhole", &stream_base::read_whole);
-  register_native_method("read", &stream_base::read);
-  register_native_method("write", &stream_base::write);
+std::streambuf *stream_base::get_streambuf() {
+  return streambuf;
 }
 
 object stream_base::class_info::create_prototype() {
@@ -57,7 +68,11 @@ object stream_base::class_info::create_prototype() {
 
   create_native_method(proto, "readWhole", 0);
   create_native_method(proto, "read", 1);
+  create_native_method(proto, "readWholeBlob", 0);
+  create_native_method(proto, "readBlob", 1);
   create_native_method(proto, "write", 1);
+  create_native_method(proto, "print", 0);
+  create_native_method(proto, "flush", 0);
 
   return proto;
 }
@@ -78,6 +93,25 @@ string stream_base::read_whole() {
   return string(data);
 }
 
+object stream_base::read_whole_blob() {
+  unsigned const N = 4096;
+
+  std::vector<char> data;
+
+  std::streamsize length;
+
+  do {
+    data.resize(data.size() + N);
+    length = streambuf->sgetn(&data[data.size() - N], N);
+    if (length < 0)
+      length = 0;
+    data.resize(data.size() - N + length);
+  } while (length > 0);
+
+  return create_native_object<blob>(
+      object(), (unsigned char const *)&data[0], data.size());
+}
+
 string stream_base::read(unsigned size) {
   if (!size)
     size = 4096;
@@ -92,8 +126,59 @@ string stream_base::read(unsigned size) {
   return string(buf.get());
 }
 
-void stream_base::write(string const &text) {
-  char const *str = text.c_str();
-  streambuf->sputn(text.c_str(), std::strlen(str));
+object stream_base::read_blob(unsigned size) {
+  if (!size)
+    size = 4096;
+
+  boost::scoped_array<char> buf(new char[size]);
+
+  std::streamsize length = streambuf->sgetn(buf.get(), size);
+  if (length < 0)
+    length = 0;
+
+  return create_native_object<blob>(
+      object(),
+      (unsigned char const *) buf.get(),
+      length);
 }
 
+void stream_base::write(value const &data) {
+  if (data.is_string()) {
+    string text = data.get_string();
+    char const *str = text.c_str();
+    streambuf->sputn(text.c_str(), std::strlen(str));
+  } else if (data.is_object()) {
+    native_object_base *ptr = native_object_base::get_native(data.get_object());
+    blob &b = dynamic_cast<blob&>(*ptr);
+    streambuf->sputn((char const*) b.get_data(), b.size());
+  }
+  //TODO slow?
+  if (get_property("autoflush").to_boolean())
+    flush();
+}
+
+void stream_base::print(call_context &x) {
+  local_root_scope scope;
+
+  value delim_v = get_property("fieldSeparator");
+  string delim;
+  if (!delim_v.is_void_or_null())
+    delim = delim_v.to_string();
+
+  std::size_t n = x.arg.size();
+  for (std::size_t i = 0; i < n; ++i) {
+    write(x.arg[i].to_string());
+    if (i < n - 1)
+      write(delim);
+  }
+
+  value record_v = get_property("recordSeparator");
+  if (!record_v.is_void_or_null())
+    write(record_v.to_string());
+
+  flush();
+}
+
+void stream_base::flush() {
+  streambuf->pubsync();
+}

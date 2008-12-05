@@ -32,7 +32,10 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 #define FLUSSPFERD_XML_TAG(id, text) \
-  struct id { static char const *name() { return text; } }
+  struct id { \
+    static char const *name() { return text; } \
+    static char const *full_name() { return "XML." text; } \
+  }
 
 FLUSSPFERD_XML_TAG(text_tag, "Text");
 FLUSSPFERD_XML_TAG(comment_tag, "Comment");
@@ -44,18 +47,17 @@ template<typename Tag>
 class general_text : public node {
 public:
   struct class_info : node::class_info {
+    static char const *full_name() { return Tag::full_name(); }
+
     static char const *constructor_name() { return Tag::name(); }
     typedef boost::mpl::size_t<2> constructor_arity;
 
     static object create_prototype();
   };
 
-  general_text(call_context &);
-  general_text(xmlNodePtr doc);
+  general_text(object const &, call_context &);
+  general_text(object const &, xmlNodePtr doc);
   ~general_text();
-
-protected:
-  void post_initialize();
 
 private: // JS methods
 

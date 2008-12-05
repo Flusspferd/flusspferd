@@ -90,6 +90,14 @@ void arguments::push_back(value const &v) {
   data().push_back(Impl::get_jsval(v));
   reset_argv();
 }
+
+void arguments::push_root(value const &v) {
+  if(!is_userprovided())
+    throw exception("trying to push data into system provided argument list");
+  roots.push_back(boost::shared_ptr<root_value>(new root_value(v)));
+  data().push_back(Impl::get_jsval(v));
+  reset_argv();
+}
     
 value arguments::back() {
   if (empty())
@@ -122,7 +130,9 @@ arguments::iterator arguments::end() {
   return Impl::arguments_impl::iterator_impl(get() + size());
 }
 
-bool flusspferd::operator!=(arguments::iterator const &lhs, arguments::iterator const &rhs) {
-  return *static_cast<Impl::arguments_impl::iterator_impl const&>(lhs) !=
+bool flusspferd::operator==(
+  arguments::iterator const &lhs, arguments::iterator const &rhs)
+{
+  return *static_cast<Impl::arguments_impl::iterator_impl const&>(lhs) ==
     *static_cast<Impl::arguments_impl::iterator_impl const&>(rhs);
 }

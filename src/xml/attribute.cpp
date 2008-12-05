@@ -32,9 +32,11 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-attribute_::attribute_(xmlAttrPtr ptr)
-  : node(xmlNodePtr(ptr))
-{}
+attribute_::attribute_(object const &obj, xmlAttrPtr ptr)
+  : node(obj, xmlNodePtr(ptr))
+{
+  init();
+}
 
 static xmlAttrPtr new_attribute_(call_context &x) {
   local_root_scope scope;
@@ -76,27 +78,27 @@ static xmlAttrPtr new_attribute_(call_context &x) {
   return result;
 }
 
-attribute_::attribute_(call_context &x)
-  : node(xmlNodePtr(new_attribute_(x)))
-{}
+attribute_::attribute_(object const &obj, call_context &x)
+  : node(obj, xmlNodePtr(new_attribute_(x)))
+{
+  init();
+}
 
 attribute_::~attribute_()
 {}
 
-void attribute_::post_initialize() {
-  node::post_initialize();
-
+void attribute_::init() {
   register_native_method("addContent", &attribute_::add_content);
 
   define_native_property("content",
-      dont_enumerate | permanent_property,
+      permanent_shared_property,
       &attribute_::prop_content);
 }
 
 object attribute_::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = node::class_info::create_prototype();
+  object proto = create_object(flusspferd::get_prototype<node>());
 
   create_native_method(proto, "addContent", 1);
 
@@ -107,14 +109,15 @@ void attribute_::add_content(string const &content) {
   if (content.empty())
     return;
 
-  local_root_scope scope;
-  call_context x;
-  x.arg.push_back(content);
-
-  object txt = create_native_object<text>(object(), boost::ref(x));
+  object txt;
+  {
+    call_context x;
+    x.arg.push_back(content);
+    txt = create_native_object<text>(object(), boost::ref(x));
+  }
 
   arguments arg;
-  arg.push_back(txt);
+  arg.push_root(txt);
 
   call("addChild", arg);
 }

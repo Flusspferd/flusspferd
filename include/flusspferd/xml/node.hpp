@@ -34,8 +34,8 @@ namespace flusspferd { namespace xml {
 
 class node : public native_object_base {
 public:
-  node(xmlNodePtr ptr);
-  node(call_context &x);
+  node(object const &o, xmlNodePtr ptr);
+  node(object const &o, call_context &x);
   ~node();
 
   static object create(xmlNodePtr ptr);
@@ -45,6 +45,8 @@ public:
   xmlNodePtr c_obj() const { return ptr; }
 
   struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "XML.Node"; }
+
     static char const *constructor_name() { return "Node"; }
     typedef boost::mpl::size_t<3> constructor_arity;
 
@@ -58,8 +60,10 @@ protected:
   void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
 protected:
-  void post_initialize();
   void trace(tracer &);
+
+private:
+  void init();
 
 private: // JS methods
   object copy(bool recursive);

@@ -27,21 +27,24 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/native_function_base.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/implementation/object.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;
 
-object flusspferd::create_object() {
-  JSObject *o = JS_NewObject(Impl::current_context(), 0, 0, 0);
+object flusspferd::create_object(object const &proto) {
+  JSObject *o = JS_NewObject(
+      Impl::current_context(), 0, Impl::get_object(proto), 0);
+
   if (!o)
     throw exception("Could not create object");
 
   return Impl::wrap_object(o);
 }
 
-object flusspferd::create_array(unsigned length) {
+array flusspferd::create_array(unsigned length) {
   JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
   if (!o)
     throw exception("Could not create array");
@@ -49,9 +52,19 @@ object flusspferd::create_array(unsigned length) {
   return Impl::wrap_object(o);
 }
 
-object flusspferd::create_native_object(native_object_base *ptr, object const &proto) {
+object flusspferd::detail::create_native_object(object const &proto) {
+  return native_object_base::do_create_object(proto);
+}
+
+object flusspferd::create_native_object(
+    native_object_base *ptr, object const &proto)
+{
   try {
-    return ptr->do_create_object(proto);
+    local_root_scope scope;
+    object obj = detail::create_native_object(proto);
+    ptr->load_into(obj);
+    ptr->late_load();
+    return *ptr;
   } catch (...) {
     delete ptr;
     throw;
@@ -67,7 +80,9 @@ function flusspferd::create_native_function(native_function_base *ptr) {
   }
 }
 
-function flusspferd::create_native_function(object const &o_, native_function_base *ptr) {
+function flusspferd::create_native_function(
+    object const &o_, native_function_base *ptr)
+{
   object o = o_;
   function fun = create_native_function(ptr);
   o.define_property(ptr->name().c_str(), fun, object::dont_enumerate);

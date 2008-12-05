@@ -21,8 +21,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/security.hpp"
 #include "flusspferd/xml/xml.hpp"
 #include "flusspferd/io/io.hpp"
+#include "flusspferd/importer.hpp"
+#include "flusspferd/blob.hpp"
+#include "flusspferd/class.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/context.hpp"
@@ -30,12 +34,16 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/properties_functions.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <string>
 
-//#include <js/jsapi.h> // DEBUG
+#ifdef HAVE_READLINE
+#  include <readline/readline.h>
+#  include <readline/history.h>
+#endif
 
 bool extfile = false;
 std::string file = __FILE__;
@@ -43,71 +51,104 @@ std::istream in(std::cin.rdbuf());
 
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
-    " -h -f <file>\n\n"
+    " -h -f <file> -i\n\n"
     "\t-h         displays this message\n"
-    "\t-f <file>  open file as input\n\n";
+    "\t-f <file>  open file as input\n"
+    "\t-i         enter interactive mode (after running a file)\n\n";
 }
 
-bool parse_cmd(int argc, char **argv) {
-  if(argc > 1) {
-    for(int i = 1; i < argc; ++i) {
-      if(std::strcmp(argv[i], "-h") == 0 ||
-         std::strcmp(argv[i], "--help"))
-      {
+bool parse_cmd(flusspferd::context &co, int argc, char **argv) {
+  if (argc <= 1)
+    return true;
+
+  for (int i = 1; i < argc; ++i) {
+    if (std::strcmp(argv[i], "-h") == 0 ||
+        std::strcmp(argv[i], "--help") == 0)
+    {
+      print_help(argv[0]);
+      return false;
+    }
+    else if (std::strcmp(argv[i], "-i") == 0 ||
+             std::strcmp(argv[i], "--interactive") == 0)
+    {
+      extfile = false;
+    }
+    else if (std::strcmp(argv[i], "-f") == 0 ||
+             std::strcmp(argv[i], "--file") == 0)
+    {
+      ++i;
+      if (i == argc) {
         print_help(argv[0]);
+        std::cerr << "ERROR: expected filename after " << argv[i-1]
+                  << " option\n";
         return false;
       }
-      else if(std::strcmp(argv[i], "-f") == 0 ||
-              std::strcmp(argv[i], "--file") == 0)
-      {
-        ++i;
-        if(i == argc) {
-          print_help(argv[0]);
-          std::cerr << "ERROR: expected filename after " << argv[i-1]
-                    << " option\n";
-          return false;
-        }
-        file = argv[i];
-        std::ifstream fin(file.c_str());
-        in.rdbuf(fin.rdbuf());
-        extfile = true;
-      }
+      file = argv[i];
+      extfile = true;
+      co.execute(file.c_str());
     }
   }
+
   return true;
 }
 
-void js_print(flusspferd::string const &v) {
-  std::cout << v << std::endl;
+bool getline(std::string &source, const char* prompt = "> ") {
+#ifdef HAVE_READLINE
+  if (!extfile) {
+    char* linep = readline(prompt);
+    if (!linep) {
+      std::cout << std::endl;
+      return false;
+    }
+    if (linep[0] != '\0')
+        add_history(linep);
+    source = linep;
+    source += '\n';
+    return true;
+  } 
+  else
+#endif
+  {
+    std::cout << prompt;
+    return std::getline(in, source);
+  }
 }
 
 int main(int argc, char **argv) {
-  if(!parse_cmd(argc, argv))
-    return 1;
 
   try {
     flusspferd::init::initialize();
     flusspferd::context co = flusspferd::context::create();
     flusspferd::current_context_scope scope(co);
 
+    flusspferd::load_class<flusspferd::blob>();
+    flusspferd::load_class<flusspferd::importer>();
+
+    flusspferd::importer::add_preloaded("io", &flusspferd::io::load_io);
     #ifdef FLUSSPFERD_HAVE_XML
-    flusspferd::xml::load_xml();
+    flusspferd::importer::add_preloaded("xml", &flusspferd::xml::load_xml);
     #endif
 
-    #ifdef FLUSSPFERD_HAVE_IO
-    flusspferd::io::load_io();
-    #endif
+    flusspferd::load_properties_functions();
 
-    co.global().define_property("print",
-      flusspferd::create_native_function(&js_print));
+    flusspferd::security &security =
+      flusspferd::security::create(flusspferd::global());
 
-    co.gc();
+    co.execute("prelude.js");
+
+    flusspferd::gc();
+
+    // if extfile is true, we've run it already, and aren't going to interactive
+    if (!parse_cmd(co, argc, argv))
+      return 1;
+
+    if (extfile)
+      return 0;
 
     std::string source;
     unsigned int line = 0;
-    if(!extfile)
-      std::cout << "> ";
-    while(std::getline(in, source)) {
+
+    while (getline(source)) {
       try {
         flusspferd::value v =
           flusspferd::evaluate(source, file.c_str(), ++line);
@@ -117,9 +158,7 @@ int main(int argc, char **argv) {
       catch(std::exception &e) {
         std::cerr << "ERROR: " << e.what() << '\n';
       }
-      co.gc();
-      if(!extfile)
-        std::cout << "> ";
+      flusspferd::gc();
     }
   }
   catch(std::exception &e) {

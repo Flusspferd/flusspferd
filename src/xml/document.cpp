@@ -45,9 +45,10 @@ xmlDocPtr document::c_from_js(object const &obj) {
   }
 }
 
-document::document(xmlDocPtr ptr)
-  : node(xmlNodePtr(ptr))
+document::document(object const &obj, xmlDocPtr ptr)
+  : node(obj, xmlNodePtr(ptr))
 {
+  init();
 }
 
 static xmlDocPtr new_doc(call_context &) {
@@ -57,9 +58,10 @@ static xmlDocPtr new_doc(call_context &) {
   return ptr;
 }
 
-document::document(call_context &x)
-  : node(xmlNodePtr(new_doc(x)))
+document::document(object const &obj, call_context &x)
+  : node(obj, xmlNodePtr(new_doc(x)))
 {
+  init();
 }
 
 document::~document() {
@@ -83,15 +85,13 @@ void document::trace(tracer &trc) {
     trc("doc-oldns", *static_cast<object*>(c_obj()->oldNs->_private));
 }
 
-void document::post_initialize() {
-  node::post_initialize();
-
+void document::init() {
   register_native_method("dump", &document::dump);
   register_native_method("copy", &document::copy);
   register_native_method("toString", &document::to_string);
 
-  unsigned const RW = permanent_property | dont_enumerate;
-  unsigned const RO = permanent_property | dont_enumerate |read_only_property;
+  unsigned const RW = permanent_shared_property;
+  unsigned const RO = RW |read_only_property;
 
   define_native_property("rootElement", RW, &document::prop_root_element);
   define_native_property("xmlNamespace", RO, &document::prop_xml_namespace);
@@ -100,7 +100,7 @@ void document::post_initialize() {
 object document::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = node::class_info::create_prototype();
+  object proto = create_object(flusspferd::get_prototype<node>());
 
   create_native_method(proto, "dump", 0);
   create_native_method(proto, "copy", 1);
@@ -190,9 +190,8 @@ void document::prop_xml_namespace(property_mode mode, value &data) {
     return;
 
   if (data.is_void()) {
-    local_root_scope scope;
     arguments arg;
-    arg.push_back(string("xml"));
+    arg.push_root(string("xml"));
     data = call("searchNamespaceByPrefix", arg);
   }
 }

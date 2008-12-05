@@ -24,6 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CONTEXT_HPP
 #define FLUSSPFERD_CONTEXT_HPP
 
+#include "object.hpp"
 #include <boost/shared_ptr.hpp>
 #include <string>
 
@@ -56,39 +57,48 @@ public:
 
   object global();
 
+  object scope_chain();
+
   value evaluate(char const *source, std::size_t n,
                  char const *file = 0x0, unsigned int line = 0);
+
+  value evaluateInScope(char const* source, std::size_t n,
+                       char const* file, unsigned int line,
+                       object const &scope);
+
   value evaluate(char const *source, char const *file = 0x0,
                  unsigned int line = 0);
   value evaluate(std::string const &source, char const *file = 0x0,
                  unsigned int line = 0);
 
+  value execute(char const *file, object const &scope = object());
+
   void gc();
 
   void add_prototype(std::string const &name, object const &proto);
-  object const &get_prototype(std::string const &name) const;
+  object get_prototype(std::string const &name) const;
 
   template<typename T>
   void add_prototype(object const &proto) {
-    add_prototype(typeid(T).name(), proto);
+    add_prototype(T::class_info::full_name(), proto);
   }
 
   template<typename T>
-  object const &get_prototype() const {
-    return get_prototype(typeid(T).name());
+  object get_prototype() const {
+    return get_prototype(T::class_info::full_name());
   }
 
   void add_constructor(std::string const &name, object const &ctor);
-  object const &get_constructor(std::string const &name) const;
+  object get_constructor(std::string const &name) const;
 
   template<typename T>
   void add_constructor(object const &ctor) {
-    add_constructor(typeid(T).name(), ctor);
+    add_constructor(T::class_info::full_name(), ctor);
   }
 
   template<typename T>
-  object const &get_constructor() const {
-    return get_constructor(typeid(T).name());
+  object get_constructor() const {
+    return get_constructor(T::class_info::full_name());
   }
 };
 
