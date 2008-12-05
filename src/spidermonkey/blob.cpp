@@ -73,6 +73,7 @@ void blob::init() {
 
   register_native_method("append", &blob::append);
   register_native_method("toArray", &blob::to_array);
+  register_native_method("copy", &blob::copy);
 }
 
 blob::~blob() {}
@@ -82,6 +83,7 @@ object blob::class_info::create_prototype() {
 
   create_native_method(proto, "append", 1);
   create_native_method(proto, "toArray", 0);
+  create_native_method(proto, "copy", 0);
 
   return proto;
 }
@@ -133,4 +135,8 @@ object blob::to_array() {
   for (std::size_t i = 0; i < data.size(); ++i)
     arr.set_element(i, int(data[i]));
   return arr;
+}
+
+object blob::copy() {
+  return create_native_object<blob>(object(), &data[0], data.size());
 }

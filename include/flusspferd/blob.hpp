@@ -50,6 +50,7 @@ protected:
 private: // JS methos
   void append(blob const &o);
   object to_array();
+  object copy();
 
 private: // JS properties
   void prop_length(property_mode mode, value &data);
