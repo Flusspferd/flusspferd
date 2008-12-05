@@ -57,6 +57,10 @@ void stream_base::set_streambuf(std::streambuf *p) {
   streambuf = p;
 }
 
+std::streambuf *stream_base::get_streambuf() {
+  return streambuf;
+}
+
 object stream_base::class_info::create_prototype() {
   local_root_scope scope;
 

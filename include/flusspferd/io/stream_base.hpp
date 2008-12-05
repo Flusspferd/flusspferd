@@ -36,6 +36,7 @@ public:
   ~stream_base();
 
   void set_streambuf(std::streambuf *buf);
+  std::streambuf *get_streambuf();
 
   struct class_info : flusspferd::class_info {
     static char const *full_name() { return "IO.Stream"; }
