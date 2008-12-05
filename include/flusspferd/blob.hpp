@@ -54,6 +54,7 @@ private: // JS methos
   void append(blob const &o);
   object to_array();
   object copy();
+  string as_utf8();
 
 private: // JS properties
   void prop_length(property_mode mode, value &data);

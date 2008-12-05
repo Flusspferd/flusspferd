@@ -23,6 +23,7 @@ THE SOFTWARE.
 #include "flusspferd/blob.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/string.hpp"
 #include <limits>
 
 using namespace flusspferd;
@@ -74,6 +75,7 @@ void blob::init() {
   register_native_method("append", &blob::append);
   register_native_method("toArray", &blob::to_array);
   register_native_method("copy", &blob::copy);
+  register_native_method("asUtf8", &blob::as_utf8);
 }
 
 blob::~blob() {}
@@ -84,6 +86,7 @@ object blob::class_info::create_prototype() {
   create_native_method(proto, "append", 1);
   create_native_method(proto, "toArray", 0);
   create_native_method(proto, "copy", 0);
+  create_native_method(proto, "asUtf8", 0);
 
   return proto;
 }
@@ -139,4 +142,12 @@ object blob::to_array() {
 
 object blob::copy() {
   return create_native_object<blob>(get_prototype(), &data[0], data.size());
+}
+
+string blob::as_utf8() {
+  std::size_t strlen = 0;
+  for (; strlen < data.size(); ++strlen)
+    if (!data[strlen])
+      break;
+  return string((char*) get_data(), strlen);
 }
