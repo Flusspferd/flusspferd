@@ -25,11 +25,17 @@ THE SOFTWARE.
 #define FLUSSPFERD_ARGUMENTS_HPP
 
 #include "implementation/arguments.hpp"
+#include "root.hpp"
+#include "value.hpp"
+#include <boost/shared_ptr.hpp>
 #include <vector>
 
 namespace flusspferd {
 
 class arguments : public Impl::arguments_impl {
+private:
+  std::vector<boost::shared_ptr<root_value> > roots;
+
 public:
   arguments() { }
   arguments(Impl::arguments_impl const &a)
@@ -43,6 +49,7 @@ public:
   value operator[](std::size_t i);
 
   void push_back(value const &v);
+  void push_root(value const &v);
   value front();
   value back();
 

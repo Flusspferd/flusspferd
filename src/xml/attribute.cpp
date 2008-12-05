@@ -109,14 +109,15 @@ void attribute_::add_content(string const &content) {
   if (content.empty())
     return;
 
-  local_root_scope scope;
-  call_context x;
-  x.arg.push_back(content);
-
-  object txt = create_native_object<text>(object(), boost::ref(x));
+  object txt;
+  {
+    call_context x;
+    x.arg.push_back(content);
+    txt = create_native_object<text>(object(), boost::ref(x));
+  }
 
   arguments arg;
-  arg.push_back(txt);
+  arg.push_root(txt);
 
   call("addChild", arg);
 }

@@ -90,6 +90,14 @@ void arguments::push_back(value const &v) {
   data().push_back(Impl::get_jsval(v));
   reset_argv();
 }
+
+void arguments::push_root(value const &v) {
+  if(!is_userprovided())
+    throw exception("trying to push data into system provided argument list");
+  roots.push_back(boost::shared_ptr<root_value>(new root_value(v)));
+  data().push_back(Impl::get_jsval(v));
+  reset_argv();
+}
     
 value arguments::back() {
   if (empty())

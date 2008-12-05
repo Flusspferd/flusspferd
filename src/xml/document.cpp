@@ -190,9 +190,8 @@ void document::prop_xml_namespace(property_mode mode, value &data) {
     return;
 
   if (data.is_void()) {
-    local_root_scope scope;
     arguments arg;
-    arg.push_back(string("xml"));
+    arg.push_root(string("xml"));
     data = call("searchNamespaceByPrefix", arg);
   }
 }

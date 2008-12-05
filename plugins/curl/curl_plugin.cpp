@@ -206,8 +206,9 @@ size_t curl::handle_curl_data( void *data, size_t nbytes) {
     object obj = cb.to_object();
     arguments args;
     // Create the blob;
-    object a = create_native_object<blob>(object(), (unsigned char const *)data, nbytes);
-    args.push_back(a);
+    object a = create_native_object<blob>(
+      object(), (unsigned char const *)data, nbytes);
+    args.push_root(a);
 
     apply(obj, args);
   }
@@ -223,7 +224,7 @@ size_t curl::handle_curl_header( void *hdr, size_t nbytes ) {
     arguments args;
     // Headers for HTTP at least should be ascii. Should we use a blob hear
     // instead
-    args.push_back(string((const char*)hdr, nbytes));
+    args.push_root(string((const char*)hdr, nbytes));
 
     apply(obj, args);
   }
