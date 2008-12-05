@@ -97,8 +97,8 @@ public:
       {
         current_context_scope scope(Impl::wrap_context(context));
         delete get_private();
+        JS_DestroyContext(context);
       }
-      JS_DestroyContext(context);
     }
   }
 
