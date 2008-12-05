@@ -50,6 +50,9 @@ private: // javascript methods
   string read_whole();
   string read(unsigned max_size);
 
+  object read_whole_blob();
+  object read_blob(unsigned max_size);
+
   void write(value const &);
   void print(call_context &);
 

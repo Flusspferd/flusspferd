@@ -39,6 +39,8 @@ stream_base::stream_base(object const &o, std::streambuf *p)
 {
   register_native_method("readWhole", &stream_base::read_whole);
   register_native_method("read", &stream_base::read);
+  register_native_method("readWholeBlob", &stream_base::read_whole_blob);
+  register_native_method("readBlob", &stream_base::read_blob);
   register_native_method("write", &stream_base::write);
   register_native_method("print", &stream_base::print);
   register_native_method("flush", &stream_base::flush);
@@ -61,6 +63,8 @@ object stream_base::class_info::create_prototype() {
 
   create_native_method(proto, "readWhole", 0);
   create_native_method(proto, "read", 1);
+  create_native_method(proto, "readWholeBlob", 0);
+  create_native_method(proto, "readBlob", 1);
   create_native_method(proto, "write", 1);
   create_native_method(proto, "print", 0);
   create_native_method(proto, "flush", 0);
@@ -84,6 +88,25 @@ string stream_base::read_whole() {
   return string(data);
 }
 
+object stream_base::read_whole_blob() {
+  unsigned const N = 4096;
+
+  std::vector<char> data;
+
+  std::streamsize length;
+
+  do {
+    data.resize(data.size() + N);
+    length = streambuf->sgetn(&data[data.size() - N], N);
+    if (length < 0)
+      length = 0;
+    data.resize(data.size() - N + length);
+  } while (length > 0);
+
+  return create_native_object<blob>(
+      object(), (unsigned char const *)&data[0], data.size());
+}
+
 string stream_base::read(unsigned size) {
   if (!size)
     size = 4096;
@@ -96,6 +119,22 @@ string stream_base::read(unsigned size) {
   buf[length] = '\0';
 
   return string(buf.get());
+}
+
+object stream_base::read_blob(unsigned size) {
+  if (!size)
+    size = 4096;
+
+  boost::scoped_array<char> buf(new char[size]);
+
+  std::streamsize length = streambuf->sgetn(buf.get(), size);
+  if (length < 0)
+    length = 0;
+
+  return create_native_object<blob>(
+      object(),
+      (unsigned char const *) buf.get(),
+      length);
 }
 
 void stream_base::write(value const &data) {
