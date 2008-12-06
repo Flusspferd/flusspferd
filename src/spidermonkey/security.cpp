@@ -48,9 +48,7 @@ security &security::get() {
 
   object obj = v.get_object();
 
-  native_object_base &base = get_native(obj);
-
-  return dynamic_cast<security&>(base);
+  return flusspferd::get_native<security>(obj);
 }
 
 class security::impl {

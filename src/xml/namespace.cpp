@@ -35,9 +35,7 @@ xmlNsPtr namespace_::c_from_js(object const &obj) {
   if (!obj.is_valid())
     return 0;
   try {
-    namespace_ &p =
-      dynamic_cast<namespace_&>(native_object_base::get_native(obj));
-    return p.c_obj();
+    return flusspferd::get_native<namespace_>(obj).c_obj();
   } catch (std::exception&) {
     return 0;
   }

@@ -90,9 +90,7 @@ xmlNodePtr node::c_from_js(object const &obj) {
   if (!obj.is_valid())
     return 0;
   try {
-    xml::node &p =
-      dynamic_cast<xml::node&>(native_object_base::get_native(obj));
-    return p.c_obj();
+    return flusspferd::get_native<node>(obj).c_obj();
   } catch (std::exception&) {
     return 0;
   }

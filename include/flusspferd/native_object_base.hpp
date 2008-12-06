@@ -166,8 +166,13 @@ private:
 };
 
 template<typename T>
+T &cast_to_derived(native_object_base &o) {
+  return dynamic_cast<T&>(o);
+}
+
+template<typename T>
 T &get_native(object const &o) {
-  return dynamic_cast<T&>(native_object_base::get_native(o));
+  return cast_to_derived<T>(native_object_base::get_native(o));
 }
 
 template<typename T>
