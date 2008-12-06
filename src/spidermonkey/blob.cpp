@@ -118,38 +118,44 @@ void blob::prop_length(property_mode mode, value &data) {
 }
 
 // TODO: Could really do with an enumerate to go with this
-bool blob::property_resolve(value const &id, unsigned ) {
-  if (!id.is_number())
+bool blob::property_resolve(value const &id, unsigned /*flags*/) {
+  if (!id.is_int())
     return false;
 
-  // Dont support anything larger than 2**30 in a blob. 1gig limit seems sane
-  int uid = id.to_integral_number(30, false);
+  int uid = id.get_int();
 
-  if ((size_t)uid > data.size())
+  if (id < 0)
+    return false;
+
+  if (size_t(uid) > data.size())
     return false;
  
   value v = int(data[uid]);
-  define_property(string(uid), v, permanent_shared_property);
+  define_property(id.to_string(), v, permanent_shared_property);
   return true;
 }
 
 void blob::property_op(property_mode mode, value const &id, value &x) {
+  int index;
   if (id.is_int()) {
-    int index = id.get_int();
-    if (index < 0 || std::size_t(index) >= data.size())
-      throw exception("Out of bounds of Blob");
-    switch (mode) {
-    case property_get:
-      x = int(data[index]);
-      break;
-    case property_set:
-      data[index] = el_from_value(x);
-      break;
-    default: break;
-    };
+    index = id.get_int();
+  } else {
+    this->native_object_base::property_op(mode, id, x);
     return;
   }
-  this->native_object_base::property_op(mode, id, x);
+
+  if (index < 0 || std::size_t(index) >= data.size())
+    throw exception("Out of bounds of Blob");
+
+  switch (mode) {
+  case property_get:
+    x = int(data[index]);
+    break;
+  case property_set:
+    data[index] = el_from_value(x);
+    break;
+  default: break;
+  };
 }
 
 void blob::append(blob const &o) {
