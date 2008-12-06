@@ -45,7 +45,12 @@ namespace {
     if (JS_GetPendingException(cx, &v)) {
       value val = Impl::wrap_jsval(v);
       ret += ": exception `" + val.to_string().to_string() + '\'';
-
+      if (val.is_object()) {
+        object o = val.to_object();
+        if(o.has_property("fileName"))
+          ret += " at " + o.get_property("fileName").to_string().to_string()
+              +  ":" + o.get_property("lineNumber").to_string().to_string();
+      }
       return ret;
     }
 
