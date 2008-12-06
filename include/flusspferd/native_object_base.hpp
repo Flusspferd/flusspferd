@@ -167,7 +167,10 @@ private:
 
 template<typename T>
 T &cast_to_derived(native_object_base &o) {
-  return dynamic_cast<T&>(o);
+  T *ptr = dynamic_cast<T*>(&o);
+  if (!ptr)
+    throw exception("Could not convert native object to derived type");
+  return *ptr;
 }
 
 template<typename T>
