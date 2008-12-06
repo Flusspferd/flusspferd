@@ -64,7 +64,8 @@ unsigned char blob::el_from_value(value const &v) {
     throw exception("Value cannot be a Blob element");
   int x = v.get_int();
   if (x < 0 || x > std::numeric_limits<unsigned char>::max())
-    throw exception("Value cannot be a Blob element");
+    // TODO: Make this a RangeError once we have error type
+    throw exception("Value cannot be a Blob element"); 
   return (unsigned char) x;
 }
 
@@ -112,6 +113,22 @@ void blob::prop_length(property_mode mode, value &data) {
     break;
   default: break;
   }
+}
+
+// TODO: Could really do with an enumerate to go with this
+bool blob::property_resolve(value const &id, unsigned ) {
+  if (!id.is_number())
+    return false;
+
+  // Dont support anything larger than 2**30 in a blob. 1gig limit seems sane
+  int uid = id.to_integral_number(30, false);
+
+  if ((size_t)uid > data.size())
+    return false;
+ 
+  value v = int(data[uid]);
+  define_property(string(uid), v, permanent_shared_property);
+  return true;
 }
 
 void blob::property_op(property_mode mode, value const &id, value &x) {

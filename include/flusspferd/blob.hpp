@@ -52,6 +52,7 @@ public:
 
 protected:
   void property_op(property_mode mode, value const &id, value &data);
+  bool property_resolve(value const &id, unsigned access);
 
 private: // JS methos
   void append(blob const &o);
