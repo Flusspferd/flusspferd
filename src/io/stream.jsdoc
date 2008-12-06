@@ -1,0 +1,73 @@
+Class: IO.Stream
+
+Base stream class for IO files. Instances of Stream cannot be created directly.
+
+Method: read
+
+  Read UTF8 data. If the stream contains an invalid utf8 bye sequence, an 
+  exception will be thrown.
+
+  Parameters:
+  size - number of bytes to read. Default 4096
+
+  Return:
+  A string ut8f characters.
+
+Method: readBlob
+
+  Read binary data.
+
+  Parameters:
+  size - number of bytes to read. Default 4096
+
+  Return:
+  A <Blob> containing the data read.
+
+Method: readWhole
+
+  Read entire strema as utf8 string
+
+  Return:
+  A utf8 character string
+
+Method: readWholeBlob
+
+  Read entire stream contents as binary data.
+
+  Return:
+  A blob of the stream contents.
+
+Method: write
+
+  Parameters:
+  data - data to write.
+
+  Data should either be a string, in which case the utf8 byte sequence is
+  written, or else a <Blob> where the raw binary data is written.
+
+Method: print
+
+  Print strings to this stream.
+
+  Parameters:
+  ... - values to print 
+
+  This method converts each argument passed to a string, writes them to the
+  string with <fieldSeperator> between each one and <recordSeparator> after the
+  last one.
+
+Method: flush
+
+Flush internal/OS buffers.
+
+Property: fieldSeperator
+
+  Printed between every argument to <print>. Default " ".
+
+Property: recordSeparator
+
+  Printed at the end of each <print> call. Default "\n".
+
+Property: autoflush
+
+  Call flush after every write. Default false.
