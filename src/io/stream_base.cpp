@@ -148,8 +148,8 @@ void stream_base::write(value const &data) {
     char const *str = text.c_str();
     streambuf->sputn(text.c_str(), std::strlen(str));
   } else if (data.is_object()) {
-    native_object_base *ptr = native_object_base::get_native(data.get_object());
-    blob &b = dynamic_cast<blob&>(*ptr);
+    native_object_base &ptr = native_object_base::get_native(data.get_object());
+    blob &b = dynamic_cast<blob&>(ptr);
     streambuf->sputn((char const*) b.get_data(), b.size());
   } else {
     throw exception("Cannot write non-object non-string value to Stream");

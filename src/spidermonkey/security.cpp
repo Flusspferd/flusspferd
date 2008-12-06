@@ -48,9 +48,9 @@ security &security::get() {
 
   object obj = v.get_object();
 
-  native_object_base *ptr = get_native(obj);
+  native_object_base &base = get_native(obj);
 
-  return dynamic_cast<security&>(*ptr);
+  return dynamic_cast<security&>(base);
 }
 
 class security::impl {

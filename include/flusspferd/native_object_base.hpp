@@ -52,7 +52,7 @@ public:
     return *static_cast<object*>(this);
   }
 
-  static native_object_base *get_native(object const &o);
+  static native_object_base &get_native(object const &o);
 
   void load_into(object const &);
 
@@ -178,7 +178,7 @@ struct detail::convert_ptr<T, native_object_base> {
     T *perform(value const &v) {
       if (!v.is_object())
         throw exception("Value is no object");
-      return native_object_base::get_native(v.get_object());
+      return &native_object_base::get_native(v.get_object());
     }
   };
 };

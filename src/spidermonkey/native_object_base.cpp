@@ -111,7 +111,7 @@ void native_object_base::invalid_method(call_context &) {
   throw exception("Invalid method");
 }
 
-native_object_base *native_object_base::get_native(object const &o_) {
+native_object_base &native_object_base::get_native(object const &o_) {
   object o = o_;
 
   if (!o.is_valid())
@@ -125,7 +125,7 @@ native_object_base *native_object_base::get_native(object const &o_) {
   if (!priv)
     throw exception("Object is not native");
 
-  return static_cast<native_object_base*>(priv);
+  return *static_cast<native_object_base*>(priv);
 }
 
 object native_object_base::do_create_object(object const &prototype_) {
@@ -230,9 +230,9 @@ JSBool native_object_base::impl::call_helper(
     native_object_base *self = 0;
     
     try {
-      self = native_object_base::get_native(Impl::wrap_object(obj));
+      self = &native_object_base::get_native(Impl::wrap_object(obj));
     } catch (exception &) {
-      self = native_object_base::get_native(Impl::wrap_object(function));
+      self = &native_object_base::get_native(Impl::wrap_object(function));
     }
 
     call_context x;
@@ -260,11 +260,11 @@ JSBool native_object_base::impl::property_op(
   FLUSSPFERD_CALLBACK_BEGIN {
     current_context_scope scope(Impl::wrap_context(ctx));
 
-    native_object_base *self =
+    native_object_base &self =
       native_object_base::get_native(Impl::wrap_object(obj));
 
     value data(Impl::wrap_jsvalp(vp));
-    self->property_op(mode, Impl::wrap_jsval(id), data);
+    self.property_op(mode, Impl::wrap_jsval(id), data);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -274,7 +274,7 @@ JSBool native_object_base::impl::new_resolve(
   FLUSSPFERD_CALLBACK_BEGIN {
     current_context_scope scope(Impl::wrap_context(ctx));
 
-    native_object_base *self =
+    native_object_base &self =
       native_object_base::get_native(Impl::wrap_object(obj));
 
     unsigned flags = 0;
@@ -291,8 +291,8 @@ JSBool native_object_base::impl::new_resolve(
       flags |= property_classname;
 
     *objp = 0;
-    if (self->property_resolve(Impl::wrap_jsval(id), flags))
-      *objp = Impl::get_object(*self);
+    if (self.property_resolve(Impl::wrap_jsval(id), flags))
+      *objp = Impl::get_object(self);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -301,11 +301,11 @@ uint32 native_object_base::impl::mark_op(
 {
   current_context_scope scope(Impl::wrap_context(ctx));
 
-  native_object_base *self =
+  native_object_base &self =
     native_object_base::get_native(Impl::wrap_object(obj));
 
   tracer trc(thing);
-  self->trace(trc);
+  self.trace(trc);
 
   return 0;
 }

@@ -35,11 +35,9 @@ xmlDocPtr document::c_from_js(object const &obj) {
   if (!obj.is_valid())
     return 0;
   try {
-    xml::document *p =
-      dynamic_cast<xml::document*>(native_object_base::get_native(obj));
-    if (!p)
-      return 0;
-    return p->c_obj();
+    xml::document &p =
+      dynamic_cast<xml::document&>(native_object_base::get_native(obj));
+    return p.c_obj();
   } catch (std::exception&) {
     return 0;
   }
