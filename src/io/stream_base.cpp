@@ -151,6 +151,8 @@ void stream_base::write(value const &data) {
     native_object_base *ptr = native_object_base::get_native(data.get_object());
     blob &b = dynamic_cast<blob&>(*ptr);
     streambuf->sputn((char const*) b.get_data(), b.size());
+  } else {
+    throw exception("Cannot write non-object non-string value to Stream");
   }
   //TODO slow?
   if (get_property("autoflush").to_boolean())
