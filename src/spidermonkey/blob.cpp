@@ -124,7 +124,7 @@ bool blob::property_resolve(value const &id, unsigned /*flags*/) {
 
   int uid = id.get_int();
 
-  if (id < 0)
+  if (uid < 0)
     return false;
 
   if (size_t(uid) > data.size())
