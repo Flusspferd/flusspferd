@@ -54,6 +54,7 @@ public:
 
   static native_object_base &get_native(object const &o);
 
+public:
   void load_into(object const &);
 
   virtual void late_load();
@@ -163,6 +164,11 @@ private:
 
   friend class impl;
 };
+
+template<typename T>
+T &get_native(object const &o) {
+  return dynamic_cast<T&>(native_object_base::get_native(o));
+}
 
 template<typename T>
 struct detail::convert_ptr<T, native_object_base> {
