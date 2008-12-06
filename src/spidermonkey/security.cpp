@@ -30,13 +30,12 @@ using namespace flusspferd;
 security &security::create(object container) {
   local_root_scope scope;
 
-  object obj = create_native_object<security>(create_object().get_prototype());
+  security &obj = create_native_object<security>(
+      create_object().get_prototype());
 
   container.define_property("$security", obj);
 
-  native_object_base *ptr = get_native(obj);
-
-  return dynamic_cast<security&>(*ptr);
+  return obj;
 }
 
 security &security::get() {
