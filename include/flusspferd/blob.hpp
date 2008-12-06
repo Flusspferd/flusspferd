@@ -56,6 +56,7 @@ protected:
 
 private: // JS methos
   void append(blob const &o);
+  object slice(int from, boost::optional<int> to);
   object to_array();
   object copy();
   string as_utf8();

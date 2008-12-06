@@ -81,6 +81,7 @@ void blob::init() {
   register_native_method("append", &blob::append);
   register_native_method("toArray", &blob::to_array);
   register_native_method("copy", &blob::copy);
+  register_native_method("slice", &blob::slice);
   register_native_method("asUtf8", &blob::as_utf8);
 }
 
@@ -92,6 +93,7 @@ object blob::class_info::create_prototype() {
   create_native_method(proto, "append", 1);
   create_native_method(proto, "toArray", 0);
   create_native_method(proto, "copy", 0);
+  create_native_method(proto, "slice", 2);
   create_native_method(proto, "asUtf8", 0);
 
   return proto;
@@ -160,6 +162,27 @@ object blob::to_array() {
   for (std::size_t i = 0; i < data.size(); ++i)
     arr.set_element(i, int(data[i]));
   return arr;
+}
+
+object blob::slice(int from, boost::optional<int> to_) {
+  int n = data.size();
+
+  if (from < 0)
+    from = n + from;
+
+  int to = to_.get_value_or(n);
+  if (to < 0)
+    to = n + to;
+
+  if (from > n)
+    from = n;
+  if (to > n)
+    to = n;
+
+  if (to < from)
+    to = from;
+
+  return create_native_object<blob>(get_prototype(), &data[from], to-from);
 }
 
 object blob::copy() {
