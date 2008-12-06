@@ -55,14 +55,15 @@ object create_object(object const &proto = object());
 
 array create_array(unsigned int length = 0);
 
-object create_native_object(native_object_base *ptr, object const &proto);
+native_object_base &create_native_object(
+  native_object_base *ptr, object const &proto);
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
   template< \
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  object create_native_object( \
+  T &create_native_object( \
     object proto \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \

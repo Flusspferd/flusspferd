@@ -56,7 +56,7 @@ object flusspferd::detail::create_native_object(object const &proto) {
   return native_object_base::do_create_object(proto);
 }
 
-object flusspferd::create_native_object(
+native_object_base &flusspferd::create_native_object(
     native_object_base *ptr, object const &proto)
 {
   try {
