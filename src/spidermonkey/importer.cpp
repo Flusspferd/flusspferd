@@ -121,7 +121,7 @@ importer::importer(object const &obj, call_context &)
   // i.load('foo'); // Assume foo module defines this.foo = 'abc'
   // print(i.foo); // abc
   //
-  // without the problem of load being overridden to do bad things
+  // without the problem of load being overridden to do bad things by a module
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
@@ -152,12 +152,14 @@ void importer::trace(tracer &trc) {
     trc("module-cache-item", it->second);
 }
 
-value importer::load(string const &name, bool binary_only) {
+value importer::load(string const &f_name, bool binary_only) {
   security &sec = security::get();
 
   //TODO use security
+  std::string name = f_name.to_string();
+  std::transform(name.begin(), name.end(), name.begin(), tolower);
 
-  impl::key_type key(name.to_string(), binary_only);
+  impl::key_type key(name, binary_only);
 
   impl::module_cache_map::iterator it = p->module_cache.find(key);
   if (it != p->module_cache.end())
