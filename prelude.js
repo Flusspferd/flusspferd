@@ -29,6 +29,15 @@ Array.from = function (iterable) {
   return Array.slice(iterable, 0);
 };
 
+function Range(from,to, by) {
+  var i = from;
+  by = by || 1;
+  while (i < to) {
+    yield i;
+    i += by;
+  }
+}
+
 String.prototype.toArray = function () {
   return this.split(/\s+/);
 };
