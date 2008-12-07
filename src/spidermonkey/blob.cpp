@@ -24,6 +24,8 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/evaluate.hpp"
+#include "flusspferd/function.hpp"
 #include <limits>
 #include <cstring>
 
@@ -96,6 +98,19 @@ object blob::class_info::create_prototype() {
   create_native_method(proto, "slice", 2);
   create_native_method(proto, "asUtf8", 0);
 
+  static const char* js_iterator ="function() { return Range(0, this.length) }";
+  value iter_val = evaluate(js_iterator, strlen(js_iterator));
+  proto.define_property("__iterator__", iter_val);
+
+  static const char* js_val_iter ="function() { var i = 0; while (i < this.length) { yield this[i]; i++ } }";
+  function values_fn = evaluate(js_val_iter, strlen(js_val_iter)).get_object();
+
+  proto.define_property("values", value(), dont_enumerate, values_fn);
+
+  static const char* js_pairs_iter ="function() { var i = 0; while (i < this.length) { yield [i, this[i]]; i++ } }";
+  function pairs_fn = evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object();
+
+  proto.define_property("pairs", value(), dont_enumerate, pairs_fn);
   return proto;
 }
 
