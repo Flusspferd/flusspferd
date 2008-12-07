@@ -185,6 +185,10 @@ int curl::perform() {
   string url = get_property("url").to_string();
   url = url.substr(0, url.length());
 
+  // TODO: Make POST and PUT do READ_WRITE
+  if (security::get().check_url(url.to_string(), READ))
+    throw exception("forbidden");
+
   if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
     throw exception(std::string(error_buffer));
 
