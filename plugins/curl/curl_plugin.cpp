@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/blob.hpp"
+#include "flusspferd/security.hpp"
 
 #include <curl/curl.h>
 
@@ -186,7 +187,7 @@ int curl::perform() {
   url = url.substr(0, url.length());
 
   // TODO: Make POST and PUT do READ_WRITE
-  if (security::get().check_url(url.to_string(), READ))
+  if (security::get().check_url(url.to_string(), security::READ))
     throw exception("forbidden");
 
   if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
