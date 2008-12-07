@@ -72,7 +72,7 @@ public:
     options |= JSOPTION_DONT_REPORT_UNCAUGHT;
     options &= ~JSOPTION_XML;
 
-    JS_SetVersion(context, JSVERSION_LATEST );
+    JS_SetVersion(context, JSVersion(JS_VERSION));
     JS_SetOptions(context, options);
 
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
