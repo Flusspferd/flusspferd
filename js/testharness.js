@@ -212,7 +212,7 @@ this.TestHarness.prototype = {
     this.do_assert( {
       type: 'same',
       when: new Date(),
-      ok: !!equiv.apply(this, args),
+      ok: !!equiv.apply(equiv, args),
       message: msg,
       default_msg: "arguments are the same"
     });
@@ -241,9 +241,7 @@ this.TestHarness.prototype = {
     
     if (a.num === 1) {
       // First assert this test
-      if (!isNaN(plan)) {
-        this.outputStream.print(" 1.." + this.current_test.plan);
-      } else {
+      if (isNaN(plan)) {
         // Just print the newline
         this.outputStream.print();
       }
@@ -262,7 +260,11 @@ this.TestHarness.prototype = {
     else if ('default_msg' in a)
       data.push('-', a.default_msg)
 
-    this.current_test[a.ok ? 'asserts_passed' : 'asserts_failed']++;
+    if (a.ok)
+      this.current_test.asserts_passed++;
+    else 
+      this.current_test.asserts_failed++;
+
     this.outputStream.print(data);
 
 
@@ -274,6 +276,7 @@ this.TestHarness.prototype = {
     this.current_test.plan = new Number(count).valueOf();
     if (isNaN(this.current_test.plan))
       throw new Error('invalid plan - not a number');
+    this.outputStream.print(" 1.." + this.current_test.plan);
   },
 
   run: function run(name) {
@@ -343,7 +346,7 @@ this.TestHarness.prototype = {
         this.asserts_failed += test.asserts.length - test.plan;
       }
       else {
-        test.passed = true;
+        test.passed = test.asserts_failed == 0;
         this.total_asserts += test.plan;
       }
     } 
@@ -366,8 +369,8 @@ this.TestHarness.prototype = {
       test.passed = false;
     } 
     else {
-      // No plan, no error. it passed
-      test.passed = true;
+      // No plan, no error.
+      test.passed = test.asserts_failed == 0;
     }
     if (msg.length)
       this.outputStream.print(msg);
