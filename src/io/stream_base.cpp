@@ -166,11 +166,27 @@ void stream_base::print(call_context &x) {
   if (!delim_v.is_void_or_null())
     delim = delim_v.to_string();
 
-  std::size_t n = x.arg.size();
-  for (std::size_t i = 0; i < n; ++i) {
-    write(x.arg[i].to_string());
-    if (i < n - 1)
-      write(delim);
+  // If passed a single array as an arugment, treat it as the arguments. i.e:
+  // print([1,2,3]) would produces same output as print(1,2,3);
+
+  if (x.arg.size() == 1 && x.arg[0].is_object() &&
+      x.arg[0].get_object().is_array())
+  {
+    array a = x.arg[0].get_object();
+    std::size_t n = a.get_length();
+    for (std::size_t i = 0; i < n; ++i) {
+      write(a.get_element(i).to_string());
+      if (i < n - 1)
+        write(delim);
+    }
+  }
+  else {
+    std::size_t n = x.arg.size();
+    for (std::size_t i = 0; i < n; ++i) {
+      write(x.arg[i].to_string());
+      if (i < n - 1)
+        write(delim);
+    }
   }
 
   value record_v = get_property("recordSeparator");
