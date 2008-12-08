@@ -46,11 +46,11 @@ namespace flusspferd {
     return get_current_context().evaluate(source, file, line);
   }
 
-  inline value evaluateInScope(const char*source, std::size_t n,
+  inline value evaluate_in_scope(const char*source, std::size_t n,
                                char const *file, unsigned int line,
                               object scope)
   {
-    return get_current_context().evaluateInScope(source, n, file, line, scope);
+    return get_current_context().evaluate_in_scope(source, n, file, line, scope);
   }
 }
 

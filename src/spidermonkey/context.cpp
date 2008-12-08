@@ -163,10 +163,10 @@ object context::scope_chain() {
 value context::evaluate(char const *source, std::size_t n,
                         char const *file, unsigned int line)
 {
-  return evaluateInScope(source, n, file, line, global());
+  return evaluate_in_scope(source, n, file, line, global());
 }
 
-value context::evaluateInScope(char const* source, std::size_t n,
+value context::evaluate_in_scope(char const* source, std::size_t n,
                                char const* file, unsigned int line,
                                object const &scope)
 {
