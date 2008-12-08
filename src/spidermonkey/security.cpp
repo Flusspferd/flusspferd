@@ -41,7 +41,14 @@ security &security::create(object container) {
 security &security::get() {
   object scope = get_current_context().scope_chain();
 
-  value v = scope.get_property("$security");
+  value v;
+  while (scope.is_valid()) {
+    v = scope.get_property("$security");
+
+    if (!v.is_void_or_null())
+      break;
+    scope = scope.get_parent();
+  }
 
   if (!v.is_object() || v.is_null())
     throw exception("Could not get security object");
