@@ -193,6 +193,10 @@ value importer::load(string const &f_name, bool binary_only) {
 
   array paths = paths_v.get_object();
 
+  object ctx = get_property("context").to_object();
+  ctx.define_property("$importer", *this);
+  ctx.define_property("$security", sec);
+
   // TODO: We could probably do with an array class.
   size_t len = paths.get_length();
   for (size_t i=0; i < len; i++) {
@@ -203,8 +207,7 @@ value importer::load(string const &f_name, bool binary_only) {
       if (sec.check_path(fullpath, security::READ))
         if (boost::filesystem::exists(fullpath))
           return get_current_context().execute(
-              fullpath.c_str(),
-              get_property("context").to_object());
+              fullpath.c_str(), ctx);
 
     fullpath = path + so_name;
 
@@ -232,7 +235,7 @@ value importer::load(string const &f_name, bool binary_only) {
 
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-      return func(get_property("context").to_object());
+      return func(ctx);
     }
   } 
 
