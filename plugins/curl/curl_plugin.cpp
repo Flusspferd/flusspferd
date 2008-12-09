@@ -187,7 +187,7 @@ int curl::perform() {
   url = url.substr(0, url.length());
 
   // TODO: Make POST and PUT do READ_WRITE
-  if (security::get().check_url(url.to_string(), security::READ))
+  if (!security::get().check_url(url.to_string(), security::READ))
     throw exception("forbidden");
 
   if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
@@ -227,8 +227,8 @@ size_t curl::handle_curl_header( void *hdr, size_t nbytes ) {
   if (cb.is_function()) {
     object obj = cb.to_object();
     arguments args;
-    // Headers for HTTP at least should be ascii. Should we use a blob hear
-    // instead
+    // Headers for HTTP at least should be ascii. Should we use a blob here
+    // instead?
     args.push_root(string((const char*)hdr, nbytes));
 
     apply(obj, args);

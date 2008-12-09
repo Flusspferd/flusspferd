@@ -1,5 +1,5 @@
 
-if (!this.HTTP) HTTP = {};
+if (!this.HTTP) this.HTTP = {};
 
 (function () {
 
@@ -28,7 +28,7 @@ if (!this.HTTP) HTTP = {};
   var header_order = [];
   var uc_headers = {};
 
-  for each (i in [general_headers, request_headers, response_headers, entity_headers]) {
+  for each (let i in [general_headers, request_headers, response_headers, entity_headers]) {
     header_order = header_order.concat(i);
   }
 
@@ -76,13 +76,15 @@ if (!this.HTTP) HTTP = {};
 
   hdrs.parse = function(str) {
     var headers = {};
+    var bytes = 0;
     function get_header_line() {
       var name, tmp, val;
       [tmp,name,val] = /^([^:]+):[ \t]*(.*?)\r\n/.exec(str) || [];
       if (tmp === undefined)
-        throw new Error("Malformed HTTP headers: " + str.substr(0,10));
+        throw new Error("Malformed HTTP headers after " + bytes + " character(s) : " + str.substr(0,10));
 
       str = str.substr(tmp.length);
+      bytes += tmp.length;
       while (true) {
         // New lines in headers are allowed if followed by a ' ' or a '\t'
         if (str.length == 0 || (str[0] != ' ' && str[0] != '\t'))
@@ -95,12 +97,16 @@ if (!this.HTTP) HTTP = {};
 
         val += " " + v2;
         str = str.substr(tmp.length);
+        bytes += tmp.length;
       }
       return [name,val];
 
     }
 
     while (str.length) {
+      if (str.match(/^\r\n/)) {
+        str = str.substr(2);
+      }
       var l = get_header_line();
       if (!l)
         break;
@@ -128,7 +134,6 @@ if (!this.HTTP) HTTP = {};
       hdrs.prototype.__defineSetter__(h$, function(v) this[k] = v );
     }
   }
-
 
   HTTP.Headers = hdrs; 
 
