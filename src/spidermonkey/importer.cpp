@@ -205,9 +205,12 @@ value importer::load(string const &f_name, bool binary_only) {
 
     if (!binary_only)
       if (sec.check_path(fullpath, security::READ))
-        if (boost::filesystem::exists(fullpath))
-          return get_current_context().execute(
+        if (boost::filesystem::exists(fullpath)) {
+          value val = get_current_context().execute(
               fullpath.c_str(), ctx);
+          p->module_cache[key] = val;
+          return val;
+        }
 
     fullpath = path + so_name;
 
@@ -235,7 +238,9 @@ value importer::load(string const &f_name, bool binary_only) {
 
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-      return func(ctx);
+      value val = func(ctx);
+      p->module_cache[key] = val;
+      return val;
     }
   } 
 
