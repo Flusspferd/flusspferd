@@ -42,6 +42,7 @@ namespace flusspferd {
 class string;
 class object;
 class function;
+class array;
 class native_object_base;
 class native_function_base;
 
@@ -194,6 +195,9 @@ struct convert<object>;
 
 template<>
 struct convert<function>;
+
+template<>
+struct convert<array>;
 
 template<>
 struct convert<string>;

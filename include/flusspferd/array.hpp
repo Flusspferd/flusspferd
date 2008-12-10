@@ -47,6 +47,20 @@ private:
   void check();
 };
 
+template<>
+struct detail::convert<array> {
+  typedef to_value_helper<array> to_value;
+
+  struct from_value {
+    root_array root;
+
+    array perform(value const &v) {
+      root = array(v.to_object());
+      return root;
+    }
+  };
+};
+
 }
 
 #endif
