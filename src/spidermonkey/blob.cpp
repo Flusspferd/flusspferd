@@ -66,7 +66,7 @@ unsigned char blob::el_from_value(value const &v) {
     throw exception("Value cannot be a Blob element");
   int x = v.get_int();
   if (x < 0 || x > std::numeric_limits<unsigned char>::max())
-    // TODO: Make this a RangeError once we have error type
+    // TODO: Make this a RangeError once we have error types
     throw exception("Value cannot be a Blob element"); 
   return (unsigned char) x;
 }
@@ -85,6 +85,8 @@ void blob::init() {
   register_native_method("copy", &blob::copy);
   register_native_method("slice", &blob::slice);
   register_native_method("asUtf8", &blob::as_utf8);
+  register_native_method("get", &blob::get_index);
+  register_native_method("set", &blob::set_index);
 }
 
 blob::~blob() {}
@@ -97,17 +99,19 @@ object blob::class_info::create_prototype() {
   create_native_method(proto, "copy", 0);
   create_native_method(proto, "slice", 2);
   create_native_method(proto, "asUtf8", 0);
+  create_native_method(proto, "get", 1);
+  create_native_method(proto, "set", 2);
 
   static const char* js_iterator ="function() { return Range(0, this.length) }";
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
   proto.define_property("__iterator__", iter_val);
 
-  static const char* js_val_iter ="function() { var i = 0; while (i < this.length) { yield this[i]; i++ } }";
+  static const char* js_val_iter ="function() { var i = 0; while (i < this.length) { yield this.get(i); i++ } }";
   function values_fn = evaluate(js_val_iter, strlen(js_val_iter)).get_object();
 
   proto.define_property("values", value(), dont_enumerate, values_fn);
 
-  static const char* js_pairs_iter ="function() { var i = 0; while (i < this.length) { yield [i, this[i]]; i++ } }";
+  static const char* js_pairs_iter ="function() { var i = 0; while (i < this.length) { yield [i, this.get(i)]; i++ } }";
   function pairs_fn = evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object();
 
   proto.define_property("pairs", value(), dont_enumerate, pairs_fn);
@@ -225,4 +229,18 @@ object blob::from_utf8(string const &text) {
   char const *str = text.c_str();
   return create_native_object<blob>(
     object(), (unsigned char const *) str, std::strlen(str));
+}
+
+value blob::set_index(int index, value x) {
+  if (index < 0 || std::size_t(index) >= data.size())
+    throw exception("Out of bounds of Blob");
+
+  return data[index] = el_from_value(x);
+}
+
+value blob::get_index(int index) {
+  if (index < 0 || std::size_t(index) >= data.size())
+    throw exception("Out of bounds of Blob");
+
+  return data[index];
 }

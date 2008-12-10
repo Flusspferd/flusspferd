@@ -61,6 +61,8 @@ private: // JS methos
   object copy();
   string as_utf8();
 
+  value set_index(int index, value x);
+  value get_index(int index);
 private: // JS properties
   void prop_length(property_mode mode, value &data);
 
