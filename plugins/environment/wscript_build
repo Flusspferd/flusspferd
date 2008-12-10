@@ -29,4 +29,5 @@ obj.includes = ['../../include', '.']
 obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H'
 obj.target = 'environment'
+obj.install_path = '${PREFIX}/lib/flusspferd'
 

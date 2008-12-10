@@ -33,4 +33,5 @@ obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H'
 obj.target = 'sqlite3'
 obj.features.append('cc')
+obj.install_path = '${PREFIX}/lib/flusspferd'
 
