@@ -52,7 +52,8 @@ public:
   environment(object const &obj, call_context &);
 
 protected:
-  
+  boost::any enumerate_start(int &n); 
+  value enumerate_next(boost::any &iter);
   bool property_resolve(value const &id, unsigned access);
 };
 
@@ -64,6 +65,7 @@ extern "C" value flusspferd_load(object container)
   // Return an instance of it as well since that'll be the common use case.
   call_context x;
   object env = create_native_object<environment>(object(), boost::ref(x));
+  container.set_property("environment", env);
   return env;
 }
 
@@ -86,6 +88,24 @@ bool environment::property_resolve(value const &id, unsigned)
   return true;
 }
 
+boost::any environment::enumerate_start(int &n) {
+  n = 0; // We dont know how many
+  return boost::any(environ);
+}
+
+value environment::enumerate_next(boost::any &iter) {
+  char **env = boost::any_cast<char**>(iter);
+
+  if (*env == 0)
+    return value();
+  
+  char* eq_c = strchr(*env, '=');
+  string s = string(*env, eq_c - *env);
+
+  iter = ++env;
+
+  return s;
+}
 
 }
 
