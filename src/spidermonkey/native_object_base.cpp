@@ -318,20 +318,14 @@ JSBool native_object_base::impl::new_enumerate(
       *statep = PRIVATE_TO_JSVAL(iter);
       if (idp)
         *idp = INT_TO_JSVAL(num);
-      if (!iter->empty()) {
-        return JS_TRUE;
-      } else {
-        return JS_FALSE; // Do we want to retrun false or true when nothing to enum.
-      }
-      break;
+      return JS_TRUE;
     case JSENUMERATE_NEXT:
     {
       iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
-      value id = self.enumerate_next(*iter);
-      if (id.is_void()) {
-        // End
+      value id;
+      if (iter->empty() || (id = self.enumerate_next(*iter)).is_void())
         *statep = JSVAL_NULL;
-      } else {
+      else {
         JS_ValueToId(ctx, Impl::get_jsval(id), idp);
       }
       return JS_TRUE;
