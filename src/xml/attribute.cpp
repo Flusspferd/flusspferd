@@ -116,10 +116,7 @@ void attribute_::add_content(string const &content) {
     txt = create_native_object<text>(object(), boost::ref(x));
   }
 
-  arguments arg;
-  arg.push_root(txt);
-
-  call("addChild", arg);
+  call("addChild", txt);
 }
 
 void attribute_::prop_content(property_mode mode, value &data) {

@@ -105,9 +105,10 @@ void curl::class_info::augment_constructor(object &ctor)
   //protocols.seal(false);
   // Arse. Can't in 1.8
 
-  ctor.define_property("versionHex", (int)data->version_num, read_only_property);
-  ctor.define_property("versionStr", string( (const char*)data->version), read_only_property);
-
+  ctor.define_property("versionHex", (int)data->version_num,
+                       read_only_property);
+  ctor.define_property("versionStr", string( (const char*)data->version),
+                       read_only_property);
 }
 
 ///////////////////////////
@@ -209,13 +210,10 @@ size_t curl::handle_curl_data( void *data, size_t nbytes) {
 
   if (cb.is_function()) {
     object obj = cb.to_object();
-    arguments args;
-    // Create the blob;
-    object a = create_native_object<blob>(
-      object(), (unsigned char const *)data, nbytes);
-    args.push_root(a);
 
-    apply(obj, args);
+    apply(obj,
+      create_native_object<blob>(
+        object(), (unsigned char const *) data, nbytes));
   }
 
   return nbytes;
@@ -226,12 +224,8 @@ size_t curl::handle_curl_header( void *hdr, size_t nbytes ) {
 
   if (cb.is_function()) {
     object obj = cb.to_object();
-    arguments args;
-    // Headers for HTTP at least should be ascii. Should we use a blob here
-    // instead?
-    args.push_root(string((const char*)hdr, nbytes));
 
-    apply(obj, args);
+    apply(obj, string((char const *) hdr, nbytes));
   }
   return nbytes;
 }
