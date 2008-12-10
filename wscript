@@ -189,4 +189,7 @@ def build(bld):
                       'include/flusspferd/implementation/*.hpp')
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
+    bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/http', 'js/src/http/*.js')
+
 def shutdown(): pass
