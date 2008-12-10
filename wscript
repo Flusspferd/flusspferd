@@ -200,4 +200,13 @@ def build(bld):
                    (bld.env['shlib_PATTERN'] % 'io'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
 
+    etc = bld.new_task_gen('subst')
+    etc.source = 'jsrepl.js.in'
+    etc.target = 'jsrepl.js'
+    etc.dict = {
+      'PREFIX': bld.env['PREFIX']
+    }
+    etc.install_path = os.path.normpath(bld.env['PREFIX'] + '/etc/flusspferd')
+    etc.apply();
+
 def shutdown(): pass
