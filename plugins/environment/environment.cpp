@@ -30,7 +30,7 @@ THE SOFTWARE.
 #if defined(__APPLE__)
 #  include <crt_externs.h> 
 #  define environ (*_NSGetEnviron()) 
-#elif defined(XP_WIN)statep
+#elif defined(XP_WIN)
 extern char** _environ; 
 #  define environ _environ
 #else
