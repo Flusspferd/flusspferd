@@ -186,8 +186,6 @@ void document::prop_xml_namespace(property_mode mode, value &data) {
     return;
 
   if (data.is_void()) {
-    arguments arg;
-    arg.push_root(string("xml"));
-    data = call("searchNamespaceByPrefix", arg);
+    data = call("searchNamespaceByPrefix", "xml");
   }
 }

@@ -81,10 +81,7 @@ exception::exception(std::string const &what)
     JS_ClearPendingException(ctx);
   } else {
     try {
-      arguments arg(std::vector<value>(1));
-      root_value message((string(what)));
-      arg[0] = message;
-      v = global().call("Error", arg);
+      v = global().call("Error", what);
     } catch (...) { }
   }
 

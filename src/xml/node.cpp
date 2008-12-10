@@ -672,11 +672,8 @@ void node::prop_namespaces(property_mode mode, value &data) {
     if (!nsList)
       return;
 
-    arguments arg(std::vector<value>(1));
-
     for (xmlNsPtr *p = nsList; *p; ++p) {
-      arg[0] = namespace_::create(*p);
-      array.call("push", arg);
+      array.call("push", namespace_::create(*p));
     }
   } catch (...) {
     if (nsList) xmlFree(nsList);

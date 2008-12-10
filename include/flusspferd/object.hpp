@@ -24,23 +24,34 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_OBJECT_HPP
 #define FLUSSPFERD_OBJECT_HPP
 
+#ifndef PREPROC_DEBUG
 #include "implementation/object.hpp"
 #include "arguments.hpp"
 #include "value.hpp"
 #include "convert.hpp"
 #include <string>
 #include <memory>
+#endif
+#include <boost/preprocessor.hpp>
+
+#ifndef FLUSSPFERD_PARAM_LIMIT
+#define FLUSSPFERD_PARAM_LIMIT 5
+#endif
 
 namespace flusspferd {
 
+#ifndef PREPROC_DEBUG
 class value;
 class context;
 class function;
 class native_object_base;
 class property_iterator;
+template<typename> class convert;
+#endif
 
 class object : public Impl::object_impl {
 public:
+#ifndef PREPROC_DEBUG
   object();
   object(Impl::object_impl const &o)
     : Impl::object_impl(o)
@@ -56,15 +67,54 @@ public:
 
   void set_parent(object const &parent);
   void set_prototype(object const &prototype);
+#endif
 
-  value apply(object const &fn, arguments const &arg = arguments());
+  value apply(object const &fn, arguments const &arg);
 
-  value call(char const *name, arguments const &arg = arguments());
-  value call(std::string const &name, arguments const &arg = arguments());
+  value call(char const *name, arguments const &arg);
+  value call(std::string const &name, arguments const &arg);
 
-  value call(object obj, arguments const &arg = arguments());
+  value call(object obj, arguments const &arg);
   value call(arguments const &arg = arguments());
 
+#define FLUSSPFERD_CALL_N(z, n, d) \
+  FLUSSPFERD_CALL_N_2( \
+    n, \
+    BOOST_PP_TUPLE_ELEM(2, 0, d), \
+    BOOST_PP_TUPLE_ELEM(2, 1, d)) \
+  /**/
+
+#define FLUSSPFERD_CALL_N_2(n, f_name, arg_type) \
+  BOOST_PP_IF(n, template<, ) \
+  BOOST_PP_ENUM_PARAMS(n, typename T) \
+  BOOST_PP_IF(n, >, ) \
+  value f_name( \
+    arg_type x \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n, T, const &arg)) \
+  { \
+    arguments arg; \
+    BOOST_PP_REPEAT(n, FLUSSPFERD_CALL_ADD_PARAM, ~) \
+    return f_name(x, arg); \
+  } \
+  /**/
+
+#define FLUSSPFERD_CALL_ADD_PARAM(z, n, d) \
+  typename convert<BOOST_PP_CAT(T, n) const &>::to_value BOOST_PP_CAT(c, n); \
+  arg.push_root(BOOST_PP_CAT(c, n).perform(BOOST_PP_CAT(arg, n))); \
+  /**/
+
+#define FLUSSPFERD_CALLS(name, arg_type) \
+  BOOST_PP_REPEAT( \
+    BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT), \
+    FLUSSPFERD_CALL_N, \
+    (name, arg_type))
+
+FLUSSPFERD_CALLS(apply, object const &)
+FLUSSPFERD_CALLS(call, char const *)
+FLUSSPFERD_CALLS(call, std::string const &)
+FLUSSPFERD_CALLS(call, object const &)
+
+#ifndef PREPROC_DEBUG
   enum property_flag {
     dont_enumerate = 1,
     read_only_property = 2,
@@ -111,8 +161,10 @@ public:
   property_iterator end() const;
 
   bool is_array() const;
+#endif
 };
 
+#ifndef PREPROC_DEBUG
 inline bool operator==(object const &a, object const &b) {
   return Impl::operator==(a, b);
 }
@@ -136,6 +188,7 @@ struct detail::convert<object>
     }
   };
 };
+#endif
 
 }
 

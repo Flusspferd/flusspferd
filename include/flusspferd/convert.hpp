@@ -190,6 +190,11 @@ struct convert< boost::optional<T> > {
   };
 };
 
+template<typename T, std::size_t N>
+struct convert<T [N]> {
+  typedef typename convert<T const *>::to_value to_value;
+};
+
 template<>
 struct convert<object>;
 
