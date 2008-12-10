@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <boost/function.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
+#include <boost/any.hpp>
 #include <memory>
 #include <functional>
 
@@ -118,6 +119,9 @@ protected:
   };
 
   virtual bool property_resolve(value const &id, unsigned access);
+
+  virtual boost::any enumerate_start(int &num_properties);
+  virtual value enumerate_next(boost::any &iter);
 
   enum property_mode { 
     property_add = 0,

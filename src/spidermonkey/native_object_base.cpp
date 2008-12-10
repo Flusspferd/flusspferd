@@ -47,6 +47,9 @@ public:
 
   static JSBool new_resolve(JSContext *, JSObject *, jsval, uintN, JSObject **);
 
+  static JSBool new_enumerate(JSContext *cx, JSObject *obj,
+    JSIterateOp enum_op, jsval *statep, jsid *idp);
+
 public:
   static JSClass native_object_class;
 
@@ -66,12 +69,12 @@ public:
 
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
-  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE,
+  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE,
   &native_object_base::impl::property_op<native_object_base::property_add>,
   &native_object_base::impl::property_op<native_object_base::property_delete>,
   &native_object_base::impl::property_op<native_object_base::property_get>,
   &native_object_base::impl::property_op<native_object_base::property_set>,
-  JS_EnumerateStub,
+  (JSEnumerateOp) &native_object_base::impl::new_enumerate,
   (JSResolveOp) &native_object_base::impl::new_resolve,
   JS_ConvertStub,
   &native_object_base::impl::finalize,
@@ -296,6 +299,45 @@ JSBool native_object_base::impl::new_resolve(
   } FLUSSPFERD_CALLBACK_END;
 }
 
+JSBool native_object_base::impl::new_enumerate(
+    JSContext *ctx, JSObject *obj, JSIterateOp enum_op, jsval *statep, jsid *idp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base &self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    
+    boost::any *iter;
+    switch (enum_op) {
+    case JSENUMERATE_INIT:
+      iter = new boost::any;
+      int num;
+      *iter = self.enumerate_start(num);
+      *statep = PRIVATE_TO_JSVAL(iter);
+      if (idp)
+        *idp = INT_TO_JSVAL(num);
+      return JS_TRUE;
+    case JSENUMERATE_NEXT:
+    {
+      iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
+      value id;
+      if (iter->empty() || (id = self.enumerate_next(*iter)).is_void())
+        *statep = JSVAL_NULL;
+      else {
+        JS_ValueToId(ctx, Impl::get_jsval(id), idp);
+      }
+      return JS_TRUE;
+    }
+    case JSENUMERATE_DESTROY:
+      iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
+      delete iter;
+      return JS_TRUE;
+    }
+  } FLUSSPFERD_CALLBACK_END;
+}
+
 uint32 native_object_base::impl::mark_op(
     JSContext *ctx, JSObject *obj, void *thing)
 {
@@ -352,6 +394,17 @@ void native_object_base::property_op(
 
 bool native_object_base::property_resolve(value const &, unsigned) {
   return false;
+}
+
+boost::any native_object_base::enumerate_start(int &n)
+{
+  n = 0;
+  return boost::any();
+}
+
+value native_object_base::enumerate_next(boost::any &)
+{
+  return value();
 }
 
 void native_object_base::trace(tracer&) {}
