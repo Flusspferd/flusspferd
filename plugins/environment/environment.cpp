@@ -76,11 +76,11 @@ bool environment::property_resolve(value const &id, unsigned)
 {
   string name = id.to_string();
   if (name == "__iterator__")
-    return true;
+    return false;
 
   char *val = getenv(name.c_str());
   if (!val) 
-    return true;
+    return false;
 
   define_property(name, string(val));
   return true;
