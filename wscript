@@ -192,4 +192,13 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
     bld.install_files('${PREFIX}/lib/flusspferd/modules/http', 'js/src/http/*.js')
 
+    etc = bld.new_task_gen('subst')
+    etc.source = 'jsrepl.js.in'
+    etc.target = 'jsrepl.js'
+    etc.dict = {
+      'PREFIX': bld.env['PREFIX']
+    }
+    etc.install_path = os.path.normpath(bld.env['PREFIX'] + '/etc/flusspferd')
+    etc.apply();
+
 def shutdown(): pass
