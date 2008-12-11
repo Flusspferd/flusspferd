@@ -52,6 +52,7 @@ public:
 
 public:
   static JSClass native_object_class;
+  static JSClass native_enumerable_object_class;
 
 public:
   typedef boost::variant<native_method_type, callback_type> method_variant;
@@ -68,6 +69,27 @@ public:
 };
 
 JSClass native_object_base::impl::native_object_class = {
+  "NativeObject",
+  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE,
+  &native_object_base::impl::property_op<native_object_base::property_add>,
+  &native_object_base::impl::property_op<native_object_base::property_delete>,
+  &native_object_base::impl::property_op<native_object_base::property_get>,
+  &native_object_base::impl::property_op<native_object_base::property_set>,
+  JS_EnumerateStub,
+  (JSResolveOp) &native_object_base::impl::new_resolve,
+  JS_ConvertStub,
+  &native_object_base::impl::finalize,
+  0,
+  0,
+  &native_object_base::impl::call_helper,
+  0,
+  0,
+  0,
+  &native_object_base::impl::mark_op,
+  0
+};
+
+JSClass native_object_base::impl::native_enumerable_object_class = {
   "NativeObject",
   JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE,
   &native_object_base::impl::property_op<native_object_base::property_add>,
@@ -121,10 +143,13 @@ native_object_base &native_object_base::get_native(object const &o_) {
     throw exception("Can not interpret 'null' as native object");
 
   JSContext *ctx = Impl::current_context();
+  JSObject *jso = Impl::get_object(o);
+  JSClass *classp = JS_GET_CLASS(ctx, jso);
 
-  void *priv = JS_GetInstancePrivate(
-      ctx, Impl::get_object(o), &impl::native_object_class, 0);
+  if (!classp || classp->finalize != &native_object_base::impl::finalize)
+    throw exception("Object is not native");
 
+  void *priv = JS_GetPrivate(ctx, jso);
   if (!priv)
     throw exception("Object is not native");
 
