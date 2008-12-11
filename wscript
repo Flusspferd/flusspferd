@@ -184,13 +184,21 @@ def build(bld):
     if bld.env['ENABLE_SANDBOX']:
       bld.add_subdirs('sandbox')
     build_pkgconfig(bld)
-    bld.install_files('${PREFIX}/include/flusspferd/', 'include/flusspferd/*.hpp')
+    bld.install_files('${PREFIX}/include/flusspferd/',
+                      'include/flusspferd/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/implementation/',
                       'include/flusspferd/implementation/*.hpp')
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
-    bld.install_files('${PREFIX}/lib/flusspferd/modules/http', 'js/src/http/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/http',
+                      'js/src/http/*.js')
+    bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
+                   (bld.env['shlib_PATTERN'] % 'xml'),
+                   '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-xml'))
+    bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
+                   (bld.env['shlib_PATTERN'] % 'io'),
+                   '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
 
     etc = bld.new_task_gen('subst')
     etc.source = 'jsrepl.js.in'

@@ -4,7 +4,7 @@
 prefix=@PREFIX@
 libdir=@LIBDIR@
 includedir=@INCLUDEDIR@
-modulesndir=@LIBDIR@/flusspferd/modules
+modulesdir=@LIBDIR@/flusspferd/modules
 
 Name: Flusspferd
 Description: JavaScript Bindings for C++
