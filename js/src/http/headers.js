@@ -50,7 +50,7 @@ if (!this.HTTP) this.HTTP = {};
     toString: function() {
       function hdr_val(h,v) {
         if (v instanceof Array)
-          return v.map( function(v2) hdr_val(h,v2) );
+          return v.map( function(v2) { hdr_val(h,v2) } );
         else
           return [h + ": " + v];
       }
@@ -130,8 +130,8 @@ if (!this.HTTP) this.HTTP = {};
     h$ = h$.join("");
     if (h != h$) {
       let k = h;
-      hdrs.prototype.__defineGetter__(h$, function() this[k] );
-      hdrs.prototype.__defineSetter__(h$, function(v) this[k] = v );
+      hdrs.prototype.__defineGetter__(h$, function() { this[k] } );
+      hdrs.prototype.__defineSetter__(h$, function(v) { this[k] = v } );
     }
   }
 

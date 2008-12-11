@@ -10,7 +10,6 @@
       if (hdr.match(/^\r\n/)) {
         // Empty line signals end of headers
         try {
-
           // Pull out HTTP status line.
           var match = /^(HTTP\/1.[10])\s+(\d+)\s+(.*?)\r\n/.exec(this.header_buffer);
           if (match) {
@@ -33,15 +32,16 @@
       this.responseBlob.append(blob);
     }
 
-    var old_perform = cURL.prototype.perform;
-    cURL.prototype.perform = function perform() {
-      this.header_buffer = "";
-      delete this.headers;
-      this.responseBlob = new Blob(0);
-      return perform.old.apply(this, arguments);
+    if (cURL.prototype.perform.old === undefined) {
+      var old_perform = cURL.prototype.perform;
+      cURL.prototype.perform = function perform() {
+        this.header_buffer = "";
+        delete this.headers;
+        this.responseBlob = new Blob(0);
+        return perform.old.apply(this, arguments);
+      }
+      cURL.prototype.perform.old = old_perform;
     }
-    cURL.prototype.perform.old = old_perform;
-
   }
   catch (e if e instanceof ReferenceError)
   { throw e }
