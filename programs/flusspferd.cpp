@@ -51,7 +51,7 @@ class flusspferd_repl {
   std::istream in;
 
   bool config_loaded;
-  char *config_file;
+  char const *config_file;
 
   flusspferd::context co;
   flusspferd::current_context_scope scope;
@@ -135,7 +135,7 @@ std::istream in(std::cin.rdbuf());
 
 bool config_loaded = false;
 // Default - can be changed by -c cmd line option
-char* config_file = INSTALL_PREFIX "/etc/flusspferd/jsrepl.js";
+char const *config_file = INSTALL_PREFIX "/etc/flusspferd/jsrepl.js";
 
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
