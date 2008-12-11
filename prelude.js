@@ -68,6 +68,8 @@ Function.bind = function (obj, name) {
   i.load('xml');
 
   g.XML = i.XML;
+
+  g.$importer = i;
 })(this);
 
 
