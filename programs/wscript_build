@@ -28,8 +28,4 @@ obj.install_path = '${PREFIX}/bin'
 obj.uselib = 'BOOST JS_H READLINE'
 obj.uselib_local = ['flusspferd']
 obj.defines = 'INSTALL_PREFIX=\\"%s\\"' % bld.env['PREFIX'];
-if bld.env['ENABLE_IO']:
-  obj.uselib_local += ['flusspferd-io']
-if bld.env['ENABLE_XML']:
-  obj.uselib_local += ['flusspferd-xml']
 obj.includes = ['../include']

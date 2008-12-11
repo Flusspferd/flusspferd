@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/xml.hpp"
+#include "flusspferd/xml/push_parser.hpp"
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/xml/text.hpp"
@@ -62,6 +63,8 @@ object flusspferd::xml::load_xml(object container) {
   load_class<processing_instruction>(XML);
   load_class<attribute_>(XML);
   load_class<namespace_>(XML);
+
+  load_class<push_parser>(XML);
 
   container.define_property(
     "XML",

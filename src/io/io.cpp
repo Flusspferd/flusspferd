@@ -31,6 +31,11 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
+extern "C" value flusspferd_load(object container)
+{
+  return load_io(container);
+}
+
 object flusspferd::io::load_io(object container) {
   local_root_scope scope;
 

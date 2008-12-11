@@ -21,33 +21,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_REFERENCE_HPP
-#define FLUSSPFERD_XML_REFERENCE_HPP
+#ifndef FLUSSPFERD_XML_PUSH_PARSER_HPP
+#define FLUSSPFERD_XML_PUSH_PARSER_HPP
 
-#include "node.hpp"
-#include <boost/noncopyable.hpp>
-#include <libxml/tree.h>
+#include "../native_object_base.hpp"
+#include "../class.hpp"
+#include "../blob.hpp"
+#include <libxml/parser.h>
 
 namespace flusspferd { namespace xml {
 
-class reference_ : public node {
+class push_parser : public native_object_base {
 public:
-  struct class_info : node::class_info {
-    static char const *full_name() { return "XML.Reference"; }
+  struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "XML.PushParser"; }
 
-    static char const *constructor_name() { return "Reference"; }
-    typedef boost::mpl::size_t<2> constructor_arity;
+    static char const *constructor_name() { return "PushParser"; }
+    typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
   };
 
-  reference_(object const &, call_context &);
-  reference_(object const &, xmlNodePtr doc);
-  ~reference_();
+  push_parser(object const &, call_context &);
+  ~push_parser();
+
+protected:
+  void trace(tracer &);
 
 private: // JS methods
+  void push(blob &, bool);
+  object terminate();
 
 private: // JS properties
+  void prop_document(property_mode, value &);
+
+private:
+  void terminate2();
+
+  xmlParserCtxtPtr parser;
+  xmlDocPtr doc;
 };
 
 }}
