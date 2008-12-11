@@ -70,8 +70,5 @@ Function.bind = function (obj, name) {
   g.XML = i.XML;
 })(this);
 
-// Set default paths to the plugin dirs
-Importer.defaultPaths = ['js/src', 'build/default/plugins/sqlite3', 
-  'build/default/plugins/curl', 'build/default/plugins/environment'];
 
 true;

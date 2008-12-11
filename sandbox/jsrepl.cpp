@@ -45,28 +45,142 @@ THE SOFTWARE.
 #  include <readline/history.h>
 #endif
 
+class flusspferd_repl {
+  bool extfile;
+  std::string file;
+  std::istream in;
+
+  bool config_loaded;
+  char *config_file;
+
+  flusspferd::context co;
+  flusspferd::current_context_scope scope;
+  flusspferd::security &security;
+
+  int argc;
+  char ** argv;
+
+  bool parse_cmdline();
+  void load_config();
+
+public:
+  flusspferd_repl(int argc, char** argv);
+
+  int run();
+};
+
+bool getline(std::string &source, const char* prompt = "> ");
+
+
+flusspferd_repl::flusspferd_repl(int argc, char **argv)
+  : extfile(false),
+    file("typein"),
+    in(std::cin.rdbuf()),
+    config_loaded(false),
+    config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
+    co(flusspferd::context::create()),
+    scope(flusspferd::current_context_scope(co)),
+    security(flusspferd::security::create(flusspferd::global())),
+    argc(argc),
+    argv(argv)
+{
+  flusspferd::load_class<flusspferd::blob>();
+  flusspferd::load_class<flusspferd::importer>();
+
+  #ifdef FLUSSPFERD_HAVE_IO
+  flusspferd::importer::add_preloaded("io", &flusspferd::io::load_io);
+  #endif
+  #ifdef FLUSSPFERD_HAVE_XML
+  flusspferd::importer::add_preloaded("xml", &flusspferd::xml::load_xml);
+  #endif
+
+  flusspferd::load_properties_functions();
+
+  flusspferd::gc();
+
+}
+
+int flusspferd_repl::run() {
+  if (!parse_cmdline())
+    return 1;
+
+  // if extfile is true, we've run it already, and aren't going to interactive
+  if (extfile)
+    return 0;
+
+  if (!config_loaded)
+    load_config();
+
+  std::string source;
+  unsigned int line = 0;
+
+  while (getline(source)) {
+    try {
+      flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
+      if (!v.is_void())
+        std::cout << v << '\n';
+    }
+    catch(std::exception &e) {
+      std::cerr << "ERROR: " << e.what() << '\n';
+    }
+    flusspferd::gc();
+  }
+
+  return 0;
+}
+
 bool extfile = false;
 std::string file = __FILE__;
 std::istream in(std::cin.rdbuf());
 
+bool config_loaded = false;
+// Default - can be changed by -c cmd line option
+char* config_file = INSTALL_PREFIX "/etc/flusspferd/jsrepl.js";
+
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
-    " -h -f <file> -i\n\n"
+    " -h -c <file> -f <file> -i\n\n"
     "\t-h         displays this message\n"
+    "\t-c <file>  load config from file\n"
     "\t-f <file>  open file as input\n"
     "\t-i         enter interactive mode (after running a file)\n\n";
 }
 
-bool parse_cmd(flusspferd::context &co, int argc, char **argv) {
+void flusspferd_repl::load_config() {
+  co.execute(config_file);
+
+  // Get the prelude and execute it too
+  flusspferd::value prelude = co.global().get_property("prelude");
+  
+  if (!prelude.is_void_or_null()) {
+    co.execute(prelude.to_string().c_str());
+  }
+}
+
+bool flusspferd_repl::parse_cmdline() {
   if (argc <= 1)
     return true;
 
+  // TODO: We probably want to build up list of files to run, then populate
+  // arguments object at top level (in JS) then run each file in turn
   for (int i = 1; i < argc; ++i) {
     if (std::strcmp(argv[i], "-h") == 0 ||
         std::strcmp(argv[i], "--help") == 0)
     {
       print_help(argv[0]);
       return false;
+    }
+    else if (std::strcmp(argv[i], "-c") == 0 ||
+             std::strcmp(argv[i], "--config") == 0)
+    {
+      ++i;
+      if (i == argc) {
+        print_help(argv[0]);
+        std::cerr << "ERROR: expected filename after " << argv[i-1]
+                  << " option\n";
+        return false;
+      }
+      config_file = argv[i];
     }
     else if (std::strcmp(argv[i], "-i") == 0 ||
              std::strcmp(argv[i], "--interactive") == 0)
@@ -84,6 +198,8 @@ bool parse_cmd(flusspferd::context &co, int argc, char **argv) {
         return false;
       }
       file = argv[i];
+      if (!config_loaded)
+        load_config();
       extfile = true;
       co.execute(file.c_str());
     }
@@ -92,7 +208,7 @@ bool parse_cmd(flusspferd::context &co, int argc, char **argv) {
   return true;
 }
 
-bool getline(std::string &source, const char* prompt = "> ") {
+bool getline(std::string &source, const char* prompt) {
 #ifdef HAVE_READLINE
   if (!extfile) {
     char* linep = readline(prompt);
@@ -118,48 +234,8 @@ int main(int argc, char **argv) {
 
   try {
     flusspferd::init::initialize();
-    flusspferd::context co = flusspferd::context::create();
-    flusspferd::current_context_scope scope(co);
-
-    flusspferd::load_class<flusspferd::blob>();
-    flusspferd::load_class<flusspferd::importer>();
-
-    flusspferd::importer::add_preloaded("io", &flusspferd::io::load_io);
-    #ifdef FLUSSPFERD_HAVE_XML
-    flusspferd::importer::add_preloaded("xml", &flusspferd::xml::load_xml);
-    #endif
-
-    flusspferd::load_properties_functions();
-
-    flusspferd::security &security =
-      flusspferd::security::create(flusspferd::global());
-
-    co.execute("prelude.js");
-
-    flusspferd::gc();
-
-    // if extfile is true, we've run it already, and aren't going to interactive
-    if (!parse_cmd(co, argc, argv))
-      return 1;
-
-    if (extfile)
-      return 0;
-
-    std::string source;
-    unsigned int line = 0;
-
-    while (getline(source)) {
-      try {
-        flusspferd::value v =
-          flusspferd::evaluate(source, file.c_str(), ++line);
-        if (!v.is_void())
-          std::cout << v << '\n';
-      }
-      catch(std::exception &e) {
-        std::cerr << "ERROR: " << e.what() << '\n';
-      }
-      flusspferd::gc();
-    }
+    flusspferd_repl repl(argc, argv);
+    repl.run();
   }
   catch(std::exception &e) {
     std::cerr << "ERROR: " << e.what() << '\n';
