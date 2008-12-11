@@ -165,6 +165,10 @@ value importer::load(string const &f_name, bool binary_only) {
   if (it != p->module_cache.end())
     return it->second;
 
+  object ctx = get_property("context").to_object();
+  ctx.define_property("$importer", *this);
+  ctx.define_property("$security", sec);
+
   object constructor = get_constructor<importer>();
   value preload = constructor.get_property("preload");
 
@@ -175,8 +179,7 @@ value importer::load(string const &f_name, bool binary_only) {
       if (!loader.is_null()) {
         local_root_scope scope;
         object x = loader.get_object();
-        object cx = get_property("context").to_object();
-        result = x.call(cx);
+        result = x.call(ctx);
       }
       return result;
     }
@@ -192,10 +195,6 @@ value importer::load(string const &f_name, bool binary_only) {
     throw exception("Unable to get search paths or its not an object");
 
   array paths = paths_v.get_object();
-
-  object ctx = get_property("context").to_object();
-  ctx.define_property("$importer", *this);
-  ctx.define_property("$security", sec);
 
   // TODO: We could probably do with an array class.
   size_t len = paths.get_length();
