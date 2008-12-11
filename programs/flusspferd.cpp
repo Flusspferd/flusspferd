@@ -22,8 +22,6 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/security.hpp"
-#include "flusspferd/xml/xml.hpp"
-#include "flusspferd/io/io.hpp"
 #include "flusspferd/importer.hpp"
 #include "flusspferd/blob.hpp"
 #include "flusspferd/class.hpp"
@@ -87,13 +85,6 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 {
   flusspferd::load_class<flusspferd::blob>();
   flusspferd::load_class<flusspferd::importer>();
-
-  #ifdef FLUSSPFERD_HAVE_IO
-  flusspferd::importer::add_preloaded("io", &flusspferd::io::load_io);
-  #endif
-  #ifdef FLUSSPFERD_HAVE_XML
-  flusspferd::importer::add_preloaded("xml", &flusspferd::xml::load_xml);
-  #endif
 
   flusspferd::load_properties_functions();
 
