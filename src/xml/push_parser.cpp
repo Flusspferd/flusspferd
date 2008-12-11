@@ -21,55 +21,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/xml.hpp"
 #include "flusspferd/xml/push_parser.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/reference.hpp"
-#include "flusspferd/xml/attribute.hpp"
-#include "flusspferd/xml/processing_instruction.hpp"
-#include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
-
+#include "flusspferd/exception.hpp"
+#include "flusspferd/tracer.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-extern "C" value flusspferd_load(object container)
+push_parser::push_parser(object const &obj, call_context &x)
+  : native_object_base(obj)
 {
-  return load_xml(container);
+  if (!x.arg[0].is_void_or_null() && !x.arg[0].is_string())
+    throw exception("Filename has to be a string");
+  set_property("filename", x.arg[0]);
 }
 
-object flusspferd::xml::load_xml(object container) {
-  local_root_scope scope;
-
-  value previous = container.get_property("XML");
-
-  if (previous.is_object())
-    return previous.to_object();
-
-  LIBXML_TEST_VERSION
-
-  object XML = flusspferd::create_object();
-
-  load_class<node>(XML);
-  load_class<document>(XML);
-  load_class<text>(XML);
-  load_class<comment>(XML);
-  load_class<cdata_section>(XML);
-  load_class<reference_>(XML);
-  load_class<processing_instruction>(XML);
-  load_class<attribute_>(XML);
-  load_class<namespace_>(XML);
-
-  load_class<push_parser>(XML);
-
-  container.define_property(
-    "XML",
-    XML,
-    object::read_only_property | object::dont_enumerate);
-
-  return XML;
+push_parser::~push_parser() {
 }
+
+object push_parser::class_info::create_prototype() {
+  object proto = create_object();
+
+  return proto;
+}
+
+void push_parser::trace(tracer &trc) {
+}
+
