@@ -1,6 +1,6 @@
 # vim:ts=2:sw=2:expandtab:autoindent:filetype=python:
 #
-# Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+# Copyright (c) 2008 Ash Berlin, Aristid Breitkreuz, Ruediger Sonderfeld
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,14 @@
 #
 
 obj = bld.new_task_gen('cxx', 'program')
-obj.source = 'spidermonkey.cpp'
-obj.target = 'spidermonkey'
-obj.install_path = None
-obj.uselib = 'JS JS_H'
-obj.includes = ['../include']
-
-obj = bld.new_task_gen('cxx', 'program')
-obj.source = 'abstract-js.cpp'
-obj.target = 'abstract-js'
-obj.install_path = None
-obj.uselib = 'BOOST JS_H'
+obj.source = 'flusspferd.cpp'
+obj.target = 'flusspferd'
+obj.install_path = '${PREFIX}/bin'
+obj.uselib = 'BOOST JS_H READLINE'
 obj.uselib_local = ['flusspferd']
+obj.defines = 'INSTALL_PREFIX=\\"%s\\"' % bld.env['PREFIX'];
 if bld.env['ENABLE_IO']:
   obj.uselib_local += ['flusspferd-io']
+if bld.env['ENABLE_XML']:
+  obj.uselib_local += ['flusspferd-xml']
 obj.includes = ['../include']
