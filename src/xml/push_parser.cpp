@@ -22,6 +22,8 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/push_parser.hpp"
+#include "flusspferd/xml/node.hpp"
+#include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/tracer.hpp"
 
@@ -29,14 +31,29 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 push_parser::push_parser(object const &obj, call_context &x)
-  : native_object_base(obj)
+  : native_object_base(obj), parser(0)
 {
   if (!x.arg[0].is_void_or_null() && !x.arg[0].is_string())
-    throw exception("Filename has to be a string");
-  set_property("filename", x.arg[0]);
+    throw exception("Could not create parser: filename has to be a string");
+
+  char const *fname = 0;
+  if (x.arg[0].is_string())
+    fname = x.arg[0].get_string().c_str();
+
+  parser = xmlCreatePushParserCtxt(0, 0, 0, 0, fname);
+
+  if (!parser)
+    throw exception("Could not create parser");
+
+  define_native_property(
+    "document",
+    read_only_property | permanent_shared_property,
+    &push_parser::prop_document);
 }
 
 push_parser::~push_parser() {
+  if (parser)
+    xmlFreeParserCtxt(parser);
 }
 
 object push_parser::class_info::create_prototype() {
@@ -46,5 +63,13 @@ object push_parser::class_info::create_prototype() {
 }
 
 void push_parser::trace(tracer &trc) {
+  if (parser->myDoc)
+    trc("parser-doc", *static_cast<object*>(parser->myDoc->_private));
 }
 
+void push_parser::prop_document(property_mode mode, value &data) {
+  if (mode != property_get)
+    return;
+
+  data = node::create(xmlNodePtr(parser->myDoc));
+}

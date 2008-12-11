@@ -50,6 +50,10 @@ protected:
 private: // JS methods
 
 private: // JS properties
+  void prop_document(property_mode, value &);
+
+private:
+  xmlParserCtxtPtr parser;
 };
 
 }}
