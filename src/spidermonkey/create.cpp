@@ -56,21 +56,6 @@ object flusspferd::detail::create_native_object(object const &proto) {
   return native_object_base::do_create_object(proto);
 }
 
-native_object_base &flusspferd::create_native_object(
-    native_object_base *ptr, object const &proto)
-{
-  try {
-    local_root_scope scope;
-    object obj = detail::create_native_object(proto);
-    ptr->load_into(obj);
-    ptr->late_load();
-    return *ptr;
-  } catch (...) {
-    delete ptr;
-    throw;
-  }
-}
-
 function flusspferd::create_native_function(native_function_base *ptr) {
   try {
     return ptr->create_function();
