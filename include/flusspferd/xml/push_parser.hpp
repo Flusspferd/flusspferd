@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
+#include "../blob.hpp"
 #include <libxml/parser.h>
 
 namespace flusspferd { namespace xml {
@@ -48,12 +49,17 @@ protected:
   void trace(tracer &);
 
 private: // JS methods
+  void push(blob &, bool);
+  object terminate();
 
 private: // JS properties
   void prop_document(property_mode, value &);
 
 private:
+  void terminate2();
+
   xmlParserCtxtPtr parser;
+  xmlDocPtr doc;
 };
 
 }}
