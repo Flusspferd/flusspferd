@@ -63,13 +63,13 @@ class flusspferd_repl {
   bool parse_cmdline();
   void load_config();
 
+  bool getline(std::string &source, const char* prompt = "> ");
 public:
   flusspferd_repl(int argc, char** argv);
 
   int run();
 };
 
-bool getline(std::string &source, const char* prompt = "> ");
 
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
@@ -77,6 +77,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
+    // Default - can be changed by -c cmd line option
     config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
@@ -128,14 +129,6 @@ int flusspferd_repl::run() {
 
   return 0;
 }
-
-bool extfile = false;
-std::string file = __FILE__;
-std::istream in(std::cin.rdbuf());
-
-bool config_loaded = false;
-// Default - can be changed by -c cmd line option
-char const *config_file = INSTALL_PREFIX "/etc/flusspferd/jsrepl.js";
 
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
@@ -208,7 +201,7 @@ bool flusspferd_repl::parse_cmdline() {
   return true;
 }
 
-bool getline(std::string &source, const char* prompt) {
+bool flusspferd_repl::getline(std::string &source, const char* prompt) {
 #ifdef HAVE_READLINE
   if (!extfile) {
     char* linep = readline(prompt);
