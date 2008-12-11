@@ -56,6 +56,10 @@ object flusspferd::detail::create_native_object(object const &proto) {
   return native_object_base::do_create_object(proto);
 }
 
+object flusspferd::detail::create_native_enumerable_object(object const &proto) {
+  return native_object_base::do_create_enumerable_object(proto);
+}
+
 function flusspferd::create_native_function(native_function_base *ptr) {
   try {
     return ptr->create_function();

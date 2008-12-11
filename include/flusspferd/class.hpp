@@ -91,6 +91,7 @@ void load_class(
 
 struct class_info {
   typedef boost::mpl::bool_<true> constructible;
+  typedef boost::mpl::bool_<false> custom_enumerate;
 
   typedef boost::mpl::size_t<0> constructor_arity;
 

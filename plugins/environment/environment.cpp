@@ -45,6 +45,7 @@ class environment : public native_object_base {
 public:
   struct class_info : public flusspferd::class_info {
     typedef boost::mpl::bool_<true> constructible;
+    typedef boost::mpl::bool_<true> custom_enumerate;
     static char const *constructor_name() { return "Environment"; }
     static char const *full_name() { return "Environment"; }
   };

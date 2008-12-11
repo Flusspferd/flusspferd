@@ -43,6 +43,7 @@ class tracer;
 
 namespace detail {
   object create_native_object(object const &proto);
+  object create_native_enumerable_object(object const &proto);
 }
 
 class native_object_base : public object, private boost::noncopyable {
@@ -159,8 +160,10 @@ private:
 
 private:
   static object do_create_object(object const &proto);
+  static object do_create_enumerable_object(object const &proto);
 
   friend object detail::create_native_object(object const &proto);
+  friend object detail::create_native_enumerable_object(object const &proto);
 
 private:
   class impl;

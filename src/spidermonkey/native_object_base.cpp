@@ -70,7 +70,7 @@ public:
 
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
-  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE,
+  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE,
   &native_object_base::impl::property_op<native_object_base::property_add>,
   &native_object_base::impl::property_op<native_object_base::property_delete>,
   &native_object_base::impl::property_op<native_object_base::property_get>,
@@ -164,6 +164,23 @@ object native_object_base::do_create_object(object const &prototype_) {
   JSObject *o = JS_NewObject(
       ctx,
       &impl::native_object_class,
+      Impl::get_object(prototype),
+      0);
+
+  if (!o)
+    throw exception("Could not create native object");
+
+  return Impl::wrap_object(o);
+}
+
+object native_object_base::do_create_enumerable_object(object const &prototype_) {
+  JSContext *ctx = Impl::current_context();
+
+  object prototype = prototype_;
+
+  JSObject *o = JS_NewObject(
+      ctx,
+      &impl::native_enumerable_object_class,
       Impl::get_object(prototype),
       0);
 
