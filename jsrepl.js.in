@@ -1,1 +1,3 @@
-Importer.defaultPaths = ['@PREFIX@/flusspferd/modules'];
+Importer.defaultPaths = ['@PREFIX@/lib/flusspferd/modules'];
+
+prelude = '@PREFIX@/lib/flusspferd/prelude.js';

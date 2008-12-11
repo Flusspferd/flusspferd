@@ -193,6 +193,9 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
     bld.install_files('${PREFIX}/lib/flusspferd/modules/http',
                       'js/src/http/*.js')
+
+    bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
+
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
                    (bld.env['shlib_PATTERN'] % 'xml'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-xml'))
