@@ -45,9 +45,6 @@ public:
   reference_(object const &, xmlNodePtr doc);
   ~reference_();
 
-protected:
-  void post_initialize();
-
 private: // JS methods
 
 private: // JS properties
