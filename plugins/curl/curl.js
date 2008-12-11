@@ -36,6 +36,7 @@
     var old_perform = cURL.prototype.perform;
     cURL.prototype.perform = function perform() {
       this.header_buffer = "";
+      delete this.headers;
       this.responseBlob = new Blob(0);
       return perform.old.apply(this, arguments);
     }
