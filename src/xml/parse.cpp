@@ -33,7 +33,7 @@ using namespace xml;
 object flusspferd::xml::parse_blob(object&, blob &b, object options) {
   value url_v;
   value encoding_v;
-  unsigned flags;
+  unsigned flags = 0;
 
   if (options.is_valid()) {
     url_v = options.get_property("url");
@@ -45,10 +45,29 @@ object flusspferd::xml::parse_blob(object&, blob &b, object options) {
   char const *encoding =
     encoding_v.is_string() ? encoding_v.get_string().c_str() : 0;
 
-  flags |= XML_PARSE_NONET;
-
   xmlDocPtr doc =
     xmlReadMemory((char*) b.get_data(), b.size(), url, encoding, flags);
+
+  if (!doc)
+    throw exception("Could not parse XML document");
+
+  return node::create(xmlNodePtr(doc));
+}
+
+object flusspferd::xml::parse_file(object&, string filename, object options) {
+  value encoding_v;
+  unsigned flags = 0;
+
+  if (options.is_valid()) {
+    encoding_v = options.get_property("encoding");
+    flags = options.get_property("options").to_integral_number(32, false);
+  }
+
+  char const *encoding =
+    encoding_v.is_string() ? encoding_v.get_string().c_str() : 0;
+
+  xmlDocPtr doc =
+    xmlReadFile(filename.c_str(), encoding, flags);
 
   if (!doc)
     throw exception("Could not parse XML document");
