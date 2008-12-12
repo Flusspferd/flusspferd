@@ -60,17 +60,46 @@ document::document(object const &obj, call_context &x)
   init();
 }
 
-document::~document() {
-  if (c_obj()->_private == static_cast<object*>(this)) {
-    xmlNodePtr x = c_obj()->children;
-    while (x) {
-      x->parent = 0;
-      x = x->next;
+static void unlock_priv(void *priv) {
+  if (!priv)
+    return;
+  object &o = *static_cast<object*>(priv);
+  node &n = flusspferd::get_native<node>(o);
+  n.set_c_obj(0);
+}
+
+static void unlock_list(xmlNodePtr node);
+
+static void unlock_properties(xmlAttrPtr prop) {
+  while (prop) {
+    prop->ns = 0;
+    unlock_priv(prop->_private);
+    unlock_list(prop->children);
+    prop = prop->next;
+  }
+}
+
+static void unlock_list(xmlNodePtr node) {
+  while (node) {
+    unlock_priv(node->_private);
+    unlock_list(node->children);
+    if (node->type == XML_ELEMENT_NODE) {
+      node->nsDef = 0;
+      unlock_properties(node->properties);
     }
-    c_obj()->children = 0;
-    c_obj()->last = 0;
-    c_obj()->oldNs = 0;
-    xmlFreeDoc(c_obj());
+    if (node->type == XML_ELEMENT_NODE || node->type == XML_ATTRIBUTE_NODE) {
+      node->ns = 0;
+    }
+    node = node->next;
+  }
+}
+
+document::~document() {
+  xmlDocPtr ptr = c_obj();
+  if (ptr && ptr->_private == static_cast<object*>(this)) {
+    unlock_list(ptr->children);
+    ptr->oldNs = 0;
+    xmlFreeDoc(ptr);
     set_c_obj(0);
   }
 }
