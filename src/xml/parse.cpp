@@ -22,10 +22,18 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/parse.hpp"
+#include "flusspferd/xml/node.hpp"
+#include "flusspferd/exception.hpp"
+#include <libxml/parser.h>
 
 using namespace flusspferd;
 using namespace xml;
 
 object flusspferd::xml::parse_blob(object &, blob &b) {
-  return object();
+  xmlDocPtr doc = xmlParseMemory((char*) b.get_data(), b.size());
+
+  if (!doc)
+    throw exception("Could not parse XML document");
+
+  return node::create(xmlNodePtr(doc));
 }
