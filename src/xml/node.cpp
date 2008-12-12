@@ -75,6 +75,14 @@ void node::create_all_children(
       namespace_::create(ptr->ns);
   }
 
+  if (ptr->type == XML_ELEMENT_NODE) {
+    xmlNsPtr ns = ptr->nsDef;
+    while (ns) {
+      namespace_::create(ns);
+      ns = ns->next;
+    }
+  }
+
   if (children) {
     for (xmlNodePtr child = ptr->children; child; child = child->next)
       create(child);
