@@ -28,6 +28,7 @@ Array.from = function (iterable) {
     return iterable.toArray();
   return Array.slice(iterable, 0);
 };
+Object.defineProperty(Array, 'from', {enumerable: false});
 
 function Range(from,to, by) {
   var i = from;
@@ -41,6 +42,7 @@ function Range(from,to, by) {
 String.prototype.toArray = function () {
   return this.split(/\s+/);
 };
+Object.defineProperty(String.prototype, 'toArray', {enumerable: false});
 
 Function.prototype.bind = function (obj) {
   var fun = this;
@@ -48,6 +50,7 @@ Function.prototype.bind = function (obj) {
       return fun.apply(obj, arguments);
     }
 };
+Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 
 Function.bind = function (obj, name) {
   var fun = obj[name];
@@ -55,6 +58,7 @@ Function.bind = function (obj, name) {
     throw new Error("Object has no function '" + name + "'");
   return fun.bind(obj);
 };
+Object.defineProperty(Function, 'bind', {enumerable: false});
 
 (function (g) {
   var i = new Importer;
