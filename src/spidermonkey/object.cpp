@@ -302,19 +302,17 @@ bool object::is_array() const {
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
 
-/*
-bool object::property_attributes(char const *name_, struct object::property_attributes &attrs) {
+bool object::get_property_attributes(char const *name_, struct property_attributes &attrs) {
   local_root_scope scope;
   string name(name_);
-  //return property_attributes(name, attrs);
+  return get_property_attributes(name, attrs);
 }
 
-bool object::property_attributes(std::string name_, struct property_attributes &attrs) {
+bool object::get_property_attributes(std::string name_, struct property_attributes &attrs) {
   local_root_scope scope;
   string name(name_);
-  //return property_attributes(name, attrs);
+  return get_property_attributes(name, attrs);
 }
-*/
 
 bool object::get_property_attributes(string const &name, struct property_attributes &attrs) {
   JSBool found;
@@ -356,3 +354,18 @@ bool object::get_property_attributes(string const &name, struct property_attribu
   }
   return true;
 }
+
+
+object::property_attributes::property_attributes()
+  : flags(0u),
+    getter(boost::none),
+    setter(boost::none)
+{}
+
+object::property_attributes::property_attributes(unsigned flags, 
+                        boost::optional<function const &> getter,
+                        boost::optional<function const &> setter)
+  : flags(flags),
+    getter(getter),
+    setter(setter)
+{}
