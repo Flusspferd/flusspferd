@@ -40,35 +40,57 @@ void flusspferd::load_properties_functions(object container) {
   create_native_function(obj_ctor, "defineProperty", ecma_define_own_property);
 }
 
-
 void ecma_define_own_property(object /*self*/, object o, string p, object desc) {
   local_root_scope scope;
 
   // TODO: Check if obj is sealed
- 
-  bool current = o.has_property(p);
 
-  // TODO: Short circuit if current property is permanent
+  struct object::property_attributes attrs;
+  bool current = o.get_property_attributes(p, attrs);
 
-  unsigned flags = object::read_only_property;
-  bool writable = false,
-       is_accessor = false;
+  bool is_accessor = false, is_data = false,
+       configurable = false, enumerable = false, writable = false;
+
+  unsigned flags = object::dont_enumerate;
+
+  // Short circuit if current property is permanent
+  if (current) {
+    if (attrs.flags & object::permanent_property)
+      throw exception("Cannot alter un-configurable properties");
+
+    flags = attrs.flags;
+  }
+
 
   // [[Enumerable]]. Default false
   value v = desc.get_property("enumerable");
-  if (!v.is_void() && v.get_boolean() == false) 
+  if (!v.is_void()) {
+    if (v.get_boolean() == false) 
       flags |= object::dont_enumerate;
+    else {
+      flags &= ~object::dont_enumerate;
+      enumerable = true;
+    }
+  }
   
   // [[Configurable]]. Default false
   v = desc.get_property("configurable");
-  if (!v.is_void() && v.get_boolean() == true)
-    flags |= object::permanent_property;
+  if (v.is_void() || v.get_boolean() == false)
+      flags |= object::permanent_property;
+  else {
+    flags &= ~object::permanent_property;
+    configurable = true;
+  }
 
   // [[Writable]]. Default false
   v = desc.get_property("writable");
-  if (!v.is_void() && v.get_boolean() == true) {
-    writable = true;
-    flags &= ~object::read_only_property;
+  if (!v.is_void()) {
+    if (v.get_boolean() == true) {
+      flags &= ~object::read_only_property;
+      writable = true;
+    }
+    else
+      flags |= object::read_only_property;
   }
 
   boost::optional<function const &> getter_fn = boost::none, 
@@ -91,9 +113,9 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
     throw exception("setter must be a function");
   }
   
+  is_data = desc.has_property("writable") || desc.has_property("value");
   is_accessor = (getter_fn || setter_fn);
-  if ( is_accessor && 
-       (desc.has_property("value") || desc.has_property("writable")) )
+  if ( is_accessor && is_data )
   {
     // 10. If either descObj.[[Getter]] or descObj.[[Setter]] are present, then
     //   a. If either descObj.[[Value]] or descObj.[[Writable]] are present,
@@ -102,13 +124,18 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
     throw exception("cannot mix value or writable with getter or setter");
   }
 
-  if (!current) {
-    if (is_accessor) {
-      o.define_property(p, value(), flags, getter_fn, setter_fn);
-    } else {
-      value val = desc.get_property("value");
-      o.define_property(p, val, flags);
-    }
-    return;
+  // Steps 7, 10a and 11a basically say you can't change anything on a
+  // permenant property, but it shouldn't die. That seems like a lot of effort
+  // for minimal gain.
+
+  // The rest of the steps basically translate to 'keep the current flags the
+  // same', in just a very very verbose manner
+
+  // Wasn't that easy
+  if (is_accessor) {
+    o.define_property(p, value(), object::property_attributes(flags, getter_fn, setter_fn));
+  } else {
+    value val = desc.has_property("value") ? desc.get_property("value") : o.get_property(p);
+    o.define_property(p, val, object::property_attributes(flags));
   }
 }
