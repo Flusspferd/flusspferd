@@ -35,3 +35,4 @@ obj.target = 'sqlite3'
 obj.features.append('cc')
 obj.install_path = '${PREFIX}/lib/flusspferd/modules'
 
+bld.install_files('${PREFIX}/lib/flusspferd/modules', 'sqlite3.js');
