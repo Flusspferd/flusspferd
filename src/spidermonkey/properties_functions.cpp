@@ -65,7 +65,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
   // [[Enumerable]]. Default false
   value v = desc.get_property("enumerable");
   if (!v.is_void()) {
-    if (v.get_boolean() == false) 
+    if (v.to_boolean() == false) 
       flags |= object::dont_enumerate;
     else {
       flags &= ~object::dont_enumerate;
@@ -75,7 +75,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
   
   // [[Configurable]]. Default false
   v = desc.get_property("configurable");
-  if (v.is_void() || v.get_boolean() == false)
+  if (v.is_void() || v.to_boolean() == false)
       flags |= object::permanent_property;
   else {
     flags &= ~object::permanent_property;
@@ -85,7 +85,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
   // [[Writable]]. Default false
   v = desc.get_property("writable");
   if (!v.is_void()) {
-    if (v.get_boolean() == true) {
+    if (v.to_boolean() == true) {
       flags &= ~object::read_only_property;
       writable = true;
     }
