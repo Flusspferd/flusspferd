@@ -24,13 +24,31 @@ THE SOFTWARE.
 #include "flusspferd/xml/parse.hpp"
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/exception.hpp"
+#include "flusspferd/string.hpp"
 #include <libxml/parser.h>
 
 using namespace flusspferd;
 using namespace xml;
 
-object flusspferd::xml::parse_blob(object &, blob &b) {
-  xmlDocPtr doc = xmlParseMemory((char*) b.get_data(), b.size());
+object flusspferd::xml::parse_blob(object&, blob &b, object options) {
+  value url_v;
+  value encoding_v;
+  unsigned flags;
+
+  if (options.is_valid()) {
+    url_v = options.get_property("url");
+    encoding_v = options.get_property("encoding");
+    flags = options.get_property("options").to_integral_number(32, false);
+  }
+
+  char const *url = url_v.is_string() ? url_v.get_string().c_str() : 0;
+  char const *encoding =
+    encoding_v.is_string() ? encoding_v.get_string().c_str() : 0;
+
+  flags |= XML_PARSE_NONET;
+
+  xmlDocPtr doc =
+    xmlReadMemory((char*) b.get_data(), b.size(), url, encoding, flags);
 
   if (!doc)
     throw exception("Could not parse XML document");
