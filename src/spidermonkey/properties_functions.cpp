@@ -45,7 +45,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
 
   // TODO: Check if obj is sealed
 
-  struct object::property_attributes attrs;
+  object::property_attributes attrs;
   bool current = o.get_property_attributes(p, attrs);
 
   bool is_accessor = false, is_data = false,
