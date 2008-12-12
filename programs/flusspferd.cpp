@@ -132,6 +132,7 @@ void print_help(char const *argv0) {
 
 void flusspferd_repl::load_config() {
   co.execute(config_file);
+  config_loaded = true;
 
   // Get the prelude and execute it too
   flusspferd::value prelude = co.global().get_property("prelude");
