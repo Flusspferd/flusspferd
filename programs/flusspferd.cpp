@@ -38,9 +38,9 @@ THE SOFTWARE.
 #include <cstring>
 #include <string>
 
-#ifdef HAVE_READLINE
-#  include <readline/readline.h>
-#  include <readline/history.h>
+#ifdef HAVE_EDITLINE
+#include <editline/readline.h>
+#include <editline/history.h>
 #endif
 
 class flusspferd_repl {
@@ -194,7 +194,7 @@ bool flusspferd_repl::parse_cmdline() {
 }
 
 bool flusspferd_repl::getline(std::string &source, const char* prompt) {
-#ifdef HAVE_READLINE
+#ifdef HAVE_EDITLINE
   if (!extfile) {
     char* linep = readline(prompt);
     if (!linep) {

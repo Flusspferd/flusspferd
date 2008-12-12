@@ -25,7 +25,7 @@ obj = bld.new_task_gen('cxx', 'program')
 obj.source = 'flusspferd.cpp'
 obj.target = 'flusspferd'
 obj.install_path = '${PREFIX}/bin'
-obj.uselib = 'BOOST JS_H READLINE'
+obj.uselib = 'BOOST JS_H EDITLINE'
 obj.uselib_local = ['flusspferd']
 obj.defines = 'INSTALL_PREFIX=\\"%s\\"' % bld.env['PREFIX'];
 obj.includes = ['../include']
