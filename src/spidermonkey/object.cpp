@@ -183,7 +183,7 @@ property_iterator object::end() const {
 
 void object::define_property(
   string const &name, value const &init_value, 
-  struct property_attributes const attrs)
+  property_attributes const attrs)
 {
   if (!is_valid())
     throw exception("Could not define property (object is null)");
@@ -221,7 +221,7 @@ void object::define_property(
 
 void object::define_property(
   std::string const &name_, value const &init_value,
-  struct property_attributes attrs)
+  property_attributes attrs)
 {
   local_root_scope scope;
   string name(name_);
@@ -230,7 +230,7 @@ void object::define_property(
 
 void object::define_property(
   char const *name_, value const &init_value,
-  struct property_attributes const attrs)
+  property_attributes const attrs)
 {
   local_root_scope scope;
   string name(name_);
@@ -302,19 +302,19 @@ bool object::is_array() const {
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
 
-bool object::get_property_attributes(char const *name_, struct property_attributes &attrs) {
+bool object::get_property_attributes(char const *name_, property_attributes &attrs) {
   local_root_scope scope;
   string name(name_);
   return get_property_attributes(name, attrs);
 }
 
-bool object::get_property_attributes(std::string name_, struct property_attributes &attrs) {
+bool object::get_property_attributes(std::string name_, property_attributes &attrs) {
   local_root_scope scope;
   string name(name_);
   return get_property_attributes(name, attrs);
 }
 
-bool object::get_property_attributes(string const &name, struct property_attributes &attrs) {
+bool object::get_property_attributes(string const &name, property_attributes &attrs) {
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;

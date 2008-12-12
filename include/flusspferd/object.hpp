@@ -136,15 +136,15 @@ FLUSSPFERD_CALLS(call, object const &)
 
   void define_property(string const &name,
     value const &init_value = value(),
-    struct property_attributes const attrs = property_attributes());
+    property_attributes const attrs = property_attributes());
 
   void define_property(std::string const &name,
     value const &init_value = value(),
-    struct property_attributes const attrs = property_attributes());
+    property_attributes const attrs = property_attributes());
 
   void define_property(char const *name,
     value const &init_value = value(),
-    struct property_attributes const attrs = property_attributes());
+    property_attributes const attrs = property_attributes());
 
   void set_property(char const *name, value const &v);
   void set_property(std::string const &name, value const &v);
@@ -167,9 +167,9 @@ FLUSSPFERD_CALLS(call, object const &)
 
   bool is_array() const;
 
-  bool get_property_attributes(char const *name, struct property_attributes &attrs);
-  bool get_property_attributes(std::string name, struct property_attributes &attrs);
-  bool get_property_attributes(string const &id, struct property_attributes &attrs);
+  bool get_property_attributes(char const *name, property_attributes &attrs);
+  bool get_property_attributes(std::string name, property_attributes &attrs);
+  bool get_property_attributes(string const &id, property_attributes &attrs);
 
 #endif
 };
