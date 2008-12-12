@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+#include <libxml/xmlIO.h>
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -44,7 +45,11 @@ extern "C" value flusspferd_load(object container)
   return load_xml(container);
 }
 
+static void safety_io_callbacks();
+
 object flusspferd::xml::load_xml(object container) {
+  safety_io_callbacks();
+
   local_root_scope scope;
 
   value previous = container.get_property("XML");
@@ -77,4 +82,11 @@ object flusspferd::xml::load_xml(object container) {
     object::read_only_property | object::dont_enumerate);
 
   return XML;
+}
+
+static void safety_io_callbacks() {
+  xmlCleanupInputCallbacks();
+  xmlCleanupOutputCallbacks();
+
+  // TODO - add safe callbacks
 }
