@@ -60,6 +60,7 @@ private: // JS methos
   object to_array();
   object copy();
   string as_utf8();
+  string as_utf16();
 
   value set_index(int index, value x);
   value get_index(int index);
@@ -68,6 +69,7 @@ private: // JS properties
 
 private: // JS constructor methods
   static object from_utf8(string const &);
+  static object from_utf16(string const &);
 
 private:
   std::vector<unsigned char> data;

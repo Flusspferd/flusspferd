@@ -73,6 +73,7 @@ unsigned char blob::el_from_value(value const &v) {
 
 void blob::class_info::augment_constructor(object &ctor) {
   create_native_function(ctor, "fromUtf8", &blob::from_utf8);
+  create_native_function(ctor, "fromUtf16", &blob::from_utf16);
 }
 
 void blob::init() {
@@ -85,6 +86,7 @@ void blob::init() {
   register_native_method("copy", &blob::copy);
   register_native_method("slice", &blob::slice);
   register_native_method("asUtf8", &blob::as_utf8);
+  register_native_method("asUtf16", &blob::as_utf16);
   register_native_method("get", &blob::get_index);
   register_native_method("set", &blob::set_index);
 }
@@ -99,6 +101,7 @@ object blob::class_info::create_prototype() {
   create_native_method(proto, "copy", 0);
   create_native_method(proto, "slice", 2);
   create_native_method(proto, "asUtf8", 0);
+  create_native_method(proto, "asUtf16", 0);
   create_native_method(proto, "get", 1);
   create_native_method(proto, "set", 2);
 
@@ -240,10 +243,21 @@ string blob::as_utf8() {
   return string((char*) get_data(), strlen);
 }
 
+string blob::as_utf16() {
+  return string((char16_t*) get_data(), size() / sizeof(char16_t));
+}
+
 object blob::from_utf8(string const &text) {
   char const *str = text.c_str();
   return create_native_object<blob>(
     object(), (unsigned char const *) str, std::strlen(str));
+}
+
+object blob::from_utf16(string const &text) {
+  return create_native_object<blob>(
+    object(),
+    (unsigned char const *) text.data(),
+    text.length() * sizeof(char16_t));
 }
 
 value blob::set_index(int index, value x) {
