@@ -24,7 +24,7 @@ THE SOFTWARE.
 (function() {
   $importer.load('sqlite3', true);
 
-  var SQLite3 = $importer.SQLite3;
+  var SQLite3 = $importer.context.SQLite3;
 
   // generators are easier to write in JS space
   SQLite3.Cursor.prototype.__iterator__ = function() {
