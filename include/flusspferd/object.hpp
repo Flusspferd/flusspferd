@@ -161,6 +161,16 @@ FLUSSPFERD_CALLS(call, object const &)
   property_iterator end() const;
 
   bool is_array() const;
+
+  struct property_attributes {
+    unsigned flags;
+    boost::optional<function const &> getter;
+    boost::optional<function const &> setter;
+  };
+  bool property_attributes(char const *name, struct property_attributes &attrs);
+  bool property_attributes(std::string name, struct property_attributes &attrs);
+  bool property_attributes(string const &id, struct property_attributes &attrs);
+
 #endif
 };
 

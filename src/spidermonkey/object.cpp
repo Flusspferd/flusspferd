@@ -303,3 +303,58 @@ value object::call(arguments const &arg) {
 bool object::is_array() const {
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
+
+/*
+bool object::property_attributes(char const *name_, struct object::property_attributes &attrs) {
+  local_root_scope scope;
+  string name(name_);
+  //return property_attributes(name, attrs);
+}
+
+bool object::property_attributes(std::string name_, struct property_attributes &attrs) {
+  local_root_scope scope;
+  string name(name_);
+  //return property_attributes(name, attrs);
+}
+*/
+
+bool object::property_attributes(string const &name, struct property_attributes &attrs) {
+  JSBool found;
+  void *getter_op, *setter_op;
+  uintN sm_flags;
+
+  attrs.flags = 0;
+  attrs.getter = boost::none;
+  attrs.setter = boost::none;
+  JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
+          Impl::current_context(), get_const(), name.data(), name.length(),
+          &sm_flags, &found, (JSPropertyOp*)&getter_op, (JSPropertyOp*)&setter_op);
+
+  if (!success)
+    throw exception("Could not query property attributes");
+
+  if (!found)
+    return false;
+
+  if (~sm_flags & JSPROP_ENUMERATE) attrs.flags |= dont_enumerate;
+  if (sm_flags & JSPROP_PERMANENT) attrs.flags |= permanent_property;
+  if (sm_flags & JSPROP_READONLY) attrs.flags |= read_only_property;
+  if (sm_flags & JSPROP_SHARED) attrs.flags |= shared_property;
+
+  if (getter_op) {
+    if (sm_flags & JSPROP_GETTER) {
+      attrs.getter = Impl::wrap_object((JSObject*)getter_op);
+    } else {
+      // What do i set attrs.getter to here....?
+    }
+  }
+  
+  if (setter_op) {
+    if (sm_flags & JSPROP_SETTER) {
+      attrs.setter = Impl::wrap_object((JSObject*)setter_op);
+    } else {
+      // What do i set attrs.setter to here....?
+    }
+  }
+  return true;
+}
