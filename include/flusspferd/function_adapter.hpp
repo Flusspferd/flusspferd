@@ -188,7 +188,7 @@ T get_native_object_parameter2(call_context &x) {
   struct function_adapter< \
     T, R, n_args, \
     typename boost::enable_if< \
-      typename boost::is_convertible<typename T::arg1_type, object>::type \
+      typename boost::is_convertible<object, typename T::arg1_type>::type \
     >::type \
   > \
   { \
@@ -209,7 +209,7 @@ T get_native_object_parameter2(call_context &x) {
   struct function_adapter< \
     T, void, n_args, \
     typename boost::enable_if< \
-      typename boost::is_convertible<typename T::arg1_type, object>::type \
+      typename boost::is_convertible<object, typename T::arg1_type>::type \
     >::type \
   > \
   { \
