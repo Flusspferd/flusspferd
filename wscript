@@ -104,8 +104,8 @@ def configure(conf):
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
-    # readline
-    if conf.check_cc(lib = 'editline', uselib_store='EDITLINE') != None:
+    # libedit
+    if conf.check_cc(lib='edit', uselib_store='EDITLINE') != None:
         u('CXXDEFINES', 'HAVE_EDITLINE')
 
     # xml

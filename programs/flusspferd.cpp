@@ -193,7 +193,7 @@ bool flusspferd_repl::parse_cmdline() {
 }
 
 bool flusspferd_repl::getline(std::string &source, const char* prompt) {
-#ifdef HAVE_READLINE
+#ifdef HAVE_EDITLINE
   if (!extfile) {
     char* linep = readline(prompt);
     if (!linep) {
