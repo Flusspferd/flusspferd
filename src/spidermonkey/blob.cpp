@@ -106,15 +106,30 @@ object blob::class_info::create_prototype() {
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
   proto.define_property("__iterator__", iter_val);
 
-  static const char* js_val_iter ="function() { var i = 0; while (i < this.length) { yield this.get(i); i++ } }";
+  static const char* js_val_iter =
+    "function() {"
+    "  var i = 0;"
+    "  while (i < this.length) {"
+    "    yield this.get(i); i++;"
+    "  }"
+    "}";
   function values_fn = evaluate(js_val_iter, strlen(js_val_iter)).get_object();
 
-  proto.define_property("values", value(), dont_enumerate, values_fn);
+  proto.define_property("values", value(),
+      object::property_attributes(dont_enumerate, values_fn));
 
-  static const char* js_pairs_iter ="function() { var i = 0; while (i < this.length) { yield [i, this.get(i)]; i++ } }";
+  static const char* js_pairs_iter =
+    "function() {"
+    "  var i = 0;"
+    "  while (i < this.length) {"
+    "    yield [i, this.get(i)]; i++;"
+    "  }"
+    "}";
+
   function pairs_fn = evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object();
 
-  proto.define_property("pairs", value(), dont_enumerate, pairs_fn);
+  proto.define_property("pairs", value(), 
+      object::property_attributes(dont_enumerate, pairs_fn));
   return proto;
 }
 

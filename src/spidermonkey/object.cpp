@@ -182,20 +182,20 @@ property_iterator object::end() const {
 }
 
 void object::define_property(
-  string const &name, value const &init_value, unsigned flags,
-  boost::optional<function const &> getter_,
-  boost::optional<function const &> setter_)
+  string const &name, value const &init_value, 
+  struct property_attributes const attrs)
 {
   if (!is_valid())
     throw exception("Could not define property (object is null)");
 
+  unsigned flags = attrs.flags;
   value v;
   v = init_value;
 
   function getter;
-  if (getter_) getter = getter_.get();
+  if (attrs.getter) getter = attrs.getter.get();
   function setter;
-  if (setter_) setter = setter_.get();
+  if (attrs.setter) setter = attrs.setter.get();
 
   JSObject *getter_o = Impl::get_object(getter);
   JSObject *setter_o = Impl::get_object(setter);
@@ -220,23 +220,21 @@ void object::define_property(
 }
 
 void object::define_property(
-  std::string const &name_, value const &init_value, unsigned flags,
-  boost::optional<function const &> getter,
-  boost::optional<function const &> setter)
+  std::string const &name_, value const &init_value,
+  struct property_attributes attrs)
 {
   local_root_scope scope;
   string name(name_);
-  define_property(name, init_value, flags, getter, setter);
+  define_property(name, init_value, attrs);
 }
 
 void object::define_property(
-  char const *name_, value const &init_value, unsigned flags,
-  boost::optional<function const &> getter,
-  boost::optional<function const &> setter)
+  char const *name_, value const &init_value,
+  struct property_attributes const attrs)
 {
   local_root_scope scope;
   string name(name_);
-  define_property(name, init_value, flags, getter, setter);
+  define_property(name, init_value,attrs);
 }
 
 bool object::is_valid() const {
@@ -318,7 +316,7 @@ bool object::property_attributes(std::string name_, struct property_attributes &
 }
 */
 
-bool object::property_attributes(string const &name, struct property_attributes &attrs) {
+bool object::get_property_attributes(string const &name, struct property_attributes &attrs) {
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;

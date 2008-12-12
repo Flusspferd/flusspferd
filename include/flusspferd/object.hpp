@@ -123,23 +123,28 @@ FLUSSPFERD_CALLS(call, object const &)
     permanent_shared_property = 12
   };
 
+  struct property_attributes {
+    unsigned flags;
+    boost::optional<function const &> getter;
+    boost::optional<function const &> setter;
+
+    property_attributes();
+    property_attributes(unsigned flags, 
+      boost::optional<function const &> getter = boost::none,
+      boost::optional<function const &> setter = boost::none);
+  };
+
   void define_property(string const &name,
-                       value const &init_value = value(),
-                       unsigned flags = 0,
-                       boost::optional<function const &> getter = boost::none,
-                       boost::optional<function const &> setter = boost::none);
+    value const &init_value = value(),
+    struct property_attributes const attrs = property_attributes());
 
   void define_property(std::string const &name,
-                       value const &init_value = value(),
-                       unsigned flags = 0,
-                       boost::optional<function const &> getter = boost::none,
-                       boost::optional<function const &> setter = boost::none);
+    value const &init_value = value(),
+    struct property_attributes const attrs = property_attributes());
 
   void define_property(char const *name,
-                       value const &init_value = value(),
-                       unsigned flags = 0,
-                       boost::optional<function const &> getter = boost::none,
-                       boost::optional<function const &> setter = boost::none);
+    value const &init_value = value(),
+    struct property_attributes const attrs = property_attributes());
 
   void set_property(char const *name, value const &v);
   void set_property(std::string const &name, value const &v);
@@ -162,14 +167,9 @@ FLUSSPFERD_CALLS(call, object const &)
 
   bool is_array() const;
 
-  struct property_attributes {
-    unsigned flags;
-    boost::optional<function const &> getter;
-    boost::optional<function const &> setter;
-  };
-  bool property_attributes(char const *name, struct property_attributes &attrs);
-  bool property_attributes(std::string name, struct property_attributes &attrs);
-  bool property_attributes(string const &id, struct property_attributes &attrs);
+  bool get_property_attributes(char const *name, struct property_attributes &attrs);
+  bool get_property_attributes(std::string name, struct property_attributes &attrs);
+  bool get_property_attributes(string const &id, struct property_attributes &attrs);
 
 #endif
 };
