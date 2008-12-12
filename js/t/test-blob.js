@@ -10,7 +10,7 @@ t.test_simple = function() {
   this.expect(2);
 
   b = new Blob(0);
-  this.ok(b instanceof Blob, "instanceof");
+  this.instance_of(b, Blob, "is Blob");
 
   this.same(b.length, 0, "length 0");
 }

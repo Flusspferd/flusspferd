@@ -218,6 +218,17 @@ this.TestHarness.prototype = {
     });
   },
 
+  instance_of: function(obj, type, msg) {
+    var test = obj instanceof type;
+    this.do_assert( {
+      type: 'instance_of',
+      ok: !!test,
+      when: new Date(),
+      message: msg,
+      default_msg: "object is instance of type"
+    });
+  },
+
   ok: function ok(test, msg) {
     if (arguments.length == 0) {
       test = true; // If nothing is passed, then assume its successful
@@ -266,8 +277,6 @@ this.TestHarness.prototype = {
       this.current_test.asserts_failed++;
 
     this.outputStream.print(data);
-
-
   },
 
   expect: function expect(count) {
