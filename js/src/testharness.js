@@ -424,13 +424,23 @@ this.TestHarness.prototype = {
   // Print summary
   finalize: function finalize() {
     if (this.tests_failed == 0) {
-      this.outputStream.print("All tests successful")
+      var msg = 'All tests successful';
+      if (this.colourize)
+        msg = '\x1b[32m' + msg + '\x1b[0m';
+      this.outputStream.print(msg)
       return;
     }
 
-    this.outputStream.print( this.tests_failed + "/" + this.total_tests, "tests",
-           "(" + this.asserts_failed + "/" + this.total_asserts,
-           "asserts)", "failed");
+    var msg = [this.tests_failed + "/" + this.total_tests, "tests",
+              "(" + this.asserts_failed + "/" + this.total_asserts,
+              "asserts)", "failed"];
+    if (this.colourize) {
+      msg[0] = '\x1b[31m' + msg[0];
+      msg[msg.length-1] = msg[msg.length-1] + '\x1b[0m';
+    }
+
+
+    this.outputStream.print(msg)
   }
 }
 
