@@ -182,11 +182,13 @@ node::~node() {
     ptr->children = 0;
     ptr->last = 0;
 
-    if (ptr->type == XML_ELEMENT_NODE)
+    if (ptr->type == XML_ELEMENT_NODE) {
       ptr->properties = 0;
+      ptr->nsDef = 0;
+    }
 
-    ptr->ns = 0;
-    ptr->nsDef = 0;
+    if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE)
+      ptr->ns = 0;
 
     xmlFreeNode(ptr);
   }
