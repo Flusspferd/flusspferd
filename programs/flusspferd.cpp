@@ -40,7 +40,9 @@ THE SOFTWARE.
 
 #ifdef HAVE_EDITLINE
 #include <editline/readline.h>
+#ifdef HAVE_EDITLINE_HISTORY_H
 #include <editline/history.h>
+#endif
 #endif
 
 class flusspferd_repl {

@@ -107,6 +107,7 @@ def configure(conf):
     # libedit
     if conf.check_cc(lib='edit', uselib_store='EDITLINE') != None:
         u('CXXDEFINES', 'HAVE_EDITLINE')
+        conf.check_cc(header_name='editline/history.h')
 
     # xml
     if Options.options.enable_xml:
