@@ -225,6 +225,10 @@ this.TestHarness = function TestHarness() {
 }
 
 this.TestHarness.prototype = {
+  constructor: TestHarness,
+
+  colourize: true,
+
   same: function() {
     var args = Array.prototype.slice.call(arguments);
 
@@ -288,7 +292,12 @@ this.TestHarness.prototype = {
     if (len > 0)
       padd += Array(len+1).join(' ');
 
-    let data = [padd + a.num, a.ok ? 'ok' : 'not ok'];
+    let data = [padd + a.num];
+    if (this.colourize)
+      data.push(a.ok ? '\x1b[32mok\x1b[0m' : '\x1b[31mnot ok\x1b[0m');
+    else
+      data.push(a.ok ? 'ok' : 'not ok');
+
     if (a.message !== undefined)
       data.push('-', a.message)
     else if ('default_msg' in a)
