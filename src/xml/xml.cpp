@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/security.hpp"
 #include <libxml/xmlIO.h>
 
 using namespace flusspferd;
@@ -84,9 +85,38 @@ object flusspferd::xml::load_xml(object container) {
   return XML;
 }
 
+template<int (*OldMatch)(char const *), unsigned mode>
+static int safety_match(char const *name) {
+  if (!OldMatch(name))
+    return 0;
+
+  std::string path(name);
+
+  std::size_t nonletter = path.find_first_not_of(
+    "abcdefghijklmnopqrstuvwxyz");
+
+  if (nonletter != 0 && nonletter != std::string::npos &&
+      path[nonletter] == ':')
+    return flusspferd::security::get().check_url(path, mode);
+  else
+    return flusspferd::security::get().check_path(path, mode);
+}
+
 static void safety_io_callbacks() {
   xmlCleanupInputCallbacks();
   xmlCleanupOutputCallbacks();
 
-  // TODO - add safe callbacks
+#define REG_INPUT(name) \
+  xmlRegisterInputCallbacks( \
+    safety_match<name ## Match, security::READ>, \
+    name ## Open, \
+    name ## Read, \
+    name ## Close) \
+  /**/
+
+  REG_INPUT(xmlFile);
+  REG_INPUT(xmlIOHTTP);
+
+  // disable any output
+  xmlRegisterOutputCallbacks(0, 0, 0, 0);
 }
