@@ -93,7 +93,8 @@ static int safety_match(char const *name) {
   std::string path(name);
 
   std::size_t nonletter = path.find_first_not_of(
-    "abcdefghijklmnopqrstuvwxyz");
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
   if (nonletter != 0 && nonletter != std::string::npos &&
       path[nonletter] == ':')
