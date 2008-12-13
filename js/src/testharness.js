@@ -236,7 +236,7 @@ this.TestHarness.prototype = {
     if (args.length > 2)
       msg = args.pop();
 
-    this.do_assert( {
+    return this.do_assert( {
       type: 'same',
       when: new Date(),
       ok: !!equiv.apply(equiv, args),
@@ -247,7 +247,7 @@ this.TestHarness.prototype = {
 
   instance_of: function(obj, type, msg) {
     var test = obj instanceof type;
-    this.do_assert( {
+    return this.do_assert( {
       type: 'instance_of',
       ok: !!test,
       when: new Date(),
@@ -258,9 +258,9 @@ this.TestHarness.prototype = {
 
   ok: function ok(test, msg) {
     if (arguments.length == 0) {
-      test = true; // If nothing is passed, then assume its successful
+      test = true; // If nothing is passed in, then assume its successful
     }
-    this.do_assert( {
+    return this.do_assert( {
       type: 'ok',
       ok: !!test,
       when: new Date(),
@@ -293,10 +293,7 @@ this.TestHarness.prototype = {
       padd += Array(len+1).join(' ');
 
     let data = [padd + a.num];
-    if (this.colourize)
-      data.push(a.ok ? '\x1b[32mok\x1b[0m' : '\x1b[31mnot ok\x1b[0m');
-    else
-      data.push(a.ok ? 'ok' : 'not ok');
+    data.push(a.ok ? this.green('ok') : this.red('not ok'));
 
     if (a.message !== undefined)
       data.push('-', a.message)
@@ -309,6 +306,7 @@ this.TestHarness.prototype = {
       this.current_test.asserts_failed++;
 
     this.outputStream.print(data);
+    return a.ok;
   },
 
   expect: function expect(count) {
@@ -363,6 +361,28 @@ this.TestHarness.prototype = {
     this.finalize();
   },
 
+  green: function() {
+    var a = Array.prototype.slice.apply(arguments);
+    if (a.length == 0 && a[0] instanceof Array)
+      a = a[0];
+
+    a = a.join(' ');
+    if (!this.colourize || !a.length)
+      return a;
+    return '\x1b[32m' + a + '\x1b[0m';
+  },
+
+  red: function() {
+    var a = Array.prototype.slice.apply(arguments);
+    if (a.length == 0 && a[0] instanceof Array)
+      a = a[0];
+
+    a = a.join(' ');
+    if (!this.colourize || !a.length)
+      return a;
+    return '\x1b[31m' + a + '\x1b[0m';
+  },
+
   finalize_test: function finalize_test() {
     var test = this.current_test;
     var msg = [];
@@ -398,23 +418,24 @@ this.TestHarness.prototype = {
       // Possibly before it could plan, so add a \n
       if (isNaN(test.plan) && test.asserts.length == 0)
         this.outputStream.print();
-
+      
       let e = this.current_test.error;
-      this.outputStream.print(test.name, 'died:');
+      this.outputStream.print( this.red(test.name, 'died:') );
       var e_msg = e.toString().replace(/\n/g, "\n  ");
       let a = ['  ' + e_msg];
       if (e.fileName) {
         a.push('at', e.fileName + ':' + e.lineNumber);
       }
-      msg = a;
+      msg = this.red(a);
       test.passed = false;
     } 
     else {
       // No plan, no error.
       test.passed = test.asserts_failed == 0;
     }
-    if (msg.length)
+    if (msg.length) {
       this.outputStream.print(msg);
+    }
 
     this.total_tests++;
     if (!test.passed)
@@ -424,23 +445,15 @@ this.TestHarness.prototype = {
   // Print summary
   finalize: function finalize() {
     if (this.tests_failed == 0) {
-      var msg = 'All tests successful';
-      if (this.colourize)
-        msg = '\x1b[32m' + msg + '\x1b[0m';
-      this.outputStream.print(msg)
+      this.outputStream.print(this.green('All tests successful'))
       return;
     }
 
     var msg = [this.tests_failed + "/" + this.total_tests, "tests",
               "(" + this.asserts_failed + "/" + this.total_asserts,
               "asserts)", "failed"];
-    if (this.colourize) {
-      msg[0] = '\x1b[31m' + msg[0];
-      msg[msg.length-1] = msg[msg.length-1] + '\x1b[0m';
-    }
 
-
-    this.outputStream.print(msg)
+    this.outputStream.print(this.red(msg))
   }
 }
 
