@@ -374,7 +374,7 @@ this.TestHarness.prototype = {
 
   red: function() {
     var a = Array.prototype.slice.apply(arguments);
-    if (a.length == 0 && a[0] instanceof Array)
+    if (a.length == 1 && a[0] instanceof Array)
       a = a[0];
 
     a = a.join(' ');
@@ -424,7 +424,8 @@ this.TestHarness.prototype = {
       var e_msg = e.toString().replace(/\n/g, "\n  ");
       let a = ['  ' + e_msg];
       if (e.fileName) {
-        a.push('at', e.fileName + ':' + e.lineNumber);
+        var stack = e.stack;
+        a.push("\n  ", stack.replace(/\n/g, "\n  "));
       }
       msg = this.red(a);
       test.passed = false;
