@@ -22,14 +22,18 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/context.hpp"
+#include "flusspferd/xml/document.hpp"
 #include "flusspferd/string.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-xml::context::context(object const &obj, call_context &)
+xml::context::context(object const &obj, call_context &x)
   : native_object_base(obj)
 {
+  document &doc = flusspferd::get_native<document>(x.arg[0].to_object());
+  define_property("document", doc, read_only_property | permanent_property);
+
   object ns = create_object();
   ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
   set_property("ns", ns);
