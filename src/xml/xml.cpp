@@ -37,7 +37,9 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/security.hpp"
+#include <boost/thread/once.hpp>
 #include <libxml/xmlIO.h>
+#include <libxml/xpath.h>
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -49,9 +51,15 @@ extern "C" value flusspferd_load(object container)
 
 static void safety_io_callbacks();
 
-object flusspferd::xml::load_xml(object container) {
+static void once() {
+  LIBXML_TEST_VERSION
+  xmlXPathInit();
   safety_io_callbacks();
+}
 
+static boost::once_flag once_flag;
+
+object flusspferd::xml::load_xml(object container) {
   local_root_scope scope;
 
   value previous = container.get_property("XML");
@@ -59,7 +67,7 @@ object flusspferd::xml::load_xml(object container) {
   if (previous.is_object())
     return previous.to_object();
 
-  LIBXML_TEST_VERSION
+  boost::call_once(once_flag, &once);
 
   object XML = flusspferd::create_object();
 
