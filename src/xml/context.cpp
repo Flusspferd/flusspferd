@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/context.hpp"
+#include "flusspferd/string.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -29,6 +30,9 @@ using namespace flusspferd::xml;
 xml::context::context(object const &obj, call_context &)
   : native_object_base(obj)
 {
+  object ns = create_object();
+  ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
+  set_property("ns", ns);
 }
 
 xml::context::~context() {}
