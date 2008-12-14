@@ -57,7 +57,7 @@ static void once() {
   safety_io_callbacks();
 }
 
-static boost::once_flag once_flag;
+static boost::once_flag once_flag = BOOST_ONCE_INIT;
 
 object flusspferd::xml::load_xml(object container) {
   local_root_scope scope;
