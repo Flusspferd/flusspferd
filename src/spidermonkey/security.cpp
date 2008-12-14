@@ -30,28 +30,32 @@ using namespace flusspferd;
 security &security::create(object container) {
   local_root_scope scope;
 
-  object obj = create_native_object<security>(create_object().get_prototype());
+  security &obj = create_native_object<security>(
+      create_object().get_prototype());
 
   container.define_property("$security", obj);
 
-  native_object_base *ptr = get_native(obj);
-
-  return dynamic_cast<security&>(*ptr);
+  return obj;
 }
 
 security &security::get() {
   object scope = get_current_context().scope_chain();
 
-  value v = scope.get_property("$security");
+  value v;
+  while (scope.is_valid()) {
+    v = scope.get_property("$security");
+
+    if (!v.is_void_or_null())
+      break;
+    scope = scope.get_parent();
+  }
 
   if (!v.is_object() || v.is_null())
     throw exception("Could not get security object");
 
   object obj = v.get_object();
 
-  native_object_base *ptr = get_native(obj);
-
-  return dynamic_cast<security&>(*ptr);
+  return flusspferd::get_native<security>(obj);
 }
 
 class security::impl {

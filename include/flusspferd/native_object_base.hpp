@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <boost/function.hpp>
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
+#include <boost/any.hpp>
 #include <memory>
 #include <functional>
 
@@ -42,6 +43,7 @@ class tracer;
 
 namespace detail {
   object create_native_object(object const &proto);
+  object create_native_enumerable_object(object const &proto);
 }
 
 class native_object_base : public object, private boost::noncopyable {
@@ -52,8 +54,9 @@ public:
     return *static_cast<object*>(this);
   }
 
-  static native_object_base *get_native(object const &o);
+  static native_object_base &get_native(object const &o);
 
+public:
   void load_into(object const &);
 
   virtual void late_load();
@@ -118,6 +121,9 @@ protected:
 
   virtual bool property_resolve(value const &id, unsigned access);
 
+  virtual boost::any enumerate_start(int &num_properties);
+  virtual value enumerate_next(boost::any &iter);
+
   enum property_mode { 
     property_add = 0,
     property_delete = -1,
@@ -154,8 +160,10 @@ private:
 
 private:
   static object do_create_object(object const &proto);
+  static object do_create_enumerable_object(object const &proto);
 
   friend object detail::create_native_object(object const &proto);
+  friend object detail::create_native_enumerable_object(object const &proto);
 
 private:
   class impl;
@@ -163,6 +171,19 @@ private:
 
   friend class impl;
 };
+
+template<typename T>
+T &cast_to_derived(native_object_base &o) {
+  T *ptr = dynamic_cast<T*>(&o);
+  if (!ptr)
+    throw exception("Could not convert native object to derived type");
+  return *ptr;
+}
+
+template<typename T>
+T &get_native(object const &o) {
+  return cast_to_derived<T>(native_object_base::get_native(o));
+}
 
 template<typename T>
 struct detail::convert_ptr<T, native_object_base> {
@@ -178,7 +199,7 @@ struct detail::convert_ptr<T, native_object_base> {
     T *perform(value const &v) {
       if (!v.is_object())
         throw exception("Value is no object");
-      return native_object_base::get_native(v.get_object());
+      return &native_object_base::get_native(v.get_object());
     }
   };
 };

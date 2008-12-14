@@ -22,6 +22,8 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/xml.hpp"
+#include "flusspferd/xml/parse.hpp"
+#include "flusspferd/xml/push_parser.hpp"
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/xml/text.hpp"
@@ -29,9 +31,12 @@ THE SOFTWARE.
 #include "flusspferd/xml/reference.hpp"
 #include "flusspferd/xml/attribute.hpp"
 #include "flusspferd/xml/processing_instruction.hpp"
+#include "flusspferd/function_adapter.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
-
+#include "flusspferd/string.hpp"
+#include "flusspferd/security.hpp"
+#include <libxml/xmlIO.h>
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -41,7 +46,11 @@ extern "C" value flusspferd_load(object container)
   return load_xml(container);
 }
 
+static void safety_io_callbacks();
+
 object flusspferd::xml::load_xml(object container) {
+  safety_io_callbacks();
+
   local_root_scope scope;
 
   value previous = container.get_property("XML");
@@ -63,10 +72,52 @@ object flusspferd::xml::load_xml(object container) {
   load_class<attribute_>(XML);
   load_class<namespace_>(XML);
 
+  load_class<push_parser>(XML);
+
+  create_native_function(XML, "parseBlob", &parse_blob);
+  create_native_function(XML, "parseFile", &parse_file);
+
   container.define_property(
     "XML",
     XML,
     object::read_only_property | object::dont_enumerate);
 
   return XML;
+}
+
+template<int (*OldMatch)(char const *), unsigned mode>
+static int safety_match(char const *name) {
+  if (!OldMatch(name))
+    return 0;
+
+  std::string path(name);
+
+  std::size_t nonletter = path.find_first_not_of(
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+  if (nonletter != 0 && nonletter != std::string::npos &&
+      path[nonletter] == ':')
+    return flusspferd::security::get().check_url(path, mode);
+  else
+    return flusspferd::security::get().check_path(path, mode);
+}
+
+static void safety_io_callbacks() {
+  xmlCleanupInputCallbacks();
+  xmlCleanupOutputCallbacks();
+
+#define REG_INPUT(name) \
+  xmlRegisterInputCallbacks( \
+    safety_match<name ## Match, security::READ>, \
+    name ## Open, \
+    name ## Read, \
+    name ## Close) \
+  /**/
+
+  REG_INPUT(xmlFile);
+  REG_INPUT(xmlIOHTTP);
+
+  // disable any output
+  xmlRegisterOutputCallbacks(0, 0, 0, 0);
 }

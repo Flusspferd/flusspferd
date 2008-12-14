@@ -43,6 +43,7 @@ public:
     xmlNodePtr ptr, bool children = true, bool properties = true);
 
   xmlNodePtr c_obj() const { return ptr; }
+  void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
   struct class_info : flusspferd::class_info {
     static char const *full_name() { return "XML.Node"; }
@@ -55,9 +56,6 @@ public:
 
 public:
   static xmlNodePtr c_from_js(object const &v);
-
-protected:
-  void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
 protected:
   void trace(tracer &);

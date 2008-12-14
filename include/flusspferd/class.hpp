@@ -111,6 +111,7 @@ void load_class(
  */
 struct class_info {
   typedef boost::mpl::bool_<true> constructible;
+  typedef boost::mpl::bool_<false> custom_enumerate;
 
   /**
    * How many paremeters the constructor expects from JS.

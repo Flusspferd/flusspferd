@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/blob.hpp"
+#include "flusspferd/security.hpp"
 
 #include <curl/curl.h>
 
@@ -104,9 +105,10 @@ void curl::class_info::augment_constructor(object &ctor)
   //protocols.seal(false);
   // Arse. Can't in 1.8
 
-  ctor.define_property("versionHex", (int)data->version_num, read_only_property);
-  ctor.define_property("versionStr", string( (const char*)data->version), read_only_property);
-
+  ctor.define_property("versionHex", (int)data->version_num,
+                       read_only_property);
+  ctor.define_property("versionStr", string( (const char*)data->version),
+                       read_only_property);
 }
 
 ///////////////////////////
@@ -185,6 +187,10 @@ int curl::perform() {
   string url = get_property("url").to_string();
   url = url.substr(0, url.length());
 
+  // TODO: Make POST and PUT do READ_WRITE
+  if (!security::get().check_url(url.to_string(), security::READ))
+    throw exception("forbidden");
+
   if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
     throw exception(std::string(error_buffer));
 
@@ -204,13 +210,10 @@ size_t curl::handle_curl_data( void *data, size_t nbytes) {
 
   if (cb.is_function()) {
     object obj = cb.to_object();
-    arguments args;
-    // Create the blob;
-    object a = create_native_object<blob>(
-      object(), (unsigned char const *)data, nbytes);
-    args.push_root(a);
 
-    apply(obj, args);
+    apply(obj,
+      create_native_object<blob>(
+        object(), (unsigned char const *) data, nbytes));
   }
 
   return nbytes;
@@ -221,12 +224,8 @@ size_t curl::handle_curl_header( void *hdr, size_t nbytes ) {
 
   if (cb.is_function()) {
     object obj = cb.to_object();
-    arguments args;
-    // Headers for HTTP at least should be ascii. Should we use a blob hear
-    // instead
-    args.push_root(string((const char*)hdr, nbytes));
 
-    apply(obj, args);
+    apply(obj, string((char const *) hdr, nbytes));
   }
   return nbytes;
 }

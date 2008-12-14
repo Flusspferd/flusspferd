@@ -26,16 +26,13 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-native_object_base *
+native_object_base &
 flusspferd::detail::get_native_object_parameter_ptr(call_context &x) {
   native_object_base *p = x.self_native;
-
   if (p)
-    return p;
+    return *p;
 
-  convert<native_object_base *>::from_value from_value;
+  convert<native_object_base &>::from_value from_value;
 
-  p = from_value.perform(x.self);
-
-  return p;
+  return from_value.perform(x.self);
 }

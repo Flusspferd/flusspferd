@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/function.hpp"
+#include "flusspferd/array.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include "flusspferd/implementation/value.hpp"
@@ -61,5 +62,6 @@ template class root<value>;
 template class root<object>;
 template class root<string>;
 template class root<function>;
+template class root<array>;
 
 }}

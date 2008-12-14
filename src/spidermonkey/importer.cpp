@@ -121,7 +121,7 @@ importer::importer(object const &obj, call_context &)
   // i.load('foo'); // Assume foo module defines this.foo = 'abc'
   // print(i.foo); // abc
   //
-  // without the problem of load being overridden to do bad things
+  // without the problem of load being overridden to do bad things by a module
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
@@ -152,16 +152,22 @@ void importer::trace(tracer &trc) {
     trc("module-cache-item", it->second);
 }
 
-value importer::load(string const &name, bool binary_only) {
+value importer::load(string const &f_name, bool binary_only) {
   security &sec = security::get();
 
   //TODO use security
+  std::string name = f_name.to_string();
+  std::transform(name.begin(), name.end(), name.begin(), tolower);
 
-  impl::key_type key(name.to_string(), binary_only);
+  impl::key_type key(name, binary_only);
 
   impl::module_cache_map::iterator it = p->module_cache.find(key);
   if (it != p->module_cache.end())
     return it->second;
+
+  object ctx = get_property("context").to_object();
+  ctx.define_property("$importer", *this);
+  ctx.define_property("$security", sec);
 
   object constructor = get_constructor<importer>();
   value preload = constructor.get_property("preload");
@@ -173,8 +179,7 @@ value importer::load(string const &name, bool binary_only) {
       if (!loader.is_null()) {
         local_root_scope scope;
         object x = loader.get_object();
-        object cx = get_property("context").to_object();
-        result = x.call(cx);
+        result = x.call(ctx);
       }
       return result;
     }
@@ -199,10 +204,12 @@ value importer::load(string const &name, bool binary_only) {
 
     if (!binary_only)
       if (sec.check_path(fullpath, security::READ))
-        if (boost::filesystem::exists(fullpath))
-          return get_current_context().execute(
-              fullpath.c_str(),
-              get_property("context").to_object());
+        if (boost::filesystem::exists(fullpath)) {
+          value val = get_current_context().execute(
+              fullpath.c_str(), ctx);
+          p->module_cache[key] = val;
+          return val;
+        }
 
     fullpath = path + so_name;
 
@@ -230,7 +237,9 @@ value importer::load(string const &name, bool binary_only) {
 
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-      return func(get_property("context").to_object());
+      value val = func(ctx);
+      p->module_cache[key] = val;
+      return val;
     }
   } 
 

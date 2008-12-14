@@ -72,6 +72,7 @@ public:
     options |= JSOPTION_DONT_REPORT_UNCAUGHT;
     options &= ~JSOPTION_XML;
 
+    JS_SetVersion(context, JSVersion(JS_VERSION));
     JS_SetOptions(context, options);
 
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
@@ -162,10 +163,10 @@ object context::scope_chain() {
 value context::evaluate(char const *source, std::size_t n,
                         char const *file, unsigned int line)
 {
-  return evaluateInScope(source, n, file, line, global());
+  return evaluate_in_scope(source, n, file, line, global());
 }
 
-value context::evaluateInScope(char const* source, std::size_t n,
+value context::evaluate_in_scope(char const* source, std::size_t n,
                                char const* file, unsigned int line,
                                object const &scope)
 {

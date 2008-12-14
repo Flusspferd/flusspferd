@@ -182,20 +182,20 @@ property_iterator object::end() const {
 }
 
 void object::define_property(
-  string const &name, value const &init_value, unsigned flags,
-  boost::optional<function const &> getter_,
-  boost::optional<function const &> setter_)
+  string const &name, value const &init_value, 
+  property_attributes const attrs)
 {
   if (!is_valid())
     throw exception("Could not define property (object is null)");
 
+  unsigned flags = attrs.flags;
   value v;
   v = init_value;
 
   function getter;
-  if (getter_) getter = getter_.get();
+  if (attrs.getter) getter = attrs.getter.get();
   function setter;
-  if (setter_) setter = setter_.get();
+  if (attrs.setter) setter = attrs.setter.get();
 
   JSObject *getter_o = Impl::get_object(getter);
   JSObject *setter_o = Impl::get_object(setter);
@@ -220,23 +220,21 @@ void object::define_property(
 }
 
 void object::define_property(
-  std::string const &name_, value const &init_value, unsigned flags,
-  boost::optional<function const &> getter,
-  boost::optional<function const &> setter)
+  std::string const &name_, value const &init_value,
+  property_attributes attrs)
 {
   local_root_scope scope;
   string name(name_);
-  define_property(name, init_value, flags, getter, setter);
+  define_property(name, init_value, attrs);
 }
 
 void object::define_property(
-  char const *name_, value const &init_value, unsigned flags,
-  boost::optional<function const &> getter,
-  boost::optional<function const &> setter)
+  char const *name_, value const &init_value,
+  property_attributes const attrs)
 {
   local_root_scope scope;
   string name(name_);
-  define_property(name, init_value, flags, getter, setter);
+  define_property(name, init_value,attrs);
 }
 
 bool object::is_valid() const {
@@ -303,3 +301,71 @@ value object::call(arguments const &arg) {
 bool object::is_array() const {
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
+
+bool object::get_property_attributes(char const *name_, property_attributes &attrs) {
+  local_root_scope scope;
+  string name(name_);
+  return get_property_attributes(name, attrs);
+}
+
+bool object::get_property_attributes(std::string name_, property_attributes &attrs) {
+  local_root_scope scope;
+  string name(name_);
+  return get_property_attributes(name, attrs);
+}
+
+bool object::get_property_attributes(string const &name, property_attributes &attrs) {
+  JSBool found;
+  void *getter_op, *setter_op;
+  uintN sm_flags;
+
+  attrs.flags = 0;
+  attrs.getter = boost::none;
+  attrs.setter = boost::none;
+  JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
+          Impl::current_context(), get_const(), name.data(), name.length(),
+          &sm_flags, &found, (JSPropertyOp*)&getter_op, (JSPropertyOp*)&setter_op);
+
+  if (!success)
+    throw exception("Could not query property attributes");
+
+  if (!found)
+    return false;
+
+  if (~sm_flags & JSPROP_ENUMERATE) attrs.flags |= dont_enumerate;
+  if (sm_flags & JSPROP_PERMANENT) attrs.flags |= permanent_property;
+  if (sm_flags & JSPROP_READONLY) attrs.flags |= read_only_property;
+  if (sm_flags & JSPROP_SHARED) attrs.flags |= shared_property;
+
+  if (getter_op) {
+    if (sm_flags & JSPROP_GETTER) {
+      attrs.getter = Impl::wrap_object((JSObject*)getter_op);
+    } else {
+      // What do i set attrs.getter to here....?
+    }
+  }
+  
+  if (setter_op) {
+    if (sm_flags & JSPROP_SETTER) {
+      attrs.setter = Impl::wrap_object((JSObject*)setter_op);
+    } else {
+      // What do i set attrs.setter to here....?
+    }
+  }
+  return true;
+}
+
+
+object::property_attributes::property_attributes()
+  : flags(0u),
+    getter(boost::none),
+    setter(boost::none)
+{}
+
+object::property_attributes::property_attributes(unsigned flags, 
+                        boost::optional<function const &> getter,
+                        boost::optional<function const &> setter)
+  : flags(flags),
+    getter(getter),
+    setter(setter)
+{}

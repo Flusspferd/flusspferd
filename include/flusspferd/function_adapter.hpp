@@ -42,6 +42,9 @@ namespace flusspferd {
 
 class native_object_base;
 
+template<typename T>
+T &cast_to_derived(native_object_base &);
+
 namespace detail {
 
 template<typename T>
@@ -56,8 +59,8 @@ template<typename T, typename Condition = void>
 struct ptr_to_native_object_type {
   typedef typename is_native_object_type<T>::naked_type naked_type;
 
-  static T get(native_object_base *self_native) {
-    return dynamic_cast<naked_type&>(*self_native);
+  static T get(native_object_base &self_native) {
+    return cast_to_derived<naked_type>(self_native);
   }
 };
 
@@ -67,23 +70,23 @@ struct ptr_to_native_object_type<
 {
   typedef typename is_native_object_type<T>::naked_type naked_type;
 
-  static T get(native_object_base *self_native) {
-    return &dynamic_cast<naked_type&>(*self_native);
+  static T get(native_object_base &self_native) {
+    return &cast_to_derived<naked_type>(self_native);
   }
 };
 
-native_object_base *get_native_object_parameter_ptr(call_context &x);
+native_object_base &get_native_object_parameter_ptr(call_context &x);
 
 template<typename T>
 typename T::arg1_type
 get_native_object_parameter(call_context &x) {
-  native_object_base *p = get_native_object_parameter_ptr(x);
+  native_object_base &p = get_native_object_parameter_ptr(x);
   return ptr_to_native_object_type<typename T::arg1_type>::get(p);
 }
 
 template<typename T>
 T get_native_object_parameter2(call_context &x) {
-  native_object_base *p = get_native_object_parameter_ptr(x);
+  native_object_base &p = get_native_object_parameter_ptr(x);
   return ptr_to_native_object_type<T>::get(p);
 }
 
@@ -185,7 +188,7 @@ T get_native_object_parameter2(call_context &x) {
   struct function_adapter< \
     T, R, n_args, \
     typename boost::enable_if< \
-      typename boost::is_convertible<typename T::arg1_type, object>::type \
+      typename boost::is_convertible<object, typename T::arg1_type>::type \
     >::type \
   > \
   { \
@@ -206,7 +209,7 @@ T get_native_object_parameter2(call_context &x) {
   struct function_adapter< \
     T, void, n_args, \
     typename boost::enable_if< \
-      typename boost::is_convertible<typename T::arg1_type, object>::type \
+      typename boost::is_convertible<object, typename T::arg1_type>::type \
     >::type \
   > \
   { \

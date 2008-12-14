@@ -1,0 +1,617 @@
+<test>
+  <configs>
+    <config name="default">
+      <INTERPOLATE>1</INTERPOLATE>
+      <ANYCASE>1</ANYCASE>
+<!--
+      <DBG_OUTPUT_FUNC>1</DBG_OUTPUT_FUNC>
+      <DBG_OUTPUT_CHUNKS>1</DBG_OUTPUT_CHUNKS>
+-->
+    </config>
+    <config name="notcase">
+      <INTERPOLATE>1</INTERPOLATE>
+      <ANYCASE>0</ANYCASE>
+    </config>
+  </configs>
+  <code>
+    <perl><![CDATA[
+my @days   = qw( Monday Tuesday Wednesday Thursday Friday Saturday Sunday );
+my $day    = -1;
+
+sub yesterday {
+    return "All my troubles seemed so far away...";
+}
+
+sub today {
+    my $when = shift || 'Now';
+    return "$when it looks as though they're here to stay.";
+}
+
+sub tomorrow {
+    my $dayno = shift;
+    unless (defined $dayno) {
+    $day++;
+    $day %= 7;
+    $dayno = $day;
+    }
+    return $days[$dayno];
+}
+
+sub belief {
+    my @beliefs = @_;
+    my $b = join(' and ', @beliefs);
+    $b = '<nothing>' unless length $b;
+    return "Oh I believe in $b.";
+}
+
+sub yankee {
+    my $a = [];
+    $a->[1] = { a => 1 };
+    $a->[3] = { a => 2 };
+    return $a;
+}
+]]></perl>
+    <javascript><![CDATA[
+
+var days = [ 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' ];
+var day  = -1;
+
+function yesterday() {
+    return "All my troubles seemed so far away...";
+}
+
+function today(when) {
+    when = when || 'Now';
+    return when + " it looks as though they're here to stay.";
+}
+
+function tomorrow(dayno) {
+    if (dayno === undefined) {
+      day++;
+      day %= 7;
+      dayno = day;
+    }
+    return days[dayno];
+}
+
+function belief() {
+    var beliefs = [];
+    for (var i=0; i < arguments.length; i++)
+      beliefs.push(arguments[i]);
+    var b = beliefs.join(' and ');
+    if (!b)
+      b = '<nothing>';
+    return "Oh I believe in " + b + ".";
+}
+
+function yankee() {
+    var a = [];
+    a[1] = { a : 1 };
+    a[3] = { a : 2 };
+    return a;
+}
+
+]]></javascript>
+  </code>
+  <stash>
+    <a>alpha</a>
+    <b>bravo</b>
+    <c>charlie</c>
+    <d>delta</d>
+    <e>echo</e>
+    <f>
+      <g>golf</g>
+      <h>hotel</h>
+      <i>
+        <j>juliet</j>
+        <k>kilo</k>
+      </i>
+    </f>
+    <g>solo golf</g>
+    <l>lima</l>
+    <r>romeo</r>
+    <s>sierra</s>
+    <t>tango</t>
+    <w>whisky</w>
+    <n type="code">
+      <perl>sub { $main::count }</perl>
+      <javascript>function() { return count; }</javascript>
+      <define>
+        <perl>$main::count = 0;</perl>
+        <javascript>var count = 0</javascript>
+      </define>
+    </n>
+    <up type="code">
+      <perl>sub { ++$main::count }</perl>
+      <javascript>function() { return ++count; }</javascript>
+    </up>
+    <down type="code">
+      <perl>sub { --$main::count }</perl>
+      <javascript>function() { return --count; }</javascript>
+    </down>
+
+    <reset type="code">
+      <perl>sub {$main::count = shift(@_) || 0 }</perl>
+      <javascript>function() { count = arguments[0] || 0; return count}</javascript>
+    </reset>
+
+    <undef type="code">
+      <perl>sub { undef }</perl>
+      <javascript>function() { return undefined; }</javascript>
+    </undef>
+
+    <zero type="code">
+      <perl>sub { 0 }</perl>
+      <javascript>function() { return 0; }</javascript>
+    </zero>
+
+    <one type="code">
+      <perl> sub { 'one' }</perl>
+      <javascript>function() { return 'one'; }</javascript>
+    </one>
+
+    <halt type="code">
+      <perl><![CDATA[sub { die Template::Exception->new('stop', 'stopped') }]]></perl>
+      <javascript><![CDATA[function() { throw new Template.Exception('stop', 'stopped'); }]]></javascript>
+    </halt>
+
+    <join type="code">
+      <perl>sub { join(shift, @_) }</perl>
+      <javascript><![CDATA[function(s) {
+        var args = []; 
+        for (var i=1; i < arguments.length; i++)
+          args.push(arguments[i]);
+        return args.join(s); 
+      }]]></javascript>
+    </join>
+
+    <split type="code">
+      <perl>sub { my $s = shift; $s = quotemeta($s);
+                  my @r = split(/$s/, shift); \@r; }</perl>
+      <javascript>function(s,str) { return str.split(s); } </javascript>
+    </split>
+
+    <magic>
+      <chant>Hocus Pocus</chant>
+      <spell type="code">
+        <perl>sub { join(" and a bit of ", @_) }</perl>
+      <javascript><![CDATA[function() {
+        var args = []; 
+        for (var i=0; i < arguments.length; i++)
+          args.push(arguments[i]);
+        return args.join(' and a bit of '); 
+      }]]></javascript>
+      </spell>
+    </magic>
+
+    <day>
+      <prev type="code">
+        <perl><![CDATA[\&yesterday]]></perl>
+        <javascript>yesterday</javascript>
+      </prev>
+      <this type="code">
+        <perl><![CDATA[\&today]]></perl>
+        <javascript>today</javascript>
+      </this>
+      <next type="code">
+        <perl><![CDATA[\&tomorrow]]></perl>
+        <javascript>tomorrow</javascript>
+      </next>
+    </day>
+    <belief type="code">
+      <perl><![CDATA[\&belief]]></perl>
+      <javascript>belief</javascript>
+    </belief>
+
+    <gee>g</gee>
+
+    <yankee type="code">
+      <perl><![CDATA[\&yankee]]></perl>
+      <javascript>yankee</javascript>
+    </yankee>
+
+    <letteralpha>'alpha'</letteralpha>
+    <_private>123</_private>
+    <_hidden>456</_hidden>
+    <expose type="code">
+      <perl><![CDATA[sub { undef $Template::Stash::PRIVATE }]]></perl>
+      <javascript><![CDATA[function() { delete Template.Stash.PRIVATE } ]]></javascript>
+    </expose>
+    <add type="code">
+      <perl>sub { $_[0] + $_[1} }</perl>
+      <javascript>function(a,b) { return a + b }</javascript>
+    </add>
+  </stash>
+
+
+  <case>
+    <input><![CDATA[[[% nosuchvariable %]]
+[$nosuchvariable]]]></input>
+    <expect><![CDATA[[]
+[]]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a %]
+[% GET b %]
+[% get c %]]]></input>
+    <expect><![CDATA[alpha
+bravo
+charlie]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% b %] [% GET b %]]]></input>
+    <expect><![CDATA[bravo bravo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[$a $b ${c} ${d} [% e %]]]></input>
+    <expect><![CDATA[alpha bravo charlie delta echo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% letteralpha %]
+[% ${"letter$a"} %]
+[% GET ${"letter$a"} %]]]></input>
+    <expect><![CDATA['alpha'
+'alpha'
+'alpha']]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% f.g %] [% f.$gee %] [% f.${gee} %]]]></input>
+    <expect><![CDATA[golf golf golf]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% GET f.h %] [% get f.h %] [% f.${'h'} %] [% get f.${'h'} %]]]></input>
+    <expect><![CDATA[hotel hotel hotel hotel]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[$f.h ${f.g} ${f.h}.gif]]></input>
+    <expect><![CDATA[hotel golf hotel.gif]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% f.i.j %] [% GET f.i.j %] [% get f.i.k %]]]></input>
+    <expect><![CDATA[juliet juliet kilo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% f.i.j %] $f.i.k [% f.${'i'}.${"j"} %] ${f.i.k}.gif]]></input>
+    <expect><![CDATA[juliet kilo juliet kilo.gif]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% 'this is literal text' %]
+[% GET 'so is this' %]
+[% "this is interpolated text containing $r and $f.i.j" %]
+[% GET "$t?" %]
+[% "<a href=\"${f.i.k}.html\">$f.i.k</a>" %]]]></input>
+    <expect><![CDATA[this is literal text
+so is this
+this is interpolated text containing romeo and juliet
+tango?
+<a href="kilo.html">kilo</a>]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% name = "$a $b $w" -%]
+Name: $name]]></input>
+    <expect><![CDATA[Name: alpha bravo whisky]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% join('--', a b, c, f.i.j) %]]]></input>
+    <expect><![CDATA[alpha--bravo--charlie--juliet]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% text = 'The cat sat on the mat' -%]
+[% FOREACH word = split(' ', text) -%]<$word> [% END %]]]></input>
+    <expect><![CDATA[<The> <cat> <sat> <on> <the> <mat> ]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% magic.chant %] [% GET magic.chant %]
+[% magic.chant('foo') %] [% GET magic.chant('foo') %]]]></input>
+    <expect><![CDATA[Hocus Pocus Hocus Pocus
+Hocus Pocus Hocus Pocus]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[<<[% magic.spell %]>>
+[% magic.spell(a b c) %]]]></input>
+    <expect><![CDATA[<<>>
+alpha and a bit of bravo and a bit of charlie]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% one %] [% one('two', 'three') %] [% one(2 3) %]]]></input>
+    <expect><![CDATA[one one one]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% day.prev %]
+[% day.this %]
+[% belief('yesterday') %]]]></input>
+    <expect><![CDATA[All my troubles seemed so far away...
+Now it looks as though they're here to stay.
+Oh I believe in yesterday.]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[Yesterday, $day.prev
+$day.this
+${belief('yesterday')}]]></input>
+    <expect><![CDATA[Yesterday, All my troubles seemed so far away...
+Now it looks as though they're here to stay.
+Oh I believe in yesterday.]]></expect>
+  </case>
+  <case use="notcase">
+    <input><![CDATA[[% day.next %]
+$day.next]]></input>
+    <expect><![CDATA[Monday
+Tuesday]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% FOREACH [ 1 2 3 4 5 ] %]$day.next [% END %]]]></input>
+    <expect><![CDATA[Wednesday Thursday Friday Saturday Sunday ]]></expect>
+  </case>
+  <case use="default">
+    <input><![CDATA[before
+[% halt %]
+after]]></input>
+    <expect><![CDATA[before
+]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% FOREACH k = yankee -%]
+[% loop.count %]. [% IF k; k.a; ELSE %]undef[% END %]
+[% END %]]]></input>
+    <expect><![CDATA[1. undef
+2. 1
+3. undef
+4. 2
+]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[before [% CALL a %]a[% CALL b %]n[% CALL c %]d[% CALL d %] after]]></input>
+    <expect><![CDATA[before and after]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[..[% CALL undef %]..]]></input>
+    <expect><![CDATA[....]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[..[% CALL zero %]..]]></input>
+    <expect><![CDATA[....]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[..[% n %]..[% CALL n %]..]]></input>
+    <expect><![CDATA[..0....]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[..[% up %]..[% CALL up %]..[% n %]]]></input>
+    <expect><![CDATA[..1....2]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% CALL reset %][% n %]]]></input>
+    <expect><![CDATA[0]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% CALL reset(100) %][% n %]]]></input>
+    <expect><![CDATA[100]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = a %] $a
+[% a = b %] $a]]></input>
+    <expect><![CDATA[ alpha
+ bravo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% SET a = a %] $a
+[% SET a = b %] $a
+[% SET a = $c %] [$a]
+[% SET a = $gee %] $a
+[% SET a = ${gee} %] $a]]></input>
+    <expect><![CDATA[ alpha
+ bravo
+ []
+ solo golf
+ solo golf]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = b
+   b = c
+   c = d
+   d = e
+%][% a %] [% b %] [% c %] [% d %]]]></input>
+    <expect><![CDATA[bravo charlie delta echo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% SET
+   a = c
+   b = d
+   c = e
+%]$a $b $c]]></input>
+    <expect><![CDATA[charlie delta echo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% 'a' = d
+   'include' = e
+   'INCLUDE' = f.g
+%][% a %]-[% ${'include'} %]-[% ${'INCLUDE'} %]]]></input>
+    <expect><![CDATA[delta-echo-golf]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = f.g %] $a
+[% a = f.i.j %] $a]]></input>
+    <expect><![CDATA[ golf
+ juliet]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% f.g = r %] $f.g
+[% f.i.j = s %] $f.i.j
+[% f.i.k = f.i.j %] ${f.i.k}]]></input>
+    <expect><![CDATA[ romeo
+ sierra
+ sierra]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% user = {
+    id = 'abw'
+    name = 'Andy Wardley'
+    callsign = "[-$a-$b-$w-]"
+   }
+-%]
+${user.id} ${ user.id } $user.id ${user.id}.gif
+[% message = "$b: ${ user.name } (${user.id}) ${ user.callsign }" -%]
+MSG: $message]]></input>
+    <expect><![CDATA[abw abw abw abw.gif
+MSG: bravo: Andy Wardley (abw) [-alpha-bravo-whisky-]]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% product = {
+     id   => 'XYZ-2000',
+     desc => 'Bogon Generator',
+     cost => 678,
+   }
+-%]
+The $product.id $product.desc costs \$${product.cost}.00]]></input>
+    <expect><![CDATA[The XYZ-2000 Bogon Generator costs $678.00]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% data => {
+       g => 'my data'
+   }
+   complex = {
+       gee => 'g'
+   }
+-%]
+[% data.${complex.gee} %]]]></input>
+    <expect><![CDATA[my data]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a %]
+[% DEFAULT a = b -%]
+[% a %]]]></input>
+    <expect><![CDATA[alpha
+alpha]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = '' -%]
+[% DEFAULT a = b -%]
+[% a %]]]></input>
+    <expect><![CDATA[bravo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = ''   b = '' -%]
+[% DEFAULT 
+   a = c
+   b = d
+   z = r
+-%]
+[% a %] [% b %] [% z %]]]></input>
+    <expect><![CDATA[charlie delta romeo]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% global.version = '3.14' -%]
+Version: [% global.version %]]]></input>
+    <expect><![CDATA[Version: 3.14]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[Version: [% global.version %]]]></input>
+    <expect><![CDATA[Version: 3.14]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% global.newversion = global.version + 1 -%]
+Version: [% global.version %]
+Version: [% global.newversion %]]]></input>
+    <expect><![CDATA[Version: 3.14
+Version: 4.14]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[Version: [% global.version %]
+Version: [% global.newversion %]]]></input>
+    <expect><![CDATA[Version: 3.14
+Version: 4.14]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% hash1 = {
+      foo => 'Foo',
+      bar => 'Bar',
+   }
+   hash2 = {
+      wiz => 'Wiz',
+      woz => 'Woz',
+   }
+-%]
+[% hash1.import(hash2) -%]
+keys: [% hash1.keys.sort.join(', ') %]]]></input>
+    <expect><![CDATA[keys: bar, foo, wiz, woz]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% mage = { name    =>    'Gandalf', 
+        aliases =>  [ 'Mithrandir', 'Olorin', 'Incanus' ] }
+-%]
+[% import(mage) -%]
+[% name %]
+[% aliases.join(', ') %]]]></input>
+    <expect><![CDATA[Gandalf
+Mithrandir, Olorin, Incanus]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[[% _private %]][[% _hidden %]]]]></input>
+    <expect><![CDATA[[][]]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% CALL expose -%]
+[[% _private %]][[% _hidden %]]]]></input>
+    <expect><![CDATA[[123][456]]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = 4 -%]
+[% b=6 -%]
+[% c = a + b -%]
+[% d=a+b -%]
+[% c %]/[% d %]]]></input>
+    <expect><![CDATA[10/10]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = 1
+   b = 2
+   c = 3
+-%]
+[% d = 1+1 %]d: [% d %]
+[% e = a+b %]e: [% e %]]]></input>
+    <expect><![CDATA[d: 2
+e: 3]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[%  1 || 0 && 0  # should be 1 || (0&&0), not (1||0)&&0 %]]]></input>
+    <expect><![CDATA[1]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[%  1 + !0 + 1  # should be 1 + (!0) + 0, not 1 + !(0 + 1) %]]]></input>
+    <expect><![CDATA[3]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% "x" _ "y" == "y"; ','  # should be ("x"_"y")=="y", not "x"_("y"=="y") %]]]></input>
+    <expect><![CDATA[,]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% "x" _ "y" == "xy"      # should be ("x"_"y")=="xy", not "x"_("y"=="xy") %]]]></input>
+    <expect><![CDATA[1]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% add(3, 5) %]]]></input>
+    <expect><![CDATA[8]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% add(3 + 4, 5 + 7) %]]]></input>
+    <expect><![CDATA[19]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = 10;
+   b = 20;
+   c = 30;
+   add(add(a,b+1),c*3);
+%]]]></input>
+    <expect><![CDATA[121]]></expect>
+  </case>
+  <case>
+    <input><![CDATA[[% a = 10;
+   b = 20;
+   c = 30;
+   d = 5;
+   e = 7;
+   add(a+5, b < 10 ? c : d + e*5);
+-%]]]></input>
+    <expect><![CDATA[55]]></expect>
+  </case>
+</test>

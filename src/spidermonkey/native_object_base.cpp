@@ -47,8 +47,12 @@ public:
 
   static JSBool new_resolve(JSContext *, JSObject *, jsval, uintN, JSObject **);
 
+  static JSBool new_enumerate(JSContext *cx, JSObject *obj,
+    JSIterateOp enum_op, jsval *statep, jsid *idp);
+
 public:
   static JSClass native_object_class;
+  static JSClass native_enumerable_object_class;
 
 public:
   typedef boost::variant<native_method_type, callback_type> method_variant;
@@ -72,6 +76,27 @@ JSClass native_object_base::impl::native_object_class = {
   &native_object_base::impl::property_op<native_object_base::property_get>,
   &native_object_base::impl::property_op<native_object_base::property_set>,
   JS_EnumerateStub,
+  (JSResolveOp) &native_object_base::impl::new_resolve,
+  JS_ConvertStub,
+  &native_object_base::impl::finalize,
+  0,
+  0,
+  &native_object_base::impl::call_helper,
+  0,
+  0,
+  0,
+  &native_object_base::impl::mark_op,
+  0
+};
+
+JSClass native_object_base::impl::native_enumerable_object_class = {
+  "NativeObject",
+  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE,
+  &native_object_base::impl::property_op<native_object_base::property_add>,
+  &native_object_base::impl::property_op<native_object_base::property_delete>,
+  &native_object_base::impl::property_op<native_object_base::property_get>,
+  &native_object_base::impl::property_op<native_object_base::property_set>,
+  (JSEnumerateOp) &native_object_base::impl::new_enumerate,
   (JSResolveOp) &native_object_base::impl::new_resolve,
   JS_ConvertStub,
   &native_object_base::impl::finalize,
@@ -111,21 +136,24 @@ void native_object_base::invalid_method(call_context &) {
   throw exception("Invalid method");
 }
 
-native_object_base *native_object_base::get_native(object const &o_) {
+native_object_base &native_object_base::get_native(object const &o_) {
   object o = o_;
 
   if (!o.is_valid())
     throw exception("Can not interpret 'null' as native object");
 
   JSContext *ctx = Impl::current_context();
+  JSObject *jso = Impl::get_object(o);
+  JSClass *classp = JS_GET_CLASS(ctx, jso);
 
-  void *priv = JS_GetInstancePrivate(
-      ctx, Impl::get_object(o), &impl::native_object_class, 0);
+  if (!classp || classp->finalize != &native_object_base::impl::finalize)
+    throw exception("Object is not native");
 
+  void *priv = JS_GetPrivate(ctx, jso);
   if (!priv)
     throw exception("Object is not native");
 
-  return static_cast<native_object_base*>(priv);
+  return *static_cast<native_object_base*>(priv);
 }
 
 object native_object_base::do_create_object(object const &prototype_) {
@@ -136,6 +164,23 @@ object native_object_base::do_create_object(object const &prototype_) {
   JSObject *o = JS_NewObject(
       ctx,
       &impl::native_object_class,
+      Impl::get_object(prototype),
+      0);
+
+  if (!o)
+    throw exception("Could not create native object");
+
+  return Impl::wrap_object(o);
+}
+
+object native_object_base::do_create_enumerable_object(object const &prototype_) {
+  JSContext *ctx = Impl::current_context();
+
+  object prototype = prototype_;
+
+  JSObject *o = JS_NewObject(
+      ctx,
+      &impl::native_enumerable_object_class,
       Impl::get_object(prototype),
       0);
 
@@ -230,9 +275,9 @@ JSBool native_object_base::impl::call_helper(
     native_object_base *self = 0;
     
     try {
-      self = native_object_base::get_native(Impl::wrap_object(obj));
+      self = &native_object_base::get_native(Impl::wrap_object(obj));
     } catch (exception &) {
-      self = native_object_base::get_native(Impl::wrap_object(function));
+      self = &native_object_base::get_native(Impl::wrap_object(function));
     }
 
     call_context x;
@@ -260,11 +305,11 @@ JSBool native_object_base::impl::property_op(
   FLUSSPFERD_CALLBACK_BEGIN {
     current_context_scope scope(Impl::wrap_context(ctx));
 
-    native_object_base *self =
+    native_object_base &self =
       native_object_base::get_native(Impl::wrap_object(obj));
 
     value data(Impl::wrap_jsvalp(vp));
-    self->property_op(mode, Impl::wrap_jsval(id), data);
+    self.property_op(mode, Impl::wrap_jsval(id), data);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -274,7 +319,7 @@ JSBool native_object_base::impl::new_resolve(
   FLUSSPFERD_CALLBACK_BEGIN {
     current_context_scope scope(Impl::wrap_context(ctx));
 
-    native_object_base *self =
+    native_object_base &self =
       native_object_base::get_native(Impl::wrap_object(obj));
 
     unsigned flags = 0;
@@ -291,8 +336,47 @@ JSBool native_object_base::impl::new_resolve(
       flags |= property_classname;
 
     *objp = 0;
-    if (self->property_resolve(Impl::wrap_jsval(id), flags))
-      *objp = Impl::get_object(*self);
+    if (self.property_resolve(Impl::wrap_jsval(id), flags))
+      *objp = Impl::get_object(self);
+  } FLUSSPFERD_CALLBACK_END;
+}
+
+JSBool native_object_base::impl::new_enumerate(
+    JSContext *ctx, JSObject *obj, JSIterateOp enum_op, jsval *statep, jsid *idp)
+{
+  FLUSSPFERD_CALLBACK_BEGIN {
+    current_context_scope scope(Impl::wrap_context(ctx));
+
+    native_object_base &self =
+      native_object_base::get_native(Impl::wrap_object(obj));
+
+    
+    boost::any *iter;
+    switch (enum_op) {
+    case JSENUMERATE_INIT:
+      iter = new boost::any;
+      int num;
+      *iter = self.enumerate_start(num);
+      *statep = PRIVATE_TO_JSVAL(iter);
+      if (idp)
+        *idp = INT_TO_JSVAL(num);
+      return JS_TRUE;
+    case JSENUMERATE_NEXT:
+    {
+      iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
+      value id;
+      if (iter->empty() || (id = self.enumerate_next(*iter)).is_void())
+        *statep = JSVAL_NULL;
+      else {
+        JS_ValueToId(ctx, Impl::get_jsval(id), idp);
+      }
+      return JS_TRUE;
+    }
+    case JSENUMERATE_DESTROY:
+      iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
+      delete iter;
+      return JS_TRUE;
+    }
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -301,11 +385,11 @@ uint32 native_object_base::impl::mark_op(
 {
   current_context_scope scope(Impl::wrap_context(ctx));
 
-  native_object_base *self =
+  native_object_base &self =
     native_object_base::get_native(Impl::wrap_object(obj));
 
   tracer trc(thing);
-  self->trace(trc);
+  self.trace(trc);
 
   return 0;
 }
@@ -352,6 +436,17 @@ void native_object_base::property_op(
 
 bool native_object_base::property_resolve(value const &, unsigned) {
   return false;
+}
+
+boost::any native_object_base::enumerate_start(int &n)
+{
+  n = 0;
+  return boost::any();
+}
+
+value native_object_base::enumerate_next(boost::any &)
+{
+  return value();
 }
 
 void native_object_base::trace(tracer&) {}

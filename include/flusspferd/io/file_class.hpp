@@ -35,7 +35,7 @@ public:
   file_class(object const &, call_context &);
   ~file_class();
 
-  struct class_info {
+  struct class_info : flusspferd::class_info  {
     static char const *full_name() { return "IO.File"; }
 
     typedef boost::mpl::bool_<true> constructible;

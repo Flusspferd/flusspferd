@@ -68,8 +68,7 @@ static blob &get_arg(call_context &x) {
   if (!x.arg[0].is_object() || x.arg[0].is_null())
     throw exception("Could not create BlobStream without Blob");
   object obj = x.arg[0].get_object();
-  native_object_base *ptr = native_object_base::get_native(obj);
-  return dynamic_cast<blob&>(*ptr);
+  return flusspferd::get_native<blob>(obj);
 }
 
 blob_stream::blob_stream(object const &obj, call_context &x)

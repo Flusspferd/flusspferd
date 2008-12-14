@@ -75,6 +75,14 @@ void node::create_all_children(
       namespace_::create(ptr->ns);
   }
 
+  if (ptr->type == XML_ELEMENT_NODE) {
+    xmlNsPtr ns = ptr->nsDef;
+    while (ns) {
+      namespace_::create(ns);
+      ns = ns->next;
+    }
+  }
+
   if (children) {
     for (xmlNodePtr child = ptr->children; child; child = child->next)
       create(child);
@@ -90,11 +98,7 @@ xmlNodePtr node::c_from_js(object const &obj) {
   if (!obj.is_valid())
     return 0;
   try {
-    xml::node *p =
-      dynamic_cast<xml::node*>(native_object_base::get_native(obj));
-    if (!p)
-      return 0;
-    return p->c_obj();
+    return flusspferd::get_native<node>(obj).c_obj();
   } catch (std::exception&) {
     return 0;
   }
@@ -178,11 +182,13 @@ node::~node() {
     ptr->children = 0;
     ptr->last = 0;
 
-    if (ptr->type == XML_ELEMENT_NODE)
+    if (ptr->type == XML_ELEMENT_NODE) {
       ptr->properties = 0;
+      ptr->nsDef = 0;
+    }
 
-    ptr->ns = 0;
-    ptr->nsDef = 0;
+    if (ptr->type == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE)
+      ptr->ns = 0;
 
     xmlFreeNode(ptr);
   }
@@ -676,11 +682,8 @@ void node::prop_namespaces(property_mode mode, value &data) {
     if (!nsList)
       return;
 
-    arguments arg(std::vector<value>(1));
-
     for (xmlNsPtr *p = nsList; *p; ++p) {
-      arg[0] = namespace_::create(*p);
-      array.call("push", arg);
+      array.call("push", namespace_::create(*p));
     }
   } catch (...) {
     if (nsList) xmlFree(nsList);

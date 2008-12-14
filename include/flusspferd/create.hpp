@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "local_root_scope.hpp"
 #include <boost/type_traits/is_function.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/mpl/bool.hpp>
 #endif
 #include <boost/preprocessor.hpp>
 
@@ -48,6 +49,7 @@ class native_function_base;
 namespace detail {
 
 object create_native_object(object const &proto);
+object create_native_enumerable_object(object const &proto);
 
 }
 
@@ -55,21 +57,39 @@ object create_object(object const &proto = object());
 
 array create_array(unsigned int length = 0);
 
-object create_native_object(native_object_base *ptr, object const &proto);
-
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
   template< \
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  object create_native_object( \
+  T &create_native_object( \
     object proto \
-    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
+    typename boost::enable_if< boost::mpl::not_<\
+      typename T::class_info::custom_enumerate > \
+    >::type * = 0 \
   ) { \
     if (!proto.is_valid()) \
       proto = get_current_context().get_prototype<T>(); \
     local_root_scope scope; \
     object obj = detail::create_native_object(proto); \
+    return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
+  } \
+  \
+  template< \
+    typename T \
+    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
+  > \
+  T &create_native_object( \
+    object proto \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
+    typename boost::enable_if< \
+      typename T::class_info::custom_enumerate >::type * = 0 \
+  ) { \
+    if (!proto.is_valid()) \
+      proto = get_current_context().get_prototype<T>(); \
+    local_root_scope scope; \
+    object obj = detail::create_native_enumerable_object(proto); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
   } \
   /**/

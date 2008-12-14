@@ -33,6 +33,7 @@ class value;
 class object;
 class string;
 class function;
+class array;
 
 namespace detail {
 
@@ -57,6 +58,7 @@ typedef detail::root<value> root_value;
 typedef detail::root<object> root_object;
 typedef detail::root<string> root_string;
 typedef detail::root<function> root_function;
+typedef detail::root<array> root_array;
 
 }
 

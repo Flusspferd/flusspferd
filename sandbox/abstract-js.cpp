@@ -217,7 +217,10 @@ int main() {
     flusspferd::global().call("fun");
 
     flusspferd::global().define_property(
-      "abc", flusspferd::value(), flusspferd::object::read_only_property, x);
+      "abc", flusspferd::value(),
+      flusspferd::object::property_attributes(
+        flusspferd::object::read_only_property,
+        x));
 
     char const *source3 = "abc";
     v = flusspferd::evaluate(source3, __FILE__, 3);

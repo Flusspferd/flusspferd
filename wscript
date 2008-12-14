@@ -104,8 +104,10 @@ def configure(conf):
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
-    if conf.check_cc(lib = 'readline', uselib_store='READLINE') != None:
-        u('CXXDEFINES', 'HAVE_READLINE')
+    # libedit
+    if conf.check_cc(lib='edit', uselib_store='EDITLINE') != None:
+        u('CXXDEFINES', 'HAVE_EDITLINE')
+        conf.check_cc(header_name='editline/history.h')
 
     # xml
     if Options.options.enable_xml:
@@ -175,7 +177,9 @@ def build_pkgconfig(bld):
 
 def build(bld):
     bld.add_subdirs('src')
+    bld.add_subdirs('programs')
     bld.add_subdirs('plugins/sqlite3')
+    bld.add_subdirs('plugins/environment')
     if bld.env['ENABLE_CURL']:
         bld.add_subdirs('plugins/curl')
     if bld.env['ENABLE_TESTS']:
@@ -183,9 +187,32 @@ def build(bld):
     if bld.env['ENABLE_SANDBOX']:
       bld.add_subdirs('sandbox')
     build_pkgconfig(bld)
-    bld.install_files('${PREFIX}/include/flusspferd/', 'include/flusspferd/*.hpp')
+    bld.install_files('${PREFIX}/include/flusspferd/',
+                      'include/flusspferd/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/implementation/',
                       'include/flusspferd/implementation/*.hpp')
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
+
+    bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/http',
+                      'js/src/http/*.js')
+
+    bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
+
+    bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
+                   (bld.env['shlib_PATTERN'] % 'xml'),
+                   '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-xml'))
+    bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
+                   (bld.env['shlib_PATTERN'] % 'io'),
+                   '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
+
+    etc = bld.new_task_gen('subst')
+    etc.source = 'jsrepl.js.in'
+    etc.target = 'jsrepl.js'
+    etc.dict = {
+      'PREFIX': bld.env['PREFIX']
+    }
+    etc.install_path = os.path.normpath(bld.env['PREFIX'] + '/etc/flusspferd')
+    etc.apply();
 
 def shutdown(): pass
