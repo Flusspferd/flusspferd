@@ -34,12 +34,19 @@ xml::context::context(object const &obj, call_context &x)
   document &doc = flusspferd::get_native<document>(x.arg[0].to_object());
   define_property("document", doc, read_only_property | permanent_property);
 
+  xpath_ctx = xmlXPathNewContext(doc.c_obj());
+
+  if (!xpath_ctx)
+    throw exception("Could not initialise XPath context");
+
   object ns = create_object();
   ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
   set_property("ns", ns);
 }
 
-xml::context::~context() {}
+xml::context::~context() {
+  xmlXPathFreeContext(xpath_ctx);
+}
 
 object xml::context::class_info::create_prototype() {
   object proto = create_object();

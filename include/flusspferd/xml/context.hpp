@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
+#include <libxml/xpath.h>
 
 namespace flusspferd { namespace xml {
 
@@ -43,6 +44,7 @@ public:
   ~context();
 
 private:
+  xmlXPathContextPtr xpath_ctx;
 };
 
 }}
