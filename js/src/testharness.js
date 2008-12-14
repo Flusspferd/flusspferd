@@ -215,13 +215,47 @@ function equiv() {
     }(a, b)) && equiv.apply(this, args.splice(1, args.length -1)); // apply transition with (1..n) arguments
 }
 
-this.TestHarness = function TestHarness() {
+this.TestHarness = function TestHarness(name) {
+  this.name = name;
   this.tests = [];
   this.asserts_failed = 0;
   this.total_asserts = 0;
   this.tests_failed = 0;
   this.total_tests = 0;
   this.outputStream = IO.stdout;
+  TestHarness.suites.push(this);
+}
+
+TestHarness.suites = [];
+
+TestHarness.go = function TestHarness$go() {
+  var suites_failed = [];
+  var suites = Array.prototype.slice.apply(arguments);
+  if (suites.length == 0)
+    suites = this.suites;
+
+  if (suites.length == 0)
+    return;
+
+  for (var i in suites) {
+    var s = suites[i];
+    if (s.name === undefined)
+      s.name = 'Suite ' + i;
+    s.outputStream.print('#', s.name); 
+    
+    s.go();
+
+    if (s.tests_failed > 0)
+      suites_failed.push(s);
+  }
+
+  var msg;
+  if (suites_failed.length) {
+    msg = suites[0].red(suites_failed.length + '/' + suites.length, 'suites failed')
+  } else {
+    msg = suites[0].green(suites.length + '/' + suites.length, 'suites sucessful');
+  }
+  suites[0].outputStream.print(msg);
 }
 
 this.TestHarness.prototype = {
