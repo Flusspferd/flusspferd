@@ -43,18 +43,19 @@ Format: 1.4
 # time it is run.  When working with groups, just deal with the braces and
 # forget about the indentation and comments.
 # 
-# You can use this file on other computers even if they use different
-# directories.  As long as the command line points to the same source files,
-# Natural Docs will be able to correct the locations automatically.
-# 
 # --------------------------------------------------------------------------
 
 
 Group: IO  {
 
-   File: File  (/Users/ash/code/js/flusspferd/src/io/file.jsdoc)
-   File: Stream  (/Users/ash/code/js/flusspferd/src/io/stream.jsdoc)
+   File: File  (no auto-title, src/io/file.jsdoc)
+   File: Stream  (no auto-title, src/io/stream.jsdoc)
    }  # Group: IO
+
+Group: Database Access  {
+
+   File: sqlite3  (plugins/sqlite3/sqlite3.js)
+   }  # Group: Database Access
 
 Group: Index  {
 
@@ -62,11 +63,6 @@ Group: Index  {
    Class Index: Classes
    Function Index: Functions
    Property Index: Properties
+   Variable Index: Variables
    }  # Group: Index
 
-
-
-##### Do not change or remove these lines. #####
-Data: 1(D3333a6GH63p6R39ufG3l63coN66IcGHf36H936I8fGHEu\AGQ)
-Data: 1(h3333a6GH63p6R39ufG3l63coN66IcGHf36H938u)
-Data: 1(T3333a6GH63p6R39ufG3l63coN66IcGHf36H93sEo)
