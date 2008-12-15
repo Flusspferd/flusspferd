@@ -737,8 +737,17 @@ void node::add_node(call_context &x) {
   if (ptr->doc) {
     arguments arg;
     arg.push_root(create(xmlNodePtr(ptr->doc)));
-    for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
-      arg.push_back(*it);
+
+    // name
+    arg.push_back(x.arg[0]);
+
+    // namespace
+    if (x.arg[1].is_string()) {
+      value ns = call("searchNamespaceByURI", x.arg[1]);
+      if (ns.is_object() && !ns.is_null())
+        x.arg[1] = ns;
+    }
+    arg.push_back(x.arg[1]);
     x.arg = arg;
   }
   object obj = create_native_object<node>(object(), boost::ref(x));
@@ -747,10 +756,16 @@ void node::add_node(call_context &x) {
 }
 
 void node::add_namespace(call_context &x) {
+  value ns = call("searchNamespaceByURI", x.arg[0]);
+  if (ns.is_object() && !ns.is_null()) {
+    x.result = ns;
+    return;
+  }
+
   arguments arg;
   arg.push_back(*this);
-  for (arguments::iterator it = x.arg.begin(); it != x.arg.end(); ++it)
-    arg.push_root(*it);
+  arg.push_back(x.arg[0]); // href
+  arg.push_back(x.arg[1]); // prefix
   x.arg = arg;
   object obj = create_native_object<namespace_>(object(), boost::ref(x));
   x.result = obj;
