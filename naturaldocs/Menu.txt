@@ -70,6 +70,11 @@ Group: Modules  {
       File: cURL  (plugins/curl/curl.js)
       }  # Group: curl
 
+   Group: environment  {
+
+      File: Environment  (plugins/environment/environment.jsdoc)
+      }  # Group: environment
+
    }  # Group: Modules
 
 Group: Index  {
