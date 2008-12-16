@@ -49,25 +49,28 @@ THE SOFTWARE.
       }
       else
         this.header_buffer += hdr;
-    },
-
-    cURL.prototype.dataReceived = function (blob) {
-      this.responseBlob.append(blob);
-    }
-
-    if (cURL.prototype.perform.old === undefined) {
-      var old_perform = cURL.prototype.perform;
-      cURL.prototype.perform = function perform() {
-        this.header_buffer = "";
-        delete this.headers;
-        this.responseBlob = new Blob(0);
-        return perform.old.apply(this, arguments);
-      }
-      cURL.prototype.perform.old = old_perform;
     }
   }
   catch (e if /Unable to find library/.exec(e))
   { // Stomp on the module not found message
+  }
+
+  cURL.prototype.dataReceived = function (blob) {
+    this.responseBlob.append(blob);
+  }
+
+  if (cURL.prototype.perform.old === undefined) {
+    var old_perform = cURL.prototype.perform;
+    cURL.prototype.perform = function perform() {
+      this.header_buffer = "";
+      delete this.headers;
+      delete this.protocol;
+      delete this.status;
+      delete this.statusMessage;
+      this.responseBlob = new Blob(0);
+      return perform.old.apply(this, arguments);
+    }
+    cURL.prototype.perform.old = old_perform;
   }
 
   return cURL;
