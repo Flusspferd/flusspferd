@@ -86,12 +86,19 @@ object flusspferd::xml::load_xml(object container) {
   create_native_function(XML, "parseBlob", &parse_blob);
   create_native_function(XML, "parseFile", &parse_file);
 
-  load_class<xpath_context>(XML);
+  object XPath = flusspferd::create_object();
+
+  load_class<xpath_context>(XPath);
+
+  XML.define_property(
+    "XPath",
+    XPath,
+    object::read_only_property | object::permanent_property);
 
   container.define_property(
     "XML",
     XML,
-    object::read_only_property | object::dont_enumerate);
+    object::read_only_property | object::permanent_property);
 
   return XML;
 }
