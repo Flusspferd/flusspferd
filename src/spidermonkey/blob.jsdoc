@@ -1,5 +1,7 @@
 Class: Blob
 
+Binary data storage class.
+
 Javascript strings are stored as UTF8 bytes. This makes storing and processing
 strings in other encodings or random binary data (such as images) hard. 
 
