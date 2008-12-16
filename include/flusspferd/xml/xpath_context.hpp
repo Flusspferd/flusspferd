@@ -30,18 +30,18 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace xml {
 
-class context : public native_object_base {
+class xpath_context : public native_object_base {
 public:
   struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.Context"; }
+    static char const *full_name() { return "XML.XPath.Context"; }
     static char const *constructor_name() { return "Context"; }
     typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
   };
 
-  context(object const &, call_context &);
-  ~context();
+  xpath_context(object const &, call_context &);
+  ~xpath_context();
 
 private:
   xmlXPathContextPtr xpath_ctx;
