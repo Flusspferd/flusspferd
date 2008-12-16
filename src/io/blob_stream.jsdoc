@@ -1,0 +1,18 @@
+Class: IO.BlobStream
+
+<IO.Stream> interface to <Blob>. See <IO.Stream> for the other methods on this class.
+
+Group: Constructor
+
+Constructor: BlobStream
+
+  Parameters:
+    blob - Blob to wrap in a stream
+
+  > stream = new BlobStream(blob);
+
+Group: Methods
+
+Function: getBlob
+
+  Access the <Blob> object.
