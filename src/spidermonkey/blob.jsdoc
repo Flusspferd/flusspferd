@@ -71,10 +71,11 @@ Function: slice
     from - start index
     to   - (optional) end index.
 
-  to can be negative, in which case it counts backwards from the last 
+  Either parameter can be negative, in which case it counts backwards from the last 
   byte:
 
   > (new Blob([4,5,6,7,8,9,0])).slice(1, -3).toArray(); // [5,6,7]
+  > (new Blob([4,5,6,7,8,9,0])).slice(-3).toArray(); // [8,9,0]
 
 Function: asUtf8
 
