@@ -40,7 +40,7 @@ public:
   void property_op(property_mode, value const &, value &);
 
   struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.XPath.Context.Namespaces"; }
+    static char const *full_name() { return "XML.XPath.Namespaces"; }
     typedef boost::mpl::bool_<false> constructible;
   };
 

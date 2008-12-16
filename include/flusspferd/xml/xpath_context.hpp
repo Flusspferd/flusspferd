@@ -33,8 +33,8 @@ namespace flusspferd { namespace xml {
 class xpath_context : public native_object_base {
 public:
   struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.XPath.Context"; }
-    static char const *constructor_name() { return "Context"; }
+    static char const *full_name() { return "XML.XPath"; }
+    static char const *constructor_name() { return "XPath"; }
     typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
