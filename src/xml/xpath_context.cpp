@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/xml/xpath_context.hpp"
 #include "flusspferd/xml/document.hpp"
+#include "flusspferd/xml/node.hpp"
 #include "flusspferd/string.hpp"
 
 using namespace flusspferd;
@@ -109,6 +110,15 @@ void xpath_context::eval(call_context &x) {
     break;
   case XPATH_STRING:
     x.result = string((char const *) obj->stringval);
+    break;
+  case XPATH_NODESET:
+    {
+      xmlNodeSetPtr nodeset = obj->nodesetval;
+      array arr = create_array(nodeset->nodeNr);
+      for (int i = 0; i < nodeset->nodeNr; ++i)
+        arr.set_element(i, node::create(nodeset->nodeTab[i]));
+      x.result = arr;
+    }
     break;
   default:
     throw exception("XPath object type not supported");
