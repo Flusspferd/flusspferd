@@ -58,7 +58,7 @@ private: // JS methos
   void append(blob const &o);
   object slice(int from, boost::optional<int> to);
   object to_array();
-  object copy();
+  object clone();
   string as_utf8();
   string as_utf16();
 
