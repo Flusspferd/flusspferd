@@ -83,7 +83,7 @@ void blob::init() {
 
   register_native_method("append", &blob::append);
   register_native_method("toArray", &blob::to_array);
-  register_native_method("copy", &blob::copy);
+  register_native_method("clone", &blob::clone);
   register_native_method("slice", &blob::slice);
   register_native_method("asUtf8", &blob::as_utf8);
   register_native_method("asUtf16", &blob::as_utf16);
@@ -98,7 +98,7 @@ object blob::class_info::create_prototype() {
 
   create_native_method(proto, "append", 1);
   create_native_method(proto, "toArray", 0);
-  create_native_method(proto, "copy", 0);
+  create_native_method(proto, "clone", 0);
   create_native_method(proto, "slice", 2);
   create_native_method(proto, "asUtf8", 0);
   create_native_method(proto, "asUtf16", 0);
@@ -231,7 +231,7 @@ object blob::slice(int from, boost::optional<int> to_) {
   return create_native_object<blob>(get_prototype(), &data[from], to-from);
 }
 
-object blob::copy() {
+object blob::clone() {
   return create_native_object<blob>(get_prototype(), &data[0], data.size());
 }
 
