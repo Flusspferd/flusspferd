@@ -82,11 +82,12 @@ object xpath_context::class_info::create_prototype() {
 }
 
 void xpath_context::eval(call_context &x) {
+  xmlXPathObjectPtr obj;
+
   if (x.arg[0].is_string()) {
     string expr = x.arg[0];
 
-    xmlXPathObjectPtr obj =
-      xmlXPathEval((xmlChar const *) expr.c_str(), xpath_ctx);
+    obj = xmlXPathEval((xmlChar const *) expr.c_str(), xpath_ctx);
 
     if (!obj)
       throw exception("Could not evaluate XPath expression");
@@ -94,6 +95,24 @@ void xpath_context::eval(call_context &x) {
     x.result = true;
   } else {
     throw exception("Does not work now.");
+  }
+
+  switch (obj->type) {
+  case XPATH_UNDEFINED:
+    x.result = value();
+    break;
+  case XPATH_BOOLEAN:
+    x.result = bool(obj->boolval);
+    break;
+  case XPATH_NUMBER:
+    x.result = obj->floatval;
+    break;
+  case XPATH_STRING:
+    x.result = string((char const *) obj->stringval);
+    break;
+  default:
+    throw exception("XPath object type not supported");
+    break;
   }
 }
 
