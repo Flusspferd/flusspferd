@@ -158,6 +158,10 @@ FLUSSPFERD_CALLS(call, object const &)
   bool has_property(std::string const &name) const;
   bool has_property(value const &id) const;
 
+  bool has_own_property(char const *name) const;
+  bool has_own_property(std::string const &name) const;
+  bool has_own_property(value const &id) const;
+
   void delete_property(char const *name);
   void delete_property(std::string const &name);
   void delete_property(value const &id);

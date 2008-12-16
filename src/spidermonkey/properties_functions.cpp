@@ -46,7 +46,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
   // TODO: Check if obj is sealed
 
   object::property_attributes attrs;
-  bool current = o.get_property_attributes(p, attrs);
+  bool current = o.has_own_property(p) && o.get_property_attributes(p, attrs);
 
   bool is_accessor = false, is_data = false,
        configurable = false, enumerable = false, writable = false;
@@ -84,14 +84,12 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
 
   // [[Writable]]. Default false
   v = desc.get_property("writable");
-  if (!v.is_void()) {
-    if (v.to_boolean() == true) {
-      flags &= ~object::read_only_property;
-      writable = true;
-    }
-    else
-      flags |= object::read_only_property;
+  if (!v.is_void() && v.to_boolean() == true) {
+    flags &= ~object::read_only_property;
+    writable = true;
   }
+  else
+    flags |= object::read_only_property;
 
   boost::optional<function const &> getter_fn = boost::none, 
                                     setter_fn = boost::none;
