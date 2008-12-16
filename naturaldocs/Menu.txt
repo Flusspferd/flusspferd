@@ -46,18 +46,26 @@ Format: 1.4
 # --------------------------------------------------------------------------
 
 
-Group: IO  {
+Group: Core Classes  {
 
-   File: File  (no auto-title, src/io/file.jsdoc)
-   File: Stream  (no auto-title, src/io/stream.jsdoc)
-   }  # Group: IO
+   File: Blob  (src/spidermonkey/blob.jsdoc)
+   }  # Group: Core Classes
 
-Group: Database Access  {
+Group: Modules  {
 
-   File: sqlite3  (plugins/sqlite3/sqlite3.js)
-   }  # Group: Database Access
+   Group: io  {
 
-File: Blob  (src/spidermonkey/blob.jsdoc)
+      File: BlobStream  (src/io/blob_stream.jsdoc)
+      File: File  (no auto-title, src/io/file.jsdoc)
+      File: Stream  (no auto-title, src/io/stream.jsdoc)
+      }  # Group: io
+
+   Group: sqlite3  {
+
+      File: SQLite3  (no auto-title, plugins/sqlite3/sqlite3.js)
+      }  # Group: sqlite3
+
+   }  # Group: Modules
 
 Group: Index  {
 
