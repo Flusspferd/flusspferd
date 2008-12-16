@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/context.hpp"
+#include "flusspferd/xml/xpath_context.hpp"
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/string.hpp"
 
@@ -48,7 +48,7 @@ private:
 
 }
 
-xml::context::context(object const &obj, call_context &x)
+xpath_context::xpath_context(object const &obj, call_context &x)
   : native_object_base(obj)
 {
   document &doc = flusspferd::get_native<document>(x.arg[0].to_object());
@@ -69,11 +69,11 @@ xml::context::context(object const &obj, call_context &x)
   define_property("ns", ns, read_only_property | permanent_property);
 }
 
-xml::context::~context() {
+xpath_context::~xpath_context() {
   xmlXPathFreeContext(xpath_ctx);
 }
 
-object xml::context::class_info::create_prototype() {
+object xpath_context::class_info::create_prototype() {
   object proto = create_object();
 
   return proto;

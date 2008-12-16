@@ -22,7 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/xml.hpp"
-#include "flusspferd/xml/context.hpp"
+#include "flusspferd/xml/xpath_context.hpp"
 #include "flusspferd/xml/parse.hpp"
 #include "flusspferd/xml/push_parser.hpp"
 #include "flusspferd/xml/node.hpp"
@@ -86,7 +86,7 @@ object flusspferd::xml::load_xml(object container) {
   create_native_function(XML, "parseBlob", &parse_blob);
   create_native_function(XML, "parseFile", &parse_file);
 
-  load_class<xml::context>(XML);
+  load_class<xpath_context>(XML);
 
   container.define_property(
     "XML",
