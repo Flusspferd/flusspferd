@@ -69,6 +69,9 @@ xpath_context::xpath_context(object const &obj, call_context &x)
   ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
   define_property("ns", ns, read_only_property | permanent_property);
 
+  define_native_property(
+    "current", permanent_shared_property, &xpath_context::prop_current);
+
   register_native_method("", &xpath_context::eval);
 }
 
@@ -123,6 +126,25 @@ void xpath_context::eval(call_context &x) {
   default:
     throw exception("XPath object type not supported");
     break;
+  }
+}
+
+void xpath_context::prop_current(property_mode mode, value &data) {
+  switch (mode) {
+  case property_set:
+    if (data.is_void_or_null()) {
+      xpath_ctx->node = 0;
+    } else {
+      xmlNodePtr ptr = node::c_from_js(data.to_object());
+      if (!ptr)
+        throw exception("Not a valid XML node");
+      xpath_ctx->node = ptr;
+    }
+    // !! fall thru !!
+  case property_get:
+    data = node::create(xpath_ctx->node);
+    break;
+  default: break;
   }
 }
 

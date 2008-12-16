@@ -46,6 +46,9 @@ public:
 private: // JS methods
   void eval(call_context &);
 
+private: // JS properties
+  void prop_current(property_mode, value &);
+
 private:
   xmlXPathContextPtr xpath_ctx;
 };
