@@ -84,16 +84,9 @@ object flusspferd::xml::load_xml(object container) {
   load_class<push_parser>(XML);
 
   create_native_function(XML, "parseBlob", &parse_blob);
-  create_native_function(XML, "parseFile", &parse_file);
+  create_native_function(XML, "parse", &parse_file);
 
-  object XPath = flusspferd::create_object();
-
-  load_class<xpath_context>(XPath);
-
-  XML.define_property(
-    "XPath",
-    XPath,
-    object::read_only_property | object::permanent_property);
+  object XPath = load_class<xpath_context>(XML);
 
   container.define_property(
     "XML",
