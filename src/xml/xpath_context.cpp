@@ -59,6 +59,9 @@ xpath_context::xpath_context(object const &obj, call_context &x)
   if (!xpath_ctx)
     throw exception("Could not initialise XPath context");
 
+  if (xmlXPathOrderDocElems(xpath_ctx->doc) < 0)
+    throw exception("Could not initialise XPath context");
+
   xpath_ctx->nsHash = xmlHashCreate(1);
 
   if (!xpath_ctx->nsHash)
