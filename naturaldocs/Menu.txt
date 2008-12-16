@@ -65,6 +65,11 @@ Group: Modules  {
       File: SQLite3  (no auto-title, plugins/sqlite3/sqlite3.js)
       }  # Group: sqlite3
 
+   Group: curl  {
+
+      File: cURL  (plugins/curl/curl.js)
+      }  # Group: curl
+
    }  # Group: Modules
 
 Group: Index  {
