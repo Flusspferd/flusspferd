@@ -46,10 +46,11 @@ Format: 1.4
 # --------------------------------------------------------------------------
 
 
-Group: Core Classes  {
+Group: Core Classes/Extensions  {
 
    File: Blob  (src/spidermonkey/blob.jsdoc)
-   }  # Group: Core Classes
+   File: Object  (src/spidermonkey/properties_functions.cpp)
+   }  # Group: Core Classes/Extensions
 
 Group: Modules  {
 
