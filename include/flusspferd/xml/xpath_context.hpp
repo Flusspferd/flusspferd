@@ -43,6 +43,9 @@ public:
   xpath_context(object const &, call_context &);
   ~xpath_context();
 
+private: // JS methods
+  void eval(call_context &);
+
 private:
   xmlXPathContextPtr xpath_ctx;
 };

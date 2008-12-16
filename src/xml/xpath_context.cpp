@@ -67,6 +67,8 @@ xpath_context::xpath_context(object const &obj, call_context &x)
   object ns = create_native_object<namespaces>(object(), xpath_ctx->nsHash);
   ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
   define_property("ns", ns, read_only_property | permanent_property);
+
+  register_native_method("", &xpath_context::eval);
 }
 
 xpath_context::~xpath_context() {
@@ -77,6 +79,22 @@ object xpath_context::class_info::create_prototype() {
   object proto = create_object();
 
   return proto;
+}
+
+void xpath_context::eval(call_context &x) {
+  if (x.arg[0].is_string()) {
+    string expr = x.arg[0];
+
+    xmlXPathObjectPtr obj =
+      xmlXPathEval((xmlChar const *) expr.c_str(), xpath_ctx);
+
+    if (!obj)
+      throw exception("Could not evaluate XPath expression");
+
+    x.result = true;
+  } else {
+    throw exception("Does not work now.");
+  }
 }
 
 namespaces::namespaces(object const &obj, xmlHashTablePtr table)
