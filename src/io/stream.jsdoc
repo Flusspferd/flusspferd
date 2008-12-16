@@ -4,14 +4,14 @@ Base stream class for IO files. Instances of Stream cannot be created directly.
 
 Method: read
 
-  Read UTF8 data. If the stream contains an invalid utf8 bye sequence, an 
+  Read UTF-8 data. If the stream contains an invalid UTF-8 bye sequence, an 
   exception will be thrown.
 
   Parameters:
   size - number of bytes to read. Default 4096
 
   Return:
-  A string ut8f characters.
+  A string UTF-8 characters.
 
 Method: readBlob
 
@@ -25,10 +25,10 @@ Method: readBlob
 
 Method: readWhole
 
-  Read entire strema as utf8 string
+  Read entire strema as UTF-8 string
 
   Return:
-  A utf8 character string
+  A UTF-8 character string
 
 Method: readWholeBlob
 
@@ -42,7 +42,7 @@ Method: write
   Parameters:
   data - data to write.
 
-  Data should either be a string, in which case the utf8 byte sequence is
+  Data should either be a string, in which case the UTF-8 byte sequence is
   written, or else a <Blob> where the raw binary data is written.
 
 Method: print
