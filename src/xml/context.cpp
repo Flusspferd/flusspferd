@@ -66,7 +66,7 @@ xml::context::context(object const &obj, call_context &x)
 
   object ns = create_native_object<namespaces>(object(), xpath_ctx->nsHash);
   ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
-  set_property("ns", ns);
+  define_property("ns", ns, read_only_property | permanent_property);
 }
 
 xml::context::~context() {
