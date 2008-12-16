@@ -72,3 +72,54 @@ THE SOFTWARE.
 
   return cURL;
 })()
+
+/**
+ * Class: cURL
+ * 
+ * Network access via libcurl.
+ *
+ * Group: Constructor Properties
+ *
+ * Property: supportedProtocols
+ *
+ * Array of protocols by this module.
+ *
+ * Property: versionHex
+ *
+ * libcurl version number in hex. For example 7.18.2 is 0x071202
+ *
+ * Property: versionStr
+ *
+ * libcurl version number in dotted-decimal string form.
+ *
+ * Group: Constructor
+ *
+ * Constructor: cURL
+ *
+ * Construct a cURL object. Takes no parameters
+ *
+ * Group: Methods
+ *
+ * Method: perform
+ *
+ * Method: setMethod
+ *
+ * Group: Properties
+ *
+ * Property: url
+ *
+ * Property: protocol
+ *
+ * Property: status
+ *
+ * Property: statusMessage
+ *
+ * Group: Callback Methods
+ *
+ * Optional methods that get called when headers or data are received. If the
+ * <http.headers> module can be loaded, then <headerReceived> will have a default implementation that will parse the headers into an <HTTP.Headers> object
+ *
+ * Method: dataReceived
+ *
+ * Method: headerReceived
+ */
