@@ -66,8 +66,9 @@ THE SOFTWARE.
       cURL.prototype.perform.old = old_perform;
     }
   }
-  catch (e if e instanceof ReferenceError)
-  { throw e }
-  catch (e)
-  { print(e) }
+  catch (e if /Unable to find library/.exec(e))
+  { // Stomp on the module not found message
+  }
+
+  return cURL;
 })()
