@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/document.hpp"
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/property_iterator.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -52,7 +53,11 @@ private:
 xpath_context::xpath_context(object const &obj, call_context &x)
   : native_object_base(obj)
 {
-  document &doc = flusspferd::get_native<document>(x.arg[0].to_object());
+  local_root_scope scope;
+  value doc_v = x.arg[0];
+  value ns_v = x.arg[1];
+
+  document &doc = flusspferd::get_native<document>(doc_v.to_object());
   define_property("document", doc, read_only_property | permanent_property);
 
   xpath_ctx = xmlXPathNewContext(doc.c_obj());
@@ -67,6 +72,11 @@ xpath_context::xpath_context(object const &obj, call_context &x)
 
   object ns = create_native_object<namespaces>(object(), xpath_ctx->nsHash);
   ns.set_property("xml", string("http://www.w3.org/XML/1998/namespace"));
+  if (ns_v.is_object() && !ns_v.is_null()) {
+    object o = ns_v.get_object();
+    for (property_iterator it = o.begin(); it != o.end(); ++it)
+      ns.set_property(*it, o.get_property(*it));
+  }
   define_property("ns", ns, read_only_property | permanent_property);
 
   define_native_property(
