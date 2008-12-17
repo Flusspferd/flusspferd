@@ -184,7 +184,7 @@ bool object::has_own_property(value const &id) const {
                                        obj->map->ops->lookupProperty, 1, argv, 
                                        &vp);
   has = JSVAL_TO_BOOLEAN(vp);
-  if (!ret);
+  if (!ret)
 #endif
   {
     throw exception("Unable to check for own property");
