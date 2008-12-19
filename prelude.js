@@ -44,7 +44,7 @@ String.prototype.toArray = function toArray() {
 };
 Object.defineProperty(String.prototype, 'toArray', {enumerable: false});
 
-Function.prototype.bind = function proto$bind(obj) {
+Function.prototype.bind = function bind(obj) {
   var fun = this;
   return function bound_func() {
       return fun.apply(obj, arguments);
