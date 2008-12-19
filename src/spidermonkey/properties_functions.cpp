@@ -133,7 +133,11 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
   if (is_accessor) {
     o.define_property(p, value(), object::property_attributes(flags, getter_fn, setter_fn));
   } else {
-    value val = desc.has_property("value") ? desc.get_property("value") : o.get_property(p);
+    value val = desc.has_property("value") 
+              ? desc.get_property("value") 
+              : current
+              ? o.get_property(p) 
+              : value();
     o.define_property(p, val, object::property_attributes(flags));
   }
 }

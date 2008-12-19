@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Array.from = function (iterable) {
+Array.from = function from(iterable) {
   if (!iterable)
     return [];
   if (iterable.toArray)
@@ -39,26 +39,28 @@ function Range(from,to, by) {
   }
 }
 
-String.prototype.toArray = function () {
+String.prototype.toArray = function toArray() {
   return this.split(/\s+/);
 };
 Object.defineProperty(String.prototype, 'toArray', {enumerable: false});
 
-Function.prototype.bind = function (obj) {
+Function.prototype.bind = function proto$bind(obj) {
   var fun = this;
-  return function() {
+  return function bound_func() {
       return fun.apply(obj, arguments);
     }
 };
 Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 
-Function.bind = function (obj, name) {
-  var fun = obj[name];
-  if (!fun)
-    throw new Error("Object has no function '" + name + "'");
-  return fun.bind(obj);
-};
-Object.defineProperty(Function, 'bind', {enumerable: false});
+Object.defineProperty(Function, 'bind', 
+  { enumerable: false, 
+    value: function bind(obj, name) {
+      var fun = obj[name];
+      if (!fun || !(fun instanceof Function))
+        throw new Error("Object has no function '" + name + "'");
+      return fun.bind(obj);
+    }
+  });
 
 (function (g) {
   var i = new Importer;
