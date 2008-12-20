@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/xml/reference.hpp"
 #include "flusspferd/xml/attribute.hpp"
 #include "flusspferd/xml/processing_instruction.hpp"
+#include "flusspferd/xml/html_document.hpp"
 #include "flusspferd/function_adapter.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
@@ -87,6 +88,15 @@ object flusspferd::xml::load_xml(object container) {
   create_native_function(XML, "parse", &parse_file);
 
   object XPath = load_class<xpath_context>(XML);
+
+  object HTML = flusspferd::create_object();
+
+  load_class<html_document>(HTML);
+
+  XML.define_property(
+    "HTML",
+    HTML,
+    object::read_only_property | object::permanent_property);
 
   container.define_property(
     "XML",

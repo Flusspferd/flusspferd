@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/xml/document.hpp"
+#include "flusspferd/xml/html_document.hpp"
 #include "flusspferd/xml/text.hpp"
 #include "flusspferd/xml/namespace.hpp"
 #include "flusspferd/xml/reference.hpp"
@@ -47,6 +48,8 @@ object node::create(xmlNodePtr ptr) {
   switch (ptr->type) {
   case XML_DOCUMENT_NODE:
     return create_native_object<document>(object(), xmlDocPtr(ptr));
+  case XML_HTML_DOCUMENT_NODE:
+    return create_native_object<html_document>(object(), htmlDocPtr(ptr));
   case XML_TEXT_NODE:
     return create_native_object<text>(object(), ptr);
   case XML_COMMENT_NODE:
