@@ -92,6 +92,8 @@ object flusspferd::xml::load_xml(object container) {
   object HTML = flusspferd::create_object();
 
   load_class<html_document>(HTML);
+  create_native_function(HTML, "parseBlob", &html_parse_blob);
+  create_native_function(HTML, "parse", &html_parse_file);
 
   XML.define_property(
     "HTML",

@@ -26,27 +26,45 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/string.hpp"
 #include <libxml/parser.h>
+#include <libxml/HTMLparser.h>
 
 using namespace flusspferd;
 using namespace xml;
 
-object flusspferd::xml::parse_blob(object&, blob &b, object options) {
-  value url_v;
-  value encoding_v;
-  unsigned flags = 0;
+namespace {
 
-  if (options.is_valid()) {
-    url_v = options.get_property("url");
-    encoding_v = options.get_property("encoding");
-    flags = options.get_property("options").to_integral_number(32, false);
+struct opt {
+  char const *url;
+  char const *encoding;
+  unsigned flags;
+
+  opt(object const &options)
+    : url(0), encoding(0), flags(0)
+  {
+    value url_v;
+    value encoding_v;
+
+    if (options.is_valid()) {
+      url_v = options.get_property("url");
+      encoding_v = options.get_property("encoding");
+      flags = options.get_property("options").to_integral_number(32, false);
+    }
+
+    if (url_v.is_string())
+      url = url_v.get_string().c_str();
+
+    if (encoding_v.is_string())
+      encoding = encoding_v.get_string().c_str();
   }
+};
 
-  char const *url = url_v.is_string() ? url_v.get_string().c_str() : 0;
-  char const *encoding =
-    encoding_v.is_string() ? encoding_v.get_string().c_str() : 0;
+}
+
+object flusspferd::xml::parse_blob(object&, blob &b, object options) {
+  opt x(options);
 
   xmlDocPtr doc =
-    xmlReadMemory((char*) b.get_data(), b.size(), url, encoding, flags);
+    xmlReadMemory((char*) b.get_data(), b.size(), x.url, x.encoding, x.flags);
 
   if (!doc)
     throw exception("Could not parse XML document");
@@ -55,22 +73,39 @@ object flusspferd::xml::parse_blob(object&, blob &b, object options) {
 }
 
 object flusspferd::xml::parse_file(object&, string filename, object options) {
-  value encoding_v;
-  unsigned flags = 0;
-
-  if (options.is_valid()) {
-    encoding_v = options.get_property("encoding");
-    flags = options.get_property("options").to_integral_number(32, false);
-  }
-
-  char const *encoding =
-    encoding_v.is_string() ? encoding_v.get_string().c_str() : 0;
+  opt x(options);
 
   xmlDocPtr doc =
-    xmlReadFile(filename.c_str(), encoding, flags);
+    xmlReadFile(filename.c_str(), x.encoding, x.flags);
 
   if (!doc)
     throw exception("Could not parse XML document");
+
+  return node::create(xmlNodePtr(doc));
+}
+
+object flusspferd::xml::html_parse_blob(object&, blob &b, object options) {
+  opt x(options);
+
+  htmlDocPtr doc =
+    htmlReadMemory((char*) b.get_data(), b.size(), x.url, x.encoding, x.flags);
+
+  if (!doc)
+    throw exception("Could not parse HTML document");
+
+  return node::create(xmlNodePtr(doc));
+}
+
+object flusspferd::xml::html_parse_file(
+    object&, string filename, object options)
+{
+  opt x(options);
+
+  htmlDocPtr doc =
+    htmlReadFile(filename.c_str(), x.encoding, x.flags);
+
+  if (!doc)
+    throw exception("Could not parse HTML document");
 
   return node::create(xmlNodePtr(doc));
 }
