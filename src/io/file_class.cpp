@@ -111,6 +111,11 @@ void file_class::impl::create(char const *name, boost::optional<int> mode) {
 }
 
 bool file_class::impl::exists(char const *name) {
+  security &sec = security::get();
+
+  if (!sec.check_path(name, security::ACCESS))
+    throw exception("Could not check whether file exists (security)");
+
   return boost::filesystem::exists(name);
 }
 

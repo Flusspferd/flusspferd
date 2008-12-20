@@ -45,7 +45,8 @@ public:
     READ = 1,
     WRITE = 2,
     READ_WRITE = READ|WRITE,
-    CREATE = 4
+    CREATE = 4,
+    ACCESS = 8
   };
 
   bool check_path(std::string const &filename, unsigned mode);
