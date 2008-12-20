@@ -65,6 +65,7 @@ file_class::~file_class()
 
 void file_class::class_info::augment_constructor(object constructor) {
   create_native_function(constructor, "create", &impl::create);
+  create_native_function(constructor, "exists", &impl::exists);
 }
 
 object file_class::class_info::create_prototype() {
@@ -74,7 +75,6 @@ object file_class::class_info::create_prototype() {
 
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);
-  create_native_method(proto, "exists", 0);
 
   return proto;
 }
