@@ -33,17 +33,28 @@ using namespace flusspferd::xml;
 html_push_parser::html_push_parser(object const &obj, call_context &x)
   : native_object_base(obj), parser(0), doc(0)
 {
-  if (!x.arg[0].is_void_or_null() && !x.arg[0].is_string())
-    throw exception("Could not create parser: filename has to be a string");
+  local_root_scope scope;
+
+  object options = x.arg[0].to_object();
 
   char const *fname = 0;
-  if (x.arg[0].is_string())
-    fname = x.arg[0].get_string().c_str();
+  unsigned flags = 0;
+
+  if (options.is_valid()) {
+    value fname_v = options.get_property("filename");
+    if (!fname_v.is_void_or_null())
+      fname = fname_v.to_string().c_str();
+
+    flags = options.get_property("options").to_integral_number(32, false);
+  }
 
   parser = htmlCreatePushParserCtxt(0, 0, 0, 0, fname, XML_CHAR_ENCODING_NONE);
 
   if (!parser)
     throw exception("Could not create parser");
+
+  if (htmlCtxtUseOptions(parser, flags) != 0)
+    throw exception("Could not initialise parser options");
 
   define_native_property(
     "document",
