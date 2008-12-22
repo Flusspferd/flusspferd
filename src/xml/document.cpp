@@ -135,10 +135,13 @@ object document::class_info::create_prototype() {
 }
 
 string document::dump() {
-  xmlChar *doc_txt;
-  int doc_txt_len;
+  xmlChar *doc_txt = 0;
+  int doc_txt_len = 0;
 
   xmlDocDumpFormatMemoryEnc(c_obj(), &doc_txt, &doc_txt_len, "UTF-16", 1);
+
+  if (!doc_txt)
+    throw exception("Could not dump XML document");
 
   char16_t *txt = (char16_t *) doc_txt;
   int txt_len = doc_txt_len / sizeof(char16_t);
@@ -164,8 +167,8 @@ object document::copy(bool recursive) {
   return create_native_object<document>(get_prototype(), copy);
 }
 
-string document::to_string() {
-  return dump();
+value document::to_string() {
+  return call("dump");
 }
 
 void document::prop_root_element(property_mode mode, value &data) {
