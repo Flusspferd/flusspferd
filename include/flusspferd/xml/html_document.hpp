@@ -45,6 +45,9 @@ public:
   ~html_document();
 
 private:
+  string dump();
+
+private:
   void init();
 };
 

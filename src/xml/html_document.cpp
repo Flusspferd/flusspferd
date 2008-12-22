@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/xml/html_document.hpp"
+#include "flusspferd/string.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
@@ -51,10 +52,38 @@ html_document::~html_document() {
 }
 
 void html_document::init() {
+  register_native_method("dump", &html_document::dump);
 }
 
 object html_document::class_info::create_prototype() {
   object proto = create_object(flusspferd::get_prototype<document>());
 
+  create_native_method(proto, "dump", 0);
+
   return proto;
+}
+
+string html_document::dump() {
+  string result;
+
+  xmlOutputBufferPtr buf = xmlAllocOutputBuffer(0);
+
+  if (!buf)
+    throw exception("Could not dump HTML document");
+
+  try {
+    htmlDocContentDumpFormatOutput(buf, c_obj(), 0, 1);
+
+    char *data = (char*) buf->buffer->content;
+    std::size_t size = buf->buffer->use;
+
+    result = string(data, size);
+  } catch (...) {
+    xmlOutputBufferClose(buf);
+    throw;
+  }
+
+  xmlOutputBufferClose(buf);
+
+  return result;
 }
