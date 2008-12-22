@@ -63,6 +63,7 @@ static void once() {
 static boost::once_flag once_flag = BOOST_ONCE_INIT;
 
 static void xml_constants(object);
+static void html_constants(object);
 
 object flusspferd::xml::load_xml(object container) {
   local_root_scope scope;
@@ -99,6 +100,8 @@ object flusspferd::xml::load_xml(object container) {
   load_class<html_push_parser>(HTML);
   create_native_function(HTML, "parseBlob", &html_parse_blob);
   create_native_function(HTML, "parse", &html_parse_file);
+
+  html_constants(HTML);
 
   XML.define_property(
     "HTML",
@@ -144,6 +147,26 @@ static void xml_constants(object XML) {
   //CONST(PARSE_OLD10);
   //CONST(PARSE_NOBASEFIX);
   //CONST(PARSE_HUGE);
+
+#undef CONST
+}
+
+static void html_constants(object HTML) {
+#define CONST(x) \
+  HTML.define_property( \
+    BOOST_PP_STRINGIZE(x), \
+    BOOST_PP_CAT(HTML_, x), \
+    object::read_only_property | object::permanent_property) \
+  /**/
+
+  // parser constants
+  CONST(PARSE_RECOVER);
+  CONST(PARSE_NOERROR);
+  CONST(PARSE_NOWARNING);
+  CONST(PARSE_PEDANTIC);
+  CONST(PARSE_NOBLANKS);
+  CONST(PARSE_NONET);
+  CONST(PARSE_COMPACT);
 
 #undef CONST
 }
