@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/security.hpp"
 #include <boost/thread/once.hpp>
+#include <boost/preprocessor.hpp>
 #include <libxml/xmlIO.h>
 #include <libxml/xpath.h>
 
@@ -60,6 +61,8 @@ static void once() {
 }
 
 static boost::once_flag once_flag = BOOST_ONCE_INIT;
+
+static void xml_constants(object);
 
 object flusspferd::xml::load_xml(object container) {
   local_root_scope scope;
@@ -102,12 +105,47 @@ object flusspferd::xml::load_xml(object container) {
     HTML,
     object::read_only_property | object::permanent_property);
 
+  xml_constants(XML);
+
   container.define_property(
     "XML",
     XML,
     object::read_only_property | object::permanent_property);
 
   return XML;
+}
+
+static void xml_constants(object XML) {
+#define CONST(x) \
+  XML.define_property( \
+    BOOST_PP_STRINGIZE(x), \
+    BOOST_PP_CAT(XML_, x), \
+    object::read_only_property | object::permanent_property) \
+  /**/
+
+  // parser constants
+  CONST(PARSE_RECOVER);
+  CONST(PARSE_NOENT);
+  CONST(PARSE_DTDLOAD);
+  //CONST(PARSE_DTDADDR);
+  CONST(PARSE_DTDVALID);
+  CONST(PARSE_NOERROR);
+  CONST(PARSE_NOWARNING);
+  CONST(PARSE_PEDANTIC);
+  CONST(PARSE_NOBLANKS);
+  CONST(PARSE_SAX1);
+  CONST(PARSE_XINCLUDE);
+  CONST(PARSE_NONET);
+  CONST(PARSE_NODICT);
+  CONST(PARSE_NSCLEAN);
+  CONST(PARSE_NOCDATA);
+  CONST(PARSE_NOXINCNODE);
+  CONST(PARSE_COMPACT);
+  //CONST(PARSE_OLD10);
+  //CONST(PARSE_NOBASEFIX);
+  //CONST(PARSE_HUGE);
+
+#undef CONST
 }
 
 template<int (*OldMatch)(char const *), unsigned mode>
