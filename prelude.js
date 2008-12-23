@@ -33,10 +33,18 @@ Object.defineProperty(Array, 'from', {enumerable: false});
 function Range(from,to, by) {
   var i = from;
   by = by || 1;
-  while (i < to) {
-    yield i;
-    i += by;
-  }
+  var r;
+  function RangeInstance() {
+    while (i < to) {
+      r[i] = i;
+      yield i;
+      i += by;
+    }
+  };
+  r = new RangeInstance();
+  r.__itererator__ = function() { return r };
+
+  return r;
 }
 
 String.prototype.toArray = function toArray() {
