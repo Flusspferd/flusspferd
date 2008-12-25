@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/object.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
 #include "test_environment.hpp"
 
@@ -82,6 +83,13 @@ BOOST_AUTO_TEST_CASE( object_property_value ) {
   BOOST_CHECK(!obj.has_property(name));
   flusspferd::value const empty;
   BOOST_CHECK_EQUAL(obj.get_property(name), empty);
+}
+
+BOOST_AUTO_TEST_CASE( function_as_object ) {
+  flusspferd::value v = flusspferd::evaluate("(function () {})");
+  BOOST_CHECK(!v.is_void());
+  BOOST_CHECK(v.is_object());
+  BOOST_CHECK(!v.is_null());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
