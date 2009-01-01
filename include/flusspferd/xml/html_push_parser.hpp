@@ -21,36 +21,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_CONTEXT_HPP
-#define FLUSSPFERD_XML_CONTEXT_HPP
+#ifndef FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
+#define FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
-#include <libxml/xpath.h>
+#include "../blob.hpp"
+#include <libxml/HTMLparser.h>
 
 namespace flusspferd { namespace xml {
 
-class xpath_context : public native_object_base {
+class html_push_parser : public native_object_base {
 public:
   struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.XPath"; }
-    static char const *constructor_name() { return "XPath"; }
+    static char const *full_name() { return "XML.HTML.PushParser"; }
+
+    static char const *constructor_name() { return "PushParser"; }
     typedef boost::mpl::size_t<1> constructor_arity;
 
     static object create_prototype();
   };
 
-  xpath_context(object const &, call_context &);
-  ~xpath_context();
+  html_push_parser(object const &, call_context &);
+  ~html_push_parser();
+
+protected:
+  void trace(tracer &);
 
 private: // JS methods
-  void eval(call_context &);
+  void push(blob &, bool);
+  object terminate();
 
 private: // JS properties
-  void prop_current(property_mode, value &);
+  void prop_document(property_mode, value &);
 
 private:
-  xmlXPathContextPtr xpath_ctx;
+  void terminate2();
+
+  htmlParserCtxtPtr parser;
+  htmlDocPtr doc;
 };
 
 }}

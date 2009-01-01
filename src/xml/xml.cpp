@@ -32,12 +32,15 @@ THE SOFTWARE.
 #include "flusspferd/xml/reference.hpp"
 #include "flusspferd/xml/attribute.hpp"
 #include "flusspferd/xml/processing_instruction.hpp"
+#include "flusspferd/xml/html_document.hpp"
+#include "flusspferd/xml/html_push_parser.hpp"
 #include "flusspferd/function_adapter.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/security.hpp"
 #include <boost/thread/once.hpp>
+#include <boost/preprocessor.hpp>
 #include <libxml/xmlIO.h>
 #include <libxml/xpath.h>
 
@@ -58,6 +61,9 @@ static void once() {
 }
 
 static boost::once_flag once_flag = BOOST_ONCE_INIT;
+
+static void xml_constants(object);
+static void html_constants(object);
 
 object flusspferd::xml::load_xml(object container) {
   local_root_scope scope;
@@ -84,16 +90,25 @@ object flusspferd::xml::load_xml(object container) {
   load_class<push_parser>(XML);
 
   create_native_function(XML, "parseBlob", &parse_blob);
-  create_native_function(XML, "parseFile", &parse_file);
+  create_native_function(XML, "parse", &parse_file);
 
-  object XPath = flusspferd::create_object();
+  object XPath = load_class<xpath_context>(XML);
 
-  load_class<xpath_context>(XPath);
+  object HTML = flusspferd::create_object();
+
+  load_class<html_document>(HTML);
+  load_class<html_push_parser>(HTML);
+  create_native_function(HTML, "parseBlob", &html_parse_blob);
+  create_native_function(HTML, "parse", &html_parse_file);
+
+  html_constants(HTML);
 
   XML.define_property(
-    "XPath",
-    XPath,
+    "HTML",
+    HTML,
     object::read_only_property | object::permanent_property);
+
+  xml_constants(XML);
 
   container.define_property(
     "XML",
@@ -101,6 +116,59 @@ object flusspferd::xml::load_xml(object container) {
     object::read_only_property | object::permanent_property);
 
   return XML;
+}
+
+static void xml_constants(object XML) {
+#define CONST(x) \
+  XML.define_property( \
+    BOOST_PP_STRINGIZE(x), \
+    BOOST_PP_CAT(XML_, x), \
+    object::read_only_property | object::permanent_property) \
+  /**/
+
+  // parser constants
+  CONST(PARSE_RECOVER);
+  CONST(PARSE_NOENT);
+  CONST(PARSE_DTDLOAD);
+  //CONST(PARSE_DTDADDR);
+  CONST(PARSE_DTDVALID);
+  CONST(PARSE_NOERROR);
+  CONST(PARSE_NOWARNING);
+  CONST(PARSE_PEDANTIC);
+  CONST(PARSE_NOBLANKS);
+  CONST(PARSE_SAX1);
+  CONST(PARSE_XINCLUDE);
+  CONST(PARSE_NONET);
+  CONST(PARSE_NODICT);
+  CONST(PARSE_NSCLEAN);
+  CONST(PARSE_NOCDATA);
+  CONST(PARSE_NOXINCNODE);
+  CONST(PARSE_COMPACT);
+  //CONST(PARSE_OLD10);
+  //CONST(PARSE_NOBASEFIX);
+  //CONST(PARSE_HUGE);
+
+#undef CONST
+}
+
+static void html_constants(object HTML) {
+#define CONST(x) \
+  HTML.define_property( \
+    BOOST_PP_STRINGIZE(x), \
+    BOOST_PP_CAT(HTML_, x), \
+    object::read_only_property | object::permanent_property) \
+  /**/
+
+  // parser constants
+  CONST(PARSE_RECOVER);
+  CONST(PARSE_NOERROR);
+  CONST(PARSE_NOWARNING);
+  CONST(PARSE_PEDANTIC);
+  CONST(PARSE_NOBLANKS);
+  CONST(PARSE_NONET);
+  CONST(PARSE_COMPACT);
+
+#undef CONST
 }
 
 template<int (*OldMatch)(char const *), unsigned mode>

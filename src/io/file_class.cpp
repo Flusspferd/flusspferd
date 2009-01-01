@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld, Ash Berlin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"
 #include <boost/scoped_array.hpp>
+#include <boost/filesystem.hpp>
 #include <fstream>
 #include <iostream>
 #include <sys/types.h>
@@ -43,6 +44,7 @@ public:
   std::fstream stream;
 
   static void create(char const *name, boost::optional<int> mode);
+  static bool exists(char const *name);
 };
 
 file_class::file_class(object const &obj, call_context &x)
@@ -63,6 +65,7 @@ file_class::~file_class()
 
 void file_class::class_info::augment_constructor(object constructor) {
   create_native_function(constructor, "create", &impl::create);
+  create_native_function(constructor, "exists", &impl::exists);
 }
 
 object file_class::class_info::create_prototype() {
@@ -84,12 +87,17 @@ void file_class::open(char const *name) {
 
   p->stream.open(name);
 
+  define_property("fileName", string(name), 
+                  permanent_property | read_only_property );
+
   if (!p->stream)
+    // TODO: Include some sort of system error message here
     throw exception("Could not open file");
 }
 
 void file_class::close() {
   p->stream.close();
+  delete_property("fileName");
 }
 
 void file_class::impl::create(char const *name, boost::optional<int> mode) {
@@ -101,3 +109,13 @@ void file_class::impl::create(char const *name, boost::optional<int> mode) {
   if (creat(name, mode.get_value_or(0666)) < 0)
     throw exception("Could not create file");
 }
+
+bool file_class::impl::exists(char const *name) {
+  security &sec = security::get();
+
+  if (!sec.check_path(name, security::ACCESS))
+    throw exception("Could not check whether file exists (security)");
+
+  return boost::filesystem::exists(name);
+}
+

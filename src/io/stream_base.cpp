@@ -42,8 +42,9 @@ stream_base::stream_base(object const &o, std::streambuf *p)
   register_native_method("readWholeBlob", &stream_base::read_whole_blob);
   register_native_method("readBlob", &stream_base::read_blob);
   register_native_method("write", &stream_base::write);
-  register_native_method("print", &stream_base::print);
   register_native_method("flush", &stream_base::flush);
+  register_native_method("print", &stream_base::print);
+  register_native_method("readLine", &stream_base::read_line);
 
   define_property("fieldSeparator", string(" "));
   define_property("recordSeparator", string("\n"));
@@ -71,8 +72,9 @@ object stream_base::class_info::create_prototype() {
   create_native_method(proto, "readWholeBlob", 0);
   create_native_method(proto, "readBlob", 1);
   create_native_method(proto, "write", 1);
-  create_native_method(proto, "print", 0);
   create_native_method(proto, "flush", 0);
+  create_native_method(proto, "print", 0);
+  create_native_method(proto, "readLine", 1);
 
   return proto;
 }
@@ -158,6 +160,10 @@ void stream_base::write(value const &data) {
     flush();
 }
 
+void stream_base::flush() {
+  streambuf->pubsync();
+}
+
 void stream_base::print(call_context &x) {
   local_root_scope scope;
 
@@ -166,27 +172,28 @@ void stream_base::print(call_context &x) {
   if (!delim_v.is_void_or_null())
     delim = delim_v.to_string();
 
-  // If passed a single array as an arugment, treat it as the arguments. i.e:
-  // print([1,2,3]) would produces same output as print(1,2,3);
+  std::size_t n = x.arg.size();
+  for (std::size_t i = 0; i < n; ++i) {
+    value p = x.arg[i];
 
-  if (x.arg.size() == 1 && x.arg[0].is_object() &&
-      x.arg[0].get_object().is_array())
-  {
-    array a = x.arg[0].get_object();
-    std::size_t n = a.get_length();
-    for (std::size_t i = 0; i < n; ++i) {
-      write(a.get_element(i).to_string());
-      if (i < n - 1)
-        write(delim);
+    if (p.is_object() && p.get_object().is_array()) {
+      value recordSep = get_property("recordSeparator");
+
+      array arr = p.get_object();
+      arguments arg;
+      std::size_t length = arr.get_length();
+      for (std::size_t i = 0; i < length; ++i)
+        arg.push_back(arr.get_element(i));
+
+      set_property("recordSeparator", value());
+      call("print", arg);
+      set_property("recordSeparator", recordSep);
+    } else {
+      write(p.to_string());
     }
-  }
-  else {
-    std::size_t n = x.arg.size();
-    for (std::size_t i = 0; i < n; ++i) {
-      write(x.arg[i].to_string());
-      if (i < n - 1)
-        write(delim);
-    }
+
+    if (i < n - 1)
+      write(delim);
   }
 
   value record_v = get_property("recordSeparator");
@@ -196,6 +203,33 @@ void stream_base::print(call_context &x) {
   flush();
 }
 
-void stream_base::flush() {
-  streambuf->pubsync();
+string stream_base::read_line(value sep_) {
+  local_root_scope scope;
+
+  if (sep_.is_void_or_null())
+    sep_ = string("\n");
+
+  string sep = sep_.to_string();
+
+  if (sep.length() != 1)
+    throw exception("Line separators with size other than 1 are not supported");
+
+  int sepc = sep.data()[0];
+
+  if (sepc >= 128)
+    throw exception("Non-ASCII line separators are not supported");
+
+  std::string line;
+
+  for (;;) {
+    int ch = streambuf->sbumpc();
+    if (ch == std::char_traits<char>::eof())
+      break;
+    line += ch;
+    if (ch == sepc)
+      break;
+  }
+
+  return line;
 }
+

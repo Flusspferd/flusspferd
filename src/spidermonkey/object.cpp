@@ -36,6 +36,12 @@ THE SOFTWARE.
 #include <cassert>
 #include <js/jsapi.h>
 
+#if JS_VERSION < 180
+#include <js/jsobj.h>
+#endif
+
+
+
 using namespace flusspferd;
 
 object::object() : Impl::object_impl(0) { }
@@ -149,6 +155,41 @@ bool object::has_property(value const &id) const {
                         &foundp))
     throw exception("Could not check property");
   return foundp;
+}
+
+bool object::has_own_property(char const *name_) const {
+  local_root_scope scope;
+  string name(name_);
+  return has_own_property(name);
+}
+
+bool object::has_own_property(std::string const &name_) const {
+  local_root_scope scope;
+  string name(name_);
+  return has_own_property(name);
+}
+
+bool object::has_own_property(value const &id) const {
+
+  JSBool has;
+#if JS_VERSION >= 180
+  string name = id.to_string();
+  if (!JS_AlreadyHasOwnUCProperty(Impl::current_context(), get_const(),
+                                  name.data(), name.length(), &has))
+#else
+  JSObject *obj = get_const();
+  jsval argv[] = { Impl::get_jsval(id) };
+  jsval vp;
+  JSBool ret = js_HasOwnPropertyHelper(Impl::current_context(), obj,
+                                       obj->map->ops->lookupProperty, 1, argv, 
+                                       &vp);
+  has = JSVAL_TO_BOOLEAN(vp);
+  if (!ret)
+#endif
+  {
+    throw exception("Unable to check for own property");
+  }
+  return has;
 }
 
 void object::delete_property(char const *name) {

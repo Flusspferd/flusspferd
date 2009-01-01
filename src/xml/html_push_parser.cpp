@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/push_parser.hpp"
+#include "flusspferd/xml/html_push_parser.hpp"
 #include "flusspferd/xml/node.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
@@ -30,7 +30,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-push_parser::push_parser(object const &obj, call_context &x)
+html_push_parser::html_push_parser(object const &obj, call_context &x)
   : native_object_base(obj), parser(0), doc(0)
 {
   local_root_scope scope;
@@ -48,29 +48,29 @@ push_parser::push_parser(object const &obj, call_context &x)
     flags = options.get_property("options").to_integral_number(32, false);
   }
 
-  parser = xmlCreatePushParserCtxt(0, 0, 0, 0, fname);
+  parser = htmlCreatePushParserCtxt(0, 0, 0, 0, fname, XML_CHAR_ENCODING_NONE);
 
   if (!parser)
     throw exception("Could not create parser");
 
-  if (xmlCtxtUseOptions(parser, flags) != 0)
+  if (htmlCtxtUseOptions(parser, flags) != 0)
     throw exception("Could not initialise parser options");
 
   define_native_property(
     "document",
     read_only_property | permanent_shared_property,
-    &push_parser::prop_document);
+    &html_push_parser::prop_document);
 
   register_native_method(
     "push",
-    &push_parser::push);
+    &html_push_parser::push);
 
   register_native_method(
     "terminate",
-    &push_parser::terminate);
+    &html_push_parser::terminate);
 }
 
-push_parser::~push_parser() {
+html_push_parser::~html_push_parser() {
   if (parser) {
     if (parser->myDoc != doc)
       xmlFreeDoc(parser->myDoc);
@@ -78,7 +78,7 @@ push_parser::~push_parser() {
   }
 }
 
-object push_parser::class_info::create_prototype() {
+object html_push_parser::class_info::create_prototype() {
   object proto = create_object();
 
   create_native_method(proto, "push", 2);
@@ -87,23 +87,23 @@ object push_parser::class_info::create_prototype() {
   return proto;
 }
 
-void push_parser::trace(tracer &trc) {
+void html_push_parser::trace(tracer &trc) {
   if (doc)
     trc("parser-doc", *static_cast<object*>(doc->_private));
 }
 
-void push_parser::prop_document(property_mode mode, value &data) {
+void html_push_parser::prop_document(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
   data = node::create(xmlNodePtr(doc));
 }
 
-void push_parser::push(blob &b, bool t) {
+void html_push_parser::push(blob &b, bool t) {
   if (!parser)
     throw exception("Could not parse chunk: parser is empty");
 
-  int status = xmlParseChunk(parser, (char *) b.get_data(), b.size(), t);
+  int status = htmlParseChunk(parser, (char *) b.get_data(), b.size(), t);
 
   if (status != XML_ERR_OK)
     throw exception("Could not parse chunk");
@@ -112,8 +112,8 @@ void push_parser::push(blob &b, bool t) {
     terminate2();
 }
 
-object push_parser::terminate() {
-  int status = xmlParseChunk(parser, 0, 0, true);
+object html_push_parser::terminate() {
+  int status = htmlParseChunk(parser, 0, 0, true);
 
   if (status != XML_ERR_OK)
     throw exception("Could not terminate parser");
@@ -123,10 +123,10 @@ object push_parser::terminate() {
   return node::create(xmlNodePtr(doc));
 }
 
-void push_parser::terminate2() {
+void html_push_parser::terminate2() {
   doc = parser->myDoc;
   node::create(xmlNodePtr(doc));
 
-  xmlFreeParserCtxt(parser);
+  htmlFreeParserCtxt(parser);
   parser = 0;
 }

@@ -21,36 +21,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_CONTEXT_HPP
-#define FLUSSPFERD_XML_CONTEXT_HPP
+#ifndef FLUSSPFERD_XML_HTML_DOCUMENT_HPP
+#define FLUSSPFERD_XML_HTML_DOCUMENT_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include <libxml/xpath.h>
+#include "document.hpp"
+#include <libxml/HTMLtree.h>
 
 namespace flusspferd { namespace xml {
 
-class xpath_context : public native_object_base {
+class html_document : public document {
 public:
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.XPath"; }
-    static char const *constructor_name() { return "XPath"; }
-    typedef boost::mpl::size_t<1> constructor_arity;
+  struct class_info : node::class_info {
+    static char const *full_name() { return "XML.HTML.Document"; }
+
+    static char const *constructor_name() { return "Document"; }
+    typedef boost::mpl::size_t<0> constructor_arity;
 
     static object create_prototype();
   };
 
-  xpath_context(object const &, call_context &);
-  ~xpath_context();
-
-private: // JS methods
-  void eval(call_context &);
-
-private: // JS properties
-  void prop_current(property_mode, value &);
+  html_document(object const &, call_context &);
+  html_document(object const &, htmlDocPtr doc);
+  ~html_document();
 
 private:
-  xmlXPathContextPtr xpath_ctx;
+  string dump();
+
+private:
+  void init();
 };
 
 }}
