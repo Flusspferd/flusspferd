@@ -45,6 +45,10 @@ Method: write
   Data should either be a string, in which case the UTF-8 byte sequence is
   written, or else a <Blob> where the raw binary data is written.
 
+Method: flush
+
+Flush internal/OS buffers.
+
 Method: print
 
   Print strings to this stream.
@@ -56,9 +60,12 @@ Method: print
   string with <fieldSeperator> between each one and <recordSeparator> after the
   last one.
 
-Method: flush
+Method: readLine
 
-Flush internal/OS buffers.
+  Read a line from the stream.
+
+  Parameters:
+  separator - The line separator to use. Must be a single ASCII character. Default "\n".
 
 Property: fieldSeperator
 
