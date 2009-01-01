@@ -1,5 +1,7 @@
 flusspferd TODO list:
 
+- Revisit the C++ exception system, especially the throw exception("Foo") part.
+
 - really make Importer secure (including maybe white/blacklisting of modules,
   and restricting search paths)
 
