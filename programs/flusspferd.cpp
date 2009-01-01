@@ -93,7 +93,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::load_properties_functions();
 
-  flusspferd::create_native_function(flusspferd::global(), "quit", &quit);
+  flusspferd::object g = flusspferd::global();
+  flusspferd::create_native_function(g, "quit", &quit);
+  flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
   flusspferd::gc();
 }
