@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/properties_functions.hpp"
+#include <boost/bind.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -57,6 +58,8 @@ class flusspferd_repl {
   flusspferd::current_context_scope scope;
   flusspferd::security &security;
 
+  bool running;
+
   int argc;
   char ** argv;
 
@@ -65,15 +68,16 @@ class flusspferd_repl {
 
   bool getline(std::string &source, const char* prompt = "> ");
 
+  void quit() {
+    running = false;
+    throw flusspferd::js_quit();
+  }
+
 public:
   flusspferd_repl(int argc, char** argv);
 
   int run();
 };
-
-static void quit() {
-  throw flusspferd::js_quit();
-}
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
   : extfile(false),
@@ -85,6 +89,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
     security(flusspferd::security::create(flusspferd::global())),
+    running(false),
     argc(argc),
     argv(argv)
 {
@@ -94,7 +99,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   flusspferd::load_properties_functions();
 
   flusspferd::object g = flusspferd::global();
-  flusspferd::create_native_function(g, "quit", &quit);
+  flusspferd::create_native_function<void ()>(
+    g, "quit",
+    boost::bind(&flusspferd_repl::quit, this));
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
   flusspferd::gc();
@@ -114,7 +121,9 @@ int flusspferd_repl::run() {
   std::string source;
   unsigned int line = 0;
 
-  while (getline(source)) {
+  running = true;
+
+  while (running && getline(source)) {
     try {
       flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
       if (!v.is_void())
@@ -194,12 +203,7 @@ bool flusspferd_repl::parse_cmdline() {
       if (!config_loaded)
         load_config();
       extfile = true;
-      try {
-        co.execute(file.c_str());
-      } catch (flusspferd::exception &e) {
-        if (!e.empty())
-          throw;
-      }
+      co.execute(file.c_str());
     }
   }
 
