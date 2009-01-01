@@ -28,18 +28,31 @@ THE SOFTWARE.
 #include <stdexcept>
 
 namespace flusspferd {
-  class exception : public std::runtime_error {
-  public:
-    exception(std::string const &what);
-    ~exception() throw();
 
-  public:
-    void throw_js_INTERNAL();
+class value;
 
-  private:
-    class impl;
-    boost::shared_ptr<impl> p;
-  };
+class exception : public std::runtime_error {
+public:
+  exception(std::string const &what);
+  ~exception() throw();
+
+  value val() const;
+  bool empty() const;
+
+public:
+  void throw_js_INTERNAL();
+
+private:
+  class impl;
+  boost::shared_ptr<impl> p;
+};
+
+class js_quit {
+public:
+  js_quit();
+  virtual ~js_quit();
+};
+
 }
 
 #define FLUSSPFERD_CALLBACK_BEGIN try
@@ -51,6 +64,8 @@ namespace flusspferd {
     } catch (::std::exception &e) { \
       ::flusspferd::exception x(e.what()); \
       x.throw_js_INTERNAL(); \
+      return JS_FALSE; \
+    } catch (::flusspferd::js_quit&) {\
       return JS_FALSE; \
     } \
     return JS_TRUE

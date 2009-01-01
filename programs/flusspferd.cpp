@@ -64,13 +64,16 @@ class flusspferd_repl {
   void load_config();
 
   bool getline(std::string &source, const char* prompt = "> ");
+
 public:
   flusspferd_repl(int argc, char** argv);
 
   int run();
 };
 
-
+static void quit() {
+  throw flusspferd::js_quit();
+}
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
   : extfile(false),
@@ -90,8 +93,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::load_properties_functions();
 
-  flusspferd::gc();
+  flusspferd::create_native_function(flusspferd::global(), "quit", &quit);
 
+  flusspferd::gc();
 }
 
 int flusspferd_repl::run() {
@@ -188,7 +192,12 @@ bool flusspferd_repl::parse_cmdline() {
       if (!config_loaded)
         load_config();
       extfile = true;
-      co.execute(file.c_str());
+      try {
+        co.execute(file.c_str());
+      } catch (flusspferd::exception &e) {
+        if (!e.empty())
+          throw;
+      }
     }
   }
 
@@ -218,14 +227,13 @@ bool flusspferd_repl::getline(std::string &source, const char* prompt) {
 }
 
 int main(int argc, char **argv) {
-
   try {
     flusspferd::init::initialize();
     flusspferd_repl repl(argc, argv);
     repl.run();
-  }
-  catch(std::exception &e) {
+  } catch (std::exception &e) {
     std::cerr << "ERROR: " << e.what() << '\n';
     return 1;
   }
+  return 0;
 }
