@@ -40,7 +40,12 @@ class native_object_base::impl {
 public:
   static void finalize(JSContext *ctx, JSObject *obj);
   static JSBool call_helper(JSContext *, JSObject *, uintN, jsval *, jsval *);
+
+#if JS_VERSION >= 180
+  static void trace_op(JSTracer *trc, JSObject *obj);
+#else
   static uint32 mark_op(JSContext *, JSObject *, void *);
+#endif
 
   template<property_mode>
   static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
@@ -68,9 +73,23 @@ public:
   property_callback_map property_callbacks;
 };
 
+static const unsigned int basic_flags =
+  JSCLASS_HAS_PRIVATE
+  | JSCLASS_NEW_RESOLVE
+#if JS_VERSION >= 180
+  | JSCLASS_MARK_IS_TRACE
+#endif
+  ;
+
+#if JS_VERSION >= 180
+#define MARK_TRACE_OP ((JSMarkOp) &native_object_base::impl::trace_op)
+#else
+#define MARK_TRACE_OP (&native_object_base::impl::mark_op)
+#endif
+
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
-  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE,
+  basic_flags,
   &native_object_base::impl::property_op<native_object_base::property_add>,
   &native_object_base::impl::property_op<native_object_base::property_delete>,
   &native_object_base::impl::property_op<native_object_base::property_get>,
@@ -85,13 +104,13 @@ JSClass native_object_base::impl::native_object_class = {
   0,
   0,
   0,
-  &native_object_base::impl::mark_op,
+  MARK_TRACE_OP,
   0
 };
 
 JSClass native_object_base::impl::native_enumerable_object_class = {
   "NativeObject",
-  JSCLASS_HAS_PRIVATE | JSCLASS_NEW_RESOLVE | JSCLASS_NEW_ENUMERATE,
+  basic_flags | JSCLASS_NEW_ENUMERATE,
   &native_object_base::impl::property_op<native_object_base::property_add>,
   &native_object_base::impl::property_op<native_object_base::property_delete>,
   &native_object_base::impl::property_op<native_object_base::property_get>,
@@ -106,7 +125,7 @@ JSClass native_object_base::impl::native_enumerable_object_class = {
   0,
   0,
   0,
-  &native_object_base::impl::mark_op,
+  MARK_TRACE_OP,
   0
 };
 
@@ -380,6 +399,19 @@ JSBool native_object_base::impl::new_enumerate(
   } FLUSSPFERD_CALLBACK_END;
 }
 
+#if JS_VERSION >= 180
+void native_object_base::impl::trace_op(
+    JSTracer *trc, JSObject *obj)
+{
+  current_context_scope scope(Impl::wrap_context(trc->context));
+
+  native_object_base &self =
+    native_object_base::get_native(Impl::wrap_object(obj));
+
+  tracer tracer_(trc);
+  self.trace(tracer_);
+}
+#else
 uint32 native_object_base::impl::mark_op(
     JSContext *ctx, JSObject *obj, void *thing)
 {
@@ -393,6 +425,7 @@ uint32 native_object_base::impl::mark_op(
 
   return 0;
 }
+#endif
 
 void native_object_base::call_native_method(
     std::string const &name, call_context &x)
