@@ -31,21 +31,37 @@ using namespace flusspferd;
 
 class tracer::impl {
 public:
-  impl(JSContext *cx, void *x) : cx(cx), x(x) {}
+  impl(void *x)
+#if JS_VERSION >= 180
+  : trc((JSTracer*) x)
+#else
+  : cx(Impl::current_context()), x(x)
+#endif
+  {}
 
+#if JS_VERSION >= 180
+  JSTracer *trc;
+#else
   JSContext *cx;
   void *x;
+#endif
 };
 
-tracer::tracer(void *x) : p(new impl(Impl::current_context(), x)) { }
+tracer::tracer(void *x) : p(new impl(x)) { }
 
 tracer::~tracer() {}
 
 void tracer::trace_gcptr(char const *name, void *gcthing) {
   if (!gcthing)
     return;
+
   jsval v = * (jsval *) gcthing;
+
+#if JS_VERSION >= 180
+  JS_CALL_VALUE_TRACER(p->trc, v, name);
+#else
   if (!JSVAL_IS_GCTHING(v))
     return;
   JS_MarkGCThing(p->cx, JSVAL_TO_GCTHING(v), name, p->x);
+#endif
 }

@@ -60,10 +60,11 @@ namespace {
 
 class exception::impl {
 public:
-  impl() {}
+  impl() : empty(true) {}
 
   context ctx;
   boost::scoped_ptr<root_value> exception_value;
+  bool empty;
 };
 
 exception::exception(std::string const &what)
@@ -78,6 +79,7 @@ exception::exception(std::string const &what)
 
   value &v = *p->exception_value;
   if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
+    p->empty = false;
     JS_ClearPendingException(ctx);
   } else {
     try {
@@ -101,3 +103,17 @@ void exception::throw_js_INTERNAL() {
       Impl::current_context(),
       Impl::get_jsval(*p->exception_value));
 }
+
+value exception::val() const {
+  return p->exception_value ? *p->exception_value : value();
+}
+
+bool exception::empty() const {
+  return p->empty;
+}
+
+
+
+js_quit::js_quit() {}
+
+js_quit::~js_quit() {}

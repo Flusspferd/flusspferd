@@ -55,9 +55,11 @@ private: // javascript methods
   object read_blob(unsigned max_size);
 
   void write(value const &);
-  void print(call_context &);
 
   void flush();
+
+  void print(call_context &);
+  string read_line(value sep);
 
 private:
   std::streambuf *streambuf;
