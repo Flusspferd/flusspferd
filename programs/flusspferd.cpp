@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <list>
 
 #ifdef HAVE_EDITLINE
 #include <editline/readline.h>
@@ -47,8 +48,7 @@ THE SOFTWARE.
 #endif
 
 class flusspferd_repl {
-  bool extfile;
-  std::string file;
+  bool interactive;
   std::istream in;
 
   bool config_loaded;
@@ -62,8 +62,9 @@ class flusspferd_repl {
 
   int argc;
   char ** argv;
-
-  bool parse_cmdline();
+  
+  // Returns list of file(s) to execute
+  std::list<std::string> parse_cmdline();
   void load_config();
 
   bool getline(std::string &source, const char* prompt = "> ");
@@ -80,8 +81,8 @@ public:
 };
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
-  : extfile(false),
-    file("typein"),
+  : interactive(false),
+    //file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
     // Default - can be changed by -c cmd line option
@@ -108,11 +109,15 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 }
 
 int flusspferd_repl::run() {
-  if (!parse_cmdline())
-    return 1;
+  std::list<std::string> files = parse_cmdline();
 
-  // if extfile is true, we've run it already, and aren't going to interactive
-  if (extfile)
+  typedef std::list<std::string>::const_iterator iter;
+  for (iter i = files.begin(), e = files.end(); i != e; ++i) {
+    const std::string &file = *i;
+    co.execute(file.c_str());
+  }
+  
+  if (interactive)
     return 0;
 
   if (!config_loaded)
@@ -125,7 +130,7 @@ int flusspferd_repl::run() {
 
   while (running && getline(source)) {
     try {
-      flusspferd::value v = flusspferd::evaluate(source, file.c_str(), ++line);
+      flusspferd::value v = flusspferd::evaluate(source, "typein", ++line);
       if (!v.is_void())
         std::cout << v << '\n';
     }
@@ -140,11 +145,21 @@ int flusspferd_repl::run() {
 
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
-    " -h -c <file> -f <file> -i\n\n"
-    "\t-h         displays this message\n"
-    "\t-c <file>  load config from file\n"
-    "\t-f <file>  open file as input\n"
-    "\t-i         enter interactive mode (after running a file)\n\n";
+    " [option] ... [file | -] [arg] ...\n\n"
+    "Options\n"
+    "    -h                       displays this message\n"
+    "\n"
+    "    -c <file>\n"
+    "\n"
+    "    --config <file>          load config from file\n"
+    "\n"
+    "    -i\n"
+    "    --interactive            enter interactive mode (after files)\n"
+    "\n"
+    "    -f <file>\n"
+    "    --file <file>            run this file before standard script handling\n"
+    "\n"
+    "    --                       stop processing arguments\n\n";
 }
 
 void flusspferd_repl::load_config() {
@@ -159,60 +174,102 @@ void flusspferd_repl::load_config() {
   }
 }
 
-bool flusspferd_repl::parse_cmdline() {
-  if (argc <= 1)
-    return true;
+std::list<std::string> flusspferd_repl::parse_cmdline() {
+  bool interactive_set = false;
+  flusspferd::array args = flusspferd::create_array();
+  co.global().set_property("arguments", args);
 
-  // TODO: We probably want to build up list of files to run, then populate
-  // arguments object at top level (in JS) then run each file in turn
-  for (int i = 1; i < argc; ++i) {
-    if (std::strcmp(argv[i], "-h") == 0 ||
-        std::strcmp(argv[i], "--help") == 0)
-    {
-      print_help(argv[0]);
-      return false;
-    }
-    else if (std::strcmp(argv[i], "-c") == 0 ||
-             std::strcmp(argv[i], "--config") == 0)
-    {
-      ++i;
-      if (i == argc) {
-        print_help(argv[0]);
-        std::cerr << "ERROR: expected filename after " << argv[i-1]
-                  << " option\n";
-        return false;
+  std::list<std::string> files;
+
+  if (argc <= 1)
+    return files;
+
+  int i=1;
+
+  for (i = 1; i < argc; ++i) {
+    if (argv[i][0] == '-') {
+      if (std::strcmp(argv[i], "--") == 0)
+      {
+        i++;
+        break;
       }
-      config_file = argv[i];
-    }
-    else if (std::strcmp(argv[i], "-i") == 0 ||
-             std::strcmp(argv[i], "--interactive") == 0)
-    {
-      extfile = false;
-    }
-    else if (std::strcmp(argv[i], "-f") == 0 ||
-             std::strcmp(argv[i], "--file") == 0)
-    {
-      ++i;
-      if (i == argc) {
+      else if (std::strcmp(argv[i], "-h") == 0 ||
+          std::strcmp(argv[i], "--help") == 0)
+      {
         print_help(argv[0]);
-        std::cerr << "ERROR: expected filename after " << argv[i-1]
-                  << " option\n";
-        return false;
+        throw flusspferd::js_quit();
       }
-      file = argv[i];
-      if (!config_loaded)
-        load_config();
-      extfile = true;
-      co.execute(file.c_str());
+      else if (std::strcmp(argv[i], "-c") == 0 ||
+               std::strcmp(argv[i], "--config") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected filename after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        config_file = argv[i];
+      }
+      else if (std::strcmp(argv[i], "-i") == 0 ||
+               std::strcmp(argv[i], "--interactive") == 0)
+      {
+        interactive = true;
+        interactive_set = true;
+      }
+      else if (std::strcmp(argv[i], "-f") == 0 ||
+               std::strcmp(argv[i], "--file") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected filename after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        std::string file = argv[i];
+        if (!config_loaded)
+          load_config();
+        if (!interactive_set)
+          interactive = false;
+        files.push_back(file);
+      }
     }
+    else
+      break; // Not an option, stop looking for one
   }
 
-  return true;
+  if (i >= argc) {
+    if (!interactive_set)
+      interactive = !files.empty();
+  } else {
+    // some cmd line args left.
+    // first one is file
+    // others go into arguments array
+    std::string file = argv[i++];
+    if (file == "-") {
+      // TODO: Maybe check if stdin is actualy connected to a terminal?
+      interactive = true;
+    }
+    else {
+      files.push_back(file);
+    }
+
+    int x=0;
+    for (; i < argc; ++i) {
+      args.set_element(x++, flusspferd::string(argv[i]));
+    }
+
+  }
+
+  return files;
 }
 
 bool flusspferd_repl::getline(std::string &source, const char* prompt) {
 #ifdef HAVE_EDITLINE
-  if (!extfile) {
+  if (interactive) {
     char* linep = readline(prompt);
     if (!linep) {
       std::cout << std::endl;
@@ -237,6 +294,7 @@ int main(int argc, char **argv) {
     flusspferd::init::initialize();
     flusspferd_repl repl(argc, argv);
     repl.run();
+  } catch (flusspferd::js_quit&) {
   } catch (std::exception &e) {
     std::cerr << "ERROR: " << e.what() << '\n';
     return 1;
