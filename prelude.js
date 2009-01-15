@@ -42,7 +42,7 @@ function Range(from,to, by) {
     }
   };
   r = new RangeInstance();
-  r.__itererator__ = function() { return r };
+  r.__iterator__ = function() { return r };
 
   return r;
 }
