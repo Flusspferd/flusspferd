@@ -147,6 +147,9 @@ int main() {
         else:
           u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
 
+    if conf.check_cxx(function_name='fork', header_name='unistd.h') != None:
+      conf.env['ENABLE_POSIX'] = True
+
     if Options.options.enable_io:
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
@@ -182,6 +185,9 @@ def build(bld):
     bld.add_subdirs('plugins/environment')
     if bld.env['ENABLE_CURL']:
         bld.add_subdirs('plugins/curl')
+    if bld.env['ENABLE_POSIX']:
+      bld.add_subdirs('plugins/posix')
+
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['ENABLE_SANDBOX']:
