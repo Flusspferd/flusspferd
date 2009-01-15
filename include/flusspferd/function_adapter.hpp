@@ -135,6 +135,7 @@ T get_native_object_parameter2(call_context &x) {
   struct function_adapter<T, void, n_args, C> { \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
+      (void)x; \
       function(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
     } \
     static std::size_t const arity = (n_args); \

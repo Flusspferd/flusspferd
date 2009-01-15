@@ -176,7 +176,9 @@ value context::evaluate_in_scope(char const* source, std::size_t n,
   JSBool ok = JS_EvaluateScript(p->context, Impl::get_object(scope),
                                   source, n, file, line, &rval);
   if(!ok) {
-    throw exception("Could not evaluate script");
+    exception e("Could not evaluate script");
+    if (!e.empty())
+      throw e;
   }
   return Impl::wrap_jsval(rval);
 }
@@ -233,8 +235,11 @@ value context::execute(char const *filename, object const &scope_) {
  
   JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
  
-  if (!ok)
-    throw exception("Script execution failed");
+  if (!ok) {
+    exception e("Script execution failed");
+    if (!e.empty())
+      throw e;
+  }
 
   return result;
 }
