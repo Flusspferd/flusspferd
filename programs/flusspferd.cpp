@@ -117,7 +117,7 @@ int flusspferd_repl::run() {
     co.execute(file.c_str());
   }
   
-  if (interactive)
+  if (!interactive)
     return 0;
 
   if (!config_loaded)
@@ -181,9 +181,6 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
 
   std::list<std::string> files;
 
-  if (argc <= 1)
-    return files;
-
   int i=1;
 
   for (i = 1; i < argc; ++i) {
@@ -243,7 +240,7 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
 
   if (i >= argc) {
     if (!interactive_set)
-      interactive = !files.empty();
+      interactive = files.empty();
   } else {
     // some cmd line args left.
     // first one is file
