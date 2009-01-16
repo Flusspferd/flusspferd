@@ -25,11 +25,25 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/security.hpp"
 
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#else ifdef HAVE_SLEEPEX
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 using namespace flusspferd;
 
 namespace {
+
+#ifdef HAVE_SLEEPEX
+int usleep(unsigned int usec) {
+  // Windows only has microsecond sleep
+  return SleepEx( (usec+500)/1000);
+}
+#endif
+
+
 
 // import hook
 extern "C" value flusspferd_load(object container)
@@ -38,6 +52,14 @@ extern "C" value flusspferd_load(object container)
   object posix = create_object();
   
   container.set_property("posix", posix);
+
+#ifdef HAVE_FORK
+  // TODO: Need to work out how to make this play nice with the interactive repl
+  posix.set_property("fork", create_native_function(fork, "fork"));
+#endif
+  posix.set_property("sleep", create_native_function(sleep, "sleep"));
+  posix.set_property("usleep", create_native_function(usleep, "usleep"));
+
   return posix;
 }
 

@@ -27,7 +27,7 @@ obj = bld.new_task_gen('cxx', libtype)
 obj.source = ['posix.cpp']
 obj.includes = ['../../include', '.']
 obj.uselib_local = 'flusspferd'
-obj.uselib = 'JS_H'
+obj.uselib = 'JS_H POSIX'
 obj.target = 'posix'
 obj.install_path = '${PREFIX}/lib/flusspferd/modules'
 
