@@ -151,16 +151,10 @@ int main() {
                    header_name='unistd.h',
                    uselib_store='POSIX',
                    defines=['HAVE_FORK','HAVE_UNISTD_H'])
-    if conf.check_cxx(function_name='usleep', 
+    conf.check_cxx(function_name='usleep', 
                    header_name='unistd.h',
                    uselib_store='POSIX',
-                   defines=['HAVE_USLEEP']
-                   ) == None:
-        conf.check_cxx(function_name='SleepEx', 
-                       header_name='windows.h',
-                       uselib_store='POSIX',
-                       defines=['HAVE_SLEEPEX','HAVE_USLEEP']
-                       )
+                   defines=['HAVE_USLEEP'])
 
     if Options.options.enable_io:
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
