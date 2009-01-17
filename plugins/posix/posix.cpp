@@ -43,11 +43,13 @@ extern "C" value flusspferd_load(object container)
 
 #ifdef HAVE_FORK
   // TODO: Need to work out how to make this play nice with the interactive repl
-  posix.set_property("fork", create_native_function(fork, "fork"));
+  create_native_function(posix, "fork", &::fork);
 #endif
-  posix.set_property("sleep", create_native_function(sleep, "sleep"));
+
+  create_native_function(posix, "sleep", &::sleep);
+
 #ifdef HAVE_USLEEP
-  posix.set_property("usleep", create_native_function(usleep, "usleep"));
+  create_native_function(posix, "usleep", usleep);
 #endif
 
   return posix;
