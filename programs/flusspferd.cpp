@@ -114,6 +114,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 int flusspferd_repl::run() {
   std::list<std::string> files = parse_cmdline();
 
+  if (!config_loaded)
+    load_config();
+
   typedef std::list<std::string>::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     const std::string &file = *i;
@@ -122,9 +125,6 @@ int flusspferd_repl::run() {
   
   if (!interactive)
     return exit_code;
-
-  if (!config_loaded)
-    load_config();
 
   std::string source;
   unsigned int line = 0;
