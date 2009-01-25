@@ -223,7 +223,7 @@ value importer::load(string const &f_name, bool binary_only) {
         std::stringstream ss;
         ss << "Unable to load library '" << fullpath.c_str()
            << "': " << dlerror();
-        throw exception(ss.str());
+        throw exception(ss.str().c_str());
       }
 
       void *symbol = dlsym(module, "flusspferd_load");
@@ -232,7 +232,7 @@ value importer::load(string const &f_name, bool binary_only) {
         std::stringstream ss;
         ss << "Unable to load library '" << fullpath.c_str() 
            << "': " << dlerror();
-        throw exception(ss.str());
+        throw exception(ss.str().c_str());
       }
 
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
@@ -249,7 +249,7 @@ value importer::load(string const &f_name, bool binary_only) {
   ss << name.c_str();
   ss << "' in [";
   ss << paths_v.to_string().c_str() << "]";
-  throw exception(ss.str());
+  throw exception(ss.str().c_str());
 }
 
 // Take 'foo.bar' as a flusspferd::string, check no path sep in it, and

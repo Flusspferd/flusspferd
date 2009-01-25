@@ -33,7 +33,8 @@ class value;
 
 class exception : public std::runtime_error {
 public:
-  exception(std::string const &what);
+  exception(char const *what, std::string const &type = "Error");
+  exception(value const &val);
   ~exception() throw();
 
   value val() const;
