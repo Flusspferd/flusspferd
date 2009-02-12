@@ -7,7 +7,7 @@ includedir=@INCLUDEDIR@
 modulesdir=@LIBDIR@/flusspferd/modules
 
 Name: Flusspferd
-Description: JavaScript Bindings for C++
+Description: Javascript Bindings for C++
 Version: @VERSION@
 # Requires:
 Libs: -L${libdir} -lflusspferd

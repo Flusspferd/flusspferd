@@ -147,6 +147,15 @@ int main() {
         else:
           u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
 
+    conf.check_cxx(function_name='fork', 
+                   header_name='unistd.h',
+                   uselib_store='POSIX',
+                   defines=['HAVE_FORK','HAVE_UNISTD_H'])
+    conf.check_cxx(function_name='usleep', 
+                   header_name='unistd.h',
+                   uselib_store='POSIX',
+                   defines=['HAVE_USLEEP'])
+
     if Options.options.enable_io:
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
@@ -180,8 +189,10 @@ def build(bld):
     bld.add_subdirs('programs')
     bld.add_subdirs('plugins/sqlite3')
     bld.add_subdirs('plugins/environment')
+    bld.add_subdirs('plugins/posix')
     if bld.env['ENABLE_CURL']:
         bld.add_subdirs('plugins/curl')
+
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['ENABLE_SANDBOX']:

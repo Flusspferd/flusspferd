@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008 Ash Berlin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,54 +21,40 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_EXCEPTION_HPP
-#define FLUSSPFERD_EXCEPTION_HPP
+#include "flusspferd/class.hpp"
+#include "flusspferd/create.hpp"
+#include "flusspferd/security.hpp"
 
-#include <boost/shared_ptr.hpp>
-#include <stdexcept>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
-namespace flusspferd {
+using namespace flusspferd;
 
-class value;
+namespace {
 
-class exception : public std::runtime_error {
-public:
-  exception(char const *what, std::string const &type = "Error");
-  exception(value const &val);
-  ~exception() throw();
+// import hook
+extern "C" value flusspferd_load(object container)
+{
+  local_root_scope scope;
+  object posix = create_object();
+  
+  container.set_property("posix", posix);
 
-  value val() const;
-  bool empty() const;
+#ifdef HAVE_FORK
+  // TODO: Need to work out how to make this play nice with the interactive repl
+  create_native_function(posix, "fork", &::fork);
+#endif
 
-public:
-  void throw_js_INTERNAL();
+  create_native_function(posix, "sleep", &::sleep);
 
-private:
-  class impl;
-  boost::shared_ptr<impl> p;
-};
+#ifdef HAVE_USLEEP
+  create_native_function(posix, "usleep", usleep);
+#endif
 
-class js_quit {
-public:
-  js_quit();
-  virtual ~js_quit();
-};
+  return posix;
+}
+
 
 }
 
-#define FLUSSPFERD_CALLBACK_BEGIN try
-
-#define FLUSSPFERD_CALLBACK_END \
-    catch (::flusspferd::exception &e) { \
-      e.throw_js_INTERNAL(); \
-      return JS_FALSE; \
-    } catch (::std::exception &e) { \
-      ::flusspferd::exception x(e.what()); \
-      x.throw_js_INTERNAL(); \
-      return JS_FALSE; \
-    } catch (::flusspferd::js_quit&) {\
-      return JS_FALSE; \
-    } \
-    return JS_TRUE
-
-#endif /* FLUSSPFERD_EXCEPTION_HPP */

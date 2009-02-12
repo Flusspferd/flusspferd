@@ -309,7 +309,7 @@ object sqlite3_cursor::next() {
         {
           std::stringstream ss;
           ss << "SQLite3.Cursor.next: Unknown column type " << type;
-          throw exception(ss.str());
+          throw exception(ss.str().c_str());
         }
         break;
     }
@@ -411,7 +411,7 @@ void raise_sqlite_error(::sqlite3* db)
 {
   std::string s = "SQLite3 Error: ";
   s += sqlite3_errmsg(db);
-  throw exception(s);
+  throw exception(s.c_str());
 }
 
 }

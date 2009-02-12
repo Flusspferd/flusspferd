@@ -191,7 +191,7 @@ value context::execute(char const *filename, object const &scope_) {
 
   FILE *file = fopen(filename, "r");
   if (!file) {
-    throw exception(std::string("Could not open '") + filename + "'");
+    throw exception((std::string("Could not open '") + filename + "'").c_str());
   }
  
   /*

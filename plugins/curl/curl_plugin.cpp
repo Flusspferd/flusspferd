@@ -171,10 +171,10 @@ void curl::set_method(string &f_meth) {
   else if (meth == "HEAD")
     ok = curl_easy_setopt(curlHandle, CURLOPT_NOBODY, 1);
   else
-    throw exception("Unkown request method " + meth);
+    throw exception(("Unkown request method " + meth).c_str());
 
   if (ok != CURLE_OK)
-    throw exception(std::string(error_buffer));
+    throw exception(error_buffer);
 }
 
 ///////////////////////////
@@ -192,7 +192,7 @@ int curl::perform() {
     throw exception("forbidden");
 
   if (curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str()) != CURLE_OK)
-    throw exception(std::string(error_buffer));
+    throw exception(error_buffer);
 
   if (curl_easy_perform(curlHandle) != CURLE_OK)
     throw exception(error_buffer);

@@ -59,6 +59,7 @@ class flusspferd_repl {
   flusspferd::security &security;
 
   bool running;
+  int exit_code;
 
   int argc;
   char ** argv;
@@ -69,8 +70,9 @@ class flusspferd_repl {
 
   bool getline(std::string &source, const char* prompt = "> ");
 
-  void quit() {
+  void quit(int code) {
     running = false;
+    exit_code = code;
     throw flusspferd::js_quit();
   }
 
@@ -91,6 +93,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     scope(flusspferd::current_context_scope(co)),
     security(flusspferd::security::create(flusspferd::global())),
     running(false),
+    exit_code(0),
     argc(argc),
     argv(argv)
 {
@@ -100,9 +103,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   flusspferd::load_properties_functions();
 
   flusspferd::object g = flusspferd::global();
-  flusspferd::create_native_function<void ()>(
+  flusspferd::create_native_function<void (int)>(
     g, "quit",
-    boost::bind(&flusspferd_repl::quit, this));
+    boost::bind(&flusspferd_repl::quit, this, _1));
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
   flusspferd::gc();
@@ -111,6 +114,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 int flusspferd_repl::run() {
   std::list<std::string> files = parse_cmdline();
 
+  if (!config_loaded)
+    load_config();
+
   typedef std::list<std::string>::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     const std::string &file = *i;
@@ -118,10 +124,7 @@ int flusspferd_repl::run() {
   }
   
   if (!interactive)
-    return 0;
-
-  if (!config_loaded)
-    load_config();
+    return exit_code;
 
   std::string source;
   unsigned int line = 0;
@@ -140,7 +143,7 @@ int flusspferd_repl::run() {
     flusspferd::gc();
   }
 
-  return 0;
+  return exit_code;
 }
 
 void print_help(char const *argv0) {
@@ -290,11 +293,10 @@ int main(int argc, char **argv) {
   try {
     flusspferd::init::initialize();
     flusspferd_repl repl(argc, argv);
-    repl.run();
+    return repl.run();
   } catch (flusspferd::js_quit&) {
   } catch (std::exception &e) {
     std::cerr << "ERROR: " << e.what() << '\n';
     return 1;
   }
-  return 0;
 }

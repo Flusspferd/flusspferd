@@ -48,7 +48,7 @@ struct unconstructible_class_constructor : native_function_base {
     std::string msg = "Instances of " 
                     + get_name() 
                     + " cannot be created directly";
-    throw exception(msg);
+    throw exception(msg.c_str());
   }
 };
 

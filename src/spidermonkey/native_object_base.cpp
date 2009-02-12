@@ -223,7 +223,7 @@ void native_object_base::add_native_method(
       0);
 
   if (!func)
-    throw exception("Could not create native method " + name); 
+    throw exception(("Could not create native method " + name).c_str());
 }
 
 function native_object_base::create_native_method(
@@ -240,7 +240,7 @@ function native_object_base::create_native_method(
       name.c_str());
 
   if (!func)
-    throw exception("Could not create native method " + name); 
+    throw exception(("Could not create native method " + name).c_str());
 
   return Impl::wrap_function(func);
 }
@@ -433,7 +433,7 @@ void native_object_base::call_native_method(
   impl::native_method_map::iterator it = p->native_methods.find(name);
 
   if (it == p->native_methods.end())
-    throw exception("No such method: " + name);
+    throw exception(("No such method: " + name).c_str());
 
   impl::method_variant m = it->second;
   switch (m.which()) {

@@ -67,7 +67,7 @@ public:
   bool empty;
 };
 
-exception::exception(std::string const &what)
+exception::exception(char const *what, std::string const &type)
   : std::runtime_error(exception_message(what))
 {
   boost::shared_ptr<impl> p(new impl);
@@ -78,16 +78,24 @@ exception::exception(std::string const &what)
   JSContext *ctx = Impl::get_context(p->ctx);
 
   value &v = *p->exception_value;
+
   if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
     p->empty = false;
     JS_ClearPendingException(ctx);
   } else {
     try {
-      v = global().call("Error", what);
+      v = global().call(type, what);
     } catch (...) { }
   }
 
   this->p = p;
+}
+
+exception::exception(value const &val)
+  : std::runtime_error(string(val).to_string()), p(new impl)
+{
+  p->exception_value.reset(new root_value(val));
+  p->ctx = get_current_context();
 }
 
 exception::~exception() throw()

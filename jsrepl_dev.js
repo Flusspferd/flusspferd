@@ -25,6 +25,7 @@ THE SOFTWARE.
 Importer.defaultPaths = ['js/src', 
   'plugins/sqlite3', 'build/default/plugins/sqlite3', 
   'plugins/curl', 'build/default/plugins/curl',
+  'plugins/posix', 'build/default/plugins/posix',
   'build/default/plugins/environment',
   'build/default/src'];
 
