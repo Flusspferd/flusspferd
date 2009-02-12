@@ -1,0 +1,25 @@
+Class: Environment
+
+Get or set environment variables.
+
+Synopsis:
+
+(code)
+var env = import('environment')
+
+var paths = env.PATH.split(/:/);
+
+// print out the current environment
+for (var i in env)
+  print(i, '=', env[i]);
+
+(end code)
+
+Loading the environment modules defines an Environment class, and since what
+you will want to do almost all of the time is just query or set env variables,
+it also returns a created instance of this class.
+
+This class has no special properties or methods -
+it just appears like a normal object, except that its properties are tied to
+the underlying environment variables.
+
