@@ -141,3 +141,58 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
     o.define_property(p, val, object::property_attributes(flags));
   }
 }
+
+/**
+ * Title: Object
+ *
+ * Extensions to built in Object class.
+ *
+ * Function: defineProperty
+ *
+ * Define a property on an object with flags. This allows you to create
+ * read-only or non-enumerable properties on your javascript objects.
+ *
+ * Parameters:
+ *   obj - Object on which to define the property
+ *   name - property name
+ *   descriptor - property descriptor. See below
+ *
+ * This is modeled after the defineProperty method from the upcoming ES 3.1
+ * (draft) specification.
+ *
+ * A property descriptor is an object with some of the following keys
+ *
+ *   enumerable - is the property visible in "for in" loops
+ * configurable - can further changes be made to this property
+ *     writable - read only property
+ *        value - initial property value
+ *       getter - getter function
+ *       setter - setter function
+ * 
+ * All values default to false or undefined. If either writable or value exist
+ * then neither getter nor setter are allowed. 
+ *
+ * A getter function is one which is called and should return the current value
+ * of the property. A setter is called with the argument to set the property
+ * too, but you can set it do a derivative of that value, or ignore it
+ * completly. Both getter and setter are called with "this" set to the object
+ * in question.
+ *
+ * (code)
+ * function MyObj() {
+ *   var prop = 0;
+ *   Object.defineProperty(
+ *     myobj, 
+ *     "prop",
+ *     { getter: function() { return prop },
+ *       setter: function(x) { prop = x * 2; return prop; },
+ *       enumerable: false,
+ *       configurable: true
+ *     }
+ *   );
+ * }
+ * (end code)
+ *
+ * If configurable is false, then any further attempts to call <defineProperty>
+ * on that property will result in an exception.
+ */

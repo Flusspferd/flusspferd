@@ -89,13 +89,56 @@ void load_class(
 
 }
 
+/**
+ * Information about classes exposed to javascript. Expose a class to 
+ * javascript, you will need to define a <class_info> struct as a public member
+ * of your class, as shown in the example below
+ *
+ * @code
+ * class MyClass : public native_object_base {
+ * public:
+ *   struct class_info : flusspferd::class_info {
+ *     static char const *constructor_name() { return "MyJSClass"; }
+ *     typedef boost:mpl:size_t<2> constructor_arity;
+ *     static object create_prototype() { ... }
+ *   };
+ * };
+ * @endcode
+ *
+ * Inheriting from <flusspferd::class_info> gives you default behaviour of 0
+ * constructor arity, no augmentation and an empty prototype. You will always
+ * have to define the C<constructor_name> yourself.
+ */
 struct class_info {
   typedef boost::mpl::bool_<true> constructible;
   typedef boost::mpl::bool_<false> custom_enumerate;
 
+  /**
+   * How many paremeters the constructor expects from JS.
+   *
+   * @code
+   * typedef boost::mpl::size_t<2> constructor_arity;
+   * @endcode
+   *
+   * for example will mean that your constructor will have a (nominal) arity 
+   * of 2.
+   */
   typedef boost::mpl::size_t<0> constructor_arity;
 
-  static void augment_constructor(object &ctor) {
+#ifdef IN_DOXYGEN
+  /**
+   * A function that returns the name of the constructor. 
+   */
+   static char const *constructor_name();
+#endif
+
+  /**
+   * Function: augment_constructor 
+   *
+   * Hook to add properties to the constructor object. Most commonly used to
+   * add static methods or properties
+   */
+  static void augment_constructor(object const &ctor) {
     (void) ctor;
   }
 
@@ -104,6 +147,15 @@ struct class_info {
   }
 };
 
+/**
+ * Function: load_class
+ *
+ * Expose a class with a native constructor to Javascript.
+ *
+ * @param container  Object in which to define the constructor.
+ *
+ * The class name is pulled from the class's <class_info> struct.
+*/
 template<typename T>
 object load_class(
   object container = global(),
@@ -138,6 +190,14 @@ object load_class(
   return constructor;
 }
 
+/**
+ * Expose a class that is unconstructible in Javascript. Trying to create an
+ * instance of the class will throw an error
+ *
+ * @param container Object in which to define the constructor.
+ *
+ * Create a class/constructor on container without constructor.
+*/
 template<typename T>
 object load_class(
   object container = global(),

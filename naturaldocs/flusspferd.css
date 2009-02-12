@@ -1,0 +1,13 @@
+p {
+   text-indent: 0;
+   margin-bottom: 1em;
+   }
+
+.Summary {
+  margin-left: 0;
+}
+
+.CDLEntry {
+  font-size: 11pt;
+  font-weight: bold;
+}
