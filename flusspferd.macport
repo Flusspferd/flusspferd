@@ -1,0 +1,49 @@
+# -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
+# $Id$
+
+name                flusspferd
+version             git
+categories          lang
+maintainers         
+description         Flusspferd
+long_description    Flusspferd provides Javascript bindings for C++
+homepage            http://wiki.github.com/ruediger/flusspferd
+platforms           darwin
+
+fetch.type          git
+git.url             git://github.com/ruediger/flusspferd.git
+
+depends_build       port:python25
+
+depends_lib         port:spidermonkey \
+                    port:boost
+default_variants    test
+
+variant test {
+    configure.args-append --enable-tests
+    pre-destroot {
+        # TODO run tests
+    }
+}
+
+variant io description { Add IO support } {
+    configure.args-append --enable-io
+}
+
+variant xml description { Add XML support } {
+    configure.args-append --enable-xml
+    depends_lib-append port:libxml2
+}
+
+variant curl description { Add Curl support } {
+    configure.args-append --enable-curl
+    depends_lib-append port:curl
+}
+
+configure {
+    python2.5 ./waf configure ${configure.args}
+}
+
+pre-build {
+    echo "PYTHON := python2.5" > .localsettings.mak
+}
