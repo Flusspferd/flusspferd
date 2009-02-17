@@ -66,7 +66,8 @@ def configure(conf):
     if darwin:
         u('CXXDEFINES', 'APPLE')
         # Is there a better way of doing this?
-        u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
+        if 'FRAMEWORKPATH' in os.environ:
+            u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
 
     if Options.options.cxxflags:
         conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
