@@ -22,9 +22,11 @@ depends_lib         port:spidermonkey \
                     port:boost
 default_variants    test
 
-variant test {
+configure.args      
+
+variant test description { Build Unit Tests } {
     configure.args-append --enable-tests
-#    pre-destroot {
+#    test {
         # TODO run tests
 #    }
 }
@@ -44,9 +46,15 @@ variant curl description { Add Curl support } {
 }
 
 configure {
-    python2.5 ./waf configure ${configure.args}
+    system "cd ${worksrcpath} && python2.5 ./waf configure ${configure.args}"
 }
 
 pre-build {
-    echo "PYTHON := python2.5" > .localsettings.mak
+    system \
+"cd ${worksrcpath} && echo \"PYTHON := python2.5\" > .localsettings.mak"
+}
+
+destroot {
+    system \
+"cd ${worksrcpath} &&  python2.5 ./waf install --prefix=\"${destroot}\""
 }
