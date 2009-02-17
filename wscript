@@ -50,7 +50,8 @@ def set_options(opt):
     opt.add_option('--enable-curl', action='store_true',
                    help='Build cURL extension')
     if darwin:
-      opt.add_option('--libxml-framework', action='store', nargs=1, dest='libxml_framework',
+      opt.add_option('--libxml-framework', action='store', nargs=1,
+                     dest='libxml_framework',
                      help='libxml framework name')
 
 def configure(conf):
