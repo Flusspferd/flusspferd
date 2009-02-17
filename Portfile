@@ -1,12 +1,15 @@
 # -*- coding: utf-8; mode: tcl; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- vim:fenc=utf-8:ft=tcl:et:sw=4:ts=4:sts=4
 # $Id$
 
+PortSystem          1.0
+
+
 name                flusspferd
 version             git
-categories          lang
-maintainers         
+categories          devel
+maintainers         c-plusplus.de:ruediger
 description         Flusspferd
-long_description    Flusspferd provides Javascript bindings for C++
+long_description    Flusspferd provides Javascript bindings for C++.
 homepage            http://wiki.github.com/ruediger/flusspferd
 platforms           darwin
 
@@ -21,9 +24,9 @@ default_variants    test
 
 variant test {
     configure.args-append --enable-tests
-    pre-destroot {
+#    pre-destroot {
         # TODO run tests
-    }
+#    }
 }
 
 variant io description { Add IO support } {
