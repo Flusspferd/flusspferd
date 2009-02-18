@@ -1,2 +1,2 @@
 #!/bin/sh
-./waf configure "$@" && touch .configure
+$PYTHON ./waf configure "$@" && touch .configure
