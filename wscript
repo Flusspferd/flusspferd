@@ -108,32 +108,26 @@ def configure(conf):
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
     # spidermonkey
-    test_env = conf.env.copy()
+    lib_path = ''
+    include_path = ''
     if Options.options.spidermonkey_include:
-        conf.env['CPPPATH_JS_H'] = [Options.options.spidermonkey_include]
-        test_env['CPPPATH'] += [Options.options.spidermonkey_include]
+        include_path = Options.options.spidermonkey_include
     if Options.options.spidermonkey_library:
-        conf.env['LIBPATH_JS'] = [Options.options.spidermonkey_library]
-        test_env['LIBPATH'] += [Options.options.spidermonkey_library]
+        lib_path = Options.options.spidermonkey_library
     if Options.options.spidermonkey_path:
-        conf.env['CPPPATH_JS_H'] = [
-            os.path.join(Options.options.spidermonkey_path,
-                         "include")]
-        test_env['CPPPATH'] += conf.env['CPPPATH_JS_H']
-        conf.env['LIBPATH_JS'] = [
-            os.path.join(Options.options.spidermonkey_path,
-                         "lib")]
-        test_env['LIBPATH'] += conf.env['LIBPATH_JS']
+        include_path = os.path.join(Options.options.spidermonkey_path,
+                                    "include")
+        lib_path = os.path.join(Options.options.spidermonkey_path, "lib")
 
-    ret = conf.check_cxx(lib = 'js', uselib_store='JS', env=test_env)
+    ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
     if ret == None:
         conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
-                       env=test_env)
+                       libpath=lib_path)
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
                    defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
-                   env=test_env)
+                   includes=include_path)
 
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
