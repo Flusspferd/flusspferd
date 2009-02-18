@@ -49,6 +49,18 @@ def set_options(opt):
                    help='Enable XML support')
     opt.add_option('--enable-curl', action='store_true',
                    help='Build cURL extension')
+    opt.add_option('--with-spidermonkey-include', action='store', nargs=1,
+                   dest='spidermonkey_include',
+                   help='spidermonkey include path without the js/')
+    opt.add_option('--with-spidermonkey-library', action='store', nargs=1,
+                   dest='spidermonkey_library',
+                   help='spidermonkey library path')
+    opt.add_option('--with-spidermonkey', action='store', nargs=1,
+                   dest='spidermonkey_path',
+                   help='''
+base path for spidermonkey. /include and /lib are added. (overwrites
+--with-spidermonkey-include/-library)
+''')
     if darwin:
       opt.add_option('--libxml-framework', action='store', nargs=1,
                      dest='libxml_framework',
@@ -95,13 +107,32 @@ def configure(conf):
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
     # spidermonkey
-    ret = conf.check_cxx(lib = 'js', uselib_store='JS')
+    test_env = conf.env.copy()
+    if Options.options.spidermonkey_include:
+        conf.env['CPPPATH_JS_H'] = [Options.options.spidermonkey_include]
+        test_env['CPPPATH'] += [Options.options.spidermonkey_include]
+    if Options.options.spidermonkey_library:
+        conf.env['LIBPATH_JS'] = [Options.options.spidermonkey_library]
+        test_env['LIBPATH'] += [Options.options.spidermonkey_library]
+    if Options.options.spidermonkey_path:
+        conf.env['CPPPATH_JS_H'] = [
+            os.path.join(Options.options.spidermonkey_path,
+                         "include")]
+        test_env['CPPPATH'] += conf.env['CPPPATH_JS_H']
+        conf.env['LIBPATH_JS'] = [
+            os.path.join(Options.options.spidermonkey_path,
+                         "lib")]
+        test_env['LIBPATH'] += conf.env['LIBPATH_JS']
+
+    ret = conf.check_cxx(lib = 'js', uselib_store='JS', env=test_env)
     if ret == None:
         conf.env['LIB_JS'] = []
-        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1)
+        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
+                       env=test_env)
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
+                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   env=test_env)
 
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
