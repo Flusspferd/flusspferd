@@ -68,6 +68,9 @@ public:
   // Destructor.
   ~object();
 
+  /**
+   * Check if the object is null.
+   */
   bool is_null() const;
 
   /**
