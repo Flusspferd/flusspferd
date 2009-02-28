@@ -42,7 +42,7 @@ push_parser::push_parser(object const &obj, call_context &x)
 
   if (options.is_valid()) {
     value fname_v = options.get_property("filename");
-    if (!fname_v.is_void_or_null())
+    if (!fname_v.is_undefined_or_null())
       fname = fname_v.to_string().c_str();
 
     flags = options.get_property("options").to_integral_number(32, false);

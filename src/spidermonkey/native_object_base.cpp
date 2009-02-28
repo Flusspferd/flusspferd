@@ -384,7 +384,7 @@ JSBool native_object_base::impl::new_enumerate(
     {
       iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
       value id;
-      if (iter->empty() || (id = self.enumerate_next(*iter)).is_void())
+      if (iter->empty() || (id = self.enumerate_next(*iter)).is_undefined())
         *statep = JSVAL_NULL;
       else {
         JS_ValueToId(ctx, Impl::get_jsval(id), idp);

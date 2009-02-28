@@ -183,7 +183,7 @@ struct convert< boost::optional<T> > {
     typename convert<T>::from_value base;
 
     boost::optional<T> perform(value const &v) {
-      if (v.is_void() || v.is_null())
+      if (v.is_undefined() || v.is_null())
         return boost::optional<T>();
       return base.perform(v);
     }

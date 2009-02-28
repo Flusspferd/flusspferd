@@ -57,7 +57,7 @@ value::value(string const &s)
 { }
 
 bool value::is_null() const { return JSVAL_IS_NULL(get()); }
-bool value::is_void() const { return JSVAL_IS_VOID(get()); }
+bool value::is_undefined() const { return JSVAL_IS_VOID(get()); }
 bool value::is_int() const { return JSVAL_IS_INT(get()); }
 bool value::is_double() const { return JSVAL_IS_DOUBLE(get()); }
 bool value::is_number() const { return JSVAL_IS_NUMBER(get()); }

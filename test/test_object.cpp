@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( object_property_value ) {
 
 BOOST_AUTO_TEST_CASE( function_as_object ) {
   flusspferd::value v = flusspferd::evaluate("(function () {})");
-  BOOST_CHECK(!v.is_void());
+  BOOST_CHECK(!v.is_undefined());
   BOOST_CHECK(v.is_object());
   BOOST_CHECK(!v.is_null());
 }
