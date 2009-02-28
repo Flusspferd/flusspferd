@@ -125,6 +125,12 @@ struct class_info {
    */
   typedef boost::mpl::size_t<0> constructor_arity;
 
+  /**
+   * Function: augment_constructor 
+   *
+   * Hook to add properties to the constructor object. Most commonly used to
+   * add static methods or properties
+   */
   static void augment_constructor(object &ctor) {
     (void) ctor;
   }
@@ -184,7 +190,7 @@ object load_class(
  * @param container Object in which to define the constructor.
  *
  * Create a class/constructor on container without constructor.
-*/
+ */
 template<typename T>
 object load_class(
   object container = global(),
