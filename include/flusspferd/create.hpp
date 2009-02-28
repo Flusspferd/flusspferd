@@ -46,12 +46,14 @@ class native_object_base;
 class function;
 class native_function_base;
 
+#ifndef IN_DOXYGEN
 namespace detail {
 
 object create_native_object(object const &proto);
 object create_native_enumerable_object(object const &proto);
 
 }
+#endif
 
 object create_object(object const &proto = object());
 

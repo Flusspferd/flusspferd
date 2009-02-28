@@ -45,6 +45,8 @@ class native_object_base;
 template<typename T>
 T &cast_to_derived(native_object_base &);
 
+#ifndef IN_DOXYGEN
+
 namespace detail {
 
 template<typename T>
@@ -308,6 +310,8 @@ FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_MEMFN)
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_MEMFN_R_VOID)
 
 }
+
+#endif
 
 template<typename T>
 class function_adapter {

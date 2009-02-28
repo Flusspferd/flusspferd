@@ -35,7 +35,8 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-// Everything in this namespace is 'private'
+#ifndef IN_DOXYGEN
+
 namespace detail {
 
 template<typename T>
@@ -88,6 +89,8 @@ void load_class(
 }
 
 }
+
+#endif
 
 /**
  * Information about classes exposed to javascript. Expose a class to 
