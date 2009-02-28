@@ -48,7 +48,7 @@ object flusspferd::io::load_io(object container) {
 
   object IO = get_current_context().get_constructor("IO");
 
-  if (!IO.is_valid()) {
+  if (IO.is_null()) {
     IO = flusspferd::create_object();
 
     load_class<stream_base>(IO);

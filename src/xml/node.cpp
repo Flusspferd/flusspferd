@@ -98,8 +98,9 @@ void node::create_all_children(
 }
 
 xmlNodePtr node::c_from_js(object const &obj) {
-  if (!obj.is_valid())
+  if (obj.is_null())
     return 0;
+
   try {
     return flusspferd::get_native<node>(obj).c_obj();
   } catch (std::exception&) {

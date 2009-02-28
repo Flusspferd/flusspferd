@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE( void_value ) {
 
 BOOST_AUTO_TEST_CASE( null_value ) {
   flusspferd::object null_object;
-  BOOST_REQUIRE(!null_object.is_valid());
+  BOOST_REQUIRE(null_object.is_null());
 
   flusspferd::value null_value(null_object);
   BOOST_CHECK(!null_value.is_undefined());

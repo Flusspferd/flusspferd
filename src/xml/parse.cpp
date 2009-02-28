@@ -44,7 +44,7 @@ struct opt {
     value url_v;
     value encoding_v;
 
-    if (options.is_valid()) {
+    if (!options.is_null()) {
       url_v = options.get_property("url");
       encoding_v = options.get_property("encoding");
       flags = options.get_property("options").to_integral_number(32, false);

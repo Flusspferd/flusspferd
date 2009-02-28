@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE( global ) {
   flusspferd::object global;
   BOOST_CHECK_NO_THROW(global = context.global());
 
-  BOOST_CHECK(global.is_valid());
+  BOOST_CHECK(!global.is_null());
 }
 
 BOOST_AUTO_TEST_CASE( evaluate ) {

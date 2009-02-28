@@ -32,7 +32,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 xmlNsPtr namespace_::c_from_js(object const &obj) {
-  if (!obj.is_valid())
+  if (!obj.is_null())
     return 0;
   try {
     return flusspferd::get_native<namespace_>(obj).c_obj();

@@ -40,7 +40,7 @@ html_push_parser::html_push_parser(object const &obj, call_context &x)
   char const *fname = 0;
   unsigned flags = 0;
 
-  if (options.is_valid()) {
+  if (!options.is_null()) {
     value fname_v = options.get_property("filename");
     if (!fname_v.is_undefined_or_null())
       fname = fname_v.to_string().c_str();
