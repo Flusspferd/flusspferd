@@ -158,15 +158,8 @@ struct class_info {
   }
 };
 
-/**
- * Function: load_class
- *
- * Expose a class with a native constructor to Javascript.
- *
- * @param container  Object in which to define the constructor.
- *
- * The class name is pulled from the class's <class_info> struct.
-*/
+#ifndef IN_DOXYGEN
+
 template<typename T>
 object load_class(
   object container = global(),
@@ -201,14 +194,6 @@ object load_class(
   return constructor;
 }
 
-/**
- * Expose a class that is unconstructible in Javascript. Trying to create an
- * instance of the class will throw an error
- *
- * @param container Object in which to define the constructor.
- *
- * Create a class/constructor on container without constructor.
- */
 template<typename T>
 object load_class(
   object container = global(),
@@ -242,6 +227,26 @@ object load_class(
 
   return constructor;
 }
+
+#else
+
+/**
+ * Expose a class to Javascript.
+ *
+ * If the class is not constructible, trying to create an instance of the class
+ * will throw an error. A dummy "constructor" will be created though.
+ *
+ * The class name is pulled from the class's class_info struct, as
+ * well as other information.
+ *
+ * @param container Object in which to define the constructor.
+ *
+ * @see flusspferd::class_info
+ */
+template<typename T>
+object load_class(object container = global());
+
+#endif
 
 }
 
