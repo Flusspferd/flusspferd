@@ -31,10 +31,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
+#ifndef FLUSSPFERD_COVERAGE
 extern "C" value flusspferd_load(object container)
 {
   return load_io(container);
 }
+#endif
 
 object flusspferd::io::load_io(object container) {
   local_root_scope scope;
