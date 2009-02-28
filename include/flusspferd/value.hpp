@@ -130,27 +130,7 @@ public:
   double to_integral_number(int bits, bool has_negative) const;
   bool to_boolean() const;
   object to_object() const;
-
-  template<typename Visitor>
-  inline void visit(Visitor &v) const;
 };
-
-// implementation
-template<typename Visitor>
-void value::visit(Visitor &v) const {
-  if(is_int())
-    v(get_int());
-  else if(is_double())
-    v(get_double());
-  else if(is_string())
-    v(get_string());
-  else if(is_object())
-    v(get_object());
-  else if(is_boolean())
-    v(get_boolean());
-  else
-    return;
-}
 
 }
 
