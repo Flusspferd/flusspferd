@@ -110,7 +110,17 @@ void load_class(
  * have to define the C<constructor_name> yourself.
  */
 struct class_info {
+  /**
+   * Whether the type is constructible.
+   */
   typedef boost::mpl::bool_<true> constructible;
+
+  /**
+   * Whether the class overrides the standard enumerate hooks.
+   *
+   * Should be enabled when the class overrides
+   * native_object_base::enumerate_start and native_object_base::enumerate_next.
+   */
   typedef boost::mpl::bool_<false> custom_enumerate;
 
   /**
@@ -126,15 +136,20 @@ struct class_info {
   typedef boost::mpl::size_t<0> constructor_arity;
 
   /**
-   * Function: augment_constructor 
-   *
    * Hook to add properties to the constructor object. Most commonly used to
    * add static methods or properties
+   *
+   * @param ctor The constructor to be augmented.
    */
   static void augment_constructor(object &ctor) {
     (void) ctor;
   }
 
+  /**
+   * Hook to create the prototype object of the class.
+   *
+   * @return Return the newly created prototype object.
+   */
   static object create_prototype() {
     return create_object();
   }
