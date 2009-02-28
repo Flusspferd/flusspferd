@@ -25,9 +25,9 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/exception.hpp"
 #include "flusspferd/io/io.hpp"
 #include "test_environment.hpp"
-
 #include <iostream>
 #include <string>
 
@@ -43,6 +43,16 @@ BOOST_AUTO_TEST_CASE( test_have_IO ) {
   BOOST_CHECK(!v.is_null());
 
   flusspferd::gc();
+}
+
+BOOST_AUTO_TEST_CASE( IO_no_security ) {
+  flusspferd::io::load_io();
+
+  const char* js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
+  flusspferd::root_value v;
+  BOOST_CHECK_THROW( 
+    v = flusspferd::evaluate(js, __FILE__, __LINE__),
+    flusspferd::exception);
 }
 
 BOOST_AUTO_TEST_CASE( test_file_read ) {
