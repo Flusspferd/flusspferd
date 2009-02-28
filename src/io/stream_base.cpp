@@ -169,7 +169,7 @@ void stream_base::print(call_context &x) {
 
   value delim_v = get_property("fieldSeparator");
   string delim;
-  if (!delim_v.is_void_or_null())
+  if (!delim_v.is_undefined_or_null())
     delim = delim_v.to_string();
 
   std::size_t n = x.arg.size();
@@ -197,7 +197,7 @@ void stream_base::print(call_context &x) {
   }
 
   value record_v = get_property("recordSeparator");
-  if (!record_v.is_void_or_null())
+  if (!record_v.is_undefined_or_null())
     write(record_v.to_string());
 
   flush();
@@ -206,7 +206,7 @@ void stream_base::print(call_context &x) {
 string stream_base::read_line(value sep_) {
   local_root_scope scope;
 
-  if (sep_.is_void_or_null())
+  if (sep_.is_undefined_or_null())
     sep_ = string("\n");
 
   string sep = sep_.to_string();

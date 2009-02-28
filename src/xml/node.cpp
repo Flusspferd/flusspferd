@@ -351,7 +351,7 @@ void node::prop_content(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
     xmlNodeSetContent(ptr, 0);
-    if (!data.is_void() && !data.is_null())
+    if (!data.is_undefined() && !data.is_null())
       xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
     create_all_children(ptr, true, false);
     // !! fall thru !!
@@ -371,7 +371,7 @@ void node::prop_content(property_mode mode, value &data) {
 void node::prop_parent(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void() || data.is_null()) {
+    if (data.is_undefined() || data.is_null()) {
       if (ptr->parent) {
         if (ptr->type == XML_ATTRIBUTE_NODE) {
           if (ptr->parent->type == XML_ELEMENT_NODE && !ptr->prev)
@@ -445,7 +445,7 @@ void node::prop_parent(property_mode mode, value &data) {
 void node::prop_next(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void() || data.is_null()) {
+    if (data.is_undefined() || data.is_null()) {
       if (ptr->parent)
         if (ptr->type != XML_ATTRIBUTE_NODE)
           ptr->parent->last = ptr;
@@ -488,7 +488,7 @@ void node::prop_next(property_mode mode, value &data) {
 void node::prop_prev(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void() || data.is_null()) {
+    if (data.is_undefined() || data.is_null()) {
       if (ptr->parent)
         if (ptr->type == XML_ATTRIBUTE_NODE) {
           if (ptr->parent->type == XML_ELEMENT_NODE)
@@ -543,7 +543,7 @@ void node::prop_prev(property_mode mode, value &data) {
 void node::prop_first_child(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void() || data.is_null()) {
+    if (data.is_undefined() || data.is_null()) {
       xmlNodePtr old = ptr->children;
       while (old) {
         old->parent = 0;
@@ -650,7 +650,7 @@ void node::prop_type(property_mode mode, value &data) {
 void node::prop_namespace(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void() || data.is_null()) {
+    if (data.is_undefined() || data.is_null()) {
       ptr->ns->context = 0;
       ptr->ns = 0;
       data = object();
@@ -699,7 +699,7 @@ void node::prop_first_attr(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
     if (ptr->type == XML_ELEMENT_NODE) {
-      if (data.is_void_or_null()) {
+      if (data.is_undefined_or_null()) {
         ptr->properties = 0;
       } else if (data.is_object()) {
         xmlNodePtr attr = c_from_js(data.get_object());
@@ -822,7 +822,7 @@ void node::find_attribute(call_context &x) {
   xmlChar const *ns_href = 0;
   if (x.arg[1].is_string()) {
     ns_href = (xmlChar const *) x.arg[1].get_string().c_str();
-  } else if (!x.arg[1].is_void_or_null()) {
+  } else if (!x.arg[1].is_undefined_or_null()) {
     xmlNsPtr ns = namespace_::c_from_js(x.arg[1].to_object());
     if (!ns)
       throw exception("Could not find XML attribute: "
@@ -868,7 +868,7 @@ string node::to_string() {
 object node::search_namespace_by_prefix(value const &prefix_) {
   local_root_scope scope;
   xmlChar const *prefix = 0; 
-  if (!prefix_.is_string() && !prefix_.is_void() && !prefix_.is_null())
+  if (!prefix_.is_string() && !prefix_.is_undefined() && !prefix_.is_null())
     throw exception("Could not search for non-string namespace prefix");
   if (prefix_.is_string())
     prefix = (xmlChar const *) prefix_.get_string().c_str();

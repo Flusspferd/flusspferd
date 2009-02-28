@@ -134,7 +134,7 @@ int flusspferd_repl::run() {
   while (running && getline(source)) {
     try {
       flusspferd::value v = flusspferd::evaluate(source, "typein", ++line);
-      if (!v.is_void())
+      if (!v.is_undefined())
         std::cout << v << '\n';
     }
     catch(std::exception &e) {
@@ -172,7 +172,7 @@ void flusspferd_repl::load_config() {
   // Get the prelude and execute it too
   flusspferd::value prelude = co.global().get_property("prelude");
   
-  if (!prelude.is_void_or_null()) {
+  if (!prelude.is_undefined_or_null()) {
     co.execute(prelude.to_string().c_str());
   }
 }

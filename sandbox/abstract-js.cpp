@@ -49,7 +49,7 @@ struct my_object : flusspferd::native_object_base {
   my_object(object const &o, flusspferd::call_context &x)
     : flusspferd::native_object_base(o),
       v(
-        x.arg[0].is_void()
+        x.arg[0].is_undefined()
         ? flusspferd::string("test")
         : x.arg[0].to_string())
   {

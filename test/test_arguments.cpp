@@ -37,8 +37,8 @@ BOOST_AUTO_TEST_CASE( arguments_empty ) {
 
 BOOST_AUTO_TEST_CASE( arguments_push_back_front ) {
   flusspferd::arguments a;
-  BOOST_CHECK(a.front().is_void());
-  BOOST_CHECK(a.back().is_void());
+  BOOST_CHECK(a.front().is_undefined());
+  BOOST_CHECK(a.back().is_undefined());
   flusspferd::value v0(299);
   a.push_back(v0);
   BOOST_CHECK_EQUAL(a.front(), v0);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE( arguments_op_access ) {
 
 BOOST_AUTO_TEST_CASE( arguments_op_access_offbyone ) {
   flusspferd::arguments a;
-  BOOST_CHECK(a[1].is_void());
+  BOOST_CHECK(a[1].is_undefined());
 }
 
 BOOST_AUTO_TEST_CASE( arguments_op_copy ) {

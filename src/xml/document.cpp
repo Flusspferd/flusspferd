@@ -176,7 +176,7 @@ void document::prop_root_element(property_mode mode, value &data) {
 
   switch (mode) {
   case property_set:
-    if (data.is_null() || data.is_void()) {
+    if (data.is_null() || data.is_undefined()) {
       node = 0;
       data = object();
     } else if (data.is_object()) {
@@ -217,7 +217,7 @@ void document::prop_xml_namespace(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
-  if (data.is_void()) {
+  if (data.is_undefined()) {
     data = call("searchNamespaceByPrefix", "xml");
   }
 }

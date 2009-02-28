@@ -107,11 +107,11 @@ public:
   /// Check if the value is <code>null</code>.
   bool is_null() const;
 
-  /// Check if the value is void (<code>undefined</code>).
-  bool is_void() const;
-
-  /// Check if the value is <code>undefined</code> or <code>null</code>.
-  bool is_void_or_null() const { return is_null() || is_void(); }
+  // Check if the value is <code>undefined</code>.  
+  bool is_undefined() const;
+  
+  // Check if the value is <code>undefined</code> or <code>null</code>.
+  bool is_undefined_or_null() const { return is_null() || is_undefined(); }
 
   /// Check if the value is an int.
   bool is_int() const;

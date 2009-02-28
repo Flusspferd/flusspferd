@@ -45,7 +45,7 @@ security &security::get() {
   while (scope.is_valid()) {
     v = scope.get_property("$security");
 
-    if (!v.is_void_or_null())
+    if (!v.is_undefined_or_null())
       break;
     scope = scope.get_parent();
   }
