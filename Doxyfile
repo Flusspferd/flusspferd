@@ -92,55 +92,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 INPUT                  = ./include ./help
 INPUT_ENCODING         = UTF-8
-FILE_PATTERNS          = *.c \
-                         *.cc \
-                         *.cxx \
-                         *.cpp \
-                         *.c++ \
-                         *.d \
-                         *.java \
-                         *.ii \
-                         *.ixx \
-                         *.ipp \
-                         *.i++ \
-                         *.inl \
-                         *.h \
-                         *.hh \
-                         *.hxx \
-                         *.hpp \
-                         *.h++ \
-                         *.idl \
-                         *.odl \
-                         *.cs \
-                         *.php \
-                         *.php3 \
-                         *.inc \
-                         *.m \
-                         *.mm \
-                         *.dox \
-                         *.py \
-                         *.f90 \
-                         *.f \
-                         *.vhd \
-                         *.vhdl \
-                         *.C \
-                         *.CC \
-                         *.C++ \
-                         *.II \
-                         *.I++ \
-                         *.H \
-                         *.HH \
-                         *.H++ \
-                         *.CS \
-                         *.PHP \
-                         *.PHP3 \
-                         *.M \
-                         *.MM \
-                         *.PY \
-                         *.F90 \
-                         *.F \
-                         *.VHD \
-                         *.VHDL
+FILE_PATTERNS          = *.cpp *.hpp *.c *.h *.dox 
 RECURSIVE              = YES
 EXCLUDE                = 
 EXCLUDE_SYMLINKS       = NO
