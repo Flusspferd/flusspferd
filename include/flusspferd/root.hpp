@@ -37,6 +37,9 @@ class array;
 
 namespace detail {
 
+/**
+ * Keeps a Javascript value/object/... in a root scope.
+ */
 template<class T>
 class root : public T, private boost::noncopyable {
 public:
@@ -54,10 +57,19 @@ private:
 
 }
 
+/// Javascript root scope for a flusspferd::value.
 typedef detail::root<value> root_value;
+
+/// Javascript root scope for a flusspferd::object.
 typedef detail::root<object> root_object;
+
+/// Javascript root scope for a flusspferd::string.
 typedef detail::root<string> root_string;
+
+/// Javascript root scope for a flusspferd::function.
 typedef detail::root<function> root_function;
+
+/// Javascript root scope for a flusspferd::array.
 typedef detail::root<array> root_array;
 
 }
