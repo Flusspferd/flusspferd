@@ -49,32 +49,97 @@ class property_iterator;
 template<typename> class convert;
 #endif
 
+/**
+ * A Javascript object.
+ */
 class object : public Impl::object_impl {
 public:
 #ifndef PREPROC_DEBUG
+
+  /// Construct a new <code>null</code> object.
   object();
+
+#ifndef IN_DOXYGEN
   object(Impl::object_impl const &o)
     : Impl::object_impl(o)
   { }
+#endif
+
+  // Destructor.
   ~object();
 
   bool is_valid() const;
 
+  /**
+   * Seal the object.
+   *
+   * @param deep Whether to seal all reachable sub-objects, too.
+   */
   void seal(bool deep);
 
+  /// Get the object's parent (__parent__).
   object get_parent();
+
+  /// Get the object's prototype (__prototype__).
   object get_prototype();
 
+  /**
+   * Set the object's parent (__parent__).
+   *
+   * @param parent The object to set the parent to.
+   */
   void set_parent(object const &parent);
+
+  /**
+   * Set the object's prototype (__prototype__).
+   *
+   * @param prototype The object to set the prototype to.
+   */
   void set_prototype(object const &prototype);
 #endif
 
+  /**
+   * Apply a function to this object.
+   *
+   * @param fn The function to apply to this object.
+   * @param arg The function arguments.
+   * @return The function's return value.
+   */
   value apply(object const &fn, arguments const &arg);
 
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param arg The function arguments.
+   * @return The method's return value.
+   */
   value call(char const *name, arguments const &arg);
+
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param arg The function arguments.
+   * @return The method's return value.
+   */
   value call(std::string const &name, arguments const &arg);
 
+  /**
+   * Call this object as a function and apply it to @p obj.
+   *
+   * @param obj The object to apply this function to.
+   * @param arg The function arguments.
+   * @return The function's return value.
+   */
   value call(object obj, arguments const &arg);
+
+  /**
+   * Call this object as a function on the global object.
+   *
+   * @param arg The function arguments.
+   * @return The function's return value.
+   */
   value call(arguments const &arg = arguments());
 
 #define FLUSSPFERD_CALL_N(z, n, d) \
