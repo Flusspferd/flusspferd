@@ -49,15 +49,29 @@ def set_options(opt):
                    help='Enable XML support')
     opt.add_option('--enable-curl', action='store_true',
                    help='Build cURL extension')
+    opt.add_option('--with-spidermonkey-include', action='store', nargs=1,
+                   dest='spidermonkey_include',
+                   help='spidermonkey include path without the js/')
+    opt.add_option('--with-spidermonkey-library', action='store', nargs=1,
+                   dest='spidermonkey_library',
+                   help='spidermonkey library path')
+    opt.add_option('--with-spidermonkey', action='store', nargs=1,
+                   dest='spidermonkey_path',
+                   help='''
+base path for spidermonkey. /include and /lib are added. (overwrites
+--with-spidermonkey-include/-library)
+''')
     if darwin:
-      opt.add_option('--libxml-framework', action='store', nargs=1, dest='libxml_framework',
+      opt.add_option('--libxml-framework', action='store', nargs=1,
+                     dest='libxml_framework',
                      help='libxml framework name')
 
 def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
 
-    print '%s :' % 'Creating implementation link'.ljust(conf.line_just),
+    print '%s : ' % 'Creating implementation link'.ljust(conf.line_just),
+    sys.stdout.flush()
     try: os.unlink('include/flusspferd/implementation')
     except OSError: pass
     os.symlink('spidermonkey', 'include/flusspferd/implementation')
@@ -66,7 +80,8 @@ def configure(conf):
     if darwin:
         u('CXXDEFINES', 'APPLE')
         # Is there a better way of doing this?
-        u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
+        if 'FRAMEWORKPATH' in os.environ:
+            u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
 
     if Options.options.cxxflags:
         conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
@@ -93,13 +108,26 @@ def configure(conf):
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
     # spidermonkey
-    ret = conf.check_cxx(lib = 'js', uselib_store='JS')
+    lib_path = ''
+    include_path = ''
+    if Options.options.spidermonkey_include:
+        include_path = Options.options.spidermonkey_include
+    if Options.options.spidermonkey_library:
+        lib_path = Options.options.spidermonkey_library
+    if Options.options.spidermonkey_path:
+        include_path = os.path.join(Options.options.spidermonkey_path,
+                                    "include")
+        lib_path = os.path.join(Options.options.spidermonkey_path, "lib")
+
+    ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
     if ret == None:
         conf.env['LIB_JS'] = []
-        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1)
+        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
+                       libpath=lib_path)
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
+                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   includes=include_path)
 
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')

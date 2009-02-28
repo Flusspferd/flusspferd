@@ -125,20 +125,7 @@ struct class_info {
    */
   typedef boost::mpl::size_t<0> constructor_arity;
 
-#ifdef IN_DOXYGEN
-  /**
-   * A function that returns the name of the constructor. 
-   */
-   static char const *constructor_name();
-#endif
-
-  /**
-   * Function: augment_constructor 
-   *
-   * Hook to add properties to the constructor object. Most commonly used to
-   * add static methods or properties
-   */
-  static void augment_constructor(object const &ctor) {
+  static void augment_constructor(object &ctor) {
     (void) ctor;
   }
 

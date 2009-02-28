@@ -5,3 +5,4 @@ include/flusspferd/implementation
 *.swp
 .lock-wscript
 .waf-*
+.localsettings.mak
