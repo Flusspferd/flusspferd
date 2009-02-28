@@ -104,31 +104,70 @@ public:
    */
   void unbind();
 
+  /// Check if the value is <code>null</code>.
   bool is_null() const;
+
+  /// Check if the value is void (<code>undefined</code>).
   bool is_void() const;
+
+  /// Check if the value is <code>undefined</code> or <code>null</code>.
   bool is_void_or_null() const { return is_null() || is_void(); }
+
+  /// Check if the value is an int.
   bool is_int() const;
+
+  /// Check if the value is a double.
   bool is_double() const;
+
+  /// Check if the value is a number.
   bool is_number() const;
+
+  /// Check if the value is boolean.
   bool is_boolean() const;
+
+  /// Check if the value is a string.
   bool is_string() const;
+
+  /// Check if the value is an object.
   bool is_object() const;
+
+  /// Check if the value is a function.
   bool is_function() const;
 
+  /// Check if the value is boolean.
   bool is_bool() const { return is_boolean(); }
 
+  /// Get the boolean value.
   bool get_boolean() const;
+
+  /// Get the boolean value.
   bool get_bool() const { return get_boolean(); }
 
+  /// Get the int value.
   int get_int() const;
+
+  /// Get the double value.
   double get_double() const;
+
+  /// Get the object value.
   object get_object() const;
+
+  /// Get the string value.
   string get_string() const;
 
+  /// Convert the value to a string.
   string to_string() const;
+
+  /// Convert the number to a number.
   double to_number() const;
+
+  /// Convert the value to an integral number.
   double to_integral_number(int bits, bool has_negative) const;
+
+  /// Convert the value to a boolean.
   bool to_boolean() const;
+
+  /// Convert the value to an object.
   object to_object() const;
 };
 
