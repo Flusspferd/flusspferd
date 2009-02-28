@@ -55,10 +55,11 @@ property_iterator::property_iterator(object const &o_)
 
   local_root_scope scope;
 
-  if (!o.is_valid())
+  if (o.is_null())
     throw exception("Could not create property iterator (object is null)");
 
-  JSObject *iterator = JS_NewPropertyIterator(Impl::current_context(), Impl::get_object(o));
+  JSObject *iterator =
+    JS_NewPropertyIterator(Impl::current_context(), Impl::get_object(o));
 
   if (!iterator)
     throw exception("Could not create property iterator");
@@ -75,7 +76,7 @@ property_iterator::property_iterator(property_iterator const &o)
   if (!p)
     return;
 
-  if (o.p->iterator.is_valid()) {
+  if (!o.p->iterator.is_null()) {
     p->iterator = o.p->iterator;
     p->root_iterator = p->iterator;
     p->root_cache = value(o.p->root_cache);
@@ -87,11 +88,13 @@ property_iterator::~property_iterator()
 {}
 
 void property_iterator::increment() {
-  if (!JS_NextProperty(Impl::current_context(), Impl::get_object(p->iterator), &p->id))
+  if (!JS_NextProperty(
+        Impl::current_context(), Impl::get_object(p->iterator), &p->id))
     throw exception("Could not load / increment property iterator");
 
   if (p->id != JSVAL_VOID) {
-    if (!JS_IdToValue(Impl::current_context(), p->id, Impl::get_jsvalp(p->root_cache)))
+    if (!JS_IdToValue(
+          Impl::current_context(), p->id, Impl::get_jsvalp(p->root_cache)))
       throw exception("Could not load / increment property iterator");
   } else {
     p.reset();

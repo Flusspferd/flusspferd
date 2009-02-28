@@ -68,7 +68,7 @@ public:
   // Destructor.
   ~object();
 
-  bool is_valid() const;
+  bool is_null() const;
 
   /**
    * Seal the object.

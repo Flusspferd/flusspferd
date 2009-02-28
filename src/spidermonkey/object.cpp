@@ -40,8 +40,6 @@ THE SOFTWARE.
 #include <js/jsobj.h>
 #endif
 
-
-
 using namespace flusspferd;
 
 object::object() : Impl::object_impl(0) { }
@@ -53,33 +51,33 @@ void object::seal(bool deep) {
 }
 
 object object::get_parent() {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not get object parent (object is null)");
   return Impl::wrap_object(JS_GetParent(Impl::current_context(), get()));
 }
 
 object object::get_prototype() {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not get object prototype (object is null)");
   return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
 }
 
 void object::set_parent(object const &o) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not set parent (object is null)");
   if (!JS_SetParent(Impl::current_context(), get(), o.get_const()))
     throw exception("Could not set object parent");
 }
 
 void object::set_prototype(object const &o) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not set object prototype (object is null)");
   if (!JS_SetPrototype(Impl::current_context(), get(), o.get_const()))
     throw exception("Could not set object prototype");
 }
 
 void object::set_property(char const *name, value const &v_) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not set property (object is null)");
   value v = v_;
   if (!JS_SetProperty(Impl::current_context(), get(), name,
@@ -92,7 +90,7 @@ void object::set_property(std::string const &name, value const &v) {
 }
 
 void object::set_property(value const &id, value const &v_) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not set property (object is null)");
   local_root_scope scope;
   value v = v_;
@@ -104,7 +102,7 @@ void object::set_property(value const &id, value const &v_) {
 }
 
 value object::get_property(char const *name) const {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not get property (object is null)");
   value result;
   if (!JS_GetProperty(Impl::current_context(), get_const(),
@@ -118,7 +116,7 @@ value object::get_property(std::string const &name) const {
 }
 
 value object::get_property(value const &id) const {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not get property (object is null)");
   value result;
   local_root_scope scope;
@@ -131,7 +129,7 @@ value object::get_property(value const &id) const {
 }
 
 bool object::has_property(char const *name) const {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not check property (object is null)");
   JSBool foundp;
   if (!JS_HasProperty(Impl::current_context(), get_const(), name,
@@ -145,7 +143,7 @@ bool object::has_property(std::string const &name) const {
 }
 
 bool object::has_property(value const &id) const {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not check property (object is null)");
   local_root_scope scope;
   string name = id.to_string();
@@ -193,7 +191,7 @@ bool object::has_own_property(value const &id) const {
 }
 
 void object::delete_property(char const *name) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not delete property (object is null)");
   if (!JS_DeleteProperty(Impl::current_context(), get(), name))
     throw exception("Could not delete property");
@@ -204,7 +202,7 @@ void object::delete_property(std::string const &name) {
 }
 
 void object::delete_property(value const &id) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not delete property (object is null)");
   local_root_scope scope;
   string name = id.to_string();
@@ -226,7 +224,7 @@ void object::define_property(
   string const &name, value const &init_value, 
   property_attributes const attrs)
 {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not define property (object is null)");
 
   unsigned flags = attrs.flags;
@@ -278,12 +276,12 @@ void object::define_property(
   define_property(name, init_value,attrs);
 }
 
-bool object::is_valid() const {
-  return get_const();
+bool object::is_null() const {
+  return !get_const();
 }
 
 value object::apply(object const &fn, arguments const &arg_) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not apply function (object is null)");
 
   value fnv(fn);
@@ -306,7 +304,7 @@ value object::apply(object const &fn, arguments const &arg_) {
 }
 
 value object::call(char const *fn, arguments const &arg_) {
-  if (!is_valid())
+  if (is_null())
     throw exception("Could not call function (object is null)");
 
   root_value result((value()));
@@ -343,19 +341,25 @@ bool object::is_array() const {
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
 
-bool object::get_property_attributes(char const *name_, property_attributes &attrs) {
+bool object::get_property_attributes(
+    char const *name_, property_attributes &attrs)
+{
   local_root_scope scope;
   string name(name_);
   return get_property_attributes(name, attrs);
 }
 
-bool object::get_property_attributes(std::string name_, property_attributes &attrs) {
+bool object::get_property_attributes(
+    std::string name_, property_attributes &attrs)
+{
   local_root_scope scope;
   string name(name_);
   return get_property_attributes(name, attrs);
 }
 
-bool object::get_property_attributes(string const &name, property_attributes &attrs) {
+bool object::get_property_attributes(
+    string const &name, property_attributes &attrs)
+{
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;
@@ -365,7 +369,8 @@ bool object::get_property_attributes(string const &name, property_attributes &at
   attrs.setter = boost::none;
   JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
           Impl::current_context(), get_const(), name.data(), name.length(),
-          &sm_flags, &found, (JSPropertyOp*)&getter_op, (JSPropertyOp*)&setter_op);
+          &sm_flags, &found,
+          (JSPropertyOp*)&getter_op, (JSPropertyOp*)&setter_op);
 
   if (!success)
     throw exception("Could not query property attributes");
@@ -403,9 +408,11 @@ object::property_attributes::property_attributes()
     setter(boost::none)
 {}
 
-object::property_attributes::property_attributes(unsigned flags, 
-                        boost::optional<function const &> getter,
-                        boost::optional<function const &> setter)
+object::property_attributes::property_attributes(
+  unsigned flags, 
+  boost::optional<function const &> getter,
+  boost::optional<function const &> setter
+)
   : flags(flags),
     getter(getter),
     setter(setter)

@@ -71,7 +71,7 @@ array create_array(unsigned int length = 0);
       typename T::class_info::custom_enumerate > \
     >::type * = 0 \
   ) { \
-    if (!proto.is_valid()) \
+    if (proto.is_null()) \
       proto = get_current_context().get_prototype<T>(); \
     local_root_scope scope; \
     object obj = detail::create_native_object(proto); \
@@ -88,7 +88,7 @@ array create_array(unsigned int length = 0);
     typename boost::enable_if< \
       typename T::class_info::custom_enumerate >::type * = 0 \
   ) { \
-    if (!proto.is_valid()) \
+    if (proto.is_null()) \
       proto = get_current_context().get_prototype<T>(); \
     local_root_scope scope; \
     object obj = detail::create_native_enumerable_object(proto); \

@@ -42,7 +42,7 @@ security &security::get() {
   object scope = get_current_context().scope_chain();
 
   value v;
-  while (scope.is_valid()) {
+  while (!scope.is_null()) {
     v = scope.get_property("$security");
 
     if (!v.is_undefined_or_null())
