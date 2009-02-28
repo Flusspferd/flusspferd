@@ -108,16 +108,16 @@ def configure(conf):
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
     # spidermonkey
-    lib_path = ''
-    include_path = ''
+    lib_path = []
+    include_path = []
     if Options.options.spidermonkey_include:
-        include_path = Options.options.spidermonkey_include
+        include_path = [Options.options.spidermonkey_include]
     if Options.options.spidermonkey_library:
-        lib_path = Options.options.spidermonkey_library
+        lib_path = [Options.options.spidermonkey_library]
     if Options.options.spidermonkey_path:
-        include_path = os.path.join(Options.options.spidermonkey_path,
-                                    "include")
-        lib_path = os.path.join(Options.options.spidermonkey_path, "lib")
+        include_path = [os.path.join(Options.options.spidermonkey_path,
+                                    "include")]
+        lib_path = [os.path.join(Options.options.spidermonkey_path, "lib")]
 
     ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
     if ret == None:
