@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/evaluate.hpp"
+#include "flusspferd/security.hpp"
 #include "flusspferd/io/io.hpp"
 #include "test_environment.hpp"
 
@@ -46,6 +47,8 @@ BOOST_AUTO_TEST_CASE( test_have_IO ) {
 
 BOOST_AUTO_TEST_CASE( test_file_read ) {
   flusspferd::io::load_io();
+  flusspferd::security::create(flusspferd::global());
+
   const char* js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
   flusspferd::root_value v;
   BOOST_CHECK_NO_THROW( v = flusspferd::evaluate(js, __FILE__, __LINE__) );
