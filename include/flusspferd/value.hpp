@@ -31,25 +31,77 @@ namespace flusspferd {
 class object;
 class string;
 
+/**
+ * Any Javascript value.
+ */
 class value : public Impl::value_impl {
 private:
   template<typename T>
   value(T *);
 
 public:
+  /// Create a new value (Javascript: <code>undefined</code>).
   value();
+
+  /**
+   * Create a new boolean value.
+   *
+   * @param b The value.
+   */
   value(bool b);
+
+  /**
+   * Create a new number value from an integer.
+   *
+   * @param i The integer value.
+   */
   value(int i);
+
+  /**
+   * Create a new number value.
+   *
+   * @param d The value.
+   */
   value(double d);
+
+  /**
+   * Create a new object value.
+   *
+   * @param o The object.
+   */
   value(object const &o);
+
+  /**
+   * Create a new string value.
+   *
+   * @param s The string.
+   */
   value(string const &s);
+
+  /// Destructor.
   ~value();
 
+#ifndef IN_DOXYGEN
   value(Impl::value_impl const &v)
     : Impl::value_impl(v)
   { }
+#endif
 
+  /**
+   * Bind to another value.
+   *
+   * The value will act as a reference to @p o.
+   *
+   * @param o The value to bind to.
+   */
   void bind(value o);
+
+  /**
+   * Unbind the value.
+   *
+   * If the value is a reference to another value, the binding will be removed.
+   * Also, the value will be reset to (Javascript) <code>undefined</code>.
+   */
   void unbind();
 
   bool is_null() const;
