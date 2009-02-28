@@ -47,10 +47,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
+#ifndef FLUSSPFERD_COVERAGE
 extern "C" value flusspferd_load(object container)
 {
   return load_xml(container);
 }
+#endif
 
 static void safety_io_callbacks();
 

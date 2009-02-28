@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Ash Berlin
+Copyright (c) 2008 Ash Berlin, Aristid Breitkreuz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,36 +21,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/string.hpp"
-#include "flusspferd/init.hpp"
-#include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/evaluate.hpp"
+#include "flusspferd/security.hpp"
+#include "flusspferd/exception.hpp"
 #include "flusspferd/io/io.hpp"
-#include <boost/test/unit_test.hpp>
-
+#include "test_environment.hpp"
 #include <iostream>
 #include <string>
 
 #ifdef FLUSSPFERD_HAVE_IO
 
-BOOST_AUTO_TEST_SUITE( io )
+BOOST_FIXTURE_TEST_SUITE( io, context_fixture )
+
+BOOST_AUTO_TEST_CASE( test_have_IO ) {
+  flusspferd::io::load_io();
+  flusspferd::root_value v;
+  BOOST_CHECK_NO_THROW( v = flusspferd::evaluate("IO", __FILE__, __LINE__) );
+  BOOST_CHECK(v.is_object());
+  BOOST_CHECK(!v.is_null());
+
+  flusspferd::gc();
+}
+
+BOOST_AUTO_TEST_CASE( IO_no_security ) {
+  flusspferd::io::load_io();
+
+  const char* js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
+  flusspferd::root_value v;
+  BOOST_CHECK_THROW( 
+    v = flusspferd::evaluate(js, __FILE__, __LINE__),
+    flusspferd::exception);
+}
 
 BOOST_AUTO_TEST_CASE( test_file_read ) {
-  flusspferd::init::initialize();
-  flusspferd::context co = flusspferd::context::create();
-  flusspferd::current_context_scope scope(co);
   flusspferd::io::load_io();
+  flusspferd::security::create(flusspferd::global());
+
   const char* js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
-  flusspferd::value v;
-  BOOST_CHECK_NO_THROW( v = co.evaluate(js, strlen(js), __FILE__, __LINE__) );
+  flusspferd::root_value v;
+  BOOST_CHECK_NO_THROW( v = flusspferd::evaluate(js, __FILE__, __LINE__) );
   BOOST_CHECK_EQUAL(v.to_string().c_str(), "foobar\nbaz\n");
 
   js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
-  BOOST_CHECK_NO_THROW( v = co.evaluate(js, strlen(js), __FILE__, __LINE__) );
+  BOOST_CHECK_NO_THROW( v = flusspferd::evaluate(js, __FILE__, __LINE__) );
   BOOST_CHECK_EQUAL(v.to_string().c_str(), "foobar\nbaz\n");
 
-  co.gc();
+  flusspferd::gc();
 }
 
 

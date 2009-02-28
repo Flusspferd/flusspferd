@@ -120,7 +120,7 @@ def configure(conf):
         lib_path = [os.path.join(Options.options.spidermonkey_path, "lib")]
 
     ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
-    if ret == None:
+    if ret == False:
         conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
                        libpath=lib_path)
@@ -133,7 +133,7 @@ def configure(conf):
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
     # libedit
-    if conf.check_cc(lib='edit', uselib_store='EDITLINE') != None:
+    if conf.check_cc(lib='edit', uselib_store='EDITLINE'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cc(header_name='editline/history.h')
 
