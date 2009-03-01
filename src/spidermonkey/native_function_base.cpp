@@ -64,22 +64,6 @@ native_function_base::native_function_base(
 
 native_function_base::~native_function_base() { }
 
-void native_function_base::set_arity(unsigned arity) {
-  p->arity = arity;
-}
-
-unsigned native_function_base::get_arity() const {
-  return p->arity;
-}
-
-void native_function_base::set_name(std::string const &name) {
-  p->name = name;
-}
-
-std::string const &native_function_base::get_name() const {
-  return p->name;
-}
-
 JSClass native_function_base::impl::function_priv_class = {
   "FunctionParent",
   JSCLASS_HAS_PRIVATE,

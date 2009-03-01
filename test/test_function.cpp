@@ -58,16 +58,4 @@ BOOST_AUTO_TEST_CASE( root_native_function ) {
   BOOST_CHECK_EQUAL(f_x.name(), "rnf");
 }
 
-BOOST_AUTO_TEST_CASE( native_function_base ) {
-  function_struct s(2u, "test");
-  BOOST_CHECK_EQUAL(s.get_arity(), 2u);
-  BOOST_CHECK_EQUAL(s.get_name(), "test");
-  s.set_arity(5u);
-  BOOST_CHECK_EQUAL(s.get_arity(), 5u);
-  BOOST_CHECK_EQUAL(s.get_name(), "test");
-  s.set_name("bar");
-  BOOST_CHECK_EQUAL(s.get_arity(), 5u);
-  BOOST_CHECK_EQUAL(s.get_name(), "bar");
-}
-
 BOOST_AUTO_TEST_SUITE_END()
