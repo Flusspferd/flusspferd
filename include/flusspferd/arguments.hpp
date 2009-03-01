@@ -67,16 +67,23 @@ public:
     }
 
     value operator*() const;
+
+  public:
+    bool equals(iterator const &b) const;
   };
 
   iterator begin();
   iterator end();
 };
 
-bool operator==(arguments::iterator const &lhs, arguments::iterator const &rhs);
+inline bool operator==(
+  arguments::iterator const &lhs, arguments::iterator const &rhs)
+{
+  return lhs.equals(rhs);
+}
 
-inline bool operator!=(arguments::iterator const &lhs,
-                       arguments::iterator const &rhs)
+inline bool operator!=(
+  arguments::iterator const &lhs, arguments::iterator const &rhs)
 {
   return !(lhs == rhs);
 }

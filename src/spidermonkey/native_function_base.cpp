@@ -55,8 +55,11 @@ native_function_base::native_function_base(unsigned arity)
 : p(new impl(arity, std::string()))
 {}
 
-native_function_base::native_function_base(unsigned arity, std::string const &name)
-: p(new impl(arity, name))
+native_function_base::native_function_base(
+  unsigned arity,
+  std::string const &name
+)
+  : p(new impl(arity, name))
 {}
 
 native_function_base::~native_function_base() { }

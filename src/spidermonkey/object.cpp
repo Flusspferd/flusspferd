@@ -294,7 +294,7 @@ value object::apply(object const &fn, arguments const &arg_) {
       get(),
       Impl::get_jsval(fnv),
       arg.size(),
-      arg.get(),
+      Impl::get_arguments(arg),
       Impl::get_jsvalp(result));
 
   if (!status)
@@ -316,7 +316,7 @@ value object::call(char const *fn, arguments const &arg_) {
       get(),
       fn,
       arg.size(),
-      arg.get(),
+      Impl::get_arguments(arg),
       Impl::get_jsvalp(result));
 
   if (!status)
