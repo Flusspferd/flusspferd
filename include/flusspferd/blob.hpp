@@ -54,7 +54,7 @@ protected:
   void property_op(property_mode mode, value const &id, value &data);
   bool property_resolve(value const &id, unsigned access);
 
-private: // JS methos
+private: // JS methods
   void append(blob const &o);
   object slice(int from, boost::optional<int> to);
   object to_array();
