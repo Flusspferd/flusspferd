@@ -32,12 +32,6 @@ class object;
 class string;
 
 /**
- * @defgroup value_types Value types
- *
- * Javascript values.
- */
-
-/**
  * Any Javascript value.
  *
  * @ingroup value_types
