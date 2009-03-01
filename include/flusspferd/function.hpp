@@ -32,6 +32,11 @@ namespace flusspferd {
 
 class native_function_base;
 
+/**
+ * A Javascript function.
+ *
+ * @ingroup value_types
+ */
 class function : 
   public Impl::function_impl,
   public object

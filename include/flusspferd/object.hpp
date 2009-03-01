@@ -51,6 +51,8 @@ template<typename> class convert;
 
 /**
  * A Javascript object.
+ *
+ * @ingroup value_types
  */
 class object : public Impl::object_impl {
 public:

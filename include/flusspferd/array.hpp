@@ -28,6 +28,11 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * A Javascript array.
+ *
+ * @ingroup value_types
+ */
 class array : public object {
 public:
   array();

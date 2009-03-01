@@ -32,6 +32,11 @@ namespace flusspferd {
 
 class value;
 
+/**
+ * A Javascript string.
+ *
+ * @ingroup value_types
+ */
 class string : public Impl::string_impl {
 public:
   string();
