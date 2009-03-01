@@ -38,14 +38,24 @@ class array;
 namespace detail {
 
 /**
- * Keeps a Javascript value/object/... in a root scope.
+ * Keeps a Javascript value, object or anything in a GC %root scope.
+ *
+ * @see root_value, root_object, root_string, root_function, root_array
  */
 template<class T>
 class root : public T, private boost::noncopyable {
 public:
+  /**
+   * Construct the %root scope.
+   *
+   * @param x The initial value.
+   */
   root(T const &x = T());
+
+  /// Destructor.
   ~root();
 
+  /// Assignment.
   root &operator=(T const &o) {
     T::operator=(o);
     return *this;
