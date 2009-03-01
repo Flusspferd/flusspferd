@@ -20,22 +20,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#include "flusspferd/class.hpp"
+#include "flusspferd/string.hpp"
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_INIT_HPP
-#define FLUSSPFERD_SPIDERMONKEY_INIT_HPP
+using namespace flusspferd;
 
-#include "../init.hpp"
-#include "context.hpp"
+void detail::unconstructible_class_constructor::call(call_context &) {
+  std::string msg = "Instances of " 
+                  + name().to_string()
+                  + " cannot be created directly";
+  throw exception(msg.c_str());
+}
 
-typedef struct JSContext JSContext;
-typedef struct JSRuntime JSRuntime;
-
-namespace flusspferd { namespace Impl {
-  inline JSContext *current_context() {
-    return get_context(flusspferd::current_context());
-  }
-
-  JSRuntime *get_runtime();
-}}
-
-#endif /* FLUSSPFERD_SPIDERMONKEY_INIT_HPP */

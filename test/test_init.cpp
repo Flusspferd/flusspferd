@@ -31,27 +31,27 @@ BOOST_AUTO_TEST_CASE( initialize ) {
   BOOST_CHECK_NO_THROW(init = &flusspferd::init::initialize());
   BOOST_CHECK_NE(init, (flusspferd::init*) 0);
 
-  flusspferd::context &context = init->get_current_context();
+  flusspferd::context &context = init->current_context();
   BOOST_CHECK(!context.is_valid());
 }
 
 BOOST_AUTO_TEST_CASE( enter_leave ) {
   flusspferd::init &init = flusspferd::init::initialize();
 
-  flusspferd::context old_context(init.get_current_context());
+  flusspferd::context old_context(init.current_context());
 
   flusspferd::context context(flusspferd::context::create());
 
-  BOOST_CHECK_NE(context, init.get_current_context());
+  BOOST_CHECK_NE(context, init.current_context());
 
   BOOST_CHECK_EQUAL(init.enter_current_context(context), old_context);
 
-  BOOST_CHECK_EQUAL(context, init.get_current_context());
+  BOOST_CHECK_EQUAL(context, init.current_context());
 
   BOOST_CHECK(!init.leave_current_context(old_context));
 
   BOOST_CHECK(init.leave_current_context(context));
 
-  BOOST_CHECK_EQUAL(old_context, init.get_current_context());
+  BOOST_CHECK_EQUAL(old_context, init.current_context());
 }
 

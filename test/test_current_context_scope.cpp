@@ -29,31 +29,31 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
 BOOST_AUTO_TEST_CASE( current_context_scope ) {
   flusspferd::init &init = flusspferd::init::initialize();
 
-  flusspferd::context old_context(init.get_current_context());
+  flusspferd::context old_context(init.current_context());
 
   flusspferd::context context(flusspferd::context::create());
 
-  BOOST_CHECK_NE(context, init.get_current_context());
+  BOOST_CHECK_NE(context, init.current_context());
 
   {
     flusspferd::current_context_scope scope(context);
 
-    BOOST_CHECK_EQUAL(context, init.get_current_context());
+    BOOST_CHECK_EQUAL(context, init.current_context());
 
     {
       flusspferd::context context2(flusspferd::context::create());
 
       flusspferd::current_context_scope scope(context2);
 
-      BOOST_CHECK_EQUAL(context2, init.get_current_context());
+      BOOST_CHECK_EQUAL(context2, init.current_context());
     }
 
-    BOOST_CHECK_EQUAL(context, init.get_current_context());
+    BOOST_CHECK_EQUAL(context, init.current_context());
   }
 
-  BOOST_CHECK_EQUAL(old_context, init.get_current_context());
+  BOOST_CHECK_EQUAL(old_context, init.current_context());
 }
 
 BOOST_FIXTURE_TEST_CASE( context_in_fixture, context_fixture ) {
-  BOOST_CHECK(flusspferd::get_current_context().is_valid());
+  BOOST_CHECK(flusspferd::current_context().is_valid());
 }

@@ -31,26 +31,26 @@ namespace flusspferd {
   inline value evaluate(char const *source, std::size_t n,
                         char const *file = 0x0, unsigned int line = 0)
   {
-    return get_current_context().evaluate(source, n, file, line);
+    return current_context().evaluate(source, n, file, line);
   }
 
   inline value evaluate(char const *source, char const *file = 0x0,
                         unsigned int line = 0)
   {
-    return get_current_context().evaluate(source, file, line);
+    return current_context().evaluate(source, file, line);
   }
 
   inline value evaluate(std::string const &source, char const *file = 0x0,
                         unsigned int line = 0)
   {
-    return get_current_context().evaluate(source, file, line);
+    return current_context().evaluate(source, file, line);
   }
 
   inline value evaluate_in_scope(const char*source, std::size_t n,
                                char const *file, unsigned int line,
                               object scope)
   {
-    return get_current_context().evaluate_in_scope(source, n, file, line, scope);
+    return current_context().evaluate_in_scope(source, n, file, line, scope);
   }
 }
 

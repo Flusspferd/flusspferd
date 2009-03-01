@@ -32,8 +32,6 @@ namespace flusspferd {
 
 class importer : public native_object_base {
 public:
-  // The type of function which we look for in loaded .so modules
-  // extern "C" value flusspferd_load(object container);
   typedef value (*flusspferd_load_t)(object container);
 
   struct class_info : flusspferd::class_info {

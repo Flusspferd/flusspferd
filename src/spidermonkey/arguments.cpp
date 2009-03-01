@@ -130,9 +130,7 @@ arguments::iterator arguments::end() {
   return Impl::arguments_impl::iterator_impl(get() + size());
 }
 
-bool flusspferd::operator==(
-  arguments::iterator const &lhs, arguments::iterator const &rhs)
-{
-  return *static_cast<Impl::arguments_impl::iterator_impl const&>(lhs) ==
-    *static_cast<Impl::arguments_impl::iterator_impl const&>(rhs);
+bool arguments::iterator::equals(arguments::iterator const &b) const {
+  return *static_cast<Impl::arguments_impl::iterator_impl const&>(*this) ==
+    *static_cast<Impl::arguments_impl::iterator_impl const&>(b);
 }

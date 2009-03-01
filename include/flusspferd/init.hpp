@@ -45,11 +45,10 @@ public:
   struct detail;
   friend struct init::detail;
 
-  // returns pointer to old context or null
   context enter_current_context(context const &c);
-  // returns true if c was current context
   bool leave_current_context(context const &c);
-  context &get_current_context();
+
+  context &current_context();
 
   static init &initialize();
 };
@@ -62,26 +61,26 @@ inline bool leave_current_context(context const &c) {
   return init::initialize().leave_current_context(c);
 }
 
-inline context &get_current_context() {
-  return init::initialize().get_current_context();
+inline context &current_context() {
+  return init::initialize().current_context();
 }
 
 inline object global() {
-  return get_current_context().global();
+  return current_context().global();
 }
 
 inline void gc() {
-  return get_current_context().gc();
+  return current_context().gc();
 }
 
 template<typename T>
 object get_prototype() {
-  return get_current_context().get_prototype<T>();
+  return current_context().get_prototype<T>();
 }
 
 template<typename T>
 object get_constructor() {
-  return get_current_context().get_constructor<T>();
+  return current_context().get_constructor<T>();
 }
 
 }

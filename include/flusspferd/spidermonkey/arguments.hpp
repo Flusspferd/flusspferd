@@ -39,6 +39,14 @@ class arguments_impl {
   jsval *argv;
 
 public:
+  arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
+  arguments_impl(arguments_impl const &o);
+
+protected:
+  arguments_impl() : n(0), argv(0x0) {}
+  arguments_impl(std::vector<value> const &o);
+
+protected:
   jsval const *get() const { return argv; }
   jsval *get() { return argv; }
   std::size_t size() const { return n; }
@@ -51,10 +59,6 @@ public:
     return values.size() == n; // TODO does this fix the problem?
   }
 
-  arguments_impl() : n(0), argv(0x0) {}
-  arguments_impl(std::size_t n, jsval *argv) : n(n), argv(argv) { }
-  arguments_impl(std::vector<value> const &o);
-  arguments_impl(arguments_impl const &o);
   arguments_impl &operator=(arguments_impl const &o);
 
   class iterator_impl {
@@ -67,7 +71,13 @@ public:
     }
     jsval *operator*() const { return iter; }
   };
+
+  friend jsval *get_arguments(arguments_impl &);
 };
+
+inline jsval *get_arguments(arguments_impl &arg) {
+  return arg.get();
+}
 
 }}
 

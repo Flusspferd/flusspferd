@@ -136,6 +136,9 @@ public:
     }
 
     value operator*() const;
+
+  public:
+    bool equals(iterator const &b) const;
   };
 
   /// Return an iterator to the beginning of the arguments list.
@@ -153,7 +156,11 @@ public:
  *
  * @relates flusspferd::arguments::iterator
  */
-bool operator==(arguments::iterator const &lhs, arguments::iterator const &rhs);
+inline bool operator==(
+  arguments::iterator const &lhs, arguments::iterator const &rhs)
+{
+  return lhs.equals(rhs);
+}
 
 /**
  * Check two arguments::iterator%s for inequality.

@@ -104,7 +104,7 @@ bool init::leave_current_context(context const &c) {
   }
 }
 
-context &init::get_current_context() {
+context &init::current_context() {
   return p->current_context;
 }
 
