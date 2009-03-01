@@ -24,13 +24,15 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP
 #define FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP
 
-#include <flusspferd/context.hpp>
+#include "flusspferd/context.hpp"
 
 typedef struct JSContext JSContext;
 
 namespace flusspferd { namespace Impl {
-  JSContext *get_context(context &co);
-  context wrap_context(JSContext *c);
+
+JSContext *get_context(context &co);
+context wrap_context(JSContext *c);
+
 }}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP */
