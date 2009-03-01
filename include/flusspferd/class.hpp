@@ -117,7 +117,7 @@ object load_class(
 
   local_root_scope scope;
 
-  context ctx = get_current_context();
+  context ctx = current_context();
 
   value previous = container.get_property(name);
 
@@ -149,7 +149,7 @@ object load_class(
 
   local_root_scope scope;
 
-  context ctx = get_current_context();
+  context ctx = current_context();
 
   value previous = container.get_property(name);
 

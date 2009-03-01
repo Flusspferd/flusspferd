@@ -30,7 +30,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 local_root_scope::local_root_scope()
-: ctx(get_current_context()) {
+: ctx(current_context()) {
   if (!JS_EnterLocalRootScope(Impl::get_context(ctx)))
     throw exception("Could not enter local GC root scope");
 }

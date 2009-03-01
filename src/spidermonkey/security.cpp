@@ -39,7 +39,7 @@ security &security::create(object container) {
 }
 
 security &security::get() {
-  object scope = get_current_context().scope_chain();
+  object scope = current_context().scope_chain();
 
   value v;
   while (!scope.is_null()) {

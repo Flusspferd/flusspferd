@@ -205,7 +205,7 @@ value importer::load(string const &f_name, bool binary_only) {
     if (!binary_only)
       if (sec.check_path(fullpath, security::READ))
         if (boost::filesystem::exists(fullpath)) {
-          value val = get_current_context().execute(
+          value val = current_context().execute(
               fullpath.c_str(), ctx);
           p->module_cache[key] = val;
           return val;

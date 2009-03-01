@@ -32,7 +32,7 @@ typedef struct JSRuntime JSRuntime;
 
 namespace flusspferd { namespace Impl {
   inline JSContext *current_context() {
-    return get_context(get_current_context());
+    return get_context(flusspferd::current_context());
   }
 
   JSRuntime *get_runtime();
