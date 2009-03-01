@@ -45,9 +45,7 @@ public:
   struct detail;
   friend struct init::detail;
 
-  // returns pointer to old context or null
   context enter_current_context(context const &c);
-  // returns true if c was current context
   bool leave_current_context(context const &c);
 
   context &current_context();

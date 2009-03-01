@@ -35,7 +35,6 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-// Everything in this namespace is 'private'
 namespace detail {
 
 struct unconstructible_class_constructor : native_function_base {
