@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include <sstream>
 #include <errno.h>
 
-// Wrap the windows calls to the *nix equivalents
-#ifndef _WIN32
 #include <dlfcn.h>
 
 #define DIRSEP1 "/"
@@ -46,35 +44,6 @@ THE SOFTWARE.
 #define SHLIBSUFFIX ".dylib"
 #else
 #define SHLIBSUFFIX ".so"
-#endif
-
-#else
-
-#include <windows.h>
-
-#define DIRSEP1 "\\"
-#define DIRSEP2 "/"
-#define SHLIBPREFIX 0
-#define SHLIBSUFFIX ".dll"
-
-#define dlopen(x,y) (void*)LoadLibrary(x)
-#define dlsym(x,y) (void*)GetProcAddress((HMODULE)x,y)
-#define dlclose(x) FreeLibrary((HMODULE)x)
-
-// FIXME - not thread safe?
-const char *dlerror() {
-  static char szMsgBuf[256];
-  ::FormatMessage(
-      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      ::GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      szMsgBuf,
-      sizeof szMsgBuf,
-      NULL);
-  return szMsgBuf;
-}
-
 #endif
 
 using namespace flusspferd;
