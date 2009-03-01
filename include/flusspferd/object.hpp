@@ -183,20 +183,45 @@ FLUSSPFERD_CALLS(call, std::string const &)
 FLUSSPFERD_CALLS(call, object const &)
 
 #ifndef PREPROC_DEBUG
+  /// Property flags.
   enum property_flag {
+    /// The property is not enumerable.
     dont_enumerate = 1,
+
+    /// The property is read-only.
     read_only_property = 2,
+
+    /// The property can not be deleted.
     permanent_property = 4,
+
+    /// The property's attributes are shared between objects.
     shared_property = 8,
+
+    /// The property is both permanent and shared.
     permanent_shared_property = 12
   };
 
+  /// A property's attributes: flags, getters and setters.
   struct property_attributes {
+    /// The property's flags.
     unsigned flags;
+
+    /// The property's getter.
     boost::optional<function const &> getter;
+
+    /// The property's setter.
     boost::optional<function const &> setter;
 
+    /// Construct default attributes.
     property_attributes();
+
+    /**
+     * Construct property attributes.
+     *
+     * @param flags The flags.
+     * @param getter The getter.
+     * @param setter The setter.
+     */
     property_attributes(unsigned flags, 
       boost::optional<function const &> getter = boost::none,
       boost::optional<function const &> setter = boost::none);
