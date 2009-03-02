@@ -50,13 +50,13 @@ void object::seal(bool deep) {
     throw exception("Could not seal object");
 }
 
-object object::get_parent() {
+object object::parent() {
   if (is_null())
     throw exception("Could not get object parent (object is null)");
   return Impl::wrap_object(JS_GetParent(Impl::current_context(), get()));
 }
 
-object object::get_prototype() {
+object object::prototype() {
   if (is_null())
     throw exception("Could not get object prototype (object is null)");
   return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));

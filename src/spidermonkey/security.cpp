@@ -31,7 +31,7 @@ security &security::create(object container) {
   local_root_scope scope;
 
   security &obj = create_native_object<security>(
-      create_object().get_prototype());
+      create_object().prototype());
 
   container.define_property("$security", obj);
 
@@ -47,7 +47,7 @@ security &security::get() {
 
     if (!v.is_undefined_or_null())
       break;
-    scope = scope.get_parent();
+    scope = scope.parent();
   }
 
   if (!v.is_object() || v.is_null())

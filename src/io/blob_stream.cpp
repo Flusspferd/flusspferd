@@ -82,7 +82,7 @@ blob_stream::~blob_stream()
 {}
 
 object blob_stream::class_info::create_prototype() {
-  object proto = create_object(flusspferd::get_prototype<stream_base>());
+  object proto = create_object(flusspferd::prototype<stream_base>());
 
   create_native_method(proto, "getBlob", 0);
 

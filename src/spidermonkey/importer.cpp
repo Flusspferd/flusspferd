@@ -60,7 +60,7 @@ void importer::class_info::augment_constructor(object &ctor) {
 
 void importer::add_preloaded(std::string const &name, object const &obj) {
   local_root_scope scope;
-  object ctor = get_constructor<importer>();
+  object ctor = constructor<importer>();
   object preload = ctor.get_property("preload").to_object();
   preload.set_property(name, obj);
 }
@@ -94,7 +94,7 @@ importer::importer(object const &obj, call_context &)
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
-  object constructor = get_constructor<importer>();
+  object constructor = flusspferd::constructor<importer>();
 
   // Store search paths
   array arr = constructor.get_property("defaultPaths").to_object();
@@ -108,7 +108,7 @@ importer::importer(object const &obj, call_context &)
 
   // this.contexnt.__proto__ = this.__proto__; 
   // Not sure we actually want to do this, but we can for now.
-  context.set_prototype(get_prototype());
+  context.set_prototype(prototype());
   set_prototype(context);
 }
 
@@ -138,7 +138,7 @@ value importer::load(string const &f_name, bool binary_only) {
   ctx.define_property("$importer", *this);
   ctx.define_property("$security", sec);
 
-  object constructor = get_constructor<importer>();
+  object constructor = flusspferd::constructor<importer>();
   value preload = constructor.get_property("preload");
 
   if (preload.is_object()) {

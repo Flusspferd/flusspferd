@@ -71,7 +71,7 @@ void file_class::class_info::augment_constructor(object constructor) {
 object file_class::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object(flusspferd::get_prototype<stream_base>());
+  object proto = create_object(flusspferd::prototype<stream_base>());
 
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);

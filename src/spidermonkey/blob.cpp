@@ -228,11 +228,11 @@ object blob::slice(int from, boost::optional<int> to_) {
   if (to < from)
     to = from;
 
-  return create_native_object<blob>(get_prototype(), &data[from], to-from);
+  return create_native_object<blob>(prototype(), &data[from], to-from);
 }
 
 object blob::clone() {
-  return create_native_object<blob>(get_prototype(), &data[0], data.size());
+  return create_native_object<blob>(prototype(), &data[0], data.size());
 }
 
 string blob::as_utf8() {
