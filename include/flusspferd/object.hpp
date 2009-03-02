@@ -83,10 +83,10 @@ public:
   void seal(bool deep);
 
   /// Get the object's parent (__parent__).
-  object get_parent();
-
+  object parent();
+  
   /// Get the object's prototype (__prototype__).
-  object get_prototype();
+  object prototype();
 
   /**
    * Set the object's parent (__parent__).

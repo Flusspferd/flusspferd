@@ -46,7 +46,7 @@ object flusspferd::io::load_io(object container) {
   if (previous.is_object())
     return previous.to_object();
 
-  object IO = current_context().get_constructor("IO");
+  object IO = current_context().constructor("IO");
 
   if (IO.is_null()) {
     IO = flusspferd::create_object();

@@ -56,7 +56,7 @@ void html_document::init() {
 }
 
 object html_document::class_info::create_prototype() {
-  object proto = create_object(flusspferd::get_prototype<document>());
+  object proto = create_object(flusspferd::prototype<document>());
 
   create_native_method(proto, "dump", 0);
 

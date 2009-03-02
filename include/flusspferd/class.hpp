@@ -174,7 +174,7 @@ object load_class(
   if (previous.is_object())
     return previous.get_object();
 
-  object constructor = ctx.get_constructor<T>();
+  object constructor = ctx.constructor<T>();
 
   if (constructor.is_null()) {
     constructor =
@@ -206,7 +206,7 @@ object load_class(
   if (previous.is_object())
     return previous.get_object();
 
-  object constructor = ctx.get_constructor<T>();
+  object constructor = ctx.constructor<T>();
 
   if (constructor.is_null()) {
     char const *full_name = T::class_info::full_name();

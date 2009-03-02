@@ -249,7 +249,7 @@ void context::add_prototype(std::string const &name, object const &proto) {
     context_private::root_object_ptr(new root_object(proto));
 }
 
-object context::get_prototype(std::string const &name) const {
+object context::prototype(std::string const &name) const {
   context_private::root_object_ptr ptr = p->get_private()->prototypes[name];
   return ptr ? *ptr : object();
 }
@@ -259,7 +259,7 @@ void context::add_constructor(std::string const &name, object const &ctor) {
     context_private::root_object_ptr(new root_object(ctor));
 }
 
-object context::get_constructor(std::string const &name) const {
+object context::constructor(std::string const &name) const {
   context_private::root_object_ptr ptr = p->get_private()->constructors[name];
   return ptr ? *ptr : object();
 }

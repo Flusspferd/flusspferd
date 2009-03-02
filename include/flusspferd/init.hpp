@@ -74,13 +74,13 @@ inline void gc() {
 }
 
 template<typename T>
-object get_prototype() {
-  return current_context().get_prototype<T>();
+object prototype() {
+  return current_context().prototype<T>();
 }
 
 template<typename T>
-object get_constructor() {
-  return current_context().get_constructor<T>();
+object constructor() {
+  return current_context().constructor<T>();
 }
 
 }
