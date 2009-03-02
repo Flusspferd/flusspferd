@@ -151,7 +151,7 @@ void stream_base::write(value const &data) {
     streambuf->sputn(text.c_str(), std::strlen(str));
   } else if (data.is_object()) {
     blob &b = flusspferd::get_native<blob>(data.get_object());
-    streambuf->sputn((char const*) b.get_data(), b.size());
+    streambuf->sputn((char const*) b.data(), b.size());
   } else {
     throw exception("Cannot write non-object non-string value to Stream");
   }

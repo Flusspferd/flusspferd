@@ -32,7 +32,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 blob::blob(object const &obj, unsigned char const *data, std::size_t length)
-  : native_object_base(obj), data(data, data+length)
+  : native_object_base(obj), data_(data, data+length)
 {
   init();
 }
@@ -45,16 +45,16 @@ blob::blob(object const &obj, call_context &x)
   local_root_scope scope;
   if (x.arg[0].is_int()) {
     std::size_t length = x.arg[0].get_int();
-    data.resize(length);
+    data_.resize(length);
     return;
   } else if (x.arg[0].is_object()) {
     object data = x.arg[0].get_object();
     if (data.is_array()) {
       array arr = data;
       std::size_t length = arr.get_length();
-      this->data.reserve(length);
+      data_.reserve(length);
       for (std::size_t i = 0; i < length; ++i)
-        this->data.push_back(el_from_value(arr.get_element(i)));
+        data_.push_back(el_from_value(arr.get_element(i)));
       return;
     }
   }
@@ -146,12 +146,12 @@ void blob::prop_length(property_mode mode, value &data) {
     int new_len = data.get_int();
     if (new_len < 0)
       new_len = 0;
-    this->data.resize(new_len);
+    data_.resize(new_len);
     data = new_len;
     break;
   }
   case property_get:
-    data = (int)this->data.size();
+    data = (int)data_.size();
     break;
   default: break;
   }
@@ -167,10 +167,10 @@ bool blob::property_resolve(value const &id, unsigned /*flags*/) {
   if (uid < 0)
     return false;
 
-  if (size_t(uid) > data.size())
+  if (size_t(uid) > data_.size())
     return false;
  
-  value v = int(data[uid]);
+  value v = int(data_[uid]);
   define_property(id.to_string(), v, permanent_shared_property);
   return true;
 }
@@ -184,34 +184,34 @@ void blob::property_op(property_mode mode, value const &id, value &x) {
     return;
   }
 
-  if (index < 0 || std::size_t(index) >= data.size())
+  if (index < 0 || std::size_t(index) >= data_.size())
     throw exception("Out of bounds of Blob");
 
   switch (mode) {
   case property_get:
-    x = int(data[index]);
+    x = int(data_[index]);
     break;
   case property_set:
-    data[index] = el_from_value(x);
+    data_[index] = el_from_value(x);
     break;
   default: break;
   };
 }
 
 void blob::append(blob const &o) {
-  data.reserve(data.size() + o.data.size());
-  data.insert(data.end(), o.data.begin(), o.data.end());
+  data_.reserve(data_.size() + o.data_.size());
+  data_.insert(data_.end(), o.data_.begin(), o.data_.end());
 }
 
 object blob::to_array() {
-  array arr = create_array(data.size());
-  for (std::size_t i = 0; i < data.size(); ++i)
-    arr.set_element(i, int(data[i]));
+  array arr = create_array(data_.size());
+  for (std::size_t i = 0; i < data_.size(); ++i)
+    arr.set_element(i, int(data_[i]));
   return arr;
 }
 
 object blob::slice(int from, boost::optional<int> to_) {
-  int n = data.size();
+  int n = data_.size();
 
   if (from < 0)
     from = n + from;
@@ -228,23 +228,23 @@ object blob::slice(int from, boost::optional<int> to_) {
   if (to < from)
     to = from;
 
-  return create_native_object<blob>(prototype(), &data[from], to-from);
+  return create_native_object<blob>(prototype(), &data_[from], to-from);
 }
 
 object blob::clone() {
-  return create_native_object<blob>(prototype(), &data[0], data.size());
+  return create_native_object<blob>(prototype(), &data_[0], data_.size());
 }
 
 string blob::as_utf8() {
   std::size_t strlen = 0;
-  for (; strlen < data.size(); ++strlen)
-    if (!data[strlen])
+  for (; strlen < data_.size(); ++strlen)
+    if (!data_[strlen])
       break;
-  return string((char*) get_data(), strlen);
+  return string((char*) data(), strlen);
 }
 
 string blob::as_utf16() {
-  return string((char16_t*) get_data(), size() / sizeof(char16_t));
+  return string((char16_t*) data(), size() / sizeof(char16_t));
 }
 
 object blob::from_utf8(string const &text) {
@@ -261,15 +261,15 @@ object blob::from_utf16(string const &text) {
 }
 
 value blob::set_index(int index, value x) {
-  if (index < 0 || std::size_t(index) >= data.size())
+  if (index < 0 || std::size_t(index) >= data_.size())
     throw exception("Out of bounds of Blob");
 
-  return data[index] = el_from_value(x);
+  return data_[index] = el_from_value(x);
 }
 
 value blob::get_index(int index) {
-  if (index < 0 || std::size_t(index) >= data.size())
+  if (index < 0 || std::size_t(index) >= data_.size())
     throw exception("Out of bounds of Blob");
 
-  return data[index];
+  return data_[index];
 }
