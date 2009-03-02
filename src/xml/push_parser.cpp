@@ -103,7 +103,7 @@ void push_parser::push(blob &b, bool t) {
   if (!parser)
     throw exception("Could not parse chunk: parser is empty");
 
-  int status = xmlParseChunk(parser, (char *) b.get_data(), b.size(), t);
+  int status = xmlParseChunk(parser, (char *) b.data(), b.size(), t);
 
   if (status != XML_ERR_OK)
     throw exception("Could not parse chunk");

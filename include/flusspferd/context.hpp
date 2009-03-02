@@ -40,12 +40,13 @@ class context {
   struct context_private;
 
 public:
+  context();
+  ~context();
+
   struct detail;
   friend struct detail;
 
-  context();
   context(detail const&);
-  ~context();
 
   bool is_valid() const;
 
