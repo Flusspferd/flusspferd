@@ -22,6 +22,9 @@ a:active { text-decoration: none; font-weight: bold; color: #900; background: #F
 a:hover { text-decoration: none; color: #C00; background: #FC0; }
 .email { text-decoration: none; font-weight: bold; color: #300; }
 .email:hover { text-decorarion: none; color: #C00; background: #FC0; }
+.footnote { font-size: 8pt;  }
+a.footnote-link { vertical-align: super; font-size: 6pt; color: #555 }
+
 </style>
 </head>
 <body>
@@ -39,7 +42,9 @@ a:hover { text-decoration: none; color: #C00; background: #FC0; }
 
    <p>Flusspferd supports <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> as its backend, and possibly support for <a href="http://code.google.com/apis/v8">v8</a> or other engines will be added later.</p>
 
-   <p class="small">In case you wonder, "Flusspferd" is a German word which translates to <a href="http://en.wikipedia.org/wiki/Hippopotamus">hippo</a>. The reason we chose this word is that <a href="http://oreilly.com/catalog/9781565925779/index.html">a book on Javascript</a> shows a hippo on its cover, and Javascript has this animal naming tradition: Spidermonkey (two animals, even!), Rhino, and now Flusspferd.</p>
+   <p class="small">In case you wonder, "Flusspferd" is a German word which translates to <a href="http://en.wikipedia.org/wiki/Hippopotamus">hippo</a>.
+     The reason we chose this word is that <a href="http://oreilly.com/catalog/9781565925779/index.html">a book on Javascript</a> shows a hippo on its cover, and Javascript has this animal naming tradition:
+     Spidermonkey (two animals, even!<a name="footnote-1-back" href="#footnote-1" class="footnote-link">1</a>), <a href="http://www.mozilla.org/rhino/">Rhino</a>, and now Flusspferd.</p>
 
    <h3>Code</h3>
 
@@ -50,7 +55,7 @@ a:hover { text-decoration: none; color: #C00; background: #FC0; }
    <h3>Services</h3>
 
    <ul>
-    <li><a name="github"><a href="http://github.com/ruediger/flusspferd">github</a></a></li>
+    <li id="github"><a href="http://github.com/ruediger/flusspferd">github</a></li>
     <li><a href="http://cia.vc/stats/project/flusspferd">cia</a></li>
     <li><a href="https://launchpad.net/flusspferd">launchpad</a>, especially the <a href="https://bugs.launchpad.net/flusspferd">bug-tracking</a></li>
    </ul>
@@ -62,6 +67,15 @@ a:hover { text-decoration: none; color: #C00; background: #FC0; }
    <p>You can find us on IRC in <a href="irc://irc.freenode.net/#flusspferd">#flusspferd</a> on <a href="http://freenode.net/">freenode</a>.
       Use <a href="http://www.mibbit.com/chat/?server=irc.freenode.net&channel=%23flusspferd&nick=flusspferd-user">Mibbit</a> or the <a href="http://java.freenode.net/index.php?nick=flusspferd-user&channel=flusspferd">freenode Java client</a> to connect to the channel if you don't have an IRC client on your computer.
       Alternatively, contact us via e-mail at <span class="email">team -AT- flusspferd -DOT- org</span>.</p>
+
+
+    <h3>Footnotes</h3>
+
+    <ol>
+     <li id="footnote-1" class="footnote"><a href="#footnote-1-back" class="footnote-link">(back)</a> Actually, spider monkeys are, I was told, <a href="http://en.wikipedia.org/wiki/Spider_monkey">a weird looking, intelligent species of monkeys.</a><a name="footnote-2-back" href="#footnote-2" class="footnote-link">2</a></li>
+     <li id="footnote-2" class="footnote"><a href="#footnote-2-back" class="footnote-link">(back)</a> To be more pedantic, spider monkeys are seemingly not really a species, as the word "species" is too specific a classification.</a>
+    </ol>
+
   </div>
 
   <div class="clear">&nbsp;</span>
