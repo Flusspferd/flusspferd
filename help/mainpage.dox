@@ -25,7 +25,7 @@ THE SOFTWARE.
 @mainpage Flusspferd Documentation
 
 @htmlonly
-<img src="http://img76.imageshack.us/img76/4504/flusspferdlogo192x192xo4.png" width="192" height="192" alt="Flusspferd Logo" style="float:right;"/>
+<img src="http://flusspferd.org/flusspferd-logo.png" width="192" height="192" alt="Flusspferd Logo" style="float:right;"/>
 @endhtmlonly
 
 Flusspferd (German for Hippopotamus) is a C++ library providing Javascript bindings. Flusspferd uses Mozilla's SpiderMonkey as its underlying Javascript engine but porting it to other engines (like Google's v8) should be easy.
