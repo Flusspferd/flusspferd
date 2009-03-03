@@ -1,7 +1,7 @@
 #!/bin/sh
 mkdir -p html/docs
 
-if [ -x NaturalDocs ];
+if ! which naturaldocs;
 then
 	ND=NaturalDocs
 else
