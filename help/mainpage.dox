@@ -32,10 +32,6 @@ Flusspferd (German for Hippopotamus) is a C++ library providing Javascript bindi
 
 See <a href="docs/index.html">JS docs</a> for documentation of the Javascript interface.
 
-@li <a href="http://github.com/ruediger/flusspferd/tree/master">Homepage</a>
-@li <a href="https://launchpad.net/flusspferd"><i>Flusspferd</i> on launchpad</a> &ndash; report bugs and ask questions on Launchpad.
-@li <a href="http://cia.vc/stats/project/flusspferd"><i>Flusspferd</i> on CIA.vc</a> &ndash; stats about flusspferd.
-
-You can find us on IRC in <a href="irc://irc.freenode.net/#freenode">#%flusspferd</a> on Freenode.
+Our <a href="http://flusspferd.org/">homepage</a> contains other useful information.
 
 */
