@@ -125,9 +125,25 @@ def configure(conf):
         conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
                        libpath=lib_path)
+    js_h_defines = []
+    if not conf.check_cxx(header_name = 'js/js-config.h', includes=include_path,
+                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8']):
+        if conf.check_cxx(uselib='JS', err_msg='not thread safe',
+                          includes=include_path,
+                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8',
+                                   'JS_THREADSAFE'],
+                          msg='Checking if SM needs JS_THREADSAFE',
+                          fragment='''
+#include <js/jsapi.h>
+int main() {
+  return JS_BeginRequest == 0x0 ? 1 : 0;
+}
+'''):
+            js_h_defines += ['JS_THREADSAFE']
+
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   defines=js_h_defines + ['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
                    includes=include_path)
     conf.check_cxx(uselib=['JS_H', 'JS'],
                    mandatory = 1,
