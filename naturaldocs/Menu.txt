@@ -1,17 +1,11 @@
 Format: Development Release 12-07-2007 (1.35 base)
 
 
-# You can add a title and sub-title to your menu like this:
-# Title: [project name]
-# SubTitle: [subtitle]
+Title: Flusspferd
+SubTitle: JavaScript Modules
 
 Footer: <script src="http://www.google-analytics.com/ga.js"></script> <script src="http://flusspferd.org/ga.js"></script>
-
-# You can add a timestamp to your documentation like one of these:
-# Timestamp: Generated on month day, year
-# Timestamp: Updated mm/dd/yyyy
-# Timestamp: Last updated mon day
-#
+Timestamp: Updated mm/dd/yyyy
 #   m     - One or two digit month.  January is "1"
 #   mm    - Always two digit month.  January is "01"
 #   mon   - Short month word.  January is "Jan"
