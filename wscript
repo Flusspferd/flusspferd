@@ -49,6 +49,7 @@ def set_options(opt):
                    help='Enable XML support')
     opt.add_option('--enable-curl', action='store_true',
                    help='Build cURL extension')
+    opt.add_option('--enable-sqlite', action='store_true', help='Enable SQLite plugin')
     opt.add_option('--with-spidermonkey-include', action='store', nargs=1,
                    dest='spidermonkey_include',
                    help='spidermonkey include path without the js/')
@@ -136,6 +137,25 @@ def configure(conf):
     if conf.check_cc(lib='edit', uselib_store='EDITLINE'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cc(header_name='editline/history.h')
+
+    # sqlite
+    if Options.options.enable_sqlite:
+        conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
+                       uselib_store='SQLITE',
+                       errmsg='SQLite 3 (>= 3.5.0) could not be found or the found version is too old.',
+                       fragment='''
+#include <sqlite3.h>
+#include <stdio.h>
+int main() {
+   if(SQLITE_VERSION_NUMBER <= 3005000) {
+     fprintf(stderr, "Need sqlite3 version 3.5.0 or better. Found %s\\n",
+             SQLITE_VERSION);
+     return 1;
+   }
+   return 0;
+}
+''')
+        conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
 
     # xml
     if Options.options.enable_xml:

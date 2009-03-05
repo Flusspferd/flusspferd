@@ -12,6 +12,9 @@ all: .configure
 reconfigure:
 	$(PYTHON) ./waf configure
 
+install:
+	$(PYTHON) ./waf install
+
 clean:
 	rm .configure
 	$(PYTHON) ./waf clean

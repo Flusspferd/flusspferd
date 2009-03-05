@@ -49,7 +49,7 @@ array flusspferd::create_array(unsigned length) {
   if (!o)
     throw exception("Could not create array");
 
-  return Impl::wrap_object(o);
+  return object(Impl::wrap_object(o));
 }
 
 object flusspferd::detail::create_native_object(object const &proto) {
