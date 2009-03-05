@@ -129,6 +129,15 @@ def configure(conf):
                    uselib_store='JS_H',
                    defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
                    includes=include_path)
+    conf.check_cxx(uselib=['JS_H', 'JS'],
+                   mandatory = 1,
+                   errmsg='Spidermonkey not compiled with UTF8 Support!',
+                   fragment='''
+#include <js/jsapi.h>
+int main() {
+  return JS_CStringsAreUTF8() ? 0 : 1;
+}
+''')
 
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
