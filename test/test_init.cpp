@@ -28,7 +28,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::context)
 
 BOOST_AUTO_TEST_CASE( initialize ) {
   flusspferd::init *init = 0;
-  BOOST_CHECK_NO_THROW(init = &flusspferd::init::initialize());
+  init = &flusspferd::init::initialize();
   BOOST_CHECK_NE(init, (flusspferd::init*) 0);
 
   flusspferd::context &context = init->current_context();
