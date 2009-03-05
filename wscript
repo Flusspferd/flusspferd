@@ -152,6 +152,7 @@ int main() {
                    includes=include_path)
     conf.check_cxx(uselib=['JS_H', 'JS'],
                    mandatory = 1,
+                   msg='Checking if SM was compiled with UTF8',
                    errmsg='Spidermonkey not compiled with UTF8 Support!',
                    fragment='''
 #include <js/jsapi.h>
