@@ -142,8 +142,7 @@ def configure(conf):
                                    #include <js/jsapi.h>
                                    #include <stdio.h>
                                    int main() {
-                                     putchar('1');
-                                     return JS_BeginRequest == 0x0 ? 1 : 0;
+                                     printf("%p", (void*) JS_BeginRequest);
                                    }
                                 ''')
         if ret:
