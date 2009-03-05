@@ -139,7 +139,21 @@ def configure(conf):
         conf.check_cc(header_name='editline/history.h')
 
     if Options.options.enable_sqlite:
-        conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1, uselib_store='SQLITE')
+        conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
+                       uselib_store='SQLITE',
+                       errmsg='SQLite 3 (>= 3.5.0) could not be found or the found version is too old.',
+                       fragment='''
+#include <sqlite3.h>
+#include <stdio.h>
+int main() {
+   if(SQLITE_VERSION_NUMBER <= 3005000) {
+     fprintf(stderr, "Need sqlite3 version 3.5.0 or better. Found %s\\n",
+             SQLITE_VERSION);
+     return 1;
+   }
+   return 0;
+}
+''')
         conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
 
     # xml
