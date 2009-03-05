@@ -133,17 +133,20 @@ def configure(conf):
     js_h_defines = []
     if not conf.check_cxx(header_name = 'js/js-config.h', includes=include_path,
                           defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8']):
-        if conf.check_cxx(uselib='JS', err_msg='not thread safe',
-                          includes=include_path,
+        ret = conf.check_cxx(uselib='JS',
+                          includes=include_path, execute=1,
                           defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8',
                                    'JS_THREADSAFE'],
                           msg='Checking if SM needs JS_THREADSAFE',
                           fragment='''
-#include <js/jsapi.h>
-int main() {
-  return JS_BeginRequest == 0x0 ? 1 : 0;
-}
-'''):
+                                   #include <js/jsapi.h>
+                                   #include <stdio.h>
+                                   int main() {
+                                     putchar('1');
+                                     return JS_BeginRequest == 0x0 ? 1 : 0;
+                                   }
+                                ''')
+        if ret:
             js_h_defines += ['JS_THREADSAFE']
 
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
@@ -151,7 +154,7 @@ int main() {
                    defines=js_h_defines + ['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
                    includes=include_path)
     conf.check_cxx(uselib=['JS_H', 'JS'],
-                   mandatory = 1,
+                   mandatory = 1, execute=1,
                    msg='Checking if SM was compiled with UTF8',
                    errmsg='Spidermonkey not compiled with UTF8 Support!',
                    fragment='''
@@ -172,7 +175,7 @@ int main() {
     # sqlite
     if Options.options.enable_sqlite:
         conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
-                       uselib_store='SQLITE',
+                       uselib_store='SQLITE', execute=1,
                        errmsg='SQLite 3 (>= 3.5.0) could not be found or the found version is too old.',
                        fragment='''
 #include <sqlite3.h>
