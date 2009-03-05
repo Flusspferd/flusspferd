@@ -30,9 +30,7 @@ namespace flusspferd {
 
 class array : public object {
 public:
-  array();
   array(object const &o);
-  array(object_impl const &o);
 
   array &operator=(object const &o);
 
