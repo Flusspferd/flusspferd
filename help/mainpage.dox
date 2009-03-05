@@ -30,6 +30,8 @@ THE SOFTWARE.
 
 Flusspferd (German for Hippopotamus) is a C++ library providing Javascript bindings. Flusspferd uses Mozilla's SpiderMonkey as its underlying Javascript engine but porting it to other engines (like Google's v8) should be easy.
 
+The license is <a href="http://www.opensource.org/licenses/mit-license.php">MIT license</a>.
+
 See <a href="docs/index.html">JS docs</a> for documentation of the Javascript interface.
 
 Our <a href="http://flusspferd.org/">homepage</a> contains other useful information.
