@@ -54,11 +54,11 @@ public:
 #endif
 
     if (!JS_CStringsAreUTF8())
-      throw exception("UTF8 support in Spidermonkey required");
+      throw std::runtime_error("UTF8 support in Spidermonkey required");
 
     runtime = JS_NewRuntime( FLUSSPFERD_MAX_BYTES );
     if (!runtime) {
-      throw exception("Could not create Spidermonkey Runtime");
+      throw std::runtime_error("Could not create Spidermonkey Runtime");
     }
   }
   ~impl() {
