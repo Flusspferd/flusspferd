@@ -28,13 +28,7 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-array::array() : object() {}
-
 array::array(object const &o) : object(o) {
-  check();
-}
-
-array::array(object_impl const &o) : object(o) {
   check();
 }
 
