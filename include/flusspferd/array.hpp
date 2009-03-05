@@ -29,16 +29,22 @@ THE SOFTWARE.
 namespace flusspferd {
 
 /**
- * A Javascript array.
+ * A class for holding a Javascript Array.
  *
  * @ingroup value_types
  */
 class array : public object {
 public:
+  /// Construct a <code>null</code> object.
   array();
+
+  /// Construct an #array from a Javascript Array object.
   array(object const &o);
+
+  /// Construct an #array from a Javascript Array object.
   array(object_impl const &o);
 
+  /// Assign a Javascript Array object to an #array object.
   array &operator=(object const &o);
 
 public:
