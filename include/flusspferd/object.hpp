@@ -58,12 +58,12 @@ public:
   { }
   ~object();
 
-  bool is_valid() const;
+  bool is_null() const;
 
   void seal(bool deep);
 
-  object get_parent();
-  object get_prototype();
+  object parent();
+  object prototype();
 
   void set_parent(object const &parent);
   void set_prototype(object const &prototype);

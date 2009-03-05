@@ -34,8 +34,6 @@ THE SOFTWARE.
 #include <sstream>
 #include <errno.h>
 
-// Wrap the windows calls to the *nix equivalents
-#ifndef _WIN32
 #include <dlfcn.h>
 
 #define DIRSEP1 "/"
@@ -46,35 +44,6 @@ THE SOFTWARE.
 #define SHLIBSUFFIX ".dylib"
 #else
 #define SHLIBSUFFIX ".so"
-#endif
-
-#else
-
-#include <windows.h>
-
-#define DIRSEP1 "\\"
-#define DIRSEP2 "/"
-#define SHLIBPREFIX 0
-#define SHLIBSUFFIX ".dll"
-
-#define dlopen(x,y) (void*)LoadLibrary(x)
-#define dlsym(x,y) (void*)GetProcAddress((HMODULE)x,y)
-#define dlclose(x) FreeLibrary((HMODULE)x)
-
-// FIXME - not thread safe?
-const char *dlerror() {
-  static char szMsgBuf[256];
-  ::FormatMessage(
-      FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-      NULL,
-      ::GetLastError(),
-      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-      szMsgBuf,
-      sizeof szMsgBuf,
-      NULL);
-  return szMsgBuf;
-}
-
 #endif
 
 using namespace flusspferd;
@@ -91,7 +60,7 @@ void importer::class_info::augment_constructor(object &ctor) {
 
 void importer::add_preloaded(std::string const &name, object const &obj) {
   local_root_scope scope;
-  object ctor = get_constructor<importer>();
+  object ctor = constructor<importer>();
   object preload = ctor.get_property("preload").to_object();
   preload.set_property(name, obj);
 }
@@ -125,7 +94,7 @@ importer::importer(object const &obj, call_context &)
   add_native_method("load", 2);
   register_native_method("load", &importer::load);
 
-  object constructor = get_constructor<importer>();
+  object constructor = flusspferd::constructor<importer>();
 
   // Store search paths
   array arr = constructor.get_property("defaultPaths").to_object();
@@ -139,7 +108,7 @@ importer::importer(object const &obj, call_context &)
 
   // this.contexnt.__proto__ = this.__proto__; 
   // Not sure we actually want to do this, but we can for now.
-  context.set_prototype(get_prototype());
+  context.set_prototype(prototype());
   set_prototype(context);
 }
 
@@ -169,7 +138,7 @@ value importer::load(string const &f_name, bool binary_only) {
   ctx.define_property("$importer", *this);
   ctx.define_property("$security", sec);
 
-  object constructor = get_constructor<importer>();
+  object constructor = flusspferd::constructor<importer>();
   value preload = constructor.get_property("preload");
 
   if (preload.is_object()) {
@@ -205,7 +174,7 @@ value importer::load(string const &f_name, bool binary_only) {
     if (!binary_only)
       if (sec.check_path(fullpath, security::READ))
         if (boost::filesystem::exists(fullpath)) {
-          value val = get_current_context().execute(
+          value val = current_context().execute(
               fullpath.c_str(), ctx);
           p->module_cache[key] = val;
           return val;
@@ -254,15 +223,14 @@ value importer::load(string const &f_name, bool binary_only) {
 
 // Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
-std::string importer::process_name(string const &name, bool for_script) {
-  std::string p = name.to_string();
-
+std::string importer::process_name(std::string const &name, bool for_script) {
+  std::string p = name;
   if (p.find(DIRSEP1, 0) != std::string::npos &&
       p.find(DIRSEP2, 0) != std::string::npos) {
     throw exception("Path seperator not allowed in module name");
   }
 
-  unsigned int pos = 0;
+  std::size_t pos = 0;
   while ( (pos = p.find('.', pos)) != std::string::npos) {
     p.replace(pos, 1, DIRSEP1);
     pos++;

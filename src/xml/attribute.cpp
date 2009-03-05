@@ -56,18 +56,18 @@ static xmlAttrPtr new_attribute_(call_context &x) {
 
   xmlNsPtr ns = namespace_::c_from_js(x.arg[offset + 2].to_object());
 
-  if (!ns && !x.arg[offset + 2].is_void_or_null())
+  if (!ns && !x.arg[offset + 2].is_undefined_or_null())
     --offset;
 
   value content_v = x.arg[offset + 3];
 
-  if (!content_v.is_void_or_null() && !content_v.is_string())
+  if (!content_v.is_undefined_or_null() && !content_v.is_string())
     throw exception("Could not create XML element attribute: "
                     "content has to be a string");
 
   xmlChar const *content = 0;
   
-  if (!content_v.is_void_or_null())
+  if (!content_v.is_undefined_or_null())
     content = (xmlChar const *) content_v.get_string().c_str();
 
   xmlAttrPtr result = xmlNewNsProp(parent, ns, name, content);
@@ -98,7 +98,7 @@ void attribute_::init() {
 object attribute_::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object(flusspferd::get_prototype<node>());
+  object proto = create_object(flusspferd::prototype<node>());
 
   create_native_method(proto, "addContent", 1);
 
@@ -123,7 +123,7 @@ void attribute_::prop_content(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
     xmlNodeSetContent(node::c_obj(), 0);
-    if (!data.is_void_or_null())
+    if (!data.is_undefined_or_null())
       add_content(data.to_string());
     // !! fall thru !!
   case property_get: {

@@ -82,7 +82,7 @@ blob_stream::~blob_stream()
 {}
 
 object blob_stream::class_info::create_prototype() {
-  object proto = create_object(flusspferd::get_prototype<stream_base>());
+  object proto = create_object(flusspferd::prototype<stream_base>());
 
   create_native_method(proto, "getBlob", 0);
 
@@ -139,6 +139,9 @@ std::streampos blob_device::seek(
     break;
   case std::ios_base::end:
     *p_pos = v.size() + off;
+    break;
+  default:
+    assert(false && "strange stdlib behaviour. (_S_ios_seekdir_end)");
     break;
   }
   return *p_pos;

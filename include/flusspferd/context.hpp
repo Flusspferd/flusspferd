@@ -40,12 +40,13 @@ class context {
   struct context_private;
 
 public:
+  context();
+  ~context();
+
   struct detail;
   friend struct detail;
 
-  context();
   context(detail const&);
-  ~context();
 
   bool is_valid() const;
 
@@ -76,7 +77,7 @@ public:
   void gc();
 
   void add_prototype(std::string const &name, object const &proto);
-  object get_prototype(std::string const &name) const;
+  object prototype(std::string const &name) const;
 
   template<typename T>
   void add_prototype(object const &proto) {
@@ -84,12 +85,12 @@ public:
   }
 
   template<typename T>
-  object get_prototype() const {
-    return get_prototype(T::class_info::full_name());
+  object prototype() const {
+    return prototype(T::class_info::full_name());
   }
 
   void add_constructor(std::string const &name, object const &ctor);
-  object get_constructor(std::string const &name) const;
+  object constructor(std::string const &name) const;
 
   template<typename T>
   void add_constructor(object const &ctor) {
@@ -97,8 +98,8 @@ public:
   }
 
   template<typename T>
-  object get_constructor() const {
-    return get_constructor(T::class_info::full_name());
+  object constructor() const {
+    return constructor(T::class_info::full_name());
   }
 };
 

@@ -69,8 +69,8 @@ array create_array(unsigned int length = 0);
       typename T::class_info::custom_enumerate > \
     >::type * = 0 \
   ) { \
-    if (!proto.is_valid()) \
-      proto = get_current_context().get_prototype<T>(); \
+    if (proto.is_null()) \
+      proto = current_context().prototype<T>(); \
     local_root_scope scope; \
     object obj = detail::create_native_object(proto); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
@@ -86,8 +86,8 @@ array create_array(unsigned int length = 0);
     typename boost::enable_if< \
       typename T::class_info::custom_enumerate >::type * = 0 \
   ) { \
-    if (!proto.is_valid()) \
-      proto = get_current_context().get_prototype<T>(); \
+    if (proto.is_null()) \
+      proto = current_context().prototype<T>(); \
     local_root_scope scope; \
     object obj = detail::create_native_enumerable_object(proto); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \

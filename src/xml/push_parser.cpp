@@ -40,9 +40,9 @@ push_parser::push_parser(object const &obj, call_context &x)
   char const *fname = 0;
   unsigned flags = 0;
 
-  if (options.is_valid()) {
+  if (!options.is_null()) {
     value fname_v = options.get_property("filename");
-    if (!fname_v.is_void_or_null())
+    if (!fname_v.is_undefined_or_null())
       fname = fname_v.to_string().c_str();
 
     flags = options.get_property("options").to_integral_number(32, false);
@@ -103,7 +103,7 @@ void push_parser::push(blob &b, bool t) {
   if (!parser)
     throw exception("Could not parse chunk: parser is empty");
 
-  int status = xmlParseChunk(parser, (char *) b.get_data(), b.size(), t);
+  int status = xmlParseChunk(parser, (char *) b.data(), b.size(), t);
 
   if (status != XML_ERR_OK)
     throw exception("Could not parse chunk");

@@ -53,8 +53,8 @@ public:
   void unbind();
 
   bool is_null() const;
-  bool is_void() const;
-  bool is_void_or_null() const { return is_null() || is_void(); }
+  bool is_undefined() const;
+  bool is_undefined_or_null() const { return is_null() || is_undefined(); }
   bool is_int() const;
   bool is_double() const;
   bool is_number() const;
@@ -78,27 +78,7 @@ public:
   double to_integral_number(int bits, bool has_negative) const;
   bool to_boolean() const;
   object to_object() const;
-
-  template<typename Visitor>
-  inline void visit(Visitor &v) const;
 };
-
-// implementation
-template<typename Visitor>
-void value::visit(Visitor &v) const {
-  if(is_int())
-    v(get_int());
-  else if(is_double())
-    v(get_double());
-  else if(is_string())
-    v(get_string());
-  else if(is_object())
-    v(get_object());
-  else if(is_boolean())
-    v(get_boolean());
-  else
-    return;
-}
 
 }
 

@@ -49,15 +49,34 @@ def set_options(opt):
                    help='Enable XML support')
     opt.add_option('--enable-curl', action='store_true',
                    help='Build cURL extension')
+    opt.add_option('--enable-sqlite', action='store_true', help='Enable SQLite plugin')
+    opt.add_option('--with-spidermonkey-include', action='store', nargs=1,
+                   dest='spidermonkey_include',
+                   help='spidermonkey include path without the js/')
+    opt.add_option('--with-spidermonkey-library', action='store', nargs=1,
+                   dest='spidermonkey_library',
+                   help='spidermonkey library path')
+    opt.add_option('--with-spidermonkey', action='store', nargs=1,
+                   dest='spidermonkey_path',
+                   help='''
+base path for spidermonkey. /include and /lib are added. (overwrites
+--with-spidermonkey-include/-library)
+''')
     if darwin:
-      opt.add_option('--libxml-framework', action='store', nargs=1, dest='libxml_framework',
+      opt.add_option('--libxml-framework', action='store', nargs=1,
+                     dest='libxml_framework',
                      help='libxml framework name')
+
+def append_each_unique(env, to, what, split=' '):
+    for i in what.split(split):
+        env.append_unique(to, i)
 
 def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
 
-    print '%s :' % 'Creating implementation link'.ljust(conf.line_just),
+    print '%s : ' % 'Creating implementation link'.ljust(conf.line_just),
+    sys.stdout.flush()
     try: os.unlink('include/flusspferd/implementation')
     except OSError: pass
     os.symlink('spidermonkey', 'include/flusspferd/implementation')
@@ -66,14 +85,16 @@ def configure(conf):
     if darwin:
         u('CXXDEFINES', 'APPLE')
         # Is there a better way of doing this?
-        u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
+        if 'FRAMEWORKPATH' in os.environ:
+            u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
 
     if Options.options.cxxflags:
         conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
     else:
-        u('CXXFLAGS', '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
-        #u('CXXFLAGS', '-O3 -DNDEBUG')
-        u('CXXFLAGS', '-O0 -g -DDEBUG')
+        append_each_unique(conf.env, 'CXXFLAGS',
+                           '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
+        #append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DNDEBUG')
+        append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
@@ -93,21 +114,81 @@ def configure(conf):
     conf.check_boost(lib = boostlib, min_version='1.36.0', mandatory=1)
 
     # spidermonkey
-    ret = conf.check_cxx(lib = 'js', uselib_store='JS')
-    if ret == None:
+    lib_path = []
+    include_path = []
+    if Options.options.spidermonkey_include:
+        include_path = [Options.options.spidermonkey_include]
+    if Options.options.spidermonkey_library:
+        lib_path = [Options.options.spidermonkey_library]
+    if Options.options.spidermonkey_path:
+        include_path = [os.path.join(Options.options.spidermonkey_path,
+                                    "include")]
+        lib_path = [os.path.join(Options.options.spidermonkey_path, "lib")]
+
+    ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
+    if ret == False:
         conf.env['LIB_JS'] = []
-        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1)
+        conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
+                       libpath=lib_path)
+    js_h_defines = []
+    if not conf.check_cxx(header_name = 'js/js-config.h', includes=include_path,
+                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8']):
+        ret = conf.check_cxx(uselib='JS',
+                          includes=include_path, execute=1,
+                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8',
+                                   'JS_THREADSAFE'],
+                          msg='Checking if SM needs JS_THREADSAFE',
+                          fragment='''
+                                   #include <js/jsapi.h>
+                                   #include <stdio.h>
+                                   int main() {
+                                     printf("%p", (void*) JS_BeginRequest);
+                                   }
+                                ''')
+        if ret:
+            js_h_defines += ['JS_THREADSAFE']
+
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'])
+                   defines=js_h_defines + ['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   includes=include_path)
+    conf.check_cxx(uselib=['JS_H', 'JS'],
+                   mandatory = 1, execute=1,
+                   msg='Checking if SM was compiled with UTF8',
+                   errmsg='Spidermonkey not compiled with UTF8 Support!',
+                   fragment='''
+#include <js/jsapi.h>
+int main() {
+  return JS_CStringsAreUTF8() ? 0 : 1;
+}
+''')
 
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
     # libedit
-    if conf.check_cc(lib='edit', uselib_store='EDITLINE') != None:
+    if conf.check_cc(lib='edit', uselib_store='EDITLINE') and conf.check_cc(header_name='editline/readline.h'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cc(header_name='editline/history.h')
+
+    # sqlite
+    if Options.options.enable_sqlite:
+        conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
+                       uselib_store='SQLITE', execute=1,
+                       errmsg='SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
+                       fragment='''
+#include <sqlite3.h>
+#include <stdio.h>
+int main() {
+   if(SQLITE_VERSION_NUMBER <= 3004000) {
+     fprintf(stderr, "Need sqlite3 version 3.4.0 or better. Found %s\\n",
+             SQLITE_VERSION);
+     return 1;
+   }
+   return 0;
+}
+''')
+        conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
 
     # xml
     if Options.options.enable_xml:

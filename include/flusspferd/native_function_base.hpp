@@ -41,12 +41,6 @@ public:
   native_function_base(unsigned arity, std::string const &name);
   virtual ~native_function_base();
 
-  void set_name(std::string const &name);
-  std::string const &get_name() const;
-
-  void set_arity(unsigned arity);
-  unsigned get_arity() const;
-
   static native_function_base *get_native(object const &o);
 
 protected:

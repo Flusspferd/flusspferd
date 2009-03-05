@@ -64,7 +64,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
 
   // [[Enumerable]]. Default false
   value v = desc.get_property("enumerable");
-  if (!v.is_void()) {
+  if (!v.is_undefined()) {
     if (v.to_boolean() == false) 
       flags |= object::dont_enumerate;
     else {
@@ -75,7 +75,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
   
   // [[Configurable]]. Default false
   v = desc.get_property("configurable");
-  if (v.is_void() || v.to_boolean() == false)
+  if (v.is_undefined() || v.to_boolean() == false)
       flags |= object::permanent_property;
   else {
     flags &= ~object::permanent_property;
@@ -84,7 +84,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
 
   // [[Writable]]. Default false
   v = desc.get_property("writable");
-  if (!v.is_void() && v.to_boolean() == true) {
+  if (!v.is_undefined() && v.to_boolean() == true) {
     flags &= ~object::read_only_property;
     writable = true;
   }
@@ -95,7 +95,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
                                     setter_fn = boost::none;
   v = desc.get_property("getter");
   try {
-    if (!v.is_void())
+    if (!v.is_undefined())
       getter_fn = v.to_object();
   } catch (exception &e) {
     // TODO: This should be a TypeError
@@ -104,7 +104,7 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
 
   v = desc.get_property("setter");
   try {
-    if (!v.is_void())
+    if (!v.is_undefined())
       setter_fn = v.to_object();
   } catch (exception &e) {
     // TODO: This should be a TypeError

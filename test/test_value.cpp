@@ -35,7 +35,7 @@ BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( void_value ) {
   flusspferd::value void_value;
-  BOOST_CHECK(void_value.is_void());
+  BOOST_CHECK(void_value.is_undefined());
   BOOST_CHECK(!void_value.is_null());
   BOOST_CHECK(!void_value.is_boolean());
   BOOST_CHECK(!void_value.is_int());
@@ -49,10 +49,10 @@ BOOST_AUTO_TEST_CASE( void_value ) {
 
 BOOST_AUTO_TEST_CASE( null_value ) {
   flusspferd::object null_object;
-  BOOST_REQUIRE(!null_object.is_valid());
+  BOOST_REQUIRE(null_object.is_null());
 
   flusspferd::value null_value(null_object);
-  BOOST_CHECK(!null_value.is_void());
+  BOOST_CHECK(!null_value.is_undefined());
   BOOST_CHECK(null_value.is_null());
   BOOST_CHECK(null_value.is_object());
   BOOST_CHECK(!null_value.is_boolean());
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
   BOOST_CHECK(boolean_value.is_boolean());
   BOOST_CHECK(!boolean_value.get_boolean());
 
-  BOOST_CHECK(!boolean_value.is_void());
+  BOOST_CHECK(!boolean_value.is_undefined());
   BOOST_CHECK(!boolean_value.is_null());
   BOOST_CHECK(!boolean_value.is_number());
   BOOST_CHECK(!boolean_value.is_int());
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE( int_value ) {
   BOOST_CHECK(int_value.is_number());
   BOOST_CHECK(int_value.is_int());
   BOOST_CHECK(!int_value.is_double());
-  BOOST_CHECK(!int_value.is_void());
+  BOOST_CHECK(!int_value.is_undefined());
   BOOST_CHECK(!int_value.is_null());
   BOOST_CHECK(!int_value.is_boolean());
   BOOST_CHECK(!int_value.is_object());
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE( double_value ) {
   BOOST_CHECK(double_value.is_number());
   BOOST_CHECK(double_value.is_double());
   BOOST_CHECK(!double_value.is_int());
-  BOOST_CHECK(!double_value.is_void());
+  BOOST_CHECK(!double_value.is_undefined());
   BOOST_CHECK(!double_value.is_null());
   BOOST_CHECK(!double_value.is_boolean());
   BOOST_CHECK(!double_value.is_object());
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE( string_value ) {
   BOOST_CHECK(!v.is_number());
   BOOST_CHECK(!v.is_double());
   BOOST_CHECK(!v.is_int());
-  BOOST_CHECK(!v.is_void());
+  BOOST_CHECK(!v.is_undefined());
   BOOST_CHECK(!v.is_null());
   BOOST_CHECK(!v.is_boolean());
 

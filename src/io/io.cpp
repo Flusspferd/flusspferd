@@ -31,10 +31,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
+#ifndef FLUSSPFERD_COVERAGE
 extern "C" value flusspferd_load(object container)
 {
   return load_io(container);
 }
+#endif
 
 object flusspferd::io::load_io(object container) {
   local_root_scope scope;
@@ -44,9 +46,9 @@ object flusspferd::io::load_io(object container) {
   if (previous.is_object())
     return previous.to_object();
 
-  object IO = get_current_context().get_constructor("IO");
+  object IO = current_context().constructor("IO");
 
-  if (!IO.is_valid()) {
+  if (IO.is_null()) {
     IO = flusspferd::create_object();
 
     load_class<stream_base>(IO);
@@ -65,7 +67,7 @@ object flusspferd::io::load_io(object container) {
       "stdin",
       create_native_object<stream_base>(object(), std::cin.rdbuf()));
 
-    get_current_context().add_constructor("IO", IO);
+    current_context().add_constructor("IO", IO);
   }
 
   container.define_property(

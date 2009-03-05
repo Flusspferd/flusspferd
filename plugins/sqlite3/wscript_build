@@ -27,10 +27,10 @@ darwin = sys.platform.startswith('darwin')
 libtype = 'shlib'
 
 obj = bld.new_task_gen('cxx', libtype)
-obj.source = ['sqlite3.c', 'sqlite_plugin.cpp']
-obj.includes = ['../../include', '.']
+obj.source = ['sqlite_plugin.cpp']
+obj.includes = ['../../include']
 obj.uselib_local = 'flusspferd'
-obj.uselib = 'JS_H'
+obj.uselib = 'JS_H SQLITE'
 obj.target = 'sqlite3'
 obj.features.append('cc')
 obj.install_path = '${PREFIX}/lib/flusspferd/modules'

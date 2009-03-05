@@ -32,7 +32,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 xmlNsPtr namespace_::c_from_js(object const &obj) {
-  if (!obj.is_valid())
+  if (!obj.is_null())
     return 0;
   try {
     return flusspferd::get_native<namespace_>(obj).c_obj();
@@ -77,15 +77,16 @@ namespace_::namespace_(object const &obj, call_context &x)
                     "node has to be null or an XML node");
 
   xmlChar const *href_p = 0;
-  if (!href_v.is_void() && !href_v.is_null())
+  if (!href_v.is_undefined() && !href_v.is_null()) {
     if (href_v.is_string())
       href_p = (xmlChar const *) href_v.get_string().c_str();
     else
       throw exception("Could not create XML namespace: "
                       "href has to be a string");
+  }
 
   xmlChar const *prefix_p = 0;
-  if (!prefix_v.is_void() && !prefix_v.is_null())
+  if (!prefix_v.is_undefined() && !prefix_v.is_null())
     if (prefix_v.is_string())
       prefix_p = (xmlChar const *) prefix_v.get_string().c_str();
     else
@@ -159,7 +160,7 @@ void namespace_::prop_href(property_mode mode, value &data) {
   case property_set:
     if (ptr->href)
       xmlFree((xmlChar *) ptr->href);
-    if (data.is_void() || data.is_null())
+    if (data.is_undefined() || data.is_null())
       ptr->href = 0;
     else
       ptr->href = xmlStrdup((xmlChar const *) data.to_string().c_str());
@@ -179,7 +180,7 @@ void namespace_::prop_prefix(property_mode mode, value &data) {
   case property_set:
     if (ptr->prefix)
       xmlFree((xmlChar *) ptr->prefix);
-    if (data.is_void() || data.is_null())
+    if (data.is_undefined() || data.is_null())
       ptr->prefix = 0;
     else
       ptr->prefix = xmlStrdup((xmlChar const *) data.to_string().c_str());

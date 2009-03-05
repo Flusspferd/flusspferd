@@ -74,7 +74,7 @@ reference_::~reference_()
 object reference_::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object(flusspferd::get_prototype<node>());
+  object proto = create_object(flusspferd::prototype<node>());
 
   return proto;
 }

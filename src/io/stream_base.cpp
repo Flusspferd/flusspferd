@@ -35,7 +35,7 @@ using namespace flusspferd;
 using namespace flusspferd::io;
 
 stream_base::stream_base(object const &o, std::streambuf *p)
-  : native_object_base(o), streambuf(p)
+  : native_object_base(o), streambuf_(p)
 {
   register_native_method("readWhole", &stream_base::read_whole);
   register_native_method("read", &stream_base::read);
@@ -55,11 +55,11 @@ stream_base::~stream_base()
 {}
 
 void stream_base::set_streambuf(std::streambuf *p) {
-  streambuf = p;
+  streambuf_ = p;
 }
 
-std::streambuf *stream_base::get_streambuf() {
-  return streambuf;
+std::streambuf *stream_base::streambuf() {
+  return streambuf_;
 }
 
 object stream_base::class_info::create_prototype() {
@@ -86,7 +86,7 @@ string stream_base::read_whole() {
   std::streamsize length;
 
   do { 
-    length = streambuf->sgetn(buf, sizeof(buf));
+    length = streambuf_->sgetn(buf, sizeof(buf));
     if (length < 0)
       length = 0;
     data.append(buf, length);
@@ -104,7 +104,7 @@ object stream_base::read_whole_blob() {
 
   do {
     data.resize(data.size() + N);
-    length = streambuf->sgetn(&data[data.size() - N], N);
+    length = streambuf_->sgetn(&data[data.size() - N], N);
     if (length < 0)
       length = 0;
     data.resize(data.size() - N + length);
@@ -120,7 +120,7 @@ string stream_base::read(unsigned size) {
 
   boost::scoped_array<char> buf(new char[size + 1]);
 
-  std::streamsize length = streambuf->sgetn(buf.get(), size);
+  std::streamsize length = streambuf_->sgetn(buf.get(), size);
   if (length < 0)
     length = 0;
   buf[length] = '\0';
@@ -134,7 +134,7 @@ object stream_base::read_blob(unsigned size) {
 
   boost::scoped_array<char> buf(new char[size]);
 
-  std::streamsize length = streambuf->sgetn(buf.get(), size);
+  std::streamsize length = streambuf_->sgetn(buf.get(), size);
   if (length < 0)
     length = 0;
 
@@ -148,10 +148,10 @@ void stream_base::write(value const &data) {
   if (data.is_string()) {
     string text = data.get_string();
     char const *str = text.c_str();
-    streambuf->sputn(text.c_str(), std::strlen(str));
+    streambuf_->sputn(text.c_str(), std::strlen(str));
   } else if (data.is_object()) {
     blob &b = flusspferd::get_native<blob>(data.get_object());
-    streambuf->sputn((char const*) b.get_data(), b.size());
+    streambuf_->sputn((char const*) b.data(), b.size());
   } else {
     throw exception("Cannot write non-object non-string value to Stream");
   }
@@ -161,7 +161,7 @@ void stream_base::write(value const &data) {
 }
 
 void stream_base::flush() {
-  streambuf->pubsync();
+  streambuf_->pubsync();
 }
 
 void stream_base::print(call_context &x) {
@@ -169,7 +169,7 @@ void stream_base::print(call_context &x) {
 
   value delim_v = get_property("fieldSeparator");
   string delim;
-  if (!delim_v.is_void_or_null())
+  if (!delim_v.is_undefined_or_null())
     delim = delim_v.to_string();
 
   std::size_t n = x.arg.size();
@@ -197,7 +197,7 @@ void stream_base::print(call_context &x) {
   }
 
   value record_v = get_property("recordSeparator");
-  if (!record_v.is_void_or_null())
+  if (!record_v.is_undefined_or_null())
     write(record_v.to_string());
 
   flush();
@@ -206,7 +206,7 @@ void stream_base::print(call_context &x) {
 string stream_base::read_line(value sep_) {
   local_root_scope scope;
 
-  if (sep_.is_void_or_null())
+  if (sep_.is_undefined_or_null())
     sep_ = string("\n");
 
   string sep = sep_.to_string();
@@ -222,7 +222,7 @@ string stream_base::read_line(value sep_) {
   std::string line;
 
   for (;;) {
-    int ch = streambuf->sbumpc();
+    int ch = streambuf_->sbumpc();
     if (ch == std::char_traits<char>::eof())
       break;
     line += ch;

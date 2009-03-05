@@ -31,7 +31,7 @@ security &security::create(object container) {
   local_root_scope scope;
 
   security &obj = create_native_object<security>(
-      create_object().get_prototype());
+      create_object().prototype());
 
   container.define_property("$security", obj);
 
@@ -39,15 +39,15 @@ security &security::create(object container) {
 }
 
 security &security::get() {
-  object scope = get_current_context().scope_chain();
+  object scope = current_context().scope_chain();
 
   value v;
-  while (scope.is_valid()) {
+  while (!scope.is_null()) {
     v = scope.get_property("$security");
 
-    if (!v.is_void_or_null())
+    if (!v.is_undefined_or_null())
       break;
-    scope = scope.get_parent();
+    scope = scope.parent();
   }
 
   if (!v.is_object() || v.is_null())

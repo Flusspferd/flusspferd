@@ -44,7 +44,7 @@ struct opt {
     value url_v;
     value encoding_v;
 
-    if (options.is_valid()) {
+    if (!options.is_null()) {
       url_v = options.get_property("url");
       encoding_v = options.get_property("encoding");
       flags = options.get_property("options").to_integral_number(32, false);
@@ -64,7 +64,7 @@ object flusspferd::xml::parse_blob(object&, blob &b, object options) {
   opt x(options);
 
   xmlDocPtr doc =
-    xmlReadMemory((char*) b.get_data(), b.size(), x.url, x.encoding, x.flags);
+    xmlReadMemory((char*) b.data(), b.size(), x.url, x.encoding, x.flags);
 
   if (!doc)
     throw exception("Could not parse XML document");
@@ -88,7 +88,7 @@ object flusspferd::xml::html_parse_blob(object&, blob &b, object options) {
   opt x(options);
 
   htmlDocPtr doc =
-    htmlReadMemory((char*) b.get_data(), b.size(), x.url, x.encoding, x.flags);
+    htmlReadMemory((char*) b.data(), b.size(), x.url, x.encoding, x.flags);
 
   if (!doc)
     throw exception("Could not parse HTML document");

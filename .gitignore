@@ -2,6 +2,8 @@
 build/*
 html/*
 include/flusspferd/implementation
+naturaldocs/*
 *.swp
 .lock-wscript
 .waf-*
+.localsettings.mak

@@ -32,8 +32,9 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 xmlDocPtr document::c_from_js(object const &obj) {
-  if (!obj.is_valid())
+  if (obj.is_null())
     return 0;
+
   try {
     return flusspferd::get_native<xml::document>(obj).c_obj();
   } catch (std::exception&) {
@@ -125,7 +126,7 @@ void document::init() {
 object document::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object(flusspferd::get_prototype<node>());
+  object proto = create_object(flusspferd::prototype<node>());
 
   create_native_method(proto, "dump", 0);
   create_native_method(proto, "copy", 1);
@@ -164,7 +165,7 @@ object document::copy(bool recursive) {
   if (!copy)
     throw exception("Could not copy XML document");
 
-  return create_native_object<document>(get_prototype(), copy);
+  return create_native_object<document>(prototype(), copy);
 }
 
 value document::to_string() {
@@ -176,7 +177,7 @@ void document::prop_root_element(property_mode mode, value &data) {
 
   switch (mode) {
   case property_set:
-    if (data.is_null() || data.is_void()) {
+    if (data.is_null() || data.is_undefined()) {
       node = 0;
       data = object();
     } else if (data.is_object()) {
@@ -217,7 +218,7 @@ void document::prop_xml_namespace(property_mode mode, value &data) {
   if (mode != property_get)
     return;
 
-  if (data.is_void()) {
+  if (data.is_undefined()) {
     data = call("searchNamespaceByPrefix", "xml");
   }
 }

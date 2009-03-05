@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <new>
 #include <sstream>
 
-#include "sqlite3.h"
+#include <sqlite3.h>
 
 using namespace flusspferd;
 
@@ -354,7 +354,7 @@ void sqlite3_cursor::bind_array(array &a, size_t num_binds) {
   for (size_t n = 1; n <= num_binds; n++) {
     value bind = a.get_element(n-1);
 
-    if (!bind.is_void())
+    if (!bind.is_undefined())
       do_bind_param(n, bind);
 
   }
@@ -378,7 +378,7 @@ void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
       bind = o.get_property(name);
     }
 
-    if (!bind.is_void())
+    if (!bind.is_undefined())
       do_bind_param(n, bind);
 
   }

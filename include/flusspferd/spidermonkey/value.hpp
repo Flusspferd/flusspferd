@@ -27,63 +27,65 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 
 namespace flusspferd { namespace Impl {
-  class value_impl {
-    jsval val;
-    jsval *ref;
 
-  protected:
-    jsval get() const { return *ref; }
-    jsval *getp()     { return ref; }
-    void set(jsval v) { *ref = v; }
-    void setp(jsval *p) { ref = p; }
-    void setval(jsval v) { val = v; }
-    jsval *getvalp() { return &val; }
+class value_impl {
+  jsval val;
+  jsval *ref;
 
-    value_impl(jsval v) : val(v), ref(&val) { }
-    value_impl(jsval *v) : val(JSVAL_VOID), ref(v) { }
-    value_impl() : val(JSVAL_VOID), ref(&val) { }
+protected:
+  jsval get() const { return *ref; }
+  jsval *getp()     { return ref; }
+  void set(jsval v) { *ref = v; }
+  void setp(jsval *p) { ref = p; }
+  void setval(jsval v) { val = v; }
+  jsval *getvalp() { return &val; }
 
-    friend jsval get_jsval(value_impl const &v);
-    friend value_impl wrap_jsval(jsval v);
-    friend jsval *get_jsvalp(value_impl &v);
-    friend value_impl wrap_jsvalp(jsval *p);
+  value_impl(jsval v) : val(v), ref(&val) { }
+  value_impl(jsval *v) : val(JSVAL_VOID), ref(v) { }
+  value_impl() : val(JSVAL_VOID), ref(&val) { }
 
-  public:
-    value_impl(value_impl const &o) {
-      if (o.ref == &o.val) {
-        val = o.val;
-        ref = &val;
-      } else {
-        val = JSVAL_VOID;
-        ref = o.ref;
-      }
+  friend jsval get_jsval(value_impl const &v);
+  friend value_impl wrap_jsval(jsval v);
+  friend jsval *get_jsvalp(value_impl &v);
+  friend value_impl wrap_jsvalp(jsval *p);
+
+public:
+  value_impl(value_impl const &o) {
+    if (o.ref == &o.val) {
+      val = o.val;
+      ref = &val;
+    } else {
+      val = JSVAL_VOID;
+      ref = o.ref;
     }
-
-    value_impl &operator=(value_impl const &o) {
-      *ref = *o.ref;
-      return *this;
-    }
-
-    void *get_gcptr() {
-      return getp();
-    }
-  };
-
-  inline jsval get_jsval(value_impl const &v) {
-    return v.get();
   }
 
-  inline value_impl wrap_jsval(jsval v) {
-    return value_impl(v);
+  value_impl &operator=(value_impl const &o) {
+    *ref = *o.ref;
+    return *this;
   }
 
-  inline jsval *get_jsvalp(value_impl &v) {
-    return v.getp();
+  void *get_gcptr() {
+    return getp();
   }
+};
 
-  inline value_impl wrap_jsvalp(jsval *p) {
-    return value_impl(p);
-  }
+inline jsval get_jsval(value_impl const &v) {
+  return v.get();
+}
+
+inline value_impl wrap_jsval(jsval v) {
+  return value_impl(v);
+}
+
+inline jsval *get_jsvalp(value_impl &v) {
+  return v.getp();
+}
+
+inline value_impl wrap_jsvalp(jsval *p) {
+  return value_impl(p);
+}
+
 }}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_VALUE_HPP */

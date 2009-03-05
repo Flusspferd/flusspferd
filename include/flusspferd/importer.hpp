@@ -32,8 +32,6 @@ namespace flusspferd {
 
 class importer : public native_object_base {
 public:
-  // The type of function which we look for in loaded .so modules
-  // extern "C" value flusspferd_load(object container);
   typedef value (*flusspferd_load_t)(object container);
 
   struct class_info : flusspferd::class_info {
@@ -55,7 +53,9 @@ public:
 protected:
   void trace(tracer &);
 
-  static std::string process_name(string const &name, bool for_script = false);
+  static std::string process_name(
+    std::string const &name,
+    bool for_script = false);
 
 private: // JS methods
   value load(string const &name, bool binary_only); 

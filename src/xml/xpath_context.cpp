@@ -142,7 +142,7 @@ void xpath_context::eval(call_context &x) {
 void xpath_context::prop_current(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
-    if (data.is_void_or_null()) {
+    if (data.is_undefined_or_null()) {
       xpath_ctx->node = 0;
     } else {
       xmlNodePtr ptr = node::c_from_js(data.to_object());

@@ -54,11 +54,11 @@ public:
 #endif
 
     if (!JS_CStringsAreUTF8())
-      throw exception("UTF8 support in Spidermonkey required");
+      throw std::runtime_error("UTF8 support in Spidermonkey required");
 
     runtime = JS_NewRuntime( FLUSSPFERD_MAX_BYTES );
     if (!runtime) {
-      throw exception("Could not create Spidermonkey Runtime");
+      throw std::runtime_error("Could not create Spidermonkey Runtime");
     }
   }
   ~impl() {
@@ -104,7 +104,7 @@ bool init::leave_current_context(context const &c) {
   }
 }
 
-context &init::get_current_context() {
+context &init::current_context() {
   return p->current_context;
 }
 

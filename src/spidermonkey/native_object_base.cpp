@@ -134,18 +134,18 @@ native_object_base::native_object_base(object const &o) : p(new impl) {
 }
 
 native_object_base::~native_object_base() {
-  if (is_valid()) {
+  if (!is_null()) {
     JS_SetPrivate(Impl::current_context(), get(), 0);
   }
 }
 
 void native_object_base::load_into(object const &o) {
-  if (is_valid())
+  if (!is_null())
     throw exception("Cannot load native_object data into more than one object");
 
   object::operator=(o);
 
-  if (is_valid()) {
+  if (!is_null()) {
     if (!JS_SetPrivate(Impl::current_context(), Impl::get_object(o), this))
       throw exception("Could not create native object (private data)");
   }
@@ -158,7 +158,7 @@ void native_object_base::invalid_method(call_context &) {
 native_object_base &native_object_base::get_native(object const &o_) {
   object o = o_;
 
-  if (!o.is_valid())
+  if (o.is_null())
     throw exception("Can not interpret 'null' as native object");
 
   JSContext *ctx = Impl::current_context();
@@ -384,7 +384,7 @@ JSBool native_object_base::impl::new_enumerate(
     {
       iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
       value id;
-      if (iter->empty() || (id = self.enumerate_next(*iter)).is_void())
+      if (iter->empty() || (id = self.enumerate_next(*iter)).is_undefined())
         *statep = JSVAL_NULL;
       else {
         JS_ValueToId(ctx, Impl::get_jsval(id), idp);

@@ -59,5 +59,6 @@ if bld.env['ENABLE_TESTS']:
     obj.uselib = 'GCOV JS JS_H BOOST_THREAD BOOST_FILESYSTEM BOOST_SYSTEM BOOST DL ISFINITE'
     if bld.env['ENABLE_XML']:
       obj.uselib += ' LIBXML2'
+    obj.defines = 'FLUSSPFERD_COVERAGE'
     obj.target = 'flusspferd-coverage'
     obj.install_path = None

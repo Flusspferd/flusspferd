@@ -45,16 +45,16 @@ public:
     static void augment_constructor(object &);
   };
 
-  unsigned char *get_data() { return &data[0]; }
-  std::size_t size() { return data.size(); }
+  unsigned char *data() { return &data_[0]; }
+  std::size_t size() { return data_.size(); }
 
-  std::vector<unsigned char> &get() { return data; }
+  std::vector<unsigned char> &get() { return data_; }
 
 protected:
   void property_op(property_mode mode, value const &id, value &data);
   bool property_resolve(value const &id, unsigned access);
 
-private: // JS methos
+private: // JS methods
   void append(blob const &o);
   object slice(int from, boost::optional<int> to);
   object to_array();
@@ -72,7 +72,7 @@ private: // JS constructor methods
   static object from_utf16(string const &);
 
 private:
-  std::vector<unsigned char> data;
+  std::vector<unsigned char> data_;
 
   static unsigned char el_from_value(value const &);
 

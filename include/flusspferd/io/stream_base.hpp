@@ -35,8 +35,8 @@ public:
   stream_base(object const &o, std::streambuf *b);
   ~stream_base();
 
+  std::streambuf *streambuf();
   void set_streambuf(std::streambuf *buf);
-  std::streambuf *get_streambuf();
 
   struct class_info : flusspferd::class_info {
     static char const *full_name() { return "IO.Stream"; }
@@ -62,7 +62,7 @@ private: // javascript methods
   string read_line(value sep);
 
 private:
-  std::streambuf *streambuf;
+  std::streambuf *streambuf_;
 };
 
 

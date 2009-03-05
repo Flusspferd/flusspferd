@@ -73,7 +73,7 @@ exception::exception(char const *what, std::string const &type)
   boost::shared_ptr<impl> p(new impl);
 
   p->exception_value.reset(new root_value);
-  p->ctx = get_current_context();
+  p->ctx = current_context();
 
   JSContext *ctx = Impl::get_context(p->ctx);
 
@@ -95,7 +95,7 @@ exception::exception(value const &val)
   : std::runtime_error(string(val).to_string()), p(new impl)
 {
   p->exception_value.reset(new root_value(val));
-  p->ctx = get_current_context();
+  p->ctx = current_context();
 }
 
 exception::~exception() throw()
