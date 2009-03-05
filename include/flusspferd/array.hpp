@@ -42,10 +42,16 @@ public:
   array &operator=(object const &o);
 
 public:
+  /// Get the length of the Array.
   std::size_t get_length() const;
+
+  /// Set the length of the array, resizing it in the process.
   void set_length(std::size_t);
 
+  /// Get an array element.
   value get_element(std::size_t n) const;
+
+  /// Set an array element.
   void set_element(std::size_t n, value const &x);
 
 private:
