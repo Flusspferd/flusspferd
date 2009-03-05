@@ -138,6 +138,7 @@ def configure(conf):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cc(header_name='editline/history.h')
 
+    # sqlite
     if Options.options.enable_sqlite:
         conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
                        uselib_store='SQLITE',
