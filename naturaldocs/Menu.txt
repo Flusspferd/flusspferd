@@ -5,9 +5,7 @@ Format: Development Release 12-07-2007 (1.35 base)
 # Title: [project name]
 # SubTitle: [subtitle]
 
-# You can add a footer to your documentation like this:
-# Footer: [text]
-# If you want to add a copyright notice, this would be the place to do it.
+Footer: <script src="http://flusspferd.org/ga.js"></script>
 
 # You can add a timestamp to your documentation like one of these:
 # Timestamp: Generated on month day, year
