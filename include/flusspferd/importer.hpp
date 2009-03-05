@@ -53,7 +53,9 @@ public:
 protected:
   void trace(tracer &);
 
-  static std::string process_name(string const &name, bool for_script = false);
+  static std::string process_name(
+    std::string const &name,
+    bool for_script = false);
 
 private: // JS methods
   value load(string const &name, bool binary_only); 
