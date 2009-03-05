@@ -223,15 +223,14 @@ value importer::load(string const &f_name, bool binary_only) {
 
 // Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
-std::string importer::process_name(string const &name, bool for_script) {
-  std::string p = name.to_string();
-
+std::string importer::process_name(std::string const &name, bool for_script) {
+  std::string p = name;
   if (p.find(DIRSEP1, 0) != std::string::npos &&
       p.find(DIRSEP2, 0) != std::string::npos) {
     throw exception("Path seperator not allowed in module name");
   }
 
-  unsigned int pos = 0;
+  std::size_t pos = 0;
   while ( (pos = p.find('.', pos)) != std::string::npos) {
     p.replace(pos, 1, DIRSEP1);
     pos++;
