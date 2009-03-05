@@ -67,6 +67,10 @@ base path for spidermonkey. /include and /lib are added. (overwrites
                      dest='libxml_framework',
                      help='libxml framework name')
 
+def append_each_unique(env, to, what, split=' '):
+    for i in what.split(split):
+        env.append_unique(to, i)
+
 def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
@@ -87,9 +91,10 @@ def configure(conf):
     if Options.options.cxxflags:
         conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
     else:
-        u('CXXFLAGS', '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
-        #u('CXXFLAGS', '-O3 -DNDEBUG')
-        u('CXXFLAGS', '-O0 -g -DDEBUG')
+        append_each_unique(conf.env, 'CXXFLAGS',
+                           '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
+        #append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DNDEBUG')
+        append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
@@ -159,7 +164,7 @@ int main() {
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
     # libedit
-    if conf.check_cc(lib='edit', uselib_store='EDITLINE'):
+    if conf.check_cc(lib='edit', uselib_store='EDITLINE') and conf.check_cc(header_name='editline/readline.h'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cc(header_name='editline/history.h')
 

@@ -16,9 +16,9 @@ install:
 	$(PYTHON) ./waf install
 
 clean:
-	rm .configure
+	rm -f .configure
 	$(PYTHON) ./waf clean
 
 distclean:
-	rm .configure
+	rm -f .configure
 	$(PYTHON) ./waf distclean
