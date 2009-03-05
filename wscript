@@ -176,13 +176,13 @@ int main() {
     if Options.options.enable_sqlite:
         conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
                        uselib_store='SQLITE', execute=1,
-                       errmsg='SQLite 3 (>= 3.5.0) could not be found or the found version is too old.',
+                       errmsg='SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
                        fragment='''
 #include <sqlite3.h>
 #include <stdio.h>
 int main() {
-   if(SQLITE_VERSION_NUMBER <= 3005000) {
-     fprintf(stderr, "Need sqlite3 version 3.5.0 or better. Found %s\\n",
+   if(SQLITE_VERSION_NUMBER <= 3004000) {
+     fprintf(stderr, "Need sqlite3 version 3.4.0 or better. Found %s\\n",
              SQLITE_VERSION);
      return 1;
    }
