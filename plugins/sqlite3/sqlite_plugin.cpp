@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <new>
 #include <sstream>
 
-#include "sqlite3.h"
+#include <sqlite3.h>
 
 using namespace flusspferd;
 
