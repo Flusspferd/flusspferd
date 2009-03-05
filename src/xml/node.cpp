@@ -490,24 +490,26 @@ void node::prop_prev(property_mode mode, value &data) {
   switch (mode) {
   case property_set:
     if (data.is_undefined() || data.is_null()) {
-      if (ptr->parent)
+      if (ptr->parent) {
         if (ptr->type == XML_ATTRIBUTE_NODE) {
           if (ptr->parent->type == XML_ELEMENT_NODE)
             ptr->parent->properties = xmlAttrPtr(ptr);
         } else {
           ptr->parent->children = ptr;
         }
+      }
       ptr->prev = 0;
     } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
       ptr->prev = prev;
       if (xmlNodePtr pn = prev->next) {
-        if (pn->parent)
+        if (pn->parent) {
           if (pn->type == XML_ATTRIBUTE_NODE) {
             if (ptr->parent->type == XML_ELEMENT_NODE)
               ptr->parent->properties = xmlAttrPtr(pn);
           } else {
             pn->parent->children = pn;
           }
+        }
         pn->prev = 0;
       } else if (prev->parent) {
         if (prev->type != XML_ATTRIBUTE_NODE) {
