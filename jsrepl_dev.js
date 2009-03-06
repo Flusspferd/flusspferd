@@ -29,7 +29,7 @@ Importer.defaultPaths = ['js/src',
   'build/default/plugins/environment',
   'build/default/src'];
 
-Importer.preload['xml'] = function() { return this.$importer.load('flusspferd-xml'); }
-Importer.preload['io'] = function() { return this.$importer.load('flusspferd-io'); }
+Importer.preload['XML'] = function() { return this.$importer.load('flusspferd-xml'); }
+Importer.preload['IO'] = function() { return this.$importer.load('flusspferd-io'); }
 
 prelude = 'prelude.js';

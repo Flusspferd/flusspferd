@@ -297,16 +297,16 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
-    bld.install_files('${PREFIX}/lib/flusspferd/modules/http',
-                      'js/src/http/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/HTTP',
+                      'js/src/HTTP/*.js')
 
     bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
 
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
-                   (bld.env['shlib_PATTERN'] % 'xml'),
+                   (bld.env['shlib_PATTERN'] % 'XML'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-xml'))
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
-                   (bld.env['shlib_PATTERN'] % 'io'),
+                   (bld.env['shlib_PATTERN'] % 'IO'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
 
     etc = bld.new_task_gen('subst')
