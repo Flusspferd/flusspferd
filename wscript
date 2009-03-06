@@ -122,8 +122,8 @@ def configure(conf):
         lib_path = [Options.options.spidermonkey_library]
     if Options.options.spidermonkey_path:
         include_path = [os.path.join(Options.options.spidermonkey_path,
-                                    "include")]
-        lib_path = [os.path.join(Options.options.spidermonkey_path, "lib")]
+                                    'include')]
+        lib_path = [os.path.join(Options.options.spidermonkey_path, 'lib')]
 
     ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
     if ret == False:
