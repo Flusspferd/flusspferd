@@ -252,6 +252,16 @@ int main() {
     conf.env['ENABLE_XML'] = Options.options.enable_xml
     conf.env['ENABLE_IO'] = Options.options.enable_io
 
+def get_defines(bld, envvars):
+    result = ''
+    def_pattern = bld.env['CXXDEFINES_ST']
+    for envvar in envvars:
+        defines = bld.env['CXXDEFINES_' + envvar]
+        if defines:
+            for i in defines:
+                result += def_pattern % i + ' '
+    return result
+
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
     obj.source = 'flusspferd.pc.in'
@@ -260,7 +270,8 @@ def build_pkgconfig(bld):
         'PREFIX': bld.env['PREFIX'],
         'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
         'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
-        'VERSION': VERSION
+        'VERSION': VERSION,
+        'CFLAGS': get_defines(bld, ['JS_H'])
         }
     obj.install_path = os.path.normpath(bld.env['PREFIX'] + '/lib/pkgconfig/')
     obj.apply()
