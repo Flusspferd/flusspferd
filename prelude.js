@@ -80,7 +80,7 @@ Object.defineProperty(Function, 'bind',
 
   g.IO = i.IO;
 
-  i.load('IO');
+  i.load('XML');
 
   g.XML = i.XML;
 
