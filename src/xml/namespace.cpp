@@ -77,12 +77,13 @@ namespace_::namespace_(object const &obj, call_context &x)
                     "node has to be null or an XML node");
 
   xmlChar const *href_p = 0;
-  if (!href_v.is_undefined() && !href_v.is_null())
+  if (!href_v.is_undefined() && !href_v.is_null()) {
     if (href_v.is_string())
       href_p = (xmlChar const *) href_v.get_string().c_str();
     else
       throw exception("Could not create XML namespace: "
                       "href has to be a string");
+  }
 
   xmlChar const *prefix_p = 0;
   if (!prefix_v.is_undefined() && !prefix_v.is_null())

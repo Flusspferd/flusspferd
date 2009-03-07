@@ -83,6 +83,14 @@ object constructor() {
   return current_context().constructor<T>();
 }
 
+inline object prototype(std::string const &ID) {
+  return current_context().prototype(ID);
+}
+
+inline object constructor(std::string const &ID) {
+  return current_context().constructor(ID);
+}
+
 }
 
 #endif /* FLUSSPFERD_INIT_HPP */

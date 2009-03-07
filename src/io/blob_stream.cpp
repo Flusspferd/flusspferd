@@ -140,6 +140,9 @@ std::streampos blob_device::seek(
   case std::ios_base::end:
     *p_pos = v.size() + off;
     break;
+  default:
+    assert(false && "strange stdlib behaviour. (_S_ios_seekdir_end)");
+    break;
   }
   return *p_pos;
 }

@@ -31,8 +31,8 @@ obj.source = ['sqlite_plugin.cpp']
 obj.includes = ['../../include']
 obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H SQLITE'
-obj.target = 'sqlite3'
+obj.target = 'SQLite3'
 obj.features.append('cc')
 obj.install_path = '${PREFIX}/lib/flusspferd/modules'
 
-bld.install_files('${PREFIX}/lib/flusspferd/modules', 'sqlite3.js');
+bld.install_files('${PREFIX}/lib/flusspferd/modules', 'SQLite3.js');

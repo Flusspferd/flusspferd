@@ -73,14 +73,14 @@ Object.defineProperty(Function, 'bind',
 (function (g) {
   var i = new Importer;
 
-  i.load('io');
+  i.load('IO');
 
   g.print = Function.bind(i.IO.stdout, 'print');
   g.readline = Function.bind(i.IO.stdin, 'readLine');
 
   g.IO = i.IO;
 
-  i.load('xml');
+  i.load('XML');
 
   g.XML = i.XML;
 

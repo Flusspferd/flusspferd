@@ -124,9 +124,7 @@ void importer::trace(tracer &trc) {
 value importer::load(string const &f_name, bool binary_only) {
   security &sec = security::get();
 
-  //TODO use security
   std::string name = f_name.to_string();
-  std::transform(name.begin(), name.end(), name.begin(), tolower);
 
   impl::key_type key(name, binary_only);
 

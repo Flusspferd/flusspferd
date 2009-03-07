@@ -67,6 +67,10 @@ base path for spidermonkey. /include and /lib are added. (overwrites
                      dest='libxml_framework',
                      help='libxml framework name')
 
+def append_each_unique(env, to, what, split=' '):
+    for i in what.split(split):
+        env.append_unique(to, i)
+
 def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
@@ -87,9 +91,10 @@ def configure(conf):
     if Options.options.cxxflags:
         conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
     else:
-        u('CXXFLAGS', '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
-        #u('CXXFLAGS', '-O3 -DNDEBUG')
-        u('CXXFLAGS', '-O0 -g -DDEBUG')
+        append_each_unique(conf.env, 'CXXFLAGS',
+                           '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
+        #append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DNDEBUG')
+        append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
     conf.check_tool('compiler_cc')
@@ -117,38 +122,66 @@ def configure(conf):
         lib_path = [Options.options.spidermonkey_library]
     if Options.options.spidermonkey_path:
         include_path = [os.path.join(Options.options.spidermonkey_path,
-                                    "include")]
-        lib_path = [os.path.join(Options.options.spidermonkey_path, "lib")]
+                                    'include')]
+        lib_path = [os.path.join(Options.options.spidermonkey_path, 'lib')]
 
     ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
     if ret == False:
         conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
                        libpath=lib_path)
+    js_h_defines = []
+    if not conf.check_cxx(header_name = 'js/js-config.h', includes=include_path,
+                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8']):
+        ret = conf.check_cxx(uselib='JS',
+                          includes=include_path, execute=1,
+                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8',
+                                   'JS_THREADSAFE'],
+                          msg='Checking if SM needs JS_THREADSAFE',
+                          fragment='''
+                                   #include <js/jsapi.h>
+                                   #include <stdio.h>
+                                   int main() {
+                                     printf("%p", (void*) JS_BeginRequest);
+                                   }
+                                ''')
+        if ret:
+            js_h_defines += ['JS_THREADSAFE']
+
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   defines=js_h_defines + ['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
                    includes=include_path)
+    conf.check_cxx(uselib=['JS_H', 'JS'],
+                   mandatory = 1, execute=1,
+                   msg='Checking if SM was compiled with UTF8',
+                   errmsg='Spidermonkey not compiled with UTF8 Support!',
+                   fragment='''
+#include <js/jsapi.h>
+int main() {
+  return JS_CStringsAreUTF8() ? 0 : 1;
+}
+''')
 
     # dl
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
     # libedit
-    if conf.check_cc(lib='edit', uselib_store='EDITLINE'):
+    if conf.check_cc(lib='edit', uselib_store='EDITLINE') and conf.check_cc(header_name='editline/readline.h'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cc(header_name='editline/history.h')
 
     # sqlite
     if Options.options.enable_sqlite:
         conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
-                       uselib_store='SQLITE',
-                       errmsg='SQLite 3 (>= 3.5.0) could not be found or the found version is too old.',
+                       uselib_store='SQLITE', execute=1,
+                       errmsg='SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
                        fragment='''
 #include <sqlite3.h>
 #include <stdio.h>
 int main() {
-   if(SQLITE_VERSION_NUMBER <= 3005000) {
-     fprintf(stderr, "Need sqlite3 version 3.5.0 or better. Found %s\\n",
+   if(SQLITE_VERSION_NUMBER <= 3004000) {
+     fprintf(stderr, "Need sqlite3 version 3.4.0 or better. Found %s\\n",
              SQLITE_VERSION);
      return 1;
    }
@@ -219,6 +252,16 @@ int main() {
     conf.env['ENABLE_XML'] = Options.options.enable_xml
     conf.env['ENABLE_IO'] = Options.options.enable_io
 
+def get_defines(bld, envvars):
+    result = ''
+    def_pattern = bld.env['CXXDEFINES_ST']
+    for envvar in envvars:
+        defines = bld.env['CXXDEFINES_' + envvar]
+        if defines:
+            for i in defines:
+                result += def_pattern % i + ' '
+    return result
+
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
     obj.source = 'flusspferd.pc.in'
@@ -227,7 +270,8 @@ def build_pkgconfig(bld):
         'PREFIX': bld.env['PREFIX'],
         'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
         'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
-        'VERSION': VERSION
+        'VERSION': VERSION,
+        'CFLAGS': get_defines(bld, ['JS_H'])
         }
     obj.install_path = os.path.normpath(bld.env['PREFIX'] + '/lib/pkgconfig/')
     obj.apply()
@@ -253,16 +297,16 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
-    bld.install_files('${PREFIX}/lib/flusspferd/modules/http',
-                      'js/src/http/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/HTTP',
+                      'js/src/HTTP/*.js')
 
     bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
 
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
-                   (bld.env['shlib_PATTERN'] % 'xml'),
+                   (bld.env['shlib_PATTERN'] % 'XML'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-xml'))
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
-                   (bld.env['shlib_PATTERN'] % 'io'),
+                   (bld.env['shlib_PATTERN'] % 'IO'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
 
     etc = bld.new_task_gen('subst')

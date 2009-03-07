@@ -23,12 +23,12 @@ THE SOFTWARE.
 
 (function() {
   // Load binary module
-  $importer.load('curl', true); 
+  $importer.load('cURL', true); 
 
   try {
     // If we have HTTP.Headers, define a default header callback that
     // creates 
-    $importer.load('http.headers');
+    $importer.load('HTTP.Headers');
     cURL.prototype.headerReceived = function headerReceived(hdr) {
       if (hdr.match(/^\r\n/)) {
         // Empty line signals end of headers
