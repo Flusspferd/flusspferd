@@ -28,6 +28,14 @@ THE SOFTWARE.
 #include <ostream>
 
 namespace flusspferd {
+  /**
+   * Prints a string on a stream.
+   *
+   * @param out The stream to print on.
+   * @param v The string to print.
+   *
+   * @relates string
+   */
   inline std::ostream &operator<<(std::ostream &out, string const &v) {
     return out << v.c_str();
   }

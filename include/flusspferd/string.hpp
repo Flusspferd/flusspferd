@@ -70,7 +70,20 @@ public:
   static string concat(string const &a, string const &b);
 };
 
+/**
+ * Compare two string%s for equality.
+ *
+ * @relates string
+ */
 bool operator==(string const &lhs, string const &rhs);
+
+/**
+ * Compare two string%s lexicographically.
+ *
+ * @return Whether @p lhs is lexicographically smaller than @p rhs.
+ *
+ * @relates string
+ */
 bool operator<(string const &lhs, string const &rhs);
 
 template<>

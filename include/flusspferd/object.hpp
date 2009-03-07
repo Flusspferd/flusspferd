@@ -274,10 +274,20 @@ FLUSSPFERD_CALLS(call, object const &)
 };
 
 #ifndef PREPROC_DEBUG
+/**
+ * Compare two object%s for equality.
+ *
+ * @relates object
+ */
 inline bool operator==(object const &a, object const &b) {
   return Impl::operator==(a, b);
 }
 
+/**
+ * Compare two object%s for inequality.
+ *
+ * @relates object
+ */
 inline bool operator!=(object const &a, object const &b) {
   return Impl::operator!=(a, b);
 }
