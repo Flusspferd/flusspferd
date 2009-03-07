@@ -39,8 +39,23 @@ class value;
  */
 class string : public Impl::string_impl {
 public:
+  /// Construct an empty string.
   string();
+
+  /**
+   * Construct a string from a value.
+   *
+   * @param v The value to convert to a string.
+   */
   string(value const &v);
+
+  /**
+   * Construct a string from a UTF-8 input string.
+   *
+   * @param str The UTF-8 string.
+   * @param length The length in bytes. If this is <code>0</code>, std::strlen
+   *            will be used to determine the length.
+   */
   string(char const *str, std::size_t length = 0);
   string(char16_t const *str, std::size_t length);
   string(std::string const &s);
