@@ -33,6 +33,9 @@ namespace flusspferd {
 class context;
 class object;
 
+/**
+ * Manage the current context and the initialisation of the Javascript engine.
+ */
 class init : boost::noncopyable {
   init();
 
@@ -42,14 +45,42 @@ class init : boost::noncopyable {
 public:
   ~init();
 
+#ifndef IN_DOXYGEN
   struct detail;
   friend struct init::detail;
+#endif
 
+  /**
+   * Set the current context to @p c.
+   *
+   * @param c The new current context.
+   * @return The old current context.
+   */
   context enter_current_context(context const &c);
+
+  /**
+   * Unset the current context.
+   *
+   * Sets the current context to an invalid context if the current context is
+   * @p c or the current context is already invalid.
+   *
+   * @param c The context to unset.
+   * @return Whether the unsetting was successful.
+   */
   bool leave_current_context(context const &c);
 
+  /**
+   * Get the current context.
+   *
+   * @return The current context.
+   */
   context &current_context();
 
+  /**
+   * Initialize the Javascript engine if needed. Works as a singleton.
+   *
+   * @return The global #init object (singleton).
+   */
   static init &initialize();
 };
 
@@ -65,10 +96,20 @@ inline context &current_context() {
   return init::initialize().current_context();
 }
 
+/**
+ * Get the global object of the current context.
+ *
+ * @see current_context, context::global
+ */
 inline object global() {
   return current_context().global();
 }
 
+/**
+ * Run the garbage collector on the current context.
+ *
+ * @see current_context, context::gc
+ */
 inline void gc() {
   return current_context().gc();
 }
