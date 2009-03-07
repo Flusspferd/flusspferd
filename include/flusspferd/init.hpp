@@ -43,9 +43,9 @@ class init : boost::noncopyable {
   boost::scoped_ptr<impl> p;
 
 public:
+#ifndef IN_DOXYGEN
   ~init();
 
-#ifndef IN_DOXYGEN
   struct detail;
   friend struct init::detail;
 #endif
@@ -84,14 +84,29 @@ public:
   static init &initialize();
 };
 
+/**
+ * Set the current context to @p c.
+ *
+ * @see init::enter_current_context
+ */
 inline context enter_current_context(context const &c) {
   return init::initialize().enter_current_context(c);
 }
 
+/**
+ * Unset the current context.
+ *
+ * @see init::leave_current_context
+ */
 inline bool leave_current_context(context const &c) {
   return init::initialize().leave_current_context(c);
 }
 
+/**
+ * Get the current context.
+ *
+ * @see init::current_context
+ */
 inline context &current_context() {
   return init::initialize().current_context();
 }
@@ -114,20 +129,40 @@ inline void gc() {
   return current_context().gc();
 }
 
+/**
+ * Get a prototype from the current context's prototype registry.
+ *
+ * @see current_context, context::prototype(void)
+ */
 template<typename T>
 object prototype() {
   return current_context().prototype<T>();
 }
 
+/**
+ * Get a constructor from the current context's constructor registry.
+ *
+ * @see current_context, context::constructor(void)
+ */
 template<typename T>
 object constructor() {
   return current_context().constructor<T>();
 }
 
+/**
+ * Get a prototype from the current context's prototype registry.
+ *
+ * @see current_context, context::prototype(const std::string &name) const
+ */
 inline object prototype(std::string const &ID) {
   return current_context().prototype(ID);
 }
 
+/**
+ * Get a constructor from the current context's constructor registry.
+ *
+ * @see current_context, context::constructor(const std::string & name) const
+ */
 inline object constructor(std::string const &ID) {
   return current_context().constructor(ID);
 }
