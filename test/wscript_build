@@ -23,8 +23,7 @@
 
 import glob
 
-for source in glob.glob(bld.path.abspath() + '/test_*.cpp'):
-  source = source.replace(bld.path.abspath() + '/', '')
+for source in bld.glob('test_*.cpp'):
   target = source.replace('.cpp', '')
   name = target.replace('test_', '')
   obj = bld.new_task_gen('cxx', 'program')
