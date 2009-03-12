@@ -346,6 +346,8 @@ value object::call(arguments const &arg) {
 }
 
 bool object::is_array() const {
+  if (is_null())
+    return false;
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
 
