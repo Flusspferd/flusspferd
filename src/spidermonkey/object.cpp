@@ -370,6 +370,9 @@ bool object::get_property_attributes(
 bool object::get_property_attributes(
     string const &name, property_attributes &attrs)
 {
+  if (is_null())
+    throw exception("Could not get property attributes (object is null)");
+
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;
