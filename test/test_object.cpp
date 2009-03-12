@@ -115,6 +115,17 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
   X(obj.set_property("abc", flusspferd::value()));
   X(obj.set_property(flusspferd::value(3), flusspferd::value()));
   X(obj.set_property(std::string("abc"), flusspferd::value()));
+  X(obj.get_property("abc"));
+  X(obj.get_property(std::string("abc")));
+  X(obj.get_property(flusspferd::value(3)));
+  X(obj.has_property("abc"));
+  X(obj.has_property(std::string("abc")));
+  X(obj.has_property(flusspferd::value(3)));
+  X(obj.has_own_property("abc"));
+  X(obj.has_own_property(std::string("abc")));
+  X(obj.has_own_property(flusspferd::value(3)));
+
+
   //TODO
 #undef X
 }
