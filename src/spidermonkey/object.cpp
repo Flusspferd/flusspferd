@@ -170,6 +170,8 @@ bool object::has_own_property(std::string const &name_) const {
 }
 
 bool object::has_own_property(value const &id) const {
+  if (is_null())
+    throw exception("Could not check property (object is null)");
 
   JSBool has;
 #if JS_VERSION >= 180
