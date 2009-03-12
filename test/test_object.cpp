@@ -95,42 +95,57 @@ BOOST_AUTO_TEST_CASE( function_as_object ) {
 BOOST_AUTO_TEST_CASE( call_on_invalid ) {
   flusspferd::object invalid_object;
   BOOST_REQUIRE(invalid_object.is_null());
-  BOOST_CHECK_THROW(invalid_object.seal(true), flusspferd::exception);
-  BOOST_CHECK_THROW(invalid_object.parent(), flusspferd::exception);
-  BOOST_CHECK_THROW(invalid_object.prototype(), flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.set_parent(flusspferd::object()), flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.set_prototype(flusspferd::object()), flusspferd::exception);
-  BOOST_CHECK_THROW(
-    (invalid_object.apply(flusspferd::global(), flusspferd::arguments())),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    (invalid_object.call("toString", flusspferd::arguments())),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    (invalid_object.call(flusspferd::global(), flusspferd::arguments())),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.call(flusspferd::arguments()), flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.define_property("abc"), flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.define_property(flusspferd::string()),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.define_property(std::string("abc")),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.set_property("abc", flusspferd::value()),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.set_property(flusspferd::value(3), flusspferd::value()),
-    flusspferd::exception);
-  BOOST_CHECK_THROW(
-    invalid_object.set_property(std::string("abc"), flusspferd::value()),
-    flusspferd::exception);
+
+  flusspferd::object &obj = invalid_object;
+
+#define X(a) BOOST_CHECK_THROW((a), flusspferd::exception)
+
+  X(obj.seal(true));
+  X(obj.parent());
+  X(obj.prototype());
+  X(obj.set_parent(flusspferd::object()));
+  X(obj.set_prototype(flusspferd::object()));
+  X((obj.apply(flusspferd::global(), flusspferd::arguments())))
+  X((obj.call("toString", flusspferd::arguments())));
+  X((obj.call(flusspferd::global(), flusspferd::arguments())));
+  X(obj.call(flusspferd::arguments()));
+  X(obj.define_property("abc"));
+  X(obj.define_property(flusspferd::string()));
+  X(obj.define_property(std::string("abc")));
+  X(obj.set_property("abc", flusspferd::value()));
+  X(obj.set_property(flusspferd::value(3), flusspferd::value()));
+  X(obj.set_property(std::string("abc"), flusspferd::value()));
+  
   //TODO
+#undef X
+}
+
+BOOST_AUTO_TEST_CASE( call_on_valid ) {
+  flusspferd::object valid_object = flusspferd::create_object();
+  BOOST_REQUIRE(!valid_object.is_null());
+
+  flusspferd::object &obj = valid_object;
+
+#define X(a) BOOST_CHECK_NO_THROW((a))
+
+  X(obj.seal(true));
+  X(obj.parent());
+  X(obj.prototype());
+  X(obj.set_parent(flusspferd::object()));
+  X(obj.set_prototype(flusspferd::object()));
+  X((obj.apply(flusspferd::global(), flusspferd::arguments())))
+  X((obj.call("toString", flusspferd::arguments())));
+  X((obj.call(flusspferd::global(), flusspferd::arguments())));
+  X(obj.call(flusspferd::arguments()));
+  X(obj.define_property("abc"));
+  X(obj.define_property(flusspferd::string()));
+  X(obj.define_property(std::string("abc")));
+  X(obj.set_property("abc", flusspferd::value()));
+  X(obj.set_property(flusspferd::value(3), flusspferd::value()));
+  X(obj.set_property(std::string("abc"), flusspferd::value()));
+  
+  //TODO
+#undef X
 }
 
 BOOST_AUTO_TEST_SUITE_END()
