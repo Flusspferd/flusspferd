@@ -46,6 +46,8 @@ object::object() : Impl::object_impl(0) { }
 object::~object() { }
 
 void object::seal(bool deep) {
+  if (is_null())
+    throw exception("Could not seal object (object is null)");
   if (!JS_SealObject(Impl::current_context(), get(), deep))
     throw exception("Could not seal object");
 }
