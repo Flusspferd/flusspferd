@@ -217,10 +217,14 @@ void object::delete_property(value const &id) {
 }
 
 property_iterator object::begin() const {
+  if (is_null())
+    throw exception("Could not create iterator for null object");
   return property_iterator(*this);
 }
 
 property_iterator object::end() const {
+  if (is_null())
+    throw exception("Could not create iterator for null object");
   return property_iterator();
 }
 
