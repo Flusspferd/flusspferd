@@ -92,4 +92,19 @@ BOOST_AUTO_TEST_CASE( function_as_object ) {
   BOOST_CHECK(!v.is_null());
 }
 
+BOOST_AUTO_TEST_CASE( call_on_invalid ) {
+  flusspferd::object invalid_object;
+  BOOST_REQUIRE(invalid_object.is_null());
+  BOOST_CHECK_THROW(invalid_object.parent(), flusspferd::exception);
+  BOOST_CHECK_THROW(invalid_object.prototype(), flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.set_parent(flusspferd::object()), flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.set_prototype(flusspferd::object()), flusspferd::exception);
+  BOOST_CHECK_THROW(
+    (invalid_object.apply(flusspferd::global(), flusspferd::arguments())),
+    flusspferd::exception);
+  //TODO
+}
+
 BOOST_AUTO_TEST_SUITE_END()
