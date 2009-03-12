@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/property_iterator.hpp"
 #include "test_environment.hpp"
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
@@ -124,7 +125,17 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
   X(obj.has_own_property("abc"));
   X(obj.has_own_property(std::string("abc")));
   X(obj.has_own_property(flusspferd::value(3)));
+  X(obj.delete_property("abc"));
+  X(obj.delete_property(std::string("abc")));
+  X(obj.delete_property(flusspferd::value(3)));
+  X(obj.begin());
+  X(obj.end());
+  BOOST_CHECK_EQUAL(obj.is_array(), false);
 
+  flusspferd::object::property_attributes dummy;
+  X(obj.get_property_attributes("abc", dummy));
+  X(obj.get_property_attributes(std::string("abc"), dummy));
+  X(obj.get_property_attributes(flusspferd::string(), dummy));
 
   //TODO
 #undef X
