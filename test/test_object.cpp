@@ -95,6 +95,7 @@ BOOST_AUTO_TEST_CASE( function_as_object ) {
 BOOST_AUTO_TEST_CASE( call_on_invalid ) {
   flusspferd::object invalid_object;
   BOOST_REQUIRE(invalid_object.is_null());
+  BOOST_CHECK_THROW(invalid_object.seal(true), flusspferd::exception);
   BOOST_CHECK_THROW(invalid_object.parent(), flusspferd::exception);
   BOOST_CHECK_THROW(invalid_object.prototype(), flusspferd::exception);
   BOOST_CHECK_THROW(
@@ -103,6 +104,31 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
     invalid_object.set_prototype(flusspferd::object()), flusspferd::exception);
   BOOST_CHECK_THROW(
     (invalid_object.apply(flusspferd::global(), flusspferd::arguments())),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    (invalid_object.call("toString", flusspferd::arguments())),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    (invalid_object.call(flusspferd::global(), flusspferd::arguments())),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.call(flusspferd::arguments()), flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.define_property("abc"), flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.define_property(flusspferd::string()),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.define_property(std::string("abc")),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.set_property("abc", flusspferd::value()),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.set_property(flusspferd::value(3), flusspferd::value()),
+    flusspferd::exception);
+  BOOST_CHECK_THROW(
+    invalid_object.set_property(std::string("abc"), flusspferd::value()),
     flusspferd::exception);
   //TODO
 }
