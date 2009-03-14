@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/property_iterator.hpp"
 #include "test_environment.hpp"
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
@@ -90,6 +91,54 @@ BOOST_AUTO_TEST_CASE( function_as_object ) {
   BOOST_CHECK(!v.is_undefined());
   BOOST_CHECK(v.is_object());
   BOOST_CHECK(!v.is_null());
+}
+
+BOOST_AUTO_TEST_CASE( call_on_invalid ) {
+  flusspferd::object invalid_object;
+  BOOST_REQUIRE(invalid_object.is_null());
+
+  flusspferd::object &obj = invalid_object;
+
+#define X(a) BOOST_CHECK_THROW((a), flusspferd::exception)
+
+  X(obj.seal(true));
+  X(obj.parent());
+  X(obj.prototype());
+  X(obj.set_parent(flusspferd::object()));
+  X(obj.set_prototype(flusspferd::object()));  
+  X((obj.apply(flusspferd::global(), flusspferd::arguments())))
+  X((obj.call("toString", flusspferd::arguments())));
+  X((obj.call(flusspferd::global(), flusspferd::arguments())));
+  X(obj.call(flusspferd::arguments()));
+  X(obj.define_property("abc"));
+  X(obj.define_property(flusspferd::string()));
+  X(obj.define_property(std::string("abc")));
+  X(obj.set_property("abc", flusspferd::value()));
+  X(obj.set_property(flusspferd::value(3), flusspferd::value()));
+  X(obj.set_property(std::string("abc"), flusspferd::value()));
+  X(obj.get_property("abc"));
+  X(obj.get_property(std::string("abc")));
+  X(obj.get_property(flusspferd::value(3)));
+  X(obj.has_property("abc"));
+  X(obj.has_property(std::string("abc")));
+  X(obj.has_property(flusspferd::value(3)));
+  X(obj.has_own_property("abc"));
+  X(obj.has_own_property(std::string("abc")));
+  X(obj.has_own_property(flusspferd::value(3)));
+  X(obj.delete_property("abc"));
+  X(obj.delete_property(std::string("abc")));
+  X(obj.delete_property(flusspferd::value(3)));
+  X(obj.begin());
+  X(obj.end());
+  BOOST_CHECK_EQUAL(obj.is_array(), false);
+
+  flusspferd::object::property_attributes dummy;
+  X(obj.get_property_attributes("abc", dummy));
+  X(obj.get_property_attributes(std::string("abc"), dummy));
+  X(obj.get_property_attributes(flusspferd::string(), dummy));
+
+  //TODO
+#undef X
 }
 
 BOOST_AUTO_TEST_SUITE_END()

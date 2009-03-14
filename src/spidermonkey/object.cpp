@@ -46,6 +46,8 @@ object::object() : Impl::object_impl(0) { }
 object::~object() { }
 
 void object::seal(bool deep) {
+  if (is_null())
+    throw exception("Could not seal object (object is null)");
   if (!JS_SealObject(Impl::current_context(), get(), deep))
     throw exception("Could not seal object");
 }
@@ -168,6 +170,8 @@ bool object::has_own_property(std::string const &name_) const {
 }
 
 bool object::has_own_property(value const &id) const {
+  if (is_null())
+    throw exception("Could not check property (object is null)");
 
   JSBool has;
 #if JS_VERSION >= 180
@@ -213,10 +217,14 @@ void object::delete_property(value const &id) {
 }
 
 property_iterator object::begin() const {
+  if (is_null())
+    throw exception("Could not create iterator for null object");
   return property_iterator(*this);
 }
 
 property_iterator object::end() const {
+  if (is_null())
+    throw exception("Could not create iterator for null object");
   return property_iterator();
 }
 
@@ -338,6 +346,8 @@ value object::call(arguments const &arg) {
 }
 
 bool object::is_array() const {
+  if (is_null())
+    return false;
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
 
@@ -360,6 +370,9 @@ bool object::get_property_attributes(
 bool object::get_property_attributes(
     string const &name, property_attributes &attrs)
 {
+  if (is_null())
+    throw exception("Could not get property attributes (object is null)");
+
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;
