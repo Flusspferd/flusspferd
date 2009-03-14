@@ -4,8 +4,8 @@ Format: Development Release 12-07-2007 (1.35 base)
 Title: Flusspferd
 SubTitle: JavaScript Modules
 
-Footer: <script src="http://www.google-analytics.com/ga.js"></script> <script src="http://flusspferd.org/ga.js"></script>
-Timestamp: Updated mm/dd/yyyy
+Footer: <span style="color:black">Contact us at team -AT- flusspferd -DOT- org or as described on our <a href="http://flusspferd.org/" style="color:blue">homepage</a> (section Contact).</span> <script src="http://www.google-analytics.com/ga.js"></script> <script src="http://flusspferd.org/ga.js"></script>
+Timestamp: Updated yyyy-mm-dd
 #   m     - One or two digit month.  January is "1"
 #   mm    - Always two digit month.  January is "01"
 #   mon   - Short month word.  January is "Jan"
