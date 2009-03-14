@@ -64,9 +64,10 @@ $ ./waf --help
  * might need to specify additional options.
  *
  * If you don't need special options, we should configure the project now (this is like ./configure in autotools based projects) and then build and install it.
+ * We will install into /usr (/usr/local is the default). Use @p --prefix to change the place where Flusspferd should be installed.
  *
  * @verbatim
-$ ./waf configure --enable-io --enable-xml
+$ ./waf configure --prefix=/usr --enable-io --enable-xml
 $ ./waf build
 $ sudo ./waf install
 @endverbatim
