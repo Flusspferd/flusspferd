@@ -53,21 +53,13 @@ Group: Modules  {
       File: Stream  (no auto-title, src/io/stream.jsdoc)
       }  # Group: io
 
-   Group: sqlite3  {
-
-      File: SQLite3  (no auto-title, plugins/sqlite3/sqlite3.js)
-      }  # Group: sqlite3
-
-   Group: curl  {
-
-      File: cURL  (plugins/curl/curl.js)
-      }  # Group: curl
-
    Group: environment  {
 
       File: Environment  (plugins/environment/environment.jsdoc)
       }  # Group: environment
 
+   File: cURL  (plugins/curl/cURL.js)
+   File: sqlite3  (plugins/sqlite3/SQLite3.js)
    }  # Group: Modules
 
 Group: Index  {
