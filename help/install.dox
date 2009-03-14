@@ -95,4 +95,20 @@ Hello world!
  * For the purposes of this tutorial, we have not enabled all parts of
  * Flusspferd. We have omitted several modules which you can choose to
  * activate if you have the necessary dependencies.
+ *
+ * @subsection make Install using ./configure and make
+ *
+ * If you want to use make instead of waf to compile flusspferd, you can do this
+ * too.
+ *
+ * @verbatim
+$ ./configure --prefix=/usr --enable-xml --enable-io
+$ make
+$ sudo make install
+@endverbatim
+ *
+ * @subsection ebuild Install on Gentoo
+ *
+ * On Gentoo, you can use our ebuild, <code>flusspferd-9999.ebuild</code>, to compile and
+ * install Flusspferd.
  */
