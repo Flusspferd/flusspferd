@@ -22,11 +22,16 @@ THE SOFTWARE.
 */
 
 /**
- * @page tutorials Tutorials
+ * @page cpp-tutorial Using Flusspferd from C++
  *
- * It is always difficult to learn how to use a new library. Tutorials are
- * designed to cope with that problem.
+ * @section configuring Configuring Flusspferd in your project
  *
- * @li @subpage install
- * @li @subpage cpp-tutorial
+ * We assume that you have already @ref install "installed" Flusspferd. To use it in your
+ * project, you can use pkg-config, like this:
+ *
+ * @verbatim
+g++ $(pkg-config --cflags --libs flusspferd) myfile.cpp
+@endverbatim
+ *
+ * If you use <a href="http://code.google.com/p/waf">WAF</a>, you can...
  */
