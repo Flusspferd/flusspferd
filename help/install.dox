@@ -89,7 +89,7 @@ Hello world!
  *
  * You might have noticed that Flusspferd doesn't use autotools or Makefiles
  * (although we provide a compatibility layer for those who can't live without).
- * Flusspferd uses <a href="http://code.google.com/p/waf">WAF</a> as its build
+ * Flusspferd uses <a href="http://code.google.com/p/waf">Waf</a> as its build
  * system. But as you have seen, you don't have to install it, it's entirely
  * self-contained in a single binary.
  *
