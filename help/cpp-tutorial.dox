@@ -64,7 +64,7 @@ conf.check_cfg(
  * as long it is in scope. You can use flusspferd::current_context_scope in
  * multiple nested scopes.
  *
- * @section secondprogram Your second Flusspferd program: Hello, World respectively FLusspferd.
+ * @section secondprogram Your second Flusspferd program: Hello, World respectively Flusspferd.
  *
  * Which tutorial is complete without a "Hello, World!" example? But this one
  * comes with a twist.
