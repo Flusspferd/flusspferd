@@ -26,8 +26,8 @@ THE SOFTWARE.
  *
  * @section configuring Configuring Flusspferd in your project
  *
- * We assume that you have already @ref install "installed" Flusspferd. To use it in your
- * project, you can use pkg-config, like this:
+ * We assume that you have already @ref install "installed" Flusspferd. To use 
+ * it in your project, you can use pkg-config, like this:
  *
  * @verbatim
 $ g++ $(pkg-config --cflags --libs flusspferd) myfile.cpp
@@ -43,4 +43,24 @@ conf.check_cfg(
                args='--cflags --libs',
                mandatory=1)
 @endverbatim
+ *
+ * @section firstprogram Your first Flusspferd program
+ *
+ * Let's begin with a very simple program that does, well, nothing.
+ *
+ * @code
+ * #include <flusspferd/current_context_scope.hpp>
+ * #include <flusspferd/context.hpp>
+ *
+ * int main() {
+ *   flusspferd::current_context_scope context_scope(flusspferd::context::create());
+ *   // Flusspferd is now initialized. Now we can do what we really want to do: nothing.
+ * }
+ * @endcode
+ *
+ * In order to use Flusspferd (even though we actually don't, in that simple
+ * example), we need to create a @ref flusspferd::context "context" and make it
+ * the <b>current context</b>, which flusspferd::current_context_scope does
+ * as long it is in scope. You can use flusspferd::current_context_scope in
+ * multiple nested scopes.
  */
