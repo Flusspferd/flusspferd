@@ -252,26 +252,36 @@ int main() {
     conf.env['ENABLE_XML'] = Options.options.enable_xml
     conf.env['ENABLE_IO'] = Options.options.enable_io
 
-def get_defines(bld, envvars):
+def get_cflags(bld, envvars):
     result = ''
     def_pattern = bld.env['CXXDEFINES_ST']
+    inc_pattern = bld.env['CPPPATH_ST']
     for envvar in envvars:
         defines = bld.env['CXXDEFINES_' + envvar]
         if defines:
+            if isinstance(defines, basestring):
+                defines = [defines]
             for i in defines:
                 result += def_pattern % i + ' '
+        includes = bld.env['CPPPATH_' + envvar]
+        if includes:
+            if isinstance(includes, basestring):
+                includes = [includes]
+            for i in includes:
+                result += inc_pattern % i + ' '
     return result
 
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
     obj.source = 'flusspferd.pc.in'
     obj.target = 'flusspferd.pc'
+    cflags = get_cflags(bld, ['JS_H', 'BOOST'])
     obj.dict = {
         'PREFIX': bld.env['PREFIX'],
         'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
         'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
         'VERSION': VERSION,
-        'CFLAGS': get_defines(bld, ['JS_H'])
+        'CFLAGS': cflags
         }
     obj.install_path = os.path.normpath(bld.env['PREFIX'] + '/lib/pkgconfig/')
     obj.apply()
