@@ -60,7 +60,39 @@ conf.check_cfg(
  *
  * In order to use Flusspferd (even though we actually don't, in that simple
  * example), we need to create a @ref flusspferd::context "context" and make it
- * the <b>current context</b>, which flusspferd::current_context_scope does
+ * the <em>current context</em>, which flusspferd::current_context_scope does
  * as long it is in scope. You can use flusspferd::current_context_scope in
  * multiple nested scopes.
+ *
+ * @section secondprogram Your second Flusspferd program: Hello, World respectively FLusspferd.
+ *
+ * Which tutorial is complete without a "Hello, World!" example? But this one
+ * comes with a twist.
+ *
+ * @code
+ * #include <flusspferd/current_context_scope.hpp>
+ * #include <flusspferd/context.hpp>
+ * #include <flusspferd/init.hpp>
+ * #include <flusspferd/root.hpp>
+ * #include <flusspferd/string.hpp>
+ * #include <flusspferd/value_io.hpp>
+ * #include <flusspferd/evaluate.hpp>
+ * #include <iostream>
+ *
+ * int main() {
+ *   flusspferd::current_context_scope context_scope(flusspferd::context::create());
+ *   flusspferd::root_string str("Hello, World!\n");
+ *   flusspferd::gc(); // <- this line is not necessary - it calls the garbage collector
+ *   flusspferd::global().set_property("str", str);
+ *   std::cout << flusspferd::evaluate("str.replace('World', 'Flusspferd')");
+ * }
+ * @endcode
+ * 
+ * And this should be the output:
+ *
+ * @verbatim
+Hello, Flusspferd!
+@endverbatim
+ *
+ * At least \em slightly more interesting than "Hello, World!".
  */
