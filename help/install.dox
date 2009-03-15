@@ -29,10 +29,11 @@ THE SOFTWARE.
  * Before installing Flusspferd, you need to install its dependencies.
  *
  * @li Linux or Mac OS X (possibly other POSIX systems work too),
- * @li <a href="http://www.python.org/">Python 2.3 or higher (2.5 is recommended)</a>,
- * @li <a href="http://www.boost.org/">Boost 1.36 or higher</a>,
- * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> (<a href="http://ftp.mozilla.org/pub/mozilla.org/js/">download here</a>),
- * @li maybe something else.
+ * @li <a href="http://www.python.org/">Python</a> 2.3 or higher (2.5 is recommended) - required for the build system,
+ * @li <a href="http://www.boost.org/">Boost</a> 1.36 or higher,
+ * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
+ *     1.7 or higher 
+ *     (<a href="http://ftp.mozilla.org/pub/mozilla.org/js/">download here</a>).
  *
  * To get direct access to the development repository, you also need <a href="http://git-scm.com/">GIT</a>.
  *
@@ -109,6 +110,6 @@ $ sudo make install
  *
  * @subsection ebuild Install on Gentoo
  *
- * On Gentoo, you can use our ebuild, <code>flusspferd-9999.ebuild</code>, to compile and
- * install Flusspferd.
+ * On Gentoo, you can use our ebuild, <code>flusspferd-9999.ebuild</code>, to
+ * compile and install Flusspferd.
  */
