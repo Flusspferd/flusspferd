@@ -30,8 +30,17 @@ THE SOFTWARE.
  * project, you can use pkg-config, like this:
  *
  * @verbatim
-g++ $(pkg-config --cflags --libs flusspferd) myfile.cpp
+$ g++ $(pkg-config --cflags --libs flusspferd) myfile.cpp
 @endverbatim
  *
- * If you use <a href="http://code.google.com/p/waf">WAF</a>, you can...
+ * If you use <a href="http://code.google.com/p/waf">Waf</a>, you can use
+ * Flusspferd by calling check_cfg on the configuration object:
+ *
+ * @verbatim
+conf.check_cfg(
+               package = 'flusspferd',
+               uselib_store='FLUSSPFERD',
+               args='--cflags --libs',
+               mandatory=1)
+@endverbatim
  */
