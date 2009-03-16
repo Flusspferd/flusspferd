@@ -247,6 +247,7 @@ int main() {
                         uselib_store='CURL') != None):
         conf.env['ENABLE_CURL'] = True
 
+    conf.env['ENABLE_SQLITE'] = Options.options.enable_sqlite
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
     conf.env['ENABLE_XML'] = Options.options.enable_xml
