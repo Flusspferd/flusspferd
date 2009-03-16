@@ -1,7 +1,7 @@
 Format: Development Release 12-07-2007 (1.35 base)
 
 
-Title: Flusspferd
+Title: Flusspferd (Javascript bindings for C++)
 SubTitle: JavaScript Modules
 
 Footer: <span style="color:black">Contact us at team -AT- flusspferd -DOT- org or as described on our <a href="http://flusspferd.org/" style="color:blue">homepage</a> (section Contact).</span> <script src="http://www.google-analytics.com/ga.js"></script> <script src="http://flusspferd.org/ga.js"></script>
