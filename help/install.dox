@@ -34,7 +34,12 @@ THE SOFTWARE.
  * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
  *     1.7 or higher 
  *     (<a href="http://ftp.mozilla.org/pub/mozilla.org/js/">download here</a>).
- * @li Optionally, <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell.
+ *
+ *
+ * Recommended, but optional:
+ *
+ * @li <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell,
+ * @li <a href="http://xmlsoft.org/">libxml2</a> for XML support.
  *
  * To get direct access to the development repository, you also need <a href="http://git-scm.com/">GIT</a>.
  *
