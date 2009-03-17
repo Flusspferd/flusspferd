@@ -123,5 +123,5 @@ $ sudo apt-get install libcurl4-gnutls-dev
  * @verbatim
 $ sudo apt-get install libcurl4-openssl-dev
 @endverbatim
- * and add --enable-curl to configure flags
+ * and add @p --enable-curl to configure flags
  */
