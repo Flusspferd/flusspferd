@@ -108,6 +108,11 @@ $ make
 $ sudo make install
 @endverbatim
  *
+ * @subsection ubu Install on Ubuntu 8.10
+ *
+ * There is a seperate page on @ref ubuntu "how to build Flusspferd on Ubuntu
+ 8.10" and similar distributions.
+ *
  * @subsection ebuild Install on Gentoo
  *
  * On Gentoo, you can use our ebuild, <code>flusspferd-9999.ebuild</code>, to
