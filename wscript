@@ -159,7 +159,12 @@ def configure(conf):
                    fragment='''
 #include <js/jsapi.h>
 int main() {
+#if JS_VERSION >= 180
+  // JS 1.8 allows this to be set at runtime
+  return 0;
+# else
   return JS_CStringsAreUTF8() ? 0 : 1;
+#endif
 }
 ''')
 
@@ -180,7 +185,7 @@ int main() {
 #include <sqlite3.h>
 #include <stdio.h>
 int main() {
-   if(SQLITE_VERSION_NUMBER <= 3004000) {
+   if(SQLITE_VERSION_NUMBER < 3004000) {
      fprintf(stderr, "Need sqlite3 version 3.4.0 or better. Found %s\\n",
              SQLITE_VERSION);
      return 1;
