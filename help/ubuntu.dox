@@ -112,6 +112,7 @@ $ sudo apt-get install libsqlite3-dev
  * @verbatim
 $ sudo apt-get install libxml2-dev
 @endverbatim
+ * and add @p --enable-xml to the configure flags.
  *
  * @subsection curl Building Flusspferd with cURL support
  * You have to install cURL's headers first. Either choose
