@@ -49,7 +49,6 @@ public:
   impl()
   {
 #if JS_VERSION >= 180
-    // TODO: We should really only call this once.
     boost::call_once(runtime_created, JS_SetCStringsAreUTF8);
 #endif
 

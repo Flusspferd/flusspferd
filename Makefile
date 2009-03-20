@@ -23,5 +23,5 @@ distclean:
 	rm -f .configure
 	$(PYTHON) ./waf distclean
 
-test:
+test: all
 	@util/run_tests.sh
