@@ -49,6 +49,7 @@ public:
   /// Set the length of the array, resizing it in the process.
   void set_length(std::size_t);
 
+  /// Get the length of the Array.
   std::size_t size() const { return length(); }
   
   /// Get an array element.
