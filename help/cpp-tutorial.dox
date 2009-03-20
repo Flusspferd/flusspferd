@@ -109,7 +109,8 @@ Hello, Flusspferd!
  * @section values_and_objects Values and objects
  *
  * Let's have a bird's eyes' look at the basic value types supported by
- * flusspferd.
+ * flusspferd. We shall just create a few values of different types to
+ * get the hang of it. Also we will assert some basic facts about the values.
  *
  * @code
 #include <flusspferd/current_context_scope.hpp>
