@@ -83,6 +83,15 @@ Hello, Flusspferd!
  *       will be destroyed by the garbage collector prematurely. But more about
  *       that in a later section.
  *
+ * @subsection simple_objects Dealing with simple objects
+ *
+ * Let us translate this simple Javascript code to a C++ equivalent:
+ *
+ * @include simple_objects.js
+ *
+ * Translated to C++:
+ *
+ * @include simple_objects.cpp
  * 
  * @em TODO
  */
