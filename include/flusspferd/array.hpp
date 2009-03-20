@@ -35,7 +35,7 @@ public:
   array &operator=(object const &o);
 
 public:
-  std::size_t get_length() const;
+  std::size_t length() const;
   void set_length(std::size_t);
 
   value get_element(std::size_t n) const;
