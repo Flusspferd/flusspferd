@@ -67,7 +67,7 @@ public:
   { }
 #endif
 
-  // Destructor.
+  /// Destructor.
   ~object();
 
   /**
