@@ -32,3 +32,15 @@ THE SOFTWARE.
  *
  * Types for dealing with object properties.
  */
+
+/**
+ * @defgroup create Creating values
+ *
+ * Functions for creating values of different types.
+ */
+
+/**
+ * @defgroup create_function Creating functions
+ *
+ * Functions for creating native functions.
+ */

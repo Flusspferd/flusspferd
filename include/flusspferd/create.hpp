@@ -55,9 +55,31 @@ object create_native_enumerable_object(object const &proto);
 }
 #endif
 
+/**
+ * @name Creating values
+ * @addtogroup create
+ */
+//@{
+/**
+ * Create a simple object.
+ *
+ * Creates a new object with prototype @p proto. If proto is @c null,
+ * @c Object.prototype will be used.
+ *
+ * @param proto The object to use as prototype.
+ * @return The new object.
+ */
 object create_object(object const &proto = object());
 
+/**
+ * Create an array.
+ *
+ * @param length The initial length of the new array.
+ * @return The new array.
+ */
 array create_array(unsigned int length = 0);
+
+#ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
   template< \
@@ -102,9 +124,50 @@ BOOST_PP_REPEAT(
   ~
 )
 
-function create_native_function(native_function_base *);
+#else
 
+/**
+ * Create a new native object of type @p T.
+ *
+ * @param T The type of the object's class.
+ * @param proto The prototype to be used. If @p null, the class' default
+ *          prototype will be used.
+ * @param ... The parameters to the constructor of @p T.
+ * @return The new object.
+ */
+template<typename T>
+T &create_native_object(object const &proto, ...);
+
+#endif
+//@}
+
+/**
+ * @addtogroup create_function
+ */
+//@{
+
+/**
+ * Create a new native function.
+ *
+ * @p ptr will be <code>delete</code>d by Flusspferd.
+ *
+ * @param ptr The native function object.
+ * @return The new function.
+ */
+function create_native_function(native_function_base *ptr);
+
+/**
+ * Create a new native function as method of an object.
+ *
+ * The new method of object @p o will have the name @c ptr->name().
+ *
+ * @param o The object to add the method to.
+ * @param ptr The native function object.
+ * @return The new method.
+ */
 function create_native_function(object const &o, native_function_base *ptr);
+
+#ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION(z, n_args, d) \
   template< \
@@ -138,6 +201,45 @@ BOOST_PP_REPEAT(
   ~
 )
 
+#else
+
+/**
+ * Create a new native function of type @p F.
+ *
+ * @p F must inherit from #native_function_base.
+ *
+ * @param F The function type.
+ * @param ... The parameters to pass to the constructor of @p F.
+ * @return The new function.
+ */
+template<typename F>
+object create_native_function( );
+
+/**
+ * Create a new native function of type @p F as method of an object.
+ *
+ * @p F must inherit from #native_function_base.
+ *
+ * The new method of object @p o will have the name @c ptr->name().
+ *
+ * @param F The function type.
+ * @param o The object to add the method to.
+ * @param ... The parameters to pass to the constructor of @p F.
+ * @return The new method.
+ */
+template<typename F>
+object create_native_function(object const &o, ...);
+
+#endif
+
+/**
+ * Create a new native function.
+ *
+ * @param fn The functor to call.
+ * @param arity The function arity.
+ * @param name The function name.
+ * @return The new function.
+ */
 inline function create_native_function(
   boost::function<void (call_context &)> const &fn,
   unsigned arity = 0,
@@ -146,6 +248,15 @@ inline function create_native_function(
   return create_native_function<native_function<void> >(fn, arity, name);
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param fn The functor to call.
+ * @param arity The function arity.
+ * @return The new function.
+ */
 inline function create_native_function(
   object const &o,
   std::string const &name,
@@ -155,6 +266,14 @@ inline function create_native_function(
   return create_native_function<native_function<void> >(o, fn, arity, name);
 }
 
+/**
+ * Create a new native function.
+ *
+ * @param T The function signature to use.
+ * @param fn The functor to call.
+ * @param name The function name.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_function(
   boost::function<T> const &fn,
@@ -163,6 +282,15 @@ function create_native_function(
   return create_native_function<native_function<T> >(fn, name);
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * @param T The function signature to use.
+ * @param o The object to add the method to.
+ * @param name The function name.
+ * @param fn The functor to call.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_function(
   object const &o,
@@ -172,6 +300,13 @@ function create_native_function(
   return create_native_function<native_function<T> >(o, fn, name);
 }
 
+/**
+ * Create a new native function.
+ *
+ * @param fnptr The function to call (also determines the function signature).
+ * @param name The function name.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_function(
   T *fnptr,
@@ -181,6 +316,14 @@ function create_native_function(
   return create_native_function<T>(boost::function<T>(fnptr), name);
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param fnptr The function to call (also determines the function signature).
+ * @return The new method.
+ */
 template<typename T>
 function create_native_function(
   object const &o,
@@ -190,6 +333,7 @@ function create_native_function(
 {
   return create_native_function<T>(o, name, boost::function<T>(fnptr));
 }
+//@}
 
 }
 
