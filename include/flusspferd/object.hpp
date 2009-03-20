@@ -229,39 +229,169 @@ FLUSSPFERD_CALLS(call, object const &)
       boost::optional<function const &> setter = boost::none);
   };
 
+  /**
+   * Define a property.
+   *
+   * @param name The property's name.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
   void define_property(string const &name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  /**
+   * Define a property.
+   *
+   * @param name The property's name.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
   void define_property(std::string const &name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  /**
+   * Define a property.
+   *
+   * @param name The property's name.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
   void define_property(char const *name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  /**
+   * Set a property.
+   *
+   * @param name The property's name.
+   * @param v The new value.
+   */
   void set_property(char const *name, value const &v);
+
+  /**
+   * Set a property.
+   *
+   * @param name The property's name.
+   * @param v The new value.
+   */
   void set_property(std::string const &name, value const &v);
+
+  /**
+   * Set a property.
+   *
+   * @param id The property's name / ID.
+   * @param v The new value.
+   */
   void set_property(value const &id, value const &v);
 
+  /**
+   * Get a property.
+   *
+   * @param name The property's name.
+   * @return The current value.
+   */
   value get_property(char const *name) const;
+
+  /**
+   * Get a property.
+   *
+   * @param name The property's name.
+   * @return The current value.
+   */
   value get_property(std::string const &name) const;
+
+  /**
+   * Get a property.
+   *
+   * @param id The property's name / ID.
+   * @return The current value.
+   */
   value get_property(value const &id) const;
-    
+
+  /**
+   * Check whether a property exists on the object or any of its prototypes.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_property(char const *name) const;
+
+  /**
+   * Check whether a property exists on the object or any of its prototypes.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_property(std::string const &name) const;
+
+  /**
+   * Check whether a property exists on the object or any of its prototypes.
+   *
+   * @param id The property's name / ID.
+   * @return Whether the property exists.
+   */
   bool has_property(value const &id) const;
 
+  /**
+   * Check whether a property exists directly on the object.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_own_property(char const *name) const;
+
+  /**
+   * Check whether a property exists directly on the object.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_own_property(std::string const &name) const;
+
+  /**
+   * Check whether a property exists directly on the object.
+   *
+   * @param id The property's name / ID.
+   * @return Whether the property exists.
+   */
   bool has_own_property(value const &id) const;
 
+  /**
+   * Delete a property from the object.
+   *
+   * @param name The property's name.
+   */
   void delete_property(char const *name);
+
+  /**
+   * Delete a property from the object.
+   *
+   * @param name The property's name.
+   */
   void delete_property(std::string const &name);
+
+  /**
+   * Delete a property from the object.
+   *
+   * @param id The property's name / ID.
+   */
   void delete_property(value const &id);
 
+  /**
+   * Return a property_iterator to the first property (in arbitrary order).
+   *
+   * @return The property_iterator to the first property.
+   */
   property_iterator begin() const;
+
+  /**
+   * Return a property_iterator to behind the last property 
+   * (in arbitrary order).
+   *
+   * @return The property_iterator to behind the last property.
+   */
   property_iterator end() const;
 
   bool is_array() const;
