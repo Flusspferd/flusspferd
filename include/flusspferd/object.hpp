@@ -125,7 +125,7 @@ public:
    * Call an object method.
    *
    * @param name The method name.
-   * @param arg The function arguments.
+   * @param arg The %function %arguments.
    * @return The method's return value.
    */
   value call(char const *name, arguments const &arg);
@@ -134,25 +134,25 @@ public:
    * Call an object method.
    *
    * @param name The method name.
-   * @param arg The function arguments.
+   * @param arg The %function %arguments.
    * @return The method's return value.
    */
   value call(std::string const &name, arguments const &arg);
 
   /**
-   * Call this object as a function and apply it to @p obj.
+   * Call this object as a %function and apply it to @p obj.
    *
-   * @param obj The object to apply this function to.
-   * @param arg The function arguments.
-   * @return The function's return value.
+   * @param obj The object to apply this %function to.
+   * @param arg The %function %arguments.
+   * @return The %function's return value.
    */
   value call(object obj, arguments const &arg);
 
   /**
    * Call this object as a function on the global object.
    *
-   * @param arg The function arguments.
-   * @return The function's return value.
+   * @param arg The %function %arguments.
+   * @return The %function's return value.
    */
   value call(arguments const &arg = arguments());
 
