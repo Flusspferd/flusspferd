@@ -32,6 +32,7 @@ namespace flusspferd {
  * A class for holding a Javascript Array.
  *
  * @ingroup value_types
+ * @ingroup property_types
  */
 class array : public object {
 public:
