@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "implementation/object.hpp"
+#include "property_attributes.hpp"
 #include "arguments.hpp"
 #include "value.hpp"
 #include "convert.hpp"
@@ -259,32 +260,6 @@ FLUSSPFERD_CALLS(call, object const &)
 
     /// The property is both permanent and shared.
     permanent_shared_property = 12
-  };
-
-  /// A property's attributes: flags, getters and setters.
-  struct property_attributes {
-    /// The property's flags.
-    unsigned flags;
-
-    /// The property's getter.
-    boost::optional<function const &> getter;
-
-    /// The property's setter.
-    boost::optional<function const &> setter;
-
-    /// Construct default attributes.
-    property_attributes();
-
-    /**
-     * Construct property attributes.
-     *
-     * @param flags The flags.
-     * @param getter The getter.
-     * @param setter The setter.
-     */
-    property_attributes(unsigned flags, 
-      boost::optional<function const &> getter = boost::none,
-      boost::optional<function const &> setter = boost::none);
   };
 
   /**
