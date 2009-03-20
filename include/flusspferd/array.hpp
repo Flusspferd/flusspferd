@@ -38,6 +38,8 @@ public:
   std::size_t length() const;
   void set_length(std::size_t);
 
+  std::size_t size() const { return length(); }
+
   value get_element(std::size_t n) const;
   void set_element(std::size_t n, value const &x);
 
