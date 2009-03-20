@@ -119,7 +119,7 @@ object blob::class_info::create_prototype() {
   function values_fn = evaluate(js_val_iter, strlen(js_val_iter)).get_object();
 
   proto.define_property("values", value(),
-      object::property_attributes(dont_enumerate, values_fn));
+      property_attributes(dont_enumerate, values_fn));
 
   static const char* js_pairs_iter =
     "function() {"
@@ -132,7 +132,7 @@ object blob::class_info::create_prototype() {
   function pairs_fn = evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object();
 
   proto.define_property("pairs", value(), 
-      object::property_attributes(dont_enumerate, pairs_fn));
+      property_attributes(dont_enumerate, pairs_fn));
   return proto;
 }
 

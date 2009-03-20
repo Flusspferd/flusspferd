@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
   X(obj.end());
   BOOST_CHECK_EQUAL(obj.is_array(), false);
 
-  flusspferd::object::property_attributes dummy;
+  flusspferd::property_attributes dummy;
   X(obj.get_property_attributes("abc", dummy));
   X(obj.get_property_attributes(std::string("abc"), dummy));
   X(obj.get_property_attributes(flusspferd::string(), dummy));
