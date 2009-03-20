@@ -99,11 +99,11 @@ FILE_PATTERNS          = *.cpp \
                          *.h \
                          *.dox
 RECURSIVE              = YES
-EXCLUDE                = 
+EXCLUDE                = ./help/examples
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = 
 EXCLUDE_SYMBOLS        = 
-EXAMPLE_PATH           = 
+EXAMPLE_PATH           = ./help/examples
 EXAMPLE_PATTERNS       = *
 EXAMPLE_RECURSIVE      = NO
 IMAGE_PATH             = 
