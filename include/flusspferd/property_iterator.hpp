@@ -30,6 +30,11 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * Property iterator.
+ *
+ * @ingroup property_types
+ */
 class property_iterator
   : public boost::iterator_facade<
       property_iterator,

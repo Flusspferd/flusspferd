@@ -27,3 +27,8 @@ THE SOFTWARE.
  * Javascript values.
  */
 
+/**
+ * @defgroup property_types Property types
+ *
+ * Types for dealing with object properties.
+ */
