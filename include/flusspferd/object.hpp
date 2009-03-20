@@ -72,9 +72,16 @@ public:
 
   /**
    * Check if the object is null.
+   *
+   * @return Whether the object is null.
    */
   bool is_null() const;
 
+  /**
+   * Check if the object is an array.
+   *
+   * @return Whether the object is an array.
+   */
   bool is_array() const;
   
   /**
@@ -264,12 +271,34 @@ FLUSSPFERD_CALLS(call, object const &)
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
-
+  /**
+   * Get a property's attributes.
+   *
+   * @param name The property's name.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
   bool get_property_attributes(char const *name, property_attributes &attrs);
+
+  /**
+   * Get a property's attributes.
+   *
+   * @param name The property's name.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
   bool get_property_attributes(std::string name, property_attributes &attrs);
+
+  /**
+   * Get a property's attributes.
+   *
+   * @param id The property's name / ID.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
   bool get_property_attributes(string const &id, property_attributes &attrs);
     
-   /**
+  /**
    * Set a property.
    *
    * @param name The property's name.
