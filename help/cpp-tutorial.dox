@@ -92,6 +92,58 @@ Hello, Flusspferd!
  * Translated to C++:
  *
  * @include simple_objects.cpp
+ *
+ * @section gc Garbage collection
+ *
+ * As you probably know, Javascript and its implementations rely on
+ * <a href="http://en.wikipedia.org/wiki/Garbage_collection_(computer_science)">
+ * garbage collection</a>. You can call the garbage collector explicity,
+ * like this:
+ *
+ * @code
+ * flusspferd::gc();
+ * @endcode
+ *
+ * But Flusspferd or, rather, the underlying Javascript engine, will call the
+ * garbage collector itself from time to time. Therefore, you need to protect
+ * your objects and non-immediate values (@c undefined, @c null, boolean
+ * values and small integer values are immediate) from garbage collection. You
+ * can do so either by making sure they are <b>reachable</b>, for example by
+ * making them a member of another "protected" object, for example the global 
+ * object, or by explicitly protecting them by making them root values. There
+ * is also a third possibility that we won't cover now (see flusspferd::tracer
+ * and flusspferd::native_object_base::trace).
+ *
+ * You can create root values either by creating a flusspferd::local_root_scope
+ * -- while it is in scope, all newly created objects and non-immediate values
+ * will be root values. They will cease to be root values once it is no longer
+ * in scope.
+ *
+ * @code
+flusspferd::object o1 = flusspferd::create_object();
+
+{
+  flusspferd::local_root_scope scope;
+
+  flusspferd::object o2 = flusspferd::create_object();
+
+  flusspferd::gc();
+
+  // o1 is probably deleted now, o2 is still alive.
+}
+
+flusspferd::gc();
+
+// Now, o2 is probably deleted, too.
+@endcode
+ *
+ * Alternatively, you can create root values directly:
+ *
+ * @code
+ * flusspferd::root_value v;
+ * flusspferd::root_string s;
+ * ...
+ * @endcode
  * 
  * @em TODO
  */
