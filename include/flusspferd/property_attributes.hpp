@@ -30,12 +30,31 @@ namespace flusspferd {
 
 class function;
 
+/**
+ * A property's attributes: flags, getters and setters.
+ *
+ * @ingroup property_types
+ */
 struct property_attributes {
+  /// The property's flags.
   unsigned flags;
+
+  /// The property's getter.
   boost::optional<function const &> getter;
+
+  /// The property's setter.
   boost::optional<function const &> setter;
 
+  /// Construct default attributes.
   property_attributes();
+
+  /**
+   * Construct property attributes.
+   *
+   * @param flags The flags.
+   * @param getter The getter.
+   * @param setter The setter.
+   */
   property_attributes(unsigned flags, 
     boost::optional<function const &> getter = boost::none,
     boost::optional<function const &> setter = boost::none);
