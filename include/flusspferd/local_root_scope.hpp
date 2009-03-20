@@ -33,6 +33,8 @@ namespace flusspferd {
  *
  * During the lifetime of local_root_scope, every newly created GC object
  * (string, object, number) will be exempted from garbage collection.
+ *
+ * @ingroup gc
  */
 class local_root_scope {
 public:

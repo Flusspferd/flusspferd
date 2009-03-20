@@ -33,6 +33,11 @@ namespace flusspferd {
 class context;
 class value;
 
+/**
+ * Garbage collection tracer.
+ *
+ * @ingroup gc
+ */
 class tracer {
 public:
   void trace_gcptr(char const *name, void *gcptr);

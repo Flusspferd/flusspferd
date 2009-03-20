@@ -124,6 +124,8 @@ inline object global() {
  * Run the garbage collector on the current context.
  *
  * @see current_context, context::gc
+ *
+ * @ingroup gc
  */
 inline void gc() {
   return current_context().gc();

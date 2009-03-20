@@ -46,6 +46,9 @@ namespace detail {
   object create_native_enumerable_object(object const &proto);
 }
 
+/**
+ * Native object base.
+ */
 class native_object_base : public object, private boost::noncopyable {
 public:
   virtual ~native_object_base() = 0;
@@ -108,6 +111,11 @@ protected:
 protected:
   virtual void call_native_method(std::string const &name, call_context &);
 
+  /**
+   * Trace the object.
+   *
+   * @see @ref gc
+   */
   virtual void trace(tracer &);
 
 protected:

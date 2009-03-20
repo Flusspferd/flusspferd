@@ -41,6 +41,8 @@ namespace detail {
  * Keeps a Javascript value, object or anything in a GC %root scope.
  *
  * @see root_value, root_object, root_string, root_function, root_array
+ *
+ * @ingroup gc
  */
 template<class T>
 class root : public T, private boost::noncopyable {
@@ -67,6 +69,11 @@ private:
 
 }
 
+/**
+ * @addtogroup gc
+ */
+//@{
+
 /// Javascript root scope for a flusspferd::value.
 typedef detail::root<value> root_value;
 
@@ -81,6 +88,8 @@ typedef detail::root<function> root_function;
 
 /// Javascript root scope for a flusspferd::array.
 typedef detail::root<array> root_array;
+
+//@}
 
 }
 

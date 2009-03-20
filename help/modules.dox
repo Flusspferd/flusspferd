@@ -44,3 +44,11 @@ THE SOFTWARE.
  *
  * Functions for creating native functions.
  */
+
+/**
+ * @defgroup gc Garbage collection
+ *
+ * Garbage collection and related things.
+ *
+ * @see context::gc, native_object_base::trace
+ */

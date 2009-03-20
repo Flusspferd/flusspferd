@@ -131,7 +131,11 @@ public:
    */
   value execute(char const *file, object const &scope = object());
 
-  /// Run the garbage collector.
+  /**
+   * Run the garbage collector.
+   *
+   * @see flusspferd::gc
+   */
   void gc();
 
   /**
