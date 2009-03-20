@@ -142,6 +142,7 @@ T &create_native_object(object const &proto, ...);
 //@}
 
 /**
+ * @name Creating functions
  * @addtogroup create_function
  */
 //@{
