@@ -156,6 +156,8 @@ public:
    */
   value call(arguments const &arg = arguments());
 
+#ifndef IN_DOXYGEN
+
 #define FLUSSPFERD_CALL_N(z, n, d) \
   FLUSSPFERD_CALL_N_2( \
     n, \
@@ -192,6 +194,44 @@ FLUSSPFERD_CALLS(apply, object const &)
 FLUSSPFERD_CALLS(call, char const *)
 FLUSSPFERD_CALLS(call, std::string const &)
 FLUSSPFERD_CALLS(call, object const &)
+
+#else // IN_DOXYGEN
+  /**
+   * Apply a %function to this object.
+   *
+   * @param fn The %function to apply to this object.
+   * @param ... The %function %arguments.
+   * @return The function's return value.
+   */
+  value apply(object const &fn, ...);
+
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param ... The %function %arguments.
+   * @return The method's return value.
+   */
+  value call(char const *name, ...);
+
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param ... The %function %arguments.
+   * @return The method's return value.
+   */
+  value call(std::string const &name, ...);
+
+  /**
+   * Call this object as a %function and apply it to @p obj.
+   *
+   * @param obj The object to apply this %function to.
+   * @param ... The %function %arguments.
+   * @return The function's return value.
+   */
+  value call(object const &obj, ...);
+#endif
 
 #ifndef PREPROC_DEBUG
   /// Property flags.
