@@ -51,7 +51,7 @@ blob::blob(object const &obj, call_context &x)
     object data = x.arg[0].get_object();
     if (data.is_array()) {
       array arr = data;
-      std::size_t length = arr.get_length();
+      std::size_t length = arr.length();
       data_.reserve(length);
       for (std::size_t i = 0; i < length; ++i)
         data_.push_back(el_from_value(arr.get_element(i)));

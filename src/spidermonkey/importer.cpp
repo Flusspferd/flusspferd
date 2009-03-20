@@ -164,7 +164,7 @@ value importer::load(string const &f_name, bool binary_only) {
   array paths = paths_v.get_object();
 
   // TODO: We could probably do with an array class.
-  size_t len = paths.get_length();
+  size_t len = paths.length();
   for (size_t i=0; i < len; i++) {
     std::string path = paths.get_element(i).to_string().to_string();
     std::string fullpath = path + js_name;

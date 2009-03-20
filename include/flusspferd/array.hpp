@@ -44,11 +44,13 @@ public:
 
 public:
   /// Get the length of the Array.
-  std::size_t get_length() const;
+  std::size_t length() const;
 
   /// Set the length of the array, resizing it in the process.
   void set_length(std::size_t);
 
+  std::size_t size() const { return length(); }
+  
   /// Get an array element.
   value get_element(std::size_t n) const;
 
