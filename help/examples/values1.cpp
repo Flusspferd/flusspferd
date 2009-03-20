@@ -28,11 +28,11 @@ int main() {
   assert(v3.is_number());
   assert(v3.get_int() == 1);
 
-  // double (1.0)
-  flusspferd::value v4(1.0);
+  // double (1.1)
+  flusspferd::value v4(1.1);
   assert(v4.is_double());
   assert(v4.is_number());
-  assert(v4.get_double() == 1.0);
+  assert(v4.get_double() == 1.1);
 
   // object (null)
   flusspferd::object o1;
