@@ -75,6 +75,8 @@ public:
    */
   bool is_null() const;
 
+  bool is_array() const;
+  
   /**
    * Seal the object.
    *
@@ -262,7 +264,12 @@ FLUSSPFERD_CALLS(call, object const &)
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
-  /**
+
+  bool get_property_attributes(char const *name, property_attributes &attrs);
+  bool get_property_attributes(std::string name, property_attributes &attrs);
+  bool get_property_attributes(string const &id, property_attributes &attrs);
+    
+   /**
    * Set a property.
    *
    * @param name The property's name.
@@ -393,13 +400,6 @@ FLUSSPFERD_CALLS(call, object const &)
    * @return The property_iterator to behind the last property.
    */
   property_iterator end() const;
-
-  bool is_array() const;
-
-  bool get_property_attributes(char const *name, property_attributes &attrs);
-  bool get_property_attributes(std::string name, property_attributes &attrs);
-  bool get_property_attributes(string const &id, property_attributes &attrs);
-
 #endif
 };
 
