@@ -78,6 +78,7 @@ conf.check_cfg(
  * #include <flusspferd/value_io.hpp>
  * #include <flusspferd/evaluate.hpp>
  * #include <iostream>
+ * #include <ostream>
  *
  * int main() {
  *   flusspferd::current_context_scope context_scope(flusspferd::context::create());
