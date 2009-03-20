@@ -34,7 +34,7 @@ THE SOFTWARE.
  */
 
 /**
- * @defgroup create Creating values
+ * @defgroup create Creating values, objects and functions
  *
  * Functions for creating values of different types.
  */
