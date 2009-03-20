@@ -94,7 +94,7 @@ public:
   /// Get the object's parent (__parent__).
   object parent();
   
-  /// Get the object's prototype (__prototype__).
+  /// Get the object's prototype (__proto__).
   object prototype();
 
   /**
@@ -105,7 +105,7 @@ public:
   void set_parent(object const &parent);
 
   /**
-   * Set the object's prototype (__prototype__).
+   * Set the object's prototype (__proto__).
    *
    * @param prototype The object to set the prototype to.
    */
