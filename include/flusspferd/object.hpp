@@ -113,6 +113,13 @@ public:
 #endif
 
   /**
+   * @name Method / function invocation
+   *
+   * Calling methods and functions.
+   */
+//@{
+
+  /**
    * Apply a function to this object.
    *
    * @param fn The function to apply to this object.
@@ -232,8 +239,10 @@ FLUSSPFERD_CALLS(call, object const &)
    */
   value call(object const &obj, ...);
 #endif
+//@}
 
 #ifndef PREPROC_DEBUG
+
   /// Property flags.
   enum property_flag {
     /// The property is not enumerable.
@@ -278,6 +287,12 @@ FLUSSPFERD_CALLS(call, object const &)
       boost::optional<function const &> setter = boost::none);
   };
 
+  /**
+   * @name Properties
+   *
+   * Accessing properties and their attributes.
+   */
+//@{
   /**
    * Define a property.
    *
@@ -469,6 +484,7 @@ FLUSSPFERD_CALLS(call, object const &)
    * @return The property_iterator to behind the last property.
    */
   property_iterator end() const;
+//@}
 #endif
 };
 
