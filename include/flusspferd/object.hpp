@@ -54,6 +54,7 @@ template<typename> class convert;
  * A Javascript object.
  *
  * @ingroup value_types
+ * @ingroup property_types
  */
 class object : public Impl::object_impl {
 public:
@@ -244,7 +245,11 @@ FLUSSPFERD_CALLS(call, object const &)
 
 #ifndef PREPROC_DEBUG
 
-  /// Property flags.
+  /**
+   * Property flags.
+   *
+   * @ingroup property_types
+   */
   enum property_flag {
     /// The property is not enumerable.
     dont_enumerate = 1,
