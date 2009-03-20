@@ -13,3 +13,9 @@ for (let i in x) {
     print(i + ': ' + x[i]);
   }
 }
+
+// Uneval
+print(x.toSource());
+
+// Check if 'toSource' is enumerable
+print(x.propertyIsEnumerable('toSource'));

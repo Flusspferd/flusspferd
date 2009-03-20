@@ -27,5 +27,12 @@ int main() {
       std::cout << *it << ": " << x.get_property(*it) << std::endl;
     }
   }
+
+  // Uneval
+  std::cout << x.call("toSource") << std::endl;
+
+  // Check if 'toSource' is enumerable
+  // (Note that there is another way to do it (flusspferd::property::get_attributes), but we call the method here to show how methods can be called.)
+  std::cout << x.call("propertyIsEnumerable", "toSource") << std::endl;
 }
 
