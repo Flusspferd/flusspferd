@@ -60,6 +60,8 @@ public:
 
   bool is_null() const;
 
+  bool is_array() const;
+
   void seal(bool deep);
 
   object parent();
@@ -146,6 +148,10 @@ FLUSSPFERD_CALLS(call, object const &)
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  bool get_property_attributes(char const *name, property_attributes &attrs);
+  bool get_property_attributes(std::string name, property_attributes &attrs);
+  bool get_property_attributes(string const &id, property_attributes &attrs);
+
   void set_property(char const *name, value const &v);
   void set_property(std::string const &name, value const &v);
   void set_property(value const &id, value const &v);
@@ -168,13 +174,6 @@ FLUSSPFERD_CALLS(call, object const &)
 
   property_iterator begin() const;
   property_iterator end() const;
-
-  bool is_array() const;
-
-  bool get_property_attributes(char const *name, property_attributes &attrs);
-  bool get_property_attributes(std::string name, property_attributes &attrs);
-  bool get_property_attributes(string const &id, property_attributes &attrs);
-
 #endif
 };
 
