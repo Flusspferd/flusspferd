@@ -149,11 +149,15 @@ int main() {
   assert(v4.get_double() == 1.0);
 
   // object (null)
-  flusspferd::object o;
-  assert(o.is_null());
-  flusspferd::value v5(o);
+  flusspferd::object o1;
+  assert(o1.is_null());
+  flusspferd::value v5(o1);
   assert(v5.is_object());
   assert(v5.is_null());
+
+  // another object (the global object)
+  flusspferd::object o2 = flusspferd::global();
+  assert(!o2.is_null());
 
   // string (empty)
   flusspferd::string s; // <- valid (!), empty string
