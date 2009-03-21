@@ -29,10 +29,10 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace xml {
 
-object parse_blob(object &self, blob &b, object options);
-object parse_file(object &self, string filename, object options);
-object html_parse_blob(object &self, blob &b, object options);
-object html_parse_file(object &self, string filename, object options);
+object parse_blob(blob &b, object options);
+object parse_file(string filename, object options);
+object html_parse_blob(blob &b, object options);
+object html_parse_file(string filename, object options);
 
 }}
 

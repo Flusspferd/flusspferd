@@ -91,8 +91,8 @@ object flusspferd::xml::load_xml(object container) {
 
   load_class<push_parser>(XML);
 
-  create_native_function<false>(XML, "parseBlob", &parse_blob);
-  create_native_function<false>(XML, "parse", &parse_file);
+  create_native_function(XML, "parseBlob", &parse_blob);
+  create_native_function(XML, "parse", &parse_file);
 
   object XPath = load_class<xpath_context>(XML);
 
@@ -100,8 +100,8 @@ object flusspferd::xml::load_xml(object container) {
 
   load_class<html_document>(HTML);
   load_class<html_push_parser>(HTML);
-  create_native_function<false>(HTML, "parseBlob", &html_parse_blob);
-  create_native_function<false>(HTML, "parse", &html_parse_file);
+  create_native_function(HTML, "parseBlob", &html_parse_blob);
+  create_native_function(HTML, "parse", &html_parse_file);
 
   html_constants(HTML);
 
