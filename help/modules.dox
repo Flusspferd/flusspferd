@@ -52,3 +52,9 @@ THE SOFTWARE.
  *
  * @see context::gc, native_object_base::trace
  */
+
+/**
+ * @defgroup classes Classes and native objects
+ *
+ * Classes and native objects.
+ */

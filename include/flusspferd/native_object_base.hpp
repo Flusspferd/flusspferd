@@ -48,6 +48,8 @@ namespace detail {
 
 /**
  * Native object base.
+ *
+ * @ingroup classes
  */
 class native_object_base : public object, private boost::noncopyable {
 public:

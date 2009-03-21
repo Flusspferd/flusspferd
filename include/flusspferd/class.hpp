@@ -105,6 +105,8 @@ void load_class(
  * Inheriting from <flusspferd::class_info> gives you default behaviour of 0
  * constructor arity, no augmentation and an empty prototype. You will always
  * have to define the C<constructor_name> yourself.
+ *
+ * @ingroup classes
  */
 struct class_info {
   /**
@@ -236,6 +238,8 @@ object load_class(
  * @param container Object in which to define the constructor.
  *
  * @see flusspferd::class_info
+ *
+ * @ingroup classes
  */
 template<typename T>
 object load_class(object container = global());
