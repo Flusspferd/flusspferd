@@ -209,12 +209,12 @@ BOOST_PP_REPEAT(
  *
  * @p F must inherit from #native_function_base.
  *
- * @param F The function type.
+ * @param F The functor type.
  * @param ... The parameters to pass to the constructor of @p F.
  * @return The new function.
  */
 template<typename F>
-object create_native_function( );
+object create_native_functor_function( );
 
 /**
  * Create a new native function of type @p F as method of an object.
@@ -223,13 +223,13 @@ object create_native_function( );
  *
  * The new method of object @p o will have the name @c ptr->name().
  *
- * @param F The function type.
+ * @param F The functor type.
  * @param o The object to add the method to.
  * @param ... The parameters to pass to the constructor of @p F.
  * @return The new method.
  */
 template<typename F>
-object create_native_function(object const &o, ...);
+object create_native_functor_function(object const &o, ...);
 
 #endif
 
