@@ -60,7 +60,7 @@ struct opt {
 
 }
 
-object flusspferd::xml::parse_blob(object&, blob &b, object options) {
+object flusspferd::xml::parse_blob(blob &b, object options) {
   opt x(options);
 
   xmlDocPtr doc =
@@ -72,7 +72,7 @@ object flusspferd::xml::parse_blob(object&, blob &b, object options) {
   return node::create(xmlNodePtr(doc));
 }
 
-object flusspferd::xml::parse_file(object&, string filename, object options) {
+object flusspferd::xml::parse_file(string filename, object options) {
   opt x(options);
 
   xmlDocPtr doc =
@@ -84,7 +84,7 @@ object flusspferd::xml::parse_file(object&, string filename, object options) {
   return node::create(xmlNodePtr(doc));
 }
 
-object flusspferd::xml::html_parse_blob(object&, blob &b, object options) {
+object flusspferd::xml::html_parse_blob(blob &b, object options) {
   opt x(options);
 
   htmlDocPtr doc =
@@ -96,9 +96,7 @@ object flusspferd::xml::html_parse_blob(object&, blob &b, object options) {
   return node::create(xmlNodePtr(doc));
 }
 
-object flusspferd::xml::html_parse_file(
-    object&, string filename, object options)
-{
+object flusspferd::xml::html_parse_file(string filename, object options) {
   opt x(options);
 
   htmlDocPtr doc =

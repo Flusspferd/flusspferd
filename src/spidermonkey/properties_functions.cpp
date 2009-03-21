@@ -28,7 +28,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 // An implementation like [[DefineOwnProperty]] from ES3.1 spec
-void ecma_define_own_property(object self, object o, string p, object desc);
+void ecma_define_own_property(object o, string p, object desc);
 
 void flusspferd::load_properties_functions(object container) {
   value v = container.get_property("Object");
@@ -37,13 +37,13 @@ void flusspferd::load_properties_functions(object container) {
     throw exception("Unable to get Object constructor");
   object obj_ctor = v.to_object();
 
-  create_native_function<true>(
+  create_native_function(
       obj_ctor,
       "defineProperty",
       ecma_define_own_property);
 }
 
-void ecma_define_own_property(object /*self*/, object o, string p, object desc) {
+void ecma_define_own_property(object o, string p, object desc) {
   local_root_scope scope;
 
   // TODO: Check if obj is sealed

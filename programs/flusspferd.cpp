@@ -103,10 +103,10 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   flusspferd::load_properties_functions();
 
   flusspferd::object g = flusspferd::global();
-  flusspferd::create_native_function<false, void (int)>(
+  flusspferd::create_native_function<void (int)>(
     g, "quit",
     boost::bind(&flusspferd_repl::quit, this, _1));
-  flusspferd::create_native_function<false>(g, "gc", &flusspferd::gc);
+  flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
   flusspferd::gc();
 }
