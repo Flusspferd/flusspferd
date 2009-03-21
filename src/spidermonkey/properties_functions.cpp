@@ -37,7 +37,10 @@ void flusspferd::load_properties_functions(object container) {
     throw exception("Unable to get Object constructor");
   object obj_ctor = v.to_object();
 
-  create_native_function(obj_ctor, "defineProperty", ecma_define_own_property);
+  create_native_function<true>(
+      obj_ctor,
+      "defineProperty",
+      ecma_define_own_property);
 }
 
 void ecma_define_own_property(object /*self*/, object o, string p, object desc) {

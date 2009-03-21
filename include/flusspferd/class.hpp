@@ -180,7 +180,9 @@ object load_class(
 
   if (constructor.is_null()) {
     constructor =
-      create_native_function<detail::class_constructor<T> >(arity, full_name);
+      create_native_functor_function<
+          detail::class_constructor<T> 
+        >(arity, full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }
@@ -213,8 +215,9 @@ object load_class(
   if (constructor.is_null()) {
     char const *full_name = T::class_info::full_name();
     constructor =
-      create_native_function<detail::unconstructible_class_constructor>
-        (full_name);
+      create_native_functor_function<
+          detail::unconstructible_class_constructor
+        >(full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }

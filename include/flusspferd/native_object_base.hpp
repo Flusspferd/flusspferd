@@ -90,10 +90,10 @@ protected:
     register_native_method(name, native_method_type(method));
   }
 
-  template<typename T, typename X>
+  template<typename T, bool Method, typename X>
   void register_native_method_cb(std::string const &name, X const &cb) {
     boost::function<T> fun(cb);
-    function_adapter<T> adapter(fun);
+    function_adapter<T, Method> adapter(fun);
     register_native_method_cb(name, adapter);
   }
 

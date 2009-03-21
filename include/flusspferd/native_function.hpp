@@ -30,8 +30,11 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-template<class T = void>
+template<class T = void, bool Method = false>
 class native_function : public native_function_base {
+private:
+  typedef function_adapter<T, Method> adapter_type;
+
 public:
   typedef boost::function<T> callback_type;
 
@@ -39,7 +42,7 @@ public:
       callback_type const &cb,
       std::string const &name = std::string()
     )
-    : native_function_base(function_adapter<T>::arity, name), adapter(cb)
+    : native_function_base(adapter_type::arity, name), adapter(cb)
   {}
 
 private:
@@ -47,11 +50,11 @@ private:
     adapter(x);
   }
 
-  function_adapter<T> adapter;
+  adapter_type adapter;
 };
 
 template<>
-class native_function<void> : public native_function_base {
+class native_function<void, false> : public native_function_base {
 public:
   typedef boost::function<void (call_context &)> callback_type;
 
