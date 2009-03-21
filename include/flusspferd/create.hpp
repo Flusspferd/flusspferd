@@ -285,6 +285,16 @@ function create_native_function(
   return create_native_functor_function<native_function<T, false> >(fn, name);
 }
 
+/**
+ * Create a new native function.
+ *
+ * The first parameter passed will be 'this'.
+ *
+ * @param T The function signature to use.
+ * @param fn The functor to call.
+ * @param name The function name.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_method(
   boost::function<T> const &fn,
@@ -311,6 +321,17 @@ function create_native_function(
   return create_native_functor_function<native_function<T,false> >(o, fn, name);
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * The first parameter passed will be 'this'.
+ *
+ * @param T The function signature to use.
+ * @param o The object to add the method to.
+ * @param name The function name.
+ * @param fn The functor to call.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_method(
   object const &o,
@@ -336,6 +357,15 @@ function create_native_function(
   return create_native_function<T>(boost::function<T>(fnptr), name);
 }
 
+/**
+ * Create a new native function.
+ *
+ * The first parameter passed will be 'this'.
+ *
+ * @param fnptr The function to call (also determines the function signature).
+ * @param name The function name.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_method(
   T *fnptr,
@@ -363,6 +393,16 @@ function create_native_function(
   return create_native_function<T>(o, name, boost::function<T>(fnptr));
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * The first parameter passed will be 'this'.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param fnptr The function to call (also determines the function signature).
+ * @return The new method.
+ */
 template<typename T>
 function create_native_method(
   object const &o,
