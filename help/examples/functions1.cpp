@@ -35,17 +35,19 @@ int main() {
 
   // Create a method of the global object (= global function) with name "print"
   // that calls print().
-  flusspferd::create_native_function(g, "print", &print);
+  // (The "false" tells Flusspferd that this function does not take a 'this'
+  // parameter.)
+  flusspferd::create_native_function<false>(g, "print", &print);
 
   // Create a global function that calls exp_i().
-  flusspferd::create_native_function(g, "exp", &exp_i);
+  flusspferd::create_native_function<false>(g, "exp", &exp_i);
   
   flusspferd::object p = flusspferd::evaluate("Object.prototype").to_object();
 
   // Create a method of Object.prototype that calls print_object().
   // (Note that every normal object ultimately has as prototype the value of
   // Object.prototype.)
-  flusspferd::create_native_function(p, "print", &print_object);
+  flusspferd::create_native_function<true>(p, "print", &print_object);
 
   // Print e.
   // (Note that 1.2 is rounded down to 1.)
