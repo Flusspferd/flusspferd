@@ -144,6 +144,15 @@ flusspferd::gc();
  * flusspferd::root_string s;
  * ...
  * @endcode
+ *
+ * @section functions Binding C++ functions
+ *
+ * An important use of Flusspferd is binding C++ functions to Javascript, for
+ * obvious reasons. Flusspferd provides convenient methods for doing so.
+ *
+ * @include functions1.cpp
+ *
+ * @see @ref create_function
  * 
  * @em TODO
  */
