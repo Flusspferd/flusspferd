@@ -72,8 +72,8 @@ unsigned char blob::el_from_value(value const &v) {
 }
 
 void blob::class_info::augment_constructor(object &ctor) {
-  create_native_function(ctor, "fromUtf8", &blob::from_utf8);
-  create_native_function(ctor, "fromUtf16", &blob::from_utf16);
+  create_native_function<false>(ctor, "fromUtf8", &blob::from_utf8);
+  create_native_function<false>(ctor, "fromUtf16", &blob::from_utf16);
 }
 
 void blob::init() {

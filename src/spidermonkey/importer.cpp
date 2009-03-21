@@ -69,7 +69,7 @@ void importer::add_preloaded(
   std::string const &name,
   boost::function<object (object const &)> const &fun)
 {
-  add_preloaded(name, create_native_function(fun, name));
+  add_preloaded(name, create_native_function<true>(fun, name));
 }
 
 class importer::impl {
