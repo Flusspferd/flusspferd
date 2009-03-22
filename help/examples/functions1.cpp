@@ -35,8 +35,6 @@ int main() {
 
   // Create a method of the global object (= global function) with name "print"
   // that calls print().
-  // (The "false" tells Flusspferd that this function does not take a 'this'
-  // parameter.)
   flusspferd::create_native_function(g, "print", &print);
 
   // Create a global function that calls exp_i().
