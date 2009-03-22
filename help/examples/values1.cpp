@@ -8,7 +8,8 @@
 #include <cassert>
 
 int main() {
-  flusspferd::current_context_scope context_scope(flusspferd::context::create());
+  flusspferd::current_context_scope context_scope(
+      flusspferd::context::create());
 
   // See below. You can ignore this line for now.
   flusspferd::local_root_scope root_scope;

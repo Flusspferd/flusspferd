@@ -9,7 +9,8 @@
 #include <ostream>
 
 int main() {
-  flusspferd::current_context_scope context_scope(flusspferd::context::create());
+  flusspferd::current_context_scope context_scope(
+      flusspferd::context::create());
 
   // Create a simple object
   flusspferd::root_object x(flusspferd::create_object());
@@ -32,7 +33,8 @@ int main() {
   std::cout << x.call("toSource") << std::endl;
 
   // Check if 'toSource' is enumerable
-  // (Note that there is another way to do it (flusspferd::property::get_attributes), but we call the method here to show how methods can be called.)
+  // (Note that there is another way to do it (see flusspferd::property::get_attributes),
+  // but we call the method here to show how methods can be called.)
   std::cout << x.call("propertyIsEnumerable", "toSource") << std::endl;
 }
 

@@ -29,7 +29,8 @@ double exp_i(int i) {
 }
 
 int main() {
-  flusspferd::current_context_scope context_scope(flusspferd::context::create());
+  flusspferd::current_context_scope context_scope(
+      flusspferd::context::create());
 
   flusspferd::object g = flusspferd::global();
 
