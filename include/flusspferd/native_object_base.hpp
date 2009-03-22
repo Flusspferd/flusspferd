@@ -59,8 +59,6 @@ public:
 public:
   void load_into(object const &);
 
-  virtual void late_load();
-
 protected:
   native_object_base(object const &o);
 
