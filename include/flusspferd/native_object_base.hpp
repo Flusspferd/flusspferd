@@ -53,15 +53,31 @@ namespace detail {
  */
 class native_object_base : public object, private boost::noncopyable {
 public:
+  /// Destructor.
   virtual ~native_object_base() = 0;
 
+  /**
+   * Explicitly return the associated object.
+   * 
+   * @return The associated object.
+   */
   object get_object() {
     return *static_cast<object*>(this);
   }
 
+  /**
+   * Get the native object associated with a Javascript object.
+   *
+   * @return A reference to the object.
+   */
   static native_object_base &get_native(object const &o);
 
 public:
+  /**
+   * Associate with an object if there is no association yet.
+   *
+   * Do not use directly.
+   */
   void load_into(object const &);
 
   virtual void late_load();
