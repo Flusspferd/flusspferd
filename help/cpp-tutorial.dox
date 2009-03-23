@@ -153,6 +153,14 @@ flusspferd::gc();
  * @include functions1.cpp
  *
  * @see @ref create_function
+ *
+ * @section classes Creating a Javascript class
+ *
+ * Other than functions, users of flusspferd will likely want to create classes.
+ *
+ * As a simple example, we have chosen a "set of strings".
+ *
+ * @include "stringset.cpp"
  * 
  * @em TODO
  */
