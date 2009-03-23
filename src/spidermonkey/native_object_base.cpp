@@ -483,4 +483,3 @@ value native_object_base::enumerate_next(boost::any &)
 }
 
 void native_object_base::trace(tracer&) {}
-void native_object_base::late_load() {}
