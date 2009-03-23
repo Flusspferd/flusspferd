@@ -297,10 +297,11 @@ protected:
    *
    * Will be called only if class_info::custom_enumerate is activated.
    *
-   * Default implementation: set num_properties to zero and return boost::any().
+   * Default implementation: return boost::any().
    *
    * @param[out] num_properties The number of properties, if that can be
    *                computed in advance. Otherwise should be set to zero.
+   *                Pre-initialized to zero.
    * @return An opaque iterator for use by #enumerate_next.
    */
   virtual boost::any enumerate_start(int &num_properties);
