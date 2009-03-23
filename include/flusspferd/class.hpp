@@ -96,15 +96,16 @@ void load_class(
  * public:
  *   struct class_info : flusspferd::class_info {
  *     static char const *constructor_name() { return "MyJSClass"; }
+ *     static char const *full_name() { return "MyNamespace.MyJSClass"; }
  *     typedef boost:mpl:size_t<2> constructor_arity;
  *     static object create_prototype() { ... }
  *   };
  * };
  * @endcode
  *
- * Inheriting from <flusspferd::class_info> gives you default behaviour of 0
+ * Inheriting from flusspferd::class_info gives you default behaviour of 0
  * constructor arity, no augmentation and an empty prototype. You will always
- * have to define the C<constructor_name> yourself.
+ * have to define the @c constructor_name and @c full_name yourself.
  *
  * @ingroup classes
  */
