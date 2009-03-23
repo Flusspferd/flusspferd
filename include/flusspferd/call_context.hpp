@@ -32,13 +32,37 @@ namespace flusspferd {
 
 class native_object_base;
 
+/**
+ * Context information about a %function call.
+ */
 struct call_context {
+  /// Default constructor.
   call_context() : self_native(0) {}
 
+  /**
+   * The 'this' object.
+   */
   object self;
+
+  /**
+   * The 'this' object as a pointer to native_object_base. Might be @c NULL
+   * even if @p self is a native object.
+   */
   native_object_base *self_native;
+
+  /**
+   * The %function parameters.
+   */
   arguments arg;
+
+  /**
+   * The %function's result.
+   */
   value result;
+
+  /**
+   * The %function object.
+   */
   object function;
 };
 
