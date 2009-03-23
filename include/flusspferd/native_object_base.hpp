@@ -407,6 +407,7 @@ protected:
   }
 
 private:
+#ifndef IN_DOXYGEN
   static object do_create_object(object const &proto);
   static object do_create_enumerable_object(object const &proto);
 
@@ -418,6 +419,7 @@ private:
   boost::scoped_ptr<impl> p;
 
   friend class impl;
+#endif
 };
 
 template<typename T>
