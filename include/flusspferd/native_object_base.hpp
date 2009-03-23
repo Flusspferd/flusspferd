@@ -396,6 +396,14 @@ protected:
     add_property_op(id, property_callback(cb));
   }
 
+  /**
+   * Combines object::define_property and native_object_base::add_property_op
+   * for convenience.
+   *
+   * @param id The property's name.
+   * @param flags The property's flags.
+   * @param cb The callback.
+   */
   template<typename T>
   void define_native_property(
       std::string const &id,
