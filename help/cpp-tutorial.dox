@@ -225,15 +225,16 @@ flusspferd::gc();
  * @note You can find the source in <code>help/examples/functions1.cpp</code>.
  *
  * As you can see in the above example, you just declare your C++ functions
- * with the type you want, Flusspferd will deal with converting them
- * automaitically from the underlying type for you. The same goes for the
- * return values from your functions. If you've ever dealt with the
- * Spidermonkey API directly you'll know how much of a time saver this
- * behaviour is. (And in case you are wondering, this is achieved through C++
- * templates and boost meta-programming. Scary, scary meta-programming.)
+ * with the type you want, Flusspferd will deal with converting the arguments
+ * and the return value automaitically to and from the underlying types for
+ * you. The same goes for the return values from your functions. If you've ever
+ * dealt with the Spidermonkey API directly you'll know how much of a time
+ * saver this behaviour is. (And in case you are wondering, this is achieved
+ * through C++ templates and boost meta-programming. Scary, scary
+ * meta-programming.)
  *
  * If this type coercion behaviour is counter to what you need for a particular
- * case then you can get the raw arguments that your function was called with
+ * case, then you can get the raw arguments that your function was called with
  * by defining your function as returning <code>void</code> and taking a single
  * flusspferd::call_context argument:
  *
