@@ -36,6 +36,7 @@ class native_function_base;
  * A Javascript function.
  *
  * @ingroup value_types
+ * @ingroup functions
  */
 class function : 
   public Impl::function_impl,

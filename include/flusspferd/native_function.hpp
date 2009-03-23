@@ -30,6 +30,11 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * Native function.
+ *
+ * @ingroup functions
+ */
 template<class T = void, bool Method = false>
 class native_function : public native_function_base {
 private:
@@ -53,6 +58,7 @@ private:
   adapter_type adapter;
 };
 
+#ifndef IN_DOXYGEN
 template<>
 class native_function<void, false> : public native_function_base {
 public:
@@ -73,6 +79,7 @@ private:
 
   callback_type cb;
 };
+#endif
 
 }
 

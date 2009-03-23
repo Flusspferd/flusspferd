@@ -35,6 +35,11 @@ namespace flusspferd {
 
 struct call_context;
 
+/**
+ * Native function base.
+ *
+ * @ingroup functions
+ */
 class native_function_base : public function, private boost::noncopyable {
 public:
   native_function_base(unsigned arity = 0);

@@ -43,6 +43,8 @@ THE SOFTWARE.
  * @defgroup create_function Creating functions
  *
  * Functions for creating native functions.
+ *
+ * @see functions
  */
 
 /**
@@ -57,4 +59,10 @@ THE SOFTWARE.
  * @defgroup classes Classes and native objects
  *
  * Classes and native objects.
+ */
+
+/**
+ * @defgroup functions Functions
+ *
+ * @see create_function
  */

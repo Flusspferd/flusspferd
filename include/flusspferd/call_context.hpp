@@ -34,6 +34,8 @@ class native_object_base;
 
 /**
  * Context information about a %function call.
+ *
+ * @ingroup functions
  */
 struct call_context {
   /// Default constructor.

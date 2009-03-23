@@ -314,6 +314,11 @@ FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_MEMFN_R_VOID)
 
 #endif
 
+/**
+ * Function adapter.
+ *
+ * @ingroup functions
+ */
 template<typename T, bool Method>
 class function_adapter {
 public:
@@ -340,6 +345,11 @@ private:
   function_type function;
 };
 
+/**
+ * Function adapter.
+ *
+ * @ingroup functions
+ */
 template<typename R, typename T>
 class function_adapter_memfn {
 public:
