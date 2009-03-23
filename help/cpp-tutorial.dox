@@ -150,7 +150,7 @@ Hello, Flusspferd!
  *       <code>help/examples/simple_objects.js</code> and
  *       <code>simple_objects.cpp</code>.
  *
- * Next: \ref gc
+ * Next: \ref cpp-tutorial-gc
  */
 
 /**
