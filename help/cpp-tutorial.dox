@@ -50,6 +50,9 @@ conf.check_cfg(
  *
  * @include first_program.cpp
  *
+ * @note You can find the program in
+ *       <code>help/examples/first_program.cpp</code>.
+ *
  * In order to use Flusspferd (even though we actually don't, in that simple
  * example), we need to create a @ref flusspferd::context "context" and make it
  * the <em>current context</em>, which flusspferd::current_context_scope does
@@ -71,6 +74,9 @@ Hello, Flusspferd!
  *
  * At least \em slightly more interesting than "Hello, World!".
  *
+ * @note You can find the program in
+ *       <code>help/examples/second_program.cpp</code>.
+ *
  * @section values_and_objects Values and objects
  *
  * Let's have a bird's eyes' look at the basic value types supported by
@@ -83,6 +89,8 @@ Hello, Flusspferd!
  *       will be destroyed by the garbage collector prematurely. But more about
  *       that in a later section.
  *
+ * @note You can find the program in <code>help/examples/values1.cpp</code>.
+ *
  * @subsection simple_objects Dealing with simple objects
  *
  * Let us translate this simple Javascript code to a C++ equivalent:
@@ -92,6 +100,10 @@ Hello, Flusspferd!
  * Translated to C++:
  *
  * @include simple_objects.cpp
+ *
+ * @note You can find the programs in
+ *       <code>help/examples/simple_objects.js</code> and
+ *       <code>simple_objects.cpp</code>.
  *
  * @section gc Garbage collection
  *
@@ -151,6 +163,8 @@ flusspferd::gc();
  * obvious reasons. Flusspferd provides convenient methods for doing so.
  *
  * @include functions1.cpp
+ *
+ * @note You can find the program in <code>help/examples/functions1.cpp</code>.
  *
  * @see @ref create_function
  *
