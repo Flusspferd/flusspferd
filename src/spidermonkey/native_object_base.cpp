@@ -151,10 +151,6 @@ void native_object_base::load_into(object const &o) {
   }
 }
 
-void native_object_base::invalid_method(call_context &) {
-  throw exception("Invalid method");
-}
-
 native_object_base &native_object_base::get_native(object const &o_) {
   object o = o_;
 
