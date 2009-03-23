@@ -137,7 +137,7 @@ protected:
    * implementation (#call_native_method).
    *
    * @param name The name of the method.
-   * @param method The C++ functor to be called.
+   * @param cb The C++ functor to be called.
    */
   void register_native_method_cb(
       std::string const &name, callback_type const &cb);
@@ -319,20 +319,76 @@ protected:
    */
   virtual value enumerate_next(boost::any &iter);
 
-  enum property_mode { 
+  /**
+   * Possible modes for native_object_base::property_op.
+   */
+  enum property_mode {
+    /**
+     * Used just before a new property is added to an object.
+     */
     property_add = 0,
+
+    /**
+     * Used during most property deletions, even when the object has no property
+     * with the given name / index.
+     *
+     * Will <em>not</em> be used for permanent properties.
+     */
     property_delete = -1,
+
+    /**
+     * Used as the default getter for new properties or for non-existing
+     * properties.
+     */
     property_get = 1,
+
+    /**
+     * Used as the default setter for new properties.
+     */
     property_set = 2
   };
 
+  /**
+   * Virtual method invoked for property addition, deletion, read access and
+   * write access.
+   *
+   * Default implementation:
+   * Try to find a callback added with #add_property_op and call it or do
+   * nothing.
+   *
+   * @param mode The reason for invocation.
+   * @param id The property name / index.
+   * @param[in,out] data The old/new value of the property.
+   *
+   * @see property_mode
+   */
   virtual void property_op(property_mode mode, value const &id, value &data);
 
+  /**
+   * Callback type for property methods.
+   *
+   * @param mode The reason for invocation.
+   * @param[in,out] data The old/new value of the property.
+   */
   typedef void (native_object_base::*property_callback)(
       property_mode mode, value &data);
 
+  /**
+   * Add a property callback to be invoked by the default implementation
+   * of native_object_base::property_op.
+   *
+   * @param id The name of the property.
+   * @param cb The callback.
+   */
   void add_property_op(std::string const &id, property_callback cb);
 
+  /**
+   * Add a property callback to be invoked by the default implementation
+   * of #property_op.
+   *
+   * @param id The name of the property.
+   * @param cb The callback.
+   */
   template<typename T>
   void add_property_op(
       std::string const &id, void (T::*cb)(property_mode, value &))
