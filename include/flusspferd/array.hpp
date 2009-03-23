@@ -31,6 +31,8 @@ namespace flusspferd {
 /**
  * A class for holding a Javascript Array.
  *
+ * @see flusspferd::create_array()
+ *
  * @ingroup value_types
  * @ingroup property_types
  */

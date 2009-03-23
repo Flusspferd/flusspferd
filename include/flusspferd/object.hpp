@@ -53,6 +53,8 @@ template<typename> class convert;
 /**
  * A Javascript object.
  *
+ * @see flusspferd::create_object()
+ *
  * @ingroup value_types
  * @ingroup property_types
  */
@@ -60,7 +62,11 @@ class object : public Impl::object_impl {
 public:
 #ifndef PREPROC_DEBUG
 
-  /// Construct a new <code>null</code> object.
+  /**
+   * Construct a new <code>null</code> object.
+   *
+   * Use flusspferd::create_object() to create a simple object.
+   */
   object();
 
 #ifndef IN_DOXYGEN
