@@ -27,6 +27,7 @@ THE SOFTWARE.
  * It is always difficult to learn how to use a new library. Tutorials are
  * designed to cope with that problem.
  *
- * @li @subpage install
- * @li @subpage cpp-tutorial
+ * - @subpage install
+ *   - @ref ubuntu
+ * - @subpage cpp-tutorial
  */
