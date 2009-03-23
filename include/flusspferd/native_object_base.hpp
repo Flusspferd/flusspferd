@@ -38,6 +38,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+#ifndef IN_DOXYGEN
 struct call_context;
 class tracer;
 
@@ -45,6 +46,7 @@ namespace detail {
   object create_native_object(object const &proto);
   object create_native_enumerable_object(object const &proto);
 }
+#endif
 
 /**
  * Native object base.
@@ -77,26 +79,76 @@ public:
    * Associate with an object if there is no association yet.
    *
    * Do not use directly.
+   *
+   * @param o The object to associate with.
    */
-  void load_into(object const &);
+  void load_into(object const &o);
 
 protected:
+  /**
+   * Constructor.
+   *
+   * Immediately associates with object @p o.
+   *
+   * Do not use with arbitrary objects.
+   *
+   * @param o The object to associate with.
+   */
   native_object_base(object const &o);
 
 protected:
+  /**
+   * Type for simple member function Javascript methods.
+   */
   typedef void (native_object_base::*native_method_type)(call_context &);
+
+  /**
+   * Type for simple boost::function Javascript methods.
+   */
   typedef boost::function<void (call_context &)> callback_type;
 
 protected:
+  /**
+   * Add a native method to this object.
+   *
+   * Note that this adds the method directly to the object and not to its
+   * prototype, which is more usual.
+   *
+   * @param name The name of the method.
+   * @param arity The method's arity.
+   *
+   * @see create_native_method
+   */
   void add_native_method(std::string const &name, unsigned arity = 0);
 
 protected:
+  /**
+   * Register a callback to be called by the default native method call
+   * implementation (#call_native_method).
+   *
+   * @param name The name of the method.
+   * @param method The C++ method to be called.
+   */
   void register_native_method(
       std::string const &name, native_method_type method);
 
+  /**
+   * Register a callback to be called by the default native method call
+   * implementation (#call_native_method).
+   *
+   * @param name The name of the method.
+   * @param method The C++ functor to be called.
+   */
   void register_native_method_cb(
       std::string const &name, callback_type const &cb);
 
+  /**
+   * Register a callback to be called by the default native method call
+   * implementation (#call_native_method).
+   *
+   * @param name The name of the method.
+   * @param method The C++ method to be called.
+   */
   template<typename T>
   void register_native_method(
     std::string const &name, void (T::*method)(call_context&))
@@ -104,6 +156,18 @@ protected:
     register_native_method(name, native_method_type(method));
   }
 
+  /**
+   * Register a callback to be called by the default native method call
+   * implementation (#call_native_method) with arbitrary %function signature.
+   *
+   * The callback @p cb has to be compatible with the signature of @p T.
+   *
+   * @param T The function signature.
+   * @param Method Whether the first parameter should be a reference to
+   *          Javascript 'this'.
+   * @param name The name of the method.
+   * @param cb The C++ functor to be called.
+   */
   template<typename T, bool Method, typename X>
   void register_native_method_cb(std::string const &name, X const &cb) {
     boost::function<T> fun(cb);
@@ -111,6 +175,15 @@ protected:
     register_native_method_cb(name, adapter);
   }
 
+  /**
+   * Register a callback to be called by the default native method call
+   * implementation (#call_native_method) with arbitrary %function signature.
+   *
+   * The signature is determined automatically.
+   *
+   * @param name The name of the method.
+   * @param f The C++ member function to be called.
+   */
   template<typename R, typename T>
   void register_native_method(std::string const &name, R T::*f) {
     function_adapter_memfn<R, T> adapter(f);
@@ -118,34 +191,131 @@ protected:
   }
 
 protected:
+  /**
+   * Create a native method for use on prototypes.
+   *
+   * @param name The name of the method.
+   * @param arity The arity of the method.
+   */
   static function create_native_method(
     std::string const &name, unsigned arity);
 
+  /**
+   * Create a native method for use on prototypes.
+   *
+   * The generated method will be added to @p container.
+   *
+   * @param container The object (typically a prototype) to add the method to.
+   * @param name The name of the method.
+   * @param arity The arity of the method.
+   */
   static function create_native_method(
     object &container, std::string const &name, unsigned arity);
 
 protected:
-  virtual void call_native_method(std::string const &name, call_context &);
+  /**
+   * Virtual method invoked for each native method call.
+   *
+   * Default implementation:
+   * @li Try to find a method registered with one of the register_native_method
+   *   overloads.
+   * @li If found, call it.
+   * @li Otherwise, throw an exception.
+   *
+   * @param name The name of the method that has been invoked.
+   * @param x The call_context with the method call information.
+   * 
+   * @see add_native_method, create_native_method
+   */
+  virtual void call_native_method(std::string const &name, call_context &x);
 
   /**
-   * Trace the object.
+   * Virtual method invoked whenever the object has to be traced.
+   *
+   * Default implementation: stub.
+   *
+   * For each value that is an otherwise unreachable member of the object and
+   * that should be protected from garbage collection, call @c trc(x).
+   *
+   * @param trc The tracer to be used.
    *
    * @see @ref gc
    */
-  virtual void trace(tracer &);
+  virtual void trace(tracer &trc);
 
 protected:
+  /**
+   * Possible property access methods. Can be combined by bitwise or.
+   */
   enum property_access {
+    /**
+     * The property access uses the @c . or @c [] operator:
+     * @c obj.id or @c obj[id], not @c id.
+     */
     property_qualified = 1,
+
+    /**
+     * The property appears on the left-hand side of an assignment.
+     */
     property_assigning = 2,
+
+    /**
+     * The property is being used in code like "<code>if (o.p) ...</code>",
+     * or a similar idiom where the apparent purpose of the property access is
+     * to detect whether the property exists.
+     */
     property_detecting = 4,
+
+    /**
+     * The property is being declared in a var, const, or function declaration. 
+     */
     property_declaring = 8,
+
+    /**
+     * class name used when constructing. (???)
+     */
     property_classname = 16
   };
 
+  /**
+   * Virtual method invoked when a property is <em>not</em> found on an object.
+   *
+   * Default implementation: stub that returns @c false.
+   *
+   * It can be used to implement lazy properties.
+   *
+   * If possible, @p id will be an integer, or a string otherwise.
+   *
+   * @param id The property name / index.
+   * @param access Information about the kind of property access. A combination
+   *           of #property_access values.
+   */
   virtual bool property_resolve(value const &id, unsigned access);
 
+  /**
+   * Virtual method invoked to start enumerating properties.
+   *
+   * Will be called only if class_info::custom_enumerate is activated.
+   *
+   * Default implementation: set num_properties to zero and return boost::any().
+   *
+   * @param[out] num_properties The number of properties, if that can be
+   *                computed in advance. Otherwise should be set to zero.
+   * @return An opaque iterator for use by #enumerate_next.
+   */
   virtual boost::any enumerate_start(int &num_properties);
+
+  /**
+   * Virtual method invoked to advance the enumeration and pull out the next
+   * property name / index.
+   *
+   * Default implementation: return @c value().
+   *
+   * Should return @c value() (@c undefined) to stop the enumeration.
+   *
+   * @param[in,out] iter The opaque iterator.
+   * @return The next property name / index.
+   */
   virtual value enumerate_next(boost::any &iter);
 
   enum property_mode { 
