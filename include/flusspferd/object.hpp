@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "implementation/object.hpp"
+#include "property_attributes.hpp"
 #include "arguments.hpp"
 #include "value.hpp"
 #include "convert.hpp"
@@ -59,6 +60,8 @@ public:
   ~object();
 
   bool is_null() const;
+
+  bool is_array() const;
 
   void seal(bool deep);
 
@@ -123,17 +126,6 @@ FLUSSPFERD_CALLS(call, object const &)
     permanent_shared_property = 12
   };
 
-  struct property_attributes {
-    unsigned flags;
-    boost::optional<function const &> getter;
-    boost::optional<function const &> setter;
-
-    property_attributes();
-    property_attributes(unsigned flags, 
-      boost::optional<function const &> getter = boost::none,
-      boost::optional<function const &> setter = boost::none);
-  };
-
   void define_property(string const &name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
@@ -145,6 +137,10 @@ FLUSSPFERD_CALLS(call, object const &)
   void define_property(char const *name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
+
+  bool get_property_attributes(char const *name, property_attributes &attrs);
+  bool get_property_attributes(std::string name, property_attributes &attrs);
+  bool get_property_attributes(string const &id, property_attributes &attrs);
 
   void set_property(char const *name, value const &v);
   void set_property(std::string const &name, value const &v);
@@ -168,13 +164,6 @@ FLUSSPFERD_CALLS(call, object const &)
 
   property_iterator begin() const;
   property_iterator end() const;
-
-  bool is_array() const;
-
-  bool get_property_attributes(char const *name, property_attributes &attrs);
-  bool get_property_attributes(std::string name, property_attributes &attrs);
-  bool get_property_attributes(string const &id, property_attributes &attrs);
-
 #endif
 };
 

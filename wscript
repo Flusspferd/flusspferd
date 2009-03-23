@@ -159,7 +159,12 @@ def configure(conf):
                    fragment='''
 #include <js/jsapi.h>
 int main() {
+#if JS_VERSION >= 180
+  // JS 1.8 allows this to be set at runtime
+  return 0;
+# else
   return JS_CStringsAreUTF8() ? 0 : 1;
+#endif
 }
 ''')
 
@@ -180,7 +185,7 @@ int main() {
 #include <sqlite3.h>
 #include <stdio.h>
 int main() {
-   if(SQLITE_VERSION_NUMBER <= 3004000) {
+   if(SQLITE_VERSION_NUMBER < 3004000) {
      fprintf(stderr, "Need sqlite3 version 3.4.0 or better. Found %s\\n",
              SQLITE_VERSION);
      return 1;
@@ -247,31 +252,42 @@ int main() {
                         uselib_store='CURL') != None):
         conf.env['ENABLE_CURL'] = True
 
+    conf.env['ENABLE_SQLITE'] = Options.options.enable_sqlite
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
     conf.env['ENABLE_XML'] = Options.options.enable_xml
     conf.env['ENABLE_IO'] = Options.options.enable_io
 
-def get_defines(bld, envvars):
+def get_cflags(bld, envvars):
     result = ''
     def_pattern = bld.env['CXXDEFINES_ST']
+    inc_pattern = bld.env['CPPPATH_ST']
     for envvar in envvars:
         defines = bld.env['CXXDEFINES_' + envvar]
         if defines:
+            if isinstance(defines, basestring):
+                defines = [defines]
             for i in defines:
                 result += def_pattern % i + ' '
+        includes = bld.env['CPPPATH_' + envvar]
+        if includes:
+            if isinstance(includes, basestring):
+                includes = [includes]
+            for i in includes:
+                result += inc_pattern % i + ' '
     return result
 
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
     obj.source = 'flusspferd.pc.in'
     obj.target = 'flusspferd.pc'
+    cflags = get_cflags(bld, ['JS_H', 'BOOST'])
     obj.dict = {
         'PREFIX': bld.env['PREFIX'],
         'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
         'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
         'VERSION': VERSION,
-        'CFLAGS': get_defines(bld, ['JS_H'])
+        'CFLAGS': cflags
         }
     obj.install_path = os.path.normpath(bld.env['PREFIX'] + '/lib/pkgconfig/')
     obj.apply()
@@ -279,7 +295,8 @@ def build_pkgconfig(bld):
 def build(bld):
     bld.add_subdirs('src')
     bld.add_subdirs('programs')
-    bld.add_subdirs('plugins/sqlite3')
+    if bld.env['ENABLE_SQLITE']:
+        bld.add_subdirs('plugins/sqlite3')
     bld.add_subdirs('plugins/environment')
     bld.add_subdirs('plugins/posix')
     if bld.env['ENABLE_CURL']:

@@ -6,7 +6,7 @@ inherit git
 
 DESCRIPTION="Flusspferd (German for Hippopotamus) is a C++ library providing
 Javascript bindings."
-HOMEPAGE="https://launchpad.net/flusspferd"
+HOMEPAGE="http://flusspferd.org/"
 
 EGIT_REPO_URI="git://github.com/ruediger/flusspferd.git"
 

@@ -59,8 +59,6 @@ public:
 public:
   void load_into(object const &);
 
-  virtual void late_load();
-
 protected:
   native_object_base(object const &o);
 
@@ -85,10 +83,10 @@ protected:
     register_native_method(name, native_method_type(method));
   }
 
-  template<typename T, typename X>
+  template<typename T, bool Method, typename X>
   void register_native_method_cb(std::string const &name, X const &cb) {
     boost::function<T> fun(cb);
-    function_adapter<T> adapter(fun);
+    function_adapter<T, Method> adapter(fun);
     register_native_method_cb(name, adapter);
   }
 
@@ -154,9 +152,6 @@ protected:
     add_property_op(id, cb);
     define_property(id, value(), flags);
   }
-
-private:
-  void invalid_method(call_context &);
 
 private:
   static object do_create_object(object const &proto);

@@ -50,6 +50,8 @@ public:
 
   std::size_t length() const;
 
+  std::size_t size() const { return length(); }
+
   bool empty() const {
     return !length();
   }

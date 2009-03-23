@@ -109,7 +109,7 @@ function create_native_function(object const &o, native_function_base *ptr);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  object create_native_function( \
+  object create_native_functor_function( \
     BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
     BOOST_PP_COMMA_IF(n_args) \
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
@@ -121,7 +121,7 @@ function create_native_function(object const &o, native_function_base *ptr);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  object create_native_function( \
+  object create_native_functor_function( \
     object const &o \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
@@ -141,7 +141,8 @@ inline function create_native_function(
   unsigned arity = 0,
   std::string const &name = std::string())
 {
-  return create_native_function<native_function<void> >(fn, arity, name);
+  return create_native_functor_function<native_function<void> >(
+      fn, arity, name);
 }
 
 inline function create_native_function(
@@ -150,7 +151,8 @@ inline function create_native_function(
   boost::function<void (call_context &)> const &fn,
   unsigned arity = 0)
 {
-  return create_native_function<native_function<void> >(o, fn, arity, name);
+  return create_native_functor_function<native_function<void> >(
+      o, fn, arity, name);
 }
 
 template<typename T>
@@ -158,7 +160,15 @@ function create_native_function(
   boost::function<T> const &fn,
   std::string const &name = std::string())
 {
-  return create_native_function<native_function<T> >(fn, name);
+  return create_native_functor_function<native_function<T, false> >(fn, name);
+}
+
+template<typename T>
+function create_native_method(
+  boost::function<T> const &fn,
+  std::string const &name = std::string())
+{
+  return create_native_functor_function<native_function<T, true> >(fn, name);
 }
 
 template<typename T>
@@ -167,7 +177,16 @@ function create_native_function(
   std::string const &name,
   boost::function<T> const &fn)
 {
-  return create_native_function<native_function<T> >(o, fn, name);
+  return create_native_functor_function<native_function<T,false> >(o, fn, name);
+}
+
+template<typename T>
+function create_native_method(
+  object const &o,
+  std::string const &name,
+  boost::function<T> const &fn)
+{
+  return create_native_functor_function<native_function<T,true> >(o, fn, name);
 }
 
 template<typename T>
@@ -180,6 +199,15 @@ function create_native_function(
 }
 
 template<typename T>
+function create_native_method(
+  T *fnptr,
+  std::string const &name = std::string(),
+  typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
+{
+  return create_native_method<T>(boost::function<T>(fnptr), name);
+}
+
+template<typename T>
 function create_native_function(
   object const &o,
   std::string const &name,
@@ -187,6 +215,16 @@ function create_native_function(
   typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
 {
   return create_native_function<T>(o, name, boost::function<T>(fnptr));
+}
+
+template<typename T>
+function create_native_method(
+  object const &o,
+  std::string const &name,
+  T *fnptr,
+  typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
+{
+  return create_native_method<T>(o, name, boost::function<T>(fnptr));
 }
 
 }

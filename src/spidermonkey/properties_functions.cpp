@@ -28,7 +28,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 // An implementation like [[DefineOwnProperty]] from ES3.1 spec
-void ecma_define_own_property(object self, object o, string p, object desc);
+void ecma_define_own_property(object o, string p, object desc);
 
 void flusspferd::load_properties_functions(object container) {
   value v = container.get_property("Object");
@@ -37,15 +37,18 @@ void flusspferd::load_properties_functions(object container) {
     throw exception("Unable to get Object constructor");
   object obj_ctor = v.to_object();
 
-  create_native_function(obj_ctor, "defineProperty", ecma_define_own_property);
+  create_native_function(
+      obj_ctor,
+      "defineProperty",
+      ecma_define_own_property);
 }
 
-void ecma_define_own_property(object /*self*/, object o, string p, object desc) {
+void ecma_define_own_property(object o, string p, object desc) {
   local_root_scope scope;
 
   // TODO: Check if obj is sealed
 
-  object::property_attributes attrs;
+  property_attributes attrs;
   bool current = o.has_own_property(p) && o.get_property_attributes(p, attrs);
 
   bool is_accessor = false, is_data = false,
@@ -131,13 +134,14 @@ void ecma_define_own_property(object /*self*/, object o, string p, object desc) 
 
   // Wasn't that easy
   if (is_accessor) {
-    o.define_property(p, value(), object::property_attributes(flags, getter_fn, setter_fn));
+    o.define_property(p, value(), 
+        property_attributes(flags, getter_fn, setter_fn));
   } else {
     value val = desc.has_property("value") 
               ? desc.get_property("value") 
               : current
               ? o.get_property(p) 
               : value();
-    o.define_property(p, val, object::property_attributes(flags));
+    o.define_property(p, val, property_attributes(flags));
   }
 }

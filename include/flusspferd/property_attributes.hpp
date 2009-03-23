@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PARSE_HPP
-#define FLUSSPFERD_XML_PARSE_HPP
+#ifndef FLUSSPFERD_PROPERTY_ATTRIBUTES
+#define FLUSSPFERD_PROPERTY_ATTRIBUTES
 
-#include "../object.hpp"
-#include "../blob.hpp"
+#include <boost/optional.hpp>
 
-namespace flusspferd { namespace xml {
+namespace flusspferd {
 
-object parse_blob(blob &b, object options);
-object parse_file(string filename, object options);
-object html_parse_blob(blob &b, object options);
-object html_parse_file(string filename, object options);
+class function;
 
-}}
+struct property_attributes {
+  unsigned flags;
+  boost::optional<function const &> getter;
+  boost::optional<function const &> setter;
+
+  property_attributes();
+  property_attributes(unsigned flags, 
+    boost::optional<function const &> getter = boost::none,
+    boost::optional<function const &> setter = boost::none);
+};
+
+}
 
 #endif

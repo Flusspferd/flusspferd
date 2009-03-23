@@ -413,20 +413,3 @@ bool object::get_property_attributes(
   }
   return true;
 }
-
-
-object::property_attributes::property_attributes()
-  : flags(0u),
-    getter(boost::none),
-    setter(boost::none)
-{}
-
-object::property_attributes::property_attributes(
-  unsigned flags, 
-  boost::optional<function const &> getter,
-  boost::optional<function const &> setter
-)
-  : flags(flags),
-    getter(getter),
-    setter(setter)
-{}
