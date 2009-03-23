@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld, Ash Berlin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,39 @@ THE SOFTWARE.
 /**
  * @page cpp-tutorial Using Flusspferd from C++
  *
- * @section configuring Configuring Flusspferd in your project
+ * @section Contents
+ *
+ * - \subpage cpp-tutorial-firstprogram
+ * - \subpage cpp-tutorial-secondprogram
+ * - \subpage cpp-tutorial-values_and_objects
+ * - \subpage cpp-tutorial-gc
+ * - \subpage cpp-tutorial-functions
+ * - \subpage cpp-tutorial-classes
+ *
+ */
+
+/**
+ * @page cpp-tutorial-firstprogram Your first Flusspferd program
+ *
+ * Previous: \ref cpp-tutorial
+ *
+ * Let's begin with a very simple program that does, well, nothing.
+ *
+ * @include first_program.cpp
+ *
+ * @note You can find the source file listed above in
+ *       <code>help/examples/first_program.cpp</code>.
+ *
+ * In order to use Flusspferd (even though we actually don't, in that simple
+ * example), we need to create a @ref flusspferd::context "context" and make it
+ * the <em>current context</em>, which flusspferd::current_context_scope does
+ * as long it is in scope. You can use flusspferd::current_context_scope in
+ * multiple nested scopes.
+ *
+ * @section compiling Compiling Flusspferd in your project
+ *
+ * Now that you've got a (very) simple project that uses Flusspferd, its time
+ * to compile it.
  *
  * We assume that you have already @ref install "installed" Flusspferd. To use 
  * it in your project, you can use pkg-config, like this:
@@ -44,44 +76,57 @@ conf.check_cfg(
                mandatory=1)
 @endverbatim
  *
- * @section firstprogram Your first Flusspferd program
+ * Lets go with the simple method of shelling out to <code>pkg-config</code> for now.
+ * We don't recomend that you use this method for any serious development, but
+ * it has the advtange of being easy
+ * and quick.
  *
- * Let's begin with a very simple program that does, well, nothing.
+ * @verbatim
+$ g++  $(pkg-config --cflags --libs flusspferd) -o first_program first_program.cpp >/dev/null
+$ ./first_programm
+$ 
+@endverbatim
  *
- * @include first_program.cpp
+ * If you see no output and just get a shell back, then everything worked. If
+ * either of the above commands produce any output, then something went wrong
+ * in the install proccess and most likely a required file couldn't be found. 
  *
- * @note You can find the program in
- *       <code>help/examples/first_program.cpp</code>.
+ * Onto \ref cpp-tutorial-secondprogram "your second Flusspferd program".
+ */
+
+/**
+ * @page cpp-tutorial-secondprogram Your second Flusspferd program: Hello, World respectively Flusspferd.
  *
- * In order to use Flusspferd (even though we actually don't, in that simple
- * example), we need to create a @ref flusspferd::context "context" and make it
- * the <em>current context</em>, which flusspferd::current_context_scope does
- * as long it is in scope. You can use flusspferd::current_context_scope in
- * multiple nested scopes.
- *
- * @section secondprogram Your second Flusspferd program: Hello, World respectively Flusspferd.
+ * Previous: \ref cpp-tutorial-firstprogram
  *
  * Which tutorial is complete without a "Hello, World!" example? But this one
  * comes with a twist.
  *
+ * @note You can find the source in
+ *       <code>help/examples/second_program.cpp</code>.
+ *
  * @include second_program.cpp
  * 
- * And this should be the output:
+ * And the output when you run this program (once you've
+ * <a class="el" href="firstprogram.html#compiling">compiled</a> it like before, of course) should be:
  *
  * @verbatim
 Hello, Flusspferd!
 @endverbatim
  *
- * At least \em slightly more interesting than "Hello, World!".
+ * At least it's \em slightly more interesting than "Hello, World!".
  *
- * @note You can find the program in
- *       <code>help/examples/second_program.cpp</code>.
+ * Next: \ref cpp-tutorial-values_and_objects
+ */
+
+/**
+ * @page cpp-tutorial-values_and_objects Values and objects
  *
- * @section values_and_objects Values and objects
+ * Previous: \ref cpp-tutorial-secondprogram
  *
- * Let's have a bird's eyes' look at the basic value types supported by
- * flusspferd. We shall just create a few values of different types to
- * get the hang of it. Also we will assert some basic facts about the values.
+ * Let's have a bird's-eye-view look at the basic value types supported by
+ * Flusspferd. We shall create a few values of different types to get the hang
+ * of it and we will also assert some basic facts about the values.
  *
  * @include values1.cpp
  *
@@ -89,7 +134,7 @@ Hello, Flusspferd!
  *       will be destroyed by the garbage collector prematurely. But more about
  *       that in a later section.
  *
- * @note You can find the program in <code>help/examples/values1.cpp</code>.
+ * @note You can find the source in <code>help/examples/values1.cpp</code>.
  *
  * @subsection simple_objects Dealing with simple objects
  *
@@ -105,7 +150,13 @@ Hello, Flusspferd!
  *       <code>help/examples/simple_objects.js</code> and
  *       <code>simple_objects.cpp</code>.
  *
- * @section gc Garbage collection
+ * Next: \ref gc
+ */
+
+/**
+ * @page cpp-tutorial-gc Garbage collection
+ *
+ * Previous: \ref cpp-tutorial-values_and_objects
  *
  * As you probably know, Javascript and its implementations rely on
  * <a href="http://en.wikipedia.org/wiki/Garbage_collection_(computer_science)">
@@ -121,15 +172,15 @@ Hello, Flusspferd!
  * your objects and non-immediate values (@c undefined, @c null, boolean
  * values and small integer values are immediate) from garbage collection. You
  * can do so either by making sure they are <b>reachable</b>, for example by
- * making them a member of another "protected" object, for example the global 
+ * making them a member of another "rooted" object, for example the global 
  * object, or by explicitly protecting them by making them root values. There
- * is also a third possibility that we won't cover now (see flusspferd::tracer
- * and flusspferd::native_object_base::trace).
+ * is also a third more advanced possibility that we won't cover now (see
+ * flusspferd::tracer and flusspferd::native_object_base::trace).
  *
- * You can create root values either by creating a flusspferd::local_root_scope
- * -- while it is in scope, all newly created objects and non-immediate values
- * will be root values. They will cease to be root values once it is no longer
- * in scope.
+ * The simplest way to create rooted values is by creating a
+ * flusspferd::local_root_scope. While it is in scope, all newly created
+ * objects and non-immediate values will be root values. They will cease to be
+ * root values once the local_root_scope is no longer in scope.
  *
  * @code
 flusspferd::object o1 = flusspferd::create_object();
@@ -157,18 +208,57 @@ flusspferd::gc();
  * ...
  * @endcode
  *
- * @section functions Binding C++ functions
+ * Next: \ref cpp-tutorial-functions
+ */
+
+/**
+ * @page cpp-tutorial-functions Binding C++ functions
  *
- * An important use of Flusspferd is binding C++ functions to Javascript, for
- * obvious reasons. Flusspferd provides convenient methods for doing so.
+ * Previous: \ref cpp-tutorial-gc
+ *
+ * An important use of Flusspferd is binding C++ functions so that they are
+ * accessible from Javascript, for obvious reasons. Flusspferd provides
+ * convenient methods for doing so.
  *
  * @include functions1.cpp
  *
- * @note You can find the program in <code>help/examples/functions1.cpp</code>.
+ * @note You can find the source in <code>help/examples/functions1.cpp</code>.
+ *
+ * As you can see in the above example, you just declare your C++ functions
+ * with the type you want, Flusspferd will deal with converting them
+ * automaitically from the underlying type for you. The same goes for the
+ * return values from your functions. If you've ever dealt with the
+ * Spidermonkey API directly you'll know how much of a time saver this
+ * behaviour is. (And in case you are wondering, this is achieved through C++
+ * templates and boost meta-programming. Scary, scary meta-programming.)
+ *
+ * If this type coercion behaviour is counter to what you need for a particular
+ * case then you can get the raw arguments that your function was called with
+ * by defining your function as returning <code>void</code> and taking a single
+ * flusspferd::call_context argument:
+ *
+ * @code
+void my_function(call_context &x) {
+  // Result of the function is the number of arguments that it was called with
+  x.result = x.args.size();
+
+  if (x.args.size() > 1) {
+    // Print the first argument (if there is one) to stdout
+    cout << x.arg[0] << endl;
+  }
+}
+@endcode
  *
  * @see @ref create_function
  *
- * @section classes Creating a Javascript class
+ * Next: \ref cpp-tutorial-classes
+ *
+ */
+
+/**
+ * @page cpp-tutorial-classes Creating a Javascript class
+ *
+ * Previous: \ref cpp-tutorial-classes
  *
  * Other than functions, users of flusspferd will likely want to create classes.
  *
