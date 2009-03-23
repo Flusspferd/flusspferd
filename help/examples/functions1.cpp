@@ -45,8 +45,8 @@ int main() {
 
   // Create a method of Object.prototype that calls print_object().
   // (Note that every normal object ultimately has as prototype the value of
-  // Object.prototype so doing this in practice (without making it dont_enum)
-  // is a really bad plan.)
+  // Object.prototype. However create_native_method and create_native_function
+  // create the properties with dont_enum, so doing this is safe.)
   flusspferd::create_native_method(p, "print", &print_object);
 
   // Print e.
