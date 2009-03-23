@@ -21,12 +21,12 @@ public:
     static char const *full_name() { return "StringSet"; }
 
     static object create_prototype() {
-      flusspferd::object o = flusspferd::create_object();
-      create_native_method(o, "dump", 0);
-      create_native_method(o, "add", 1);
-      create_native_method(o, "delete", 1);
-      create_native_method(o, "toArray", 0);
-      return o;
+      flusspferd::object proto = flusspferd::create_object();
+      create_native_method(proto, "dump", 0);
+      create_native_method(proto, "add", 1);
+      create_native_method(proto, "delete", 1);
+      create_native_method(proto, "toArray", 0);
+      return proto;
     }
   };
 
