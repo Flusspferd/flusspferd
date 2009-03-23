@@ -350,9 +350,6 @@ protected:
   }
 
 private:
-  void invalid_method(call_context &);
-
-private:
   static object do_create_object(object const &proto);
   static object do_create_enumerable_object(object const &proto);
 
