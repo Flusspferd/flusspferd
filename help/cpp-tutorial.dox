@@ -174,7 +174,126 @@ flusspferd::gc();
  *
  * As a simple example, we have chosen a "set of strings".
  *
+ * A brief look at the whole program and then we shall look at it piece by
+ * piece.
+ *
  * @include "stringset.cpp"
+ *
+ * Let's begin the walk through. First, as always, the required headers.
+ *
+ * @dontinclude "stringset.cpp"
+ *
+ * @until <set>
+ *
+ * Our "set of strings" class needs to inherit from
+ * flusspferd::native_object_base to be used from Javascript.
+ *
+ * @skip StringSet
+ * @until public:
+ *
+ * Inside this class, we have to tell Flusspferd the name of the class'
+ * constructor and the full identifying name of the class.
+ *
+ * @skip class_info
+ * @until full_name
+ *
+ * As we intend to add our class methods to the prototype, we have to write
+ * a function for creating the prototype.
+ *
+ * @skip create_prototype
+ * @until create_object
+ *
+ * With @ref flusspferd::native_object_base::create_native_method(object &, std::string const &, unsigned) "native_object_base::create_native_method",
+ * we can add the methods to our prototype and return it.
+ *
+ * @skip create_native_method
+ * @until }
+ *
+ * Flusspferd also needs to know which C++ methods to call for each Javascript
+ * method. We can use
+ * @ref flusspferd::native_object_base::register_native_method "register_native_method"
+ * for this purpose.
+ *
+ * @skip init
+ * @until }
+ *
+ * Below is the constructor that will be called from Javascript. Note that
+ * the first parameter has to be passed to flusspferd::native_object_base.
+ *
+ * @skip StringSet
+ * @until {
+ *
+ * Now, we call @c init() to bind the C++ methods.
+ *
+ * @skipline init
+ *
+ * Let us notify the user that the constructor has been called successfully.
+ *
+ * @skipline cout
+ *
+ * Now, we add the constructor parameters to the @c StringSet. To do so we
+ * convert the flusspferd::value parameters to std::string (via
+ * flusspferd::string).
+ *
+ * @skip for
+ * @until }
+ *
+ * That's the whole constructor.
+ *
+ * @skipline }
+ *
+ * The first three methods should be pretty straight-forward:
+ *
+ * @skip private
+ * @until delete_
+ * @until }
+ *
+ * The method @c to_array (or rather, @c toArray, as seen from Javascript)
+ * creates an array and calls @c Array.prototype.push to add each element
+ * from the @c StringSet.
+ *
+ * @skip to_array
+ * @until return
+ * @until }
+ *
+ * The finish the implementation of @c StringSet, we need a @c std::set to
+ * store the elements in.
+ *
+ * @skip private
+ * @until };
+ *
+ * The print function simply prints its parameter.
+ *
+ * @skip print
+ * @until }
+ *
+ * In @c main, we first create a flusspferd::context and then load the @c print
+ * function.
+ *
+ * @skip main
+ * @until print
+ *
+ * Now (<i>*drumrolls*</i>), we load the class @c StringSet into Flusspferd.
+ *
+ * @skipline load_class
+ *
+ * And finally, we'll use @c StringSet from Javascript.
+ *
+ * @skip evaluate
+ * @until }
+ *
+ * That's it.
+ *
+ * @note You can find the program in <code>help/examples/stringset.cpp</code>.
+ *
+ * The output should be:
+ *
+ * @verbatim
+Creating StringSet
+Dumping StringSet: a,b,c,d
+As Array: ["c", "d"]
+Destroying StringSet
+@endverbatim
  * 
  * @em TODO
  */
