@@ -32,6 +32,7 @@ THE SOFTWARE.
  * - \subpage cpp-tutorial-gc
  * - \subpage cpp-tutorial-functions
  * - \subpage cpp-tutorial-classes
+ * - \subpage cpp-tutorial-modules
  *
  */
 
@@ -385,5 +386,52 @@ As Array: ["c", "d"]
 Destroying StringSet
 @endverbatim
  * 
- * @em TODO
+ * Next: \ref cpp-tutorial-modules
+ */
+
+/**
+ * @page cpp-tutorial-modules Using and writing loadable modules
+ *
+ * Previous: \ref cpp-tutorial-classes
+ *
+ * Loading a module is easy:
+ *
+ * @verbatim
+posix = $importer.load('posix');
+posix.sleep(5);
+@endverbatim
+ *
+ * To load modules in directories that aren't searched by default, you
+ * can do the following:
+ *
+ * @verbatim
+$importer.paths.push('/my/directory');
+$importer.load('other');
+@endverbatim
+ *
+ * And you can also write your own modules. Either by simply putting a file
+ * named @c <module-name>.js in a directory in <code>$importer.paths</code> -
+ * or, more relevant to this tutorial, by compiling a shared object or dynamic
+ * library (the name pattern is lib<module-name>.so or lib<module-name>.dylib
+ * there).
+ *
+ * @include "dummy_module.cpp"
+ *
+ * @note You can find this module in
+ *       <code>help/examples/dummy_module.cpp</code>.
+ *
+ * If you compile this module as a shared library with the name
+ * libdummy_module.so or libmodule_dummy.dylib, you should be able to load it
+ * from the @c flusspferd shell.
+ *
+ * @verbatim
+> $importer.paths.push('/my/directory')
+2
+> $importer.load('dummy_module')
+Module loaded!
+Here, take this cookie.
+> $importer.load('dummy_module')
+Here, take this cookie.
+@endverbatim
+ *
  */
