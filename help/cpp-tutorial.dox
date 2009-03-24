@@ -258,7 +258,7 @@ void my_function(call_context &x) {
 /**
  * @page cpp-tutorial-classes Creating a Javascript class
  *
- * Previous: \ref cpp-tutorial-classes
+ * Previous: \ref cpp-tutorial-functions
  *
  * Other than functions, users of flusspferd will likely want to create classes.
  *
