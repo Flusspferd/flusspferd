@@ -422,7 +422,7 @@ $importer.load('other');
  *
  * If you compile this module as a shared library with the name
  * libdummy_module.so or libmodule_dummy.dylib, you should be able to load it
- * from the @c flusspferd shell.
+ * from the @c %flusspferd shell.
  *
  * @verbatim
 > $importer.paths.push('/my/directory')
