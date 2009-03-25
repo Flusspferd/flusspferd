@@ -109,7 +109,7 @@ exception::~exception() throw()
 void exception::throw_js_INTERNAL() {
   JS_SetPendingException(
       Impl::current_context(),
-      Impl::get_jsval(*p->exception_value));
+      Impl::get_jsval(p->exception_value ? *p->exception_value : value()));
 }
 
 value exception::val() const {
