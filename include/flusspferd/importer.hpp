@@ -31,6 +31,8 @@ namespace flusspferd {
 
 void load_import_function(object container = flusspferd::global());
 
+typedef value (*flusspferd_load_t)(object container);
+
 }
 
 #endif
