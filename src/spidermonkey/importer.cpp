@@ -46,6 +46,48 @@ THE SOFTWARE.
 #define SHLIBSUFFIX ".so"
 #endif
 
+namespace flusspferd {
+class importer : public native_object_base {
+public:
+  typedef value (*flusspferd_load_t)(object container);
+
+  struct class_info : flusspferd::class_info {
+    static char const *full_name() { return "Importer"; }
+    typedef boost::mpl::bool_<true> constructible;
+    static char const *constructor_name() { return "Importer"; }
+    static object create_prototype();
+    static void augment_constructor(object &);
+  };
+
+  importer(object const &obj, call_context &x);
+  ~importer();
+
+  static void add_preloaded(std::string const &name, object const &obj);
+  static void add_preloaded(
+    std::string const &name,
+    boost::function<object (object const &)> const &fun);
+
+protected:
+  void trace(tracer &);
+
+  static std::string process_name(
+    std::string const &name,
+    bool for_script = false);
+
+private: // JS methods
+  value load(string const &name, bool binary_only); 
+
+private:
+  class impl;
+  boost::scoped_ptr<impl> p;
+};
+
+void load_import_function(object container) {
+  load_class<importer>(container);
+}
+
+}
+
 using namespace flusspferd;
 
 object importer::class_info::create_prototype() {
