@@ -22,14 +22,16 @@ THE SOFTWARE.
 */
 
 // Set default paths to the plugin dirs
-Importer.defaultPaths = ['js/src', 
+Import.paths.push(
+  'js/src', 
   'plugins/sqlite3', 'build/default/plugins/sqlite3', 
   'plugins/curl', 'build/default/plugins/curl',
   'plugins/posix', 'build/default/plugins/posix',
   'build/default/plugins/environment',
-  'build/default/src'];
+  'build/default/src'
+);
 
-Importer.preload['XML'] = function() { return this.$importer.load('flusspferd-xml'); }
-Importer.preload['IO'] = function() { return this.$importer.load('flusspferd-io'); }
+Import.preload['XML'] = function() { return Import('flusspferd-xml'); }
+Import.preload['IO'] = function() { return Import('flusspferd-io'); }
 
 prelude = 'prelude.js';
