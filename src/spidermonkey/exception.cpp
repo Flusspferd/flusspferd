@@ -62,6 +62,8 @@ class exception::impl {
 public:
   impl() : empty(true) {}
 
+  ~impl();
+
   context ctx;
   boost::scoped_ptr<root_value> exception_value;
   bool empty;
@@ -100,9 +102,12 @@ exception::exception(value const &val)
 
 exception::~exception() throw()
 {
-  if (p->exception_value) {
-    current_context_scope scope(p->ctx);
-    p->exception_value.reset();
+}
+
+exception::impl::~impl() {
+  if (exception_value) {
+    current_context_scope scope(ctx);
+    exception_value.reset();
   }
 }
 
