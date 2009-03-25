@@ -397,7 +397,7 @@ Destroying StringSet
  * Loading a module is easy:
  *
  * @verbatim
-posix = $importer.load('posix');
+Import('posix')
 posix.sleep(5);
 @endverbatim
  *
@@ -405,8 +405,8 @@ posix.sleep(5);
  * can do the following:
  *
  * @verbatim
-$importer.paths.push('/my/directory');
-$importer.load('other');
+Import.paths.push('/my/directory');
+Import('somemodule');
 @endverbatim
  *
  * And you can also write your own modules. Either by simply putting a file
@@ -425,12 +425,12 @@ $importer.load('other');
  * from the @c %flusspferd shell.
  *
  * @verbatim
-> $importer.paths.push('/my/directory')
+> Import.paths.push('/my/directory')
 2
-> $importer.load('dummy_module')
+> Import('dummy_module')
 Module loaded!
 Here, take this cookie.
-> $importer.load('dummy_module')
+> Import('dummy_module')
 Here, take this cookie.
 @endverbatim
  *
