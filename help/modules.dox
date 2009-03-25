@@ -66,3 +66,7 @@ THE SOFTWARE.
  *
  * @see create_function
  */
+
+/**
+ * @defgroup exceptions Exceptions, errors and exit conditions
+ */
