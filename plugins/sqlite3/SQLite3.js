@@ -22,7 +22,7 @@ THE SOFTWARE.
 */
 
 (function() {
-  $importer.load('SQLite3', true);
+  Import('SQLite3', true);
 
   var SQLite3 = $importer.context.SQLite3;
 

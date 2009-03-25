@@ -98,7 +98,8 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     argv(argv)
 {
   flusspferd::load_class<flusspferd::blob>();
-  flusspferd::load_class<flusspferd::importer>();
+
+  flusspferd::load_import_function();
 
   flusspferd::load_properties_functions();
 
