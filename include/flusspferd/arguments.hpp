@@ -34,6 +34,8 @@ namespace flusspferd {
 
 /**
  * Holds the %arguments for a Javascript %function call.
+ *
+ * @ingroup functions
  */
 class arguments : public Impl::arguments_impl {
 private:
@@ -124,21 +126,29 @@ public:
   /// An iterator class for flusspferd::arguments.
   class iterator : public Impl::arguments_impl::iterator_impl {
   public:
+#ifndef IN_DOXYGEN
     iterator(Impl::arguments_impl::iterator_impl const &i)
       : Impl::arguments_impl::iterator_impl(i)
     { }
+#endif
 
+    /// Increment (pre-fix).
     iterator &operator++();
+
+    /// Increment (post-fix).
     iterator operator++(int) {
       iterator tmp(*this);
       ++*this;
       return tmp;
     }
 
+    /// Dereference.
     value operator*() const;
 
   public:
+#ifndef IN_DOXYGEN
     bool equals(iterator const &b) const;
+#endif
   };
 
   /// Return an iterator to the beginning of the arguments list.
