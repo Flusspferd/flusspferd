@@ -62,10 +62,14 @@ function::function(Impl::object_impl const &o)
 { }
 
 std::size_t function::arity() const {
+  if (is_null())
+    throw exception("Could not get function arity: object is null");
   return JS_GetFunctionArity(Impl::function_impl::get_const());
 }
 
 string function::name() const {
+  if (is_null())
+    throw exception("Could not get function name: object is null");
   return Impl::wrap_string(
       JS_GetFunctionId(Impl::function_impl::get_const()));
 }
