@@ -33,6 +33,8 @@ namespace flusspferd {
 /**
  * Property iterator.
  *
+ * Uses boost::iterator_facade to support basic iterator operations.
+ *
  * @ingroup property_types
  */
 class property_iterator
@@ -43,15 +45,33 @@ class property_iterator
     >
 {
 public:
+  /// Constructor for end()-iterator.
   property_iterator();
+
+  /// Copy-constructor.
   property_iterator(property_iterator const &);
+
+  /// Constructor for begin()-iterator.
   explicit property_iterator(object const &o);
+
+  /// Destructor.
   ~property_iterator();
 
+  /**
+   * Swap with another iterator.
+   *
+   * @param o The iterator to swap with.
+   */
   void swap(property_iterator &o) {
     p.swap(o.p);
   }
 
+  /**
+   * Assignment operator.
+   *
+   * @param o The iterator to assign.
+   * @return *this
+   */
   property_iterator &operator=(property_iterator const &o) {
     property_iterator(o).swap(*this);
     return *this;
