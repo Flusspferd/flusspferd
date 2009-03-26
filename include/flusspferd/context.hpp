@@ -35,6 +35,8 @@ class object;
 
 /**
  * Javascript %context.
+ *
+ * @ingroup contexts
  */
 class context {
   class impl;

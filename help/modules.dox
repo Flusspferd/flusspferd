@@ -70,3 +70,7 @@ THE SOFTWARE.
 /**
  * @defgroup exceptions Exceptions, errors and exit conditions
  */
+
+/**
+ * @defgroup contexts Context and runtime
+ */
