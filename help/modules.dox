@@ -78,3 +78,7 @@ THE SOFTWARE.
 /**
  * @defgroup loadable_modules Loadable modules
  */
+
+/**
+ * @defgroup jsext Javascript extensions
+ */

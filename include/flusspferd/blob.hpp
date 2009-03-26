@@ -37,6 +37,8 @@ namespace flusspferd {
  * Wraps a (mutable) std::vector<unsigned char>.
  *
  * @see <a href="docs/files/src/spidermonkey/blob-jsdoc.html">Javascript 'Blob'</a>.
+ *
+ * @ingroup jsext
  */
 class blob : public native_object_base {
 public:

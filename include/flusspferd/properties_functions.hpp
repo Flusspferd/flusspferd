@@ -34,6 +34,8 @@ namespace flusspferd {
  *
  * @param o The container (must contain an Object property) to load the
  *          functions into.
+ *
+ * @ingroup jsext
  */
 void load_properties_functions(object o = global());
 

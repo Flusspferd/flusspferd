@@ -37,6 +37,7 @@ namespace flusspferd {
  * @param container The object to load the function into.
  *
  * @ingroup loadable_modules
+ * @ingroup jsext
  */
 void load_import_function(object container = flusspferd::global());
 
