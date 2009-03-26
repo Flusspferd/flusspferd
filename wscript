@@ -41,8 +41,6 @@ def set_options(opt):
                    help='Set non-standard CXXFLAGS')
     opt.add_option('--enable-tests', action='store_true',
                    help='Enable tests')
-    opt.add_option('--enable-sandbox', action='store_true',
-                   help='Enable sandbox tests')
     opt.add_option('--enable-io', action='store_true',
                    help='Enable IO support')
     opt.add_option('--enable-xml', action='store_true',
@@ -254,7 +252,6 @@ int main() {
 
     conf.env['ENABLE_SQLITE'] = Options.options.enable_sqlite
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
-    conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
     conf.env['ENABLE_XML'] = Options.options.enable_xml
     conf.env['ENABLE_IO'] = Options.options.enable_io
 
@@ -304,8 +301,6 @@ def build(bld):
 
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
-    if bld.env['ENABLE_SANDBOX']:
-      bld.add_subdirs('sandbox')
     build_pkgconfig(bld)
     bld.install_files('${PREFIX}/include/flusspferd/',
                       'include/flusspferd/*.hpp')
