@@ -35,6 +35,9 @@ int main() {
   flusspferd::object p = flusspferd::evaluate("Object.prototype").to_object();
 
   // Create a method of Object.prototype that calls print_object().
+  // The difference between create_native_function and create_native_method is
+  // that the latter passes Javascript's 'this' as parameter to the function.
+  //
   // (Note that every normal object ultimately has as prototype the value of
   // Object.prototype. However create_native_method and create_native_function
   // create the properties with dont_enum, so doing this is safe.)
