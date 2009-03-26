@@ -31,18 +31,31 @@ namespace flusspferd {
 
 class context;
 
+/**
+ * Load a context while in scope.
+ *
+ * @ingroup contexts
+ */
 class current_context_scope {
 private:
   context c;
   context old;
 
 public:
+  /**
+   * Constructor.
+   *
+   * @param c The context to load.
+   */
   current_context_scope(context const &c)
       : c(c)
   {
     old = enter_current_context(this->c);
   }
 
+  /**
+   * Destructor.
+   */
   ~current_context_scope() {
     if(leave_current_context(c) && old.is_valid())
       enter_current_context(old);
