@@ -1,5 +1,4 @@
-#include <flusspferd/current_context_scope.hpp>
-#include <flusspferd/context.hpp>
+#include <flusspferd.hpp>
 
 int main() {
   flusspferd::current_context_scope context_scope(

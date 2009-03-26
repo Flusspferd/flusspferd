@@ -1,15 +1,4 @@
-#include <flusspferd/current_context_scope.hpp>
-#include <flusspferd/context.hpp>
-#include <flusspferd/init.hpp>
-#include <flusspferd/value.hpp>
-#include <flusspferd/object.hpp>
-#include <flusspferd/string.hpp>
-#include <flusspferd/string_io.hpp>
-#include <flusspferd/value_io.hpp>
-#include <flusspferd/create.hpp>
-#include <flusspferd/evaluate.hpp>
-#include <flusspferd/native_object_base.hpp>
-#include <flusspferd/class.hpp>
+#include <flusspferd.hpp>
 #include <iostream>
 #include <ostream>
 #include <set>

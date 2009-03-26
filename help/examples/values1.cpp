@@ -1,10 +1,4 @@
-#include <flusspferd/current_context_scope.hpp>
-#include <flusspferd/context.hpp>
-#include <flusspferd/init.hpp>
-#include <flusspferd/value.hpp>
-#include <flusspferd/object.hpp>
-#include <flusspferd/string.hpp>
-#include <flusspferd/local_root_scope.hpp>
+#include <flusspferd.hpp>
 #include <cassert>
 
 int main() {

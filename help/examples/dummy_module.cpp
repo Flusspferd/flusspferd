@@ -1,6 +1,4 @@
-#include <flusspferd/object.hpp>
-#include <flusspferd/value.hpp>
-#include <flusspferd/string.hpp>
+#include <flusspferd.hpp>
 #include <iostream>
 #include <ostream>
 

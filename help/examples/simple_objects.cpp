@@ -1,10 +1,4 @@
-#include <flusspferd/current_context_scope.hpp>
-#include <flusspferd/context.hpp>
-#include <flusspferd/init.hpp>
-#include <flusspferd/root.hpp>
-#include <flusspferd/value_io.hpp>
-#include <flusspferd/create.hpp>
-#include <flusspferd/property_iterator.hpp>
+#include <flusspferd.hpp>
 #include <iostream>
 #include <ostream>
 
