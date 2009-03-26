@@ -29,8 +29,30 @@ THE SOFTWARE.
 
 namespace flusspferd { 
 
+/**
+ * Load the 'Import()' function into @p container.
+ *
+ * Creates a new instance of the Import function.
+ *
+ * @param container The object to load the function into.
+ *
+ * @ingroup loadable_modules
+ */
 void load_import_function(object container = flusspferd::global());
 
+/**
+ * The prototype for module loader functions.
+ *
+ * Modules should define a function @c flusspferd_load (with 
+ * <code>extern "C"</code>) with this signature.
+ *
+ * Example:
+ * @dontinclude help/examples/dummy_module.cpp
+ * @skip extern "C"
+ * @until }
+ *
+ * @ingroup loadable_modules
+ */
 typedef value (*flusspferd_load_t)(object container);
 
 }
