@@ -46,124 +46,102 @@ THE SOFTWARE.
 #define SHLIBSUFFIX ".so"
 #endif
 
+namespace flusspferd {
+
+void import(call_context &);
+
+void load_import_function(object container) {
+  function imp = create_native_function(container, "Import", &import, 2);
+  container.define_property("import", imp, object::dont_enumerate);
+
+  imp.define_property("preload", create_object(), object::permanent_property);
+  imp.define_property("paths", create_array(), object::permanent_property);
+  imp.define_property("module_cache", create_object(),
+                      object::permanent_property);
+}
+
+}
+
 using namespace flusspferd;
 
-object importer::class_info::create_prototype() {
-  object proto = create_object();
-  return proto;
+namespace {
+
+// Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
+// return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
+std::string process_name(std::string const &name, bool for_script) {
+  std::string p = name;
+  if (p.find(DIRSEP1, 0) != std::string::npos &&
+      p.find(DIRSEP2, 0) != std::string::npos) {
+    throw exception("Path seperator not allowed in module name");
+  }
+
+  std::size_t pos = 0;
+  while ( (pos = p.find('.', pos)) != std::string::npos) {
+    p.replace(pos, 1, DIRSEP1);
+    pos++;
+  }
+
+  if (!for_script && SHLIBPREFIX) {
+    // stick the lib on the front as needed
+    pos = p.rfind(DIRSEP1, 0);
+    if (pos == std::string::npos)
+      pos = 0;
+    p.insert(pos, SHLIBPREFIX);
+  }
+
+  p = DIRSEP1 + p;
+  if (for_script)
+    p += ".js";
+  else
+    p += SHLIBSUFFIX;
+
+  return p;
 }
 
-void importer::class_info::augment_constructor(object &ctor) {
-  ctor.define_property("preload", create_object(), permanent_property);
-  ctor.define_property("defaultPaths", create_array(), permanent_property);
 }
 
-void importer::add_preloaded(std::string const &name, object const &obj) {
-  local_root_scope scope;
-  object ctor = constructor<importer>();
-  object preload = ctor.get_property("preload").to_object();
-  preload.set_property(name, obj);
-}
-
-void importer::add_preloaded(
-  std::string const &name,
-  boost::function<object (object const &)> const &fun)
-{
-  add_preloaded(name, create_native_function(fun, name));
-}
-
-class importer::impl {
-public:
-  typedef std::pair<std::string, bool> key_type;
-  typedef boost::unordered_map<key_type, value> module_cache_map;
-  module_cache_map module_cache;
-};
-
-importer::importer(object const &obj, call_context &)
-  : native_object_base(obj), p(new impl)
-{
-  local_root_scope scope;
-
-  // Create the load method on the actual object itself, not on the prototype
-  // That way the following works:
-  // 
-  // i.load('foo'); // Assume foo module defines this.foo = 'abc'
-  // print(i.foo); // abc
-  //
-  // without the problem of load being overridden to do bad things by a module
-  add_native_method("load", 2);
-  register_native_method("load", &importer::load);
-
-  object constructor = flusspferd::constructor<importer>();
-
-  // Store search paths
-  array arr = constructor.get_property("defaultPaths").to_object();
-  arr = arr.call("concat").to_object();
-  set_property("paths", arr);
-
-  // Create a context object, which is the object on which all modules are
-  // evaluated
-  object context = create_object();
-  set_property("context", context);
-
-  // this.contexnt.__proto__ = this.__proto__; 
-  // Not sure we actually want to do this, but we can for now.
-  context.set_prototype(prototype());
-  set_prototype(context);
-}
-
-importer::~importer() {}
-
-void importer::trace(tracer &trc) {
-  for (impl::module_cache_map::iterator it = p->module_cache.begin();
-      it != p->module_cache.end();
-      ++it)
-    trc("module-cache-item", it->second);
-}
-
-value importer::load(string const &f_name, bool binary_only) {
+void flusspferd::import(call_context &x) {
   security &sec = security::get();
 
-  std::string name = f_name.to_string();
+  std::string name = flusspferd::string(x.arg[0]).to_string();
+  bool binary_only = x.arg[1].to_boolean();
 
-  impl::key_type key(name, binary_only);
+  object module_cache = x.function.get_property("module_cache").to_object();
+  if (module_cache.is_null())
+    throw exception("No valid module cache");
+ 
+  std::string key = name + (binary_only ? ";binary-only" : "");
+  if (module_cache.has_own_property(key)) {
+    x.result = module_cache.get_property(key);
+    return;
+  }
 
-  impl::module_cache_map::iterator it = p->module_cache.find(key);
-  if (it != p->module_cache.end())
-    return it->second;
+  object ctx = flusspferd::global();
 
-  object ctx = get_property("context").to_object();
-  ctx.define_property("$importer", *this);
-  ctx.define_property("$security", sec);
+  value preload = x.function.get_property("preload");
 
-  object constructor = flusspferd::constructor<importer>();
-  value preload = constructor.get_property("preload");
-
-  if (preload.is_object()) {
+  if (preload.is_object() && !preload.is_null()) {
     value loader = preload.get_object().get_property(name);
     if (loader.is_object()) {
-      value result;
       if (!loader.is_null()) {
         local_root_scope scope;
-        object x = loader.get_object();
-        result = x.call(ctx);
+        object o = loader.get_object();
+        x.result = o.call(ctx);
       }
-      return result;
+      return;
     }
   }
 
   std::string so_name, js_name;
-  so_name = process_name(name);
+  so_name = process_name(name, false);
   js_name = process_name(name, true);
   
-  //TODO: I'd like a version that throws an exception instead of assert traps
-  value paths_v = get_property("paths").to_object();
-  if (!paths_v.is_object())
-    throw exception("Unable to get search paths or its not an object");
+  value paths_v = x.function.get_property("paths").to_object();
+  if (!paths_v.is_object() || paths_v.is_null())
+    throw exception("Unable to get search paths or it is not an object");
 
   array paths = paths_v.get_object();
 
-  // TODO: We could probably do with an array class.
   size_t len = paths.length();
   for (size_t i=0; i < len; i++) {
     std::string path = paths.get_element(i).to_string().to_string();
@@ -174,8 +152,9 @@ value importer::load(string const &f_name, bool binary_only) {
         if (boost::filesystem::exists(fullpath)) {
           value val = current_context().execute(
               fullpath.c_str(), ctx);
-          p->module_cache[key] = val;
-          return val;
+          module_cache.set_property(key, val);
+          x.result = val;
+          return;
         }
 
     fullpath = path + so_name;
@@ -205,49 +184,17 @@ value importer::load(string const &f_name, bool binary_only) {
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
       value val = func(ctx);
-      p->module_cache[key] = val;
-      return val;
+      module_cache.set_property(key, val);
+      x.result = val;
+      return;
     }
   } 
 
-  // We probably want to throw an exception here.
   std::stringstream ss;
   ss << "Unable to find library '";
   ss << name.c_str();
   ss << "' in [";
   ss << paths_v.to_string().c_str() << "]";
   throw exception(ss.str().c_str());
-}
-
-// Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
-// return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
-std::string importer::process_name(std::string const &name, bool for_script) {
-  std::string p = name;
-  if (p.find(DIRSEP1, 0) != std::string::npos &&
-      p.find(DIRSEP2, 0) != std::string::npos) {
-    throw exception("Path seperator not allowed in module name");
-  }
-
-  std::size_t pos = 0;
-  while ( (pos = p.find('.', pos)) != std::string::npos) {
-    p.replace(pos, 1, DIRSEP1);
-    pos++;
-  }
-
-  if (!for_script && SHLIBPREFIX) {
-    // stick the lib on the front as needed
-    pos = p.rfind(DIRSEP1, 0);
-    if (pos == std::string::npos)
-      pos = 0;
-    p.insert(pos, SHLIBPREFIX);
-  }
-
-  p = DIRSEP1 + p;
-  if (for_script)
-    p += ".js";
-  else
-    p += SHLIBSUFFIX;
-
-  return p;
 }
 

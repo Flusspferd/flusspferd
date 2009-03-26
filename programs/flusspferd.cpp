@@ -21,18 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/security.hpp"
-#include "flusspferd/importer.hpp"
-#include "flusspferd/blob.hpp"
-#include "flusspferd/class.hpp"
-#include "flusspferd/value.hpp"
-#include "flusspferd/object.hpp"
-#include "flusspferd/context.hpp"
-#include "flusspferd/value_io.hpp"
-#include "flusspferd/evaluate.hpp"
-#include "flusspferd/current_context_scope.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/properties_functions.hpp"
+#include "flusspferd.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
 #include <fstream>
@@ -98,7 +87,8 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     argv(argv)
 {
   flusspferd::load_class<flusspferd::blob>();
-  flusspferd::load_class<flusspferd::importer>();
+
+  flusspferd::load_import_function();
 
   flusspferd::load_properties_functions();
 

@@ -21,13 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/class.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/native_object_base.hpp"
-#include "flusspferd/string.hpp"
-#include "flusspferd/blob.hpp"
-#include "flusspferd/security.hpp"
-
+#include "flusspferd.hpp"
 #include <curl/curl.h>
 
 using namespace flusspferd;

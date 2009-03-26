@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Ash Berlin
+Copyright (c) 2008, 2009 Ash Berlin, Aristid Breitkreuz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/class.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/native_object_base.hpp"
-#include "flusspferd/string.hpp"
-#include "flusspferd/tracer.hpp"
+#include "flusspferd.hpp"
 #include <new>
 #include <sstream>
 
