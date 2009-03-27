@@ -198,3 +198,41 @@ void flusspferd::import(call_context &x) {
   throw exception(ss.str().c_str());
 }
 
+/**
+ * Title: Import
+ *
+ * Loadable module support. Import is defined as a top level function on the
+ * global object. 
+ *
+ * (code)
+ * Import.paths.unshift('./lib');
+ * Import('My.Module'); // Will look for My/Module.js
+ * (end code)
+ *
+ * Function: Import
+ *
+ * Load a module.
+ *
+ * Parameters:
+ *   name - Module name to load
+ *   options - Additional options that control behaviour
+ *
+ * Group: Properties
+ *
+ * Please note, that all the properties listed below are properties of the
+ * Import function itself.
+ *
+ * Property: paths
+ *
+ * List of directories to search for modules in.
+ *
+ * Property: module_cache
+ *
+ * Dictionary of currently loaded modules.
+ *
+ * Property: preload
+ *
+ * Dictionary of callback functions. The first time a module name matching a
+ * key in perload is loaded, the function stored there will be called.
+ * 
+ */

@@ -42,6 +42,7 @@ Group: Core Classes/Extensions  {
 
    File: Blob  (src/spidermonkey/blob.jsdoc)
    File: Object  (src/spidermonkey/properties_functions.cpp)
+   File: Import  (src/spidermonkey/importer.cpp)
    }  # Group: Core Classes/Extensions
 
 Group: Modules  {
