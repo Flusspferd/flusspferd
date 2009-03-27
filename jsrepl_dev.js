@@ -31,7 +31,7 @@ Import.paths.push(
   'build/default/src'
 );
 
-Import.preload['XML'] = function() { return Import('flusspferd-xml'); }
-Import.preload['IO'] = function() { return Import('flusspferd-io'); }
+Import.alias['XML'] = 'flusspferd-xml'
+Import.alias['IO'] = 'flusspferd-io'
 
 prelude = 'prelude.js';
