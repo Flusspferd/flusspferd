@@ -56,6 +56,7 @@ void load_import_function(object container) {
 
   imp.define_property("preload", create_object(), object::permanent_property);
   imp.define_property("paths", create_array(), object::permanent_property);
+  imp.define_property("alias", create_object(), object::permanent_property);
   imp.define_property("module_cache", create_object(),
                       object::permanent_property);
 }
@@ -105,6 +106,14 @@ void flusspferd::import(call_context &x) {
 
   std::string name = flusspferd::string(x.arg[0]).to_string();
   bool binary_only = x.arg[1].to_boolean();
+
+  value alias_v = x.function.get_property("alias");
+  
+  if (alias_v.is_object() && !alias_v.is_null()) {
+    object alias = alias_v.get_object();
+    if (alias.has_own_property(name))
+      name = alias.get_property(name).to_string().to_string();
+  }
 
   object module_cache = x.function.get_property("module_cache").to_object();
   if (module_cache.is_null())
