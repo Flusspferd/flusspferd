@@ -34,3 +34,8 @@ Property: preload
 Dictionary of callback functions. The first time a module name matching a
 key in perload is loaded, the function stored there will be called.
 
+Property: alias
+
+Dictionary of aliases. The destination is designated by a string only. There is
+no recursive alias lookup. Aliases will be resolved before anything else.
+
