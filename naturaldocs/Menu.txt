@@ -41,8 +41,8 @@ Timestamp: Updated yyyy-mm-dd
 Group: Core Classes/Extensions  {
 
    File: Blob  (src/spidermonkey/blob.jsdoc)
-   File: Object  (src/spidermonkey/properties_functions.cpp)
-   File: Import  (src/spidermonkey/importer.cpp)
+   File: Object  (src/spidermonkey/object.jsdoc)
+   File: Import  (src/spidermonkey/import.jsdoc)
    }  # Group: Core Classes/Extensions
 
 Group: Modules  {
