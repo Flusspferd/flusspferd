@@ -30,4 +30,11 @@ THE SOFTWARE.
  * - @subpage install
  *   - @ref ubuntu
  * - @subpage cpp-tutorial
+ *   - @ref cpp-tutorial-firstprogram
+ *   - @ref cpp-tutorial-secondprogram
+ *   - @ref cpp-tutorial-values_and_objects
+ *   - @ref cpp-tutorial-gc
+ *   - @ref cpp-tutorial-functions
+ *   - @ref cpp-tutorial-classes
+ *   - @ref cpp-tutorial-modules
  */
