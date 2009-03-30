@@ -32,22 +32,51 @@ THE SOFTWARE.
  * - @subpage js-tutorial-invoke
  * - @subpage js-tutorial-io
  * - @subpage js-tutorial-xml
+ *
+ * @see
+ *   - @ref cpp-tutorial-modules
  */
 
 /**
  * @page js-tutorial-invoke Using the %flusspferd shell / interpreter
  *
- * TODO
+ * Once Flusspferd is @ref install "installed", you can run %flusspferd like
+ * this:
+ *
+ * @verbatim
+$ flusspferd
+@endverbatim
+ *
+ * It will open up a shell. You can use it to evaluate arbitrary Javascript
+ * expressions.
+ *
+ * @verbatim
+> 1 + 1
+2
+> world = "Shell"; print("Hello ", world);
+Hello  Shell
+@endverbatim
+ *
+ * Next: \ref js-tutorial-io
+ *
  */
 
 /**
  * @page js-tutorial-io Using IO
  *
+ * Previous: \ref js-tutorial-invoke
+ *
  * TODO
+ *
+ * Next: \ref js-tutorial-xml
+ *
  */
 
 /**
  * @page js-tutorial-xml Using XML
  *
+ * Previous: \ref js-tutorial-io
+ *
  * TODO
+ *
  */
