@@ -137,7 +137,7 @@ Hello, Flusspferd!
  *
  * @note You can find the source in <code>help/examples/values1.cpp</code>.
  *
- * @subsection simple_objects Dealing with simple objects
+ * @section simple_objects Dealing with simple objects
  *
  * Let us translate this simple Javascript code to a C++ equivalent:
  *
@@ -150,6 +150,39 @@ Hello, Flusspferd!
  * @note You can find the programs in
  *       <code>help/examples/simple_objects.js</code> and
  *       <code>simple_objects.cpp</code>.
+ *
+ * @section properties Objects and properties
+ *
+ * The class flusspferd::object (together with the other classes in 
+ * @ref property_types) provides many methods for creating, accessing,
+ * querying and manipulating properties. We will briefly look at some of them
+ * here.
+ *
+ * For example, you can easily create a non-enumerable, read-only property:
+ *
+ * @code
+obj.define_property("prop", initial_value,
+  flusspferd::object::dont_enumerate | flusspferd::object::read_only_property);
+@endcode
+ *
+ * Or, a property with a custom getter and setter:
+ *
+ * @code
+flusspferd::property_attributes attr;
+attr.getter = getter_function;
+attr.setter = setter_function;
+obj.define_property("prop", initial_value, attr);
+@endcode
+ *
+ * @note Both @p getter_function and @p setter_function have to be of type
+ *       flusspferd::function, which you can create with one of
+ *       @ref create_function "these functions".
+ *
+ * And, among many other things, you can delete properties altogether:
+ *
+ * @code
+obj.delete_property("prop");
+@endcode
  *
  * Next: \ref cpp-tutorial-gc
  */
