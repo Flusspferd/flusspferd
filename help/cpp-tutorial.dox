@@ -394,7 +394,7 @@ Destroying StringSet
  *
  * Previous: \ref cpp-tutorial-classes
  *
- * Loading a module is easy:
+ * Loading a module - and using it - is easy:
  *
  * @verbatim
 Import('posix')
