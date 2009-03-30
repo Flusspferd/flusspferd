@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2009 Aristid Breitkreuz, Ruediger Sonderfeld, Ash Berlin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,32 @@ THE SOFTWARE.
 */
 
 /**
- * @page tutorials Tutorials
+ * @page js-tutorial Using Flusspferd from Javascript
  *
- * It is always difficult to learn how to use a new library. Tutorials are
- * designed to cope with that problem.
+ * It is possible to use Flusspferd without ever touching C++ - and even if
+ * you do, you will probably use some of our Javascript-side features.
  *
- * - @subpage install
- *   - @ref ubuntu
+ * @section Contents
  *
- * - @subpage cpp-tutorial
- *   - @ref cpp-tutorial-firstprogram
- *   - @ref cpp-tutorial-secondprogram
- *   - @ref cpp-tutorial-values_and_objects
- *   - @ref cpp-tutorial-gc
- *   - @ref cpp-tutorial-functions
- *   - @ref cpp-tutorial-classes
- *   - @ref cpp-tutorial-modules
+ * - @subpage js-tutorial-invoke
+ * - @subpage js-tutorial-io
+ * - @subpage js-tutorial-xml
+ */
+
+/**
+ * @page js-tutorial-invoke Using the %flusspferd shell / interpreter
  *
- * - @subpage js-tutorial
- *   - @ref js-tutorial-invoke
- *   - @ref js-tutorial-io
- *   - @ref js-tutorial-xml
+ * TODO
+ */
+
+/**
+ * @page js-tutorial-io Using IO
+ *
+ * TODO
+ */
+
+/**
+ * @page js-tutorial-xml Using XML
+ *
+ * TODO
  */
