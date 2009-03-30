@@ -116,7 +116,7 @@ array create_array(unsigned int length = 0);
     object obj = detail::create_native_enumerable_object(proto); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
   } \
-  /**/
+  /* */
 
 BOOST_PP_REPEAT(
   BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
@@ -194,7 +194,7 @@ function create_native_function(object const &o, native_function_base *ptr);
   ) { \
     return create_native_function(o, new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
   } \
-  /**/
+  /* */
 
 BOOST_PP_REPEAT(
   BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
