@@ -126,7 +126,7 @@ static void xml_constants(object XML) {
     BOOST_PP_STRINGIZE(x), \
     BOOST_PP_CAT(XML_, x), \
     object::read_only_property | object::permanent_property) \
-  /**/
+  /* */
 
   // parser constants
   CONST(PARSE_RECOVER);
@@ -159,7 +159,7 @@ static void html_constants(object HTML) {
     BOOST_PP_STRINGIZE(x), \
     BOOST_PP_CAT(HTML_, x), \
     object::read_only_property | object::permanent_property) \
-  /**/
+  /* */
 
   // parser constants
   CONST(PARSE_RECOVER);
@@ -201,7 +201,7 @@ static void safety_io_callbacks() {
     name ## Open, \
     name ## Read, \
     name ## Close) \
-  /**/
+  /* */
 
   REG_INPUT(xmlFile);
   REG_INPUT(xmlIOHTTP);

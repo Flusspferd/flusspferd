@@ -85,7 +85,7 @@ public:
     n, \
     BOOST_PP_TUPLE_ELEM(2, 0, d), \
     BOOST_PP_TUPLE_ELEM(2, 1, d)) \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CALL_N_2(n, f_name, arg_type) \
   BOOST_PP_IF(n, template<, ) \
@@ -99,12 +99,12 @@ public:
     BOOST_PP_REPEAT(n, FLUSSPFERD_CALL_ADD_PARAM, ~) \
     return f_name(x, arg); \
   } \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CALL_ADD_PARAM(z, n, d) \
   typename convert<BOOST_PP_CAT(T, n) const &>::to_value BOOST_PP_CAT(c, n); \
   arg.push_root(BOOST_PP_CAT(c, n).perform(BOOST_PP_CAT(arg, n))); \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CALLS(name, arg_type) \
   BOOST_PP_REPEAT( \
