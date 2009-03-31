@@ -38,7 +38,7 @@ THE SOFTWARE.
  */
 
 /**
- * @page js-tutorial-invoke Using the %flusspferd shell / interpreter
+ * @page js-tutorial-invoke Using the Flusspferd shell / interpreter
  *
  * Once Flusspferd is @ref install "installed", you can run %flusspferd like
  * this:
@@ -53,8 +53,8 @@ $ flusspferd
  * @verbatim
 > 1 + 1
 2
-> world = "Shell"; print("Hello ", world);
-Hello  Shell
+> world = "Shell"; print("Hello", world);
+Hello Shell
 @endverbatim
  *
  * Next: \ref js-tutorial-io
