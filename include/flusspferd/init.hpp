@@ -35,6 +35,8 @@ class object;
 
 /**
  * Manage the current context and the initialisation of the Javascript engine.
+ *
+ * @ingroup contexts
  */
 class init : boost::noncopyable {
   init();
@@ -88,6 +90,7 @@ public:
  * Set the current context to @p c.
  *
  * @see init::enter_current_context
+ * @ingroup contexts
  */
 inline context enter_current_context(context const &c) {
   return init::initialize().enter_current_context(c);
@@ -97,6 +100,7 @@ inline context enter_current_context(context const &c) {
  * Unset the current context.
  *
  * @see init::leave_current_context
+ * @ingroup contexts
  */
 inline bool leave_current_context(context const &c) {
   return init::initialize().leave_current_context(c);
@@ -106,6 +110,7 @@ inline bool leave_current_context(context const &c) {
  * Get the current context.
  *
  * @see init::current_context
+ * @ingroup contexts
  */
 inline context &current_context() {
   return init::initialize().current_context();
