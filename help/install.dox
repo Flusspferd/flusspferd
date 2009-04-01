@@ -95,7 +95,7 @@ Hello world!
  *
  * Flusspferd comes with an
  * <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode to call the
- * Flusspferd Shell and interactively send javascript code to the Shell. Similar
+ * Flusspferd Shell and interactively send javascript code to the Shell similar
  * to emacs-lisp-mode or inferior python mode. See
  * @subpage emacs-install "How to install and setup Flusspferd's Emacs Mode"
  * for more information.

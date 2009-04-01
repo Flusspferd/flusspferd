@@ -26,7 +26,7 @@ THE SOFTWARE.
  *
  * Flusspferd comes with an
  * <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode to call the
- * Flusspferd Shell and interactively send javascript code to the Shell. Similar
+ * Flusspferd Shell and interactively send javascript code to the Shell similar
  * to emacs-lisp-mode or inferior python mode.
  *
  * If you have Emacs installed on your System then 
@@ -39,13 +39,13 @@ THE SOFTWARE.
  (add-to-list 'load-path "/usr/local/share/emacs")
 @endverbatim
  *
- * To use Flusspferd mode you should have to put the following
- * line into your ~/.emacs file
+ * To use Flusspferd mode you have to put the following  line into your
+ * @p "~/.emacs" file
  * @verbatim
  (autoload 'flusspferd "flusspferd" "Inferior Flusspferd Mode." t)
 @endverbatim
  * and restart Emacs. By typing @p "M-x flusspferd" you can start
- * the Flusspferd Shell.
+ * the Flusspferd Shell now.
  *
  * There is also a minor mode for sending javascript code to the Flusspferd
  * Shell. You can use it by adding the following line to your @p "~/.emacs" file
