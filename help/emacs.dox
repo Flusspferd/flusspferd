@@ -1,0 +1,72 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+/*
+Copyright (c) 2009 Aristid Breitkreuz, Ruediger Sonderfeld
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+/**
+ * @page emacs-install How to install and setup Flusspferd's Emacs Mode
+ *
+ * Flusspferd comes with an
+ * <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode to call the
+ * Flusspferd Shell and interactively send javascript code to the Shell. Similar
+ * to emacs-lisp-mode or inferior python mode.
+ *
+ * If you have Emacs installed on your System then 
+ * @ref install "installing Flusspferd" will byte compile the mode and
+ * install it into @p $PREFIX/share/emacs/site-lisp. To use the mode you have
+ * to make sure that @p $PREFIX/share/emacs/site-lisp is in your Emacs
+ * @p load-path. If @p $PREFIX is for example @p /usr/local (the default) you
+ * can simply put the following into your @p "~/.emacs" file
+ * @verbatim
+ (add-to-list 'load-path "/usr/local/share/emacs")
+@endverbatim
+ *
+ * To use Flusspferd mode you should have to put the following
+ * line into your ~/.emacs file
+ * @verbatim
+ (autoload 'flusspferd "flusspferd" "Inferior Flusspferd Mode." t)
+@endverbatim
+ * and restart Emacs. By typing @p "M-x flusspferd" you can start
+ * the Flusspferd Shell.
+ *
+ * There is also a minor mode for sending javascript code to the Flusspferd
+ * Shell. You can use it by adding the following line to your @p "~/.emacs" file
+ * @verbatim
+ (autoload 'flusspferd-minor-mode "flusspferd" "Flusspferd Minor Mode" t)
+@endverbatim
+ * By calling @p "M-x flusspferd-minor-mode" you can now use e.g.
+ * @p flusspferd-eval-buffer-and-go to evaluate the buffer and switch to
+ * the Flusspferd Shell to see the result.
+ *
+ * If you want to activate the minor mode everytime you edit a javascript file
+ * you can simply add a hook to your javascript-mode. If you use
+ * <a href="http://code.google.com/p/js2-mode/">js2-mode</a> you have to add the
+ * following line to your @p "~/.emacs" file
+ * @verbatim
+ (add-hook 'js2-mode-hook 'flusspferd-minor-mode)
+@endverbatim
+ * if you use
+ * <a href="http://www.brgeight.se/downloads/emacs/javascript.el">
+ * javascript-mode</a> you have to add
+ * @verbatim
+(add-hook 'javascript-mode-hook 'flusspferd-minor-mode)
+@endverbatim
+ */

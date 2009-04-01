@@ -63,7 +63,8 @@ Hello Shell
  * The flusspferd mode can be used to interactively develop
  * javascript code by sending it to the Flusspferd shell.
  *
- * TODO
+ * See \ref emacs-install "Emacs Mode install instructions"
+ * on how to use it.
  *
  * Next: \ref js-tutorial-io
  *
