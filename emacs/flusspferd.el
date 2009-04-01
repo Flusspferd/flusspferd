@@ -136,7 +136,12 @@
   :keymap flusspferd-minor-mode-map
   (easy-menu-add flusspferd-minor-mode-menu))
 
-(defun inferior-flusspferd-mode () )
+(define-derived-mode inferior-flusspferd-mode comint-mode "Inferior Flusspferd"
+                     "Embeds Flusspferd as a Javascript REPL into Emacs."
+                     :group 'flusspferd
+                     (setq comint-prompt-regexp "^> ")
+                     (setq comint-use-prompt-regexp t)
+                     (setq comint-process-echoes t))
 
 ;;;###autoload
 (defun flusspferd ()
