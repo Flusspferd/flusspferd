@@ -78,6 +78,8 @@
 (flusspferd-defun-and-go flusspferd-eval-region (start end)
   "Evaluates the region between START and END with flusspferd."
   (interactive "r")
+  (unless (flusspferd-is-running-p)
+    (flusspferd))
   (comint-send-region flusspferd-buffer-name start end)
   (comint-send-string flusspferd-buffer-name "\n"))
 
