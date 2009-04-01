@@ -57,6 +57,14 @@ $ flusspferd
 Hello Shell
 @endverbatim
  *
+ * @section js-tutorial-emacs Using inferior-flusspferd-mode
+ * Flusspferd comes with an
+ * <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode.
+ * The flusspferd mode can be used to interactively develop
+ * javascript code by sending it to the Flusspferd shell.
+ *
+ * TODO
+ *
  * Next: \ref js-tutorial-io
  *
  */
