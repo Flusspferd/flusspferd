@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 /**
+ * Construct a cURL object. Takes no parameters
  * @name cURL
  * @constructor
  *
@@ -81,33 +82,48 @@ THE SOFTWARE.
      * {@link #headerReceived} for caveats.
      * @name protocol
      * @fieldof cURL.prototype
+     * @type strings
      */
     /** 
      * Numeric status code. Might not be defined for non-HTTP requests. See
      * {@link #headerReceived} for caveats.
      * @name status
      * @fieldof cURL.prototype
+     * @type int
      */
     /** 
-     * HUman readable status message. Might not be defined for non-HTTP
+     * Human readable status message. Might not be defined for non-HTTP
      * requests. See {@link #headerReceived} for caveats.
-     * @name status
+     * @name statusMessage
      * @fieldof cURL.prototype
+     * @type string
      */
     /**
-     * {@link Blob} of the response content. If you replace the
+     * Binary response content. If you replace the
      * {@link #dataReceived} callback than you will have to update this blob
      * yourself.
      * @name responseBlob
-     * @fieldOf cURL.prototpe
-     */
-    /**
-     * {@link HTTP.Headers} object containing response headers. See 
-     * {@link headerReceived} for caveats.
-     * @name headers
      * @fieldOf cURL.prototype
+     * @type Blob
      */
 
+    /**
+     * HTTP response headers (if applicable). See * {@link headerReceived} for
+     * caveats.
+     * @name headers
+     * @fieldOf cURL.prototype
+     * @type HTTP.Headers
+     */
+
+
+    /**
+     * Set the request method to use when {@link #perform} is called. Currently understood
+     * values are "GET", "POST", "PUT" and "HEAD".
+     * @name setMethod
+     * @methodOf cURL.prototype
+     *
+     * @param {string} method
+     */
 
     /**
      * Called for each line of the headers. The line includes the new line
@@ -151,6 +167,13 @@ THE SOFTWARE.
   { // Stomp on the module not found message
   }
 
+  /**
+   * Called when a chunk of body data is available. The default implementation
+   * simply appends each chunk of data into <responseBlob>.
+   * @event
+   *
+   * @param {Blob} blob chunk of response data
+   */
   cURL.prototype.dataReceived = function (blob) {
     this.responseBlob.append(blob);
   }
@@ -178,90 +201,3 @@ THE SOFTWARE.
 
   return cURL;
 })()
-
-/**
- * Class: cURL
- * 
- * Network access via libcurl.
- *
- * Synopsis:
- *
- * (code)
- * import('curl')
- * c = new cURL();
- * c.url = 'http://www.google.com';
- * var status = c.perform();
- *
- * // Currently there is no auto-following of redirects, so:
- * while (status >= 300 && status <= 399) {
- *  c.url = c.header.Location;
- *  status = c.perform();
- * }
- * IO.stdout.write(c.responseBlob);
- * (end code)
- *
- * Group: Constructor Properties
- *
- * Property: supportedProtocols
- *
- * Array of protocols by this module.
- *
- * Property: versionHex
- *
- * libcurl version number in hex. For example 7.18.2 is 0x071202
- *
- * Property: versionStr
- *
- * libcurl version number in dotted-decimal string form.
- *
- * Group: Constructor
- *
- * Constructor: cURL
- *
- * Construct a cURL object. Takes no parameters
- *
- * Group: Methods
- *
- * Method: perform
- *
- * Perform the request on <url>.
- *
- * Before the request starts the <headers>, <protocol>, <status>,
- * <statusMessage> and the <responseBlob> properties are cleared
- *
- * Method: setMethod
- *
- * Set the request method to use when <perform> is called. Currently understood
- * values are "GET", "POST", "PUT" and "HEAD".
- *
- * Parameters:
- *  method - request method
- *
- *
- * Group: Callback Methods
- *
- * Optional methods that get called when headers or data are received. 
- *
- * Method: dataReceived
- *
- * Called when a chunk of body data is available. The default implementation
- * simply appends each chunk of data into <responseBlob>.
- *
- * Parameters:
- *  data - a <Blob> of body data.
- *
- * Method: headerReceived
- *
- * Called for each line of the headers. The line includes the new line
- * characters, and the end of headers are signified by "\r\n".
- *
- * Populates the <headers>, <protocol>, <status> and <statusMessage> properties
- * after all headers have been received.
- *
- * Parameters:
- *  line - a single line of header data
- *
- * This default implementation is conditionally provided on being able to load
- * the <HTTP.Headers> module. If it cannot be loaded then the <headers>,
- * <protocol>, <status> and <statusMessage> properties will not be defined.
- */
