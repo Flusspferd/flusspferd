@@ -126,7 +126,9 @@
     ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
     "--"
     ["Go to Flusspferd buffer" flusspferd-switch-to
-     :active (not (string= (buffer-name) flusspferd-buffer-name))]))
+     :visible (flusspferd-is-running-p)
+     :active (not (string= (buffer-name) flusspferd-buffer-name))]
+    ["Start Flusspferd Shell" flusspferd :visible (not (flusspferd-is-running-p))]))
 
 ;;;###autoload
 (define-minor-mode flusspferd-minor-mode
