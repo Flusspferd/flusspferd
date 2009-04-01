@@ -54,13 +54,17 @@
   :group 'flusspferd
   :type '(string))
 
+(defun flusspferd-is-running-p ()
+  "Checks if flusspferd is already running"
+  (comint-check-proc flusspferd-buffer-name))
+
 (defun flusspferd-mode () )
 
 ;;;###autoload
 (defun flusspferd ()
   "Flusspferd (Javascript interpreter) REPL"
   (interactive)
-  (unless (comint-check-proc flusspferd-buffer-name)
+  (unless (flusspferd-is-running-p)
     (let ((flusspferd-buffer
            (apply 'make-comint-in-buffer "Flusspferd" flusspferd-buffer-name
                   flusspferd-executable nil
@@ -71,6 +75,12 @@
   (when (interactive-p)
       (switch-to-buffer flusspferd-buffer-name)))
 
-;; TODO flusspferd-eval-region flusspferd-eval-last-sexp flusspferd-eval-buffer flusspferd-minor-mode and so on
+(defun flusspferd-eval-region (start end)
+  "evaluated the region between START and END with flusspferd."
+  (interactive "r")
+  (comint-send-region flusspferd-buffer-name start end)
+  (comint-send-string flusspferd-buffer-name "\n"))
+
+;; TODO flusspferd-eval-last-sexp flusspferd-eval-buffer flusspferd-minor-mode and so on
 
 (provide 'flusspferd)
