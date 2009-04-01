@@ -93,18 +93,21 @@
 (flusspferd-defun-and-go flusspferd-eval-last-sexp ()
   "Evaluate last sexp."
   (interactive)
-  (flusspferd-eval-region (save-excursion
-                            (backward-sexp) (point))
-                          (point)))
+  (flusspferd-eval-region
+   (save-excursion (backward-sexp) (point))
+   (point)))
 
 (flusspferd-defun-and-go flusspferd-eval-buffer ()
   "Evaluate buffer with Flusspferd."
   (interactive)
   (flusspferd-eval-region (point-min) (point-max)))
 
-;(flusspferd-defun-and-go flusspferd-eval-line ()
-;  "Evaluate current line with Flusspferd."
-;  )
+(flusspferd-defun-and-go flusspferd-eval-line ()
+  "Evaluate current line with Flusspferd."
+  (interactive)
+  (flusspferd-eval-region
+   (save-excursion (move-beginning-of-line nil) (point))
+   (save-excursion (move-end-of-line nil) (point))))
 
 (defvar flusspferd-minor-mode-map
   (let ((map (make-sparse-keymap)))
