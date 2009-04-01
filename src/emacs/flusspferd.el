@@ -110,11 +110,18 @@
     ;; TODO
     map))
 
+(defun flusspferd-helper-mark-active ()
+  "Checks if there is an active region"
+  (if (functionp 'use-region-p)
+      (use-region-p)
+      (and transient-mark-mode mark-active)))
+
 (easy-menu-define flusspferd-minor-mode-menu flusspferd-minor-mode-map
   "Flusspferd menu"
   '("Flusspferd"
     ["Evaluate Last S-Expression" flusspferd-eval-last-sexp t]
-    ["Evaluate Region" flusspferd-eval-region t] ;; TODO find out if there is a region
+    ["Evaluate Region" flusspferd-eval-region
+     :active (flusspferd-helper-mark-active)]
     ["Evaluate Buffer" flusspferd-eval-buffer t]
     ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
     "--"
