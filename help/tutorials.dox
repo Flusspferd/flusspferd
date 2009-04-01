@@ -29,6 +29,7 @@ THE SOFTWARE.
  *
  * - @subpage install
  *   - @ref ubuntu
+ *   - @ref emacs-install
  *
  * - @subpage cpp-tutorial
  *   - @ref cpp-tutorial-firstprogram
