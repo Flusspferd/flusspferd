@@ -37,7 +37,7 @@ THE SOFTWARE.
  * var status = c.perform();
  *
  * // Currently there is no auto-following of redirects, so:
- * while (status >= 300 && status <= 399) {
+ * while (status >= 300 &amp;&amp; status <= 399) {
  *  c.url = c.header.Location;
  *  status = c.perform();
  * }
@@ -122,7 +122,7 @@ THE SOFTWARE.
      * @name setMethod
      * @methodOf cURL.prototype
      *
-     * @param {string} method
+     * @param {string} method request method
      */
 
     /**
@@ -169,7 +169,7 @@ THE SOFTWARE.
 
   /**
    * Called when a chunk of body data is available. The default implementation
-   * simply appends each chunk of data into <responseBlob>.
+   * simply appends each chunk of data into {@link #responseBlob}.
    * @event
    *
    * @param {Blob} blob chunk of response data
