@@ -5,4 +5,4 @@ if [ -z "$CLASSPATH" ]; then
   exit 1
 fi
 
-java JsRun vendor/JSDoc-2.1.0/run.js -c=jsdoc_template/config.json js/src plugins/
+java JsRun vendor/JSDoc-2.1.0/run.js -c=jsdoc_template/config.json js/src plugins/ src
