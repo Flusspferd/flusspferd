@@ -23,6 +23,7 @@
 
 import sys, os
 import Utils, Options
+import TaskGen
 
 VERSION = 'dev'
 APPNAME = 'flusspferd'
@@ -250,6 +251,9 @@ int main() {
                         uselib_store='CURL') != None):
         conf.env['ENABLE_CURL'] = True
 
+    if conf.find_program('emacs', var='EMACS'):
+        conf.env['HAS_EMACS'] = True
+
     conf.env['ENABLE_SQLITE'] = Options.options.enable_sqlite
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
     conf.env['ENABLE_XML'] = Options.options.enable_xml
@@ -301,6 +305,9 @@ def build(bld):
 
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
+    if bld.env['HAS_EMACS']:
+        bld.add_subdirs('emacs')
+        bld.install_files('${PREFIX}/share/emacs/site-lisp/', 'emacs/*.el')
     build_pkgconfig(bld)
     bld.install_files('${PREFIX}/include/flusspferd/',
                       'include/flusspferd/*.hpp')
@@ -331,3 +338,13 @@ def build(bld):
     etc.apply();
 
 def shutdown(): pass
+
+TaskGen.declare_chain(
+    name = 'emacs',
+    rule = '${EMACS} -q -batch -f batch-byte-compile ${SRC} && mv ${SRC}c ${TGT}',
+    ext_in = '.el',
+    ext_out = '.elc',
+    reentrant = 0
+    )
+# TODO install .elc
+
