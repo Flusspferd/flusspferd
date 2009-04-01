@@ -52,9 +52,7 @@ THE SOFTWARE.
  *
  * @class SQLite3 Database handle.
  *
- * <br /><br />
- *
- * Example usage: 
+ * <h2>Example:</h2> 
  * <pre class="code">
  * Import('SQLite3');
  * var db = new SQLite3('./my_db.sqlite');
