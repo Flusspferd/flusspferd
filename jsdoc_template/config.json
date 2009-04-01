@@ -1,0 +1,7 @@
+{
+  d: 'html/docs',
+  t: 'jsdoc_template',
+  r: true,
+  x: 'js,jsdoc',
+  q: true
+}
