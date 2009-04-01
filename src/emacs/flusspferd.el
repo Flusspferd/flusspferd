@@ -29,7 +29,10 @@
 ;;
 ;; ...
 
+;;; Code:
+
 (require 'comint)
+(require 'easymenu)
 
 ;; Options
 (defgroup flusspferd nil
@@ -55,10 +58,78 @@
   :type '(string))
 
 (defun flusspferd-is-running-p ()
-  "Checks if flusspferd is already running"
+  "Checks if Flusspferd is already running"
   (comint-check-proc flusspferd-buffer-name))
 
-(defun flusspferd-mode () )
+(defun flusspferd-switch-to ()
+  "Switch to Flusspferd buffer"
+  (interactive)
+  (switch-to-buffer flusspferd-buffer-name))
+
+(defmacro flusspferd-defun-and-go (name arglist docstring &rest body)
+  "defun a function with name NAME and NAME-and-go which calls
+ (switch-to-buffer flusspferd-buffer-name) when finished."
+  (let ((name-and-go (intern (concat (symbol-name name) "-and-go")))
+        (new-docstring (concat docstring " Switches to Flusspferd buffer when finished.")))
+    `(progn
+       (defun ,name ,arglist ,docstring ,@body)
+       (defun ,name-and-go ,arglist ,new-docstring ,@body (list flusspferd-switch-to)))))
+
+(flusspferd-defun-and-go flusspferd-eval-region (start end)
+  "Evaluates the region between START and END with flusspferd."
+  (interactive "r")
+  (comint-send-region flusspferd-buffer-name start end)
+  (comint-send-string flusspferd-buffer-name "\n"))
+
+(flusspferd-defun-and-go flusspferd-eval-last-defun ()
+  "Evaluate the function definition as determined by c-mark-function."
+  (interactive)
+  (save-excursion
+    (c-mark-function)
+    (flusspferd-eval-region (point) (mark))))
+
+(flusspferd-defun-and-go flusspferd-eval-last-sexp ()
+  "Evaluate last sexp."
+  (interactive)
+  (flusspferd-eval-region (save-excursion
+                            (backward-sexp) (point))
+                          (point)))
+
+(flusspferd-defun-and-go flusspferd-eval-buffer ()
+  "Evaluate buffer with Flusspferd."
+  (interactive)
+  (flusspferd-eval-region (point-min) (point-max)))
+
+;(flusspferd-defun-and-go flusspferd-eval-line ()
+;  "Evaluate current line with Flusspferd."
+;  )
+
+(defvar flusspferd-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-x\C-e" 'flusspferd-eval-last-sexp)
+    ;; TODO
+    map))
+
+(easy-menu-define flusspferd-minor-mode-menu flusspferd-minor-mode-map
+  "Flusspferd menu"
+  '("Flusspferd"
+    ["Evaluate Last S-Expression" flusspferd-eval-last-sexp t]
+    ["Evaluate Region" flusspferd-eval-region t] ;; TODO find out if there is a region
+    ["Evaluate Buffer" flusspferd-eval-buffer t]
+    ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
+    "--"
+    ["Go to Flusspferd buffer" flusspferd-switch-to
+     :active (not (string= (buffer-name) flusspferd-buffer-name))]))
+
+;;;###autoload
+(define-minor-mode flusspferd-minor-mode
+    "Flusspferd minor mode. Provides keymap to evaluate Javascript code with Flusspferd."
+  :init-value nil
+  :lighter "Flusspferd"
+  :keymap flusspferd-minor-mode-map
+  (easy-menu-add flusspferd-minor-mode-menu))
+
+(defun inferior-flusspferd-mode () )
 
 ;;;###autoload
 (defun flusspferd ()
@@ -71,16 +142,8 @@
                   (split-string flusspferd-options))))
       (save-excursion
         (set-buffer flusspferd-buffer)
-        (flusspferd-mode))))
+        (inferior-flusspferd-mode))))
   (when (interactive-p)
       (switch-to-buffer flusspferd-buffer-name)))
-
-(defun flusspferd-eval-region (start end)
-  "evaluated the region between START and END with flusspferd."
-  (interactive "r")
-  (comint-send-region flusspferd-buffer-name start end)
-  (comint-send-string flusspferd-buffer-name "\n"))
-
-;; TODO flusspferd-eval-last-sexp flusspferd-eval-buffer flusspferd-minor-mode and so on
 
 (provide 'flusspferd)
