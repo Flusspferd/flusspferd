@@ -42,7 +42,7 @@ def set_options(opt):
     opt.add_option('--enable-tests', action='store_true',
                    help='Enable tests')
     opt.add_option('--disable-io', action='store_true',
-                   help='Enable IO support')
+                   help='Disable IO support.')
     opt.add_option('--disable-xml', action='store_true',
                    help='Disable XML extension even if libxml2 is installed.')
     opt.add_option('--disable-curl', action='store_true',
