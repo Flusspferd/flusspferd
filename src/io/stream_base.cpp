@@ -181,7 +181,7 @@ void stream_base::print(call_context &x) {
 
       array arr = p.get_object();
       arguments arg;
-      std::size_t length = arr.get_length();
+      std::size_t length = arr.length();
       for (std::size_t i = 0; i < length; ++i)
         arg.push_back(arr.get_element(i));
 

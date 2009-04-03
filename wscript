@@ -41,8 +41,6 @@ def set_options(opt):
                    help='Set non-standard CXXFLAGS')
     opt.add_option('--enable-tests', action='store_true',
                    help='Enable tests')
-    opt.add_option('--enable-sandbox', action='store_true',
-                   help='Enable sandbox tests')
     opt.add_option('--enable-io', action='store_true',
                    help='Enable IO support')
     opt.add_option('--enable-xml', action='store_true',
@@ -122,8 +120,8 @@ def configure(conf):
         lib_path = [Options.options.spidermonkey_library]
     if Options.options.spidermonkey_path:
         include_path = [os.path.join(Options.options.spidermonkey_path,
-                                    "include")]
-        lib_path = [os.path.join(Options.options.spidermonkey_path, "lib")]
+                                    'include')]
+        lib_path = [os.path.join(Options.options.spidermonkey_path, 'lib')]
 
     ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
     if ret == False:
@@ -159,7 +157,12 @@ def configure(conf):
                    fragment='''
 #include <js/jsapi.h>
 int main() {
+#if JS_VERSION >= 180
+  // JS 1.8 allows this to be set at runtime
+  return 0;
+# else
   return JS_CStringsAreUTF8() ? 0 : 1;
+#endif
 }
 ''')
 
@@ -180,7 +183,7 @@ int main() {
 #include <sqlite3.h>
 #include <stdio.h>
 int main() {
-   if(SQLITE_VERSION_NUMBER <= 3004000) {
+   if(SQLITE_VERSION_NUMBER < 3004000) {
      fprintf(stderr, "Need sqlite3 version 3.4.0 or better. Found %s\\n",
              SQLITE_VERSION);
      return 1;
@@ -247,20 +250,41 @@ int main() {
                         uselib_store='CURL') != None):
         conf.env['ENABLE_CURL'] = True
 
+    conf.env['ENABLE_SQLITE'] = Options.options.enable_sqlite
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
-    conf.env['ENABLE_SANDBOX'] = Options.options.enable_sandbox
     conf.env['ENABLE_XML'] = Options.options.enable_xml
     conf.env['ENABLE_IO'] = Options.options.enable_io
+
+def get_cflags(bld, envvars):
+    result = ''
+    def_pattern = bld.env['CXXDEFINES_ST']
+    inc_pattern = bld.env['CPPPATH_ST']
+    for envvar in envvars:
+        defines = bld.env['CXXDEFINES_' + envvar]
+        if defines:
+            if isinstance(defines, basestring):
+                defines = [defines]
+            for i in defines:
+                result += def_pattern % i + ' '
+        includes = bld.env['CPPPATH_' + envvar]
+        if includes:
+            if isinstance(includes, basestring):
+                includes = [includes]
+            for i in includes:
+                result += inc_pattern % i + ' '
+    return result
 
 def build_pkgconfig(bld):
     obj = bld.new_task_gen('subst')
     obj.source = 'flusspferd.pc.in'
     obj.target = 'flusspferd.pc'
+    cflags = get_cflags(bld, ['JS_H', 'BOOST'])
     obj.dict = {
         'PREFIX': bld.env['PREFIX'],
         'LIBDIR': os.path.normpath(bld.env['PREFIX'] + '/lib'),
         'INCLUDEDIR': os.path.normpath(bld.env['PREFIX'] + '/include'),
-        'VERSION': VERSION
+        'VERSION': VERSION,
+        'CFLAGS': cflags
         }
     obj.install_path = os.path.normpath(bld.env['PREFIX'] + '/lib/pkgconfig/')
     obj.apply()
@@ -268,7 +292,8 @@ def build_pkgconfig(bld):
 def build(bld):
     bld.add_subdirs('src')
     bld.add_subdirs('programs')
-    bld.add_subdirs('plugins/sqlite3')
+    if bld.env['ENABLE_SQLITE']:
+        bld.add_subdirs('plugins/sqlite3')
     bld.add_subdirs('plugins/environment')
     bld.add_subdirs('plugins/posix')
     if bld.env['ENABLE_CURL']:
@@ -276,8 +301,6 @@ def build(bld):
 
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
-    if bld.env['ENABLE_SANDBOX']:
-      bld.add_subdirs('sandbox')
     build_pkgconfig(bld)
     bld.install_files('${PREFIX}/include/flusspferd/',
                       'include/flusspferd/*.hpp')
@@ -286,16 +309,16 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
-    bld.install_files('${PREFIX}/lib/flusspferd/modules/http',
-                      'js/src/http/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/HTTP',
+                      'js/src/HTTP/*.js')
 
     bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
 
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
-                   (bld.env['shlib_PATTERN'] % 'xml'),
+                   (bld.env['shlib_PATTERN'] % 'XML'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-xml'))
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
-                   (bld.env['shlib_PATTERN'] % 'io'),
+                   (bld.env['shlib_PATTERN'] % 'IO'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
 
     etc = bld.new_task_gen('subst')

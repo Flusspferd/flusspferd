@@ -11,4 +11,4 @@ Description: Javascript Bindings for C++
 Version: @VERSION@
 # Requires:
 Libs: -L${libdir} -lflusspferd
-Cflags: -I${includedir}
+Cflags: -I${includedir} @CFLAGS@

@@ -45,6 +45,8 @@ class native_object_base;
 template<typename T>
 T &cast_to_derived(native_object_base &);
 
+#ifndef IN_DOXYGEN
+
 namespace detail {
 
 template<typename T>
@@ -93,7 +95,7 @@ T get_native_object_parameter2(call_context &x) {
 #define FLUSSPFERD_DECLARE_ARG_CONVERTER(z, i, T) \
   typename convert<typename T::BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _type)>::from_value \
   BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value); \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_ARG_CONVERTERS(first, last, T) \
   BOOST_PP_REPEAT_FROM_TO( \
@@ -101,13 +103,13 @@ T get_native_object_parameter2(call_context &x) {
     BOOST_PP_INC(last), \
     FLUSSPFERD_DECLARE_ARG_CONVERTER, \
     T) \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CONVERT_ARG(z, i, offset) \
   BOOST_PP_COMMA_IF(BOOST_PP_GREATER(i, 1)) \
   BOOST_PP_CAT(BOOST_PP_CAT(arg, i), _from_value) \
   .perform((x).arg[BOOST_PP_SUB(BOOST_PP_DEC(i), offset)]) \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CONVERT_ARGS(first, last, offset) \
   BOOST_PP_REPEAT_FROM_TO( \
@@ -115,11 +117,11 @@ T get_native_object_parameter2(call_context &x) {
     BOOST_PP_INC(last), \
     FLUSSPFERD_CONVERT_ARG, \
     offset) \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_(z, n_args, d) \
   template<typename T, typename R, typename C> \
-  struct function_adapter<T, R, n_args, C> { \
+  struct function_adapter<T, false, R, n_args, C> { \
     typename convert<R>::to_value to_value; \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
@@ -128,11 +130,11 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = (n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_R_VOID(z, n_args, d) \
   template<typename T, typename C> \
-  struct function_adapter<T, void, n_args, C> { \
+  struct function_adapter<T, false, void, n_args, C> { \
     FLUSSPFERD_DECLARE_ARG_CONVERTERS(1, n_args, T) \
     void action(T const &function, call_context &x) { \
       (void)x; \
@@ -140,12 +142,12 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = (n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_NATIVE_OBJECT(z, n_args, d) \
   template<typename T, typename R> \
   struct function_adapter< \
-    T, R, n_args, \
+    T, true, R, n_args, \
     typename boost::enable_if< \
       typename is_native_object_type<typename T::arg1_type>::type \
     >::type \
@@ -162,12 +164,12 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = BOOST_PP_DEC(n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_NATIVE_OBJECT_R_VOID(z, n_args, d) \
   template<typename T> \
   struct function_adapter< \
-    T, void, n_args, \
+    T, true, void, n_args, \
     typename boost::enable_if< \
       typename is_native_object_type<typename T::arg1_type>::type \
     >::type \
@@ -182,12 +184,12 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = BOOST_PP_DEC(n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_OBJECT(z, n_args, d) \
   template<typename T, typename R> \
   struct function_adapter< \
-    T, R, n_args, \
+    T, true, R, n_args, \
     typename boost::enable_if< \
       typename boost::is_convertible<object, typename T::arg1_type>::type \
     >::type \
@@ -203,12 +205,12 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = BOOST_PP_DEC(n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_OBJECT_R_VOID(z, n_args, d) \
   template<typename T> \
   struct function_adapter< \
-    T, void, n_args, \
+    T, true, void, n_args, \
     typename boost::enable_if< \
       typename boost::is_convertible<object, typename T::arg1_type>::type \
     >::type \
@@ -223,7 +225,7 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = BOOST_PP_DEC(n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_ARG_CONVERTER_MEMFN(z, i, d) \
   typename convert<BOOST_PP_CAT(P, i)>::from_value \
@@ -249,7 +251,7 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = (n_args); \
   }; \
-  /**/
+  /* */
 
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTER_MEMFN_R_VOID(z, n_args, d) \
@@ -269,7 +271,7 @@ T get_native_object_parameter2(call_context &x) {
     } \
     static std::size_t const arity = (n_args); \
   }; \
-  /**/
+  /* */
 
 #define FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(suffix) \
   BOOST_PP_REPEAT_FROM_TO( \
@@ -277,10 +279,11 @@ T get_native_object_parameter2(call_context &x) {
     BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT), \
     BOOST_PP_CAT(FLUSSPFERD_DECLARE_FUNCTION_ADAPTER, suffix), \
     ~) \
-  /**/
+  /* */
 
 template<
   typename Type,
+  bool Method,
   typename ResultType = typename Type::result_type,
   std::size_t Arity = Type::arity,
   typename Condition = void>
@@ -309,28 +312,44 @@ FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_MEMFN_R_VOID)
 
 }
 
-template<typename T>
+#endif
+
+/**
+ * Function adapter.
+ *
+ * @ingroup functions
+ */
+template<typename T, bool Method>
 class function_adapter {
 public:
   typedef T spec_type;
   typedef boost::function<spec_type> function_type;
 
+private:
+  typedef detail::function_adapter<function_type, Method> adapter_type;
+
+public:
   function_adapter(function_type const &function)
     : function(function)
   {}
 
   void operator() (call_context &x) {
-    detail::function_adapter<function_type> function_adapter_implementation;
+    adapter_type function_adapter_implementation;
     function_adapter_implementation.action(function, x);
   }
 
   static std::size_t const arity =
-    detail::function_adapter<function_type>::arity;
+    adapter_type::arity;
 
 private:
   function_type function;
 };
 
+/**
+ * Function adapter.
+ *
+ * @ingroup functions
+ */
 template<typename R, typename T>
 class function_adapter_memfn {
 public:

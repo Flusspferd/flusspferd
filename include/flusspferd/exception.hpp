@@ -31,30 +31,83 @@ namespace flusspferd {
 
 class value;
 
+/**
+ * Exception class.
+ *
+ * @ingroup exceptions
+ */
 class exception : public std::runtime_error {
 public:
+  /**
+   * Constructor.
+   *
+   * If available, this constructor will create an exception containing the last
+   * Javascript engine error. Otherwise, it will create an exception of type
+   * @p type.
+   *
+   * @param what The error message.
+   * @param type The error type (if applicable).
+   */
   exception(char const *what, std::string const &type = "Error");
+
+  /**
+   * Value constructor.
+   *
+   * Will create an exception containing @p val. The error message will be the
+   * string representation of @p val.
+   */
   exception(value const &val);
+
+  /// Destructor.
   ~exception() throw();
 
+  /**
+   * The exception value.
+   *
+   * @return The exception value.
+   */
   value val() const;
+
+  /**
+   * "Emptiness".
+   *
+   * Will return only if the exception contains an exception fetched from the
+   * underlying Javascript engine.
+   *
+   * @return Whether this exception is "empty".
+   */
   bool empty() const;
 
 public:
+#ifndef IN_DOXYGEN
   void throw_js_INTERNAL();
+#endif
 
 private:
   class impl;
   boost::shared_ptr<impl> p;
 };
 
+/**
+ * Indicator exception.
+ *
+ * If thrown inside a script or a Javascript function, this will quit
+ * the script immediately.
+ *
+ * @ingroup exceptions
+ */
 class js_quit {
 public:
+  /// Constructor.
   js_quit();
+
+  /// Destructor.
   virtual ~js_quit();
 };
 
 }
+
+#ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_CALLBACK_BEGIN try
 
@@ -70,5 +123,7 @@ public:
       return JS_FALSE; \
     } \
     return JS_TRUE
+
+#endif
 
 #endif /* FLUSSPFERD_EXCEPTION_HPP */

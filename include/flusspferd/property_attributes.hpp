@@ -1,6 +1,6 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,21 +21,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-(function() {
-  $importer.load('sqlite3', true);
+#ifndef FLUSSPFERD_PROPERTY_ATTRIBUTES
+#define FLUSSPFERD_PROPERTY_ATTRIBUTES
 
-  var SQLite3 = $importer.context.SQLite3;
+#include <boost/optional.hpp>
 
-  // generators are easier to write in JS space
-  SQLite3.Cursor.prototype.__iterator__ = function() {
-    while (true) {
-      let row = this.next();
-      if (row == null)
-        throw StopIteration;
-      yield row;
-    }
+namespace flusspferd {
 
-  };
+class function;
 
-  return SQLite3;
-})()
+/**
+ * A property's attributes: flags, getters and setters.
+ *
+ * @ingroup property_types
+ */
+struct property_attributes {
+  /// The property's flags.
+  unsigned flags;
+
+  /// The property's getter.
+  boost::optional<function const &> getter;
+
+  /// The property's setter.
+  boost::optional<function const &> setter;
+
+  /// Construct default attributes.
+  property_attributes();
+
+  /**
+   * Construct property attributes.
+   *
+   * @param flags The flags.
+   * @param getter The getter.
+   * @param setter The setter.
+   */
+  property_attributes(unsigned flags, 
+    boost::optional<function const &> getter = boost::none,
+    boost::optional<function const &> setter = boost::none);
+};
+
+}
+
+#endif

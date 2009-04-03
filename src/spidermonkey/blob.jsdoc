@@ -1,0 +1,138 @@
+Class: Blob
+
+Binary data storage class.
+
+Javascript strings are stored as UTF8 bytes. This makes storing and processing
+strings in other encodings or random binary data (such as images) hard. 
+
+To make this easier to handle, we've created the Blob class.
+
+You can treat a Blob similar to an array with its <length> property and array
+sub-script accessors, but if you are using large blobs it is worth mentioning
+that each extra property you access this way requires extra memory from
+Spidermonkey. In this case its highly recomended you use <get> and <set>
+instead.
+
+See Also:
+
+  <IO.BlobStream>.
+
+Group: Constructor Functions
+
+Function: fromUtf8
+
+  Parameters:
+    str - data
+
+  Create a blob from the UTF-8 byte sequence of str.
+
+Function: fromUtf16
+
+  Parameters:
+    str - data
+
+  Create a blob from the UTF-16 (machine specific endianness) representation of str.
+
+
+
+Group: Constructor
+
+Constructor: Blob
+
+  Create a new Blob. Pass either an array of integers (each one in the range
+  [0,255]) to create a blob of those bytes, or pass a single integer to
+  pre-allocate that many bytes
+
+  Parameters:
+    length - number of bytes to preallocate; or
+    array - array of initial bytes.
+
+
+Group: Methods
+
+Function: append
+
+  Append data from another blob into this one.
+
+  Parameters:
+    blob - blob to append to this one.
+
+Function: toArray
+
+  Return an Array of bytes
+
+Function: clone
+
+  Return a new Blob instance containing current data.
+
+Function: slice
+
+  Extract a portion of data into a new Blob.
+
+  Parameters:
+    from - start index
+    to   - (optional) end index.
+
+  Either parameter can be negative, in which case it counts backwards from the last 
+  byte:
+
+  > (new Blob([4,5,6,7,8,9,0])).slice(1, -3).toArray(); // [5,6,7]
+  > (new Blob([4,5,6,7,8,9,0])).slice(-3).toArray(); // [8,9,0]
+
+Function: asUtf8
+
+  Treat the internal bytes as a UTF-8 byte sequence and return a string.
+
+  If the blob contains an invalid UTF-8 sequence a TypeError will be 
+  thrown:
+
+  > (new Blob([66,66])).asUtf8(); // "BB"
+  > (new Blob([66,0xC3,0xE9])).asUtf8(); // "Bé"
+  > (new Blob([66,200,200])).asUtf8(); // TypeError
+
+Function: asUtf16
+
+  Similar to <asUtf8> but instead treat the bytes as a UTF-16 byte sequence
+
+  > (new Blob([66,0,66,0]).asUtf16(); // "BB"
+  > (new Blob([66,0,0xE9,0]).asUtf16(); // "Bé"
+
+  Since spidermonkey currently does not handle UTF-16 surrogates (i.e. any
+  characters outside of hte Basic-Multi-Lingual plane) this method shouldn't
+  throw a TypeError.
+
+Function: get
+
+  Return a byte of data. Provided as alternative means to access data in large
+  blobs without memory bloat.
+
+  Parameters:
+    idx - byte index
+
+Function: set
+
+  Sets a byte of data. idx must be less than the current <length>
+
+  Parameters:
+    idx - byte index
+    data - data to set
+
+
+Group: Properties
+
+Property: length
+
+  Length of blob in bytes. Setting this value will resize the blob, and new
+  entries initalized to 0.
+
+Property: values
+
+  Iterator that returns values instead of array indicies.
+
+  > for (var byte in blob.values) { ... }
+
+Property: pairs
+
+  Iterator that returns [index,byte] pairs.
+
+  > for (var [idx, byte] in blob.pairs) { ... }

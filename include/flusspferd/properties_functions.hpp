@@ -28,6 +28,15 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * Load the properties function Object.defineProperty modelled after
+ * [[DefineOwnProperty]] from the ES3.1 specification.
+ *
+ * @param o The container (must contain an Object property) to load the
+ *          functions into.
+ *
+ * @ingroup jsext
+ */
 void load_properties_functions(object o = global());
 
 }

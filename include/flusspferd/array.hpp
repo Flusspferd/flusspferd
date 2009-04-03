@@ -28,17 +28,36 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * A class for holding a Javascript Array.
+ *
+ * @see flusspferd::create_array()
+ *
+ * @ingroup value_types
+ * @ingroup property_types
+ */
 class array : public object {
 public:
+  /// Construct an #array from a Javascript Array object.
   array(object const &o);
 
+  /// Assign a Javascript Array object to an #array object.
   array &operator=(object const &o);
 
 public:
-  std::size_t get_length() const;
+  /// Get the length of the Array.
+  std::size_t length() const;
+
+  /// Set the length of the array, resizing it in the process.
   void set_length(std::size_t);
 
+  /// Get the length of the Array.
+  std::size_t size() const { return length(); }
+  
+  /// Get an array element.
   value get_element(std::size_t n) const;
+
+  /// Set an array element.
   void set_element(std::size_t n, value const &x);
 
 private:

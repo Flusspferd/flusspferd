@@ -28,23 +28,40 @@ THE SOFTWARE.
 #include "flusspferd/context.hpp"
 
 namespace flusspferd {
-  class context;
 
-  class current_context_scope {
-    context c;
-    context old;
-  public:
-    current_context_scope(context const &c)
+class context;
+
+/**
+ * Load a context while in scope.
+ *
+ * @ingroup contexts
+ */
+class current_context_scope {
+private:
+  context c;
+  context old;
+
+public:
+  /**
+   * Constructor.
+   *
+   * @param c The context to load.
+   */
+  current_context_scope(context const &c)
       : c(c)
-    {
-      old = enter_current_context(this->c);
-    }
+  {
+    old = enter_current_context(this->c);
+  }
 
-    ~current_context_scope() {
-      if(leave_current_context(c) && old.is_valid())
-        enter_current_context(old);
-    }
-  };
+  /**
+   * Destructor.
+   */
+  ~current_context_scope() {
+    if(leave_current_context(c) && old.is_valid())
+      enter_current_context(old);
+  }
+};
+
 }
 
 #endif /* FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP */

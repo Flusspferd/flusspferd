@@ -33,6 +33,11 @@ namespace flusspferd {
 class context;
 class object;
 
+/**
+ * Manage the current context and the initialisation of the Javascript engine.
+ *
+ * @ingroup contexts
+ */
 class init : boost::noncopyable {
   init();
 
@@ -40,47 +45,133 @@ class init : boost::noncopyable {
   boost::scoped_ptr<impl> p;
 
 public:
+#ifndef IN_DOXYGEN
   ~init();
 
   struct detail;
   friend struct init::detail;
+#endif
 
+  /**
+   * Set the current context to @p c.
+   *
+   * @param c The new current context.
+   * @return The old current context.
+   */
   context enter_current_context(context const &c);
+
+  /**
+   * Unset the current context.
+   *
+   * Sets the current context to an invalid context if the current context is
+   * @p c or the current context is already invalid.
+   *
+   * @param c The context to unset.
+   * @return Whether the unsetting was successful.
+   */
   bool leave_current_context(context const &c);
 
+  /**
+   * Get the current context.
+   *
+   * @return The current context.
+   */
   context &current_context();
 
+  /**
+   * Initialize the Javascript engine if needed. Works as a singleton.
+   *
+   * @return The global #init object (singleton).
+   */
   static init &initialize();
 };
 
+/**
+ * Set the current context to @p c.
+ *
+ * @see init::enter_current_context
+ * @ingroup contexts
+ */
 inline context enter_current_context(context const &c) {
   return init::initialize().enter_current_context(c);
 }
 
+/**
+ * Unset the current context.
+ *
+ * @see init::leave_current_context
+ * @ingroup contexts
+ */
 inline bool leave_current_context(context const &c) {
   return init::initialize().leave_current_context(c);
 }
 
+/**
+ * Get the current context.
+ *
+ * @see init::current_context
+ * @ingroup contexts
+ */
 inline context &current_context() {
   return init::initialize().current_context();
 }
 
+/**
+ * Get the global object of the current context.
+ *
+ * @see current_context, context::global
+ */
 inline object global() {
   return current_context().global();
 }
 
+/**
+ * Run the garbage collector on the current context.
+ *
+ * @see current_context, context::gc
+ *
+ * @ingroup gc
+ */
 inline void gc() {
   return current_context().gc();
 }
 
+/**
+ * Get a prototype from the current context's prototype registry.
+ *
+ * @see current_context, context::prototype(void)
+ */
 template<typename T>
 object prototype() {
   return current_context().prototype<T>();
 }
 
+/**
+ * Get a constructor from the current context's constructor registry.
+ *
+ * @see current_context, context::constructor(void)
+ */
 template<typename T>
 object constructor() {
   return current_context().constructor<T>();
+}
+
+/**
+ * Get a prototype from the current context's prototype registry.
+ *
+ * @see current_context, context::prototype(const std::string &name) const
+ */
+inline object prototype(std::string const &ID) {
+  return current_context().prototype(ID);
+}
+
+/**
+ * Get a constructor from the current context's constructor registry.
+ *
+ * @see current_context, context::constructor(const std::string & name) const
+ */
+inline object constructor(std::string const &ID) {
+  return current_context().constructor(ID);
 }
 
 }

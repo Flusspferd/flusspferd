@@ -70,22 +70,11 @@ Object.defineProperty(Function, 'bind',
     }
   });
 
-(function (g) {
-  var i = new Importer;
+Import('IO');
 
-  i.load('io');
+print = Function.bind(IO.stdout, 'print');
+readline = Function.bind(IO.stdin, 'readLine');
 
-  g.print = Function.bind(i.IO.stdout, 'print');
-  g.readline = Function.bind(i.IO.stdin, 'readLine');
-
-  g.IO = i.IO;
-
-  i.load('xml');
-
-  g.XML = i.XML;
-
-  g.$importer = i;
-})(this);
-
+Import('XML');
 
 true;

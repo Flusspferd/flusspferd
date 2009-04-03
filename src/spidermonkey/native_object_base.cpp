@@ -151,10 +151,6 @@ void native_object_base::load_into(object const &o) {
   }
 }
 
-void native_object_base::invalid_method(call_context &) {
-  throw exception("Invalid method");
-}
-
 native_object_base &native_object_base::get_native(object const &o_) {
   object o = o_;
 
@@ -373,28 +369,32 @@ JSBool native_object_base::impl::new_enumerate(
     boost::any *iter;
     switch (enum_op) {
     case JSENUMERATE_INIT:
-      iter = new boost::any;
-      int num;
-      *iter = self.enumerate_start(num);
-      *statep = PRIVATE_TO_JSVAL(iter);
-      if (idp)
-        *idp = INT_TO_JSVAL(num);
-      return JS_TRUE;
-    case JSENUMERATE_NEXT:
-    {
-      iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
-      value id;
-      if (iter->empty() || (id = self.enumerate_next(*iter)).is_undefined())
-        *statep = JSVAL_NULL;
-      else {
-        JS_ValueToId(ctx, Impl::get_jsval(id), idp);
+      {
+        iter = new boost::any;
+        int num = 0;
+        *iter = self.enumerate_start(num);
+        *statep = PRIVATE_TO_JSVAL(iter);
+        if (idp)
+          *idp = INT_TO_JSVAL(num);
+        return JS_TRUE;
       }
-      return JS_TRUE;
-    }
+    case JSENUMERATE_NEXT:
+      {
+        iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
+        value id;
+        if (iter->empty() || (id = self.enumerate_next(*iter)).is_undefined())
+          *statep = JSVAL_NULL;
+        else {
+          JS_ValueToId(ctx, Impl::get_jsval(id), idp);
+        }
+        return JS_TRUE;
+      }
     case JSENUMERATE_DESTROY:
-      iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
-      delete iter;
-      return JS_TRUE;
+      {
+        iter = (boost::any*)JSVAL_TO_PRIVATE(*statep);
+        delete iter;
+        return JS_TRUE;
+      }
     }
   } FLUSSPFERD_CALLBACK_END;
 }
@@ -471,9 +471,8 @@ bool native_object_base::property_resolve(value const &, unsigned) {
   return false;
 }
 
-boost::any native_object_base::enumerate_start(int &n)
+boost::any native_object_base::enumerate_start(int &)
 {
-  n = 0;
   return boost::any();
 }
 
@@ -483,4 +482,3 @@ value native_object_base::enumerate_next(boost::any &)
 }
 
 void native_object_base::trace(tracer&) {}
-void native_object_base::late_load() {}

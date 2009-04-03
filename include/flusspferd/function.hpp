@@ -32,29 +32,67 @@ namespace flusspferd {
 
 class native_function_base;
 
+/**
+ * A Javascript function.
+ *
+ * @ingroup value_types
+ * @ingroup functions
+ */
 class function : 
   public Impl::function_impl,
   public object
 {
 public:
+  /**
+   * Constructor.
+   *
+   * Creates a 'null' function (actually just an object).
+   */
   function();
 
+#ifndef IN_DOXYGEN
   function(Impl::function_impl const &f)
     : Impl::function_impl(f),
       object(Impl::function_impl::get_object())
   { }
+#endif
 
+  /**
+   * Copy-constructor.
+   *
+   * @param o The function to copy.
+   */
   function(function const &o)
     : Impl::function_impl(o),
       object(Impl::function_impl::get_object())
   { }
 
+  /**
+   * Conversion constructor.
+   *
+   * Tries to convert an object to a function.
+   *
+   * @param o The object to convert.
+   */
   function(object const &o);
 
+#ifndef IN_DOXYGEN
   function(Impl::object_impl const &o);
+#endif
 
 public:
+  /**
+   * Get the function arity.
+   *
+   * @return The arity.
+   */
   std::size_t arity() const;
+
+  /**
+   * Get the function name.
+   *
+   * @return The name.
+   */
   string name() const;
 };
 

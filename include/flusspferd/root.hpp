@@ -37,12 +37,27 @@ class array;
 
 namespace detail {
 
+/**
+ * Keeps a Javascript value, object or anything in a GC %root scope.
+ *
+ * @see root_value, root_object, root_string, root_function, root_array
+ *
+ * @ingroup gc
+ */
 template<class T>
 class root : public T, private boost::noncopyable {
 public:
+  /**
+   * Construct the %root scope.
+   *
+   * @param x The initial value.
+   */
   root(T const &x = T());
+
+  /// Destructor.
   ~root();
 
+  /// Assignment.
   root &operator=(T const &o) {
     T::operator=(o);
     return *this;
@@ -54,11 +69,27 @@ private:
 
 }
 
+/**
+ * @addtogroup gc
+ */
+//@{
+
+/// Javascript root scope for a flusspferd::value.
 typedef detail::root<value> root_value;
+
+/// Javascript root scope for a flusspferd::object.
 typedef detail::root<object> root_object;
+
+/// Javascript root scope for a flusspferd::string.
 typedef detail::root<string> root_string;
+
+/// Javascript root scope for a flusspferd::function.
 typedef detail::root<function> root_function;
+
+/// Javascript root scope for a flusspferd::array.
 typedef detail::root<array> root_array;
+
+//@}
 
 }
 

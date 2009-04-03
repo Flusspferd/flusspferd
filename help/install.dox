@@ -1,0 +1,125 @@
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+/*
+Copyright (c) 2009 Aristid Breitkreuz, Ruediger Sonderfeld
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+/**
+ * @page install How to install Flusspferd
+ *
+ * @section Dependencies
+ *
+ * Before installing Flusspferd, you need to install its dependencies.
+ *
+ * @li Linux or Mac OS X (possibly other POSIX systems work too),
+ * @li <a href="http://www.python.org/">Python</a> 2.3 or higher (2.5 is recommended) - required for the build system,
+ * @li <a href="http://www.boost.org/">Boost</a> 1.36 or higher,
+ * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
+ *     1.7 or higher 
+ *     (<a href="http://ftp.mozilla.org/pub/mozilla.org/js/">download here</a>).
+ *
+ *
+ * Recommended, but optional:
+ *
+ * @li <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell,
+ * @li <a href="http://xmlsoft.org/">libxml2</a> for XML support.
+ *
+ * To get direct access to the development repository, you also need <a href="http://git-scm.com/">GIT</a>.
+ *
+ * @section Download
+ *
+ * If you haven't done so already, get the newest version of Flusspferd with
+ *
+ * @verbatim
+$ git clone git://github.com/ruediger/flusspferd.git
+@endverbatim
+ *
+ * Alternatively, you can download it as a zip/tar archive from <a href="http://github.com/ruediger/flusspferd">Github</a>.
+ *
+ * @section Build
+ *
+ * Make sure that you are in Flusspferd's directory.
+ *
+ * @verbatim
+$ cd flusspferd
+@endverbatim
+ *
+ * To get an overview of all possible options, run
+ *
+ * @verbatim
+$ ./waf --help
+@endverbatim
+ *
+ * Especially if you have installed your dependencies in unusual paths, you
+ * might need to specify additional options.
+ *
+ * If you don't need special options, we should configure the project now (this is like ./configure in autotools based projects) and then build and install it.
+ * We will install into /usr (/usr/local is the default). Use @p --prefix to change the place where Flusspferd should be installed.
+ *
+ * @verbatim
+$ ./waf configure --prefix=/usr --enable-io --enable-xml
+$ ./waf build
+$ sudo ./waf install
+@endverbatim
+ *
+ * @section results Test the results
+ *
+ * If all went fine so far, we should test whether flusspferd works now.
+ *
+ * @verbatim
+$ flusspferd
+> print("Hello", "world!");
+Hello world!
+@endverbatim
+ *
+ * Feel free to play around with the Javascript shell.
+ *
+ * @section notes Some notes
+ *
+ * You might have noticed that Flusspferd doesn't use autotools or Makefiles
+ * (although we provide a compatibility layer for those who can't live without).
+ * Flusspferd uses <a href="http://code.google.com/p/waf">Waf</a> as its build
+ * system. But as you have seen, you don't have to install it, it's entirely
+ * self-contained in a single binary.
+ *
+ * For the purposes of this tutorial, we have not enabled all parts of
+ * Flusspferd. We have omitted several modules which you can choose to
+ * activate if you have the necessary dependencies.
+ *
+ * @subsection make Install using ./configure and make
+ *
+ * If you want to use make instead of waf to compile flusspferd, you can do this
+ * too.
+ *
+ * @verbatim
+$ ./configure --prefix=/usr --enable-xml --enable-io
+$ make
+$ sudo make install
+@endverbatim
+ *
+ * @subsection ubu Install on Ubuntu 8.10
+ *
+ * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 8.10" and similar distributions.
+ *
+ * @subsection ebuild Install on Gentoo
+ *
+ * On Gentoo, you can use our ebuild, <code>flusspferd-9999.ebuild</code>, to
+ * compile and install Flusspferd.
+ */

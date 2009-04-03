@@ -43,7 +43,7 @@ void array::check() {
     throw exception("Object is not array");
 }
 
-std::size_t array::get_length() const {
+std::size_t array::length() const {
   jsuint length;
   if (!JS_GetArrayLength(Impl::current_context(), get_const(), &length))
     throw exception("Could not get array length");

@@ -2,7 +2,7 @@
 build/*
 html/*
 include/flusspferd/implementation
-naturaldocs/*
+naturaldocs/Data/*
 *.swp
 .lock-wscript
 .waf-*

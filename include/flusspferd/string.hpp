@@ -32,40 +32,162 @@ namespace flusspferd {
 
 class value;
 
+/**
+ * A Javascript string.
+ *
+ * @ingroup value_types
+ */
 class string : public Impl::string_impl {
 public:
+  /// Construct an empty string.
   string();
+
+  /**
+   * Construct a string from a value.
+   *
+   * @param v The value to convert to a string.
+   */
   string(value const &v);
+
+  /**
+   * Construct a string from a UTF-8 input string.
+   *
+   * @param str The UTF-8 string.
+   * @param length The length in bytes. If this is <code>0</code>, std::strlen
+   *            will be used to determine the length.
+   */
   string(char const *str, std::size_t length = 0);
+
+  /**
+   * Construct a string from a UTF-16 input string.
+   *
+   * @param str The UTF-16 string.
+   * @param length The length in UTF-16 words.
+   */
   string(char16_t const *str, std::size_t length);
+
+  /**
+   * Construct a string from a UTF-8 std::string.
+   *
+   * @param s The std::string.
+   */
   string(std::string const &s);
+
+  /**
+   * Construct a string from a UTF-16 std::basic_string.
+   *
+   * @param s The std::basic_string.
+   */
   string(std::basic_string<char16_t> const &s);
+
+#ifndef IN_DOXYGEN
   string(Impl::string_impl const &s)
     : Impl::string_impl(s)
   { }
+#endif
 
+  /// Destructor.
   ~string();
 
+  /**
+   * Assignment operator.
+   *
+   * @param o The string to assign.
+   */
   string &operator=(string const &o);
 
+  /**
+   * Get the length of the string.
+   *
+   * Measured in UTF-16 words.
+   *
+   * @return The length.
+   */
   std::size_t length() const;
 
+  /**
+   * Get the length of the string.
+   *
+   * Measured in UTF-16 words.
+   *
+   * @return The length.
+   */
+  std::size_t size() const { return length(); }
+
+  /**
+   * Check if the string is empty.
+   *
+   * @return Whether the string is empty.
+   */
   bool empty() const {
     return !length();
   }
 
+  /**
+   * Convert to std::string.
+   *
+   * @return The std::string.
+   */
   std::string to_string() const;
+
+  /**
+   * Get C string.
+   *
+   * Valid only while the flusspferd::string is valid.
+   *
+   * @return The C string.
+   */
   char const *c_str() const;
 
+  /**
+   * Convert to a UTF-16 string.
+   *
+   * @return The converted string.
+   */
   std::basic_string<char16_t> to_utf16_string() const;
+
+  /**
+   * Get a UTF-16 buffer.
+   *
+   * Valid only while the flusspferd::string is valid.
+   *
+   * @return The buffer.
+   */
   char16_t const *data() const;
 
+  /**
+   * Create a substring object.
+   *
+   * @param start The index of the first character to include.
+   * @param length The number of characters.
+   * @return The substring.
+   */
   string substr(size_t start, size_t length);
 
+  /**
+   * Concatenate two strings.
+   *
+   * @param a The first string.
+   * @param b The second string.
+   * @return The concatenated string.
+   */
   static string concat(string const &a, string const &b);
 };
 
+/**
+ * Compare two string%s for equality.
+ *
+ * @relates string
+ */
 bool operator==(string const &lhs, string const &rhs);
+
+/**
+ * Compare two string%s lexicographically.
+ *
+ * @return Whether @p lhs is lexicographically smaller than @p rhs.
+ *
+ * @relates string
+ */
 bool operator<(string const &lhs, string const &rhs);
 
 template<>

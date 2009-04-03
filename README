@@ -1,0 +1,7 @@
+Flusspferd: Javascript bindings for C++, a Javascript interpreter and shell, and a Javascript/C++ module system. Also, Flusspferd includes a few Javascript classes and modules: binary blobs, XML, cURL, SQLite 3 and others.
+
+Flusspferd supports Spidermonkey as its backend, and possibly support for v8 or other engines will be added later.
+
+Flusspferd is licensed under the MIT license (open source).
+
+See http://flusspferd.org/ for more information.

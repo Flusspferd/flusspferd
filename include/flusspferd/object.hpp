@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "implementation/object.hpp"
+#include "property_attributes.hpp"
 #include "arguments.hpp"
 #include "value.hpp"
 #include "convert.hpp"
@@ -49,40 +50,135 @@ class property_iterator;
 template<typename> class convert;
 #endif
 
+/**
+ * A Javascript object.
+ *
+ * @see flusspferd::create_object()
+ *
+ * @ingroup value_types
+ * @ingroup property_types
+ */
 class object : public Impl::object_impl {
 public:
 #ifndef PREPROC_DEBUG
+
+  /**
+   * Construct a new <code>null</code> object.
+   *
+   * Use flusspferd::create_object() to create a simple object.
+   */
   object();
+
+#ifndef IN_DOXYGEN
   object(Impl::object_impl const &o)
     : Impl::object_impl(o)
   { }
+#endif
+
+  /// Destructor.
   ~object();
 
+  /**
+   * Check if the object is null.
+   *
+   * @return Whether the object is null.
+   */
   bool is_null() const;
 
+  /**
+   * Check if the object is an array.
+   *
+   * @return Whether the object is an array.
+   */
+  bool is_array() const;
+  
+  /**
+   * Seal the object.
+   *
+   * @param deep Whether to seal all reachable sub-objects, too.
+   */
   void seal(bool deep);
 
+  /// Get the object's parent (__parent__).
   object parent();
+  
+  /// Get the object's prototype (__proto__).
   object prototype();
 
+  /**
+   * Set the object's parent (__parent__).
+   *
+   * @param parent The object to set the parent to.
+   */
   void set_parent(object const &parent);
+
+  /**
+   * Set the object's prototype (__proto__).
+   *
+   * @param prototype The object to set the prototype to.
+   */
   void set_prototype(object const &prototype);
 #endif
 
+  /**
+   * @name Method / function invocation
+   *
+   * Calling methods and functions.
+   */
+//@{
+
+  /**
+   * Apply a function to this object.
+   *
+   * @param fn The function to apply to this object.
+   * @param arg The function arguments.
+   * @return The function's return value.
+   */
   value apply(object const &fn, arguments const &arg);
 
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param arg The %function %arguments.
+   * @return The method's return value.
+   */
   value call(char const *name, arguments const &arg);
+
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param arg The %function %arguments.
+   * @return The method's return value.
+   */
   value call(std::string const &name, arguments const &arg);
 
+  /**
+   * Call this object as a %function and apply it to @p obj.
+   *
+   * @param obj The object to apply this %function to.
+   * @param arg The %function %arguments.
+   * @return The %function's return value.
+   */
   value call(object obj, arguments const &arg);
+
+  /**
+   * Call this object as a function on the global object.
+   *
+   * @param arg The %function %arguments.
+   * @return The %function's return value.
+   */
   value call(arguments const &arg = arguments());
+
+#ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_CALL_N(z, n, d) \
   FLUSSPFERD_CALL_N_2( \
     n, \
     BOOST_PP_TUPLE_ELEM(2, 0, d), \
     BOOST_PP_TUPLE_ELEM(2, 1, d)) \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CALL_N_2(n, f_name, arg_type) \
   BOOST_PP_IF(n, template<, ) \
@@ -96,12 +192,12 @@ public:
     BOOST_PP_REPEAT(n, FLUSSPFERD_CALL_ADD_PARAM, ~) \
     return f_name(x, arg); \
   } \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CALL_ADD_PARAM(z, n, d) \
   typename convert<BOOST_PP_CAT(T, n) const &>::to_value BOOST_PP_CAT(c, n); \
   arg.push_root(BOOST_PP_CAT(c, n).perform(BOOST_PP_CAT(arg, n))); \
-  /**/
+  /* */
 
 #define FLUSSPFERD_CALLS(name, arg_type) \
   BOOST_PP_REPEAT( \
@@ -114,75 +210,285 @@ FLUSSPFERD_CALLS(call, char const *)
 FLUSSPFERD_CALLS(call, std::string const &)
 FLUSSPFERD_CALLS(call, object const &)
 
+#else // IN_DOXYGEN
+  /**
+   * Apply a %function to this object.
+   *
+   * @param fn The %function to apply to this object.
+   * @param ... The %function %arguments.
+   * @return The function's return value.
+   */
+  value apply(object const &fn, ...);
+
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param ... The %function %arguments.
+   * @return The method's return value.
+   */
+  value call(char const *name, ...);
+
+  /**
+   * Call an object method.
+   *
+   * @param name The method name.
+   * @param ... The %function %arguments.
+   * @return The method's return value.
+   */
+  value call(std::string const &name, ...);
+
+  /**
+   * Call this object as a %function and apply it to @p obj.
+   *
+   * @param obj The object to apply this %function to.
+   * @param ... The %function %arguments.
+   * @return The function's return value.
+   */
+  value call(object const &obj, ...);
+#endif
+//@}
+
 #ifndef PREPROC_DEBUG
+
+  /**
+   * Property flags.
+   *
+   * @ingroup property_types
+   */
   enum property_flag {
+    /// The property is not enumerable.
     dont_enumerate = 1,
+
+    /// The property is read-only.
     read_only_property = 2,
+
+    /// The property can not be deleted.
     permanent_property = 4,
+
+    /// The property's attributes are shared between objects.
     shared_property = 8,
+
+    /// The property is both permanent and shared.
     permanent_shared_property = 12
   };
 
-  struct property_attributes {
-    unsigned flags;
-    boost::optional<function const &> getter;
-    boost::optional<function const &> setter;
-
-    property_attributes();
-    property_attributes(unsigned flags, 
-      boost::optional<function const &> getter = boost::none,
-      boost::optional<function const &> setter = boost::none);
-  };
-
+  /**
+   * @name Properties
+   *
+   * Accessing properties and their attributes.
+   */
+//@{
+  /**
+   * Define a property.
+   *
+   * @param name The property's name.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
   void define_property(string const &name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  /**
+   * Define a property.
+   *
+   * @param name The property's name.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
   void define_property(std::string const &name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  /**
+   * Define a property.
+   *
+   * @param name The property's name.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
   void define_property(char const *name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 
+  /**
+   * Get a property's attributes.
+   *
+   * @param name The property's name.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
+  bool get_property_attributes(char const *name, property_attributes &attrs);
+
+  /**
+   * Get a property's attributes.
+   *
+   * @param name The property's name.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
+  bool get_property_attributes(std::string name, property_attributes &attrs);
+
+  /**
+   * Get a property's attributes.
+   *
+   * @param id The property's name / ID.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
+  bool get_property_attributes(string const &id, property_attributes &attrs);
+    
+  /**
+   * Set a property.
+   *
+   * @param name The property's name.
+   * @param v The new value.
+   */
   void set_property(char const *name, value const &v);
+
+  /**
+   * Set a property.
+   *
+   * @param name The property's name.
+   * @param v The new value.
+   */
   void set_property(std::string const &name, value const &v);
+
+  /**
+   * Set a property.
+   *
+   * @param id The property's name / ID.
+   * @param v The new value.
+   */
   void set_property(value const &id, value const &v);
 
+  /**
+   * Get a property.
+   *
+   * @param name The property's name.
+   * @return The current value.
+   */
   value get_property(char const *name) const;
+
+  /**
+   * Get a property.
+   *
+   * @param name The property's name.
+   * @return The current value.
+   */
   value get_property(std::string const &name) const;
+
+  /**
+   * Get a property.
+   *
+   * @param id The property's name / ID.
+   * @return The current value.
+   */
   value get_property(value const &id) const;
-    
+
+  /**
+   * Check whether a property exists on the object or any of its prototypes.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_property(char const *name) const;
+
+  /**
+   * Check whether a property exists on the object or any of its prototypes.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_property(std::string const &name) const;
+
+  /**
+   * Check whether a property exists on the object or any of its prototypes.
+   *
+   * @param id The property's name / ID.
+   * @return Whether the property exists.
+   */
   bool has_property(value const &id) const;
 
+  /**
+   * Check whether a property exists directly on the object.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_own_property(char const *name) const;
+
+  /**
+   * Check whether a property exists directly on the object.
+   *
+   * @param name The property's name.
+   * @return Whether the property exists.
+   */
   bool has_own_property(std::string const &name) const;
+
+  /**
+   * Check whether a property exists directly on the object.
+   *
+   * @param id The property's name / ID.
+   * @return Whether the property exists.
+   */
   bool has_own_property(value const &id) const;
 
+  /**
+   * Delete a property from the object.
+   *
+   * @param name The property's name.
+   */
   void delete_property(char const *name);
+
+  /**
+   * Delete a property from the object.
+   *
+   * @param name The property's name.
+   */
   void delete_property(std::string const &name);
+
+  /**
+   * Delete a property from the object.
+   *
+   * @param id The property's name / ID.
+   */
   void delete_property(value const &id);
 
+  /**
+   * Return a property_iterator to the first property (in arbitrary order).
+   *
+   * @return The property_iterator to the first property.
+   */
   property_iterator begin() const;
+
+  /**
+   * Return a property_iterator to behind the last property 
+   * (in arbitrary order).
+   *
+   * @return The property_iterator to behind the last property.
+   */
   property_iterator end() const;
-
-  bool is_array() const;
-
-  bool get_property_attributes(char const *name, property_attributes &attrs);
-  bool get_property_attributes(std::string name, property_attributes &attrs);
-  bool get_property_attributes(string const &id, property_attributes &attrs);
-
+//@}
 #endif
 };
 
 #ifndef PREPROC_DEBUG
+/**
+ * Compare two object%s for equality.
+ *
+ * @relates object
+ */
 inline bool operator==(object const &a, object const &b) {
   return Impl::operator==(a, b);
 }
 
+/**
+ * Compare two object%s for inequality.
+ *
+ * @relates object
+ */
 inline bool operator!=(object const &a, object const &b) {
   return Impl::operator!=(a, b);
 }

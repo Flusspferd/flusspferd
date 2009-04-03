@@ -219,17 +219,14 @@ value context::execute(char const *filename, object const &scope_) {
   int oldopts = JS_GetOptions(cx);
   JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
   JSScript *script = JS_CompileFileHandle(cx, scope, filename, file);
-  JS_SetOptions(cx, oldopts);
- 
+
   if (!script) {
-    throw exception("Could not compile script");
+    exception e("Could not compile script");
+    JS_SetOptions(cx, oldopts);
+    throw e;
   }
 
-  JSObject *rootable = JS_NewScriptObject(cx, script);
-  if (!rootable) {
-    JS_DestroyScript(cx, script);
-    return JS_FALSE;
-  }
+  JS_SetOptions(cx, oldopts);
 
   value result;
  

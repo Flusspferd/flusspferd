@@ -1,0 +1,27 @@
+Class: IO.File
+
+File access from JavaScript. Files are instances of <IO.Streams>.
+
+See Also:
+
+  <IO.Stream>.
+
+Method: close
+
+  Close the open file handle.
+
+Method: open
+
+  Open a file.
+
+  Parameters:
+  name - filename to open
+
+Method: create
+
+  Create a file.
+
+  Parameters:
+  name - filename
+  mode - optional create mode. default value of 0666
+

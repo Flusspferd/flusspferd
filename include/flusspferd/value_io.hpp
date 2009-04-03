@@ -31,6 +31,14 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * Print a value on a stream.
+ *
+ * @param out The stream to print on.
+ * @param v The value to print.
+ *
+ * @relates value
+ */
 inline std::ostream &operator<<(std::ostream &out, value const &v) {
   local_root_scope scope;
   return out << v.to_string();

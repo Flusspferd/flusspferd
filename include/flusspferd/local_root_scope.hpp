@@ -28,6 +28,14 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+/**
+ * Automatically root all newly created GC objects.
+ *
+ * During the lifetime of local_root_scope, every newly created GC object
+ * (string, object, number) will be exempted from garbage collection.
+ *
+ * @ingroup gc
+ */
 class local_root_scope {
 public:
   local_root_scope();
