@@ -20,7 +20,7 @@ depends_build       port:python25
 
 depends_lib         port:spidermonkey \
                     port:boost
-default_variants    test
+default_variants    test io
 
 configure.args      --with-spidermonkey=${prefix} --prefix=${prefix}
 
