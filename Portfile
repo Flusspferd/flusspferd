@@ -22,7 +22,7 @@ depends_lib         port:spidermonkey \
                     port:boost
 default_variants    test
 
-configure.args      --with-spidermonkey=${prefix}
+configure.args      --with-spidermonkey=${prefix} --prefix=${prefix}
 
 variant test description { Build Unit Tests } {
     configure.args-append --enable-tests
