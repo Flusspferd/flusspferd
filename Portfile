@@ -26,9 +26,9 @@ configure.args      --with-spidermonkey=${prefix} --prefix=${prefix}
 
 variant test description { Build Unit Tests } {
     configure.args-append --enable-tests
-#    test {
-        # TODO run tests
-#    }
+    test {
+        system "cd ${worksrcpath} && ./util/run_tests.sh"
+    }
 }
 
 variant io description { Add IO support } {
