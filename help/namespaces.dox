@@ -33,11 +33,13 @@ THE SOFTWARE.
  * Interpreter-independent implementation details.
  */
 
+#if 0
 /**
  * @namespace flusspferd::Impl
  *
  * Interpreter-dependent implementation details.
  */
+#endif
 
 /**
  * @namespace flusspferd::xml

@@ -28,43 +28,50 @@ THE SOFTWARE.
 #include <cstddef>
 
 namespace flusspferd {
-  class value;
 
-  typedef jschar char16_t;
+class value;
+
+typedef jschar char16_t;
+
+#ifndef IN_DOXYGEN
 
 namespace Impl {
 
-  class string_impl {
-    JSString *str;
+class string_impl {
+  JSString *str;
 
-  protected:
-    JSString *get()       { return str; }
-    void set(JSString *s) { str = s; }
+protected:
+  JSString *get()       { return str; }
+  void set(JSString *s) { str = s; }
 
-    string_impl();
-    string_impl(JSString *s) : str(s) { }
-    string_impl(char const *s);
-    string_impl(char const *s, std::size_t n);
-    string_impl(char16_t const *s, std::size_t n);
-    string_impl(value const &v);
+  string_impl();
+  string_impl(JSString *s) : str(s) { }
+  string_impl(char const *s);
+  string_impl(char const *s, std::size_t n);
+  string_impl(char16_t const *s, std::size_t n);
+  string_impl(value const &v);
 
-    friend JSString *get_string(string_impl &s);
-    friend string_impl wrap_string(JSString *s);
+  friend JSString *get_string(string_impl &s);
+  friend string_impl wrap_string(JSString *s);
 
-  public:
-    void *get_gcptr() {
-      return &str;
-    }
-  };
-
-  inline JSString *get_string(string_impl &s) {
-    return s.get();
+public:
+  void *get_gcptr() {
+    return &str;
   }
+};
 
-  inline string_impl wrap_string(JSString *s) {
-    return string_impl(s);
-  }
+inline JSString *get_string(string_impl &s) {
+  return s.get();
+}
 
-}}
+inline string_impl wrap_string(JSString *s) {
+  return string_impl(s);
+}
+
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_STRING_HPP */

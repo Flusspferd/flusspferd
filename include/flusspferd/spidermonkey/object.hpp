@@ -34,6 +34,8 @@ class context;
 class object_template;
 class object;
 
+#ifndef IN_DOXYGEN
+
 namespace Impl {
 
 class object_impl {
@@ -71,6 +73,10 @@ inline bool operator!=(object_impl const &a, object_impl const &b) {
   return !(a == b);
 }
 
-}}
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_OBJECT_HPP */

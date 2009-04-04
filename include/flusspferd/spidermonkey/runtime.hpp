@@ -26,8 +26,18 @@ THE SOFTWARE.
 
 typedef struct JSRuntime JSRuntime;
 
-namespace flusspferd { namespace Impl {
-  JSRuntime *get_runtime();
-}}
+namespace flusspferd {
+
+#ifndef IN_DOXYGEN
+
+namespace Impl {
+
+JSRuntime *get_runtime();
+
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP */
