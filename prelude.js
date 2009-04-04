@@ -70,11 +70,19 @@ Object.defineProperty(Function, 'bind',
     }
   });
 
-//Import('IO');
+try {
+  Import('IO');
 
-//print = Function.bind(IO.stdout, 'print');
-//readline = Function.bind(IO.stdin, 'readLine');
+  print = Function.bind(IO.stdout, 'print');
+  readline = Function.bind(IO.stdin, 'readLine');
+} catch (e) {
+  // TODO: do something?
+}
 
-//Import('XML');
+try {
+  Import('XML');
+} catch (e) {
+  // TODO: do something?
+}
 
 true;
