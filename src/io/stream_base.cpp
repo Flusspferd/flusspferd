@@ -48,7 +48,7 @@ stream_base::stream_base(object const &o, std::streambuf *p)
 
   define_property("fieldSeparator", string(" "));
   define_property("recordSeparator", string("\n"));
-  define_property("autoflush", false);
+  define_property("autoFlush", false);
 }
 
 stream_base::~stream_base()
@@ -156,7 +156,7 @@ void stream_base::write(value const &data) {
     throw exception("Cannot write non-object non-string value to Stream");
   }
   //TODO slow?
-  if (get_property("autoflush").to_boolean())
+  if (get_property("autoFlush").to_boolean())
     flush();
 }
 
