@@ -1,27 +1,50 @@
-Class: IO.File
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+/**
+ *
+ * @name IO.File
+ *
+ * @class
+ * File access from JavaScript. Files are instances of {@link IO.Stream}s.
+ *
+ * @extends IO.Stream
+ */
 
-File access from JavaScript. Files are instances of <IO.Streams>.
 
-See Also:
+// IO.File instance methods {{{
+/**#@+ @methodOf IO.File# */
 
-  <IO.Stream>.
+  /**
+   * Open a file.
+   *
+   * @name open
+   * @param {string} filename file to open
+   */
 
-Method: close
+  /**
+   * Close the open file handle.
+   *
+   * @name IO.File#close
+   */
 
-  Close the open file handle.
+/**#@- }}} */
 
-Method: open
+// IO.File class methods {{{
+/**#@+ @methodOf IO.File */
 
-  Open a file.
+  /**
+   * Create a file. No return value.
+   *
+   * @name create
+   * @param {string} name filename
+   * @param {int} [mode=0666] creation mode
+   */
 
-  Parameters:
-  name - filename to open
+  /**
+   * Check if a file exists.
+   * @name exists
+   * @type boolean
+   * @param {string} name filename
+   */
 
-Method: create
-
-  Create a file.
-
-  Parameters:
-  name - filename
-  mode - optional create mode. default value of 0666
+/**#@- }}} */
 
