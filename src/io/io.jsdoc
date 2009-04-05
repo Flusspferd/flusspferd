@@ -1,0 +1,116 @@
+// vim:foldmethod=marker:foldmarker={{{,}}}:
+/**
+ * @namespace IO related classes
+ * @name IO
+ *
+ * @see IO.BlobStream
+ */
+
+// IO.Stream {{{
+/**
+ * Not actually a class, but an interface
+ * @name IO.Stream
+ * @class
+ * Interface for all IO streams to follow
+ */
+
+// Stream instance methods {{{ 
+/**#@+ @methodOf IO.Stream# */
+
+  /**
+   * Read UTF-8 data. If the stream contains an invalid UTF-8 bye sequence, an
+   * exception will be thrown. 
+   *
+   * @name read
+   * @type string
+   *
+   * @param [size=4096] number of bytes to read.
+   */
+
+  /**
+   * Read binary data
+   *
+   * @name readBlob
+   * @type Blob
+   * @param [size=4096] number of bytes to read.
+   */
+
+  /**
+   * Read a line from the stream
+   *
+   * @name readLine
+   * @type string
+   * @param [separator="\n"] The line separator to use.  Must be a single ASCII character currently.
+   */
+
+  /**
+   * Read entire stream as UTF-8 string
+   *
+   * @name readWhole
+   * @type string
+   */
+
+  /**
+   * Read entire stream contents as binary data.
+   *
+   * @name readWholeBlob
+   * @type Blob
+   */
+
+  /**
+   * Write either a string, in which case the UTF-8 byte sequence is
+   * written, or else a Blob where the raw binary data is written.
+   *
+   * @name write
+   *
+   * @param data stringOrBlob
+   */
+
+  /**
+   * Flush internal/OS buffers.
+   * @name flush
+   */
+
+  /**
+   * Print strings to this stream. This method converts each argument passed to
+   * a string, writes them to the string with {@link #fieldSeperator} between
+   * each one and {@link #recordSeparator} after the last one.
+   *
+   * <br /><br />
+   *
+   * @name print
+   * @param ... values to print
+   */
+
+/**#@- }}} */
+
+// Stream instance properties {{{ 
+/**#@+ @fieldOf IO.Stream# */
+
+  /**
+   * Printed between every argument to {@link #print}.
+   *
+   * @name fieldSeperator
+   * @default " "
+   * @type string
+   */
+
+  /**
+   * Printed at the end of each {@link #print} call.
+   *
+   * @name recordSeparator
+   * @default "\n"
+   * @type string
+   */
+
+  /**
+   * Call flush after every write.
+   *
+   * @name autoFlush
+   * @default false
+   * @type boolean
+   */
+
+/**#@- }}} */
+
+/// }}}
