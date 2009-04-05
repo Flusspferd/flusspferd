@@ -67,7 +67,7 @@ THE SOFTWARE.
      */
     /** 
      * libcurl version number in dotted-decimal string form.
-     * @name versionStr
+     * @name cURL#versionStr
      * @fieldOf cURL
      * @type string
      */
