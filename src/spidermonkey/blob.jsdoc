@@ -1,5 +1,5 @@
-// vim:foldmethod=marker,foldmarker={{{,}}}:
- 
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+
  /**
   * Create a new Blob. Pass either an array of integers (each one in the range
   * [0,255]) to create a blob of those bytes, or pass a single integer to
@@ -7,7 +7,7 @@
   *
   * @param lengthOrArray number of bytes to preallocate; or array of initial
   * bytes.
-  * 
+  *
   * @class
   * Binary data storage class.
   *
@@ -15,11 +15,11 @@
   *
   *
   * Javascript strings are stored as UTF8 bytes. This makes storing and processing
-  * strings in other encodings or random binary data (such as images) hard. 
-  * 
+  * strings in other encodings or random binary data (such as images) hard.
+  *
   * <br /><br />
   * To make this easier to handle, we've created the Blob class.
-  * 
+  *
   * <br /><br />
   * You can treat a Blob similar to an array with its {@link #length} property
   * and array sub-script accessors, but if you are using large blobs it is
@@ -85,7 +85,7 @@
   /**
    * Extract a portion of the data into a new Blob. Either parameter can be
    * negative, in which case it counts backwards from
-   * the last byte: 
+   * the last byte:
    *
    * @param {int} from start index
    * @param {int} [to] end index
@@ -98,7 +98,7 @@
    * Convert to a UTF-8 string. This method treats the bytes as a UTF-8 byte
    * sequence.
    *
-   * @example 
+   * @example
    * (new Blob([66,66])).asUtf8(); // "BB"
    * (new Blob([66,0xC3,0xE9])).asUtf8(); // "Bé"
    * (new Blob([66,200,200])).asUtf8(); // TypeError
@@ -112,7 +112,7 @@
    * Convert to a UTF-16 string. Similar to {@link #asUtf8}, but instead treat
    * the bytes as a UTF-16 byte sequence.
    *
-   * <br /><br /> 
+   * <br /><br />
    * Since spidermonkey currently does not handle UTF-16 surrogates (i.e. any
    * characters outside of hte Basic-Multi-Lingual plane) this method shouldn't
    * throw a TypeError.

@@ -1,3 +1,4 @@
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
 /**
  * {@link IO.Stream} interface to {@link Blob}. See {@link IO.Stream} for the
  * other methods on this class.

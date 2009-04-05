@@ -1,4 +1,4 @@
-// vim:foldmethod=marker:foldmarker={{{,}}}:
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
 /**
  * @namespace IO related classes
  * @name IO
@@ -14,12 +14,12 @@
  * Interface for all IO streams to follow
  */
 
-// Stream instance methods {{{ 
+// Stream instance methods {{{
 /**#@+ @methodOf IO.Stream# */
 
   /**
    * Read UTF-8 data. If the stream contains an invalid UTF-8 bye sequence, an
-   * exception will be thrown. 
+   * exception will be thrown.
    *
    * @name read
    * @type string
@@ -40,7 +40,8 @@
    *
    * @name readLine
    * @type string
-   * @param [separator="\n"] The line separator to use.  Must be a single ASCII character currently.
+   * @param [separator="\n"] The line separator to use.  Must be a single ASCII
+   *                         character currently.
    */
 
   /**
@@ -84,7 +85,7 @@
 
 /**#@- }}} */
 
-// Stream instance properties {{{ 
+// Stream instance properties {{{
 /**#@+ @fieldOf IO.Stream# */
 
   /**
