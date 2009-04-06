@@ -1,7 +1,27 @@
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+
+/**
+ * Load a module. Import is defined as a top level function on the global
+ * object.
+ *
+ * @name Import
+ * @function
+ *
+ * @param {string} name Module to attempt to load
+ * @param {object} options Additional options
+ *
+ * @example
+ * Import.paths.unshift('./lib');
+ * Import('My.Module') // Will look for My/Module.js
+ */
+
+/**
+ * bar
+ * @fieldOf Import
+ * @name foo
+ */
 Title: Import
 
-Loadable module support. Import is defined as a top level function on the
-global object. 
 
 (code)
 Import.paths.unshift('./lib');

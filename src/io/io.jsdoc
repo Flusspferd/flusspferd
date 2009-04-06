@@ -74,8 +74,8 @@
 
   /**
    * Print strings to this stream. This method converts each argument passed to
-   * a string, writes them to the string with {@link #fieldSeperator} between
-   * each one and {@link #recordSeparator} after the last one.
+   * a string, writes them to the string with [[#fieldSeperator]] between
+   * each one and [[#recordSeparator]] after the last one.
    *
    * <br /><br />
    *
@@ -89,7 +89,7 @@
 /**#@+ @fieldOf IO.Stream# */
 
   /**
-   * Printed between every argument to {@link #print}.
+   * Printed between every argument to [[#print]].
    *
    * @name fieldSeperator
    * @default " "
@@ -97,7 +97,7 @@
    */
 
   /**
-   * Printed at the end of each {@link #print} call.
+   * Printed at the end of each [[#print]] call.
    *
    * @name recordSeparator
    * @default "\n"

@@ -4,7 +4,7 @@
  * @name IO.File
  *
  * @class
- * File access from JavaScript. Files are instances of {@link IO.Stream}s.
+ * File access from JavaScript. Files are instances of [[IO.Stream]]s.
  *
  * @extends IO.Stream
  */

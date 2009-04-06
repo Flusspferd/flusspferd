@@ -1,4 +1,5 @@
 // vim:ts=2:sw=2:expandtab:autoindent:
+// vim: foldmethod=marker:foldmarker={{{,}}}
 /*
 Copyright (c) 2008 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -40,6 +41,8 @@ THE SOFTWARE.
   return SQLite3;
 })()
 
+
+// SQLite3 {{{
 /**
  * Opens a handle to the database dsn Will usually be
  * a filename, but could also be ":memory:".
@@ -50,10 +53,12 @@ THE SOFTWARE.
  * @param dsn Path to sqlite DB file (or anything else it sqlite3_open
  *        supports)
  *
+ * @see SQLite3.Cursor
+ *
  * @class SQLite3 Database handle.
  *
- * <h2>Example:</h2> 
- * <pre class="code">
+ * ==Example:==
+ * {{{
  * Import('SQLite3');
  * var db = new SQLite3('./my_db.sqlite');
  * var c = db.cursor('SELECT * FROM table_1 WHERE id IN (?,?)');
@@ -62,113 +67,119 @@ THE SOFTWARE.
  * for (let row in c) {
  *  print(row.toSource());
  * }
- * </pre>
+ * }}}
  * 
  */
 
-/**
- * SQLite3 version as human readable string
- * @name versionStr
- * @type string
- * @fieldOf SQLite3
- */
+// Class properties {{{
+/**#@+ @fieldOf SQLite3 */
 
-/**
- * SQLite3 version as an integer. For example, SQLite v3.6.12 would have a
- * version of 3006012
- * @name version
- * @type int
- * @fieldOf SQLite3
- */
+  /**
+   * SQLite3 version as human readable string
+   * @name versionStr
+   * @type string
+   */
 
-/**
- * Close the database handle. Force the database handle to be closed now,
- * instead of when the object gets garbage collected.
- * @name close
- * @methodOf SQLite3.prototype
- */
+  /**
+   * SQLite3 version as an integer. For example, SQLite v3.6.12 would have a
+   * version of 3006012
+   * @name version
+   * @type int
+   */
 
-/**
- * Get a cursor to execute the given SQL statement. Bind parameters can be
- * passed in as parameters the SQL, or by using {@link Cursor#bind}.
- * @name cursor
- * @function
- * @methodOf SQLite3.prototype
- *
- * @param sql SQL to prepare.
- * @param bind_arg bind parameters passed to {@link Cursor#bind}.
- *
- * @returns {SQLite3.Cursor} A cursor object
- */
+/**#@- }}} */
 
+// Class properties {{{
+/**#@+ @methodOf SQLite3# */
+
+  /**
+   * Close the database handle. Force the database handle to be closed now,
+   * instead of when the object gets garbage collected.
+   * @name close
+   */
+
+  /**
+   * Get a cursor to execute the given SQL statement. Bind parameters can be
+   * passed in as parameters the SQL, or by using [[SQLite3.Cursor#bind]].
+   * @name cursor
+   * @function
+   *
+   * @param sql SQL to prepare.
+   * @param bind_arg bind parameters passed to [[SQLite3.Cursor#bind]].
+   *
+   * @returns {SQLite3.Cursor} A cursor object
+   */
+
+/**#@- }}} */
+// }}}
+
+// SQLite3.Cursor {{{
 /**
- * You cannot construct a cursor object directly, use {@link SQLite3#cursor} to
+ * You cannot construct a cursor object directly, use [[SQLite3#cursor]] to
  * create one.
  *
  * @class Cursor class used to execute statements.
  * @name SQLite3.Cursor
  */
 
-// TODO: Sort out the JSDoc template to deal with multiple paras
-/**
- * Bind placeholder values. Accepts either an Array or an Object. SQLite
- * bind params are 1 based. However when an array is passed the first bind
- * param is pulled from the 0th element of the array, etc.
- *
- * <br/><br/>
- * 
- * SQLite bind params are 1 based.  However when an array is passed the first
- * bind param is pulled from the 0th element of the array, etc.
- *
- * @name bind
- * @methodOf SQLite3.Cursor.prototype
- *
- * @param binds bind parameters
- */
+// Instance methods {{{
+/**#@+ @methodOf SQLite3.Cursor# */
 
-/**
- * Get next row from this cursor.
- *
- * @returns Next row as an array, or null when end of results reached.
- *
- * @name next
- * @methodOf SQLite3.Cursor.prototype
- */
+  /**
+   * Bind placeholder values. Accepts either an Array or an Object. SQLite
+   * bind params are 1 based. However when an array is passed the first bind
+   * param is pulled from the 0th element of the array, etc.
+   *
+   * SQLite bind params are 1 based.  However when an array is passed the first
+   * bind param is pulled from the 0th element of the array, etc.
+   *
+   * @name bind
+   *
+   * @param binds bind parameters
+   */
 
-/**
- * Close this cursor.  Force it to be closed now, instead of waiting for it to
- * get garbage collected.
- *
- * <br /><br />
- *
- * You don't <b>have</b> to call this method, but its probably a good idea to
- * call if you know you wont need to use this cursor any more, since garbage
- * collection might take a long time to run.
- *
- * @name SQLite3.Cursor.prototype.close
- * @methodOf SQLite3.Cursor.prototype
- */
+  /**
+   * Get next row from this cursor.
+   *
+   * @returns Next row as an array, or null when end of results reached.
+   *
+   * @name SQLite3.Cursor.prototype.next
+   */
 
-/**
- * Reset the cursor back to the start.  This will also clear any errors.
- *
- * <br /><br />
- *
- * This does not clear any bound parameters.
- * 
- * @name reset
- * @methodOf SQLite3.Cursor.prototype
- */
+  /**
+   * Close this cursor.  Force it to be closed now, instead of waiting for it to
+   * get garbage collected.
+   *
+   * You don't //have// to call this method, but its probably a good idea to
+   * call if you know you wont need to use this cursor any more, since garbage
+   * collection might take a long time to run.
+   *
+   * @name SQLite3.Cursor.prototype.close
+   */
 
-/**
- * Iterator support.  A generator function that enables you to write
- *
- * <pre class="code">
- * for (row in myCursor) { ... }
- * </pre>
- *
- * Each row will only be fetched from SQLite as needed.
- * 
- * @name __iterator__
- * @methodOf SQLite3.Cursor.prototype
- */
+  /**
+   * Reset the cursor back to the start.  This will also clear any errors.
+   *
+   * This does not clear any bound parameters.
+   * 
+   * @name reset
+   */
+/**#@- }}} */
+
+// Instance properties {{{
+/**#@+ @fieldOf SQLite3.Cursor# */
+
+  /**
+   * Iterator support.  A generator function that enables you to write
+   *
+   * {{{
+   * for (row in myCursor) { ... }
+   * }}}
+   *
+   * Each row will only be fetched from SQLite as needed as by [[#next]].
+   * 
+   * @name __iterator__
+   */
+/**#@- }}} */
+// }}}
+
