@@ -22,6 +22,8 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
+#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/implementation/object.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
 #include <fstream>
@@ -124,8 +126,28 @@ int flusspferd_repl::run() {
   running = true;
 
   while (running && getline(source)) {
+    unsigned int startline = ++line;
+
+    for (;;) {
+      JSBool compilable =
+          JS_BufferIsCompilableUnit(
+            flusspferd::Impl::current_context(),
+            flusspferd::Impl::get_object(flusspferd::global()),
+            source.data(),
+            source.size());
+
+      if (compilable)
+        break;
+
+      std::string appendix;
+      getline(appendix, "? ");
+      source += appendix;
+
+      ++line;
+    }
+
     try {
-      flusspferd::value v = flusspferd::evaluate(source, "typein", ++line);
+      flusspferd::value v = flusspferd::evaluate(source, "typein", startline);
       if (!v.is_undefined())
         std::cout << v << '\n';
     }
