@@ -11,31 +11,27 @@
   * @class
   * Binary data storage class.
   *
-  * <br /><br />
+  * Javascript strings are stored as UTF8 bytes. This makes storing and
+  * processing strings in other encodings or random binary data (such as
+  * images) hard.
   *
+  * To make this easier (and infact possible at all,) we've created the Blob
+  * class.
   *
-  * Javascript strings are stored as UTF8 bytes. This makes storing and processing
-  * strings in other encodings or random binary data (such as images) hard.
-  *
-  * <br /><br />
-  * To make this easier to handle, we've created the Blob class.
-  *
-  * <br /><br />
   * You can treat a Blob similar to an array with its {@link #length} property
   * and array sub-script accessors, but if you are using large blobs it is
   * worth mentioning that each extra property you access this way requires
   * extra memory from Spidermonkey. In this case its highly recomended you use
-  * {@link #get} and {@link #set} instead.
+  * [[#get|get]] and [[#set|set]] methods instead.
   *
   * @see cURL
-  *
   *
   * @name Blob
   */
 
 // Constructor Methods {{{
 /**#@+
- * @methodOfBlob
+ * @methodOf Blob
  */
 
   /**
@@ -109,7 +105,7 @@
    */
 
   /**
-   * Convert to a UTF-16 string. Similar to {@link #asUtf8}, but instead treat
+   * Convert to a UTF-16 string. Similar to [[#asUtf8]], but instead treat
    * the bytes as a UTF-16 byte sequence.
    *
    * <br /><br />
@@ -135,7 +131,7 @@
    */
 
   /**
-   * Set a byte of data. idx must be less than the current {@link #length}
+   * Set a byte of data. idx must be less than the current [[#length]]
    *
    * @name set
 
