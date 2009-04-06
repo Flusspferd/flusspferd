@@ -1,11 +1,11 @@
-// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+// vim: ft=javascript:foldmethod=marker:foldmarker={{{,}}}
 
 /**
  * Load a module. Import is defined as a top level function on the global
  * object.
  *
+ * @constructor
  * @name Import
- * @function
  *
  * @param {string} name Module to attempt to load
  * @param {object} options Additional options
@@ -13,49 +13,45 @@
  * @example
  * Import.paths.unshift('./lib');
  * Import('My.Module') // Will look for My/Module.js
+ *
+ * @class
+ *
+ * Import is not really a class, thats just the only way I could get JsDoc to
+ * document properties on the function.
+ *
+ * Please note, that all the properties listed below are properties of the
+ * Import function itself.
  */
 
-/**
- * bar
- * @fieldOf Import
- * @name foo
- */
-Title: Import
+// Import properties {{{
+/**#@+ @fieldOf Import */
+
+  /**
+   * List of directories to search for modules in.
+   * @type Array
+   * @name paths
+   */
+  /**
+   * Dictionary of currently loaded modules.
+   * @name module_cache
+   * @type Object
+   */
+
+  /**
+   * Dictionary of callback functions. The first time a module name matching a
+   * key in perload is loaded, the function stored there will be called.
+   * @name preload
+   * @type Object
+   */
 
 
-(code)
-Import.paths.unshift('./lib');
-Import('My.Module'); // Will look for My/Module.js
-(end code)
+  /**
+   * Dictionary of aliases. The destination is designated by a string only.
+   * There is no recursive alias lookup. Aliases will be resolved before
+   * anything else.
+   * @name alias
+   * @type Object
+   */
 
-Function: Import
-
-Load a module.
-
-Parameters:
-  name - Module name to load
-  options - Additional options that control behaviour
-
-Group: Properties
-
-Please note, that all the properties listed below are properties of the
-Import function itself.
-
-Property: paths
-
-List of directories to search for modules in.
-
-Property: module_cache
-
-Dictionary of currently loaded modules.
-
-Property: preload
-
-Dictionary of callback functions. The first time a module name matching a
-key in perload is loaded, the function stored there will be called.
-
-Property: alias
-
-Dictionary of aliases. The destination is designated by a string only. There is
-no recursive alias lookup. Aliases will be resolved before anything else.
+/**#@- }}} */
 
