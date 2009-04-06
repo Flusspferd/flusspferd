@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:
 /*
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Required Imports
-// ================
-
-Import('Util');
-
-// Optional Imports
-// ================
-
-try {
-  Import('IO');
-
-  print = Function.bind(IO.stdout, 'print');
-  readline = Function.bind(IO.stdin, 'readLine');
-} catch (e) {
-  // TODO: do something?
-}
-
-try {
-  Import('XML');
-} catch (e) {
-  // TODO: do something?
-}
-
-true;
+Import('Util.Array');
+Import('Util.Function');
+Import('Util.Range');

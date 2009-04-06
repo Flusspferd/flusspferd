@@ -21,27 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Required Imports
-// ================
+Array.from = function from(iterable) {
+  if (!iterable)
+    return [];
+  if (iterable.toArray)
+    return iterable.toArray();
+  return Array.slice(iterable, 0);
+};
+Object.defineProperty(Array, 'from', {enumerable: false});
 
-Import('Util');
-
-// Optional Imports
-// ================
-
-try {
-  Import('IO');
-
-  print = Function.bind(IO.stdout, 'print');
-  readline = Function.bind(IO.stdin, 'readLine');
-} catch (e) {
-  // TODO: do something?
-}
-
-try {
-  Import('XML');
-} catch (e) {
-  // TODO: do something?
-}
-
-true;
+String.prototype.toArray = function toArray() {
+  return this.split(/\s+/);
+};
+Object.defineProperty(String.prototype, 'toArray', {enumerable: false});
