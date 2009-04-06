@@ -313,6 +313,8 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
     bld.install_files('${PREFIX}/lib/flusspferd/modules/HTTP',
                       'js/src/HTTP/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/Util',
+                      'js/src/Util/*.js')
 
     bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
 
