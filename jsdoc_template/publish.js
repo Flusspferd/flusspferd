@@ -110,8 +110,10 @@ function publish(symbolSet) {
 
 /** Just the first sentence (up to a full stop). Should not break on dotted variable names. */
 function summarize(desc) {
-	if (typeof desc != "undefined")
-		return desc.match(/([\w\W]+?\.)[^a-z0-9_$]/i)? RegExp.$1 : desc;
+	if (typeof desc != "undefined") {
+		desc = desc.match(/([\w\W]+?\.)[^a-z0-9_$]/i)? RegExp.$1 : desc;
+    return desc.replace(/<p>/, '');
+  }
 }
 
 /** Make a symbol sorter by some attribute. */
@@ -172,13 +174,13 @@ function makeSignature(params) {
 	return signature;
 }
 
-/** Find symbol {@link ...} strings in text and turn into html links */
+/** Find symbol {@link ...} strings in text and turn into html links 
+ * Or it used to do that. Now it looks for [[WikiWords] type thing
+ * */
+
 function resolveLinks(str, from) {
-	str = str.replace(/\{@link ([^} ]+) ?\}/gi,
-		function(match, symbolName) {
-			return new Link().toSymbol(symbolName);
-		}
-	);
-	
-	return str;
+  return str.wiki2html();
 }
+
+
+
