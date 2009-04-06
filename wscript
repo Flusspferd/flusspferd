@@ -102,8 +102,8 @@ def configure(conf):
     if darwin:
         conf.check_tool('osx')
 
-    conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
-    conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
+    conf.env['CXXFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
+    conf.env['LINKFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
 
     boostlib = ['thread', 'filesystem', 'system']
     if Options.options.enable_tests:
