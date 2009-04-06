@@ -74,6 +74,7 @@ public:
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
   : interactive(false),
+    machine_mode(false),
     //file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
