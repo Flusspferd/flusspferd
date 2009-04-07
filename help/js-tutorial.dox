@@ -57,6 +57,14 @@ $ flusspferd
 Hello Shell
 @endverbatim
  *
+ * You can also invoke %flusspferd to run a Javascript file:
+ *
+ * @verbatim
+$ flusspferd source.js
+@endverbatim
+ *
+ * For more options, run <code>flusspferd -h</code>.
+ *
  * Next: \ref js-tutorial-io
  *
  */
