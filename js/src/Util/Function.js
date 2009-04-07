@@ -1,6 +1,6 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +21,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP
-#define FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP
+Function.prototype.bind = function bind(obj) {
+  var fun = this;
+  return function bound_func() {
+      return fun.apply(obj, arguments);
+    }
+};
+Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 
-typedef struct JSRuntime JSRuntime;
-
-namespace flusspferd {
-
-#ifndef IN_DOXYGEN
-
-namespace Impl {
-
-JSRuntime *get_runtime();
-
-}
-
-#endif
-
-}
-
-#endif /* FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP */
+Object.defineProperty(Function, 'bind', 
+  { enumerable: false, 
+    value: function bind(obj, name) {
+      var fun = obj[name];
+      if (!fun || !(fun instanceof Function))
+        throw new Error("Object has no function '" + name + "'");
+      return fun.bind(obj);
+    }
+  });

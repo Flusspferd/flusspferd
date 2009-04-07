@@ -1,6 +1,6 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP
-#define FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP
+function Range(from,to, by) {
+  var i = from;
+  by = by || 1;
+  var r;
+  function RangeInstance() {
+    while (i < to) {
+      r[i] = i;
+      yield i;
+      i += by;
+    }
+  };
+  r = new RangeInstance();
+  r.__iterator__ = function() { return r };
 
-typedef struct JSRuntime JSRuntime;
-
-namespace flusspferd {
-
-#ifndef IN_DOXYGEN
-
-namespace Impl {
-
-JSRuntime *get_runtime();
-
+  return r;
 }
-
-#endif
-
-}
-
-#endif /* FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP */

@@ -22,6 +22,8 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
+#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/implementation/object.hpp"
 #include <boost/bind.hpp>
 #include <iostream>
 #include <fstream>
@@ -38,6 +40,7 @@ THE SOFTWARE.
 
 class flusspferd_repl {
   bool interactive;
+  bool machine_mode;
   std::istream in;
 
   bool config_loaded;
@@ -73,6 +76,7 @@ public:
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
   : interactive(false),
+    machine_mode(false),
     //file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
@@ -122,8 +126,28 @@ int flusspferd_repl::run() {
   running = true;
 
   while (running && getline(source)) {
+    unsigned int startline = ++line;
+
+    for (;;) {
+      JSBool compilable =
+          JS_BufferIsCompilableUnit(
+            flusspferd::Impl::current_context(),
+            flusspferd::Impl::get_object(flusspferd::global()),
+            source.data(),
+            source.size());
+
+      if (compilable)
+        break;
+
+      std::string appendix;
+      getline(appendix, "? ");
+      source += appendix;
+
+      ++line;
+    }
+
     try {
-      flusspferd::value v = flusspferd::evaluate(source, "typein", ++line);
+      flusspferd::value v = flusspferd::evaluate(source, "typein", startline);
       if (!v.is_undefined())
         std::cout << v << '\n';
     }
@@ -148,6 +172,8 @@ void print_help(char const *argv0) {
     "\n"
     "    -i\n"
     "    --interactive            enter interactive mode (after files)\n"
+    "\n"
+    "    -0                       (interactive) machine command mode (separator '\\0')\n"
     "\n"
     "    -f <file>\n"
     "    --file <file>            run this file before standard script handling\n"
@@ -208,6 +234,12 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
         interactive = true;
         interactive_set = true;
       }
+      else if (std::strcmp(argv[i], "-0") == 0)
+      {
+        interactive = true;
+        interactive_set = true;
+        machine_mode = true;
+      }
       else if (std::strcmp(argv[i], "-f") == 0 ||
                std::strcmp(argv[i], "--file") == 0)
       {
@@ -258,6 +290,10 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
 }
 
 bool flusspferd_repl::getline(std::string &source, const char* prompt) {
+  if (machine_mode) {
+    return std::getline(in, source, '\0');
+  }
+  else
 #ifdef HAVE_EDITLINE
   if (interactive) {
     char* linep = readline(prompt);
