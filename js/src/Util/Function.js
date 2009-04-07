@@ -21,27 +21,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Required Imports
-// ================
+Function.prototype.bind = function bind(obj) {
+  var fun = this;
+  return function bound_func() {
+      return fun.apply(obj, arguments);
+    }
+};
+Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 
-Import('Util');
-
-// Optional Imports
-// ================
-
-try {
-  Import('IO');
-
-  print = Function.bind(IO.stdout, 'print');
-  readline = Function.bind(IO.stdin, 'readLine');
-} catch (e) {
-  // TODO: do something?
-}
-
-try {
-  Import('XML');
-} catch (e) {
-  // TODO: do something?
-}
-
-true;
+Object.defineProperty(Function, 'bind', 
+  { enumerable: false, 
+    value: function bind(obj, name) {
+      var fun = obj[name];
+      if (!fun || !(fun instanceof Function))
+        throw new Error("Object has no function '" + name + "'");
+      return fun.bind(obj);
+    }
+  });

@@ -21,27 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Required Imports
-// ================
+function Range(from,to, by) {
+  var i = from;
+  by = by || 1;
+  var r;
+  function RangeInstance() {
+    while (i < to) {
+      r[i] = i;
+      yield i;
+      i += by;
+    }
+  };
+  r = new RangeInstance();
+  r.__iterator__ = function() { return r };
 
-Import('Util');
-
-// Optional Imports
-// ================
-
-try {
-  Import('IO');
-
-  print = Function.bind(IO.stdout, 'print');
-  readline = Function.bind(IO.stdin, 'readLine');
-} catch (e) {
-  // TODO: do something?
+  return r;
 }
-
-try {
-  Import('XML');
-} catch (e) {
-  // TODO: do something?
-}
-
-true;
