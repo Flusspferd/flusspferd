@@ -10,7 +10,7 @@ categories          devel
 maintainers         c-plusplus.de:ruediger
 description         Flusspferd
 long_description    Flusspferd provides Javascript bindings for C++.
-homepage            http://wiki.github.com/ruediger/flusspferd
+homepage            http://flusspferd.org/
 platforms           darwin
 
 fetch.type          git
