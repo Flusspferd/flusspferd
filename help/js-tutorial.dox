@@ -63,7 +63,7 @@ Hello Shell
 $ flusspferd source.js
 @endverbatim
  *
- * For more options, run <code>flusspferd -h</code>.
+ * For more options, run <code>%flusspferd -h</code>.
  *
  * Next: \ref js-tutorial-io
  *
