@@ -31,6 +31,8 @@ namespace flusspferd {
 
 class value;
 
+#ifndef IN_DOXYGEN
+
 namespace Impl {
 
 class arguments_impl {
@@ -79,6 +81,10 @@ inline jsval *get_arguments(arguments_impl &arg) {
   return arg.get();
 }
 
-}}
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_ARGUMETNS_HPP */

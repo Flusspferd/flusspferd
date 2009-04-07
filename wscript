@@ -41,13 +41,14 @@ def set_options(opt):
                    help='Set non-standard CXXFLAGS')
     opt.add_option('--enable-tests', action='store_true',
                    help='Enable tests')
-    opt.add_option('--enable-io', action='store_true',
-                   help='Enable IO support')
-    opt.add_option('--enable-xml', action='store_true',
-                   help='Enable XML support')
-    opt.add_option('--enable-curl', action='store_true',
-                   help='Build cURL extension')
-    opt.add_option('--enable-sqlite', action='store_true', help='Enable SQLite plugin')
+    opt.add_option('--disable-io', action='store_true',
+                   help='Disable IO support.')
+    opt.add_option('--disable-xml', action='store_true',
+                   help='Disable XML extension even if libxml2 is installed.')
+    opt.add_option('--disable-curl', action='store_true',
+                   help='Disable cURL extension even if cURL is installed.')
+    opt.add_option('--disable-sqlite', action='store_true',
+                   help='Disable SQLite even if it is installed.')
     opt.add_option('--with-spidermonkey-include', action='store', nargs=1,
                    dest='spidermonkey_include',
                    help='spidermonkey include path without the js/')
@@ -175,11 +176,12 @@ int main() {
         conf.check_cc(header_name='editline/history.h')
 
     # sqlite
-    if Options.options.enable_sqlite:
-        conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
-                       uselib_store='SQLITE', execute=1,
-                       errmsg='SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
-                       fragment='''
+    if not Options.options.disable_sqlite:
+        available = conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
+                                   uselib_store='SQLITE', execute=1,
+                                   errmsg=
+'SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
+                                   fragment='''
 #include <sqlite3.h>
 #include <stdio.h>
 int main() {
@@ -190,11 +192,11 @@ int main() {
    }
    return 0;
 }
-''')
-        conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
+''') and conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
+        conf.env['ENABLE_SQLITE'] = available
 
     # xml
-    if Options.options.enable_xml:
+    if not Options.options.disable_xml:
         ret = None
         if darwin and Options.options.libxml_framework:
             u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
@@ -202,7 +204,8 @@ int main() {
             ret = conf.check_cxx(uselib_store='LIBXML2',
                                  framework_name=Options.options.libxml_framework, 
                                  execute=1,
-                                 errmsg='framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
+                                 errmsg=
+'framework "libxml-2.0 (>= 2.6.0)" could not be found or the found version is too old.',
                                  fragment='''
 #include <libxml/xmlversion.h>
 #include <stdio.h>
@@ -226,10 +229,11 @@ int main() {
           ret = conf.check_cfg(package = 'libxml-2.0', uselib_store='LIBXML2',
                                atleast_version='2.6.0', args = '--cflags --libs')
         if ret == None:
-          conf.check_message_2('No suitable libxml-2.0 found, disabling', color='PINK')
-          Options.options.enable_xml = None
+            conf.check_message_2('No suitable libxml-2.0 found, disabling', color='PINK')
+            conf.env['ENABLE_XML'] = None
         else:
-          u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
+            conf.env['ENABLE_XML'] = True
+            u('CXXDEFINES', 'FLUSSPFERD_HAVE_XML')
 
     conf.check_cxx(function_name='fork', 
                    header_name='unistd.h',
@@ -240,20 +244,18 @@ int main() {
                    uselib_store='POSIX',
                    defines=['HAVE_USLEEP'])
 
-    if Options.options.enable_io:
+    if not Options.options.disable_io:
+        conf.env['ENABLE_IO'] = True
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
-    if Options.options.enable_curl:
+    if not Options.options.disable_curl:
       if (conf.check_cxx(lib = 'curl', 
                         uselib_store='CURL') != None and 
          conf.check_cxx(header_name = 'curl/curl.h',
                         uselib_store='CURL') != None):
         conf.env['ENABLE_CURL'] = True
 
-    conf.env['ENABLE_SQLITE'] = Options.options.enable_sqlite
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
-    conf.env['ENABLE_XML'] = Options.options.enable_xml
-    conf.env['ENABLE_IO'] = Options.options.enable_io
 
 def get_cflags(bld, envvars):
     result = ''
@@ -311,6 +313,8 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
     bld.install_files('${PREFIX}/lib/flusspferd/modules/HTTP',
                       'js/src/HTTP/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules/Util',
+                      'js/src/Util/*.js')
 
     bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
 
