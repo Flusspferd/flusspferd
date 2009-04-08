@@ -30,6 +30,8 @@ namespace flusspferd {
 
 class object;
 
+#ifndef IN_DOXYGEN
+
 namespace Impl {
 
 class function_impl {
@@ -57,6 +59,10 @@ inline function_impl wrap_function(JSFunction *f) {
   return function_impl(f);
 }
 
-}}
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_FUNCTION_HPP */

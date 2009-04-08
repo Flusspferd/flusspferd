@@ -92,7 +92,7 @@ $
  * either of the above commands produce any output, then something went wrong
  * in the install proccess and most likely a required file couldn't be found. 
  *
- * Onto \ref cpp-tutorial-secondprogram "your second Flusspferd program".
+ * Next: \ref cpp-tutorial-secondprogram "your second Flusspferd program".
  */
 
 /**

@@ -1,6 +1,6 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP
-#define FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP
+Array.from = function from(iterable) {
+  if (!iterable)
+    return [];
+  if (iterable.toArray)
+    return iterable.toArray();
+  return Array.slice(iterable, 0);
+};
+Object.defineProperty(Array, 'from', {enumerable: false});
 
-typedef struct JSRuntime JSRuntime;
-
-namespace flusspferd {
-
-#ifndef IN_DOXYGEN
-
-namespace Impl {
-
-JSRuntime *get_runtime();
-
-}
-
-#endif
-
-}
-
-#endif /* FLUSSPFERD_SPIDERMONKEY_RUNTIME_HPP */
+String.prototype.toArray = function toArray() {
+  return this.split(/\s+/);
+};
+Object.defineProperty(String.prototype, 'toArray', {enumerable: false});

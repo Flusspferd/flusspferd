@@ -30,12 +30,22 @@ THE SOFTWARE.
 typedef struct JSContext JSContext;
 typedef struct JSRuntime JSRuntime;
 
-namespace flusspferd { namespace Impl {
-  inline JSContext *current_context() {
-    return get_context(flusspferd::current_context());
-  }
+namespace flusspferd {
 
-  JSRuntime *get_runtime();
-}}
+#ifndef IN_DOXYGEN
+
+namespace Impl {
+
+inline JSContext *current_context() {
+  return get_context(flusspferd::current_context());
+}
+
+JSRuntime *get_runtime();
+
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_INIT_HPP */

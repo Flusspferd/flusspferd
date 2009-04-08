@@ -28,11 +28,19 @@ THE SOFTWARE.
 
 typedef struct JSContext JSContext;
 
-namespace flusspferd { namespace Impl {
+namespace flusspferd { 
+
+#ifndef IN_DOXYGEN
+
+namespace Impl {
 
 JSContext *get_context(context &co);
 context wrap_context(JSContext *c);
 
-}}
+}
+
+#endif
+
+}
 
 #endif /* FLUSSPFERD_SPIDERMONKEY_CONTEXT_HPP */
