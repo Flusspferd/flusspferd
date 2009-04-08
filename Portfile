@@ -7,7 +7,7 @@ PortSystem          1.0
 name                flusspferd
 version             git
 categories          devel
-maintainers         c-plusplus.de:ruediger
+maintainers         flusspferd.org:team
 description         Flusspferd
 long_description    Flusspferd provides Javascript bindings for C++.
 homepage            http://flusspferd.org/
