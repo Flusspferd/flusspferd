@@ -92,7 +92,27 @@ Import("IO");
 IO.stdout.print("Works!");
 @endverbatim
  *
- * TODO
+ * The other global function that is exposed as part of @c prelude.js is
+ * @c readLine - which reads a line from standard input.
+ *
+ * @verbatim
+> readLine().substr(1)
+abcd
+bcd
+@endverbatim
+ *
+ * (Where @c abcd is input.)
+ *
+ * Again, @c readLine is just an alias for @c IO.stdin.readLine.
+ *
+ * The @c IO module exposes three streams by default:
+ *
+ * - @c IO.stdin
+ * - @c IO.stdout
+ * - @c IO.stderr
+ *
+ * There are many more things that you can do with this module, see
+ * <a href="#TODO">the documentation for @c IO (@em TODO)</a>.
  *
  * Next: \ref js-tutorial-xml
  *
