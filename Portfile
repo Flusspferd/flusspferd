@@ -16,7 +16,8 @@ platforms           darwin
 fetch.type          git
 git.url             git://github.com/ruediger/flusspferd.git
 
-depends_build       port:python25
+depends_build       port:python25 \
+                    port:git-core
 
 depends_lib         port:spidermonkey \
                     port:boost
