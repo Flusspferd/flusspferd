@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/io/file_class.hpp"
+#include "flusspferd/io/file.hpp"
 #include "flusspferd/security.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
@@ -39,7 +39,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
-class file_class::impl {
+class file::impl {
 public:
   std::fstream stream;
 
@@ -47,8 +47,8 @@ public:
   static bool exists(char const *name);
 };
 
-file_class::file_class(object const &obj, call_context &x)
-  : stream_base(obj, 0), p(new impl)
+file::file(object const &obj, call_context &x)
+  : stream(obj, 0), p(new impl)
 {
   set_streambuf(p->stream.rdbuf());
   if (!x.arg.empty()) {
@@ -56,22 +56,22 @@ file_class::file_class(object const &obj, call_context &x)
     open(name.c_str());
   }
 
-  register_native_method("open", &file_class::open);
-  register_native_method("close", &file_class::close);
+  register_native_method("open", &file::open);
+  register_native_method("close", &file::close);
 }
 
-file_class::~file_class()
+file::~file()
 {}
 
-void file_class::class_info::augment_constructor(object constructor) {
+void file::class_info::augment_constructor(object constructor) {
   create_native_function(constructor, "create", &impl::create);
   create_native_function(constructor, "exists", &impl::exists);
 }
 
-object file_class::class_info::create_prototype() {
+object file::class_info::create_prototype() {
   local_root_scope scope;
 
-  object proto = create_object(flusspferd::prototype<stream_base>());
+  object proto = create_object(flusspferd::prototype<stream>());
 
   create_native_method(proto, "open", 1);
   create_native_method(proto, "close", 0);
@@ -79,7 +79,7 @@ object file_class::class_info::create_prototype() {
   return proto;
 }
 
-void file_class::open(char const *name) {
+void file::open(char const *name) {
   security &sec = security::get();
 
   if (!sec.check_path(name, security::READ_WRITE))
@@ -95,12 +95,12 @@ void file_class::open(char const *name) {
     throw exception("Could not open file");
 }
 
-void file_class::close() {
+void file::close() {
   p->stream.close();
   delete_property("fileName");
 }
 
-void file_class::impl::create(char const *name, boost::optional<int> mode) {
+void file::impl::create(char const *name, boost::optional<int> mode) {
   security &sec = security::get();
 
   if (!sec.check_path(name, security::CREATE))
@@ -110,7 +110,7 @@ void file_class::impl::create(char const *name, boost::optional<int> mode) {
     throw exception("Could not create file");
 }
 
-bool file_class::impl::exists(char const *name) {
+bool file::impl::exists(char const *name) {
   security &sec = security::get();
 
   if (!sec.check_path(name, security::ACCESS))

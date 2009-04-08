@@ -24,13 +24,13 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_IO_BLOB_STREAM_HPP
 #define FLUSSPFERD_IO_BLOB_STREAM_HPP
 
-#include "stream_base.hpp"
+#include "stream.hpp"
 #include "../class.hpp"
 #include "../blob.hpp"
 
 namespace flusspferd { namespace io {
 
-class blob_stream : public stream_base {
+class blob_stream : public stream {
 public:
   blob_stream(object const &, call_context &);
   ~blob_stream();

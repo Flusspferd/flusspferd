@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/io/stream_base.hpp"
+#include "flusspferd/io/stream.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
@@ -34,35 +34,35 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
-stream_base::stream_base(object const &o, std::streambuf *p)
+stream::stream(object const &o, std::streambuf *p)
   : native_object_base(o), streambuf_(p)
 {
-  register_native_method("readWhole", &stream_base::read_whole);
-  register_native_method("read", &stream_base::read);
-  register_native_method("readWholeBlob", &stream_base::read_whole_blob);
-  register_native_method("readBlob", &stream_base::read_blob);
-  register_native_method("write", &stream_base::write);
-  register_native_method("flush", &stream_base::flush);
-  register_native_method("print", &stream_base::print);
-  register_native_method("readLine", &stream_base::read_line);
+  register_native_method("readWhole", &stream::read_whole);
+  register_native_method("read", &stream::read);
+  register_native_method("readWholeBlob", &stream::read_whole_blob);
+  register_native_method("readBlob", &stream::read_blob);
+  register_native_method("write", &stream::write);
+  register_native_method("flush", &stream::flush);
+  register_native_method("print", &stream::print);
+  register_native_method("readLine", &stream::read_line);
 
   define_property("fieldSeparator", string(" "));
   define_property("recordSeparator", string("\n"));
   define_property("autoflush", false);
 }
 
-stream_base::~stream_base()
+stream::~stream()
 {}
 
-void stream_base::set_streambuf(std::streambuf *p) {
+void stream::set_streambuf(std::streambuf *p) {
   streambuf_ = p;
 }
 
-std::streambuf *stream_base::streambuf() {
+std::streambuf *stream::streambuf() {
   return streambuf_;
 }
 
-object stream_base::class_info::create_prototype() {
+object stream::class_info::create_prototype() {
   local_root_scope scope;
 
   object proto = create_object();
@@ -79,7 +79,7 @@ object stream_base::class_info::create_prototype() {
   return proto;
 }
 
-string stream_base::read_whole() {
+string stream::read_whole() {
   std::string data;
   char buf[4096];
 
@@ -95,7 +95,7 @@ string stream_base::read_whole() {
   return string(data);
 }
 
-object stream_base::read_whole_blob() {
+object stream::read_whole_blob() {
   unsigned const N = 4096;
 
   std::vector<char> data;
@@ -114,7 +114,7 @@ object stream_base::read_whole_blob() {
       object(), (unsigned char const *)&data[0], data.size());
 }
 
-string stream_base::read(unsigned size) {
+string stream::read(unsigned size) {
   if (!size)
     size = 4096;
 
@@ -128,7 +128,7 @@ string stream_base::read(unsigned size) {
   return string(buf.get());
 }
 
-object stream_base::read_blob(unsigned size) {
+object stream::read_blob(unsigned size) {
   if (!size)
     size = 4096;
 
@@ -144,7 +144,7 @@ object stream_base::read_blob(unsigned size) {
       length);
 }
 
-void stream_base::write(value const &data) {
+void stream::write(value const &data) {
   if (data.is_string()) {
     string text = data.get_string();
     char const *str = text.c_str();
@@ -160,11 +160,11 @@ void stream_base::write(value const &data) {
     flush();
 }
 
-void stream_base::flush() {
+void stream::flush() {
   streambuf_->pubsync();
 }
 
-void stream_base::print(call_context &x) {
+void stream::print(call_context &x) {
   local_root_scope scope;
 
   value delim_v = get_property("fieldSeparator");
@@ -203,7 +203,7 @@ void stream_base::print(call_context &x) {
   flush();
 }
 
-string stream_base::read_line(value sep_) {
+string stream::read_line(value sep_) {
   local_root_scope scope;
 
   if (sep_.is_undefined_or_null())

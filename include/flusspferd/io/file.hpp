@@ -24,16 +24,16 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_IO_FILE_CLASS_HPP
 #define FLUSSPFERD_IO_FILE_CLASS_HPP
 
-#include "stream_base.hpp"
+#include "stream.hpp"
 #include <boost/mpl/size_t.hpp>
 #include <boost/mpl/bool.hpp>
 
 namespace flusspferd { namespace io {
 
-class file_class : public stream_base {
+class file : public stream {
 public:
-  file_class(object const &, call_context &);
-  ~file_class();
+  file(object const &, call_context &);
+  ~file();
 
   struct class_info : flusspferd::class_info  {
     static char const *full_name() { return "IO.File"; }

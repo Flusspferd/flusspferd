@@ -30,10 +30,10 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace io {
 
-class stream_base : public native_object_base {
+class stream : public native_object_base {
 public:
-  stream_base(object const &o, std::streambuf *b);
-  ~stream_base();
+  stream(object const &o, std::streambuf *b);
+  ~stream();
 
   std::streambuf *streambuf();
   void set_streambuf(std::streambuf *buf);
