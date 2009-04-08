@@ -70,10 +70,12 @@
   "defun a function with name NAME and NAME-and-go which calls
  (switch-to-buffer flusspferd-buffer-name) when finished."
   (let ((name-and-go (intern (concat (symbol-name name) "-and-go")))
-        (new-docstring (concat docstring " Switches to Flusspferd buffer when finished.")))
+        (new-docstring
+         (concat docstring " Switches to Flusspferd buffer when finished.")))
     `(progn
        (defun ,name ,arglist ,docstring ,@body)
-       (defun ,name-and-go ,arglist ,new-docstring ,@body (list flusspferd-switch-to)))))
+       (defun ,name-and-go ,arglist ,new-docstring
+              ,@body (list flusspferd-switch-to)))))
 
 (flusspferd-defun-and-go flusspferd-eval-region (start end)
   "Evaluates the region between START and END with flusspferd."
@@ -134,7 +136,8 @@
     ["Go to Flusspferd buffer" flusspferd-switch-to
      :visible (flusspferd-is-running-p)
      :active (not (string= (buffer-name) flusspferd-buffer-name))]
-    ["Start Flusspferd Shell" flusspferd :visible (not (flusspferd-is-running-p))]))
+    ["Start Flusspferd Shell" flusspferd
+     :visible (not (flusspferd-is-running-p))]))
 
 ;;;###autoload
 (define-minor-mode flusspferd-minor-mode
