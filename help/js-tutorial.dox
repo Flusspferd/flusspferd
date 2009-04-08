@@ -134,6 +134,45 @@ bcd
 </my:doc>
 @endverbatim
  *
- * TODO
+ * @note You may notice the encoding of UTF-16 above, because @c doc.toString()
+ *       (which is implicitly called here) converts to a Javascript string, and
+ *       in Javascript, strings are encoded in UTF-16, internally.
+ *
+ * Now let's look at that document in a few basic ways.
+ *
+ * @verbatim
+> doc.rootElement
+ELEMENT:doc
+> doc.rootElement.firstChild = null // => delete document contents
+null
+> doc
+<?xml version="1.0" encoding="UTF-16"?>
+<?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>
+<my:doc xmlns:my="http://www.jenitennison.com/" xmlns="http://www.w3.org/1999/xhtml" ... />
+> doc.firstChild
+PI:xml-stylesheet
+> doc.type
+DOCUMENT
+@endverbatim
+ *
+ * Or, leveraging XPath:
+ *
+ * @verbatim
+> doc = XML.parse("http://www.jenitennison.com/index.xml")
+...
+> xpath = new XML.XPath(doc, {my: "http://www.jenitennison.com/"})
+[object NativeObject]
+> xpath.ns.html = "http://www.w3.org/1999/xhtml" // now, namespaces html and my can be accessed
+http://www.w3.org/1999/xhtml
+> links = xpath("//my:links/my:link")
+ELEMENT:link,ELEMENT:link,ELEMENT:link,ELEMENT:link
+> links.forEach(function(x) { print(x.getAttribute("href"), x.content); })
+www.w3.org/XML W3C XML Page
+www.xml.com XML.com
+www.xml.org XML.org from OASIS
+www.bayes.co.uk/xml Chris Bayes' XML Portal
+@endverbatim
+ *
+ * @note Reference documentation has not been written yet.
  *
  */
