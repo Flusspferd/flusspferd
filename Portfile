@@ -21,7 +21,7 @@ depends_build       port:python25 \
 
 depends_lib         port:spidermonkey \
                     port:boost
-default_variants    test io
+default_variants    test
 
 configure.args      --with-spidermonkey=${prefix} --prefix=${prefix}
 
@@ -32,18 +32,16 @@ variant test description { Build Unit Tests } {
     }
 }
 
-variant io description { Add IO support } {
-    configure.args-append --enable-io
-}
-
 variant xml description { Add XML support } {
-    configure.args-append --enable-xml
     depends_lib-append port:libxml2
 }
 
 variant curl description { Add Curl support } {
-    configure.args-append --enable-curl
     depends_lib-append port:curl
+}
+
+variant sqlite description { Add SQLite support } {
+    depends_lib-append port:sqlite3
 }
 
 configure {
