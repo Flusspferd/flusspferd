@@ -1,13 +1,7 @@
 #!/bin/sh
 
-if which rhino; then
-  cmd=rhino
-else if [ -z "$CLASSPATH" ]; then
-  echo Please set CLASSPATH environment variable 1>&2
-  exit 1
-else
-  cmd="java JsRun"
-fi
-fi
-
-$cmd vendor/JSDoc-2.1.0/run.js -c=jsdoc_template/config.json js/src plugins/ src
+java -cp vendor/jsdoc_toolkit-2.1.0/jsrun.jar \
+  JsRun \
+  vendor/jsdoc_toolkit-2.1.0/app/run.js \
+  -c=jsdoc_template/config.json \
+  js/src plugins/ src
