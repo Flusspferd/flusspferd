@@ -31,6 +31,12 @@ namespace flusspferd {
 class value;
 
 /**
+ * @name Evaluating Javascript source code
+ * @addtogroup evaluate_compile
+ */
+//@{
+
+/**
  * Evaluate Javascript code.
  *
  * Uses the global object as scope.
@@ -87,6 +93,8 @@ value evaluate(std::string const &source, char const *file = 0x0,
  * @param scope The scope to use.
  */
 value execute(char const *file, object const &scope = object());
+
+//@}
 
 }
 
