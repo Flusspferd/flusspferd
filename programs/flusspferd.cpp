@@ -114,7 +114,7 @@ int flusspferd_repl::run() {
   typedef std::list<std::string>::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     const std::string &file = *i;
-    co.execute(file.c_str());
+    flusspferd::execute(file.c_str());
   }
   
   if (!interactive)
@@ -182,14 +182,14 @@ void print_help(char const *argv0) {
 }
 
 void flusspferd_repl::load_config() {
-  co.execute(config_file);
+  flusspferd::execute(config_file);
   config_loaded = true;
 
   // Get the prelude and execute it too
   flusspferd::value prelude = co.global().get_property("prelude");
   
   if (!prelude.is_undefined_or_null()) {
-    co.execute(prelude.to_string().c_str());
+    flusspferd::execute(prelude.to_string().c_str());
   }
 }
 
