@@ -74,6 +74,24 @@ $ flusspferd source.js
  *
  * Previous: \ref js-tutorial-invoke
  *
+ * There is an IO function that you have probably already encountered: @c print.
+ *
+ * @verbatim
+> print("OK: ", [1,2,3,4])
+OK: 1 2 3 4
+> IO.stdout.print("Same.")
+Same.
+@endverbatim
+ *
+ * In fact, @c print is exactly the same as @c IO.stdout.print, if @c prelude.js
+ * has been loaded. @c IO.stdout.print is available in module @c IO, so if you
+ * don't use @c prelude.js, you can do the following:
+ *
+ * @verbatim
+Import("IO");
+IO.stdout.print("Works!");
+@endverbatim
+ *
  * TODO
  *
  * Next: \ref js-tutorial-xml
