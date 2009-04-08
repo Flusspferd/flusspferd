@@ -177,7 +177,7 @@ int main() {
 
     # sqlite
     if not Options.options.disable_sqlite:
-        available = conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
+        available = conf.check_cxx(header_name = 'sqlite3.h',
                                    uselib_store='SQLITE', execute=1,
                                    errmsg=
 'SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
@@ -192,7 +192,7 @@ int main() {
    }
    return 0;
 }
-''') and conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
+''') and conf.check_cxx(lib = 'sqlite3', uselib_store='SQLITE')
         conf.env['ENABLE_SQLITE'] = available
 
     # xml
