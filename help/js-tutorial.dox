@@ -123,6 +123,17 @@ bcd
  *
  * Previous: \ref js-tutorial-io
  *
+ * Let us begin by loading an XML document from Jeni Tennison's website:
+ *
+ * @verbatim
+> doc = XML.parse("http://www.jenitennison.com/index.xml")
+<?xml version="1.0" encoding="UTF-16"?>
+<?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>
+<my:doc xmlns:my="http://www.jenitennison.com/" xmlns="http://www.w3.org/1999/xhtml" ...>
+  ...
+</my:doc>
+@endverbatim
+ *
  * TODO
  *
  */
