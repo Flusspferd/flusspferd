@@ -1,5 +1,6 @@
 /** Called automatically by JsDoc Toolkit. */
 function publish(symbolSet) {
+	Link.base = "";
 	publish.conf = {  // trailing slash expected for dirs
 		ext:         "",
 		outDir:      JSDOC.opt.d || SYS.pwd+"../out/jsdoc/",
@@ -51,7 +52,6 @@ function publish(symbolSet) {
  	var classes = symbols.filter(isaClass).sort(makeSortby("alias"));
 	
 	// create a class index, displayed in the left-hand column of every class page
-	Link.base = "../";
  	publish.classesIndex = classesTemplate.process(classes); // kept in memory
 	
 	// create each of the class pages
@@ -69,7 +69,6 @@ function publish(symbolSet) {
 	}
 	
 	// regenerate the index with different relative links, used in the index pages
-	Link.base = "";
 	publish.classesIndex = classesTemplate.process(classes);
 	
 	// create the class index page

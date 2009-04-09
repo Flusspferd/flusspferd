@@ -130,7 +130,7 @@ Link.prototype._makeSrcLink = function(srcFilePath) {
 	var target = (this.targetName)? " target=\""+this.targetName+"\"" : "";
 		
 	// transform filepath into a filename
-	var srcFile = srcFilePath.replace(/\.\.?[\\\/]/g, "").replace(/[:\\\/]/g, "_");
+	var srcFile = srcFilePath.replace(/^(?:\.\.)?[\\\/]/g, "").replace(/[:\\\/]/g, "_");
 	var outFilePath = Link.base + publish.conf.srcDir + srcFile + publish.conf.ext;
 
 	if (!this.text) this.text = FilePath.fileName(srcFilePath);
@@ -146,3 +146,4 @@ Link.prototype._makeFileLink = function(filePath) {
 	if (!this.text) this.text = filePath;
 	return "<a href=\""+outFilePath+"\""+target+">"+this.text+"</a>";
 }
+
