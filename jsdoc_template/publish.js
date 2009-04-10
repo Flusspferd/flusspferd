@@ -103,7 +103,7 @@ function publish(symbolSet) {
 
 	// output the file index page
 	var filesIndex = fileindexTemplate.process(allFiles);
-	IO.saveFile(publish.conf.outDir, "files"+publish.conf.ext, filesIndex);
+	IO.saveFile(publish.conf.outDir, "files.html", filesIndex);
 	fileindexTemplate = filesIndex = files = null;
 }
 
