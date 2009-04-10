@@ -135,7 +135,7 @@ function include(path) {
 	return IO.readFile(path);
 }
 
-/** Turn a raw source file into a code-hilited page in the docs. */
+/** Turn a raw source file into a code-highlited page in the docs. */
 function makeSrcFile(path, srcDir, name) {
 	if (JSDOC.opt.s) return;
 	
@@ -151,7 +151,7 @@ function makeSrcFile(path, srcDir, name) {
 	}
 
 	if (src.hilited) {
-		IO.saveFile(srcDir, name+publish.conf.ext, src.hilited);
+		IO.saveFile(srcDir, name+".html", src.hilited);
 	}
 }
 

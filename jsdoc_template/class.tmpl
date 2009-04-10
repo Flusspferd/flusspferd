@@ -62,7 +62,7 @@
 				{+resolveLinks(data.classDesc)+}
 				
 				<if test="!data.isBuiltin()">{# isn't defined in any file #}
-					<br /><i>Defined in: </i> {+new Link().toSrc(data.srcFile)+}.
+					<br /><i>Defined in: </i> {+new Link().toSrc(data.srcFile + ".html").withText(data.srcFile)+}.
 				</if>
 			</div>
 
