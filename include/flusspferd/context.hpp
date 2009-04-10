@@ -76,64 +76,6 @@ public:
   object scope_chain();
 
   /**
-   * Evaluate Javascript code.
-   *
-   * Uses the global object as scope.
-   *
-   * @param source The source code.
-   * @param n The length of the source code in bytes.
-   * @param file The file name to use.
-   * @param line The initial line number.
-   */
-  value evaluate(char const *source, std::size_t n,
-                 char const *file = 0x0, unsigned int line = 0);
-
-  /**
-   * Evaluate Javascript code in a scope.
-   *
-   * @param source The source code.
-   * @param n The length of the source code in bytes.
-   * @param file The file name to use.
-   * @param line The initial line number.
-   * @param scope The scope 
-   */
-  value evaluate_in_scope(char const* source, std::size_t n,
-                       char const* file, unsigned int line,
-                       object const &scope);
-
-  /**
-   * Evaluate Javascript code.
-   *
-   * Uses the global object as context.
-   *
-   * @param source The source code.
-   * @param file The file name to use.
-   * @param line The initial line number.
-   */
-  value evaluate(char const *source, char const *file = 0x0,
-                 unsigned int line = 0);
-
-  /**
-   * Evaluate Javascript code.
-   *
-   * Uses the global object as context.
-   *
-   * @param source The source code.
-   * @param file The file name to use.
-   * @param line The initial line number.
-   */
-  value evaluate(std::string const &source, char const *file = 0x0,
-                 unsigned int line = 0);
-
-  /**
-   * Execute a Javascript file.
-   *
-   * @param file The path to the file.
-   * @param scope The scope to use.
-   */
-  value execute(char const *file, object const &scope = object());
-
-  /**
    * Run the garbage collector.
    *
    * @see flusspferd::gc

@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,34 +24,78 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_EVALUATE_HPP
 #define FLUSSPFERD_EVALUATE_HPP
 
-#include <flusspferd/init.hpp>
-#include <flusspferd/context.hpp>
+#include "object.hpp"
 
 namespace flusspferd {
-  inline value evaluate(char const *source, std::size_t n,
-                        char const *file = 0x0, unsigned int line = 0)
-  {
-    return current_context().evaluate(source, n, file, line);
-  }
 
-  inline value evaluate(char const *source, char const *file = 0x0,
-                        unsigned int line = 0)
-  {
-    return current_context().evaluate(source, file, line);
-  }
+class value;
 
-  inline value evaluate(std::string const &source, char const *file = 0x0,
-                        unsigned int line = 0)
-  {
-    return current_context().evaluate(source, file, line);
-  }
+/**
+ * @name Evaluating Javascript source code
+ * @addtogroup evaluate_compile
+ */
+//@{
 
-  inline value evaluate_in_scope(const char*source, std::size_t n,
-                               char const *file, unsigned int line,
-                              object scope)
-  {
-    return current_context().evaluate_in_scope(source, n, file, line, scope);
-  }
+/**
+ * Evaluate Javascript code.
+ *
+ * Uses the global object as scope.
+ *
+ * @param source The source code.
+ * @param n The length of the source code in bytes.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ */
+value evaluate(char const *source, std::size_t n,
+               char const *file = 0x0, unsigned int line = 0);
+
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param n The length of the source code in bytes.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope 
+ */
+value evaluate_in_scope(char const* source, std::size_t n,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
+ * Evaluate Javascript code.
+ *
+ * Uses the global object as context.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ */
+value evaluate(char const *source, char const *file = 0x0,
+               unsigned int line = 0);
+
+/**
+ * Evaluate Javascript code.
+ *
+ * Uses the global object as context.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ */
+value evaluate(std::string const &source, char const *file = 0x0,
+               unsigned int line = 0);
+
+/**
+ * Execute a Javascript file.
+ *
+ * @param file The path to the file.
+ * @param scope The scope to use.
+ */
+value execute(char const *file, object const &scope = object());
+
+//@}
+
 }
 
 #endif /* FLUSSPFERD_EVALUATE_HPP */
