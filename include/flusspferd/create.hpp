@@ -413,6 +413,13 @@ function create_native_method(
   return create_native_method<T>(o, name, boost::function<T>(fnptr));
 }
 
+/**
+ * Create a new native function.
+ *
+ * @param memfnptr The member function to call.
+ * @param name The function name.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_function(
   void (T::*memfnptr)(call_context &),
@@ -423,6 +430,14 @@ function create_native_function(
     memfnptr, arity, name);
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param memfnptr The member function to call.
+ * @return The new function.
+ */
 template<typename T>
 function create_native_method(
   object const &o,
@@ -434,6 +449,14 @@ function create_native_method(
     o, memfnptr, arity, name);
 }
 
+/**
+ * Create a new native function.
+ *
+ * @param memfnptr The member function to call (also determines the function
+ *                 signature).
+ * @param name The function name.
+ * @return The new function.
+ */
 template<typename R, typename T>
 function create_native_function(
   R T::*memfnptr,
@@ -443,6 +466,15 @@ function create_native_function(
     memfnptr, name);
 }
 
+/**
+ * Create a new native method of an object.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param memfnptr The member function to call (also determines the function
+ *                 signature).
+ * @return The new function.
+ */
 template<typename R, typename T>
 function create_native_method(
   object const &o,
