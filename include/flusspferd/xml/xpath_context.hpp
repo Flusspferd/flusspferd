@@ -44,7 +44,7 @@ public:
   ~xpath_context();
 
 private: // JS methods
-  void eval(call_context &);
+  void self_call(call_context &);
 
 private: // JS properties
   void prop_current(property_mode, value &);

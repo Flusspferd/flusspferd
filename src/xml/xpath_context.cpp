@@ -81,9 +81,6 @@ xpath_context::xpath_context(object const &obj, call_context &x)
 
   define_native_property(
     "current", permanent_shared_property, &xpath_context::prop_current);
-
-  //FIXME
-  //register_native_method("", &xpath_context::eval);
 }
 
 xpath_context::~xpath_context() {
@@ -96,7 +93,7 @@ object xpath_context::class_info::create_prototype() {
   return proto;
 }
 
-void xpath_context::eval(call_context &x) {
+void xpath_context::self_call(call_context &x) {
   xmlXPathObjectPtr obj;
 
   if (x.arg[0].is_string()) {

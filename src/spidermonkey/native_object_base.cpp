@@ -237,14 +237,7 @@ JSBool native_object_base::impl::call_helper(
     x.result.bind(Impl::wrap_jsvalp(rval));
     x.function = Impl::wrap_object(function);
 
-    std::string name;
-
-    try {
-      name = flusspferd::function(x.function).name().to_string();
-    } catch (exception&) {}
-
-    //FIXME
-    //self->call_native_method(name, x);
+    self->self_call(x);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -388,6 +381,10 @@ boost::any native_object_base::enumerate_start(int &)
 value native_object_base::enumerate_next(boost::any &)
 {
   return value();
+}
+
+void native_object_base::self_call(call_context &) {
+  throw exception("Object can not be called");
 }
 
 void native_object_base::trace(tracer&) {}

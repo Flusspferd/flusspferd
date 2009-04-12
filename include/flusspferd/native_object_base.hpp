@@ -98,6 +98,16 @@ protected:
 
 protected:
   /**
+   * Virtual method invoked whenever the object is called as if it were a
+   * function.
+   *
+   * Default implementation: throw an exception.
+   *
+   * @param x The call context.
+   */
+  virtual void self_call(call_context &x);
+
+  /**
    * Virtual method invoked whenever the object has to be traced.
    *
    * Default implementation: stub.
