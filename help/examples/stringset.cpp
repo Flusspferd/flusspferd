@@ -11,26 +11,17 @@ public:
 
     static object create_prototype() {
       flusspferd::object proto = flusspferd::create_object();
-      create_native_method(proto, "dump", 0);
-      create_native_method(proto, "add", 1);
-      create_native_method(proto, "delete", 1);
-      create_native_method(proto, "toArray", 0);
+      create_native_method(proto, "dump", &StringSet::dump);
+      create_native_method(proto, "add", &StringSet::add);
+      create_native_method(proto, "delete", &StringSet::delete_);
+      create_native_method(proto, "toArray", &StringSet::to_array);
       return proto;
     }
   };
 
-  void init() {
-    register_native_method("dump", &StringSet::dump);
-    register_native_method("add", &StringSet::add);
-    register_native_method("delete", &StringSet::delete_);
-    register_native_method("toArray", &StringSet::to_array);
-  }
-
   StringSet(flusspferd::object const &self, flusspferd::call_context &x)
     : flusspferd::native_object_base(self)
   {
-    init();
-
     std::cout << "Creating StringSet" << std::endl;
 
     for (flusspferd::arguments::iterator it = x.arg.begin();

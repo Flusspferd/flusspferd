@@ -327,18 +327,10 @@ void my_function(call_context &x) {
  * @skip create_prototype
  * @until create_object
  *
- * With @ref flusspferd::native_object_base::create_native_method(object &, std::string const &, unsigned) "native_object_base::create_native_method",
- * we can add the methods to our prototype and return it.
+ * With @ref create_function "flusspferd::create_native_method etc." we can add
+ * the methods to our prototype and return it.
  *
  * @skip create_native_method
- * @until }
- *
- * Flusspferd also needs to know which C++ methods to call for each Javascript
- * method. We can use
- * @ref flusspferd::native_object_base::register_native_method "register_native_method"
- * for this purpose.
- *
- * @skip init
  * @until }
  *
  * Below is the constructor that will be called from Javascript. Note that
@@ -346,10 +338,6 @@ void my_function(call_context &x) {
  *
  * @skip StringSet
  * @until {
- *
- * Now, we call @c init() to bind the C++ methods.
- *
- * @skipline init
  *
  * Let us notify the user that the constructor has been called successfully.
  *
