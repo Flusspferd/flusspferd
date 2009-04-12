@@ -412,6 +412,47 @@ function create_native_method(
 {
   return create_native_method<T>(o, name, boost::function<T>(fnptr));
 }
+
+template<typename T>
+function create_native_member_function(
+  void (T::*memfnptr)(call_context &),
+  unsigned arity = 0,
+  std::string const &name = std::string())
+{
+  return create_native_functor_function<native_member_function<void, T> >(
+    memfnptr, arity, name);
+}
+
+template<typename T>
+function create_native_member_function(
+  object const &o,
+  std::string const &name,
+  void (T::*memfnptr)(call_context &),
+  unsigned arity = 0)
+{
+  return create_native_functor_function<native_member_function<void, T> >(
+    o, memfnptr, arity, name);
+}
+
+template<typename R, typename T>
+function create_native_member_function(
+  R T::*memfnptr,
+  std::string const &name = std::string())
+{
+  return create_native_functor_function<native_member_function<R, T> >(
+    memfnptr, name);
+}
+
+template<typename R, typename T>
+function create_native_member_function(
+  object const &o,
+  std::string const &name,
+  R T::*memfnptr)
+{
+  return create_native_functor_function<native_member_function<R, T> >(
+    o, memfnptr, name);
+}
+
 //@}
 
 }

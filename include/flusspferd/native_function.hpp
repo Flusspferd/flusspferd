@@ -81,6 +81,62 @@ private:
 };
 #endif
 
+/**
+ * Native member function.
+ *
+ * @ingroup functions
+ */
+template<typename R, typename T>
+class native_member_function : public native_function_base {
+private:
+  typedef function_adapter_memfn<R, T> adapter_type;
+
+public:
+  typedef R T::*callback_type;
+
+  native_member_function(
+      callback_type const &cb,
+      std::string const &name = std::string()
+    )
+    : native_function_base(adapter_type::arity, name), adapter(cb)
+  {}
+
+private:
+  void call(call_context &x) {
+    adapter(x);
+  }
+
+  adapter_type adapter;
+};
+
+#ifndef IN_DOXYGEN
+template<typename T>
+class native_member_function<void, T> : public native_function_base {
+public:
+  typedef void (T::*callback_type)(call_context &);
+
+  native_member_function(
+      callback_type const &cb,
+      unsigned arity = 0,
+      std::string const &name = std::string()
+    )
+    : native_function_base(arity, name), cb(cb)
+  {}
+
+private:
+  void call(call_context &x) {
+    T *ptr;
+    if (x.self_native)
+      ptr = &flusspferd::cast_to_derived<T>(x.self_native);
+    else
+      ptr = &flusspferd::get_native<T>(x.self);
+    cb(x);
+  }
+
+  callback_type cb;
+};
+#endif
+
 }
 
 #endif
