@@ -112,14 +112,12 @@ namespace_::~namespace_() {
 object namespace_::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "toString", 1);
+  create_native_method(proto, "toString", &namespace_::to_string);
 
   return proto;
 }
 
 void namespace_::init() {
-  register_native_method("toString", &namespace_::to_string);
-
   unsigned const RW = permanent_shared_property;
 
   define_native_property("href", RW, &namespace_::prop_href);

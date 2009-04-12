@@ -414,7 +414,7 @@ function create_native_method(
 }
 
 template<typename T>
-function create_native_member_function(
+function create_native_function(
   void (T::*memfnptr)(call_context &),
   unsigned arity = 0,
   std::string const &name = std::string())
@@ -424,7 +424,7 @@ function create_native_member_function(
 }
 
 template<typename T>
-function create_native_member_function(
+function create_native_method(
   object const &o,
   std::string const &name,
   void (T::*memfnptr)(call_context &),
@@ -435,7 +435,7 @@ function create_native_member_function(
 }
 
 template<typename R, typename T>
-function create_native_member_function(
+function create_native_function(
   R T::*memfnptr,
   std::string const &name = std::string())
 {
@@ -444,7 +444,7 @@ function create_native_member_function(
 }
 
 template<typename R, typename T>
-function create_native_member_function(
+function create_native_method(
   object const &o,
   std::string const &name,
   R T::*memfnptr)

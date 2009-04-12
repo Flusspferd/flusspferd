@@ -82,7 +82,8 @@ xpath_context::xpath_context(object const &obj, call_context &x)
   define_native_property(
     "current", permanent_shared_property, &xpath_context::prop_current);
 
-  register_native_method("", &xpath_context::eval);
+  //FIXME
+  //register_native_method("", &xpath_context::eval);
 }
 
 xpath_context::~xpath_context() {

@@ -55,9 +55,6 @@ file::file(object const &obj, call_context &x)
     string name = x.arg[0].to_string();
     open(name.c_str());
   }
-
-  register_native_method("open", &file::open);
-  register_native_method("close", &file::close);
 }
 
 file::~file()
@@ -73,8 +70,8 @@ object file::class_info::create_prototype() {
 
   object proto = create_object(flusspferd::prototype<stream>());
 
-  create_native_method(proto, "open", 1);
-  create_native_method(proto, "close", 0);
+  create_native_method(proto, "open", &file::open);
+  create_native_method(proto, "close", &file::close);
 
   return proto;
 }

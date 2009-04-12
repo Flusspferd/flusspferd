@@ -60,13 +60,6 @@ public:
   static JSClass native_enumerable_object_class;
 
 public:
-  typedef boost::variant<native_method_type, callback_type> method_variant;
-
-  typedef boost::unordered_map<std::string, method_variant> native_method_map;
-
-  native_method_map native_methods;
-
-public:
   typedef 
     boost::unordered_map<std::string, property_callback> property_callback_map;
 
@@ -205,65 +198,6 @@ object native_object_base::do_create_enumerable_object(object const &prototype_)
   return Impl::wrap_object(o);
 }
 
-void native_object_base::add_native_method(
-    std::string const &name, unsigned arity)
-{
-  JSContext *ctx = Impl::current_context();
-
-  JSFunction *func = JS_DefineFunction(
-      ctx,
-      this->object::get(),
-      name.c_str(),
-      &impl::call_helper,
-      arity,
-      0);
-
-  if (!func)
-    throw exception(("Could not create native method " + name).c_str());
-}
-
-function native_object_base::create_native_method(
-    std::string const &name, unsigned arity)
-{
-  JSContext *ctx = Impl::current_context();
-
-  JSFunction *func = JS_NewFunction(
-      ctx,
-      &impl::call_helper,
-      arity,
-      0, // flags
-      0, // parent
-      name.c_str());
-
-  if (!func)
-    throw exception(("Could not create native method " + name).c_str());
-
-  return Impl::wrap_function(func);
-}
-
-function native_object_base::create_native_method(
-    object &container, std::string const &name, unsigned arity)
-{
-  function fun = create_native_method(name, arity);
-  container.define_property(
-      name,
-      fun,
-      object::dont_enumerate);
-  return fun;
-}
-
-void native_object_base::register_native_method(
-  std::string const &name, native_method_type method)
-{
-  p->native_methods[name] = method;
-}
-
-void native_object_base::register_native_method_cb(
-  std::string const &name, callback_type const &cb)
-{
-  p->native_methods[name] = cb;
-}
-
 void native_object_base::add_property_op(
   std::string const &name, property_callback callback)
 {
@@ -309,7 +243,8 @@ JSBool native_object_base::impl::call_helper(
       name = flusspferd::function(x.function).name().to_string();
     } catch (exception&) {}
 
-    self->call_native_method(name, x);
+    //FIXME
+    //self->call_native_method(name, x);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -426,32 +361,6 @@ uint32 native_object_base::impl::mark_op(
   return 0;
 }
 #endif
-
-void native_object_base::call_native_method(
-    std::string const &name, call_context &x)
-{
-  impl::native_method_map::iterator it = p->native_methods.find(name);
-
-  if (it == p->native_methods.end())
-    throw exception(("No such method: " + name).c_str());
-
-  impl::method_variant m = it->second;
-  switch (m.which()) {
-  case 0: // native_method_type
-    {
-      native_method_type native_method = boost::get<native_method_type>(m);
-      if (native_method)
-        (this->*native_method)(x);
-    }
-    break;
-  case 1: // callback_type
-    {
-      callback_type const &callback = boost::get<callback_type>(m);
-      if (callback)
-        callback(x);
-    }
-  }
-}
 
 void native_object_base::property_op(
     property_mode mode, value const &id, value &data)

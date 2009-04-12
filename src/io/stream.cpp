@@ -37,15 +37,6 @@ using namespace flusspferd::io;
 stream::stream(object const &o, std::streambuf *p)
   : native_object_base(o), streambuf_(p)
 {
-  register_native_method("readWhole", &stream::read_whole);
-  register_native_method("read", &stream::read);
-  register_native_method("readWholeBlob", &stream::read_whole_blob);
-  register_native_method("readBlob", &stream::read_blob);
-  register_native_method("write", &stream::write);
-  register_native_method("flush", &stream::flush);
-  register_native_method("print", &stream::print);
-  register_native_method("readLine", &stream::read_line);
-
   define_property("fieldSeparator", string(" "));
   define_property("recordSeparator", string("\n"));
   define_property("autoFlush", false);
@@ -67,14 +58,14 @@ object stream::class_info::create_prototype() {
 
   object proto = create_object();
 
-  create_native_method(proto, "readWhole", 0);
-  create_native_method(proto, "read", 1);
-  create_native_method(proto, "readWholeBlob", 0);
-  create_native_method(proto, "readBlob", 1);
-  create_native_method(proto, "write", 1);
-  create_native_method(proto, "flush", 0);
-  create_native_method(proto, "print", 0);
-  create_native_method(proto, "readLine", 1);
+  create_native_method(proto, "readWhole", &stream::read_whole);
+  create_native_method(proto, "read", &stream::read);
+  create_native_method(proto, "readWholeBlob", &stream::read_whole_blob);
+  create_native_method(proto, "readBlob", &stream::read_blob);
+  create_native_method(proto, "write", &stream::write);
+  create_native_method(proto, "flush", &stream::flush);
+  create_native_method(proto, "print", &stream::print);
+  create_native_method(proto, "readLine", &stream::read_line);
 
   return proto;
 }

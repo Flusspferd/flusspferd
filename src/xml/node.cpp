@@ -221,46 +221,29 @@ void node::init() {
   }
 
   define_native_property("firstAttribute", RW, &node::prop_first_attr);
-
-  register_native_method("copy", &node::copy);
-  register_native_method("unlink", &node::unlink);
-  register_native_method("purge", &node::purge);
-  register_native_method("addContent", &node::add_content);
-  register_native_method("addChild", &node::add_child);
-  register_native_method("addChildList", &node::add_child_list);
-  register_native_method("addNode", &node::add_node);
-  register_native_method("addNamespace", &node::add_namespace);
-  register_native_method("addAttribute", &node::add_attribute);
-  register_native_method("setAttribute", &node::set_attribute);
-  register_native_method("unsetAttribute", &node::unset_attribute);
-  register_native_method("findAttribute", &node::find_attribute);
-  register_native_method("getAttribute", &node::get_attribute);
-  register_native_method("toString", &node::to_string);
-  register_native_method("searchNamespaceByPrefix",
-                         &node::search_namespace_by_prefix);
-  register_native_method("searchNamespaceByURI",
-                         &node::search_namespace_by_uri);
 }
 
 object node::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "copy", 1);
-  create_native_method(proto, "unlink", 0);
-  create_native_method(proto, "purge", 0);
-  create_native_method(proto, "addContent", 1);
-  create_native_method(proto, "addChild", 1);
-  create_native_method(proto, "addChildList", 1);
-  create_native_method(proto, "addNode", 2);
-  create_native_method(proto, "addNamespace", 2);
-  create_native_method(proto, "addAttribute", 3);
-  create_native_method(proto, "setAttribute", 3);
-  create_native_method(proto, "unsetAttribute", 2);
-  create_native_method(proto, "findAttribute", 2);
-  create_native_method(proto, "getAttribute", 2);
-  create_native_method(proto, "searchNamespaceByPrefix", 1);
-  create_native_method(proto, "searchNamespaceByURI", 1);
-  create_native_method(proto, "toString", 0);
+  create_native_method(proto, "copy", &node::copy);
+  create_native_method(proto, "unlink", &node::unlink);
+  create_native_method(proto, "purge", &node::purge);
+  create_native_method(proto, "addContent", &node::add_content);
+  create_native_method(proto, "addChild", &node::add_child);
+  create_native_method(proto, "addChildList", &node::add_child_list);
+  create_native_method(proto, "addNode", &node::add_node);
+  create_native_method(proto, "addNamespace", &node::add_namespace);
+  create_native_method(proto, "addAttribute", &node::add_attribute);
+  create_native_method(proto, "setAttribute", &node::set_attribute);
+  create_native_method(proto, "unsetAttribute", &node::unset_attribute);
+  create_native_method(proto, "findAttribute", &node::find_attribute);
+  create_native_method(proto, "getAttribute", &node::get_attribute);
+  create_native_method(proto, "searchNamespaceByPrefix",
+                       &node::search_namespace_by_prefix);
+  create_native_method(proto, "searchNamespaceByURI",
+                       &node::search_namespace_by_uri);
+  create_native_method(proto, "toString", &node::to_string);
 
   return proto;
 }

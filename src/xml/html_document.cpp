@@ -52,13 +52,12 @@ html_document::~html_document() {
 }
 
 void html_document::init() {
-  register_native_method("dump", &html_document::dump);
 }
 
 object html_document::class_info::create_prototype() {
   object proto = create_object(flusspferd::prototype<document>());
 
-  create_native_method(proto, "dump", 0);
+  create_native_method(proto, "dump", &html_document::dump);
 
   return proto;
 }

@@ -127,10 +127,10 @@ private:
   void call(call_context &x) {
     T *ptr;
     if (x.self_native)
-      ptr = &flusspferd::cast_to_derived<T>(x.self_native);
+      ptr = &flusspferd::cast_to_derived<T>(*x.self_native);
     else
       ptr = &flusspferd::get_native<T>(x.self);
-    cb(x);
+    (ptr->*cb)(x);
   }
 
   callback_type cb;
