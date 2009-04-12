@@ -190,6 +190,7 @@ int main() {
              SQLITE_VERSION);
      return 1;
    }
+   printf("1");
    return 0;
 }
 ''') and conf.check_cxx(lib = 'sqlite3', uselib_store='SQLITE')
