@@ -109,8 +109,8 @@ void curl::class_info::augment_constructor(object &ctor)
 object curl::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method( proto, "setMethod", 1);
-  create_native_method( proto, "perform", 0);
+  create_native_method(proto, "setMethod", &curl::set_method);
+  create_native_method(proto, "perform", &curl::perform);
 
   return proto;
 }
@@ -120,9 +120,6 @@ curl::curl(object const &obj, call_context &)
   : native_object_base(obj),
     error_buffer(NULL)
 {
-  register_native_method("setMethod", &curl::set_method);
-  register_native_method("perform", &curl::perform);
-
   curlHandle = curl_easy_init();
 
   if (!curlHandle)
