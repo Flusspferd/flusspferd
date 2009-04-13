@@ -132,8 +132,7 @@ void blob::prop_length(property_mode mode, value &data) {
   case property_set:
   {
     if (!data.is_int())
-      // TODO: make this a RangeError
-      throw exception("Blob.length out of range");
+      throw exception("Blob.length out of range", "RangeError");
     int new_len = data.get_int();
     if (new_len < 0)
       new_len = 0;
