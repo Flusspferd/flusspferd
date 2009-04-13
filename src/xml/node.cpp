@@ -204,10 +204,6 @@ node::~node() {
 void node::init() {
 //FIXME
 #if 0
-  define_native_property("nextSibling", RW, &node::prop_next);
-  define_native_property("previousSibling", RW, &node::prop_prev);
-  define_native_property("firstChild", RW, &node::prop_first_child);
-  define_native_property("lastChild", RO, &node::prop_last_child);
   define_native_property("firstSibling", RO, &node::prop_first_sibling);
   define_native_property("lastSibling", RO, &node::prop_last_sibling);
 
@@ -295,6 +291,19 @@ object node::class_info::create_prototype() {
       permanent_shared_property,
       create_native_method(object(), "", &node::get_previous_sibling),
       create_native_method(object(), "", &node::set_previous_sibling)));
+
+  proto.define_property(
+    "firstChild", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_first_child),
+      create_native_method(object(), "", &node::set_first_child)));
+
+  proto.define_property(
+    "lastChild", value(),
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_last_child)));
 
   return proto;
 }
@@ -572,45 +581,42 @@ void node::set_previous_sibling(object new_prev) {
   }
 }
 
-void node::prop_first_child(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      xmlNodePtr old = ptr->children;
-      while (old) {
-        old->parent = 0;
-        old = old->next;
-      }
-      ptr->children = 0;
-      ptr->last = 0;
-      data = object();
-    } else if (xmlNodePtr child = c_from_js(data.get_object())) {
-      xmlNodePtr old = ptr->children;
-      while (old) {
-        old->parent = 0;
-        old = old->next;
-      }
-      ptr->children = child;
-      child->parent = ptr;
-      while (child->next) {
-        child = child->next;
-        child->parent = ptr;
-      }
-      ptr->last = child;
-    }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
-    break;
-  default: break;
-  }
+object node::get_first_child() {
+  return create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
 }
 
-void node::prop_last_child(property_mode mode, value &data) {
-  if (mode != property_get)
+void node::set_first_child(object first_child) {
+  if (first_child.is_null()) {
+    xmlNodePtr old = ptr->children;
+    while (old) {
+      old->parent = 0;
+      old = old->next;
+    }
+    ptr->children = 0;
+    ptr->last = 0;
+  }
+    
+  xmlNodePtr child = c_from_js(first_child);
+
+  if (!child)
     return;
 
-  data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->last : 0);
+  xmlNodePtr old = ptr->children;
+  while (old) {
+    old->parent = 0;
+    old = old->next;
+  }
+  ptr->children = child;
+  child->parent = ptr;
+  while (child->next) {
+    child = child->next;
+    child->parent = ptr;
+  }
+  ptr->last = child;
+}
+
+object node::get_last_child() {
+  return create(ptr->type != XML_ENTITY_REF_NODE ? ptr->last : 0);
 }
 
 void node::prop_first_sibling(property_mode mode, value &data) {

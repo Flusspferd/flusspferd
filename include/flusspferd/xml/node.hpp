@@ -104,8 +104,11 @@ private: // JS properties
   object get_previous_sibling();
   void set_previous_sibling(object);
 
-  void prop_first_child  (property_mode mode, value &data);
-  void prop_last_child   (property_mode mode, value &data);
+  object get_first_child();
+  void set_first_child(object);
+
+  object get_last_child();
+
   void prop_first_sibling(property_mode mode, value &data);
   void prop_last_sibling (property_mode mode, value &data);
   void prop_namespace    (property_mode mode, value &data);
