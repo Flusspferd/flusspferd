@@ -265,9 +265,25 @@ FLUSSPFERD_CALLS(call, object const &)
    * @param init_value The initial value.
    * @param attrs The property's attributes.
    */
-  void define_property(string const &name,
+  void define_property(
+    string const &name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
+
+  /**
+   * Define a property.
+   *
+   * The property will be initialised with <code>undefined</code>.
+   *
+   * @param name The property's name.
+   * @param attrs The property's attributes.
+   */
+  void define_property(
+    string const &name,
+    property_attributes const attrs)
+  {
+    return define_property(name, value(), attrs);
+  }
 
   /**
    * Get a property's attributes.

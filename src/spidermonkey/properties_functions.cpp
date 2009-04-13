@@ -134,8 +134,7 @@ void ecma_define_own_property(object o, string p, object desc) {
 
   // Wasn't that easy
   if (is_accessor) {
-    o.define_property(p, value(), 
-        property_attributes(flags, getter_fn, setter_fn));
+    o.define_property(p, property_attributes(flags, getter_fn, setter_fn));
   } else {
     value val = desc.has_property("value") 
               ? desc.get_property("value") 

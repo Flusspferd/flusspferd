@@ -234,100 +234,100 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "toString", &node::to_string);
 
   proto.define_property(
-    "name", value(),
+    "name",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_name),
       create_native_method(object(), "", &node::set_name)));
 
   proto.define_property(
-    "type", value(),
+    "type",
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_type)));
 
   proto.define_property(
-    "document", value(),
+    "document",
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_document)));
 
   proto.define_property(
-    "lang", value(),
+    "lang",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_lang),
       create_native_method(object(), "", &node::set_lang)));
 
   proto.define_property(
-    "content", value(),
+    "content",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_content),
       create_native_method(object(), "", &node::set_content)));
 
   proto.define_property(
-    "parent", value(),
+    "parent",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_parent),
       create_native_method(object(), "", &node::set_parent)));
 
   proto.define_property(
-    "nextSibling", value(),
+    "nextSibling",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_next_sibling),
       create_native_method(object(), "", &node::set_next_sibling)));
 
   proto.define_property(
-    "previousSibling", value(),
+    "previousSibling",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_previous_sibling),
       create_native_method(object(), "", &node::set_previous_sibling)));
 
   proto.define_property(
-    "firstChild", value(),
+    "firstChild",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_first_child),
       create_native_method(object(), "", &node::set_first_child)));
 
   proto.define_property(
-    "lastChild", value(),
+    "lastChild",
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_last_child)));
 
   proto.define_property(
-    "firstSibling", value(),
+    "firstSibling",
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_first_sibling)));
 
   proto.define_property(
-    "lastSibling", value(),
+    "lastSibling",
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_last_sibling)));
 
   proto.define_property(
-    "firstAttribute", value(),
+    "firstAttribute",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_first_attribute),
       create_native_method(object(), "", &node::set_first_attribute)));
 
   proto.define_property(
-    "namespace", value(),
+    "namespace",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &node::get_namespace),
       create_native_method(object(), "", &node::set_namespace)));
 
   proto.define_property(
-    "namespaces", value(),
+    "namespaces",
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_namespaces)));

@@ -99,7 +99,6 @@ object attribute_::class_info::create_prototype() {
 
   proto.define_property(
     "content",
-    value(),
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &attribute_::get_content),

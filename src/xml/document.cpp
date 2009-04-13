@@ -125,7 +125,6 @@ object document::class_info::create_prototype() {
 
   proto.define_property(
     "rootElement",
-    value(),
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &document::get_root_element),

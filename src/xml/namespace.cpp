@@ -117,7 +117,6 @@ object namespace_::class_info::create_prototype() {
 
   proto.define_property(
     "href",
-    value(),
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &namespace_::get_href),
@@ -125,7 +124,6 @@ object namespace_::class_info::create_prototype() {
 
   proto.define_property(
     "prefix",
-    value(),
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &namespace_::get_prefix),

@@ -95,7 +95,6 @@ object blob::class_info::create_prototype() {
 
   proto.define_property(
     "length",
-    value(),
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "$get_length", &blob::get_length),
