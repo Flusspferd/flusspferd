@@ -45,21 +45,14 @@ public:
   push_parser(object const &, call_context &);
   ~push_parser();
 
-protected:
-  void trace(tracer &);
-
 private: // JS methods
   void push(blob &, bool);
-  object terminate();
-
-private: // JS properties
-  void prop_document(property_mode, value &);
+  value terminate();
 
 private:
   void terminate2();
 
   xmlParserCtxtPtr parser;
-  xmlDocPtr doc;
 };
 
 }}
