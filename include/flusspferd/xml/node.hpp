@@ -92,7 +92,9 @@ private: // JS properties
   std::string get_lang();
   void set_lang(std::string const &);
 
-  void prop_content      (property_mode mode, value &data);
+  boost::optional<std::string> get_content();
+  void set_content(boost::optional<std::string> const &);
+
   void prop_parent       (property_mode mode, value &data);
   void prop_next         (property_mode mode, value &data);
   void prop_prev         (property_mode mode, value &data);

@@ -204,8 +204,6 @@ node::~node() {
 void node::init() {
 //FIXME
 #if 0
-  define_native_property("lang", RW, &node::prop_lang);
-  define_native_property("content", RW, &node::prop_content);
   define_native_property("parent", RW, &node::prop_parent);
   define_native_property("nextSibling", RW, &node::prop_next);
   define_native_property("previousSibling", RW, &node::prop_prev);
@@ -270,6 +268,13 @@ object node::class_info::create_prototype() {
       permanent_shared_property,
       create_native_method(object(), "", &node::get_lang),
       create_native_method(object(), "", &node::set_lang)));
+
+  proto.define_property(
+    "content", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_content),
+      create_native_method(object(), "", &node::set_content)));
 
   return proto;
 }
@@ -346,25 +351,26 @@ std::string node::get_lang() {
     return std::string((char const *) lang);
 }
 
-void node::prop_content(property_mode mode, value &data) {
-  xmlChar *content;
-  switch (mode) {
-  case property_set:
-    xmlNodeSetContent(ptr, 0);
-    if (!data.is_undefined() && !data.is_null())
-      xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
-    create_all_children(ptr, true, false);
-    // !! fall thru !!
-  case property_get:
-    content = xmlNodeGetContent(ptr);
-    if (!content) {
-      data = value();
-    } else {
-      data = string((char const *) content);
+void node::set_content(boost::optional<std::string> const &x) {
+  xmlNodeSetContent(ptr, 0);
+  if (x)
+    xmlNodeAddContent(ptr, (xmlChar const *) x->c_str());
+  create_all_children(ptr, true, false);
+}
+
+boost::optional<std::string> node::get_content() {
+  xmlChar *content = xmlNodeGetContent(ptr);
+  if (!content) {
+    return boost::none;
+  } else {
+    try {
+      std::string result((char const *) content);
       xmlFree(content);
+      return result;
+    } catch (...) {
+      xmlFree(content);
+      throw;
     }
-    break;
-  default: break;
   }
 }
 
