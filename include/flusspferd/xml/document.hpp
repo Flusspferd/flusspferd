@@ -63,9 +63,9 @@ private: // JS methods
   object copy(bool recursive);
   value to_string();
 
-private:
-  void prop_root_element(property_mode mode, value &data);
-  void prop_xml_namespace(property_mode mode, value &data);
+private: // JS properties
+  void set_root_element(object const &);
+  object get_root_element();
 };
 
 }}
