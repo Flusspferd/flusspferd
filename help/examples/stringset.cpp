@@ -2,6 +2,7 @@
 #include <iostream>
 #include <ostream>
 #include <set>
+#include <string>
 
 class StringSet : public flusspferd::native_object_base {
 public:
@@ -32,18 +33,17 @@ public:
     }
   }
 
-  ~StringSet()
-  {
+  ~StringSet() {
     std::cout << "Destroying StringSet" << std::endl;
   }
 
 private:
+  typedef std::set<std::string> container;
+  typedef container::iterator iterator;
+
   void dump() {
     std::cout << "Dumping StringSet: ";
-    for (std::set<std::string>::iterator it = data.begin();
-         it != data.end();
-         ++it)
-    {
+    for (iterator it = data.begin(); it != data.end(); ++it) {
       if (it != data.begin())
         std::cout << ',';
       std::cout << *it;
@@ -56,16 +56,14 @@ private:
   }
 
   void delete_(std::string const &x) {
-    data.erase(x);
+    if (!data.erase(x))
+      throw flusspferd::exception("No such element");
   }
 
   flusspferd::array to_array() {
     flusspferd::array result = flusspferd::create_array();
 
-    for (std::set<std::string>::iterator it = data.begin();
-         it != data.end();
-         ++it)
-    {
+    for (iterator it = data.begin(); it != data.end(); ++it) {
       result.call("push", *it);
     }
 
@@ -73,7 +71,7 @@ private:
   }
 
 private:
-  std::set<std::string> data;
+  container data;
 };
 
 void print(flusspferd::string const &x) {

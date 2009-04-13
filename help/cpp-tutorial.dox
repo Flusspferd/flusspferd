@@ -354,9 +354,14 @@ void my_function(call_context &x) {
  *
  * @skipline }
  *
- * The first three methods should be pretty straight-forward:
+ * A few <code>typedef</code>s for the data types we use internally:
  *
  * @skip private
+ * @until iterator
+ *
+ * The first three methods should be pretty straight-forward:
+ *
+ * @skip dump
  * @until delete_
  * @until }
  *
