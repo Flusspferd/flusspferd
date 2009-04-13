@@ -85,6 +85,7 @@ private: // JS properties
   std::string get_name();
   void set_name(std::string const &);
   std::string get_type();
+  object get_document();
 
   void prop_name         (property_mode mode, value &data);
   void prop_lang         (property_mode mode, value &data);

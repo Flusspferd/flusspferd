@@ -256,6 +256,12 @@ object node::class_info::create_prototype() {
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_type)));
 
+  proto.define_property(
+    "document", value(),
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_document)));
+
   return proto;
 }
 
@@ -604,11 +610,8 @@ void node::prop_last_sibling(property_mode mode, value &data) {
   data = create(ptr);
 }
 
-void node::prop_document(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
-  data = create(xmlNodePtr(ptr->doc));
+object node::get_document() {
+  return create(xmlNodePtr(ptr->doc));
 }
 
 std::string node::get_type() {
