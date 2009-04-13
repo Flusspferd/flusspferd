@@ -108,9 +108,9 @@ void sqlite3::class_info::augment_constructor(object &ctor)
 {
   // Set static properties on the constructor
   ctor.define_property("version", SQLITE_VERSION_NUMBER, 
-      object::read_only_property | object::permanent_property);
+      read_only_property | permanent_property);
   ctor.define_property("versionStr", string(SQLITE_VERSION), 
-      object::read_only_property | object::permanent_property);
+      read_only_property | permanent_property);
 
   load_class<sqlite3_cursor>(ctor);
 }

@@ -52,13 +52,13 @@ void import(call_context &);
 
 void load_import_function(object container) {
   function imp = create_native_function(container, "Import", &import, 2);
-  container.define_property("import", imp, object::dont_enumerate);
+  container.define_property("import", imp, dont_enumerate);
 
-  imp.define_property("preload", create_object(), object::permanent_property);
-  imp.define_property("paths", create_array(), object::permanent_property);
-  imp.define_property("alias", create_object(), object::permanent_property);
+  imp.define_property("preload", create_object(), permanent_property);
+  imp.define_property("paths", create_array(), permanent_property);
+  imp.define_property("alias", create_object(), permanent_property);
   imp.define_property("module_cache", create_object(),
-                      object::permanent_property);
+                      permanent_property);
 }
 
 }

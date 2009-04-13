@@ -108,14 +108,14 @@ object flusspferd::xml::load_xml(object container) {
   XML.define_property(
     "HTML",
     HTML,
-    object::read_only_property | object::permanent_property);
+    read_only_property | permanent_property);
 
   xml_constants(XML);
 
   container.define_property(
     "XML",
     XML,
-    object::read_only_property | object::permanent_property);
+    read_only_property | permanent_property);
 
   return XML;
 }
@@ -125,7 +125,7 @@ static void xml_constants(object XML) {
   XML.define_property( \
     BOOST_PP_STRINGIZE(x), \
     BOOST_PP_CAT(XML_, x), \
-    object::read_only_property | object::permanent_property) \
+    read_only_property | permanent_property) \
   /* */
 
   // parser constants
@@ -158,7 +158,7 @@ static void html_constants(object HTML) {
   HTML.define_property( \
     BOOST_PP_STRINGIZE(x), \
     BOOST_PP_CAT(HTML_, x), \
-    object::read_only_property | object::permanent_property) \
+    read_only_property | permanent_property) \
   /* */
 
   // parser constants

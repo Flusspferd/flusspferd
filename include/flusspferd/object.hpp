@@ -252,28 +252,6 @@ FLUSSPFERD_CALLS(call, object const &)
 #ifndef PREPROC_DEBUG
 
   /**
-   * Property flags.
-   *
-   * @ingroup property_types
-   */
-  enum property_flag {
-    /// The property is not enumerable.
-    dont_enumerate = 1,
-
-    /// The property is read-only.
-    read_only_property = 2,
-
-    /// The property can not be deleted.
-    permanent_property = 4,
-
-    /// The property's attributes are shared between objects.
-    shared_property = 8,
-
-    /// The property is both permanent and shared.
-    permanent_shared_property = 12
-  };
-
-  /**
    * @name Properties
    *
    * Accessing properties and their attributes.
