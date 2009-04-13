@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "arguments.hpp"
 #include "value.hpp"
 #include "convert.hpp"
+#include "string.hpp"
 #include <string>
 #include <memory>
 #endif
@@ -265,28 +266,6 @@ FLUSSPFERD_CALLS(call, object const &)
    * @param attrs The property's attributes.
    */
   void define_property(string const &name,
-    value const &init_value = value(),
-    property_attributes const attrs = property_attributes());
-
-  /**
-   * Define a property.
-   *
-   * @param name The property's name.
-   * @param init_value The initial value.
-   * @param attrs The property's attributes.
-   */
-  void define_property(std::string const &name,
-    value const &init_value = value(),
-    property_attributes const attrs = property_attributes());
-
-  /**
-   * Define a property.
-   *
-   * @param name The property's name.
-   * @param init_value The initial value.
-   * @param attrs The property's attributes.
-   */
-  void define_property(char const *name,
     value const &init_value = value(),
     property_attributes const attrs = property_attributes());
 

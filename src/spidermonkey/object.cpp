@@ -235,6 +235,8 @@ void object::define_property(
   if (is_null())
     throw exception("Could not define property (object is null)");
 
+  flusspferd::root_string name_r(name);
+
   unsigned flags = attrs.flags;
   value v;
   v = init_value;
@@ -257,31 +259,13 @@ void object::define_property(
   if (getter_o) sm_flags |= JSPROP_GETTER;
   if (setter_o) sm_flags |= JSPROP_SETTER;
 
-  if(!JS_DefineUCProperty(Impl::current_context(), get_const(),
+  if (!JS_DefineUCProperty(Impl::current_context(), get_const(),
                           name.data(), name.length(),
                           Impl::get_jsval(v),
                           *(JSPropertyOp*) &getter_o,
                           *(JSPropertyOp*) &setter_o,
                           sm_flags))
     throw exception("Could not define property");
-}
-
-void object::define_property(
-  std::string const &name_, value const &init_value,
-  property_attributes attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  define_property(name, init_value, attrs);
-}
-
-void object::define_property(
-  char const *name_, value const &init_value,
-  property_attributes const attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  define_property(name, init_value,attrs);
 }
 
 bool object::is_null() const {
