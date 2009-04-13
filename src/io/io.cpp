@@ -73,7 +73,7 @@ object flusspferd::io::load_io(object container) {
   container.define_property(
     "IO",
     IO,
-    object::read_only_property | object::dont_enumerate);
+    read_only_property | dont_enumerate);
 
   return IO;
 }

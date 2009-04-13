@@ -230,9 +230,7 @@ protected:
    * Virtual method invoked for property addition, deletion, read access and
    * write access.
    *
-   * Default implementation:
-   * Try to find a callback added with #add_property_op and call it or do
-   * nothing.
+   * Default implementation: stub.
    *
    * @param mode The reason for invocation.
    * @param id The property name / index.
@@ -241,56 +239,6 @@ protected:
    * @see property_mode
    */
   virtual void property_op(property_mode mode, value const &id, value &data);
-
-  /**
-   * Callback type for property methods.
-   *
-   * @param mode The reason for invocation.
-   * @param[in,out] data The old/new value of the property.
-   */
-  typedef void (native_object_base::*property_callback)(
-      property_mode mode, value &data);
-
-  /**
-   * Add a property callback to be invoked by the default implementation
-   * of native_object_base::property_op.
-   *
-   * @param id The name of the property.
-   * @param cb The callback.
-   */
-  void add_property_op(std::string const &id, property_callback cb);
-
-  /**
-   * Add a property callback to be invoked by the default implementation
-   * of #property_op.
-   *
-   * @param id The name of the property.
-   * @param cb The callback.
-   */
-  template<typename T>
-  void add_property_op(
-      std::string const &id, void (T::*cb)(property_mode, value &))
-  {
-    add_property_op(id, property_callback(cb));
-  }
-
-  /**
-   * Combines object::define_property and native_object_base::add_property_op
-   * for convenience.
-   *
-   * @param id The property's name.
-   * @param flags The property's flags.
-   * @param cb The callback.
-   */
-  template<typename T>
-  void define_native_property(
-      std::string const &id,
-      unsigned flags,
-      void (T::*cb)(property_mode, value &))
-  {
-    add_property_op(id, cb);
-    define_property(id, value(), flags);
-  }
 
 private:
 #ifndef IN_DOXYGEN

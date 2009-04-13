@@ -75,6 +75,6 @@ function flusspferd::create_native_function(
   object o = o_;
   function fun = create_native_function(ptr);
   if (!o.is_null())
-    o.define_property(ptr->name().c_str(), fun, object::dont_enumerate);
+    o.define_property(ptr->name().c_str(), fun, dont_enumerate);
   return fun;
 }

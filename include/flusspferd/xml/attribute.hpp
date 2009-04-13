@@ -57,7 +57,8 @@ private: // JS methods
   void add_content(string const &);
 
 private: // JS properties
-  void prop_content(property_mode mode, value &data);
+  void set_content(value const &);
+  value get_content();
 };
 
 }}

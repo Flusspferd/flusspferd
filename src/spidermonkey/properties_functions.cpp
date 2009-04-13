@@ -54,11 +54,11 @@ void ecma_define_own_property(object o, string p, object desc) {
   bool is_accessor = false, is_data = false,
        configurable = false, enumerable = false, writable = false;
 
-  unsigned flags = object::dont_enumerate;
+  property_flag flags = dont_enumerate;
 
   // Short circuit if current property is permanent
   if (current) {
-    if (attrs.flags & object::permanent_property)
+    if (attrs.flags & permanent_property)
       throw exception("Cannot alter un-configurable properties");
 
     flags = attrs.flags;
@@ -69,9 +69,9 @@ void ecma_define_own_property(object o, string p, object desc) {
   value v = desc.get_property("enumerable");
   if (!v.is_undefined()) {
     if (v.to_boolean() == false) 
-      flags |= object::dont_enumerate;
+      flags = flags | dont_enumerate;
     else {
-      flags &= ~object::dont_enumerate;
+      flags = flags & ~dont_enumerate;
       enumerable = true;
     }
   }
@@ -79,20 +79,20 @@ void ecma_define_own_property(object o, string p, object desc) {
   // [[Configurable]]. Default false
   v = desc.get_property("configurable");
   if (v.is_undefined() || v.to_boolean() == false)
-      flags |= object::permanent_property;
+      flags = flags | permanent_property;
   else {
-    flags &= ~object::permanent_property;
+    flags = flags & ~permanent_property;
     configurable = true;
   }
 
   // [[Writable]]. Default false
   v = desc.get_property("writable");
   if (!v.is_undefined() && v.to_boolean() == true) {
-    flags &= ~object::read_only_property;
+    flags = flags & ~read_only_property;
     writable = true;
   }
   else
-    flags |= object::read_only_property;
+    flags = flags | read_only_property;
 
   boost::optional<function const &> getter_fn = boost::none, 
                                     setter_fn = boost::none;

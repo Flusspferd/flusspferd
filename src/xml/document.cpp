@@ -112,11 +112,6 @@ void document::trace(tracer &trc) {
 }
 
 void document::init() {
-  unsigned const RW = permanent_shared_property;
-  unsigned const RO = RW |read_only_property;
-
-  define_native_property("rootElement", RW, &document::prop_root_element);
-  define_native_property("xmlNamespace", RO, &document::prop_xml_namespace);
 }
 
 object document::class_info::create_prototype() {
@@ -127,6 +122,14 @@ object document::class_info::create_prototype() {
   create_native_method(proto, "dump", &document::dump);
   create_native_method(proto, "copy", &document::copy);
   create_native_method(proto, "toString", &document::to_string);
+
+  proto.define_property(
+    "rootElement",
+    value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &document::get_root_element),
+      create_native_method(object(), "", &document::set_root_element)));
 
   return proto;
 }
@@ -168,53 +171,33 @@ value document::to_string() {
   return call("dump");
 }
 
-void document::prop_root_element(property_mode mode, value &data) {
-  xmlNodePtr node;
+void document::set_root_element(object const &data) {
+  xmlNodePtr node = 0;
 
-  switch (mode) {
-  case property_set:
-    if (data.is_null() || data.is_undefined()) {
-      node = 0;
-      data = object();
-    } else if (data.is_object()) {
-      node = node::c_from_js(data.get_object());
-      if (!node) {
-        data = value();
-        break;
-      }
-    } else {
-      data = value();
-      break;
+  if (!data.is_null()) {
+    node = node::c_from_js(data);
+    if (!node) {
+      return;
     }
-
-    if (node && node->type != XML_ELEMENT_NODE) {
-      data = object();
-      break;
-    }
-
-    if (node) {
-      xmlDocSetRootElement(c_obj(), node);
-    } else {
-      xmlNodePtr old = xmlDocGetRootElement(c_obj());
-      xmlUnlinkNode(old);
-    }
-    break;
-  case property_get:
-    node = xmlDocGetRootElement(c_obj());
-    if (!node)
-      data = object();
-    else
-      data = node::create(node);
-    break;
-  default: break;
   }
-}
 
-void document::prop_xml_namespace(property_mode mode, value &data) {
-  if (mode != property_get)
+  if (node && node->type != XML_ELEMENT_NODE) {
     return;
+  }
 
-  if (data.is_undefined()) {
-    data = call("searchNamespaceByPrefix", "xml");
+  if (node) {
+    xmlDocSetRootElement(c_obj(), node);
+  } else {
+    xmlNodePtr old = xmlDocGetRootElement(c_obj());
+    xmlUnlinkNode(old);
   }
 }
+
+object document::get_root_element() {
+  xmlNodePtr node = xmlDocGetRootElement(c_obj());
+  if (!node)
+    return object();
+  else
+    return node::create(node);
+}
+

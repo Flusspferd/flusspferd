@@ -82,21 +82,44 @@ private: // JS methods
   string to_string();
 
 private: // JS properties
-  void prop_name         (property_mode mode, value &data);
-  void prop_lang         (property_mode mode, value &data);
-  void prop_content      (property_mode mode, value &data);
-  void prop_document     (property_mode mode, value &data);
-  void prop_parent       (property_mode mode, value &data);
-  void prop_next         (property_mode mode, value &data);
-  void prop_prev         (property_mode mode, value &data);
-  void prop_first_child  (property_mode mode, value &data);
-  void prop_last_child   (property_mode mode, value &data);
-  void prop_first_sibling(property_mode mode, value &data);
-  void prop_last_sibling (property_mode mode, value &data);
-  void prop_type         (property_mode mode, value &data);
-  void prop_namespace    (property_mode mode, value &data);
-  void prop_namespaces   (property_mode mode, value &data);
-  void prop_first_attr   (property_mode mode, value &data);
+  std::string get_name();
+  void set_name(std::string const &);
+
+  std::string get_type();
+
+  object get_document();
+
+  std::string get_lang();
+  void set_lang(std::string const &);
+
+  boost::optional<std::string> get_content();
+  void set_content(boost::optional<std::string> const &);
+
+  object get_parent();
+  void set_parent(object);
+
+  object get_next_sibling();
+  void set_next_sibling(object);
+
+  object get_previous_sibling();
+  void set_previous_sibling(object);
+
+  object get_first_child();
+  void set_first_child(object);
+
+  object get_last_child();
+
+  object get_first_sibling();
+
+  object get_last_sibling();
+
+  object get_first_attribute();
+  void set_first_attribute(object);
+
+  object get_namespace();
+  void set_namespace(object);
+
+  object get_namespaces();
 
 private:
   xmlNodePtr ptr;

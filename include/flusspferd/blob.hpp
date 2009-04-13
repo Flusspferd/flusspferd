@@ -114,8 +114,10 @@ private: // JS methods
 
   value set_index(int index, value x);
   value get_index(int index);
+
 private: // JS properties
-  void prop_length(property_mode mode, value &data);
+  int get_length();
+  void set_length(value);
 
 private: // JS constructor methods
   static object from_utf8(string const &);
