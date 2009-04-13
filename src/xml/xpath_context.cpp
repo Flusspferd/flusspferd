@@ -78,12 +78,6 @@ xpath_context::xpath_context(object const &obj, call_context &x)
       ns.set_property(*it, o.get_property(*it));
   }
   define_property("ns", ns, read_only_property | permanent_property);
-
-//FIXME
-#if 0
-  define_native_property(
-    "current", permanent_shared_property, &xpath_context::prop_current);
-#endif
 }
 
 xpath_context::~xpath_context() {
@@ -92,6 +86,14 @@ xpath_context::~xpath_context() {
 
 object xpath_context::class_info::create_prototype() {
   object proto = create_object();
+
+  proto.define_property(
+    "current",
+    value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &xpath_context::get_current),
+      create_native_method(object(), "", &xpath_context::set_current)));
 
   return proto;
 }
@@ -140,23 +142,19 @@ void xpath_context::self_call(call_context &x) {
   }
 }
 
-void xpath_context::prop_current(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined_or_null()) {
-      xpath_ctx->node = 0;
-    } else {
-      xmlNodePtr ptr = node::c_from_js(data.to_object());
-      if (!ptr)
-        throw exception("Not a valid XML node");
-      xpath_ctx->node = ptr;
-    }
-    // !! fall thru !!
-  case property_get:
-    data = node::create(xpath_ctx->node);
-    break;
-  default: break;
+void xpath_context::set_current(object data) {
+  if (data.is_null()) {
+    xpath_ctx->node = 0;
+  } else {
+    xmlNodePtr ptr = node::c_from_js(data);
+    if (!ptr)
+      throw exception("Not a valid XML node");
+    xpath_ctx->node = ptr;
   }
+}
+
+object xpath_context::get_current() {
+  return node::create(xpath_ctx->node);
 }
 
 namespaces::namespaces(object const &obj, xmlHashTablePtr table)
