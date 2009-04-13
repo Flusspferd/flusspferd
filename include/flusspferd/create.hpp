@@ -176,18 +176,6 @@ function create_native_function(object const &o, native_function_base *ptr);
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
   object create_native_functor_function( \
-    BOOST_PP_ENUM_BINARY_PARAMS(n_args, T, const & param) \
-    BOOST_PP_COMMA_IF(n_args) \
-    typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
-  ) { \
-    return create_native_function(new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
-  } \
-  \
-  template< \
-    typename T \
-    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
-  > \
-  object create_native_functor_function( \
     object const &o \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
@@ -203,18 +191,6 @@ BOOST_PP_REPEAT(
 )
 
 #else
-
-/**
- * Create a new native function of type @p F.
- *
- * @p F must inherit from #native_function_base.
- *
- * @param F The functor type.
- * @param ... The parameters to pass to the constructor of @p F.
- * @return The new function.
- */
-template<typename F>
-object create_native_functor_function( );
 
 /**
  * Create a new native function of type @p F as method of an object.
@@ -234,23 +210,6 @@ object create_native_functor_function(object const &o, ...);
 #endif
 
 /**
- * Create a new native function.
- *
- * @param fn The functor to call.
- * @param arity The function arity.
- * @param name The function name.
- * @return The new function.
- */
-inline function create_native_function(
-  boost::function<void (call_context &)> const &fn,
-  unsigned arity = 0,
-  std::string const &name = std::string())
-{
-  return create_native_functor_function<native_function<void> >(
-      fn, arity, name);
-}
-
-/**
  * Create a new native method of an object.
  *
  * @param o The object to add the method to.
@@ -267,40 +226,6 @@ inline function create_native_function(
 {
   return create_native_functor_function<native_function<void> >(
       o, fn, arity, name);
-}
-
-/**
- * Create a new native function.
- *
- * @param T The function signature to use.
- * @param fn The functor to call.
- * @param name The function name.
- * @return The new function.
- */
-template<typename T>
-function create_native_function(
-  boost::function<T> const &fn,
-  std::string const &name = std::string())
-{
-  return create_native_functor_function<native_function<T, false> >(fn, name);
-}
-
-/**
- * Create a new native function.
- *
- * The first parameter passed will be 'this'.
- *
- * @param T The function signature to use.
- * @param fn The functor to call.
- * @param name The function name.
- * @return The new function.
- */
-template<typename T>
-function create_native_method(
-  boost::function<T> const &fn,
-  std::string const &name = std::string())
-{
-  return create_native_functor_function<native_function<T, true> >(fn, name);
 }
 
 /**
@@ -342,40 +267,6 @@ function create_native_method(
 }
 
 /**
- * Create a new native function.
- *
- * @param fnptr The function to call (also determines the function signature).
- * @param name The function name.
- * @return The new function.
- */
-template<typename T>
-function create_native_function(
-  T *fnptr,
-  std::string const &name = std::string(),
-  typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
-{
-  return create_native_function<T>(boost::function<T>(fnptr), name);
-}
-
-/**
- * Create a new native function.
- *
- * The first parameter passed will be 'this'.
- *
- * @param fnptr The function to call (also determines the function signature).
- * @param name The function name.
- * @return The new function.
- */
-template<typename T>
-function create_native_method(
-  T *fnptr,
-  std::string const &name = std::string(),
-  typename boost::enable_if_c<boost::is_function<T>::value>::type* =0)
-{
-  return create_native_method<T>(boost::function<T>(fnptr), name);
-}
-
-/**
  * Create a new native method of an object.
  *
  * @param o The object to add the method to.
@@ -412,6 +303,45 @@ function create_native_method(
 {
   return create_native_method<T>(o, name, boost::function<T>(fnptr));
 }
+
+/**
+ * Create a new native method of an object.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param memfnptr The member function to call.
+ * @return The new function.
+ */
+template<typename T>
+function create_native_method(
+  object const &o,
+  std::string const &name,
+  void (T::*memfnptr)(call_context &),
+  unsigned arity = 0)
+{
+  return create_native_functor_function<native_member_function<void, T> >(
+    o, memfnptr, arity, name);
+}
+
+/**
+ * Create a new native method of an object.
+ *
+ * @param o The object to add the method to.
+ * @param name The method name.
+ * @param memfnptr The member function to call (also determines the function
+ *                 signature).
+ * @return The new function.
+ */
+template<typename R, typename T>
+function create_native_method(
+  object const &o,
+  std::string const &name,
+  R T::*memfnptr)
+{
+  return create_native_functor_function<native_member_function<R, T> >(
+    o, memfnptr, name);
+}
+
 //@}
 
 }

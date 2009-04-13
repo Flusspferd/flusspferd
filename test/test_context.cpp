@@ -23,6 +23,8 @@ THE SOFTWARE.
 
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
+#include "flusspferd/evaluate.hpp"
+#include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/implementation/context.hpp"
 #include <boost/test/unit_test.hpp>
 
@@ -118,16 +120,19 @@ BOOST_AUTO_TEST_CASE( global ) {
   BOOST_CHECK(!global.is_null());
 }
 
+// TODO: move out?
 BOOST_AUTO_TEST_CASE( evaluate ) {
   flusspferd::context context(flusspferd::context::create());
   BOOST_REQUIRE(context.is_valid());
 
-  BOOST_CHECK(context.evaluate("null", 4, __FILE__, 0).is_null());
-  BOOST_CHECK(context.evaluate("null", __FILE__, 0).is_null());
-  BOOST_CHECK(context.evaluate(std::string("null"), __FILE__, 0).is_null());
+  flusspferd::current_context_scope scope(context);
+
+  BOOST_CHECK(flusspferd::evaluate("null", 4, __FILE__, 0).is_null());
+  BOOST_CHECK(flusspferd::evaluate("null", __FILE__, 0).is_null());
+  BOOST_CHECK(flusspferd::evaluate(std::string("null"), __FILE__, 0).is_null());
 
   BOOST_CHECK_THROW(
-    context.evaluate("throw undefined", __FILE__, 0)
+    flusspferd::evaluate("throw undefined", __FILE__, 0)
     , flusspferd::exception);
 }
 

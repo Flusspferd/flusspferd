@@ -22,6 +22,12 @@ THE SOFTWARE.
 */
 
 /**
+ * @defgroup evaluate_compile Evaluation and Compiling
+ *
+ * Evaluating and compiling Javascript source code.
+ */
+
+/**
  * @defgroup value_types Value types
  *
  * Javascript values.

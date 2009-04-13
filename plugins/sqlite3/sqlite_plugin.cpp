@@ -120,8 +120,8 @@ object sqlite3::class_info::create_prototype()
 {
   object proto = create_object();
 
-  create_native_method(proto, "cursor", 1);
-  create_native_method(proto, "close", 0);
+  create_native_method(proto, "cursor", &sqlite3::cursor);
+  create_native_method(proto, "close", &sqlite3::close);
   return proto;  
 }
 
@@ -142,9 +142,6 @@ sqlite3::sqlite3(object const &obj, call_context &x)
     else
       throw std::bad_alloc(); // out of memory. better way to signal this?
   }
-
-  register_native_method("cursor", &sqlite3::cursor);
-  register_native_method("close", &sqlite3::close);
 }
 ///////////////////////////
 sqlite3::~sqlite3()
@@ -190,10 +187,10 @@ void sqlite3::cursor(call_context &x) {
 object sqlite3_cursor::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "close", 0);
-  create_native_method(proto, "reset", 0);
-  create_native_method(proto, "next", 0);
-  create_native_method(proto, "bind", 0);
+  create_native_method(proto, "close", &sqlite3_cursor::close);
+  create_native_method(proto, "reset", &sqlite3_cursor::reset);
+  create_native_method(proto, "next", &sqlite3_cursor::next);
+  create_native_method(proto, "bind", &sqlite3_cursor::bind);
 
   return proto;
 }
@@ -205,10 +202,6 @@ sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
     sth(_sth),
     state(CursorState_Init)
 {
-  register_native_method("close", &sqlite3_cursor::close);
-  register_native_method("reset", &sqlite3_cursor::reset);
-  register_native_method("next", &sqlite3_cursor::next);
-  register_native_method("bind", &sqlite3_cursor::bind);
 }
 
 

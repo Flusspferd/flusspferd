@@ -24,7 +24,8 @@ THE SOFTWARE.
 #include "flusspferd.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include "flusspferd/implementation/object.hpp"
-#include <boost/bind.hpp>
+#include <boost/spirit/home/phoenix/core.hpp>
+#include <boost/spirit/home/phoenix/bind.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -37,6 +38,9 @@ THE SOFTWARE.
 #include <editline/history.h>
 #endif
 #endif
+
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
 
 class flusspferd_repl {
   bool interactive;
@@ -99,7 +103,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   flusspferd::object g = flusspferd::global();
   flusspferd::create_native_function<void (int)>(
     g, "quit",
-    boost::bind(&flusspferd_repl::quit, this, _1));
+    phoenix::bind(&flusspferd_repl::quit, this, args::arg1));
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
   flusspferd::gc();
@@ -114,7 +118,7 @@ int flusspferd_repl::run() {
   typedef std::list<std::string>::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     const std::string &file = *i;
-    co.execute(file.c_str());
+    flusspferd::execute(file.c_str());
   }
   
   if (!interactive)
@@ -182,14 +186,14 @@ void print_help(char const *argv0) {
 }
 
 void flusspferd_repl::load_config() {
-  co.execute(config_file);
+  flusspferd::execute(config_file);
   config_loaded = true;
 
   // Get the prelude and execute it too
   flusspferd::value prelude = co.global().get_property("prelude");
   
   if (!prelude.is_undefined_or_null()) {
-    co.execute(prelude.to_string().c_str());
+    flusspferd::execute(prelude.to_string().c_str());
   }
 }
 

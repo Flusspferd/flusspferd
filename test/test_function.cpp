@@ -53,7 +53,7 @@ BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 BOOST_AUTO_TEST_CASE( root_native_function ) {
   flusspferd::root_function f_x(
       flusspferd::create_native_method(
-        &root_native_function_, std::string("rnf")));
+        flusspferd::object(), "rnf", &root_native_function_));
   
   BOOST_CHECK_EQUAL(f_x.arity(), 1ul);
   BOOST_CHECK_EQUAL(f_x.name(), "rnf");

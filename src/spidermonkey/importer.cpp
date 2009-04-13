@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/evaluate.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 #include <iostream>
@@ -33,7 +34,6 @@ THE SOFTWARE.
 #include <string>
 #include <sstream>
 #include <errno.h>
-
 #include <dlfcn.h>
 
 #define DIRSEP1 "/"
@@ -159,8 +159,7 @@ void flusspferd::import(call_context &x) {
     if (!binary_only)
       if (sec.check_path(fullpath, security::READ))
         if (boost::filesystem::exists(fullpath)) {
-          value val = current_context().execute(
-              fullpath.c_str(), ctx);
+          value val = flusspferd::execute(fullpath.c_str(), ctx);
           module_cache.set_property(key, val);
           x.result = val;
           return;

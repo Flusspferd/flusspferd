@@ -160,87 +160,6 @@ object context::scope_chain() {
   return Impl::wrap_object(JS_GetScopeChain(p->context));
 }
 
-value context::evaluate(char const *source, std::size_t n,
-                        char const *file, unsigned int line)
-{
-  return evaluate_in_scope(source, n, file, line, global());
-}
-
-value context::evaluate_in_scope(char const* source, std::size_t n,
-                               char const* file, unsigned int line,
-                               object const &scope)
-{
-  current_context_scope cxt_scope(*this);
-  
-  jsval rval;
-  JSBool ok = JS_EvaluateScript(p->context, Impl::get_object(scope),
-                                  source, n, file, line, &rval);
-  if(!ok) {
-    exception e("Could not evaluate script");
-    if (!e.empty())
-      throw e;
-  }
-  return Impl::wrap_jsval(rval);
-}
-
-value context::execute(char const *filename, object const &scope_) {
-  current_context_scope ctx_scope(*this);
-  JSContext *cx = p->context;
-
-  local_root_scope root_scope;
-
-  FILE *file = fopen(filename, "r");
-  if (!file) {
-    throw exception((std::string("Could not open '") + filename + "'").c_str());
-  }
- 
-  /*
-   * It's not interactive - just execute it.
-   *
-   * Support the UNIX #! shell hack; gobble the first line if it starts
-   * with '#'. TODO - this isn't quite compatible with sharp variables,
-   * as a legal js program (using sharp variables) might start with '#'.
-   * But that would require multi-character lookahead.
-   */
-  int ch = fgetc(file);
-  if (ch == '#') {
-      while((ch = fgetc(file)) != EOF) {
-          if (ch == '\n' || ch == '\r')
-              break;
-      }
-  }
-  ungetc(ch, file);
-
-  JSObject *scope = Impl::get_object(scope_);
-
-  if (!scope)
-    scope = Impl::get_object(this->global());
- 
-  int oldopts = JS_GetOptions(cx);
-  JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
-  JSScript *script = JS_CompileFileHandle(cx, scope, filename, file);
-
-  if (!script) {
-    exception e("Could not compile script");
-    JS_SetOptions(cx, oldopts);
-    throw e;
-  }
-
-  JS_SetOptions(cx, oldopts);
-
-  value result;
- 
-  JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
- 
-  if (!ok) {
-    exception e("Script execution failed");
-    if (!e.empty())
-      throw e;
-  }
-
-  return result;
-}
-
 void context::add_prototype(std::string const &name, object const &proto) {
   p->get_private()->prototypes[name] =
     context_private::root_object_ptr(new root_object(proto));
@@ -259,18 +178,6 @@ void context::add_constructor(std::string const &name, object const &ctor) {
 object context::constructor(std::string const &name) const {
   context_private::root_object_ptr ptr = p->get_private()->constructors[name];
   return ptr ? *ptr : object();
-}
-
-value context::evaluate(char const *source, char const *file,
-                        unsigned int line)
-{
-  return evaluate(source, std::strlen(source), file, line);
-}
-
-value context::evaluate(std::string const &source, char const *file,
-                        unsigned int line)
-{
-  return evaluate(source.data(), source.size(), file, line);
 }
 
 void context::gc() {

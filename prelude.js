@@ -33,7 +33,7 @@ try {
   Import('IO');
 
   print = Function.bind(IO.stdout, 'print');
-  readline = Function.bind(IO.stdin, 'readLine');
+  readLine = Function.bind(IO.stdin, 'readLine');
 } catch (e) {
   // TODO: do something?
 }

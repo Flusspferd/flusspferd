@@ -103,8 +103,8 @@ def configure(conf):
     if darwin:
         conf.check_tool('osx')
 
-    conf.env['CXXFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
-    conf.env['LINKFLAGS_GCOV'] = '-fprofile-arcs -ftest-coverage'
+    conf.env['CXXFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
+    conf.env['LINKFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
 
     boostlib = ['thread', 'filesystem', 'system']
     if Options.options.enable_tests:
@@ -178,7 +178,7 @@ int main() {
 
     # sqlite
     if not Options.options.disable_sqlite:
-        available = conf.check_cxx(header_name = 'sqlite3.h', mandatory = 1,
+        available = conf.check_cxx(header_name = 'sqlite3.h',
                                    uselib_store='SQLITE', execute=1,
                                    errmsg=
 'SQLite 3 (>= 3.4.0) could not be found or the found version is too old.',
@@ -191,9 +191,10 @@ int main() {
              SQLITE_VERSION);
      return 1;
    }
+   printf("1");
    return 0;
 }
-''') and conf.check_cxx(lib = 'sqlite3', mandatory = 1, uselib_store='SQLITE')
+''') and conf.check_cxx(lib = 'sqlite3', uselib_store='SQLITE')
         conf.env['ENABLE_SQLITE'] = available
 
     # xml
@@ -311,6 +312,7 @@ def build(bld):
         bld.add_subdirs('emacs')
         bld.install_files('${PREFIX}/share/emacs/site-lisp/', 'emacs/*.el')
     build_pkgconfig(bld)
+    bld.install_files('${PREFIX}/include/', 'include/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/',
                       'include/flusspferd/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/implementation/',

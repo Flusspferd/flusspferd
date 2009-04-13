@@ -88,8 +88,6 @@ attribute_::~attribute_()
 {}
 
 void attribute_::init() {
-  register_native_method("addContent", &attribute_::add_content);
-
   define_native_property("content",
       permanent_shared_property,
       &attribute_::prop_content);
@@ -100,7 +98,7 @@ object attribute_::class_info::create_prototype() {
 
   object proto = create_object(flusspferd::prototype<node>());
 
-  create_native_method(proto, "addContent", 1);
+  create_native_method(proto, "addContent", &attribute_::add_content);
 
   return proto;
 }

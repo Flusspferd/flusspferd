@@ -80,15 +80,6 @@ void blob::init() {
   unsigned const RW = permanent_shared_property;
 
   define_native_property("length", RW, &blob::prop_length);
-
-  register_native_method("append", &blob::append);
-  register_native_method("toArray", &blob::to_array);
-  register_native_method("clone", &blob::clone);
-  register_native_method("slice", &blob::slice);
-  register_native_method("asUtf8", &blob::as_utf8);
-  register_native_method("asUtf16", &blob::as_utf16);
-  register_native_method("get", &blob::get_index);
-  register_native_method("set", &blob::set_index);
 }
 
 blob::~blob() {}
@@ -96,14 +87,14 @@ blob::~blob() {}
 object blob::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "append", 1);
-  create_native_method(proto, "toArray", 0);
-  create_native_method(proto, "clone", 0);
-  create_native_method(proto, "slice", 2);
-  create_native_method(proto, "asUtf8", 0);
-  create_native_method(proto, "asUtf16", 0);
-  create_native_method(proto, "get", 1);
-  create_native_method(proto, "set", 2);
+  create_native_method(proto, "append", &blob::append);
+  create_native_method(proto, "toArray", &blob::to_array);
+  create_native_method(proto, "clone", &blob::clone);
+  create_native_method(proto, "slice", &blob::slice);
+  create_native_method(proto, "asUtf8", &blob::as_utf8);
+  create_native_method(proto, "asUtf16", &blob::as_utf16);
+  create_native_method(proto, "get", &blob::get_index);
+  create_native_method(proto, "set", &blob::set_index);
 
   static const char* js_iterator ="function() { return Range(0, this.length) }";
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
@@ -141,8 +132,7 @@ void blob::prop_length(property_mode mode, value &data) {
   case property_set:
   {
     if (!data.is_int())
-      // TODO: make this a RangeError
-      throw exception("Blob.length out of range");
+      throw exception("Blob.length out of range", "RangeError");
     int new_len = data.get_int();
     if (new_len < 0)
       new_len = 0;

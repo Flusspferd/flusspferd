@@ -112,10 +112,6 @@ void document::trace(tracer &trc) {
 }
 
 void document::init() {
-  register_native_method("dump", &document::dump);
-  register_native_method("copy", &document::copy);
-  register_native_method("toString", &document::to_string);
-
   unsigned const RW = permanent_shared_property;
   unsigned const RO = RW |read_only_property;
 
@@ -128,9 +124,9 @@ object document::class_info::create_prototype() {
 
   object proto = create_object(flusspferd::prototype<node>());
 
-  create_native_method(proto, "dump", 0);
-  create_native_method(proto, "copy", 1);
-  create_native_method(proto, "toString", 0);
+  create_native_method(proto, "dump", &document::dump);
+  create_native_method(proto, "copy", &document::copy);
+  create_native_method(proto, "toString", &document::to_string);
 
   return proto;
 }

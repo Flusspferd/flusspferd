@@ -21,6 +21,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/**
+ * Construct a cURL object. Takes no parameters
+ * @name cURL
+ * @constructor
+ *
+ * @class 
+ * Network access via libcurl.
+ *
+ * == Example: ==
+ * {{{
+ * Import('cURL')
+ * c = new cURL();
+ * c.url = 'http://www.google.com';
+ * var status = c.perform();
+ *
+ * // Currently there is no auto-following of redirects, so:
+ * while (status >= 300 &amp;&amp; status <= 399) {
+ *   c.url = c.header.Location;
+ *   status = c.perform();
+ * }
+ * IO.stdout.write(c.responseBlob);
+ * }}}
+ *
+ * Link to [[Blob]]
+ */
 (function() {
   // Load binary module
   Import('cURL', true); 
@@ -29,6 +54,94 @@ THE SOFTWARE.
     // If we have HTTP.Headers, define a default header callback that
     // creates 
     Import('HTTP.Headers');
+
+    /** 
+     * Array of protocols by the linked version of libcurl.
+     * @name supportedProtocols
+     * @fieldOf cURL
+     */
+    /** 
+     * libcurl version number in hex. For example 7.18.2 is `0x071202`
+     * @name versionHex
+     * @fieldOf cURL
+     * @type int
+     */
+    /** 
+     * libcurl version number in dotted-decimal string form.
+     * @name cURL#versionStr
+     * @fieldOf cURL
+     * @type string
+     */
+
+    /**
+     * The URL to request
+     * @name url
+     * @fieldOf cURL.prototype
+     */
+    /**
+     * HTTP Protocol version. Unknown/undefined for non-HTTP requests. See 
+     * [[#headerReceived]] for caveats.
+     * @name protocol
+     * @fieldof cURL.prototype
+     * @type strings
+     */
+    /** 
+     * Numeric status code. Might not be defined for non-HTTP requests. See
+     * [[#headerReceived]] for caveats.
+     * @name status
+     * @fieldof cURL.prototype
+     * @type int
+     */
+    /** 
+     * Human readable status message. Might not be defined for non-HTTP
+     * requests. See [[#headerReceived]] for caveats.
+     * @name statusMessage
+     * @fieldof cURL.prototype
+     * @type string
+     */
+    /**
+     * Binary response content. If you replace the
+     * [[#dataReceived]] callback than you will have to update this blob
+     * yourself.
+     * @name responseBlob
+     * @fieldOf cURL.prototype
+     * @type Blob
+     */
+
+    /**
+     * HTTP response headers (if applicable). See [[#headerReceived]] for
+     * caveats.
+     * @name headers
+     * @fieldOf cURL.prototype
+     * @type HTTP.Headers
+     */
+
+
+    /**
+     * Set the request method to use when [[#perform]] is called. Currently understood
+     * values are "GET", "POST", "PUT" and "HEAD".
+     * @name setMethod
+     * @methodOf cURL.prototype
+     *
+     * @param {string} method request method
+     */
+
+    /**
+     * Called for each line of the headers. The line includes the new line
+     * characters, and the end of headers are signified by "\r\n".<br /><br />
+     *
+     * Populates the [[#headers]], [[#protocol]], [[#status]] and
+     * [[#statusMessage]] properties after all headers have been received.<br
+     * /><br />
+     *
+     * This default implementation is conditionally provided on being able to
+     * load the [[HTTP.Headers]] module. If it cannot be loaded then the
+     * [[#headers]], [[#protocol]], [[#status]] and [[#statusMessage]]
+     * properties will not be defined.
+     *
+     * @param line a single line of header data
+     * @event
+     */
     cURL.prototype.headerReceived = function headerReceived(hdr) {
       if (hdr.match(/^\r\n/)) {
         // Empty line signals end of headers
@@ -55,12 +168,25 @@ THE SOFTWARE.
   { // Stomp on the module not found message
   }
 
+  /**
+   * Called when a chunk of body data is available. The default implementation
+   * simply appends each chunk of data into [[#responseBlob]].
+   * @event
+   *
+   * @param {Blob} blob chunk of response data
+   */
   cURL.prototype.dataReceived = function (blob) {
     this.responseBlob.append(blob);
   }
 
   if (cURL.prototype.perform.old === undefined) {
     var old_perform = cURL.prototype.perform;
+    /**
+     * Perform the request on [[#url]].
+     *
+     * Before the request starts the [[#headers]], [[#protocol]], [[#status]],
+     * [[#statusMessage]] and the [[#responseBlob]] properties are cleared
+     */
     cURL.prototype.perform = function perform() {
       this.header_buffer = "";
       delete this.headers;
@@ -75,120 +201,3 @@ THE SOFTWARE.
 
   return cURL;
 })()
-
-/**
- * Class: cURL
- * 
- * Network access via libcurl.
- *
- * Synopsis:
- *
- * (code)
- * import('curl')
- * c = new cURL();
- * c.url = 'http://www.google.com';
- * var status = c.perform();
- *
- * // Currently there is no auto-following of redirects, so:
- * while (status >= 300 && status <= 399) {
- *  c.url = c.header.Location;
- *  status = c.perform();
- * }
- * IO.stdout.write(c.responseBlob);
- * (end code)
- *
- * Group: Constructor Properties
- *
- * Property: supportedProtocols
- *
- * Array of protocols by this module.
- *
- * Property: versionHex
- *
- * libcurl version number in hex. For example 7.18.2 is 0x071202
- *
- * Property: versionStr
- *
- * libcurl version number in dotted-decimal string form.
- *
- * Group: Constructor
- *
- * Constructor: cURL
- *
- * Construct a cURL object. Takes no parameters
- *
- * Group: Methods
- *
- * Method: perform
- *
- * Perform the request on <url>.
- *
- * Before the request starts the <headers>, <protocol>, <status>,
- * <statusMessage> and the <responseBlob> properties are cleared
- *
- * Method: setMethod
- *
- * Set the request method to use when <perform> is called. Currently understood
- * values are "GET", "POST", "PUT" and "HEAD".
- *
- * Parameters:
- *  method - request method
- *
- * Group: Properties
- *
- * Property: url
- *
- * The URL to request.
- *
- * Property: protocol
- *
- * HTTP Protocol version. Unkown/undefined for non-HTTP requests. See
- * <headerReceived> for caveats.
- *
- * Property: status
- *
- * Numeric status code. Might not be defined for non-HTTP requests. See
- * <headerReceived> for caveats.
- *
- * Property: statusMessage
- *
- * Human readable status message. Might not be defined for non-HTTP requests.
- * See <headerReceived> for caveats.
- *
- * Property: responseBlob
- *
- * <Blob> of response content. If you replace the <dataReceived> callback then
- * you will have to update this blob yourself.
- *
- * Property: headers
- *
- * <HTTP.Headers> object containing response headers. See <headerReceived> for
- * caveats.
- *
- * Group: Callback Methods
- *
- * Optional methods that get called when headers or data are received. 
- *
- * Method: dataReceived
- *
- * Called when a chunk of body data is available. The default implementation
- * simply appends each chunk of data into <responseBlob>.
- *
- * Parameters:
- *  data - a <Blob> of body data.
- *
- * Method: headerReceived
- *
- * Called for each line of the headers. The line includes the new line
- * characters, and the end of headers are signified by "\r\n".
- *
- * Populates the <headers>, <protocol>, <status> and <statusMessage> properties
- * after all headers have been received.
- *
- * Parameters:
- *  line - a single line of header data
- *
- * This default implementation is conditionally provided on being able to load
- * the <HTTP.Headers> module. If it cannot be loaded then the <headers>,
- * <protocol>, <status> and <statusMessage> properties will not be defined.
- */

@@ -183,7 +183,7 @@ object load_class(
     constructor =
       create_native_functor_function<
           detail::class_constructor<T> 
-        >(arity, full_name);
+        >(flusspferd::object(), arity, full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }
@@ -218,7 +218,7 @@ object load_class(
     constructor =
       create_native_functor_function<
           detail::unconstructible_class_constructor
-        >(full_name);
+        >(flusspferd::object(), full_name);
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }

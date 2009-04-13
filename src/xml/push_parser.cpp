@@ -60,14 +60,6 @@ push_parser::push_parser(object const &obj, call_context &x)
     "document",
     read_only_property | permanent_shared_property,
     &push_parser::prop_document);
-
-  register_native_method(
-    "push",
-    &push_parser::push);
-
-  register_native_method(
-    "terminate",
-    &push_parser::terminate);
 }
 
 push_parser::~push_parser() {
@@ -81,8 +73,8 @@ push_parser::~push_parser() {
 object push_parser::class_info::create_prototype() {
   object proto = create_object();
 
-  create_native_method(proto, "push", 2);
-  create_native_method(proto, "terminate", 0);
+  create_native_method(proto, "push", &push_parser::push);
+  create_native_method(proto, "terminate", &push_parser::terminate);
 
   return proto;
 }

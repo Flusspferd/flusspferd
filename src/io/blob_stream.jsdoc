@@ -1,18 +1,20 @@
-Class: IO.BlobStream
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+/**
+ * [[IO.Stream]] interface to [[Blob]]. See [[IO.Stream]] for the other methods
+ * on this class.
+ *
+ * @name IO.BlobStream
+ * @constructor
+ *
+ * @param {Blob} blob Blob to wrap in a stream
+ *
+ * @class
+ * @extends IO.Stream
+ */
 
-<IO.Stream> interface to <Blob>. See <IO.Stream> for the other methods on this class.
-
-Group: Constructor
-
-Constructor: BlobStream
-
-  Parameters:
-    blob - Blob to wrap in a stream
-
-  > stream = new BlobStream(blob);
-
-Group: Methods
-
-Function: getBlob
-
-  Access the <Blob> object.
+/**
+ * Access the wrappeb Blob object.
+ * @name getBlob
+ * @type Blob
+ * @methodOf IO.BlobStream#
+ */
