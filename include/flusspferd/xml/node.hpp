@@ -109,11 +109,15 @@ private: // JS properties
 
   object get_last_child();
 
-  void prop_first_sibling(property_mode mode, value &data);
-  void prop_last_sibling (property_mode mode, value &data);
+  object get_first_sibling();
+
+  object get_last_sibling();
+
+  object get_first_attribute();
+  void set_first_attribute(object);
+
   void prop_namespace    (property_mode mode, value &data);
   void prop_namespaces   (property_mode mode, value &data);
-  void prop_first_attr   (property_mode mode, value &data);
 
 private:
   xmlNodePtr ptr;

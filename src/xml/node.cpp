@@ -204,15 +204,10 @@ node::~node() {
 void node::init() {
 //FIXME
 #if 0
-  define_native_property("firstSibling", RO, &node::prop_first_sibling);
-  define_native_property("lastSibling", RO, &node::prop_last_sibling);
-
   if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     define_native_property("namespace", RW, &node::prop_namespace);
     define_native_property("namespaces", RO, &node::prop_namespaces);
   }
-
-  define_native_property("firstAttribute", RW, &node::prop_first_attr);
 #endif
 }
 
@@ -304,6 +299,25 @@ object node::class_info::create_prototype() {
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_last_child)));
+
+  proto.define_property(
+    "firstSibling", value(),
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_first_sibling)));
+
+  proto.define_property(
+    "lastSibling", value(),
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_last_sibling)));
+
+  proto.define_property(
+    "firstAttribute", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_first_attribute),
+      create_native_method(object(), "", &node::set_first_attribute)));
 
   return proto;
 }
@@ -619,34 +633,26 @@ object node::get_last_child() {
   return create(ptr->type != XML_ENTITY_REF_NODE ? ptr->last : 0);
 }
 
-void node::prop_first_sibling(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
+object node::get_first_sibling() {
   if (ptr->parent) {
-    data = create(ptr->parent->children);
-    return;
+    return create(ptr->parent->children);
   }
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->prev)
     ptr = ptr->prev;
-  data = create(ptr);
+  return create(ptr);
 }
 
-void node::prop_last_sibling(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
+object node::get_last_sibling() {
   if (ptr->parent) {
-    data = create(ptr->parent->last);
-    return;
+    return create(ptr->parent->last);
   }
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->next)
     ptr = ptr->next;
-  data = create(ptr);
+  return create(ptr);
 }
 
 object node::get_document() {
@@ -727,27 +733,24 @@ void node::prop_namespaces(property_mode mode, value &data) {
   if (nsList) xmlFree(nsList);
 }
 
-void node::prop_first_attr(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (ptr->type == XML_ELEMENT_NODE) {
-      if (data.is_undefined_or_null()) {
-        ptr->properties = 0;
-      } else if (data.is_object()) {
-        xmlNodePtr attr = c_from_js(data.get_object());
-        if (attr && attr->type == XML_ATTRIBUTE_NODE) {
-          ptr->properties = xmlAttrPtr(attr);
-          attr->parent = ptr;
-        }
-      }
-    }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->type == XML_ELEMENT_NODE
+object node::get_first_attribute() {
+  return create(ptr->type == XML_ELEMENT_NODE
                   ? xmlNodePtr(ptr->properties)
                   : 0);
-    break;
-  default: break;
+}
+
+void node::set_first_attribute(object attribute) {
+  if (ptr->type != XML_ELEMENT_NODE)
+    return;
+
+  if (attribute.is_null()) {
+    ptr->properties = 0;
+  } else {
+    xmlNodePtr attr = c_from_js(attribute);
+    if (attr && attr->type == XML_ATTRIBUTE_NODE) {
+      ptr->properties = xmlAttrPtr(attr);
+      attr->parent = ptr;
+    }
   }
 }
 
