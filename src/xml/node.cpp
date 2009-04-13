@@ -319,6 +319,19 @@ object node::class_info::create_prototype() {
       create_native_method(object(), "", &node::get_first_attribute),
       create_native_method(object(), "", &node::set_first_attribute)));
 
+  proto.define_property(
+    "namespace", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_namespace),
+      create_native_method(object(), "", &node::set_namespace)));
+
+  proto.define_property(
+    "namespaces", value(),
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_namespaces)));
+
   return proto;
 }
 
@@ -634,9 +647,8 @@ object node::get_last_child() {
 }
 
 object node::get_first_sibling() {
-  if (ptr->parent) {
+  if (ptr->parent)
     return create(ptr->parent->children);
-  }
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->prev)
@@ -645,9 +657,8 @@ object node::get_first_sibling() {
 }
 
 object node::get_last_sibling() {
-  if (ptr->parent) {
+  if (ptr->parent)
     return create(ptr->parent->last);
-  }
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->next)
@@ -685,52 +696,48 @@ std::string node::get_type() {
   }
 }
 
-void node::prop_namespace(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      ptr->ns->context = 0;
-      ptr->ns = 0;
-      data = object();
-    } else if (data.is_object()) {
-      xmlNsPtr ns = namespace_::c_from_js(data.get_object());
-      if (!ns) {
-        data = value();
-        break;
-      }
-      ptr->ns = ns;
-    } else {
-      data = value();
-    }
-    // !! fall thru !!
-  case property_get:
-    data = namespace_::create(ptr->ns);
-    break;
-  default: break;
-  }
+object node::get_namespace() {
+  if (ptr->type != XML_ELEMENT_NODE && ptr->type != XML_ATTRIBUTE_NODE)
+    return object();
+  return namespace_::create(ptr->ns);
 }
 
-void node::prop_namespaces(property_mode mode, value &data) {
-  if (mode != property_get)
+void node::set_namespace(object new_ns) {
+  if (new_ns.is_null()) {
+    ptr->ns->context = 0;
+    ptr->ns = 0;
     return;
+  }
+
+  xmlNsPtr ns = namespace_::c_from_js(new_ns);
+  if (!ns)
+    return;
+  ptr->ns = ns;
+}
+
+object node::get_namespaces() {
+  if (ptr->type != XML_ELEMENT_NODE && ptr->type != XML_ATTRIBUTE_NODE)
+    return object();
 
   xmlNsPtr *nsList = xmlGetNsList(ptr->doc, ptr);
 
   try {
     object array = create_array();
-    data = array;
 
     if (!nsList)
-      return;
+      return array;
 
     for (xmlNsPtr *p = nsList; *p; ++p) {
       array.call("push", namespace_::create(*p));
     }
+
+    xmlFree(nsList);
+
+    return array;
   } catch (...) {
     if (nsList) xmlFree(nsList);
     throw;
   }
-  if (nsList) xmlFree(nsList);
 }
 
 object node::get_first_attribute() {

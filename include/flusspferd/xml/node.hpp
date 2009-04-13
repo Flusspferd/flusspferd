@@ -116,8 +116,10 @@ private: // JS properties
   object get_first_attribute();
   void set_first_attribute(object);
 
-  void prop_namespace    (property_mode mode, value &data);
-  void prop_namespaces   (property_mode mode, value &data);
+  object get_namespace();
+  void set_namespace(object);
+
+  object get_namespaces();
 
 private:
   xmlNodePtr ptr;
