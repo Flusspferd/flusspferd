@@ -82,6 +82,9 @@ private: // JS methods
   string to_string();
 
 private: // JS properties
+  std::string get_name();
+  void set_name(std::string const &);
+
   void prop_name         (property_mode mode, value &data);
   void prop_lang         (property_mode mode, value &data);
   void prop_content      (property_mode mode, value &data);

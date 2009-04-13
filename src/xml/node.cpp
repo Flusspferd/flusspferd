@@ -199,12 +199,8 @@ node::~node() {
 }
 
 void node::init() {
-  unsigned const RW = permanent_shared_property;
-  unsigned const RO = RW | read_only_property;
-
 //FIXME
 #if 0
-  define_native_property("name", RW, &node::prop_name);
   define_native_property("lang", RW, &node::prop_lang);
   define_native_property("content", RW, &node::prop_content);
   define_native_property("parent", RW, &node::prop_parent);
@@ -247,6 +243,13 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "searchNamespaceByURI",
                        &node::search_namespace_by_uri);
   create_native_method(proto, "toString", &node::to_string);
+
+  proto.define_property(
+    "name", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_name),
+      create_native_method(object(), "", &node::set_name)));
 
   return proto;
 }
@@ -299,19 +302,15 @@ void node::trace(tracer &trc) {
   }
 }
 
-void node::prop_name(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
-    // !! fall thru !!
-  case property_get:
-    if (!ptr->name)
-      data = value();
-    else
-      data = string((char const *) ptr->name);
-    break;
-  default: break;
-  };
+void node::set_name(std::string const &s) {
+  xmlNodeSetName(ptr, (xmlChar const *) s.c_str());
+}
+
+std::string node::get_name() {
+  if (!ptr->name)
+    return std::string();
+  else
+    return std::string((char const *) ptr->name);
 }
 
 void node::prop_lang(property_mode mode, value &data) {
