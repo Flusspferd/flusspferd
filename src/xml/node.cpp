@@ -282,6 +282,20 @@ object node::class_info::create_prototype() {
       create_native_method(object(), "", &node::get_parent),
       create_native_method(object(), "", &node::set_parent)));
 
+  proto.define_property(
+    "nextSibling", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_next_sibling),
+      create_native_method(object(), "", &node::set_next_sibling)));
+
+  proto.define_property(
+    "previousSibling", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_previous_sibling),
+      create_native_method(object(), "", &node::set_previous_sibling)));
+
   return proto;
 }
 
@@ -456,103 +470,105 @@ void node::set_parent(object new_parent) {
   xmlSetListDoc(ptr, parent->doc);
 }
 
-void node::prop_next(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      if (ptr->parent)
-        if (ptr->type != XML_ATTRIBUTE_NODE)
-          ptr->parent->last = ptr;
-      ptr->next = 0;
-    } else if (xmlNodePtr next = c_from_js(data.to_object())) {
-      ptr->next = next;
-      if (xmlNodePtr np = next->prev) {
-        if (np->parent)
-          if (next->type != XML_ATTRIBUTE_NODE)
-            np->parent->last = np;
-        np->next = 0;
-      } else if (next->parent) {
-        if (next->type == XML_ATTRIBUTE_NODE) {
-          if (next->parent->type == XML_ELEMENT_NODE)
-            next->parent->properties = 0;
-        } else {
-          next->parent->children = 0;
-          next->parent->last = 0;
-        }
-      }
-      next->prev = ptr;
-      if (next->type != XML_ATTRIBUTE_NODE) {
-        while (next) {
-          next->parent = ptr->parent;
-          if (!next->next && next->parent)
-            next->parent->last = next;
-          next = next->next;
-        }
-      }
-      xmlSetListDoc(ptr->next, ptr->doc);
-    }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->next);
-    break;
-  default: break;
-  }
+object node::get_next_sibling() {
+  return create(ptr->next);
 }
 
-void node::prop_prev(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      if (ptr->parent) {
-        if (ptr->type == XML_ATTRIBUTE_NODE) {
-          if (ptr->parent->type == XML_ELEMENT_NODE)
-            ptr->parent->properties = xmlAttrPtr(ptr);
-        } else {
-          ptr->parent->children = ptr;
-        }
-      }
-      ptr->prev = 0;
-    } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
-      ptr->prev = prev;
-      if (xmlNodePtr pn = prev->next) {
-        if (pn->parent) {
-          if (pn->type == XML_ATTRIBUTE_NODE) {
-            if (ptr->parent->type == XML_ELEMENT_NODE)
-              ptr->parent->properties = xmlAttrPtr(pn);
-          } else {
-            pn->parent->children = pn;
-          }
-        }
-        pn->prev = 0;
-      } else if (prev->parent) {
-        if (prev->type != XML_ATTRIBUTE_NODE) {
-          prev->parent->children = 0;
-          prev->parent->last = 0;
-        } else {
-          if (ptr->parent->type == XML_ELEMENT_NODE)
-            prev->parent->properties = 0;
-        }
-      }
-      prev->next = ptr;
-      while (prev) {
-        xmlSetTreeDoc(prev, ptr->doc);
-        prev->parent = ptr->parent;
-        if (!prev->prev && prev->parent)  {
-          if (prev->type == XML_ATTRIBUTE_NODE) {
-            if (prev->parent->type == XML_ELEMENT_NODE)
-              prev->parent->properties = xmlAttrPtr(prev);
-          } else {
-            prev->parent->children = prev;
-          }
-        }
-        prev = prev->prev;
+void node::set_next_sibling(object new_next) {
+  if (new_next.is_null()) {
+    if (ptr->parent)
+      if (ptr->type != XML_ATTRIBUTE_NODE)
+        ptr->parent->last = ptr;
+    ptr->next = 0;
+  }
+  
+  xmlNodePtr next = c_from_js(new_next);
+
+  if (!next)
+    return;
+
+  ptr->next = next;
+  if (xmlNodePtr np = next->prev) {
+    if (np->parent)
+      if (next->type != XML_ATTRIBUTE_NODE)
+        np->parent->last = np;
+    np->next = 0;
+  } else if (next->parent) {
+    if (next->type == XML_ATTRIBUTE_NODE) {
+      if (next->parent->type == XML_ELEMENT_NODE)
+        next->parent->properties = 0;
+    } else {
+      next->parent->children = 0;
+      next->parent->last = 0;
+    }
+  }
+  next->prev = ptr;
+  if (next->type != XML_ATTRIBUTE_NODE) {
+    while (next) {
+      next->parent = ptr->parent;
+      if (!next->next && next->parent)
+        next->parent->last = next;
+      next = next->next;
+    }
+  }
+  xmlSetListDoc(ptr->next, ptr->doc);
+}
+
+object node::get_previous_sibling() {
+  return create(ptr->prev);
+}
+
+void node::set_previous_sibling(object new_prev) {
+  if (new_prev.is_null()) {
+    if (ptr->parent) {
+      if (ptr->type == XML_ATTRIBUTE_NODE) {
+        if (ptr->parent->type == XML_ELEMENT_NODE)
+          ptr->parent->properties = xmlAttrPtr(ptr);
+      } else {
+        ptr->parent->children = ptr;
       }
     }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->prev);
-    break;
-  default: break;
+    ptr->prev = 0;
+  }
+    
+  xmlNodePtr prev = c_from_js(new_prev);
+
+  if (!prev)
+    return;
+
+  ptr->prev = prev;
+  if (xmlNodePtr pn = prev->next) {
+    if (pn->parent) {
+      if (pn->type == XML_ATTRIBUTE_NODE) {
+        if (ptr->parent->type == XML_ELEMENT_NODE)
+          ptr->parent->properties = xmlAttrPtr(pn);
+      } else {
+        pn->parent->children = pn;
+      }
+    }
+    pn->prev = 0;
+  } else if (prev->parent) {
+    if (prev->type != XML_ATTRIBUTE_NODE) {
+      prev->parent->children = 0;
+      prev->parent->last = 0;
+    } else {
+      if (ptr->parent->type == XML_ELEMENT_NODE)
+        prev->parent->properties = 0;
+    }
+  }
+  prev->next = ptr;
+  while (prev) {
+    xmlSetTreeDoc(prev, ptr->doc);
+    prev->parent = ptr->parent;
+    if (!prev->prev && prev->parent)  {
+      if (prev->type == XML_ATTRIBUTE_NODE) {
+        if (prev->parent->type == XML_ELEMENT_NODE)
+          prev->parent->properties = xmlAttrPtr(prev);
+      } else {
+        prev->parent->children = prev;
+      }
+    }
+    prev = prev->prev;
   }
 }
 
