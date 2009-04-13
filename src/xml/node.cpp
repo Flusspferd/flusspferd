@@ -92,8 +92,11 @@ void node::create_all_children(
   }
 
   if (properties && ptr->type == XML_ELEMENT_NODE) {
-    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
+    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
       create(xmlNodePtr(prop));
+      for (xmlNodePtr child = prop->children; child; child = child->next)
+        create(child);
+    }
   }
 }
 
@@ -210,7 +213,6 @@ void node::init() {
   define_native_property("lastChild", RO, &node::prop_last_child);
   define_native_property("firstSibling", RO, &node::prop_first_sibling);
   define_native_property("lastSibling", RO, &node::prop_last_sibling);
-  define_native_property("document", RO, &node::prop_document);
 
   if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     define_native_property("namespace", RW, &node::prop_namespace);
@@ -261,6 +263,13 @@ object node::class_info::create_prototype() {
     property_attributes(
       permanent_shared_property | read_only_property,
       create_native_method(object(), "", &node::get_document)));
+
+  proto.define_property(
+    "lang", value(),
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_lang),
+      create_native_method(object(), "", &node::set_lang)));
 
   return proto;
 }
@@ -324,23 +333,17 @@ std::string node::get_name() {
     return std::string((char const *) ptr->name);
 }
 
-void node::prop_lang(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    xmlNodeSetLang(ptr, (xmlChar const *) data.to_string().c_str());
-    create_all_children(ptr, false, true);
-    // !! fall thru !!
-  case property_get:
-    {
-      xmlChar const *lang = xmlNodeGetLang(ptr);
-      if (!lang)
-        data = value();
-      else
-        data = string((char const *) lang);
-    }
-    break;
-  default: break;
-  };
+void node::set_lang(std::string const &x) {
+  xmlNodeSetLang(ptr, (xmlChar const *) x.c_str());
+  create_all_children(ptr, false, true);
+}
+
+std::string node::get_lang() {
+  xmlChar const *lang = xmlNodeGetLang(ptr);
+  if (!lang)
+    return std::string();
+  else
+    return std::string((char const *) lang);
 }
 
 void node::prop_content(property_mode mode, value &data) {
