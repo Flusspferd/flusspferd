@@ -31,7 +31,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 html_push_parser::html_push_parser(object const &obj, call_context &x)
-  : native_object_base(obj), parser(0), doc(0)
+  : native_object_base(obj), parser(0)
 {
   local_root_scope scope;
 
@@ -67,8 +67,7 @@ html_push_parser::html_push_parser(object const &obj, call_context &x)
 
 html_push_parser::~html_push_parser() {
   if (parser) {
-    if (parser->myDoc != doc)
-      xmlFreeDoc(parser->myDoc);
+    xmlFreeDoc(parser->myDoc);
     xmlFreeParserCtxt(parser);
   }
 }
@@ -80,18 +79,6 @@ object html_push_parser::class_info::create_prototype() {
   create_native_method(proto, "terminate", &html_push_parser::terminate);
 
   return proto;
-}
-
-void html_push_parser::trace(tracer &trc) {
-  if (doc)
-    trc("parser-doc", *static_cast<object*>(doc->_private));
-}
-
-void html_push_parser::prop_document(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
-  data = node::create(xmlNodePtr(doc));
 }
 
 void html_push_parser::push(blob &b, bool t) {
@@ -107,7 +94,10 @@ void html_push_parser::push(blob &b, bool t) {
     terminate2();
 }
 
-object html_push_parser::terminate() {
+value html_push_parser::terminate() {
+  if (!parser)
+    throw exception("Could not terminate empty parser");
+
   int status = htmlParseChunk(parser, 0, 0, true);
 
   if (status != XML_ERR_OK)
@@ -115,13 +105,18 @@ object html_push_parser::terminate() {
 
   terminate2();
 
-  return node::create(xmlNodePtr(doc));
+  return get_property("document");
 }
 
 void html_push_parser::terminate2() {
-  doc = parser->myDoc;
-  node::create(xmlNodePtr(doc));
+  local_root_scope scope;
 
+  define_property(
+    "document",
+    node::create(xmlNodePtr(parser->myDoc)),
+    permanent_property | read_only_property);
+
+  parser->myDoc = 0;
   htmlFreeParserCtxt(parser);
   parser = 0;
 }

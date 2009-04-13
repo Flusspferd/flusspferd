@@ -229,16 +229,17 @@ property_iterator object::end() const {
 }
 
 void object::define_property(
-  string const &name, value const &init_value, 
+  string const &name,
+  value const &init_value, 
   property_attributes const attrs)
 {
   if (is_null())
     throw exception("Could not define property (object is null)");
 
-  flusspferd::root_string name_r(name);
+  root_string name_r(name);
 
   unsigned flags = attrs.flags;
-  value v;
+  root_value v;
   v = init_value;
 
   function getter;
@@ -259,12 +260,13 @@ void object::define_property(
   if (getter_o) sm_flags |= JSPROP_GETTER;
   if (setter_o) sm_flags |= JSPROP_SETTER;
 
-  if (!JS_DefineUCProperty(Impl::current_context(), get_const(),
-                          name.data(), name.length(),
-                          Impl::get_jsval(v),
-                          *(JSPropertyOp*) &getter_o,
-                          *(JSPropertyOp*) &setter_o,
-                          sm_flags))
+  if (!JS_DefineUCProperty(Impl::current_context(),
+                           get_const(),
+                           name.data(), name.length(),
+                           Impl::get_jsval(v),
+                           *(JSPropertyOp*) &getter_o,
+                           *(JSPropertyOp*) &setter_o,
+                           sm_flags))
     throw exception("Could not define property");
 }
 
