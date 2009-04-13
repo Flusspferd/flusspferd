@@ -24,7 +24,8 @@ THE SOFTWARE.
 #include "flusspferd.hpp"
 #include "flusspferd/implementation/init.hpp"
 #include "flusspferd/implementation/object.hpp"
-#include <boost/bind.hpp>
+#include <boost/spirit/home/phoenix/core.hpp>
+#include <boost/spirit/home/phoenix/bind.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -37,6 +38,9 @@ THE SOFTWARE.
 #include <editline/history.h>
 #endif
 #endif
+
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
 
 class flusspferd_repl {
   bool interactive;
@@ -99,7 +103,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   flusspferd::object g = flusspferd::global();
   flusspferd::create_native_function<void (int)>(
     g, "quit",
-    boost::bind(&flusspferd_repl::quit, this, _1));
+    phoenix::bind(&flusspferd_repl::quit, this, args::arg1));
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
   flusspferd::gc();
