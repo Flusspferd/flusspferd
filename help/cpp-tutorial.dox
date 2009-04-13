@@ -220,13 +220,13 @@ obj.delete_property("prop");
 flusspferd::object o1 = flusspferd::create_object();
 
 {
-  flusspferd::local_root_scope scope;
+    flusspferd::local_root_scope scope;
 
-  flusspferd::object o2 = flusspferd::create_object();
+    flusspferd::object o2 = flusspferd::create_object();
 
-  flusspferd::gc();
+    flusspferd::gc();
 
-  // o1 is probably deleted now, o2 is still alive.
+    // o1 is probably deleted now, o2 is still alive.
 }
 
 flusspferd::gc();
@@ -273,13 +273,13 @@ flusspferd::gc();
  *
  * @code
 void my_function(call_context &x) {
-  // Result of the function is the number of arguments that it was called with
-  x.result = x.args.size();
+    // Result of the function is the number of arguments that it was called with
+    x.result = x.args.size();
 
-  if (x.args.size() > 1) {
-    // Print the first argument (if there is one) to stdout
-    cout << x.arg[0] << endl;
-  }
+    if (x.args.size() > 1) {
+      // Print the first argument (if there is one) to stdout
+      cout << x.arg[0] << endl;
+    }
 }
 @endcode
  *
