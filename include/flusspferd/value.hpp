@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_VALUE_HPP
 
 #include "implementation/value.hpp"
+#include <string>
 
 namespace flusspferd {
 
@@ -159,6 +160,9 @@ public:
 
   /// Convert the value to a string.
   string to_string() const;
+
+  /// Convert the value to a C++ standard library string (std::string)
+  std::string to_std_string() const;
 
   /// Convert the number to a number.
   double to_number() const;

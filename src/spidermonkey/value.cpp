@@ -95,6 +95,10 @@ string value::to_string() const {
   return string(*this);
 }
 
+std::string value::to_std_string() const {
+  return string(*this).to_string();
+}
+
 double value::to_number() const {
   double value;
   if (!JS_ValueToNumber(Impl::current_context(), get(), &value))
