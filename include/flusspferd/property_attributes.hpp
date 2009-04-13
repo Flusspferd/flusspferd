@@ -36,21 +36,47 @@ class function;
  * @ingroup property_types
  */
 enum property_flag {
+  /// The property is normal.
+  no_property_flag = 0U,
+
   /// The property is not enumerable.
-  dont_enumerate = 1,
+  dont_enumerate = 1U,
 
   /// The property is read-only.
-  read_only_property = 2,
+  read_only_property = 2U,
 
   /// The property can not be deleted.
-  permanent_property = 4,
+  permanent_property = 4U,
 
   /// The property's attributes are shared between objects.
-  shared_property = 8,
+  shared_property = 8U,
 
   /// The property is both permanent and shared.
-  permanent_shared_property = 12
+  permanent_shared_property = 12U
 };
+
+/**
+ * Combine (union).
+ *
+ * @relates property_flag
+ */
+inline property_flag operator|(property_flag a, property_flag b) {
+  return static_cast<property_flag>(a | b);
+}
+
+/**
+ * Combine (intersection).
+ */
+inline property_flag operator&(property_flag a, property_flag b) {
+  return static_cast<property_flag>(a & b);
+}
+
+/**
+ * Invert.
+ */
+inline property_flag operator~(property_flag x) {
+  return static_cast<property_flag>(~x);
+}
 
 /**
  * A property's attributes: flags, getters and setters.
@@ -59,7 +85,7 @@ enum property_flag {
  */
 struct property_attributes {
   /// The property's flags.
-  unsigned flags;
+  property_flag flags;
 
   /// The property's getter.
   boost::optional<function const &> getter;
@@ -77,7 +103,7 @@ struct property_attributes {
    * @param getter The getter.
    * @param setter The setter.
    */
-  property_attributes(unsigned flags, 
+  property_attributes(property_flag flags, 
     boost::optional<function const &> getter = boost::none,
     boost::optional<function const &> setter = boost::none);
 };

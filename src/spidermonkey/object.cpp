@@ -377,7 +377,7 @@ bool object::get_property_attributes(
   void *getter_op, *setter_op;
   uintN sm_flags;
 
-  attrs.flags = 0;
+  attrs.flags = no_property_flag;
   attrs.getter = boost::none;
   attrs.setter = boost::none;
   JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
@@ -391,10 +391,14 @@ bool object::get_property_attributes(
   if (!found)
     return false;
 
-  if (~sm_flags & JSPROP_ENUMERATE) attrs.flags |= dont_enumerate;
-  if (sm_flags & JSPROP_PERMANENT) attrs.flags |= permanent_property;
-  if (sm_flags & JSPROP_READONLY) attrs.flags |= read_only_property;
-  if (sm_flags & JSPROP_SHARED) attrs.flags |= shared_property;
+  if (~sm_flags & JSPROP_ENUMERATE)
+    attrs.flags = attrs.flags | dont_enumerate;
+  if (sm_flags & JSPROP_PERMANENT)
+    attrs.flags = attrs.flags | permanent_property;
+  if (sm_flags & JSPROP_READONLY)
+    attrs.flags = attrs.flags | read_only_property;
+  if (sm_flags & JSPROP_SHARED)
+    attrs.flags = attrs.flags | shared_property;
 
   if (getter_op) {
     if (sm_flags & JSPROP_GETTER) {
