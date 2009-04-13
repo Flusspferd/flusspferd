@@ -305,6 +305,7 @@ def build(bld):
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     build_pkgconfig(bld)
+    bld.install_files('${PREFIX}/include/', 'include/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/',
                       'include/flusspferd/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/implementation/',
