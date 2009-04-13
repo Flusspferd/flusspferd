@@ -61,21 +61,21 @@ enum property_flag {
  * @relates property_flag
  */
 inline property_flag operator|(property_flag a, property_flag b) {
-  return static_cast<property_flag>(a | b);
+  return static_cast<property_flag>(unsigned(a) | unsigned(b));
 }
 
 /**
  * Combine (intersection).
  */
 inline property_flag operator&(property_flag a, property_flag b) {
-  return static_cast<property_flag>(a & b);
+  return static_cast<property_flag>(unsigned(a) & unsigned(b));
 }
 
 /**
  * Invert.
  */
 inline property_flag operator~(property_flag x) {
-  return static_cast<property_flag>(~x);
+  return static_cast<property_flag>(~unsigned(x));
 }
 
 /**
