@@ -84,6 +84,7 @@ private: // JS methods
 private: // JS properties
   std::string get_name();
   void set_name(std::string const &);
+  std::string get_type();
 
   void prop_name         (property_mode mode, value &data);
   void prop_lang         (property_mode mode, value &data);
@@ -96,7 +97,6 @@ private: // JS properties
   void prop_last_child   (property_mode mode, value &data);
   void prop_first_sibling(property_mode mode, value &data);
   void prop_last_sibling (property_mode mode, value &data);
-  void prop_type         (property_mode mode, value &data);
   void prop_namespace    (property_mode mode, value &data);
   void prop_namespaces   (property_mode mode, value &data);
   void prop_first_attr   (property_mode mode, value &data);

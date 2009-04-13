@@ -211,7 +211,6 @@ void node::init() {
   define_native_property("firstSibling", RO, &node::prop_first_sibling);
   define_native_property("lastSibling", RO, &node::prop_last_sibling);
   define_native_property("document", RO, &node::prop_document);
-  define_native_property("type", RO, &node::prop_type);
 
   if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     define_native_property("namespace", RW, &node::prop_namespace);
@@ -250,6 +249,12 @@ object node::class_info::create_prototype() {
       permanent_shared_property,
       create_native_method(object(), "", &node::get_name),
       create_native_method(object(), "", &node::set_name)));
+
+  proto.define_property(
+    "type", value(),
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_type)));
 
   return proto;
 }
@@ -606,32 +611,29 @@ void node::prop_document(property_mode mode, value &data) {
   data = create(xmlNodePtr(ptr->doc));
 }
 
-void node::prop_type(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
+std::string node::get_type() {
   switch (ptr->type) {
-  case XML_ELEMENT_NODE:       data = string("ELEMENT");               break;
-  case XML_ATTRIBUTE_NODE:     data = string("ATTRIBUTE");             break;
-  case XML_TEXT_NODE:          data = string("TEXT");                  break;
-  case XML_CDATA_SECTION_NODE: data = string("CDATA-SECTION");         break;
-  case XML_ENTITY_REF_NODE:    data = string("ENTITY-REFERENCE");      break;
-  case XML_ENTITY_NODE:        data = string("ENTITY");                break;
-  case XML_PI_NODE:            data = string("PI");                    break;
-  case XML_COMMENT_NODE:       data = string("COMMENT");               break;
-  case XML_DOCUMENT_NODE:      data = string("DOCUMENT");              break;
-  case XML_DOCUMENT_TYPE_NODE: data = string("DOCUMENT-TYPE");         break;
-  case XML_DOCUMENT_FRAG_NODE: data = string("DOCUMENT-FRAGMENT");     break;
-  case XML_NOTATION_NODE:      data = string("NOTATION");              break;
-  case XML_HTML_DOCUMENT_NODE: data = string("HTML-DOCUMENT");         break;
-  case XML_DTD_NODE:           data = string("DTD");                   break;
-  case XML_ELEMENT_DECL:       data = string("ELEMENT-DECLARATION");   break;
-  case XML_ATTRIBUTE_DECL:     data = string("ATTRIBUTE-DECLARATION"); break;
-  case XML_ENTITY_DECL:        data = string("ENTITY-DECLARATION");    break;
-  case XML_NAMESPACE_DECL:     data = string("NAMESPACE-DECLARATION"); break;
-  case XML_XINCLUDE_START:     data = string("XINCLUDE-START");        break;
-  case XML_XINCLUDE_END:       data = string("XINCLUDE-END");          break;
-  default:                     data = string("OTHER");                 break;
+  case XML_ELEMENT_NODE:       return "ELEMENT";               break;
+  case XML_ATTRIBUTE_NODE:     return "ATTRIBUTE";             break;
+  case XML_TEXT_NODE:          return "TEXT";                  break;
+  case XML_CDATA_SECTION_NODE: return "CDATA-SECTION";         break;
+  case XML_ENTITY_REF_NODE:    return "ENTITY-REFERENCE";      break;
+  case XML_ENTITY_NODE:        return "ENTITY";                break;
+  case XML_PI_NODE:            return "PI";                    break;
+  case XML_COMMENT_NODE:       return "COMMENT";               break;
+  case XML_DOCUMENT_NODE:      return "DOCUMENT";              break;
+  case XML_DOCUMENT_TYPE_NODE: return "DOCUMENT-TYPE";         break;
+  case XML_DOCUMENT_FRAG_NODE: return "DOCUMENT-FRAGMENT";     break;
+  case XML_NOTATION_NODE:      return "NOTATION";              break;
+  case XML_HTML_DOCUMENT_NODE: return "HTML-DOCUMENT";         break;
+  case XML_DTD_NODE:           return "DTD";                   break;
+  case XML_ELEMENT_DECL:       return "ELEMENT-DECLARATION";   break;
+  case XML_ATTRIBUTE_DECL:     return "ATTRIBUTE-DECLARATION"; break;
+  case XML_ENTITY_DECL:        return "ENTITY-DECLARATION";    break;
+  case XML_NAMESPACE_DECL:     return "NAMESPACE-DECLARATION"; break;
+  case XML_XINCLUDE_START:     return "XINCLUDE-START";        break;
+  case XML_XINCLUDE_END:       return "XINCLUDE-END";          break;
+  default:                     return "OTHER";                 break;
   }
 }
 
