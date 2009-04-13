@@ -86,12 +86,13 @@ namespace_::namespace_(object const &obj, call_context &x)
   }
 
   xmlChar const *prefix_p = 0;
-  if (!prefix_v.is_undefined() && !prefix_v.is_null())
+  if (!prefix_v.is_undefined() && !prefix_v.is_null()) {
     if (prefix_v.is_string())
       prefix_p = (xmlChar const *) prefix_v.get_string().c_str();
     else
       throw exception("Could not create XML namespace: "
                       "prefix has to be a string");
+  }
 
   ptr = xmlNewNs(node_p, href_p, prefix_p);
 
