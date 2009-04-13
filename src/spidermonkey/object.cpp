@@ -336,26 +336,12 @@ bool object::is_array() const {
 }
 
 bool object::get_property_attributes(
-    char const *name_, property_attributes &attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  return get_property_attributes(name, attrs);
-}
-
-bool object::get_property_attributes(
-    std::string name_, property_attributes &attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  return get_property_attributes(name, attrs);
-}
-
-bool object::get_property_attributes(
     string const &name, property_attributes &attrs)
 {
   if (is_null())
     throw exception("Could not get property attributes (object is null)");
+
+  flusspferd::root_string name_r(name);
 
   JSBool found;
   void *getter_op, *setter_op;

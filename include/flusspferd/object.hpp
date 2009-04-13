@@ -272,24 +272,6 @@ FLUSSPFERD_CALLS(call, object const &)
   /**
    * Get a property's attributes.
    *
-   * @param name The property's name.
-   * @param[out] attrs The property's attributes.
-   * @return Whether the property exists.
-   */
-  bool get_property_attributes(char const *name, property_attributes &attrs);
-
-  /**
-   * Get a property's attributes.
-   *
-   * @param name The property's name.
-   * @param[out] attrs The property's attributes.
-   * @return Whether the property exists.
-   */
-  bool get_property_attributes(std::string name, property_attributes &attrs);
-
-  /**
-   * Get a property's attributes.
-   *
    * @param id The property's name / ID.
    * @param[out] attrs The property's attributes.
    * @return Whether the property exists.
