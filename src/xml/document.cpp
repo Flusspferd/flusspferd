@@ -115,8 +115,11 @@ void document::init() {
   unsigned const RW = permanent_shared_property;
   unsigned const RO = RW |read_only_property;
 
+  //FIXME
+#if 0
   define_native_property("rootElement", RW, &document::prop_root_element);
   define_native_property("xmlNamespace", RO, &document::prop_xml_namespace);
+#endif
 }
 
 object document::class_info::create_prototype() {

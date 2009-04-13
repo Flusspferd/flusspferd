@@ -88,9 +88,8 @@ attribute_::~attribute_()
 {}
 
 void attribute_::init() {
-  define_native_property("content",
-      permanent_shared_property,
-      &attribute_::prop_content);
+  //FIXME
+  //define_native_property("content", permanent_shared_property, &attribute_::prop_content);
 }
 
 object attribute_::class_info::create_prototype() {

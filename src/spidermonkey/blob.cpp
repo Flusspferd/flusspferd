@@ -79,7 +79,8 @@ void blob::class_info::augment_constructor(object &ctor) {
 void blob::init() {
   unsigned const RW = permanent_shared_property;
 
-  define_native_property("length", RW, &blob::prop_length);
+  //FIXME
+  //define_native_property("length", RW, &blob::prop_length);
 }
 
 blob::~blob() {}

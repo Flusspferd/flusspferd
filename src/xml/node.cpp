@@ -202,6 +202,8 @@ void node::init() {
   unsigned const RW = permanent_shared_property;
   unsigned const RO = RW | read_only_property;
 
+//FIXME
+#if 0
   define_native_property("name", RW, &node::prop_name);
   define_native_property("lang", RW, &node::prop_lang);
   define_native_property("content", RW, &node::prop_content);
@@ -221,6 +223,7 @@ void node::init() {
   }
 
   define_native_property("firstAttribute", RW, &node::prop_first_attr);
+#endif
 }
 
 object node::class_info::create_prototype() {

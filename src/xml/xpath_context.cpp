@@ -79,8 +79,11 @@ xpath_context::xpath_context(object const &obj, call_context &x)
   }
   define_property("ns", ns, read_only_property | permanent_property);
 
+//FIXME
+#if 0
   define_native_property(
     "current", permanent_shared_property, &xpath_context::prop_current);
+#endif
 }
 
 xpath_context::~xpath_context() {

@@ -120,8 +120,11 @@ object namespace_::class_info::create_prototype() {
 void namespace_::init() {
   unsigned const RW = permanent_shared_property;
 
+  //FIXME
+#if 0
   define_native_property("href", RW, &namespace_::prop_href);
   define_native_property("prefix", RW, &namespace_::prop_prefix);
+#endif
 }
 
 void namespace_::trace(tracer &trc) {

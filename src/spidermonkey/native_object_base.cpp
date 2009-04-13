@@ -58,12 +58,6 @@ public:
 public:
   static JSClass native_object_class;
   static JSClass native_enumerable_object_class;
-
-public:
-  typedef 
-    boost::unordered_map<std::string, property_callback> property_callback_map;
-
-  property_callback_map property_callbacks;
 };
 
 static const unsigned int basic_flags =
@@ -196,12 +190,6 @@ object native_object_base::do_create_enumerable_object(object const &prototype_)
     throw exception("Could not create native object");
 
   return Impl::wrap_object(o);
-}
-
-void native_object_base::add_property_op(
-  std::string const &name, property_callback callback)
-{
-  p->property_callbacks[name] = callback;
 }
 
 void native_object_base::impl::finalize(JSContext *ctx, JSObject *obj) {
@@ -356,17 +344,8 @@ uint32 native_object_base::impl::mark_op(
 #endif
 
 void native_object_base::property_op(
-    property_mode mode, value const &id, value &data)
+    property_mode, value const &, value &)
 {
-  std::string name = id.to_string().to_string();
-  impl::property_callback_map::iterator it = p->property_callbacks.find(name);
-
-  if (it != p->property_callbacks.end()) {
-    property_callback callback = it->second;
-
-    if (callback)
-      (this->*callback)(mode, data);
-  }
 }
 
 bool native_object_base::property_resolve(value const &, unsigned) {

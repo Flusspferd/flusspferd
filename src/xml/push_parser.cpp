@@ -56,10 +56,13 @@ push_parser::push_parser(object const &obj, call_context &x)
   if (xmlCtxtUseOptions(parser, flags) != 0)
     throw exception("Could not initialise parser options");
 
+//FIXME
+#if 0
   define_native_property(
     "document",
     read_only_property | permanent_shared_property,
     &push_parser::prop_document);
+#endif
 }
 
 push_parser::~push_parser() {
