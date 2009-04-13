@@ -55,14 +55,6 @@ html_push_parser::html_push_parser(object const &obj, call_context &x)
 
   if (htmlCtxtUseOptions(parser, flags) != 0)
     throw exception("Could not initialise parser options");
-
-  //FIXME
-#if 0
-  define_native_property(
-    "document",
-    read_only_property | permanent_shared_property,
-    &html_push_parser::prop_document);
-#endif
 }
 
 html_push_parser::~html_push_parser() {
