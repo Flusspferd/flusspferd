@@ -25,6 +25,8 @@ THE SOFTWARE.
 #include "flusspferd/init.hpp"
 #include "flusspferd/implementation/init.hpp"
 
+#include <cstring>
+
 using namespace flusspferd;
 
 value flusspferd::evaluate(
