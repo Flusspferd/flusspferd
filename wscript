@@ -327,6 +327,8 @@ def build(bld):
                    (bld.env['shlib_PATTERN'] % 'IO'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
 
+    bld.install_files('${PREFIX}/share/man/man1/', 'help/flusspferd.1')
+
     etc = bld.new_task_gen('subst')
     etc.source = 'jsrepl.js.in'
     etc.target = 'jsrepl.js'
