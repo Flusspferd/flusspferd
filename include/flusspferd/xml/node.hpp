@@ -95,6 +95,9 @@ private: // JS properties
   boost::optional<std::string> get_content();
   void set_content(boost::optional<std::string> const &);
 
+  object get_parent();
+  void set_parent(object);
+
   void prop_parent       (property_mode mode, value &data);
   void prop_next         (property_mode mode, value &data);
   void prop_prev         (property_mode mode, value &data);
