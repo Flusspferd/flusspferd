@@ -352,18 +352,21 @@ private:
  */
 template<typename R, typename T>
 class function_adapter_memfn {
+private:
+  typedef detail::function_adapter_memfn<R, T> adapter_type;
+
 public:
   function_adapter_memfn(R T::*funptr)
     : funptr(funptr)
   {}
 
   void operator() (call_context &x) {
-    detail::function_adapter_memfn<R, T> function_adapter_implementation_memfn;
+    adapter_type function_adapter_implementation_memfn;
     function_adapter_implementation_memfn.action(funptr, x);
   }
 
   static std::size_t const arity =
-    detail::function_adapter_memfn<R, T>::arity;
+    adapter_type::arity;
 
 private:
   R T::*funptr;
