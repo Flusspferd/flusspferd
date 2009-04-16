@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "value.hpp"
 #include "root.hpp"
 #include "exception.hpp"
-#include "implementation/string.hpp"
+#include "spidermonkey/string.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_float.hpp>

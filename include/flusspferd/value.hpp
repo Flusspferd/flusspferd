@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_VALUE_HPP
 #define FLUSSPFERD_VALUE_HPP
 
-#include "implementation/value.hpp"
+#include "spidermonkey/value.hpp"
 #include <string>
 
 namespace flusspferd {

@@ -74,13 +74,6 @@ def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
 
-    print '%s : ' % 'Creating implementation link'.ljust(conf.line_just),
-    sys.stdout.flush()
-    try: os.unlink('include/flusspferd/implementation')
-    except OSError: pass
-    os.symlink('spidermonkey', 'include/flusspferd/implementation')
-    Utils.pprint('GREEN', 'ok')
-
     if darwin:
         u('CXXDEFINES', 'APPLE')
         # Is there a better way of doing this?

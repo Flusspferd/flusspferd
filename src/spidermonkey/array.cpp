@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/array.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;

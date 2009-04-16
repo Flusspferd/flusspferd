@@ -25,7 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_OBJECT_HPP
 
 #ifndef PREPROC_DEBUG
-#include "implementation/object.hpp"
+#include "spidermonkey/object.hpp"
 #include "property_attributes.hpp"
 #include "arguments.hpp"
 #include "value.hpp"

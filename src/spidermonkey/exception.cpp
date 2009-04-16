@@ -28,8 +28,8 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/current_context_scope.hpp"
-#include "flusspferd/implementation/value.hpp"
-#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <js/jsapi.h>

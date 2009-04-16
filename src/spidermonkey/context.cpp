@@ -25,10 +25,10 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/implementation/context.hpp"
-#include "flusspferd/implementation/value.hpp"
-#include "flusspferd/implementation/object.hpp"
-#include "flusspferd/implementation/runtime.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
+#include "flusspferd/spidermonkey/object.hpp"
+#include "flusspferd/spidermonkey/runtime.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/unordered_map.hpp>
 #include <cstring>

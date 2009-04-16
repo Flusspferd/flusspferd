@@ -22,8 +22,8 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
-#include "flusspferd/implementation/init.hpp"
-#include "flusspferd/implementation/object.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
 #include <boost/spirit/home/phoenix/bind.hpp>
 #include <iostream>

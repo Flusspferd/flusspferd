@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/context.hpp"
 #include "flusspferd/object.hpp"
-#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
 #include <boost/thread/tss.hpp>
 #include <boost/thread/once.hpp>
 #include <js/jsapi.h>

@@ -28,8 +28,8 @@ THE SOFTWARE.
 #include "flusspferd/native_function_base.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/implementation/object.hpp"
-#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/spidermonkey/object.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
 #include <js/jsapi.h>
 
 using namespace flusspferd;
