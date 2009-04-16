@@ -6,4 +6,5 @@ naturaldocs/Data/*
 *.swp
 .lock-wscript
 .waf-*
+waf-*
 .localsettings.mak
