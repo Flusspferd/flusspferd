@@ -117,17 +117,25 @@ def configure(conf):
                                     'include')]
         lib_path = [os.path.join(Options.options.spidermonkey_path, 'lib')]
 
-    ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
+    js_name = 'js'
+    if sys.platform == "win32":
+        js_name = 'js32'
+        js_platform = 'XP_WIN'
+    else:
+        js_platform = 'XP_UNIX'
+
+    ret = conf.check_cxx(lib = js_name, uselib_store='JS', libpath=lib_path)
     if ret == False:
         conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
                        libpath=lib_path)
     js_h_defines = []
+
     if not conf.check_cxx(header_name = 'js/js-config.h', includes=include_path,
-                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8']):
+                          defines=[js_platform, 'JS_C_STRINGS_ARE_UTF8']):
         ret = conf.check_cxx(uselib='JS',
                           includes=include_path, execute=1,
-                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8',
+                          defines=[js_platform, 'JS_C_STRINGS_ARE_UTF8',
                                    'JS_THREADSAFE'],
                           msg='Checking if SM needs JS_THREADSAFE',
                           fragment='''
@@ -142,7 +150,7 @@ def configure(conf):
 
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=js_h_defines + ['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   defines=js_h_defines + [js_platform, 'JS_C_STRINGS_ARE_UTF8'],
                    includes=include_path)
     conf.check_cxx(uselib=['JS_H', 'JS'],
                    mandatory = 1, execute=1,
