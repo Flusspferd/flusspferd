@@ -4,6 +4,7 @@ html/*
 include/flusspferd/implementation
 naturaldocs/Data/*
 *.swp
+*~
 .lock-wscript
 .waf-*
 waf-*
