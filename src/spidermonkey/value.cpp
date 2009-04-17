@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 #include <cassert>
 #include <cmath>
+#ifdef WIN32
+#include <float.h>
+#endif
 
 using namespace flusspferd;
 
@@ -108,10 +111,15 @@ double value::to_number() const {
 
 double value::to_integral_number(int bits, bool signedness) const {
   long double value = to_number();
+#ifdef WIN32
+  if (!_finite(value))
+    return 0;
+#else
   if (!std::isfinite(value))
     return 0;
+#endif
   long double maxU = powl(2, bits);
-  value = truncl(value);
+  value = value < 0 ? ceill(value) : floorl(value);
   value = fmodl(value, maxU);
   if (value < 0)
     value += maxU;
