@@ -132,5 +132,5 @@ $ sudo make install
  * So at the moment using the Portfile requires some additional steps.
  * See <a href="http://guide.macports.org/#development.local-repositories">
  * the Macport Guide on how to setup a local repository</a> to install
- * flusspferd.
+ * Flusspferd.
  */
