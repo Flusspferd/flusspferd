@@ -114,7 +114,8 @@
 (defvar flusspferd-minor-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-x\C-e" 'flusspferd-eval-last-sexp)
-    ;; TODO
+    (define-key map "\C-c\C-c" 'flusspferd-eval-buffer)
+    (define-key map "\C-c\C-r" 'flusspferd-eval-region)
     map))
 
 (defun flusspferd-helper-mark-active ()
