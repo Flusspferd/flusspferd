@@ -238,7 +238,7 @@ T get_native_object_parameter2(call_context &x) {
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename P) \
   > \
   struct function_adapter_memfn< \
-    R (BOOST_PP_ENUM_PARAMS(n_args, P)), T \
+    R (T::*)(BOOST_PP_ENUM_PARAMS(n_args, P)) \
   > \
   { \
     typename convert<R>::to_value to_value; \
@@ -260,7 +260,7 @@ T get_native_object_parameter2(call_context &x) {
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename P) \
   > \
   struct function_adapter_memfn< \
-    void (BOOST_PP_ENUM_PARAMS(n_args, P)), T \
+    void (T::*)(BOOST_PP_ENUM_PARAMS(n_args, P)) \
   > \
   { \
     BOOST_PP_REPEAT(n_args, FLUSSPFERD_DECLARE_ARG_CONVERTER_MEMFN, ~) \
@@ -290,8 +290,7 @@ template<
 struct function_adapter;
 
 template<
-  typename R,
-  typename T
+  typename F
 > struct function_adapter_memfn;
 
 FLUSSPFERD_DECLARE_FUNCTION_ADAPTERS(_)
@@ -352,7 +351,9 @@ private:
 template<typename R, typename T>
 class function_adapter_memfn {
 private:
-  typedef detail::function_adapter_memfn<R, T> adapter_type;
+  typedef R T::*funptr_type;
+
+  typedef detail::function_adapter_memfn<funptr_type> adapter_type;
 
 public:
   function_adapter_memfn(R T::*funptr)
