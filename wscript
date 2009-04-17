@@ -95,6 +95,8 @@ def configure(conf):
     if darwin:
         conf.check_tool('osx')
 
+    u('CXXDEFINES', 'BOOST_ALL_NO_LIB')
+
     conf.env['CXXFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
     conf.env['LINKFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
 
