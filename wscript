@@ -297,7 +297,8 @@ def build(bld):
     if bld.env['ENABLE_SQLITE']:
         bld.add_subdirs('plugins/sqlite3')
     bld.add_subdirs('plugins/environment')
-    bld.add_subdirs('plugins/posix')
+    if sys.platform != 'win32':
+        bld.add_subdirs('plugins/posix')
     if bld.env['ENABLE_CURL']:
         bld.add_subdirs('plugins/curl')
 
