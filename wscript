@@ -251,10 +251,8 @@ int main() {
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
     if not Options.options.disable_curl:
-      if (conf.check_cxx(lib = 'curl', 
-                        uselib_store='CURL') != None and 
-         conf.check_cxx(header_name = 'curl/curl.h',
-                        uselib_store='CURL') != None):
+      if (conf.check_cxx(lib = 'curl', uselib_store='CURL') and
+          conf.check_cxx(header_name = 'curl/curl.h', uselib_store='CURL')):
         conf.env['ENABLE_CURL'] = True
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
