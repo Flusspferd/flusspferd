@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "object.hpp"
 #include "convert.hpp"
-#include "implementation/function.hpp"
+#include "spidermonkey/function.hpp"
 
 namespace flusspferd {
 

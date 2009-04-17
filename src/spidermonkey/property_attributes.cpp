@@ -22,16 +22,16 @@ THE SOFTWARE.
 */
 #include "flusspferd/property_attributes.hpp"
 
-using flusspferd::property_attributes;
+using namespace flusspferd;
 
 property_attributes::property_attributes()
-  : flags(0u),
+  : flags(no_property_flag),
     getter(boost::none),
     setter(boost::none)
 {}
 
 property_attributes::property_attributes(
-  unsigned flags, 
+  property_flag flags, 
   boost::optional<function const &> getter,
   boost::optional<function const &> setter
 )

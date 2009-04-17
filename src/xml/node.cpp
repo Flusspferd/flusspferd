@@ -92,8 +92,11 @@ void node::create_all_children(
   }
 
   if (properties && ptr->type == XML_ELEMENT_NODE) {
-    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next)
+    for (xmlAttrPtr prop = ptr->properties; prop; prop = prop->next) {
       create(xmlNodePtr(prop));
+      for (xmlNodePtr child = prop->children; child; child = child->next)
+        create(child);
+    }
   }
 }
 
@@ -199,28 +202,13 @@ node::~node() {
 }
 
 void node::init() {
-  unsigned const RW = permanent_shared_property;
-  unsigned const RO = RW | read_only_property;
-
-  define_native_property("name", RW, &node::prop_name);
-  define_native_property("lang", RW, &node::prop_lang);
-  define_native_property("content", RW, &node::prop_content);
-  define_native_property("parent", RW, &node::prop_parent);
-  define_native_property("nextSibling", RW, &node::prop_next);
-  define_native_property("previousSibling", RW, &node::prop_prev);
-  define_native_property("firstChild", RW, &node::prop_first_child);
-  define_native_property("lastChild", RO, &node::prop_last_child);
-  define_native_property("firstSibling", RO, &node::prop_first_sibling);
-  define_native_property("lastSibling", RO, &node::prop_last_sibling);
-  define_native_property("document", RO, &node::prop_document);
-  define_native_property("type", RO, &node::prop_type);
-
+//FIXME
+#if 0
   if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
     define_native_property("namespace", RW, &node::prop_namespace);
     define_native_property("namespaces", RO, &node::prop_namespaces);
   }
-
-  define_native_property("firstAttribute", RW, &node::prop_first_attr);
+#endif
 }
 
 object node::class_info::create_prototype() {
@@ -244,6 +232,105 @@ object node::class_info::create_prototype() {
   create_native_method(proto, "searchNamespaceByURI",
                        &node::search_namespace_by_uri);
   create_native_method(proto, "toString", &node::to_string);
+
+  proto.define_property(
+    "name",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_name),
+      create_native_method(object(), "", &node::set_name)));
+
+  proto.define_property(
+    "type",
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_type)));
+
+  proto.define_property(
+    "document",
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_document)));
+
+  proto.define_property(
+    "lang",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_lang),
+      create_native_method(object(), "", &node::set_lang)));
+
+  proto.define_property(
+    "content",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_content),
+      create_native_method(object(), "", &node::set_content)));
+
+  proto.define_property(
+    "parent",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_parent),
+      create_native_method(object(), "", &node::set_parent)));
+
+  proto.define_property(
+    "nextSibling",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_next_sibling),
+      create_native_method(object(), "", &node::set_next_sibling)));
+
+  proto.define_property(
+    "previousSibling",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_previous_sibling),
+      create_native_method(object(), "", &node::set_previous_sibling)));
+
+  proto.define_property(
+    "firstChild",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_first_child),
+      create_native_method(object(), "", &node::set_first_child)));
+
+  proto.define_property(
+    "lastChild",
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_last_child)));
+
+  proto.define_property(
+    "firstSibling",
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_first_sibling)));
+
+  proto.define_property(
+    "lastSibling",
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_last_sibling)));
+
+  proto.define_property(
+    "firstAttribute",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_first_attribute),
+      create_native_method(object(), "", &node::set_first_attribute)));
+
+  proto.define_property(
+    "namespace",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &node::get_namespace),
+      create_native_method(object(), "", &node::set_namespace)));
+
+  proto.define_property(
+    "namespaces",
+    property_attributes(
+      permanent_shared_property | read_only_property,
+      create_native_method(object(), "", &node::get_namespaces)));
 
   return proto;
 }
@@ -296,412 +383,381 @@ void node::trace(tracer &trc) {
   }
 }
 
-void node::prop_name(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    xmlNodeSetName(ptr, (xmlChar const *) data.to_string().c_str());
-    // !! fall thru !!
-  case property_get:
-    if (!ptr->name)
-      data = value();
-    else
-      data = string((char const *) ptr->name);
-    break;
-  default: break;
-  };
+void node::set_name(std::string const &s) {
+  xmlNodeSetName(ptr, (xmlChar const *) s.c_str());
 }
 
-void node::prop_lang(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    xmlNodeSetLang(ptr, (xmlChar const *) data.to_string().c_str());
-    create_all_children(ptr, false, true);
-    // !! fall thru !!
-  case property_get:
-    {
-      xmlChar const *lang = xmlNodeGetLang(ptr);
-      if (!lang)
-        data = value();
-      else
-        data = string((char const *) lang);
-    }
-    break;
-  default: break;
-  };
+std::string node::get_name() {
+  if (!ptr->name)
+    return std::string();
+  else
+    return std::string((char const *) ptr->name);
 }
 
-void node::prop_content(property_mode mode, value &data) {
-  xmlChar *content;
-  switch (mode) {
-  case property_set:
-    xmlNodeSetContent(ptr, 0);
-    if (!data.is_undefined() && !data.is_null())
-      xmlNodeAddContent(ptr, (xmlChar const *) data.to_string().c_str());
-    create_all_children(ptr, true, false);
-    // !! fall thru !!
-  case property_get:
-    content = xmlNodeGetContent(ptr);
-    if (!content) {
-      data = value();
-    } else {
-      data = string((char const *) content);
+void node::set_lang(std::string const &x) {
+  xmlNodeSetLang(ptr, (xmlChar const *) x.c_str());
+  create_all_children(ptr, false, true);
+}
+
+std::string node::get_lang() {
+  xmlChar const *lang = xmlNodeGetLang(ptr);
+  if (!lang)
+    return std::string();
+  else
+    return std::string((char const *) lang);
+}
+
+void node::set_content(boost::optional<std::string> const &x) {
+  xmlNodeSetContent(ptr, 0);
+  if (x)
+    xmlNodeAddContent(ptr, (xmlChar const *) x->c_str());
+  create_all_children(ptr, true, false);
+}
+
+boost::optional<std::string> node::get_content() {
+  xmlChar *content = xmlNodeGetContent(ptr);
+  if (!content) {
+    return boost::none;
+  } else {
+    try {
+      std::string result((char const *) content);
       xmlFree(content);
+      return result;
+    } catch (...) {
+      xmlFree(content);
+      throw;
     }
-    break;
-  default: break;
   }
 }
 
-void node::prop_parent(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      if (ptr->parent) {
-        if (ptr->type == XML_ATTRIBUTE_NODE) {
-          if (ptr->parent->type == XML_ELEMENT_NODE && !ptr->prev)
-            ptr->parent->properties = 0;
-        } else {
-          ptr->parent->last = ptr->prev;
-          if (!ptr->prev)
-            ptr->parent->children = 0;
-        }
-        
-        if (ptr->prev) {
-          ptr->prev->next = 0;
-          ptr->prev = 0;
-        }
-        ptr->parent = 0;
-        xmlSetListDoc(ptr, 0);
-      }
-    } else if (xmlNodePtr parent = c_from_js(data.to_object())) {
-      xmlNodePtr old_parent = ptr->parent;
-      if (ptr->prev)
-        ptr->prev->next = 0;
-      ptr->prev = 0;
+object node::get_parent() {
+  return create(ptr->parent);
+}
+
+void node::set_parent(object new_parent) {
+  if (new_parent.is_null()) {
+    if (ptr->parent) {
       if (ptr->type == XML_ATTRIBUTE_NODE) {
-        if (parent->type == XML_ELEMENT_NODE) {
-          ptr->parent = parent;
-          xmlAttrPtr ptr = xmlAttrPtr(this->ptr);
-          if (xmlAttrPtr last = parent->properties) {
-            while (last->next)
-              last = last->next;
-            last->next = ptr;
-            ptr->prev = last;
-          } else {
-            parent->properties = ptr;
-            ptr->prev = 0;
-          }
-          while (ptr->next) {
-            ptr = ptr->next;
-            ptr->parent = parent;
-          }
-        }
+        if (ptr->parent->type == XML_ELEMENT_NODE && !ptr->prev)
+          ptr->parent->properties = 0;
       } else {
+        ptr->parent->last = ptr->prev;
+        if (!ptr->prev)
+          ptr->parent->children = 0;
+      }
+
+      if (ptr->prev) {
+        ptr->prev->next = 0;
+        ptr->prev = 0;
+      }
+      ptr->parent = 0;
+      xmlSetListDoc(ptr, 0);
+    }
+    return;
+  }
+  
+  xmlNodePtr parent = c_from_js(new_parent);
+
+  if (!parent)
+    return;
+
+  xmlNodePtr old_parent = ptr->parent;
+  if (ptr->prev)
+    ptr->prev->next = 0;
+  ptr->prev = 0;
+  if (ptr->type == XML_ATTRIBUTE_NODE) {
+    if (parent->type != XML_ELEMENT_NODE) {
+      ptr->parent = parent;
+      xmlAttrPtr ptr = xmlAttrPtr(this->ptr);
+      if (xmlAttrPtr last = parent->properties) {
+        while (last->next)
+          last = last->next;
+        last->next = ptr;
+        ptr->prev = last;
+      } else {
+        parent->properties = ptr;
+        ptr->prev = 0;
+      }
+      while (ptr->next) {
+        ptr = ptr->next;
         ptr->parent = parent;
-        if (old_parent) {
-          old_parent->last = ptr->prev;
-          if (!ptr->prev) 
-            old_parent->children = 0;
-        }
-        if (parent->last) {
-          ptr->prev = parent->last;
-          parent->last->next = ptr;
-        } else {
-          ptr->prev = 0;
-          parent->children = ptr;
-          parent->last = ptr;
-        }
-        while (parent->last->next) {
-          parent->last = parent->last->next;
-          parent->last->parent = parent;
-        }
       }
-      xmlSetListDoc(ptr, parent->doc);
     }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->parent);
-    break;
-  default: break;
-  }
-}
-
-void node::prop_next(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      if (ptr->parent)
-        if (ptr->type != XML_ATTRIBUTE_NODE)
-          ptr->parent->last = ptr;
-      ptr->next = 0;
-    } else if (xmlNodePtr next = c_from_js(data.to_object())) {
-      ptr->next = next;
-      if (xmlNodePtr np = next->prev) {
-        if (np->parent)
-          if (next->type != XML_ATTRIBUTE_NODE)
-            np->parent->last = np;
-        np->next = 0;
-      } else if (next->parent) {
-        if (next->type == XML_ATTRIBUTE_NODE) {
-          if (next->parent->type == XML_ELEMENT_NODE)
-            next->parent->properties = 0;
-        } else {
-          next->parent->children = 0;
-          next->parent->last = 0;
-        }
-      }
-      next->prev = ptr;
-      if (next->type != XML_ATTRIBUTE_NODE) {
-        while (next) {
-          next->parent = ptr->parent;
-          if (!next->next && next->parent)
-            next->parent->last = next;
-          next = next->next;
-        }
-      }
-      xmlSetListDoc(ptr->next, ptr->doc);
+  } else {
+    ptr->parent = parent;
+    if (old_parent) {
+      old_parent->last = ptr->prev;
+      if (!ptr->prev) 
+        old_parent->children = 0;
     }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->next);
-    break;
-  default: break;
-  }
-}
-
-void node::prop_prev(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      if (ptr->parent) {
-        if (ptr->type == XML_ATTRIBUTE_NODE) {
-          if (ptr->parent->type == XML_ELEMENT_NODE)
-            ptr->parent->properties = xmlAttrPtr(ptr);
-        } else {
-          ptr->parent->children = ptr;
-        }
-      }
+    if (parent->last) {
+      ptr->prev = parent->last;
+      parent->last->next = ptr;
+    } else {
       ptr->prev = 0;
-    } else if (xmlNodePtr prev = c_from_js(data.get_object())) {
-      ptr->prev = prev;
-      if (xmlNodePtr pn = prev->next) {
-        if (pn->parent) {
-          if (pn->type == XML_ATTRIBUTE_NODE) {
-            if (ptr->parent->type == XML_ELEMENT_NODE)
-              ptr->parent->properties = xmlAttrPtr(pn);
-          } else {
-            pn->parent->children = pn;
-          }
-        }
-        pn->prev = 0;
-      } else if (prev->parent) {
-        if (prev->type != XML_ATTRIBUTE_NODE) {
-          prev->parent->children = 0;
-          prev->parent->last = 0;
-        } else {
-          if (ptr->parent->type == XML_ELEMENT_NODE)
-            prev->parent->properties = 0;
-        }
-      }
-      prev->next = ptr;
-      while (prev) {
-        xmlSetTreeDoc(prev, ptr->doc);
-        prev->parent = ptr->parent;
-        if (!prev->prev && prev->parent)  {
-          if (prev->type == XML_ATTRIBUTE_NODE) {
-            if (prev->parent->type == XML_ELEMENT_NODE)
-              prev->parent->properties = xmlAttrPtr(prev);
-          } else {
-            prev->parent->children = prev;
-          }
-        }
-        prev = prev->prev;
+      parent->children = ptr;
+      parent->last = ptr;
+    }
+    while (parent->last->next) {
+      parent->last = parent->last->next;
+      parent->last->parent = parent;
+    }
+  }
+  xmlSetListDoc(ptr, parent->doc);
+}
+
+object node::get_next_sibling() {
+  return create(ptr->next);
+}
+
+void node::set_next_sibling(object new_next) {
+  if (new_next.is_null()) {
+    if (ptr->parent)
+      if (ptr->type != XML_ATTRIBUTE_NODE)
+        ptr->parent->last = ptr;
+    ptr->next = 0;
+  }
+  
+  xmlNodePtr next = c_from_js(new_next);
+
+  if (!next)
+    return;
+
+  ptr->next = next;
+  if (xmlNodePtr np = next->prev) {
+    if (np->parent)
+      if (next->type != XML_ATTRIBUTE_NODE)
+        np->parent->last = np;
+    np->next = 0;
+  } else if (next->parent) {
+    if (next->type == XML_ATTRIBUTE_NODE) {
+      if (next->parent->type == XML_ELEMENT_NODE)
+        next->parent->properties = 0;
+    } else {
+      next->parent->children = 0;
+      next->parent->last = 0;
+    }
+  }
+  next->prev = ptr;
+  if (next->type != XML_ATTRIBUTE_NODE) {
+    while (next) {
+      next->parent = ptr->parent;
+      if (!next->next && next->parent)
+        next->parent->last = next;
+      next = next->next;
+    }
+  }
+  xmlSetListDoc(ptr->next, ptr->doc);
+}
+
+object node::get_previous_sibling() {
+  return create(ptr->prev);
+}
+
+void node::set_previous_sibling(object new_prev) {
+  if (new_prev.is_null()) {
+    if (ptr->parent) {
+      if (ptr->type == XML_ATTRIBUTE_NODE) {
+        if (ptr->parent->type == XML_ELEMENT_NODE)
+          ptr->parent->properties = xmlAttrPtr(ptr);
+      } else {
+        ptr->parent->children = ptr;
       }
     }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->prev);
-    break;
-  default: break;
+    ptr->prev = 0;
   }
-}
+    
+  xmlNodePtr prev = c_from_js(new_prev);
 
-void node::prop_first_child(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      xmlNodePtr old = ptr->children;
-      while (old) {
-        old->parent = 0;
-        old = old->next;
+  if (!prev)
+    return;
+
+  ptr->prev = prev;
+  if (xmlNodePtr pn = prev->next) {
+    if (pn->parent) {
+      if (pn->type == XML_ATTRIBUTE_NODE) {
+        if (ptr->parent->type == XML_ELEMENT_NODE)
+          ptr->parent->properties = xmlAttrPtr(pn);
+      } else {
+        pn->parent->children = pn;
       }
-      ptr->children = 0;
-      ptr->last = 0;
-      data = object();
-    } else if (xmlNodePtr child = c_from_js(data.get_object())) {
-      xmlNodePtr old = ptr->children;
-      while (old) {
-        old->parent = 0;
-        old = old->next;
-      }
-      ptr->children = child;
-      child->parent = ptr;
-      while (child->next) {
-        child = child->next;
-        child->parent = ptr;
-      }
-      ptr->last = child;
     }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
-    break;
-  default: break;
+    pn->prev = 0;
+  } else if (prev->parent) {
+    if (prev->type != XML_ATTRIBUTE_NODE) {
+      prev->parent->children = 0;
+      prev->parent->last = 0;
+    } else {
+      if (ptr->parent->type == XML_ELEMENT_NODE)
+        prev->parent->properties = 0;
+    }
+  }
+  prev->next = ptr;
+  while (prev) {
+    xmlSetTreeDoc(prev, ptr->doc);
+    prev->parent = ptr->parent;
+    if (!prev->prev && prev->parent)  {
+      if (prev->type == XML_ATTRIBUTE_NODE) {
+        if (prev->parent->type == XML_ELEMENT_NODE)
+          prev->parent->properties = xmlAttrPtr(prev);
+      } else {
+        prev->parent->children = prev;
+      }
+    }
+    prev = prev->prev;
   }
 }
 
-void node::prop_last_child(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
-  data = create(ptr->type != XML_ENTITY_REF_NODE ? ptr->last : 0);
+object node::get_first_child() {
+  return create(ptr->type != XML_ENTITY_REF_NODE ? ptr->children : 0);
 }
 
-void node::prop_first_sibling(property_mode mode, value &data) {
-  if (mode != property_get)
+void node::set_first_child(object first_child) {
+  if (first_child.is_null()) {
+    xmlNodePtr old = ptr->children;
+    while (old) {
+      old->parent = 0;
+      old = old->next;
+    }
+    ptr->children = 0;
+    ptr->last = 0;
+  }
+    
+  xmlNodePtr child = c_from_js(first_child);
+
+  if (!child)
     return;
 
-  if (ptr->parent) {
-    data = create(ptr->parent->children);
-    return;
+  xmlNodePtr old = ptr->children;
+  while (old) {
+    old->parent = 0;
+    old = old->next;
   }
+  ptr->children = child;
+  child->parent = ptr;
+  while (child->next) {
+    child = child->next;
+    child->parent = ptr;
+  }
+  ptr->last = child;
+}
+
+object node::get_last_child() {
+  return create(ptr->type != XML_ENTITY_REF_NODE ? ptr->last : 0);
+}
+
+object node::get_first_sibling() {
+  if (ptr->parent)
+    return create(ptr->parent->children);
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->prev)
     ptr = ptr->prev;
-  data = create(ptr);
+  return create(ptr);
 }
 
-void node::prop_last_sibling(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
-  if (ptr->parent) {
-    data = create(ptr->parent->last);
-    return;
-  }
+object node::get_last_sibling() {
+  if (ptr->parent)
+    return create(ptr->parent->last);
 
   xmlNodePtr ptr = this->ptr;
   while (ptr->next)
     ptr = ptr->next;
-  data = create(ptr);
+  return create(ptr);
 }
 
-void node::prop_document(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
-  data = create(xmlNodePtr(ptr->doc));
+object node::get_document() {
+  return create(xmlNodePtr(ptr->doc));
 }
 
-void node::prop_type(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
+std::string node::get_type() {
   switch (ptr->type) {
-  case XML_ELEMENT_NODE:       data = string("ELEMENT");               break;
-  case XML_ATTRIBUTE_NODE:     data = string("ATTRIBUTE");             break;
-  case XML_TEXT_NODE:          data = string("TEXT");                  break;
-  case XML_CDATA_SECTION_NODE: data = string("CDATA-SECTION");         break;
-  case XML_ENTITY_REF_NODE:    data = string("ENTITY-REFERENCE");      break;
-  case XML_ENTITY_NODE:        data = string("ENTITY");                break;
-  case XML_PI_NODE:            data = string("PI");                    break;
-  case XML_COMMENT_NODE:       data = string("COMMENT");               break;
-  case XML_DOCUMENT_NODE:      data = string("DOCUMENT");              break;
-  case XML_DOCUMENT_TYPE_NODE: data = string("DOCUMENT-TYPE");         break;
-  case XML_DOCUMENT_FRAG_NODE: data = string("DOCUMENT-FRAGMENT");     break;
-  case XML_NOTATION_NODE:      data = string("NOTATION");              break;
-  case XML_HTML_DOCUMENT_NODE: data = string("HTML-DOCUMENT");         break;
-  case XML_DTD_NODE:           data = string("DTD");                   break;
-  case XML_ELEMENT_DECL:       data = string("ELEMENT-DECLARATION");   break;
-  case XML_ATTRIBUTE_DECL:     data = string("ATTRIBUTE-DECLARATION"); break;
-  case XML_ENTITY_DECL:        data = string("ENTITY-DECLARATION");    break;
-  case XML_NAMESPACE_DECL:     data = string("NAMESPACE-DECLARATION"); break;
-  case XML_XINCLUDE_START:     data = string("XINCLUDE-START");        break;
-  case XML_XINCLUDE_END:       data = string("XINCLUDE-END");          break;
-  default:                     data = string("OTHER");                 break;
+  case XML_ELEMENT_NODE:       return "ELEMENT";               break;
+  case XML_ATTRIBUTE_NODE:     return "ATTRIBUTE";             break;
+  case XML_TEXT_NODE:          return "TEXT";                  break;
+  case XML_CDATA_SECTION_NODE: return "CDATA-SECTION";         break;
+  case XML_ENTITY_REF_NODE:    return "ENTITY-REFERENCE";      break;
+  case XML_ENTITY_NODE:        return "ENTITY";                break;
+  case XML_PI_NODE:            return "PI";                    break;
+  case XML_COMMENT_NODE:       return "COMMENT";               break;
+  case XML_DOCUMENT_NODE:      return "DOCUMENT";              break;
+  case XML_DOCUMENT_TYPE_NODE: return "DOCUMENT-TYPE";         break;
+  case XML_DOCUMENT_FRAG_NODE: return "DOCUMENT-FRAGMENT";     break;
+  case XML_NOTATION_NODE:      return "NOTATION";              break;
+  case XML_HTML_DOCUMENT_NODE: return "HTML-DOCUMENT";         break;
+  case XML_DTD_NODE:           return "DTD";                   break;
+  case XML_ELEMENT_DECL:       return "ELEMENT-DECLARATION";   break;
+  case XML_ATTRIBUTE_DECL:     return "ATTRIBUTE-DECLARATION"; break;
+  case XML_ENTITY_DECL:        return "ENTITY-DECLARATION";    break;
+  case XML_NAMESPACE_DECL:     return "NAMESPACE-DECLARATION"; break;
+  case XML_XINCLUDE_START:     return "XINCLUDE-START";        break;
+  case XML_XINCLUDE_END:       return "XINCLUDE-END";          break;
+  default:                     return "OTHER";                 break;
   }
 }
 
-void node::prop_namespace(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (data.is_undefined() || data.is_null()) {
-      ptr->ns->context = 0;
-      ptr->ns = 0;
-      data = object();
-    } else if (data.is_object()) {
-      xmlNsPtr ns = namespace_::c_from_js(data.get_object());
-      if (!ns) {
-        data = value();
-        break;
-      }
-      ptr->ns = ns;
-    } else {
-      data = value();
-    }
-    // !! fall thru !!
-  case property_get:
-    data = namespace_::create(ptr->ns);
-    break;
-  default: break;
-  }
+object node::get_namespace() {
+  if (ptr->type != XML_ELEMENT_NODE && ptr->type != XML_ATTRIBUTE_NODE)
+    return object();
+  return namespace_::create(ptr->ns);
 }
 
-void node::prop_namespaces(property_mode mode, value &data) {
-  if (mode != property_get)
+void node::set_namespace(object new_ns) {
+  if (new_ns.is_null()) {
+    ptr->ns->context = 0;
+    ptr->ns = 0;
     return;
+  }
+
+  xmlNsPtr ns = namespace_::c_from_js(new_ns);
+  if (!ns)
+    return;
+  ptr->ns = ns;
+}
+
+object node::get_namespaces() {
+  if (ptr->type != XML_ELEMENT_NODE && ptr->type != XML_ATTRIBUTE_NODE)
+    return object();
 
   xmlNsPtr *nsList = xmlGetNsList(ptr->doc, ptr);
 
   try {
     object array = create_array();
-    data = array;
 
     if (!nsList)
-      return;
+      return array;
 
     for (xmlNsPtr *p = nsList; *p; ++p) {
       array.call("push", namespace_::create(*p));
     }
+
+    xmlFree(nsList);
+
+    return array;
   } catch (...) {
     if (nsList) xmlFree(nsList);
     throw;
   }
-  if (nsList) xmlFree(nsList);
 }
 
-void node::prop_first_attr(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    if (ptr->type == XML_ELEMENT_NODE) {
-      if (data.is_undefined_or_null()) {
-        ptr->properties = 0;
-      } else if (data.is_object()) {
-        xmlNodePtr attr = c_from_js(data.get_object());
-        if (attr && attr->type == XML_ATTRIBUTE_NODE) {
-          ptr->properties = xmlAttrPtr(attr);
-          attr->parent = ptr;
-        }
-      }
-    }
-    // !! fall thru !!
-  case property_get:
-    data = create(ptr->type == XML_ELEMENT_NODE
+object node::get_first_attribute() {
+  return create(ptr->type == XML_ELEMENT_NODE
                   ? xmlNodePtr(ptr->properties)
                   : 0);
-    break;
-  default: break;
+}
+
+void node::set_first_attribute(object attribute) {
+  if (ptr->type != XML_ELEMENT_NODE)
+    return;
+
+  if (attribute.is_null()) {
+    ptr->properties = 0;
+  } else {
+    xmlNodePtr attr = c_from_js(attribute);
+    if (attr && attr->type == XML_ATTRIBUTE_NODE) {
+      ptr->properties = xmlAttrPtr(attr);
+      attr->parent = ptr;
+    }
   }
 }
 

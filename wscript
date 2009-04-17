@@ -75,13 +75,6 @@ def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
 
-    print '%s : ' % 'Creating implementation link'.ljust(conf.line_just),
-    sys.stdout.flush()
-    try: os.unlink('include/flusspferd/implementation')
-    except OSError: pass
-    os.symlink('spidermonkey', 'include/flusspferd/implementation')
-    Utils.pprint('GREEN', 'ok')
-
     if darwin:
         u('CXXDEFINES', 'APPLE')
         # Is there a better way of doing this?
@@ -102,6 +95,8 @@ def configure(conf):
     conf.check_tool('boost')
     if darwin:
         conf.check_tool('osx')
+
+    u('CXXDEFINES', 'BOOST_ALL_NO_LIB')
 
     conf.env['CXXFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
     conf.env['LINKFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
@@ -125,17 +120,25 @@ def configure(conf):
                                     'include')]
         lib_path = [os.path.join(Options.options.spidermonkey_path, 'lib')]
 
-    ret = conf.check_cxx(lib = 'js', uselib_store='JS', libpath=lib_path)
+    js_name = 'js'
+    if sys.platform == "win32":
+        js_name = 'js32'
+        js_platform = 'XP_WIN'
+    else:
+        js_platform = 'XP_UNIX'
+
+    ret = conf.check_cxx(lib = js_name, uselib_store='JS', libpath=lib_path)
     if ret == False:
         conf.env['LIB_JS'] = []
         conf.check_cxx(lib = 'mozjs', uselib_store='JS', mandatory=1,
                        libpath=lib_path)
     js_h_defines = []
+
     if not conf.check_cxx(header_name = 'js/js-config.h', includes=include_path,
-                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8']):
+                          defines=[js_platform, 'JS_C_STRINGS_ARE_UTF8']):
         ret = conf.check_cxx(uselib='JS',
                           includes=include_path, execute=1,
-                          defines=['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8',
+                          defines=[js_platform, 'JS_C_STRINGS_ARE_UTF8',
                                    'JS_THREADSAFE'],
                           msg='Checking if SM needs JS_THREADSAFE',
                           fragment='''
@@ -150,7 +153,7 @@ def configure(conf):
 
     conf.check_cxx(header_name = 'js/jsapi.h', mandatory = 1,
                    uselib_store='JS_H',
-                   defines=js_h_defines + ['XP_UNIX', 'JS_C_STRINGS_ARE_UTF8'],
+                   defines=js_h_defines + [js_platform, 'JS_C_STRINGS_ARE_UTF8'],
                    includes=include_path)
     conf.check_cxx(uselib=['JS_H', 'JS'],
                    mandatory = 1, execute=1,
@@ -251,10 +254,8 @@ int main() {
         u('CXXDEFINES', 'FLUSSPFERD_HAVE_IO')
 
     if not Options.options.disable_curl:
-      if (conf.check_cxx(lib = 'curl', 
-                        uselib_store='CURL') != None and 
-         conf.check_cxx(header_name = 'curl/curl.h',
-                        uselib_store='CURL') != None):
+      if (conf.check_cxx(lib = 'curl', uselib_store='CURL') and
+          conf.check_cxx(header_name = 'curl/curl.h', uselib_store='CURL')):
         conf.env['ENABLE_CURL'] = True
 
     if conf.find_program('emacs', var='EMACS'):
@@ -302,7 +303,8 @@ def build(bld):
     if bld.env['ENABLE_SQLITE']:
         bld.add_subdirs('plugins/sqlite3')
     bld.add_subdirs('plugins/environment')
-    bld.add_subdirs('plugins/posix')
+    if sys.platform != 'win32':
+        bld.add_subdirs('plugins/posix')
     if bld.env['ENABLE_CURL']:
         bld.add_subdirs('plugins/curl')
 
@@ -333,6 +335,8 @@ def build(bld):
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
                    (bld.env['shlib_PATTERN'] % 'IO'),
                    '../../' + (bld.env['shlib_PATTERN'] % 'flusspferd-io'))
+
+    bld.install_files('${PREFIX}/share/man/man1/', 'help/flusspferd.1')
 
     etc = bld.new_task_gen('subst')
     etc.source = 'jsrepl.js.in'

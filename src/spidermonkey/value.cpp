@@ -25,12 +25,15 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/implementation/init.hpp"
-#include "flusspferd/implementation/object.hpp"
-#include "flusspferd/implementation/string.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/object.hpp"
+#include "flusspferd/spidermonkey/string.hpp"
 #include <js/jsapi.h>
 #include <cassert>
 #include <cmath>
+#ifdef WIN32
+#include <float.h>
+#endif
 
 using namespace flusspferd;
 
@@ -95,6 +98,10 @@ string value::to_string() const {
   return string(*this);
 }
 
+std::string value::to_std_string() const {
+  return string(*this).to_string();
+}
+
 double value::to_number() const {
   double value;
   if (!JS_ValueToNumber(Impl::current_context(), get(), &value))
@@ -104,10 +111,15 @@ double value::to_number() const {
 
 double value::to_integral_number(int bits, bool signedness) const {
   long double value = to_number();
+#ifdef WIN32
+  if (!_finite(value))
+    return 0;
+#else
   if (!std::isfinite(value))
     return 0;
+#endif
   long double maxU = powl(2, bits);
-  value = truncl(value);
+  value = value < 0 ? ceill(value) : floorl(value);
   value = fmodl(value, maxU);
   if (value < 0)
     value += maxU;

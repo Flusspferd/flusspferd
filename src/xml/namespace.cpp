@@ -86,12 +86,13 @@ namespace_::namespace_(object const &obj, call_context &x)
   }
 
   xmlChar const *prefix_p = 0;
-  if (!prefix_v.is_undefined() && !prefix_v.is_null())
+  if (!prefix_v.is_undefined() && !prefix_v.is_null()) {
     if (prefix_v.is_string())
       prefix_p = (xmlChar const *) prefix_v.get_string().c_str();
     else
       throw exception("Could not create XML namespace: "
                       "prefix has to be a string");
+  }
 
   ptr = xmlNewNs(node_p, href_p, prefix_p);
 
@@ -114,14 +115,24 @@ object namespace_::class_info::create_prototype() {
 
   create_native_method(proto, "toString", &namespace_::to_string);
 
+  proto.define_property(
+    "href",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &namespace_::get_href),
+      create_native_method(object(), "", &namespace_::set_href)));
+
+  proto.define_property(
+    "prefix",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &namespace_::get_prefix),
+      create_native_method(object(), "", &namespace_::set_prefix)));
+
   return proto;
 }
 
 void namespace_::init() {
-  unsigned const RW = permanent_shared_property;
-
-  define_native_property("href", RW, &namespace_::prop_href);
-  define_native_property("prefix", RW, &namespace_::prop_prefix);
 }
 
 void namespace_::trace(tracer &trc) {
@@ -147,42 +158,36 @@ string namespace_::to_string() {
   return string(text);
 }
 
-void namespace_::prop_href(property_mode mode, value &data) {
-  switch (mode) {
-  case property_get:
-    if (ptr->href)
-      data = string((char const *) ptr->href);
-    else
-      data = value();
-    break;
-  case property_set:
-    if (ptr->href)
-      xmlFree((xmlChar *) ptr->href);
-    if (data.is_undefined() || data.is_null())
-      ptr->href = 0;
-    else
-      ptr->href = xmlStrdup((xmlChar const *) data.to_string().c_str());
-    break;
-  default: break;
-  }
+boost::optional<std::string> namespace_::get_href() {
+  if (ptr->href)
+    return std::string((char const *) ptr->href);
+  else
+    return boost::none;
 }
 
-void namespace_::prop_prefix(property_mode mode, value &data) {
-  switch (mode) {
-  case property_get:
-    if (ptr->prefix)
-      data = string((char const *) ptr->prefix);
-    else
-      data = value();
-    break;
-  case property_set:
-    if (ptr->prefix)
-      xmlFree((xmlChar *) ptr->prefix);
-    if (data.is_undefined() || data.is_null())
-      ptr->prefix = 0;
-    else
-      ptr->prefix = xmlStrdup((xmlChar const *) data.to_string().c_str());
-    break;
-  default: break;
-  }
+void namespace_::set_href(boost::optional<std::string> const &x) {
+  if (ptr->href)
+    xmlFree((xmlChar *) ptr->href);
+ 
+  if (!x)
+    ptr->href = 0;
+  else
+    ptr->href = xmlStrdup((xmlChar const *) x->c_str());
+}
+
+boost::optional<std::string> namespace_::get_prefix() {
+  if (ptr->href)
+    return std::string((char const *) ptr->prefix);
+  else
+    return boost::none;
+}
+
+void namespace_::set_prefix(boost::optional<std::string> const &x) {
+  if (ptr->prefix)
+    xmlFree((xmlChar *) ptr->prefix);
+ 
+  if (!x)
+    ptr->prefix = 0;
+  else
+    ptr->prefix = xmlStrdup((xmlChar const *) x->c_str());
 }

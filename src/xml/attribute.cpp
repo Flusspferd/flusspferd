@@ -88,9 +88,6 @@ attribute_::~attribute_()
 {}
 
 void attribute_::init() {
-  define_native_property("content",
-      permanent_shared_property,
-      &attribute_::prop_content);
 }
 
 object attribute_::class_info::create_prototype() {
@@ -99,6 +96,13 @@ object attribute_::class_info::create_prototype() {
   object proto = create_object(flusspferd::prototype<node>());
 
   create_native_method(proto, "addContent", &attribute_::add_content);
+
+  proto.define_property(
+    "content",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "", &attribute_::get_content),
+      create_native_method(object(), "", &attribute_::set_content)));
 
   return proto;
 }
@@ -117,22 +121,27 @@ void attribute_::add_content(string const &content) {
   call("addChild", txt);
 }
 
-void attribute_::prop_content(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-    xmlNodeSetContent(node::c_obj(), 0);
-    if (!data.is_undefined_or_null())
-      add_content(data.to_string());
-    // !! fall thru !!
-  case property_get: {
-    xmlChar *content = xmlNodeGetContent(node::c_obj());
-    if (!content) {
-      data = value();
-    } else {
-      data = string((char const *) content);
-      xmlFree(content);
-    }
-    break; }
-  default: break;
+void attribute_::set_content(value const &data) {
+  local_root_scope scope;
+
+  xmlNodeSetContent(node::c_obj(), 0);
+  if (!data.is_undefined_or_null())
+    add_content(data.to_string());
+}
+
+value attribute_::get_content() {
+  xmlChar *content = xmlNodeGetContent(node::c_obj());
+
+  if (!content) {
+    return value();
+  }
+
+  try {
+    value result = string((char const *) content);
+    xmlFree(content);
+    return result;
+  } catch (...) {
+    xmlFree(content);
+    throw;
   }
 }

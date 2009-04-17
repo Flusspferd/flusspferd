@@ -35,6 +35,11 @@ THE SOFTWARE.
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#ifdef WIN32
+#include <io.h>
+
+#define creat _creat
+#endif
 
 using namespace flusspferd;
 using namespace flusspferd::io;

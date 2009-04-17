@@ -70,14 +70,12 @@ void load_class(
   prototype.define_property(
     "constructor",
     constructor,
-    object::permanent_property |
-    object::read_only_property |
-    object::dont_enumerate);
+    permanent_property | read_only_property | dont_enumerate);
 
   constructor.define_property(
     "prototype",
     prototype,
-    object::dont_enumerate);
+    dont_enumerate);
 
   T::class_info::augment_constructor(constructor);
 }
@@ -116,7 +114,7 @@ struct class_info {
   typedef boost::mpl::bool_<true> constructible;
 
   /**
-   * Whether the class overrides the standard enumerate hooks.
+   * Whether the class overrides the standarddont_enumerate hooks.
    *
    * Should be enabled when the class overrides
    * native_object_base::enumerate_start and native_object_base::enumerate_next.
@@ -188,7 +186,7 @@ object load_class(
     detail::load_class<T>(ctx, constructor);
   }
 
-  container.define_property(name, constructor, object::dont_enumerate);
+  container.define_property(name, constructor, dont_enumerate);
 
   return constructor;
 }
@@ -223,7 +221,7 @@ object load_class(
     detail::load_class<T>(ctx, constructor);
   }
 
-  container.define_property(name, constructor, object::dont_enumerate);
+  container.define_property(name, constructor, dont_enumerate);
 
   return constructor;
 }

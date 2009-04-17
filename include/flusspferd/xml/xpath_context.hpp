@@ -47,7 +47,8 @@ private: // JS methods
   void self_call(call_context &);
 
 private: // JS properties
-  void prop_current(property_mode, value &);
+  object get_current();
+  void set_current(object);
 
 private:
   xmlXPathContextPtr xpath_ctx;

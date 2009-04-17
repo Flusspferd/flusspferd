@@ -25,7 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_STRING_HPP
 
 #include "convert.hpp"
-#include "implementation/string.hpp"
+#include "spidermonkey/string.hpp"
 #include <string>
 
 namespace flusspferd {

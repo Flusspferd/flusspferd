@@ -30,9 +30,9 @@ THE SOFTWARE.
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/native_object_base.hpp"
-#include "flusspferd/implementation/init.hpp"
-#include "flusspferd/implementation/value.hpp"
-#include "flusspferd/implementation/object.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
+#include "flusspferd/spidermonkey/object.hpp"
 #include <cassert>
 #include <js/jsapi.h>
 
@@ -229,14 +229,17 @@ property_iterator object::end() const {
 }
 
 void object::define_property(
-  string const &name, value const &init_value, 
+  string const &name,
+  value const &init_value, 
   property_attributes const attrs)
 {
   if (is_null())
     throw exception("Could not define property (object is null)");
 
+  root_string name_r(name);
+
   unsigned flags = attrs.flags;
-  value v;
+  root_value v;
   v = init_value;
 
   function getter;
@@ -257,31 +260,14 @@ void object::define_property(
   if (getter_o) sm_flags |= JSPROP_GETTER;
   if (setter_o) sm_flags |= JSPROP_SETTER;
 
-  if(!JS_DefineUCProperty(Impl::current_context(), get_const(),
-                          name.data(), name.length(),
-                          Impl::get_jsval(v),
-                          *(JSPropertyOp*) &getter_o,
-                          *(JSPropertyOp*) &setter_o,
-                          sm_flags))
+  if (!JS_DefineUCProperty(Impl::current_context(),
+                           get_const(),
+                           name.data(), name.length(),
+                           Impl::get_jsval(v),
+                           *(JSPropertyOp*) &getter_o,
+                           *(JSPropertyOp*) &setter_o,
+                           sm_flags))
     throw exception("Could not define property");
-}
-
-void object::define_property(
-  std::string const &name_, value const &init_value,
-  property_attributes attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  define_property(name, init_value, attrs);
-}
-
-void object::define_property(
-  char const *name_, value const &init_value,
-  property_attributes const attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  define_property(name, init_value,attrs);
 }
 
 bool object::is_null() const {
@@ -352,32 +338,18 @@ bool object::is_array() const {
 }
 
 bool object::get_property_attributes(
-    char const *name_, property_attributes &attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  return get_property_attributes(name, attrs);
-}
-
-bool object::get_property_attributes(
-    std::string name_, property_attributes &attrs)
-{
-  local_root_scope scope;
-  string name(name_);
-  return get_property_attributes(name, attrs);
-}
-
-bool object::get_property_attributes(
     string const &name, property_attributes &attrs)
 {
   if (is_null())
     throw exception("Could not get property attributes (object is null)");
 
+  flusspferd::root_string name_r(name);
+
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;
 
-  attrs.flags = 0;
+  attrs.flags = no_property_flag;
   attrs.getter = boost::none;
   attrs.setter = boost::none;
   JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
@@ -391,10 +363,14 @@ bool object::get_property_attributes(
   if (!found)
     return false;
 
-  if (~sm_flags & JSPROP_ENUMERATE) attrs.flags |= dont_enumerate;
-  if (sm_flags & JSPROP_PERMANENT) attrs.flags |= permanent_property;
-  if (sm_flags & JSPROP_READONLY) attrs.flags |= read_only_property;
-  if (sm_flags & JSPROP_SHARED) attrs.flags |= shared_property;
+  if (~sm_flags & JSPROP_ENUMERATE)
+    attrs.flags = attrs.flags | dont_enumerate;
+  if (sm_flags & JSPROP_PERMANENT)
+    attrs.flags = attrs.flags | permanent_property;
+  if (sm_flags & JSPROP_READONLY)
+    attrs.flags = attrs.flags | read_only_property;
+  if (sm_flags & JSPROP_SHARED)
+    attrs.flags = attrs.flags | shared_property;
 
   if (getter_op) {
     if (sm_flags & JSPROP_GETTER) {

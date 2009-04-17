@@ -33,8 +33,11 @@ THE SOFTWARE.
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <errno.h>
+#ifdef WIN32
+#include <windows.h>
+#else
 #include <dlfcn.h>
+#endif
 
 #define DIRSEP1 "/"
 #define DIRSEP2 ""
@@ -52,13 +55,13 @@ void import(call_context &);
 
 void load_import_function(object container) {
   function imp = create_native_function(container, "Import", &import, 2);
-  container.define_property("import", imp, object::dont_enumerate);
+  container.define_property("import", imp, dont_enumerate);
 
-  imp.define_property("preload", create_object(), object::permanent_property);
-  imp.define_property("paths", create_array(), object::permanent_property);
-  imp.define_property("alias", create_object(), object::permanent_property);
+  imp.define_property("preload", create_object(), permanent_property);
+  imp.define_property("paths", create_array(), permanent_property);
+  imp.define_property("alias", create_object(), permanent_property);
   imp.define_property("module_cache", create_object(),
-                      object::permanent_property);
+                      permanent_property);
 }
 
 }
@@ -171,6 +174,18 @@ void flusspferd::import(call_context &x) {
       continue;
 
     if (boost::filesystem::exists(fullpath)) {
+#ifdef WIN32
+      HMODULE module = LoadLibrary(fullpath.c_str());
+
+      if (!module)
+        throw exception(("Unable to load library '" + fullpath + "'").c_str());
+
+      FARPROC symbol = GetProcAddress(module, "flusspferd_load");
+
+      if (!symbol)
+        throw exception(("Unable to load library '" + fullpath + "': symbol "
+                        "not found").c_str());
+#else
       // Load the .so
       void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
       if (!module) {
@@ -188,6 +203,7 @@ void flusspferd::import(call_context &x) {
            << "': " << dlerror();
         throw exception(ss.str().c_str());
       }
+#endif
 
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 

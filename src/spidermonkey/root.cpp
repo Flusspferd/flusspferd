@@ -29,9 +29,9 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/function.hpp"
 #include "flusspferd/array.hpp"
-#include "flusspferd/implementation/init.hpp"
-#include "flusspferd/implementation/context.hpp"
-#include "flusspferd/implementation/value.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
 #include <js/jsapi.h>
 
 namespace flusspferd { namespace detail {

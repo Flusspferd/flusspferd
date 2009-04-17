@@ -77,9 +77,6 @@ void blob::class_info::augment_constructor(object &ctor) {
 }
 
 void blob::init() {
-  unsigned const RW = permanent_shared_property;
-
-  define_native_property("length", RW, &blob::prop_length);
 }
 
 blob::~blob() {}
@@ -95,6 +92,14 @@ object blob::class_info::create_prototype() {
   create_native_method(proto, "asUtf16", &blob::as_utf16);
   create_native_method(proto, "get", &blob::get_index);
   create_native_method(proto, "set", &blob::set_index);
+
+  proto.define_property(
+    "length",
+    property_attributes(
+      permanent_shared_property,
+      create_native_method(object(), "$get_length", &blob::get_length),
+      create_native_method(object(), "$set_length", &blob::set_length)
+    ));
 
   static const char* js_iterator ="function() { return Range(0, this.length) }";
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
@@ -127,24 +132,17 @@ object blob::class_info::create_prototype() {
   return proto;
 }
 
-void blob::prop_length(property_mode mode, value &data) {
-  switch (mode) {
-  case property_set:
-  {
-    if (!data.is_int())
-      throw exception("Blob.length out of range", "RangeError");
-    int new_len = data.get_int();
-    if (new_len < 0)
-      new_len = 0;
-    data_.resize(new_len);
-    data = new_len;
-    break;
-  }
-  case property_get:
-    data = (int)data_.size();
-    break;
-  default: break;
-  }
+void blob::set_length(value data) {
+  if (!data.is_int())
+    throw exception("Blob.length out of range", "RangeError");
+  int new_len = data.get_int();
+  if (new_len < 0)
+    new_len = 0;
+  data_.resize(new_len);
+}
+
+int blob::get_length() {
+  return data_.size();
 }
 
 // TODO: Could really do with an enumerate to go with this

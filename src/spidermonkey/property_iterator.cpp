@@ -25,8 +25,8 @@ THE SOFTWARE.
 #include "flusspferd/root.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/implementation/init.hpp"
-#include "flusspferd/implementation/object.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/object.hpp"
 #include <boost/optional.hpp>
 #include <boost/utility/in_place_factory.hpp>
 #include <js/jsapi.h>

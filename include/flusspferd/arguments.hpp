@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ARGUMENTS_HPP
 #define FLUSSPFERD_ARGUMENTS_HPP
 
-#include "implementation/arguments.hpp"
+#include "spidermonkey/arguments.hpp"
 #include "root.hpp"
 #include "value.hpp"
 #include <boost/shared_ptr.hpp>

@@ -23,9 +23,9 @@ THE SOFTWARE.
 
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/implementation/init.hpp"
-#include "flusspferd/implementation/value.hpp"
-#include "flusspferd/implementation/context.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/value.hpp"
+#include "flusspferd/spidermonkey/context.hpp"
 #include <js/jsapi.h>
 #include <cstring>
 

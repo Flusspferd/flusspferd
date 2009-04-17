@@ -64,8 +64,10 @@ private: // JS methods
   string to_string();
 
 private: // JS properties
-  void prop_href(property_mode mode, value &data);
-  void prop_prefix(property_mode mode, value &data);
+  boost::optional<std::string> get_href();
+  void set_href(boost::optional<std::string> const &x);
+  boost::optional<std::string> get_prefix();
+  void set_prefix(boost::optional<std::string> const &x);
 
 private:
   xmlNsPtr ptr;

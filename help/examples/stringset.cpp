@@ -32,7 +32,7 @@ public:
         for (flusspferd::arguments::iterator it = x.arg.begin();
                 it != x.arg.end();
                 ++it) {
-            data.insert(flusspferd::string(*it).to_string());
+            data.insert((*it).to_std_string());
         }
     }
 

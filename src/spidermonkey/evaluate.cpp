@@ -23,7 +23,9 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/init.hpp"
-#include "flusspferd/implementation/init.hpp"
+#include "flusspferd/spidermonkey/init.hpp"
+
+#include <cstring>
 
 using namespace flusspferd;
 

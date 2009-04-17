@@ -31,7 +31,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 push_parser::push_parser(object const &obj, call_context &x)
-  : native_object_base(obj), parser(0), doc(0)
+  : native_object_base(obj), parser(0)
 {
   local_root_scope scope;
 
@@ -55,17 +55,11 @@ push_parser::push_parser(object const &obj, call_context &x)
 
   if (xmlCtxtUseOptions(parser, flags) != 0)
     throw exception("Could not initialise parser options");
-
-  define_native_property(
-    "document",
-    read_only_property | permanent_shared_property,
-    &push_parser::prop_document);
 }
 
 push_parser::~push_parser() {
   if (parser) {
-    if (parser->myDoc != doc)
-      xmlFreeDoc(parser->myDoc);
+    xmlFreeDoc(parser->myDoc);
     xmlFreeParserCtxt(parser);
   }
 }
@@ -77,18 +71,6 @@ object push_parser::class_info::create_prototype() {
   create_native_method(proto, "terminate", &push_parser::terminate);
 
   return proto;
-}
-
-void push_parser::trace(tracer &trc) {
-  if (doc)
-    trc("parser-doc", *static_cast<object*>(doc->_private));
-}
-
-void push_parser::prop_document(property_mode mode, value &data) {
-  if (mode != property_get)
-    return;
-
-  data = node::create(xmlNodePtr(doc));
 }
 
 void push_parser::push(blob &b, bool t) {
@@ -104,7 +86,10 @@ void push_parser::push(blob &b, bool t) {
     terminate2();
 }
 
-object push_parser::terminate() {
+value push_parser::terminate() {
+  if (!parser)
+    throw exception("Could not terminate empty parser");
+
   int status = xmlParseChunk(parser, 0, 0, true);
 
   if (status != XML_ERR_OK)
@@ -112,13 +97,16 @@ object push_parser::terminate() {
 
   terminate2();
 
-  return node::create(xmlNodePtr(doc));
+  return get_property("document");
 }
 
 void push_parser::terminate2() {
-  doc = parser->myDoc;
-  node::create(xmlNodePtr(doc));
+  define_property(
+    "document",
+    node::create(xmlNodePtr(parser->myDoc)),
+    read_only_property | permanent_property);
 
+  parser->myDoc = 0;
   xmlFreeParserCtxt(parser);
   parser = 0;
 }
