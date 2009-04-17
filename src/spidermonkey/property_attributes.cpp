@@ -22,7 +22,7 @@ THE SOFTWARE.
 */
 #include "flusspferd/property_attributes.hpp"
 
-using flusspferd::property_attributes;
+using namespace flusspferd;
 
 property_attributes::property_attributes()
   : flags(no_property_flag),
