@@ -132,7 +132,7 @@
      :active (flusspferd-helper-mark-active)]
     ["Evaluate Buffer" flusspferd-eval-buffer t]
     ["Evaluate Line" flusspferd-eval-line t :active (not (and (eolp) (bolp)))]
-    ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
+;    ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
     "--"
     ["Go to Flusspferd buffer" flusspferd-switch-to
      :visible (flusspferd-is-running-p)
