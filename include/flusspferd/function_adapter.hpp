@@ -338,8 +338,7 @@ public:
     function_adapter_implementation.action(function, x);
   }
 
-  static std::size_t const arity =
-    adapter_type::arity;
+  static std::size_t const arity = adapter_type::arity;
 
 private:
   function_type function;
@@ -365,8 +364,7 @@ public:
     function_adapter_implementation_memfn.action(funptr, x);
   }
 
-  static std::size_t const arity =
-    adapter_type::arity;
+  static std::size_t const arity = adapter_type::arity;
 
 private:
   R T::*funptr;
