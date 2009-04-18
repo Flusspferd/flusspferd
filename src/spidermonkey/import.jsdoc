@@ -16,7 +16,7 @@
  *
  * @class
  *
- * Import is not really a class, thats just the only way I could get JsDoc to
+ * Import is not really a class, that's just the only way I could get JsDoc to
  * document properties on the function.
  *
  * Please note, that all the properties listed below are properties of the

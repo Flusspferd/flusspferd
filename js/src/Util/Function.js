@@ -21,6 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/**
+ * Bind a function to an object.
+ *
+ * @param {Object} obj The object to bind "this" to.
+ *
+ * @example
+ * function myfunc() { ... }
+ * bound = myfunc.bind(myobj)
+ * bound() // calls myfunc with myobj as "this"
+ */
 Function.prototype.bind = function bind(obj) {
   var fun = this;
   return function bound_func() {
@@ -29,12 +39,18 @@ Function.prototype.bind = function bind(obj) {
 };
 Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 
-Object.defineProperty(Function, 'bind', 
-  { enumerable: false, 
-    value: function bind(obj, name) {
-      var fun = obj[name];
-      if (!fun || !(fun instanceof Function))
-        throw new Error("Object has no function '" + name + "'");
-      return fun.bind(obj);
-    }
-  });
+/**
+ * Bind an object method to its object so that it can be called without the
+ * object.
+ *
+ * @param {Object} obj   The object that contains the method and also the object
+ *                       to bind the method to.
+ * @param {string} name  The method name.
+ */
+Object.bind = function bind(obj, name) {
+  var fun = obj[name];
+  if (!fun || !(fun instanceof Function))
+    throw new Error("Object has no function '" + name + "'");
+  return fun.bind(obj);
+}
+Object.defineProperty(Function, 'bind', { enumerable: false, });

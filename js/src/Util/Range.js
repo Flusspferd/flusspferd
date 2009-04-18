@@ -21,6 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/**
+ * Create an iterable object returning all objects in a range, starting
+ * at "from", up to (not including) "to", incrementing by "by" in each step.
+ *
+ * @param {number} from The start of the range.
+ * @param {number} to The (non-inclusive) end of the range.
+ * @param {number} by The increment.
+ *
+ * @class
+ */
 function Range(from,to, by) {
   var i = from;
   by = by || 1;
