@@ -13,7 +13,7 @@
  */
 
 /**
- * Access the wrappeb Blob object.
+ * Access the wrapped Blob object.
  * @name getBlob
  * @type Blob
  * @methodOf IO.BlobStream#
