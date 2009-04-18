@@ -90,7 +90,6 @@ def configure(conf):
         append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DDEBUG')
 
     conf.check_tool('compiler_cxx')
-    conf.check_tool('compiler_cc')
     conf.check_tool('misc')
     conf.check_tool('boost')
     if darwin:
