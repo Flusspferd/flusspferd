@@ -43,7 +43,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/function_adapter.hpp"
 #include "flusspferd/function.hpp"
-#include "flusspferd/importer.hpp"
+#include "flusspferd/modules.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/native_function_base.hpp"

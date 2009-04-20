@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/importer.hpp"
+#include "flusspferd/modules.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"
@@ -53,9 +53,9 @@ namespace flusspferd {
 
 void import(call_context &);
 
-void load_import_function(object container) {
-  function imp = create_native_function(container, "Import", &import, 2);
-  container.define_property("import", imp, dont_enumerate);
+void load_require_function(object container) {
+  function imp = create_native_function(container, "require", &import, 2);
+  container.define_property("Import", imp, dont_enumerate);
 
   imp.define_property("preload", create_object(), permanent_property);
   imp.define_property("paths", create_array(), permanent_property);
