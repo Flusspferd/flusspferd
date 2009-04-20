@@ -51,9 +51,9 @@ THE SOFTWARE.
   Import('cURL', true); 
 
   try {
-    // If we have HTTP.Headers, define a default header callback that
+    // If we have HTTP/Headers, define a default header callback that
     // creates 
-    Import('HTTP.Headers');
+    Import('HTTP/Headers');
 
     /** 
      * Array of protocols by the linked version of libcurl.

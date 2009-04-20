@@ -21,6 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Import('Util.Array');
-Import('Util.Function');
-Import('Util.Range');
+Import('Util/Array');
+Import('Util/Function');
+Import('Util/Range');

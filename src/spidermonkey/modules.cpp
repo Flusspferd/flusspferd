@@ -39,8 +39,8 @@ THE SOFTWARE.
 #include <dlfcn.h>
 #endif
 
-#define DIRSEP1 "/"
-#define DIRSEP2 ""
+#define DIRSEP1 '/'
+#define DIRSEP2 '\0'
 #define SHLIBPREFIX "lib"
 
 #ifdef APPLE
@@ -74,14 +74,15 @@ namespace {
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
 std::string process_name(std::string const &name, bool for_script) {
   std::string p = name;
-  if (p.find(DIRSEP1, 0) != std::string::npos &&
-      p.find(DIRSEP2, 0) != std::string::npos) {
+  if ((DIRSEP1 == '/' || p.find(DIRSEP1) != std::string::npos) &&
+      (DIRSEP2 == '/' || p.find(DIRSEP2) != std::string::npos))
+  {
     throw exception("Path seperator not allowed in module name");
   }
 
   std::size_t pos = 0;
-  while ( (pos = p.find('.', pos)) != std::string::npos) {
-    p.replace(pos, 1, DIRSEP1);
+  while ( (pos = p.find('/', pos)) != std::string::npos) {
+    p.replace(pos, 1, 1, DIRSEP1);
     pos++;
   }
 
