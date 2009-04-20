@@ -31,7 +31,7 @@ THE SOFTWARE.
  *
  * == Example: ==
  * {{{
- * Import('cURL')
+ * require('cURL')
  * c = new cURL();
  * c.url = 'http://www.google.com';
  * var status = c.perform();
@@ -48,12 +48,12 @@ THE SOFTWARE.
  */
 (function() {
   // Load binary module
-  Import('cURL', true); 
+  require('cURL', true); 
 
   try {
     // If we have HTTP/Headers, define a default header callback that
     // creates 
-    Import('HTTP/Headers');
+    require('HTTP/Headers');
 
     /** 
      * Array of protocols by the linked version of libcurl.

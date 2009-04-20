@@ -21,16 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Required Imports
+// Required requires
 // ================
 
-Import('Util');
+require('Util');
 
-// Optional Imports
+// Optional requires
 // ================
 
 try {
-  Import('IO');
+  require('IO');
 
   print = Function.bind(IO.stdout, 'print');
   readLine = Function.bind(IO.stdin, 'readLine');
@@ -39,7 +39,7 @@ try {
 }
 
 try {
-  Import('XML');
+  require('XML');
 } catch (e) {
   // TODO: do something?
 }

@@ -30,9 +30,9 @@ THE SOFTWARE.
 namespace flusspferd { 
 
 /**
- * Load the 'Import()' function into @p container.
+ * Load the 'require()' function into @p container.
  *
- * Creates a new instance of the Import function.
+ * Creates a new instance of the require function.
  *
  * @param container The object to load the function into.
  *

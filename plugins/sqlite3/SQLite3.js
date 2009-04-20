@@ -23,7 +23,7 @@ THE SOFTWARE.
 */
 
 (function() {
-  Import('SQLite3', true);
+  require('SQLite3', true);
 
   var SQLite3 = $importer.context.SQLite3;
 
@@ -59,7 +59,7 @@ THE SOFTWARE.
  *
  * ==Example:==
  * {{{
- * Import('SQLite3');
+ * require('SQLite3');
  * var db = new SQLite3('./my_db.sqlite');
  * var c = db.cursor('SELECT * FROM table_1 WHERE id IN (?,?)');
  * c.bind([4,6]);

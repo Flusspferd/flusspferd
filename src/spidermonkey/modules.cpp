@@ -55,7 +55,6 @@ void import(call_context &);
 
 void load_require_function(object container) {
   function imp = create_native_function(container, "require", &import, 2);
-  container.define_property("Import", imp, dont_enumerate);
 
   imp.define_property("preload", create_object(), permanent_property);
   imp.define_property("paths", create_array(), permanent_property);

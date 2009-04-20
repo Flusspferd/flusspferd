@@ -97,7 +97,7 @@ Same.
  * don't use @c prelude.js, you can do the following:
  *
  * @verbatim
-Import("IO");
+require("IO");
 IO.stdout.print("Works!");
 @endverbatim
  *
