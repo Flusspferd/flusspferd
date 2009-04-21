@@ -47,9 +47,6 @@ THE SOFTWARE.
  * Link to [[Blob]]
  */
 (function() {
-  // Load binary module
-  require('cURL', true); 
-
   try {
     // If we have HTTP/Headers, define a default header callback that
     // creates 

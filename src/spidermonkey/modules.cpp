@@ -54,7 +54,7 @@ namespace flusspferd {
 void import(call_context &);
 
 void load_require_function(object container) {
-  function imp = create_native_function(container, "require", &import, 2);
+  function imp = create_native_function(container, "require", &import, 1);
 
   imp.define_property("preload", create_object(), permanent_property);
   imp.define_property("paths", create_array(), permanent_property);
@@ -108,7 +108,6 @@ void flusspferd::import(call_context &x) {
   security &sec = security::get();
 
   std::string name = flusspferd::string(x.arg[0]).to_string();
-  bool binary_only = x.arg[1].to_boolean();
 
   value alias_v = x.function.get_property("alias");
   
@@ -122,7 +121,7 @@ void flusspferd::import(call_context &x) {
   if (module_cache.is_null())
     throw exception("No valid module cache");
  
-  std::string key = name + (binary_only ? ";binary-only" : "");
+  std::string key = name;
   if (module_cache.has_own_property(key)) {
     x.result = module_cache.get_property(key);
     return;
@@ -153,27 +152,17 @@ void flusspferd::import(call_context &x) {
     throw exception("Unable to get search paths or it is not an object");
 
   array paths = paths_v.get_object();
-
   size_t len = paths.length();
-  for (size_t i=0; i < len; i++) {
-    std::string path = paths.get_element(i).to_string().to_string();
-    std::string fullpath = path + js_name;
 
-    if (!binary_only)
-      if (sec.check_path(fullpath, security::READ))
-        if (boost::filesystem::exists(fullpath)) {
-          value val = flusspferd::execute(fullpath.c_str(), ctx);
-          module_cache.set_property(key, val);
-          x.result = val;
-          return;
-        }
+  bool found = false;
 
-    fullpath = path + so_name;
+  for (size_t i = 0; i < len; i++) {
+    std::string path = paths.get_element(i).to_std_string();
+    std::string fullpath = path + so_name;
 
-    if (!sec.check_path(fullpath, security::READ))
-      continue;
-
-    if (boost::filesystem::exists(fullpath)) {
+    if (sec.check_path(fullpath, security::READ) &&
+        boost::filesystem::exists(fullpath))
+    {
 #ifdef WIN32
       HMODULE module = LoadLibrary(fullpath.c_str());
 
@@ -210,15 +199,34 @@ void flusspferd::import(call_context &x) {
       value val = func(ctx);
       module_cache.set_property(key, val);
       x.result = val;
-      return;
-    }
-  } 
 
-  std::stringstream ss;
-  ss << "Unable to find library '";
-  ss << name.c_str();
-  ss << "' in [";
-  ss << paths_v.to_string().c_str() << "]";
-  throw exception(ss.str().c_str());
+      found = true;
+      break;
+    }
+  }
+
+  for (size_t i = 0; i < len; i++) {
+    std::string path = paths.get_element(i).to_std_string();
+    std::string fullpath = path + js_name;
+  
+    if (sec.check_path(fullpath, security::READ) &&
+        boost::filesystem::exists(fullpath))
+    {
+      value val = flusspferd::execute(fullpath.c_str(), ctx);
+      module_cache.set_property(key, val);
+      x.result = val;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    std::stringstream ss;
+    ss << "Unable to find library '";
+    ss << name.c_str();
+    ss << "' in [";
+    ss << paths_v.to_string().c_str() << "]";
+    throw exception(ss.str().c_str());
+  }
 }
 

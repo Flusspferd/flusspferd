@@ -23,10 +23,6 @@ THE SOFTWARE.
 */
 
 (function() {
-  require('SQLite3', true);
-
-  var SQLite3 = $importer.context.SQLite3;
-
   // generators are easier to write in JS space
   SQLite3.Cursor.prototype.__iterator__ = function() {
     while (true) {
