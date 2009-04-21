@@ -29,10 +29,15 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/spirit/home/phoenix/core.hpp>
+#include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/utility.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <list>
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -51,6 +56,10 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
+namespace algo = boost::algorithm;
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
+
 static void require(call_context &);
 
 void flusspferd::load_require_function(object container) {
@@ -63,37 +72,52 @@ void flusspferd::load_require_function(object container) {
                       permanent_property);
 }
 
-// Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
+// Take 'foo/bar' as a flusspferd::string, check no path sep in it, and
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
 static std::string process_name(std::string const &name, bool for_script) {
-  std::string p = name;
-  if ((DIRSEP1 == '/' || p.find(DIRSEP1) != std::string::npos) &&
-      (DIRSEP2 == '/' || p.find(DIRSEP2) != std::string::npos))
+  if ((DIRSEP1 != '/' && name.find(DIRSEP1) != std::string::npos) &&
+      (DIRSEP2 != '/' && DIRSEP2 && name.find(DIRSEP2) != std::string::npos))
   {
     throw exception("Path seperator not allowed in module name");
   }
 
-  std::size_t pos = 0;
-  while ( (pos = p.find('/', pos)) != std::string::npos) {
-    p.replace(pos, 1, 1, DIRSEP1);
-    pos++;
+  typedef std::list<std::string> container;
+
+  container elements;
+  algo::split(elements, name, args::arg1 == '/', algo::token_compress_on);
+
+  if (elements.empty())
+    throw exception("Invalid module name");
+
+  for (container::iterator it = ++elements.begin(); it != elements.end();) {
+    if (*it == ".")
+      it = elements.erase(it);
+    else if (*it == ".." && it != elements.begin())
+      it = elements.erase(boost::prior(it), boost::next(it));
+    else
+      ++it;
   }
 
-  if (!for_script && SHLIBPREFIX) {
-    // stick the lib on the front as needed
-    pos = p.rfind(DIRSEP1, 0);
-    if (pos == std::string::npos)
-      pos = 0;
-    p.insert(pos, SHLIBPREFIX);
+  std::string result(1, '/');
+
+  container::iterator last = boost::prior(elements.end());
+
+  for (container::iterator it = elements.begin(); it != last; ++it) {
+    result.append(*it);
+    result += DIRSEP1;
   }
 
-  p = DIRSEP1 + p;
+  if (!for_script && SHLIBPREFIX)
+    result += SHLIBPREFIX;
+
+  result += *last;
+
   if (for_script)
-    p += ".js";
+    result += ".js";
   else
-    p += SHLIBSUFFIX;
+    result += SHLIBSUFFIX;
 
-  return p;
+  return result;
 }
 
 void require(call_context &x) {
@@ -109,11 +133,15 @@ void require(call_context &x) {
       name = alias.get_property(name).to_string().to_string();
   }
 
+  std::string so_name, js_name;
+  so_name = process_name(name, false);
+  js_name = process_name(name, true);
+
   object module_cache = x.function.get_property("module_cache").to_object();
   if (module_cache.is_null())
     throw exception("No valid module cache");
  
-  std::string key = name;
+  std::string key = js_name;
   if (module_cache.has_own_property(key)) {
     x.result = module_cache.get_property(key);
     return;
@@ -143,10 +171,6 @@ void require(call_context &x) {
     }
   }
 
-  std::string so_name, js_name;
-  so_name = process_name(name, false);
-  js_name = process_name(name, true);
-  
   value paths_v = x.function.get_property("paths").to_object();
   if (!paths_v.is_object() || paths_v.is_null())
     throw exception("Unable to get search paths or it is not an object");
