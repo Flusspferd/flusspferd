@@ -37,7 +37,6 @@ Function.prototype.bind = function bind(obj) {
       return fun.apply(obj, arguments);
     }
 };
-Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 
 /**
  * Bind an object method to its object so that it can be called without the
@@ -47,10 +46,12 @@ Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
  *                       to bind the method to.
  * @param {string} name  The method name.
  */
-Object.bind = function bind(obj, name) {
+Function.bind = function bind(obj, name) {
   var fun = obj[name];
   if (!fun || !(fun instanceof Function))
     throw new Error("Object has no function '" + name + "'");
   return fun.bind(obj);
 }
+
+Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
 Object.defineProperty(Function, 'bind', { enumerable: false, });
