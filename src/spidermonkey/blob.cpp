@@ -82,6 +82,8 @@ void blob::init() {
 blob::~blob() {}
 
 object blob::class_info::create_prototype() {
+  flusspferd::local_root_scope scope;
+
   object proto = create_object();
 
   create_native_method(proto, "append", &blob::append);
@@ -106,13 +108,19 @@ object blob::class_info::create_prototype() {
   proto.define_property("__iterator__", iter_val);
 
   static const char* js_val_iter =
-    "function() {"
-    "  var i = 0;"
-    "  while (i < this.length) {"
-    "    yield this.get(i); i++;"
-    "  }"
-    "}";
-  function values_fn = evaluate(js_val_iter, strlen(js_val_iter)).get_object();
+    "var i = 0;"
+    "while (i < this.length) {"
+    "  yield this.get(i); i++;"
+    "}"
+    ;
+  function values_fn =
+    create_function(
+      "values",
+      0,
+      std::vector<std::string>(),
+      string(js_val_iter),
+      __FILE__,
+      __LINE__);
 
   proto.define_property("values", value(),
       property_attributes(dont_enumerate, values_fn));
