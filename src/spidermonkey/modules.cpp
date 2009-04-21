@@ -49,12 +49,12 @@ THE SOFTWARE.
 #define SHLIBSUFFIX ".so"
 #endif
 
-namespace flusspferd {
+using namespace flusspferd;
 
-void import(call_context &);
+static void require(call_context &);
 
-void load_require_function(object container) {
-  function imp = create_native_function(container, "require", &import, 1);
+void flusspferd::load_require_function(object container) {
+  function imp = create_native_function(container, "require", &require, 1);
 
   imp.define_property("preload", create_object(), permanent_property);
   imp.define_property("paths", create_array(), permanent_property);
@@ -63,15 +63,9 @@ void load_require_function(object container) {
                       permanent_property);
 }
 
-}
-
-using namespace flusspferd;
-
-namespace {
-
 // Take 'foo.bar' as a flusspferd::string, check no path sep in it, and
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
-std::string process_name(std::string const &name, bool for_script) {
+static std::string process_name(std::string const &name, bool for_script) {
   std::string p = name;
   if ((DIRSEP1 == '/' || p.find(DIRSEP1) != std::string::npos) &&
       (DIRSEP2 == '/' || p.find(DIRSEP2) != std::string::npos))
@@ -102,9 +96,7 @@ std::string process_name(std::string const &name, bool for_script) {
   return p;
 }
 
-}
-
-void flusspferd::import(call_context &x) {
+void require(call_context &x) {
   security &sec = security::get();
 
   std::string name = flusspferd::string(x.arg[0]).to_string();
