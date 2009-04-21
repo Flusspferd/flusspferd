@@ -48,6 +48,8 @@ THE SOFTWARE.
  */
 (function() {
   try {
+    var cURL = exports.cURL; // get cURL as exported from the binary module
+
     // If we have HTTP/Headers, define a default header callback that
     // creates 
     require('HTTP/Headers');
