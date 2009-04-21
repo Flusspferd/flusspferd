@@ -72,7 +72,7 @@ void flusspferd::load_require_function(object container) {
   imp.define_property("alias", create_object(), permanent_property);
   imp.define_property("module_cache", create_object(),
                       permanent_property);
-  imp.define_property("current_module", flusspferd::string(),
+  imp.define_property("id", flusspferd::string(),
                       permanent_property);
 }
 
@@ -145,12 +145,12 @@ void require(call_context &x) {
   std::string name = flusspferd::string(x.arg[0]).to_string();
 
   std::string module =
-      x.function.get_property("current_module").to_std_string();
+      x.function.get_property("id").to_std_string();
 
   std::string key = process_name(name, module, "", "", '/');
 
   try {
-    x.function.set_property("current_module", flusspferd::string(key));
+    x.function.set_property("id", flusspferd::string(key));
 
     value alias_v = x.function.get_property("alias");
   
@@ -259,11 +259,11 @@ void require(call_context &x) {
       }
     }
   } catch (...) {
-    x.function.set_property("current_module", flusspferd::string(module));
+    x.function.set_property("id", flusspferd::string(module));
     throw;
   }
 
-  x.function.set_property("current_module", flusspferd::string(module));
+  x.function.set_property("id", flusspferd::string(module));
 
   if (!found) {
     std::stringstream ss;
