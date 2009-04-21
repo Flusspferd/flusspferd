@@ -97,9 +97,9 @@ private: // JS methods
 
 ///////////////////////////
 // import hook
-extern "C" value flusspferd_load(object container)
+extern "C" void flusspferd_load(object container)
 {
-  return load_class<sqlite3>(container);
+  load_class<sqlite3>(container);
 }
 
 ///////////////////////////

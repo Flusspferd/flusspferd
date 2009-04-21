@@ -54,7 +54,7 @@ void load_require_function(object container = flusspferd::global());
  *
  * @ingroup loadable_modules
  */
-typedef value (*flusspferd_load_t)(object exports);
+typedef void (*flusspferd_load_t)(object exports);
 
 }
 

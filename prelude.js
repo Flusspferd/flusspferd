@@ -30,7 +30,7 @@ require('Util');
 // ================
 
 try {
-  require('IO');
+  IO = require('IO').IO;
 
   print = Function.bind(IO.stdout, 'print');
   readLine = Function.bind(IO.stdin, 'readLine');
@@ -39,7 +39,7 @@ try {
 }
 
 try {
-  require('XML');
+  XML = require('XML').XML;
 } catch (e) {
   // TODO: do something?
 }

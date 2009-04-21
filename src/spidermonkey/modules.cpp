@@ -119,7 +119,15 @@ void require(call_context &x) {
     return;
   }
 
-  object ctx = flusspferd::global();
+  object ctx = flusspferd::create_object(flusspferd::global());
+  object exports = flusspferd::create_object();
+  ctx.define_property(
+    "exports",
+    exports,
+    read_only_property | permanent_property);
+
+  module_cache.set_property(key, exports);
+  x.result = exports;
 
   value preload = x.function.get_property("preload");
 
@@ -129,7 +137,7 @@ void require(call_context &x) {
       if (!loader.is_null()) {
         local_root_scope scope;
         object o = loader.get_object();
-        x.result = o.call(ctx);
+        o.call(ctx);
       }
       return;
     }
@@ -188,9 +196,7 @@ void require(call_context &x) {
 
       flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-      value val = func(ctx);
-      module_cache.set_property(key, val);
-      x.result = val;
+      func(exports);
 
       found = true;
       break;
@@ -205,8 +211,6 @@ void require(call_context &x) {
         boost::filesystem::exists(fullpath))
     {
       value val = flusspferd::execute(fullpath.c_str(), ctx);
-      module_cache.set_property(key, val);
-      x.result = val;
       found = true;
       break;
     }
