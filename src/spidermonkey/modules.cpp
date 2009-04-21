@@ -80,7 +80,7 @@ void flusspferd::load_require_function(object container) {
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
 static std::string process_name(
     std::string name,
-    std::string const &module,
+    std::string module,
     std::string const &prefix,
     std::string const &suffix,
     char out_dirsep)
@@ -92,6 +92,10 @@ static std::string process_name(
   }
 
   typedef std::list<std::string> container;
+
+  module.erase(
+    std::find(module.rbegin(), module.rend(), '/').base(),
+    module.end());;
 
   if (algo::starts_with(name, "./") || algo::starts_with(name, "../"))
     name = module + "/" + name;
