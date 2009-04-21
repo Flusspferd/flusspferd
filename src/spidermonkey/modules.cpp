@@ -27,9 +27,11 @@ THE SOFTWARE.
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
+#include "flusspferd/value_io.hpp"
 #include <boost/filesystem.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/spirit/home/phoenix/core.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
 #include <boost/utility.hpp>
@@ -70,18 +72,29 @@ void flusspferd::load_require_function(object container) {
   imp.define_property("alias", create_object(), permanent_property);
   imp.define_property("module_cache", create_object(),
                       permanent_property);
+  imp.define_property("current_module", flusspferd::string(),
+                      permanent_property);
 }
 
 // Take 'foo/bar' as a flusspferd::string, check no path sep in it, and
 // return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
-static std::string process_name(std::string const &name, bool for_script) {
+static std::string process_name(
+    std::string name,
+    std::string const &module,
+    std::string const &prefix,
+    std::string const &suffix,
+    char out_dirsep)
+{
   if ((DIRSEP1 != '/' && name.find(DIRSEP1) != std::string::npos) &&
       (DIRSEP2 != '/' && DIRSEP2 && name.find(DIRSEP2) != std::string::npos))
   {
-    throw exception("Path seperator not allowed in module name");
+    throw exception("Invalid module name");
   }
 
   typedef std::list<std::string> container;
+
+  if (algo::starts_with(name, "./") || algo::starts_with(name, "../"))
+    name = module + "/" + name;
 
   container elements;
   algo::split(elements, name, args::arg1 == '/', algo::token_compress_on);
@@ -89,87 +102,32 @@ static std::string process_name(std::string const &name, bool for_script) {
   if (elements.empty())
     throw exception("Invalid module name");
 
+  elements.remove(".");
+
   for (container::iterator it = ++elements.begin(); it != elements.end();) {
-    if (*it == ".")
-      it = elements.erase(it);
-    else if (*it == ".." && it != elements.begin())
+    if (*it == ".." && it != elements.begin())
       it = elements.erase(boost::prior(it), boost::next(it));
     else
       ++it;
   }
-
-  std::string result(1, '/');
+  std::string result;
 
   container::iterator last = boost::prior(elements.end());
 
   for (container::iterator it = elements.begin(); it != last; ++it) {
     result.append(*it);
-    result += DIRSEP1;
+    result += out_dirsep;
   }
 
-  if (!for_script && SHLIBPREFIX)
-    result += SHLIBPREFIX;
-
+  result += prefix;
   result += *last;
-
-  if (for_script)
-    result += ".js";
-  else
-    result += SHLIBSUFFIX;
+  result += suffix;
 
   return result;
 }
 
 void require(call_context &x) {
   security &sec = security::get();
-
-  std::string name = flusspferd::string(x.arg[0]).to_string();
-
-  value alias_v = x.function.get_property("alias");
-  
-  if (alias_v.is_object() && !alias_v.is_null()) {
-    object alias = alias_v.get_object();
-    if (alias.has_own_property(name))
-      name = alias.get_property(name).to_string().to_string();
-  }
-
-  std::string so_name, js_name;
-  so_name = process_name(name, false);
-  js_name = process_name(name, true);
-
-  object module_cache = x.function.get_property("module_cache").to_object();
-  if (module_cache.is_null())
-    throw exception("No valid module cache");
- 
-  std::string key = js_name;
-  if (module_cache.has_own_property(key)) {
-    x.result = module_cache.get_property(key);
-    return;
-  }
-
-  object ctx = flusspferd::create_object(flusspferd::global());
-  object exports = flusspferd::create_object();
-  ctx.define_property(
-    "exports",
-    exports,
-    read_only_property | permanent_property);
-
-  module_cache.set_property(key, exports);
-  x.result = exports;
-
-  value preload = x.function.get_property("preload");
-
-  if (preload.is_object() && !preload.is_null()) {
-    value loader = preload.get_object().get_property(name);
-    if (loader.is_object()) {
-      if (!loader.is_null()) {
-        local_root_scope scope;
-        object o = loader.get_object();
-        o.call(ctx);
-      }
-      return;
-    }
-  }
 
   value paths_v = x.function.get_property("paths").to_object();
   if (!paths_v.is_object() || paths_v.is_null())
@@ -180,72 +138,132 @@ void require(call_context &x) {
 
   bool found = false;
 
-  for (size_t i = 0; i < len; i++) {
-    std::string path = paths.get_element(i).to_std_string();
-    std::string fullpath = path + so_name;
+  std::string name = flusspferd::string(x.arg[0]).to_string();
 
-    if (sec.check_path(fullpath, security::READ) &&
-        boost::filesystem::exists(fullpath))
-    {
+  std::string module =
+      x.function.get_property("current_module").to_std_string();
+
+  std::string key = process_name(name, module, "", "", '/');
+
+  try {
+    x.function.set_property("current_module", flusspferd::string(key));
+
+    value alias_v = x.function.get_property("alias");
+  
+    if (alias_v.is_object() && !alias_v.is_null()) {
+      object alias = alias_v.get_object();
+      if (alias.has_own_property(key)) {
+        name = alias.get_property(key).to_std_string();
+        key = process_name(name, "", "", "", '/');
+      }
+    }
+
+    object module_cache = x.function.get_property("module_cache").to_object();
+    if (module_cache.is_null())
+      throw exception("No valid module cache");
+ 
+    if (module_cache.has_own_property(key)) {
+      x.result = module_cache.get_property(key);
+      return;
+    }
+
+    object ctx = flusspferd::create_object(flusspferd::global());
+    object exports = flusspferd::create_object();
+    ctx.define_property(
+      "exports",
+      exports,
+      read_only_property | permanent_property);
+
+    module_cache.set_property(key, exports);
+    x.result = exports;
+
+    value preload = x.function.get_property("preload");
+
+    if (preload.is_object() && !preload.is_null()) {
+      value loader = preload.get_object().get_property(key);
+      if (loader.is_object()) {
+        if (!loader.is_null()) {
+          local_root_scope scope;
+          object o = loader.get_object();
+          o.call(ctx);
+        }
+        return;
+      }
+    }
+
+    std::string so_name, js_name;
+    so_name = "/" + process_name(key, "", SHLIBPREFIX, SHLIBSUFFIX, DIRSEP1);
+    js_name = "/" + process_name(key, "", "", ".js", DIRSEP1);
+
+    for (size_t i = 0; i < len; i++) {
+      std::string path = paths.get_element(i).to_std_string();
+      std::string fullpath = path + so_name;
+
+      if (sec.check_path(fullpath, security::READ) &&
+          boost::filesystem::exists(fullpath))
+      {
 #ifdef WIN32
-      HMODULE module = LoadLibrary(fullpath.c_str());
+        HMODULE module = LoadLibrary(fullpath.c_str());
 
-      if (!module)
-        throw exception(("Unable to load library '" + fullpath + "'").c_str());
+        if (!module)
+          throw exception(("Unable to load library '" +fullpath+"'").c_str());
 
-      FARPROC symbol = GetProcAddress(module, "flusspferd_load");
+        FARPROC symbol = GetProcAddress(module, "flusspferd_load");
 
-      if (!symbol)
-        throw exception(("Unable to load library '" + fullpath + "': symbol "
-                        "not found").c_str());
+        if (!symbol)
+          throw exception(("Unable to load library '" + fullpath + "': symbol "
+                          "not found").c_str());
 #else
-      // Load the .so
-      void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
-      if (!module) {
-        std::stringstream ss;
-        ss << "Unable to load library '" << fullpath.c_str()
-           << "': " << dlerror();
-        throw exception(ss.str().c_str());
-      }
+        // Load the .so
+        void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
+        if (!module) {
+          std::stringstream ss;
+          ss << "Unable to load library '" << fullpath.c_str()
+             << "': " << dlerror();
+          throw exception(ss.str().c_str());
+        }
 
-      void *symbol = dlsym(module, "flusspferd_load");
+        void *symbol = dlsym(module, "flusspferd_load");
 
-      if (!symbol) {
-        std::stringstream ss;
-        ss << "Unable to load library '" << fullpath.c_str() 
-           << "': " << dlerror();
-        throw exception(ss.str().c_str());
-      }
+        if (!symbol) {
+          std::stringstream ss;
+          ss << "Unable to load library '" << fullpath.c_str() 
+             << "': " << dlerror();
+          throw exception(ss.str().c_str());
+        }
 #endif
 
-      flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
+        flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-      func(exports);
+        func(exports);
 
-      found = true;
-      break;
+        found = true;
+        break;
+      }
     }
-  }
 
-  for (size_t i = 0; i < len; i++) {
-    std::string path = paths.get_element(i).to_std_string();
-    std::string fullpath = path + js_name;
+    for (size_t i = 0; i < len; i++) {
+      std::string path = paths.get_element(i).to_std_string();
+      std::string fullpath = path + js_name;
   
-    if (sec.check_path(fullpath, security::READ) &&
-        boost::filesystem::exists(fullpath))
-    {
-      value val = flusspferd::execute(fullpath.c_str(), ctx);
-      found = true;
-      break;
+      if (sec.check_path(fullpath, security::READ) &&
+          boost::filesystem::exists(fullpath))
+      {
+        value val = flusspferd::execute(fullpath.c_str(), ctx);
+        found = true;
+        break;
+      }
     }
+  } catch (...) {
+    x.function.set_property("current_module", flusspferd::string(module));
+    throw;
   }
+
+  x.function.set_property("current_module", flusspferd::string(module));
 
   if (!found) {
     std::stringstream ss;
-    ss << "Unable to find library '";
-    ss << name.c_str();
-    ss << "' in [";
-    ss << paths_v.to_string().c_str() << "]";
+    ss << "Unable to find library '" << key << "' in [" << paths_v << "]";
     throw exception(ss.str().c_str());
   }
 }
