@@ -22,21 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-(function() {
-  // generators are easier to write in JS space
-  SQLite3.Cursor.prototype.__iterator__ = function() {
-    while (true) {
-      let row = this.next();
-      if (row == null)
-        throw StopIteration;
-      yield row;
-    }
+var SQLite3 = exports.SQLite3;
 
-  };
-
-  return SQLite3;
-})()
-
+// generators are easier to write in JS space
+SQLite3.Cursor.prototype.__iterator__ = function() {
+  while (true) {
+    let row = this.next();
+    if (row == null)
+      throw StopIteration;
+    yield row;
+  }
+};
 
 // SQLite3 {{{
 /**
