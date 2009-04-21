@@ -8,11 +8,10 @@
  * @name require
  *
  * @param {string} name Module to attempt to load
- * @param {object} options Additional options
  *
  * @example
  * require.paths.unshift('./lib');
- * require('My.Module') // Will look for My/Module.js
+ * exports = require('My/Module') // Will look for My/Module.js
  *
  * @class
  *
