@@ -310,8 +310,8 @@ def build(bld):
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')
     if bld.env['HAS_EMACS']:
-        bld.add_subdirs('emacs')
-        bld.install_files('${PREFIX}/share/emacs/site-lisp/', 'emacs/*.el')
+        bld.add_subdirs('misc/emacs')
+        bld.install_files('${PREFIX}/share/emacs/site-lisp/', 'misc/emacs/*.el')
     build_pkgconfig(bld)
     bld.install_files('${PREFIX}/include/', 'include/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/',
