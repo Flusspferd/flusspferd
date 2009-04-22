@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Import.paths.push('js/src');
+Import.paths.push('src/js');
 
 Import('TestHarness');
 

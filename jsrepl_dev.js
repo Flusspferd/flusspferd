@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 // Set default paths to the plugin dirs
 Import.paths.push(
-  'js/src', 
+  'src/js',
   'plugins/sqlite3', 'build/default/plugins/sqlite3', 
   'plugins/curl', 'build/default/plugins/curl',
   'plugins/posix', 'build/default/plugins/posix',

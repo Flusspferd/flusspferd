@@ -320,11 +320,11 @@ def build(bld):
                       'include/flusspferd/implementation/*.hpp')
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
-    bld.install_files('${PREFIX}/lib/flusspferd/modules', 'js/src/*.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/modules', 'src/js/*.js')
     bld.install_files('${PREFIX}/lib/flusspferd/modules/HTTP',
-                      'js/src/HTTP/*.js')
+                      'src/js/HTTP/*.js')
     bld.install_files('${PREFIX}/lib/flusspferd/modules/Util',
-                      'js/src/Util/*.js')
+                      'src/js/Util/*.js')
 
     bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
 

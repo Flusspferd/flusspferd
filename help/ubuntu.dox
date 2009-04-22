@@ -67,7 +67,7 @@ $ cd ..
  * @verbatim
 $ wget http://ftp.mozilla.org/pub/mozilla.org/js/js-1.7.0.tar.gz
 $ tar xzf js-1.7.0.tar.gz
-$ cd js/src/
+$ cd src/js/
 $ make DEFINES=-DJS_C_STRINGS_ARE_UTF8 -f Makefile.ref
 $ sudo mkdir /usr/local/include/js
 $ sudo cp *.h *.tbl Linux_All_DBG.OBJ/*.h /usr/local/include/js/
