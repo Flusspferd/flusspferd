@@ -22,25 +22,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-(function() {
-  Import('SQLite3', true);
+var SQLite3 = exports.SQLite3;
 
-  var SQLite3 = $importer.context.SQLite3;
-
-  // generators are easier to write in JS space
-  SQLite3.Cursor.prototype.__iterator__ = function() {
-    while (true) {
-      let row = this.next();
-      if (row == null)
-        throw StopIteration;
-      yield row;
-    }
-
-  };
-
-  return SQLite3;
-})()
-
+// generators are easier to write in JS space
+SQLite3.Cursor.prototype.__iterator__ = function() {
+  while (true) {
+    let row = this.next();
+    if (row == null)
+      throw StopIteration;
+    yield row;
+  }
+};
 
 // SQLite3 {{{
 /**
@@ -59,7 +51,7 @@ THE SOFTWARE.
  *
  * ==Example:==
  * {{{
- * Import('SQLite3');
+ * require('SQLite3');
  * var db = new SQLite3('./my_db.sqlite');
  * var c = db.cursor('SELECT * FROM table_1 WHERE id IN (?,?)');
  * c.bind([4,6]);

@@ -1,30 +1,29 @@
 // vim: ft=javascript:foldmethod=marker:foldmarker={{{,}}}
 
 /**
- * Load a module. Import is defined as a top level function on the global
+ * Load a module. require is defined as a top level function on the global
  * object.
  *
  * @constructor
- * @name Import
+ * @name require
  *
  * @param {string} name Module to attempt to load
- * @param {object} options Additional options
  *
  * @example
- * Import.paths.unshift('./lib');
- * Import('My.Module') // Will look for My/Module.js
+ * require.paths.unshift('./lib');
+ * exports = require('My/Module') // Will look for My/Module.js
  *
  * @class
  *
- * Import is not really a class, that's just the only way I could get JsDoc to
+ * require is not really a class, that's just the only way I could get JsDoc to
  * document properties on the function.
  *
  * Please note, that all the properties listed below are properties of the
- * Import function itself.
+ * require function itself.
  */
 
-// Import properties {{{
-/**#@+ @fieldOf Import */
+// require properties {{{
+/**#@+ @fieldOf require */
 
   /**
    * List of directories to search for modules in.

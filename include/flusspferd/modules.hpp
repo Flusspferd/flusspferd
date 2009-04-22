@@ -30,16 +30,16 @@ THE SOFTWARE.
 namespace flusspferd { 
 
 /**
- * Load the 'Import()' function into @p container.
+ * Load the 'require()' function into @p container.
  *
- * Creates a new instance of the Import function.
+ * Creates a new instance of the require function.
  *
  * @param container The object to load the function into.
  *
  * @ingroup loadable_modules
  * @ingroup jsext
  */
-void load_import_function(object container = flusspferd::global());
+void load_require_function(object container = flusspferd::global());
 
 /**
  * The prototype for module loader functions.
@@ -54,7 +54,7 @@ void load_import_function(object container = flusspferd::global());
  *
  * @ingroup loadable_modules
  */
-typedef value (*flusspferd_load_t)(object container);
+typedef void (*flusspferd_load_t)(object exports);
 
 }
 

@@ -423,7 +423,7 @@ Destroying StringSet
  * Loading a module - and using it - is easy:
  *
  * @verbatim
-Import('posix')
+require('posix')
 posix.sleep(5);
 @endverbatim
  *
@@ -431,8 +431,8 @@ posix.sleep(5);
  * can do the following:
  *
  * @verbatim
-Import.paths.push('/my/directory');
-Import('somemodule');
+require.paths.push('/my/directory');
+require('somemodule');
 @endverbatim
  *
  * And you can also write your own modules. Either by simply putting a file
@@ -451,12 +451,12 @@ Import('somemodule');
  * from the @c %flusspferd shell.
  *
  * @verbatim
-> Import.paths.push('/my/directory')
+> require.paths.push('/my/directory')
 2
-> Import('dummy_module')
+> require('dummy_module')
 Module loaded!
 Here, take this cookie.
-> Import('dummy_module')
+> require('dummy_module')
 Here, take this cookie.
 @endverbatim
  *

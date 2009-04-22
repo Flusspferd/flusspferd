@@ -74,9 +74,9 @@ size_t curl::c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream) {
 
 ///////////////////////////
 // import hook
-extern "C" value flusspferd_load(object container)
+extern "C" void flusspferd_load(object container)
 {
-  return load_class<curl>(container);
+  load_class<curl>(container);
 }
 
 ///////////////////////////

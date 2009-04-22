@@ -22,7 +22,7 @@ THE SOFTWARE.
 */
 
 // Set default paths to the plugin dirs
-Import.paths.push(
+require.paths.push(
   'src/js',
   'plugins/sqlite3', 'build/default/plugins/sqlite3', 
   'plugins/curl', 'build/default/plugins/curl',
@@ -31,7 +31,7 @@ Import.paths.push(
   'build/default/src'
 );
 
-Import.alias['XML'] = 'flusspferd-xml'
-Import.alias['IO'] = 'flusspferd-io'
+require.alias['XML'] = 'flusspferd-xml'
+require.alias['IO'] = 'flusspferd-io'
 
 prelude = 'prelude.js';

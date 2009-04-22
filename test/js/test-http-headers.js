@@ -21,12 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Import.paths.push('src/js');
+require.paths.push('src/js');
 
-Import('TestHarness');
-Import('HTTP.Headers');
+_t = require('TestHarness')
+_h = require('HTTP/Headers')
 
-t = new TestHarness();
+HTTP = _h.HTTP
+
+t = new _t.TestHarness();
 
 t.test_simple = function() {
   this.expect(1);

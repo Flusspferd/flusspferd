@@ -21,6 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Import.paths = ['@PREFIX@/lib/flusspferd/modules'];
+require.paths = ['.', '@PREFIX@/lib/flusspferd/modules'];
 
 prelude = '@PREFIX@/lib/flusspferd/prelude.js';

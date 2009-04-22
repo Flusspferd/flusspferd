@@ -32,9 +32,9 @@ using namespace flusspferd;
 using namespace flusspferd::io;
 
 #ifndef FLUSSPFERD_COVERAGE
-extern "C" value flusspferd_load(object container)
+extern "C" void flusspferd_load(object container)
 {
-  return load_io(container);
+  load_io(container);
 }
 #endif
 

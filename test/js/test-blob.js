@@ -21,11 +21,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-Import.paths.push('src/js');
+require.paths.push('src/js');
 
-Import('TestHarness');
+_t = require('TestHarness');
 
-t = new TestHarness();
+t = new _t.TestHarness();
 
 t.test_simple = function() {
   this.expect(2);

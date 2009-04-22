@@ -226,6 +226,8 @@ this.TestHarness = function TestHarness(name) {
   TestHarness.suites.push(this);
 }
 
+let TestHarness = this.TestHarness;
+
 TestHarness.suites = [];
 
 TestHarness.go = function TestHarness$go() {
@@ -492,8 +494,7 @@ this.TestHarness.prototype = {
   }
 }
 
-
-})()
+}).apply(exports)
 
 /*
 t = new TestHarness;

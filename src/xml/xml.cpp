@@ -48,9 +48,9 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 #ifndef FLUSSPFERD_COVERAGE
-extern "C" value flusspferd_load(object container)
+extern "C" void flusspferd_load(object container)
 {
-  return load_xml(container);
+  load_xml(container);
 }
 #endif
 

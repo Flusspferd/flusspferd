@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-if (!this.HTTP) this.HTTP = {};
+if (!exports.HTTP) exports.HTTP = {};
 
 (function () {
 
@@ -157,7 +157,7 @@ if (!this.HTTP) this.HTTP = {};
     }
   }
 
-  HTTP.Headers = hdrs; 
+  exports.HTTP.Headers = hdrs; 
 
 })()
 
