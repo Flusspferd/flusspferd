@@ -21,11 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-i = new Importer();
-i.context = this;
-i.paths.push('js/src');
+Import.paths.push('js/src');
 
-i.load('TestHarness');
+Import('TestHarness');
 
 t = new TestHarness();
 
