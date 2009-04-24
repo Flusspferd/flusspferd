@@ -423,7 +423,7 @@ Destroying StringSet
  * Loading a module - and using it - is easy:
  *
  * @verbatim
-require('posix')
+let posix = require('posix')
 posix.sleep(5);
 @endverbatim
  *
@@ -455,9 +455,9 @@ require('somemodule');
 2
 > require('dummy_module')
 Module loaded!
-Here, take this cookie.
+[object Object]
 > require('dummy_module')
-Here, take this cookie.
+[object Object]
 @endverbatim
  *
  */
