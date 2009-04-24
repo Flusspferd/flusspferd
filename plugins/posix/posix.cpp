@@ -34,12 +34,9 @@ using namespace flusspferd;
 namespace {
 
 // import hook
-extern "C" value flusspferd_load(object container)
+extern "C" void flusspferd_load(object posix)
 {
   local_root_scope scope;
-  object posix = create_object();
-  
-  container.set_property("posix", posix);
 
 #ifdef HAVE_FORK
   // TODO: Need to work out how to make this play nice with the interactive repl
@@ -51,8 +48,6 @@ extern "C" value flusspferd_load(object container)
 #ifdef HAVE_USLEEP
   create_native_function(posix, "usleep", usleep);
 #endif
-
-  return posix;
 }
 
 
