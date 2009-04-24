@@ -316,8 +316,8 @@ def build(bld):
     bld.install_files('${PREFIX}/include/', 'include/*.hpp')
     bld.install_files('${PREFIX}/include/flusspferd/',
                       'include/flusspferd/*.hpp')
-    bld.install_files('${PREFIX}/include/flusspferd/implementation/',
-                      'include/flusspferd/implementation/*.hpp')
+    bld.install_files('${PREFIX}/include/flusspferd/spidermonkey/',
+                      'include/flusspferd/spidermonkey/*.hpp')
     bld.install_files('${PREFIX}/lib/pkgconfig/', 'flusspferd.pc')
 
     bld.install_files('${PREFIX}/lib/flusspferd/modules', 'src/js/*.js')
