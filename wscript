@@ -176,7 +176,7 @@ int main() {
     # libedit
     if conf.check_cxx(lib='edit', uselib_store='EDITLINE') and conf.check_cxx(header_name='editline/readline.h'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
-        conf.check_cc(header_name='editline/history.h')
+        conf.check_cxx(header_name='editline/history.h')
 
     # sqlite
     if not Options.options.disable_sqlite:
