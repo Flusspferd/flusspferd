@@ -203,7 +203,7 @@ int main() {
     if not Options.options.disable_xml:
         ret = None
         if darwin and Options.options.libxml_framework:
-            u('FRAMEWORK', '-framework ' + Options.options.libxml_framework )
+            u('FRAMEWORK', Options.options.libxml_framework )
             # TODO: check the version of this framework via XMLVERSION define
             ret = conf.check_cxx(uselib_store='LIBXML2',
                                  framework_name=Options.options.libxml_framework, 
@@ -226,7 +226,7 @@ int main() {
             # This faffing is less than ideal really.
             conf.env['FRAMEWORK'] = []
             conf.env['FRAMEWORK_LIBXML2'] = \
-                ['-framework ' + Options.options.libxml_framework ]
+                [Options.options.libxml_framework ]
 
         # Non darwin, or framework failed
         if ret == None:
