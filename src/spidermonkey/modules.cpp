@@ -149,6 +149,8 @@ void require(call_context &x) {
 
   std::string key = process_name(name, module, "", "", '/');
 
+  object module_cache;
+
   try {
     x.function.set_property("id", flusspferd::string(key));
 
@@ -162,7 +164,7 @@ void require(call_context &x) {
       }
     }
 
-    object module_cache = x.function.get_property("module_cache").to_object();
+    module_cache = x.function.get_property("module_cache").to_object();
     if (module_cache.is_null())
       throw exception("No valid module cache");
  
@@ -258,17 +260,20 @@ void require(call_context &x) {
         break;
       }
     }
+
+    if (!found) {
+      std::stringstream ss;
+      ss << "Unable to find library '" << key << "' in [" << paths_v << "]";
+      throw exception(ss.str().c_str());
+    }
   } catch (...) {
+    if (!module_cache.is_null())
+      module_cache.delete_property(key);
+
     x.function.set_property("id", flusspferd::string(module));
     throw;
   }
 
   x.function.set_property("id", flusspferd::string(module));
-
-  if (!found) {
-    std::stringstream ss;
-    ss << "Unable to find library '" << key << "' in [" << paths_v << "]";
-    throw exception(ss.str().c_str());
-  }
 }
 
