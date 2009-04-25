@@ -60,14 +60,13 @@ protected:
 
 ///////////////////////////
 // import hook
-extern "C" value flusspferd_load(object container)
+extern "C" void flusspferd_load(object container)
 {
   load_class<environment>(container);
   // Return an instance of it as well since that'll be the common use case.
   call_context x;
   object env = create_native_object<environment>(object(), boost::ref(x));
   container.set_property("environment", env);
-  return env;
 }
 
 environment::environment(object const &obj, call_context &)
