@@ -27,7 +27,7 @@ THE SOFTWARE.
  *
  * @param {number} from The start of the range.
  * @param {number} to The (non-inclusive) end of the range.
- * @param {number} by The increment.
+ * @param {number} by The increment. Default: 1.
  *
  * @class
  */
@@ -47,3 +47,5 @@ function Range(from,to, by) {
 
   return r;
 }
+
+exports.Range = Range;

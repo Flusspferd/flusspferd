@@ -24,13 +24,13 @@ THE SOFTWARE.
 // Required requires
 // ================
 
-require('Util');
+Util = require('Util');
 
 // Optional requires
 // ================
 
 try {
-  IO = require('IO').IO;
+  IO = require('IO');
 
   print = Function.bind(IO.stdout, 'print');
   readLine = Function.bind(IO.stdin, 'readLine');
@@ -39,7 +39,7 @@ try {
 }
 
 try {
-  XML = require('XML').XML;
+  XML = require('XML');
 } catch (e) {
   // TODO: do something?
 }

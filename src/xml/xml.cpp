@@ -77,7 +77,7 @@ object flusspferd::xml::load_xml(object container) {
 
   boost::call_once(once_flag, &once);
 
-  object XML = flusspferd::create_object();
+  object XML = container;
 
   load_class<node>(XML);
   load_class<document>(XML);

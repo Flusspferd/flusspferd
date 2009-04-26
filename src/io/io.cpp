@@ -41,39 +41,23 @@ extern "C" void flusspferd_load(object container)
 object flusspferd::io::load_io(object container) {
   local_root_scope scope;
 
-  value previous = container.get_property("IO");
+  object IO = container;
 
-  if (previous.is_object())
-    return previous.to_object();
+  load_class<stream>(IO);
+  load_class<file>(IO);
+  load_class<blob_stream>(IO);
 
-  object IO = current_context().constructor("IO");
+  IO.define_property(
+    "stdout",
+    create_native_object<stream>(object(), std::cout.rdbuf()));
 
-  if (IO.is_null()) {
-    IO = flusspferd::create_object();
+  IO.define_property(
+    "stderr",
+    create_native_object<stream>(object(), std::cerr.rdbuf()));
 
-    load_class<stream>(IO);
-    load_class<file>(IO);
-    load_class<blob_stream>(IO);
-
-    IO.define_property(
-      "stdout",
-      create_native_object<stream>(object(), std::cout.rdbuf()));
-
-    IO.define_property(
-      "stderr",
-      create_native_object<stream>(object(), std::cerr.rdbuf()));
-
-    IO.define_property(
-      "stdin",
-      create_native_object<stream>(object(), std::cin.rdbuf()));
-
-    current_context().add_constructor("IO", IO);
-  }
-
-  container.define_property(
-    "IO",
-    IO,
-    read_only_property | dont_enumerate);
+  IO.define_property(
+    "stdin",
+    create_native_object<stream>(object(), std::cin.rdbuf()));
 
   return IO;
 }
