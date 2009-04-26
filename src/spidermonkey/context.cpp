@@ -75,6 +75,8 @@ public:
     JS_SetVersion(context, JSVersion(JS_VERSION));
     JS_SetOptions(context, options);
 
+    JS_BeginRequest(context);
+
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
     if(!global_)
       throw exception("Could not create Global Object");
