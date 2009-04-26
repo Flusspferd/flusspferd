@@ -31,21 +31,11 @@ THE SOFTWARE.
  *
  * @class
  */
-function Range(from,to, by) {
+exports.Range = function Util$Range(from, to, by) {
   var i = from;
   by = by || 1;
-  var r;
-  function RangeInstance() {
-    while (i < to) {
-      r[i] = i;
-      yield i;
-      i += by;
-    }
-  };
-  r = new RangeInstance();
-  r.__iterator__ = function() { return r };
-
-  return r;
+  while (i < to) {
+    yield i;
+    i += by;
+  }
 }
-
-exports.Range = Range;
