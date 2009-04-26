@@ -103,7 +103,8 @@ object blob::class_info::create_prototype() {
       create_native_method(object(), "$set_length", &blob::set_length)
     ));
 
-  static const char* js_iterator ="function() { return Range(0, this.length) }";
+  static const char* js_iterator =
+    "function() { return require('Util/Range').Range(0, this.length) }";
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
   proto.define_property("__iterator__", iter_val);
 
