@@ -174,7 +174,11 @@ int main() {
     ret = conf.check_cxx(lib = 'dl', uselib_store='DL')
 
     # libedit
-    if conf.check_cxx(lib='edit', uselib_store='EDITLINE') and conf.check_cxx(header_name='editline/readline.h'):
+    if conf.check_cxx(lib='edit', uselib_store='EDITLINE') and \
+       # Darwin versions of this header need FILE defined, so include stdio
+       # since *everywhere* should have that.
+       conf.check_cxx(header_name=['stdio.h', 'editline/readline.h'],
+                      msg='Checking for header editline/readline.h'):
         u('CXXDEFINES', 'HAVE_EDITLINE')
         conf.check_cxx(header_name='editline/history.h')
 
