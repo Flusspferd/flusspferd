@@ -1,6 +1,0 @@
-{
-  d: 'html/js',
-  t: 'help/jsdoc_template',
-  r: true,
-  x: 'js,jsdoc'
-}
