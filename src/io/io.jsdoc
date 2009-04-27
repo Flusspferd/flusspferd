@@ -3,6 +3,8 @@
  * @namespace IO related classes
  * @name IO
  *
+ * @see IO.Stream
+ * @see IO.File
  * @see IO.BlobStream
  */
 

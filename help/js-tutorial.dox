@@ -121,7 +121,7 @@ bcd
  * - @c IO.stderr
  *
  * There are many more things that you can do with this module, see
- * <a href="#TODO">the documentation for @c IO (@em TODO)</a>.
+ * <a href="js/IO">the documentation for @c IO</a>.
  *
  * Next: \ref js-tutorial-xml
  *
