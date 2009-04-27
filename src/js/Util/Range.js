@@ -32,10 +32,9 @@ THE SOFTWARE.
  * @class
  */
 exports.Range = function Util$Range(from, to, by) {
-  var i = from;
-  by = by || 1;
-  while (i < to) {
-    yield i;
-    i += by;
-  }
+  // TODO: find out why this hack is needed / how to get rid of it
+  var fun = new Function(
+    'from', 'to', 'by',
+    'var i = from; by = by || 1; while (i < to) { yield i; i += by; }');
+  return fun(from, to, by);
 }
