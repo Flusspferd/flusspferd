@@ -35,18 +35,10 @@ THE SOFTWARE.
 
 BOOST_FIXTURE_TEST_SUITE( io, context_fixture )
 
-BOOST_AUTO_TEST_CASE( test_have_IO ) {
-  flusspferd::io::load_io();
-  flusspferd::root_value v;
-  BOOST_CHECK_NO_THROW( v = flusspferd::evaluate("IO", __FILE__, __LINE__) );
-  BOOST_CHECK(v.is_object());
-  BOOST_CHECK(!v.is_null());
-
-  flusspferd::gc();
-}
-
 BOOST_AUTO_TEST_CASE( IO_no_security ) {
-  flusspferd::io::load_io();
+  flusspferd::object IO = flusspferd::create_object();
+  flusspferd::global().set_property("IO", IO);
+  flusspferd::io::load_io(IO);
 
   const char* js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
   flusspferd::root_value v;
@@ -56,7 +48,10 @@ BOOST_AUTO_TEST_CASE( IO_no_security ) {
 }
 
 BOOST_AUTO_TEST_CASE( test_file_read ) {
-  flusspferd::io::load_io();
+  flusspferd::object IO = flusspferd::create_object();
+  flusspferd::global().set_property("IO", IO);
+  flusspferd::io::load_io(IO);
+
   flusspferd::security::create(flusspferd::global());
 
   const char* js = "f = new IO.File('test/fixtures/file1'); f.readWhole()";
