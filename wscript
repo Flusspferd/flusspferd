@@ -100,6 +100,8 @@ def append_each_unique(env, to, what, split=' '):
         env.append_unique(to, i)
 
 def configure(conf):
+    conf.define('FLUSSPFERD_VERSION', VERSION)
+
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
 
@@ -122,8 +124,6 @@ def configure(conf):
     conf.check_tool('boost')
     if darwin:
         conf.check_tool('osx')
-
-    u('CXXDEFINES', 'FLUSSPFERD_VERSION="%s"' % VERSION)
 
     u('CXXDEFINES', 'BOOST_ALL_NO_LIB')
 
@@ -295,6 +295,8 @@ int main() {
         conf.env['HAS_EMACS'] = True
 
     conf.env['ENABLE_TESTS'] = Options.options.enable_tests
+
+    conf.write_config_header("include/config.h")
 
 def get_cflags(bld, envvars):
     result = ''
