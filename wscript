@@ -123,6 +123,8 @@ def configure(conf):
     if darwin:
         conf.check_tool('osx')
 
+    u('CXXDEFINES', 'FLUSSPFERD_VERSION="%s"' % VERSION)
+
     u('CXXDEFINES', 'BOOST_ALL_NO_LIB')
 
     conf.env['CXXFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']

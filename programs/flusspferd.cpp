@@ -170,8 +170,10 @@ void print_help(char const *argv0) {
     "Options\n"
     "    -h                       displays this message\n"
     "\n"
-    "    -c <file>\n"
+    "    -v\n"
+    "    --version                print version and exit\n"
     "\n"
+    "    -c <file>\n"
     "    --config <file>          load config from file\n"
     "\n"
     "    -i\n"
@@ -183,6 +185,12 @@ void print_help(char const *argv0) {
     "    --file <file>            run this file before standard script handling\n"
     "\n"
     "    --                       stop processing arguments\n\n";
+}
+
+void print_version() {
+  std::cout << "flusspferd shell version: " << FLUSSPFERD_VERSION << '\n';
+  std::cout << "flusspferd library version: " << flusspferd::version() << '\n';
+  std::cout.flush();
 }
 
 void flusspferd_repl::load_config() {
@@ -217,6 +225,12 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
           std::strcmp(argv[i], "--help") == 0)
       {
         print_help(argv[0]);
+        throw flusspferd::js_quit();
+      }
+      else if (std::strcmp(argv[i], "-v") == 0 ||
+          std::strcmp(argv[i], "--version") == 0)
+      {
+        print_version();
         throw flusspferd::js_quit();
       }
       else if (std::strcmp(argv[i], "-c") == 0 ||
