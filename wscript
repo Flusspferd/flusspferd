@@ -21,18 +21,46 @@
 # THE SOFTWARE.
 #
 
-import sys, os
+import sys, os, subprocess, re
 import Utils, Options
 import TaskGen
 
-VERSION = 'dev'
+DEFAULT_VERSION = 'dev'
+
+def get_version():
+    try:
+        if os.access("version", os.F_OK):
+            file = open("version", "r")
+            ver = file.readline().strip()
+            return ver
+        if os.access(".git", os.F_OK):
+            ver = subprocess.Popen(
+                ["git", "describe", "--abbrev=4", "HEAD"],
+                stdout=subprocess.PIPE).communicate()[0]
+            ver = re.match('v(\d.*)', ver).group(1)
+            dirty = subprocess.Popen(
+                ["git", "diff", "--raw", "--name-only", "HEAD"],
+                stdout=subprocess.PIPE).communicate()[0]
+            if dirty:
+                ver += '-dirty'
+            return ver
+    except:
+        pass
+    return DEFAULT_VERSION
+
 APPNAME = 'flusspferd'
+VERSION = get_version()
 
 srcdir = '.'
 blddir = 'build'
 darwin = sys.platform.startswith('darwin')
 
 def init(): pass
+
+def dist_hook():
+    versionfile = open('version', 'w')
+    versionfile.write(VERSION + '\n')
+    versionfile.close()
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
