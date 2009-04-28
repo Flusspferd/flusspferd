@@ -107,6 +107,12 @@ def configure(conf):
     u = conf.env.append_unique
     conf.check_message('platform', '', 1, sys.platform)
 
+    conf.check_tool('compiler_cxx')
+    conf.check_tool('misc')
+    conf.check_tool('boost')
+    if darwin:
+        conf.check_tool('osx')
+
     if darwin:
         u('CXXDEFINES', 'APPLE')
         # Is there a better way of doing this?
@@ -120,12 +126,6 @@ def configure(conf):
                            '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
         #append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DNDEBUG')
         append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DDEBUG')
-
-    conf.check_tool('compiler_cxx')
-    conf.check_tool('misc')
-    conf.check_tool('boost')
-    if darwin:
-        conf.check_tool('osx')
 
     u('CXXDEFINES', 'BOOST_ALL_NO_LIB')
 
