@@ -364,7 +364,7 @@ def build(bld):
     bld.install_files('${PREFIX}/lib/flusspferd/modules/Util',
                       'src/js/Util/*.js')
 
-    bld.install_files('${PREFIX}/lib/flusspferd/', 'prelude.js')
+    bld.install_files('${PREFIX}/lib/flusspferd/', 'src/js/prelude.js')
 
     bld.symlink_as('${PREFIX}/lib/flusspferd/modules/' +
                    (bld.env['shlib_PATTERN'] % 'XML'),
@@ -376,7 +376,7 @@ def build(bld):
     bld.install_files('${PREFIX}/share/man/man1/', 'help/flusspferd.1')
 
     etc = bld.new_task_gen('subst')
-    etc.source = 'jsrepl.js.in'
+    etc.source = 'src/js/jsrepl.js.in'
     etc.target = 'jsrepl.js'
     etc.dict = {
       'PREFIX': bld.env['PREFIX']
