@@ -134,16 +134,16 @@ $ sudo make install
  *
  * @subsection ebuild Install on Gentoo
  *
- * On Gentoo, you can use our ebuild, <code>flusspferd-9999.ebuild</code>, to
- * compile and install Flusspferd.
+ * On Gentoo, you can use our ebuilds, in the branch 'packages', directory
+ * 'gentoo/' to compile and install Flusspferd.
  *
  * @subsection macports Install on Mac OS X via Macports
  *
  * We have a Portfile for the <a href="http://www.macports.org">Macports
- * packaging system</a>. Currently we are not included in the official
- * Macport repository since we have no stable release, yet.
+ * packaging system</a> in branch 'packages'. If your desired version is
+ * available, you can also use the Macports repository.
  *
- * So at the moment using the Portfile requires some additional steps.
+ * Otherwise, using the Portfile requires some additional steps.
  * See <a href="http://guide.macports.org/#development.local-repositories">
  * the Macport Guide on how to setup a local repository</a> to install
  * Flusspferd.
