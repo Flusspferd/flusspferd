@@ -55,9 +55,13 @@ configure {
     system "cd ${worksrcpath} && PYTHON=python2.5 ./configure ${configure.args}"
 }
 
-pre-build {
-    system \
-"cd ${worksrcpath} && echo -e \"PYTHON := python2.5\nNOTNOISY := 1\" > .localsettings.mak"
+#pre-build {
+#    system \
+#"cd ${worksrcpath} && echo -e \"PYTHON := python2.5\nNOTNOISY := 1\" > .localsettings.mak"
+#}
+
+build {
+    system "cd ${worksrcpath} && python2.5 ./waf"
 }
 
 destroot {
