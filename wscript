@@ -67,8 +67,10 @@ def dist_hook():
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
-    opt.tool_options('compiler_cc')
     opt.tool_options('boost')
+    opt.tool_options('misc')
+    if darwin:
+        opt.tool_options('osx')
     opt.add_option('--with-cxxflags', action='store', nargs=1, dest='cxxflags',
                    help='Set non-standard CXXFLAGS')
     opt.add_option('--enable-tests', action='store_true',
@@ -109,8 +111,6 @@ def configure(conf):
     conf.check_message('platform', '', 1, sys.platform)
 
     conf.check_tool('compiler_cxx')
-    conf.check_tool('misc')
-    conf.check_tool('boost')
     if darwin:
         conf.check_tool('osx')
 
@@ -121,7 +121,7 @@ def configure(conf):
             u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
 
     if Options.options.cxxflags:
-        conf.env['CXXFLAGS'] = str(Options.options.cxxflags)
+        append_each_unique('CXXFLAGS', str(Options.options.cxxflags))
     else:
         append_each_unique(conf.env, 'CXXFLAGS',
                            '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
@@ -129,6 +129,9 @@ def configure(conf):
         append_each_unique(conf.env, 'CXXFLAGS', '-O0 -g -DDEBUG')
 
     u('CXXDEFINES', 'BOOST_ALL_NO_LIB')
+
+    conf.check_tool('misc')
+    conf.check_tool('boost')
 
     conf.env['CXXFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
     conf.env['LINKFLAGS_GCOV'] = ['-fprofile-arcs', '-ftest-coverage']
