@@ -22,7 +22,7 @@
 #
 
 import sys, os, subprocess, re
-import Utils, Options
+import Utils, Options, Scripting
 import TaskGen
 
 DEFAULT_VERSION = 'dev'
@@ -56,6 +56,8 @@ blddir = 'build'
 darwin = sys.platform.startswith('darwin')
 
 def init(): pass
+
+Scripting.excludes.remove('Makefile')
 
 def dist_hook():
     versionfile = open('version', 'w')
