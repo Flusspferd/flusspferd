@@ -28,4 +28,4 @@ obj.install_path = '${PREFIX}/bin'
 obj.uselib = 'BOOST JS_H EDITLINE'
 obj.uselib_local = ['flusspferd']
 obj.defines = 'INSTALL_PREFIX="%s"' % bld.env['PREFIX'];
-obj.includes = ['../include']
+obj.includes = ['../../include']

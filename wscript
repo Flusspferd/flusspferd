@@ -335,8 +335,7 @@ def build_pkgconfig(bld):
     obj.apply()
 
 def build(bld):
-    bld.add_subdirs('src')
-    bld.add_subdirs('programs')
+    bld.add_subdirs('src src/programs')
     if bld.env['ENABLE_SQLITE']:
         bld.add_subdirs('plugins/sqlite3')
     bld.add_subdirs('plugins/environment')
