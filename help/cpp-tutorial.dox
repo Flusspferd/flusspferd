@@ -27,7 +27,6 @@ THE SOFTWARE.
  * @section Contents
  *
  * - \subpage cpp-tutorial-firstprogram
- * - \subpage cpp-tutorial-secondprogram
  * - \subpage cpp-tutorial-values_and_objects
  * - \subpage cpp-tutorial-gc
  * - \subpage cpp-tutorial-functions
@@ -41,18 +40,17 @@ THE SOFTWARE.
  *
  * Previous: \ref cpp-tutorial
  *
- * Let's begin with a very simple program that does, well, nothing.
+ * Let's begin with a very simple program, a version of "Hello World".
  *
  * @include first_program.cpp
  *
  * @note You can find the source file listed above in
  *       <code>help/examples/first_program.cpp</code>.
  *
- * In order to use Flusspferd (even though we actually don't, in that simple
- * example), we need to create a @ref flusspferd::context "context" and make it
- * the <em>current context</em>, which flusspferd::current_context_scope does
- * as long it is in scope. You can use flusspferd::current_context_scope in
- * multiple nested scopes.
+ * In order to use Flusspferd, we need to create a
+ * @ref flusspferd::context "context" and make it the <em>current context</em>,
+ * which flusspferd::current_context_scope does as long it is in scope. You can
+ * use flusspferd::current_context_scope in multiple nested scopes.
  *
  * @section compiling Compiling Flusspferd in your project
  *
@@ -85,45 +83,22 @@ conf.check_cfg(
  * @verbatim
 $ g++  $(pkg-config --cflags --libs flusspferd) -o first_program first_program.cpp >/dev/null
 $ ./first_programm
-$ 
-@endverbatim
- *
- * If you see no output and just get a shell back, then everything worked. If
- * either of the above commands produce any output, then something went wrong
- * in the install proccess and most likely a required file couldn't be found. 
- *
- * Next: \ref cpp-tutorial-secondprogram "your second Flusspferd program".
- */
-
-/**
- * @page cpp-tutorial-secondprogram Your second Flusspferd program: Hello, World respectively Flusspferd.
- *
- * Previous: \ref cpp-tutorial-firstprogram
- *
- * Which tutorial is complete without a "Hello, World!" example? But this one
- * comes with a twist.
- *
- * @note You can find the source in
- *       <code>help/examples/second_program.cpp</code>.
- *
- * @include second_program.cpp
- * 
- * And the output when you run this program (once you've
- * <a class="el" href="firstprogram.html#compiling">compiled</a> it like before, of course) should be:
- *
- * @verbatim
 Hello, Flusspferd!
+$
 @endverbatim
  *
- * At least it's \em slightly more interesting than "Hello, World!".
+ * If you see the output "Hello, Flusspferd!" and just get a shell back, then
+ * everything worked. If either of the above commands produces any different
+ * output, then something went wrong in the install proccess and most likely a
+ * required file couldn't be found.
  *
- * Next: \ref cpp-tutorial-values_and_objects
+ * Next: \ref cpp-tutorial-values_and_objects "Values and objects".
  */
 
 /**
  * @page cpp-tutorial-values_and_objects Values and objects
  *
- * Previous: \ref cpp-tutorial-secondprogram
+ * Previous: \ref cpp-tutorial-firstprogram
  *
  * Let's have a bird's-eye-view look at the basic value types supported by
  * Flusspferd. We shall create a few values of different types to get the hang
