@@ -29,7 +29,7 @@ THE SOFTWARE.
  * Before installing Flusspferd, you need to install its dependencies.
  *
  * @li Linux or Mac OS X (possibly other POSIX systems work too),
- * @li <a href="http://www.python.org/">Python</a> 2.3 or higher (2.5 is recommended) - required for the build system,
+ * @li <a href="http://www.python.org/">Python</a> 2.5 or higher - required for the build system,
  * @li <a href="http://www.boost.org/">Boost</a> 1.36 or higher,
  * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
  *     1.7 or higher 
@@ -39,7 +39,9 @@ THE SOFTWARE.
  * Recommended, but optional:
  *
  * @li <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell,
- * @li <a href="http://xmlsoft.org/">libxml2</a> for XML support.
+ * @li <a href="http://xmlsoft.org/">libxml2</a> 2.6 or higher (for the XML plugin),
+ * @li <a href="http://curl.haxx.se">cURL</a> (for the cURL plugin),
+ * @li <a href="http://www.sqlite.org">SQLite 3</a> 3.4 or higher (for the SQLite3 plugin).
  *
  * To get direct access to the development repository, you also need <a href="http://git-scm.com/">GIT</a>.
  *
@@ -51,7 +53,10 @@ THE SOFTWARE.
 $ git clone git://github.com/ruediger/flusspferd.git
 @endverbatim
  *
- * Alternatively, you can download it as a zip/tar archive from <a href="http://github.com/ruediger/flusspferd">Github</a>.
+ * Alternatively, you can download a release from
+ * <a href="https://sourceforge.net/project/showfiles.php?group_id=255938">
+ * Sourceforge</a> or a snapshot from
+ * <a href="http://github.com/ruediger/flusspferd">Github</a>.
  *
  * @section Build
  *
