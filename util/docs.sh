@@ -1,3 +1,3 @@
 #!/bin/sh
-doxygen
+doxygen help/Doxyfile
 ./util/jsdocs.sh
