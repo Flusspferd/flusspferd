@@ -1,7 +1,57 @@
-Flusspferd: Javascript bindings for C++, a Javascript interpreter and shell, and a Javascript/C++ module system. Also, Flusspferd includes a few Javascript classes and modules: binary blobs, XML, cURL, SQLite 3 and others.
+Flusspferd
+==========
 
-Flusspferd supports Spidermonkey as its backend, and possibly support for v8 or other engines will be added later.
+Javascript bindings for C++, a Javascript interpreter and shell, and a
+Javascript/C++ module system. Also, Flusspferd includes a few Javascript classes
+and modules: binary blobs, XML, cURL, SQLite 3 and others.
+
+It supports Spidermonkey as its backend, and possibly support for other engines
+will be added later.
 
 Flusspferd is licensed under the MIT license (open source).
 
 See http://flusspferd.org/ for more information.
+
+Requirements
+------------
+
+- Linux or Mac OS X or another POSIX system
+- Spidermonkey 1.7+
+- Boost 1.36+
+- Python 2.5+ (for the build system)
+
+Optionally:
+- libedit (BSD)
+- libxml2 2.6+ (for the XML plugin)
+- SQLite3 3.4+(for the SQLite3 plugin)
+- cURL (for the cURL plugin)
+
+Building & installing Flusspferd
+--------------------------------
+
+You can build Flusspferd (thanks to our wrappers) with
+
+$ ./configure && make && sudo make install
+
+as you probably are accustomed to. Alternatively, you can build Flusspferd with
+Waf:
+
+$ ./waf configure && ./waf build && sudo ./waf install
+
+You can generate the documentation with
+
+$ ./util/docs.sh
+
+Using Flusspferd
+----------------
+
+We have tutorials at http://flusspferd.org/docs/tutorials.html. Just a quick
+peek:
+
+$ flusspferd
+> "Hello!"
+Hello!
+> require('posix').sleep(5)
+>
+
+(The text after ">" in each line is input.)
