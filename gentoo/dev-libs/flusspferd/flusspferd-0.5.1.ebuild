@@ -2,15 +2,12 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: ebuild made by Philipp Reh, sefi@s-e-f-i.de$
 
-inherit git
-
+RESTRICT="mirror"
 DESCRIPTION="Flusspferd (German for Hippopotamus) is a C++ library providing
 Javascript bindings."
 HOMEPAGE="http://flusspferd.org/"
 
-#EGIT_REPO_URI="git://github.com/ruediger/flusspferd.git"
-EGIT_REPO_URI="git://flusspferd.git.sourceforge.net/gitroot/flusspferd"
-
+SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2"
 EAPI="2"
 LICENSE="MIT"
 SLOT="0"
