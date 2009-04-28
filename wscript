@@ -121,7 +121,7 @@ def configure(conf):
             u('FRAMEWORKPATH', os.environ['FRAMEWORKPATH'] )
 
     if Options.options.cxxflags:
-        append_each_unique('CXXFLAGS', str(Options.options.cxxflags))
+        append_each_unique(conf.env, 'CXXFLAGS', str(Options.options.cxxflags))
     else:
         append_each_unique(conf.env, 'CXXFLAGS',
                            '-pipe -Wno-long-long -Wall -W -pedantic -std=c++98')
