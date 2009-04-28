@@ -58,6 +58,7 @@ darwin = sys.platform.startswith('darwin')
 def init(): pass
 
 Scripting.excludes.remove('Makefile')
+Scripting.excludes += ['.configure']
 
 def dist_hook():
     versionfile = open('version', 'w')
