@@ -337,12 +337,12 @@ def build_pkgconfig(bld):
 def build(bld):
     bld.add_subdirs('src src/programs')
     if bld.env['ENABLE_SQLITE']:
-        bld.add_subdirs('plugins/sqlite3')
-    bld.add_subdirs('plugins/environment')
+        bld.add_subdirs('src/plugins/sqlite3')
+    bld.add_subdirs('src/plugins/environment')
     if sys.platform != 'win32':
-        bld.add_subdirs('plugins/posix')
+        bld.add_subdirs('src/plugins/posix')
     if bld.env['ENABLE_CURL']:
-        bld.add_subdirs('plugins/curl')
+        bld.add_subdirs('src/plugins/curl')
 
     if bld.env['ENABLE_TESTS']:
       bld.add_subdirs('test')

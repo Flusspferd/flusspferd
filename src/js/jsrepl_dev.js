@@ -24,10 +24,10 @@ THE SOFTWARE.
 // Set default paths to the plugin dirs
 require.paths.push(
   'src/js',
-  'plugins/sqlite3', 'build/default/plugins/sqlite3', 
-  'plugins/curl', 'build/default/plugins/curl',
-  'plugins/posix', 'build/default/plugins/posix',
-  'build/default/plugins/environment',
+  'src/plugins/sqlite3', 'build/default/src/plugins/sqlite3',
+  'src/plugins/curl', 'build/default/src/plugins/curl',
+  'src/plugins/posix', 'build/default/src/plugins/posix',
+  'build/default/src/plugins/environment',
   'build/default/src'
 );
 
