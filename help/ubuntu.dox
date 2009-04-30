@@ -44,6 +44,8 @@ $ sudo apt-get install libedit-dev
  * come with Ubuntu are outdated and Flusspferd won't work with them. So we
  * need to compile our own version of Boost.
  *
+ * Note: In Ubuntu 9.04 (Jaunty) there are <a href="http://packages.ubuntu.com/search?keywords=boost+1.37&searchon=names&suite=jaunty&section=all">Boost 1.37</a> packages which should work!
+ *
  * @verbatim
 $ wget http://downloads.sourceforge.net/boost/boost_1_38_0.tar.bz2
 $ tar xjf boost_1_38_0.tar.bz2
