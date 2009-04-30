@@ -29,9 +29,23 @@ THE SOFTWARE.
 #include <unistd.h>
 #endif
 
+#include <cerrno>
+
 using namespace flusspferd;
 
 namespace {
+
+int errno_getter() {
+  return errno;
+}
+
+void errno_setter(int errno_) {
+  errno = errno_;
+}
+
+std::string strerror_(int errno_) {
+  return strerror(errno_);
+}
 
 // import hook
 extern "C" void flusspferd_load(object posix)
@@ -48,6 +62,16 @@ extern "C" void flusspferd_load(object posix)
 #ifdef HAVE_USLEEP
   create_native_function(posix, "usleep", usleep);
 #endif
+
+  // errno
+  object errno_obj = create_object(); // TODO check if this has to be rooted
+  function get_errno = create_native_function(errno_obj, "get", &errno_getter);
+  function set_errno = create_native_function(errno_obj, "set", &errno_setter);
+  property_attributes errno_attr(permanent_shared_property,
+                                 get_errno, set_errno);
+  posix.define_property("errno", errno, errno_attr);
+  create_native_function(posix, "strerror", &strerror_);
+  create_native_function(posix, "perror", &perror);
 }
 
 
