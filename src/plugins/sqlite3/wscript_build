@@ -28,7 +28,7 @@ libtype = 'shlib'
 
 obj = bld.new_task_gen('cxx', libtype)
 obj.source = ['sqlite_plugin.cpp']
-obj.includes = ['../../include']
+obj.includes = ['../../../include']
 obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H SQLITE'
 obj.target = 'SQLite3'
