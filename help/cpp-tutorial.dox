@@ -75,10 +75,9 @@ conf.check_cfg(
                mandatory=1)
 @endverbatim
  *
- * Lets go with the simple method of shelling out to <code>pkg-config</code> for now.
- * We don't recomend that you use this method for any serious development, but
- * it has the advtange of being easy
- * and quick.
+ * Let's go with the simple method of shelling out to @c pkg-config for
+ * now. We don't recommend that you use this method for any serious development,
+ * but it has the advantage of being easy and quick.
  *
  * @verbatim
 $ g++  $(pkg-config --cflags --libs flusspferd) -o first_program first_program.cpp >/dev/null
