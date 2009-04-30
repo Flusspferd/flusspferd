@@ -25,7 +25,7 @@ libtype = 'shlib'
 
 obj = bld.new_task_gen('cxx', libtype)
 obj.source = ['curl_plugin.cpp']
-obj.includes = ['../../include', '.']
+obj.includes = ['../../../include', '.']
 obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H CURL'
 obj.target = 'cURL'
