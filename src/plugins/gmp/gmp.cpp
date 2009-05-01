@@ -163,14 +163,14 @@ struct Float : public flusspferd::native_object_base {
     else if(v.is_string())
       mp = v.to_std_string();
     else
-      mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+      mp = flusspferd::get_native<Float>(v.get_object()).mp;
   }
 
   Float(flusspferd::object const &self, flusspferd::call_context &x)
     : flusspferd::native_object_base(self)
   {
     if(x.arg.size() == 1) {
-      init_with_value(x.arg.front());      
+      init_with_value(x.arg.front());
     }
     else if(x.arg.size() == 2) {
       value v = x.arg.front();
