@@ -102,15 +102,26 @@
 /**#@- }}} */
 /// }}}
 
+// gmp.Rational {{{
+/**
+ * Provides a bignum rational class (see gmp's mpq_t, mpq_class)
+ * @name gmp.Rational
+ * @see gmp.Integer
+ * @see gmp.Float
+ * @class
+ */
+/// }}}
+
 // gmp.Float {{{
 /**
  * Provides a bignum floating point class (see gmp's mpf_t, mpf_class)
  * @name gmp.Float
  * @see gmp.Integer
+ * @see gmp.Rational
  * @class
  */
 // gmp.Float class methods {{{
-/**#@+ @methodOf IO.File */
+/**#@+ @methodOf gmp.Float */
 
 /**#@- }}} */
 // gmp.Float instance methods {{{
