@@ -263,7 +263,7 @@ struct Float : public flusspferd::native_object_base {
   }
 
   // operators
-  void cmp(flusspferd::call_context &x) {
+  void cmp(flusspferd::call_context &x) /*const*/ {
     if(x.arg.empty() || x.arg.size() > 1)
       throw flusspferd::exception("Expected one parameter!");
     value v = x.arg.front();
@@ -275,19 +275,31 @@ struct Float : public flusspferd::native_object_base {
       x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
   }
 
-  Float &add(Float const &f) { // TODO Integer
-    return create_float(mp + f.mp);
+  void add(flusspferd::call_context &x) /*const*/ {
+    if(x.arg.empty() || x.arg.size() > 1)
+      throw flusspferd::exception("Expected on parameter");
+    value v = x.arg.front();
+    if(v.is_int())
+      x.result = create_float(mp + v.get_int());
+    else if(v.is_double())
+      x.result = create_float(mp + v.get_double());
+    else if(flusspferd::is_native<Integer>(v.get_object()))
+      x.result = create_float(mp + flusspferd::get_native<Integer>(v.get_object()).mp);
+    else if(flusspferd::is_native<Float>(v.get_object()))
+      x.result = create_float(mp + flusspferd::get_native<Float>(v.get_object()).mp);
+    else
+      throw flusspferd::exception("Wrong parameter type");
   }
 
-  Float &sub(Float const &f) { // TODO Integer
+  Float &sub(Float const &f) /*const*/ { // TODO Integer
     return create_float(mp - f.mp);
   }
 
-  Float &mul(Float const &f) { // TODO Integer
+  Float &mul(Float const &f) /*const*/ { // TODO Integer
     return create_float(mp * f.mp);
   }
 
-  Float &div(Float const &f) { // TODO Integer
+  Float &div(Float const &f) /*const*/ { // TODO Integer
     return create_float(mp / f.mp);
   }
 };
