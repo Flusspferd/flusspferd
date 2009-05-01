@@ -28,6 +28,7 @@ require.paths.push(
   'src/plugins/curl', 'build/default/src/plugins/curl',
   'src/plugins/posix', 'build/default/src/plugins/posix',
   'src/plugins/os', 'build/default/src/plugins/os',
+  'src/plugins/gmp', 'build/default/src/plugins/gmp',
   'build/default/src/plugins/environment',
   'build/default/src'
 );
