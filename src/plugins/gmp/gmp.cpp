@@ -52,6 +52,10 @@ struct Integer : public flusspferd::native_object_base {
       create_native_method(proto, "sqrt", &Integer::sqrt);
       create_native_method(proto, "sgn", &Integer::sgn);
       create_native_method(proto, "abs", &Integer::abs);
+      create_native_method(proto, "add", &Integer::add);
+      create_native_method(proto, "sub", &Integer::sub);
+      create_native_method(proto, "mul", &Integer::mul);
+      create_native_method(proto, "div", &Integer::div);
       return proto;
     }
   };
@@ -121,6 +125,30 @@ struct Integer : public flusspferd::native_object_base {
   Integer &abs() /*const*/ {
     return create_integer(::abs(mp));
   }
+
+// TODO Float
+#define OPERATOR(name, op)                            \
+  void name (flusspferd::call_context &x) /*const*/ { \
+    if(x.arg.empty() || x.arg.size() > 1)             \
+      throw flusspferd::exception("Expected on parameter"); \
+    value v = x.arg.front();                                \
+    if(v.is_int())                                          \
+      x.result = create_integer(mp op v.get_int());           \
+    else if(v.is_double())                                  \
+      x.result = create_integer(mp op v.get_double());        \
+    else if(flusspferd::is_native<Integer>(v.get_object())) \
+      x.result = create_integer(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
+    else \
+      throw flusspferd::exception("Wrong parameter type"); \
+  } \
+  /**/
+
+  OPERATOR(add, +)
+  OPERATOR(sub, -)
+  OPERATOR(mul, *)
+  OPERATOR(div, /)
+
+#undef OPERATOR
 };
 
 
@@ -275,33 +303,30 @@ struct Float : public flusspferd::native_object_base {
       x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
   }
 
-  void add(flusspferd::call_context &x) /*const*/ {
-    if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected on parameter");
-    value v = x.arg.front();
-    if(v.is_int())
-      x.result = create_float(mp + v.get_int());
-    else if(v.is_double())
-      x.result = create_float(mp + v.get_double());
-    else if(flusspferd::is_native<Integer>(v.get_object()))
-      x.result = create_float(mp + flusspferd::get_native<Integer>(v.get_object()).mp);
-    else if(flusspferd::is_native<Float>(v.get_object()))
-      x.result = create_float(mp + flusspferd::get_native<Float>(v.get_object()).mp);
-    else
-      throw flusspferd::exception("Wrong parameter type");
-  }
+#define OPERATOR(name, op)                            \
+  void name (flusspferd::call_context &x) /*const*/ { \
+    if(x.arg.empty() || x.arg.size() > 1)             \
+      throw flusspferd::exception("Expected on parameter"); \
+    value v = x.arg.front();                                \
+    if(v.is_int())                                          \
+      x.result = create_float(mp op v.get_int());           \
+    else if(v.is_double())                                  \
+      x.result = create_float(mp op v.get_double());        \
+    else if(flusspferd::is_native<Integer>(v.get_object())) \
+      x.result = create_float(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
+    else if(flusspferd::is_native<Float>(v.get_object())) \
+      x.result = create_float(mp op flusspferd::get_native<Float>(v.get_object()).mp); \
+    else \
+      throw flusspferd::exception("Wrong parameter type"); \
+  } \
+  /**/
 
-  Float &sub(Float const &f) /*const*/ { // TODO Integer
-    return create_float(mp - f.mp);
-  }
+  OPERATOR(add, +)
+  OPERATOR(sub, -)
+  OPERATOR(mul, *)
+  OPERATOR(div, /)
 
-  Float &mul(Float const &f) /*const*/ { // TODO Integer
-    return create_float(mp * f.mp);
-  }
-
-  Float &div(Float const &f) /*const*/ { // TODO Integer
-    return create_float(mp / f.mp);
-  }
+#undef OPERATOR
 };
 }
 
