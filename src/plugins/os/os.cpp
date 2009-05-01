@@ -1,6 +1,6 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008 Rüdiger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -21,18 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Set default paths to the plugin dirs
-require.paths.push(
-  'src/js',
-  'src/plugins/sqlite3', 'build/default/src/plugins/sqlite3',
-  'src/plugins/curl', 'build/default/src/plugins/curl',
-  'src/plugins/posix', 'build/default/src/plugins/posix',
-  'src/plugins/os', 'build/default/src/plugins/os',
-  'build/default/src/plugins/environment',
-  'build/default/src'
-);
+#include "flusspferd/class.hpp"
+#include "flusspferd/create.hpp"
+#include "flusspferd/security.hpp"
 
-require.alias['XML'] = 'flusspferd-xml'
-require.alias['IO'] = 'flusspferd-io'
+#include <cstdlib>
 
-prelude = 'src/js/prelude.js';
+using namespace flusspferd;
+
+namespace {
+extern "C" void flusspferd_load(object os) {
+  create_native_function(os, "system", &std::system);
+}
+}
