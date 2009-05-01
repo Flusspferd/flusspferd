@@ -73,7 +73,7 @@ struct Integer : public flusspferd::native_object_base {
       else if(v.is_string())
         mp = v.to_std_string();
       else
-        mp = v.to_number();
+        mp = flusspferd::get_native<Integer>(v.get_object()).mp;
     }
     else if(x.arg.size() == 2) {
       value v = x.arg.front();
@@ -105,12 +105,12 @@ struct Integer : public flusspferd::native_object_base {
   }
 
   template<typename T>
-  object create_integer(T mp) /*const*/ {
+  Integer &create_integer(T mp) /*const*/ {
     return create_native_object<Integer>(create_object(), mpz_class(mp));
   }
 
   // this should be external but js doesn't support overloading!
-  object sqrt() /*const*/ {
+  Integer &sqrt() /*const*/ {
     return create_integer(::sqrt(mp));
   }
 
@@ -118,15 +118,132 @@ struct Integer : public flusspferd::native_object_base {
     return ::sgn(mp);
   }
 
-  object abs() /*const*/ {
+  Integer &abs() /*const*/ {
     return create_integer(::abs(mp));
   }
 };
 
-  // ...
+
+struct Float : public flusspferd::native_object_base {
+  struct class_info : flusspferd::class_info {
+    static char const *constructor_name() {
+      return "Float";
+    }
+
+    static char const *full_name() {
+      return "Float";
+    }
+
+    static object create_prototype() {
+      flusspferd::object proto = flusspferd::create_object();
+      create_native_method(proto, "fits_int", &Float::fits_int);
+      create_native_method(proto, "get_int", &Float::get_int);
+      create_native_method(proto, "get_double", &Float::get_double);
+      create_native_method(proto, "get_string", &Float::get_string);
+      create_native_method(proto, "get_string_base", &Float::get_string_base);
+      create_native_method(proto, "get_prec", &Float::get_prec);
+      create_native_method(proto, "set_prec", &Float::set_prec);
+      create_native_method(proto, "sqrt", &Float::sqrt);
+      create_native_method(proto, "sgn", &Float::sgn);
+      create_native_method(proto, "abs", &Float::abs);
+      return proto;
+    }
+  };
+  mpf_class mp;
+
+  Float(flusspferd::object const &self, mpf_class const &mp)
+    : flusspferd::native_object_base(self), mp(mp)
+  { }
+
+  void init_with_value(value v) {
+    if(v.is_double())
+      mp = v.get_double();
+    else if(v.is_int())
+      mp = v.get_int();
+    else if(v.is_string())
+      mp = v.to_std_string();
+    else
+      mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+  }
+
+  Float(flusspferd::object const &self, flusspferd::call_context &x)
+    : flusspferd::native_object_base(self)
+  {
+    if(x.arg.size() == 1) {
+      init_with_value(x.arg.front());      
+    }
+    else if(x.arg.size() == 2) {
+      value v = x.arg.front();
+      value u = x.arg.back();
+      if(v.is_string() && u.is_int())
+        mp.set_str(v.to_std_string(), u.get_int());
+      else {
+        mp.set_prec(u.get_int());
+        init_with_value(v);
+      }
+    }
+    else if(x.arg.size() == 3) {
+      value v = x.arg[0];
+      value u = x.arg[1];
+      value w = x.arg[2];
+      if(v.is_string() && u.is_int() && w.is_int()) {
+        mp.set_prec(u.get_int());
+        mp.set_str(v.to_std_string(), w.get_int());
+      }
+      else
+        throw flusspferd::exception("Wrong arguments! (string, int, int) expected.");
+    }
+    else
+      throw flusspferd::exception("Wrong number of arguments!");
+  }
+
+  bool fits_int() /*const*/ {
+    return mp.fits_sint_p();
+  }
+  int get_int() /*const*/ {
+    assert(fits_int());
+    return mp.get_si();
+  }
+  double get_double() /*const*/ {
+    return mp.get_d();
+  }
+  std::string get_string() /*const*/ {
+    mp_exp_t expo; // TODO handle expo
+    return mp.get_str(expo);
+  }
+  std::string get_string_base(int base) /*const*/ {
+    mp_exp_t expo; // TODO handle expo
+    return mp.get_str(expo, base);
+  }
+  int get_prec() /*const*/ {
+    return mp.get_prec();
+  }
+  void set_prec(int p) {
+    mp.set_prec(p);
+  }
+
+  template<typename T>
+  Float &create_float(T mp) /*const*/ {
+    return create_native_object<Float>(create_object(), mpf_class(mp));
+  }
+
+  // this should be external but js doesn't support overloading!
+  Float &sqrt() /*const*/ {
+    return create_float(::sqrt(mp));
+  }
+
+  int sgn() /*const*/ {
+    return ::sgn(mp);
+  }
+
+  Float &abs() /*const*/ {
+    return create_float(::abs(mp));
+  }
+};
 }
 
 extern "C" void flusspferd_load(object gmp) {
   load_class<multi_precission::Integer>(gmp);
+  load_class<multi_precission::Float>(gmp);
 }
 }
