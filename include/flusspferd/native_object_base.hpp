@@ -270,6 +270,22 @@ T &get_native(object const &o) {
 }
 
 template<typename T>
+bool is_derived(native_object_base &o) {
+  return dynamic_cast<T*>(&o);
+}
+
+/**
+ * Checks if @p o is a @p T.
+ *
+ * @param o object to check
+ * @see get_native
+ */
+template<typename T>
+bool is_native(object const &o) {
+  return is_derived<T>(native_object_base::get_native(o));
+}
+
+template<typename T>
 struct detail::convert_ptr<T, native_object_base> {
   struct to_value {
     value perform(T *ptr) {
