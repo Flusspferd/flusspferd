@@ -21,8 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// TODO
+#ifndef WIN32
 #define POSIX
+#endif
 
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
@@ -33,8 +34,10 @@ THE SOFTWARE.
 #ifdef POSIX
 #include <time.h>
 #include <cerrno>
+#elif WIN32
+#include <windows.h>
 #else
-#include <cassert>
+#error "OS not supported by os plugin"
 #endif
 
 using namespace flusspferd;
@@ -48,9 +51,9 @@ void sleep_(unsigned ms) {
   while(nanosleep(&ts, &rem) == -1 && errno == EINTR)
     ts = rem;
 }
-#else
-void sleep_(unsigned) {
-  assert(false);
+#elif WIN32
+void sleep_(unsigned ms) {
+  Sleep(ms);
 }
 #endif
 
