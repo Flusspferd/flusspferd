@@ -52,6 +52,7 @@ struct Integer : public flusspferd::native_object_base {
       create_native_method(proto, "sqrt", &Integer::sqrt);
       create_native_method(proto, "sgn", &Integer::sgn);
       create_native_method(proto, "abs", &Integer::abs);
+      create_native_method(proto, "cmp", &Integer::cmp);
       create_native_method(proto, "add", &Integer::add);
       create_native_method(proto, "sub", &Integer::sub);
       create_native_method(proto, "mul", &Integer::mul);
@@ -124,6 +125,18 @@ struct Integer : public flusspferd::native_object_base {
 
   Integer &abs() /*const*/ {
     return create_integer(::abs(mp));
+  }
+
+  void cmp(flusspferd::call_context &x) /*const*/ {
+    if(x.arg.empty() || x.arg.size() > 1)
+      throw flusspferd::exception("Expected one parameter!");
+    value v = x.arg.front();
+    if(v.is_int())
+      x.result = ::cmp(mp, v.get_int());
+    else if(v.is_double())
+      x.result = ::cmp(mp, v.get_double());
+    else
+      x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
   }
 
 // TODO Float
