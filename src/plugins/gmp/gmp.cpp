@@ -164,6 +164,41 @@ struct Integer : public flusspferd::native_object_base {
 #undef OPERATOR
 };
 
+struct Rational : public flusspferd::native_object_base {
+  struct class_info : flusspferd::class_info {
+    static char const *constructor_name() {
+      return "Rational";
+    }
+
+    static char const *full_name() {
+      return "Rational";
+    }
+
+    static object create_prototype() {
+      flusspferd::object proto = flusspferd::create_object();
+      // create_native_method(proto, "fits_int", &Rational::fits_int);
+      // create_native_method(proto, "get_int", &Rational::get_int);
+      // create_native_method(proto, "get_double", &Rational::get_double);
+      // create_native_method(proto, "get_string", &Rational::get_string);
+      // create_native_method(proto, "get_string_base", &Rational::get_string_base);
+      // create_native_method(proto, "get_prec", &Rational::get_prec);
+      // create_native_method(proto, "set_prec", &Rational::set_prec);
+      // create_native_method(proto, "sqrt", &Rational::sqrt);
+      // create_native_method(proto, "sgn", &Rational::sgn);
+      // create_native_method(proto, "abs", &Rational::abs);
+      // create_native_method(proto, "ceil", &Rational::ceil);
+      // create_native_method(proto, "floor", &Rational::floor);
+      // create_native_method(proto, "trunc", &Rational::trunc);
+      // create_native_method(proto, "cmp", &Rational::cmp);
+      // create_native_method(proto, "add", &Rational::add);
+      // create_native_method(proto, "sub", &Rational::sub);
+      // create_native_method(proto, "mul", &Rational::mul);
+      // create_native_method(proto, "div", &Rational::div);
+      return proto;
+    }
+  };
+  mpq_class mp;
+};
 
 struct Float : public flusspferd::native_object_base {
   struct class_info : flusspferd::class_info {
@@ -211,8 +246,12 @@ struct Float : public flusspferd::native_object_base {
       mp = v.get_int();
     else if(v.is_string())
       mp = v.to_std_string();
-    else
+    else if(flusspferd::is_native<Integer>(v.get_object()))
+      mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+    else if(flusspferd::is_native<Float>(v.get_object()))
       mp = flusspferd::get_native<Float>(v.get_object()).mp;
+    else
+      throw flusspferd::exception("Wrong parameter type");
   }
 
   Float(flusspferd::object const &self, flusspferd::call_context &x)
@@ -306,14 +345,18 @@ struct Float : public flusspferd::native_object_base {
   // operators
   void cmp(flusspferd::call_context &x) /*const*/ {
     if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected one parameter!");
+      throw flusspferd::exception("Expected one parameter");
     value v = x.arg.front();
     if(v.is_int())
       x.result = ::cmp(mp, v.get_int());
     else if(v.is_double())
       x.result = ::cmp(mp, v.get_double());
-    else
+    else if(flusspferd::is_native<Integer>(v.get_object()))
+      x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
+    else if(flusspferd::is_native<Float>(v.get_object()))
       x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
+    else
+      throw flusspferd::exception("Wrong parameter type");
   }
 
 #define OPERATOR(name, op)                            \
@@ -347,6 +390,6 @@ struct Float : public flusspferd::native_object_base {
 
 FLUSSPFERD_LOADER(gmp) {
   load_class<multi_precission::Integer>(gmp);
-  // TODO Rational
+  load_class<multi_precission::Rational>(gmp);
   load_class<multi_precission::Float>(gmp);
 }
