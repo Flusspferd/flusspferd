@@ -243,6 +243,10 @@ void require(call_context &x) {
 
         func(exports);
 
+        // The exports reference might have been changed.
+        module_cache.set_property(key, exports);
+        x.result = exports;
+
         found = true;
         break;
       }
