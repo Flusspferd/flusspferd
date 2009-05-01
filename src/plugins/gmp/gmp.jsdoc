@@ -3,16 +3,35 @@
  * @namespace gmp - GNU Multiple Precision Arithmetic Library
  * @name gmp
  *
+ * @see gmp.Integer
  * @see gmp.Float
  */
 
-// gmp.Float {{{
+// gmp.Integer {{{
 /**
- * Provides a bignum floating point class (see gmp's mpf)
- * @name gmp.Float
+ * Provides a bignum integer class (see gmp's mpz_t, mpz_class)
+ * @name gmp.Integer
+ * @see gmp.Float
  * @class
  */
-// Stream instance methods {{{
+// Integer instance methods {{{
+/**#@+ @methodOf gmp.Integer# */
+
+/**#@- }}} */
+/// }}}
+
+// gmp.Float {{{
+/**
+ * Provides a bignum floating point class (see gmp's mpf_t, mpf_class)
+ * @name gmp.Float
+ * @see gmp.Integer
+ * @class
+ */
+// gmp.Float class methods {{{
+/**#@+ @methodOf IO.File */
+
+/**#@- }}} */
+// gmp.Float instance methods {{{
 /**#@+ @methodOf gmp.Float# */
 
 /**
@@ -73,6 +92,59 @@
 /**
  * returns the absolute value
  * @name abs
+ * @return Float
+ */
+
+/**
+ * returns the smallest integral value not less than the value
+ * @name ceil
+ * @return Float
+ */
+
+/**
+ * returns the largest integral value not greater than the value
+ * @name floor
+ * @return Float
+ */
+
+/**
+ * returns the truncated value
+ * @name trunc
+ * @return Float
+ */
+
+/**
+ * compares value to another Float, double or integer
+ * @name cmp
+ * @param op compare to
+ * @return integer Returns a positive value if value > op, zero if value == op, and a negative value if value < op.  
+ */
+
+/**
+ * returns the addition of value with an operator
+ * @name add
+ * @param op added to value
+ * @return Float value + op
+ */
+
+/**
+ * returns the subtraction of operator from value
+ * @name sub
+ * @param op
+ * @return Float
+ */
+
+/**
+ * returns the multiplication of value with operator
+ * @name mul
+ * @param op
+ * @return Float
+ */
+
+/**
+ * returns the dividion of value by operator
+ * @name div
+ * @param op
  * @return Float
  */
 
