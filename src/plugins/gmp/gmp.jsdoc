@@ -1,0 +1,80 @@
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+/**
+ * @namespace gmp - GNU Multiple Precision Arithmetic Library
+ * @name gmp
+ *
+ * @see gmp.Float
+ */
+
+// gmp.Float {{{
+/**
+ * Provides a bignum floating point class (see gmp's mpf)
+ * @name gmp.Float
+ * @class
+ */
+// Stream instance methods {{{
+/**#@+ @methodOf gmp.Float# */
+
+/**
+ * checks if the value fits into an integer
+ * @name fits_int
+ * @return bool
+ */
+
+/**
+ * returns the value as an integer
+ * @name get_int()
+ * @return integer
+ */
+
+/**
+ * returns the value as a double
+ * @name get_double
+ * @return double
+ */
+
+/**
+ * returns the value as a string
+ * @name get_string
+ * @return string
+ */
+
+/**
+ * returns the value as a string in a specific base
+ * @name get_string_base
+ * @param base
+ * @return string
+ */
+
+/**
+ * returns the precision
+ * @name get_prec
+ * @return integer
+ */
+
+/**
+ * sets the precision
+ * @name set_prec
+ * @param precision
+ */
+
+/**
+ * returns the square root
+ * @name sqrt
+ * @return Float containing the square root
+ */
+
+/**
+ * returns the signum
+ * @name sgn
+ * @return integer
+ */
+
+/**
+ * returns the absolute value
+ * @name abs
+ * @return Float
+ */
+
+/**#@- }}} */
+/// }}}
