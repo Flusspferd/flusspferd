@@ -12,3 +12,12 @@
  * @name system
  * @param command string to execute
  */
+
+/**
+ * Sleeps for an amount of microseconds
+ *
+ * @name sleep
+ * @param msec the amount of microseconds to sleep
+ * @see posix.sleep
+ * @see posix.usleep
+ */

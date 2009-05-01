@@ -21,16 +21,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// TODO
+#define POSIX
+
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/security.hpp"
 
 #include <cstdlib>
 
+#ifdef POSIX
+#include <time.h>
+#include <cerrno>
+#else
+#include <cassert>
+#endif
+
 using namespace flusspferd;
+
+#ifdef POSIX
+void sleep_(unsigned ms) {
+  timespec ts;
+  ts.tv_sec = ms/1000;
+  ts.tv_nsec = (ms%1000) * 1000000; // convert ms to ns
+  timespec rem;
+  while(nanosleep(&ts, &rem) == -1 && errno == EINTR)
+    ts = rem;
+}
+#else
+void sleep_(unsigned) {
+  assert(false);
+}
+#endif
 
 namespace {
 extern "C" void flusspferd_load(object os) {
   create_native_function(os, "system", &std::system);
+  create_native_function(os, "sleep", &sleep_);
 }
 }
