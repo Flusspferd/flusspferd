@@ -54,7 +54,7 @@ void load_require_function(object container = flusspferd::global());
  *
  * @ingroup loadable_modules
  */
-typedef void (*flusspferd_load_t)(object exports);
+typedef void (*flusspferd_load_t)(object &exports);
 
 /**
  * Define a module loader.
@@ -62,7 +62,7 @@ typedef void (*flusspferd_load_t)(object exports);
  * @param exports The object containing the module exports.
  */
 #define FLUSSPFERD_LOADER(exports) \
-  extern "C" void flusspferd_load(::flusspferd::object exports)
+  extern "C" void flusspferd_load(::flusspferd::object &exports)
 
 }
 

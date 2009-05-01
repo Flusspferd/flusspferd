@@ -59,12 +59,12 @@ protected:
   bool property_resolve(value const &id, unsigned access);
 };
 
-FLUSSPFERD_LOADER(container) {
-  load_class<environment>(container);
-  // Return an instance of it as well since that'll be the common use case.
+FLUSSPFERD_LOADER(exports) {
+  local_root_scope scope;
+  load_class<environment>(create_object());
+
   call_context x;
-  object env = create_native_object<environment>(object(), boost::ref(x));
-  container.set_property("environment", env);
+  exports = create_native_object<environment>(object(), boost::ref(x));
 }
 
 environment::environment(object const &obj, call_context &)
