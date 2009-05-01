@@ -64,7 +64,7 @@ extern "C" void flusspferd_load(object posix)
 #endif
 
   // errno
-  object errno_obj = create_object(); // TODO check if this has to be rooted
+  object errno_obj = create_object();
   function get_errno = create_native_function(errno_obj, "get", &errno_getter);
   function set_errno = create_native_function(errno_obj, "set", &errno_setter);
   property_attributes errno_attr(permanent_shared_property,
