@@ -1,0 +1,14 @@
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+/**
+ * @namespace os - system independent OS interface
+ * @name os
+ *
+ */
+
+/**#@+ @methodOf os# */
+/**
+ * System executes a shell command like C's system(3).
+ *
+ * @name system
+ * @param command string to execute
+ */
