@@ -26,14 +26,14 @@ THE SOFTWARE.
 #include "flusspferd/io/blob_stream.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/class.hpp"
+#include "flusspferd/modules.hpp"
 #include <iostream>
 
 using namespace flusspferd;
 using namespace flusspferd::io;
 
 #ifndef FLUSSPFERD_COVERAGE
-extern "C" void flusspferd_load(object container)
-{
+FLUSSPFERD_LOADER(container) {
   load_io(container);
 }
 #endif

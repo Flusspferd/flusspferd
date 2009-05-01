@@ -24,6 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/modules.hpp"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -47,9 +48,7 @@ std::string strerror_(int errno_) {
   return std::strerror(errno_);
 }
 
-// import hook
-extern "C" void flusspferd_load(object posix)
-{
+FLUSSPFERD_LOADER(posix) {
   local_root_scope scope;
 
 #ifdef HAVE_FORK

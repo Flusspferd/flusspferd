@@ -24,7 +24,7 @@ THE SOFTWARE.
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/security.hpp"
-
+#include "flusspferd/modules.hpp"
 #include <gmpxx.h>
 
 using namespace flusspferd;
@@ -242,8 +242,9 @@ struct Float : public flusspferd::native_object_base {
 };
 }
 
-extern "C" void flusspferd_load(object gmp) {
+}/*namespace*/
+
+FLUSSPFERD_LOADER(gmp) {
   load_class<multi_precission::Integer>(gmp);
   load_class<multi_precission::Float>(gmp);
-}
 }

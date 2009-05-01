@@ -26,6 +26,7 @@ THE SOFTWARE.
 #include "flusspferd/native_object_base.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/modules.hpp"
 
 #if defined(__APPLE__)
 #  include <crt_externs.h> 
@@ -58,10 +59,7 @@ protected:
   bool property_resolve(value const &id, unsigned access);
 };
 
-///////////////////////////
-// import hook
-extern "C" void flusspferd_load(object container)
-{
+FLUSSPFERD_LOADER(container) {
   load_class<environment>(container);
   // Return an instance of it as well since that'll be the common use case.
   call_context x;

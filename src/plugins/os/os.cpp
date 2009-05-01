@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/modules.hpp"
 
 #include <cstdlib>
 
@@ -58,8 +59,9 @@ void sleep_(unsigned ms) {
 }
 #endif
 
-extern "C" void flusspferd_load(object os) {
+}
+
+FLUSSPFERD_LOADER(os) {
   create_native_function(os, "system", &std::system);
   create_native_function(os, "sleep", &sleep_);
-}
 }

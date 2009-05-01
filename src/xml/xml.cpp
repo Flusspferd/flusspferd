@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/modules.hpp"
 #include <boost/thread/once.hpp>
 #include <boost/preprocessor.hpp>
 #include <libxml/xmlIO.h>
@@ -48,8 +49,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 #ifndef FLUSSPFERD_COVERAGE
-extern "C" void flusspferd_load(object container)
-{
+FLUSSPFERD_LOADER(container) {
   load_xml(container);
 }
 #endif

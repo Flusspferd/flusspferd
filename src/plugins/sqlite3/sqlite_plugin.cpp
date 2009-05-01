@@ -95,10 +95,7 @@ private: // JS methods
   void bind(call_context &x);
 };
 
-///////////////////////////
-// import hook
-extern "C" void flusspferd_load(object container)
-{
+FLUSSPFERD_LOADER(container) {
   load_class<sqlite3>(container);
 }
 

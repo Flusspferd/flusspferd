@@ -56,6 +56,14 @@ void load_require_function(object container = flusspferd::global());
  */
 typedef void (*flusspferd_load_t)(object exports);
 
+/**
+ * Define a module loader.
+ *
+ * @param exports The object containing the module exports.
+ */
+#define FLUSSPFERD_LOADER(exports) \
+  extern "C" void flusspferd_load(::flusspferd::object exports)
+
 }
 
 #endif

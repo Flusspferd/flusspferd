@@ -2,6 +2,6 @@
 #include <iostream>
 #include <ostream>
 
-extern "C" void flusspferd_load(flusspferd::object container) {
+FLUSSPFERD_LOADER(exports) {
     std::cout << "Module loaded!" << std::endl;
 }
