@@ -106,7 +106,7 @@ struct Integer : public flusspferd::native_object_base {
 
   template<typename T>
   Integer &create_integer(T mp) /*const*/ {
-    return create_native_object<Integer>(create_object(), mpz_class(mp));
+    return create_native_object<Integer>(object(), mpz_class(mp));
   }
 
   // this should be external but js doesn't support overloading!
@@ -146,6 +146,14 @@ struct Float : public flusspferd::native_object_base {
       create_native_method(proto, "sqrt", &Float::sqrt);
       create_native_method(proto, "sgn", &Float::sgn);
       create_native_method(proto, "abs", &Float::abs);
+      create_native_method(proto, "ceil", &Float::ceil);
+      create_native_method(proto, "floor", &Float::floor);
+      create_native_method(proto, "trunc", &Float::trunc);
+      create_native_method(proto, "cmp", &Float::cmp);
+      create_native_method(proto, "add", &Float::add);
+      create_native_method(proto, "sub", &Float::sub);
+      create_native_method(proto, "mul", &Float::mul);
+      create_native_method(proto, "div", &Float::div);
       return proto;
     }
   };
@@ -224,7 +232,7 @@ struct Float : public flusspferd::native_object_base {
 
   template<typename T>
   Float &create_float(T mp) /*const*/ {
-    return create_native_object<Float>(create_object(), mpf_class(mp));
+    return create_native_object<Float>(object(), mpf_class(mp));
   }
 
   // this should be external but js doesn't support overloading!
@@ -239,6 +247,49 @@ struct Float : public flusspferd::native_object_base {
   Float &abs() /*const*/ {
     return create_float(::abs(mp));
   }
+
+  Float &ceil() /*const*/ {
+    return create_float(::ceil(mp));
+  }
+
+  Float &floor() /*const*/ {
+    return create_float(::floor(mp));
+  }
+
+  // hypot
+
+  Float &trunc() /*const*/ {
+    return create_float(::trunc(mp));
+  }
+
+  // operators
+  void cmp(flusspferd::call_context &x) {
+    if(x.arg.empty() || x.arg.size() > 1)
+      throw flusspferd::exception("Expected one parameter!");
+    value v = x.arg.front();
+    if(v.is_int())
+      x.result = ::cmp(v.get_int(), mp);
+    else if(v.is_double())
+      x.result = ::cmp(v.get_double(), mp);
+    else
+      x.result = ::cmp(flusspferd::get_native<Float>(v.get_object()).mp, mp);
+  }
+
+  Float &add(Float const &f) { // TODO Integer
+    return create_float(mp + f.mp);
+  }
+
+  Float &sub(Float const &f) { // TODO Integer
+    return create_float(mp - f.mp);
+  }
+
+  Float &mul(Float const &f) { // TODO Integer
+    return create_float(mp * f.mp);
+  }
+
+  Float &div(Float const &f) { // TODO Integer
+    return create_float(mp / f.mp);
+  }
 };
 }
 
@@ -246,5 +297,6 @@ struct Float : public flusspferd::native_object_base {
 
 FLUSSPFERD_LOADER(gmp) {
   load_class<multi_precission::Integer>(gmp);
+  // TODO Rational
   load_class<multi_precission::Float>(gmp);
 }
