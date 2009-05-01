@@ -268,7 +268,7 @@ void my_function(call_context &x) {
  *
  * Previous: \ref cpp-tutorial-functions
  *
- * Other than functions, users of flusspferd will likely want to create classes.
+ * Other than functions, users of Flusspferd will likely want to create classes.
  *
  * As a simple example, we have chosen a "set of strings".
  *
