@@ -1,0 +1,48 @@
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+/**
+ * @namespace posix - posix system interface
+ * @name posix
+ *
+ */
+
+/**#@+ @methodOf posix# */
+/**
+ * number of last error. See errno(3)
+ *
+ * @name errno
+ * @type int
+ */
+
+/**
+ * return string describing error number. See strerror(3)
+ *
+ * @name strerror
+ * @param errnum number of error
+ */
+
+/**
+ * print a system error message. See perror(3)
+ *
+ * @name perror
+ * @param s additional message
+ */
+
+/**
+ * create a child process. See fork(2)
+ *
+ * @name fork
+ */
+
+/**
+ * delay for a specified number of seconds. See sleep(3)
+ *
+ * @name sleep
+ * @param seconds the amount of seconds to sleep
+ */
+
+/**
+ * suspend execution for microsecond intervals. See usleep(3)
+ *
+ * @name usleep
+ * @param usec the amount of microseconds to sleep
+ */

@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Ash Berlin
+Copyright (c) 2008 Ash Berlin, Rüdiger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ void errno_setter(int errno_) {
 }
 
 std::string strerror_(int errno_) {
-  return strerror(errno_);
+  return std::strerror(errno_);
 }
 
 // import hook
@@ -71,7 +71,7 @@ extern "C" void flusspferd_load(object posix)
                                  get_errno, set_errno);
   posix.define_property("errno", errno, errno_attr);
   create_native_function(posix, "strerror", &strerror_);
-  create_native_function(posix, "perror", &perror);
+  create_native_function(posix, "perror", &std::perror);
 }
 
 
