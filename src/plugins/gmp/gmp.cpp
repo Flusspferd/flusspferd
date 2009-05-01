@@ -268,11 +268,11 @@ struct Float : public flusspferd::native_object_base {
       throw flusspferd::exception("Expected one parameter!");
     value v = x.arg.front();
     if(v.is_int())
-      x.result = ::cmp(v.get_int(), mp);
+      x.result = ::cmp(mp, v.get_int());
     else if(v.is_double())
-      x.result = ::cmp(v.get_double(), mp);
+      x.result = ::cmp(mp, v.get_double());
     else
-      x.result = ::cmp(flusspferd::get_native<Float>(v.get_object()).mp, mp);
+      x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
   }
 
   Float &add(Float const &f) { // TODO Integer
