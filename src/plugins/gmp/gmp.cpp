@@ -106,7 +106,7 @@ struct Integer : public flusspferd::native_object_base {
 
   template<typename T>
   Integer &create_integer(T mp) /*const*/ {
-    return create_native_object<Integer>(create_object(), mpz_class(mp));
+    return create_native_object<Integer>(object(), mpz_class(mp));
   }
 
   // this should be external but js doesn't support overloading!
@@ -224,7 +224,7 @@ struct Float : public flusspferd::native_object_base {
 
   template<typename T>
   Float &create_float(T mp) /*const*/ {
-    return create_native_object<Float>(create_object(), mpf_class(mp));
+    return create_native_object<Float>(object(), mpf_class(mp));
   }
 
   // this should be external but js doesn't support overloading!
