@@ -16,7 +16,89 @@
  */
 // Integer instance methods {{{
 /**#@+ @methodOf gmp.Integer# */
+/**
+ * checks if the value fits into an integer
+ * @name fits_int
+ * @return bool
+ */
 
+/**
+ * returns the value as an integer
+ * @name get_int()
+ * @return integer
+ */
+
+/**
+ * returns the value as a double
+ * @name get_double
+ * @return double
+ */
+
+/**
+ * returns the value as a string
+ * @name get_string
+ * @return string
+ */
+
+/**
+ * returns the value as a string in a specific base
+ * @name get_string_base
+ * @param base
+ * @return string
+ */
+
+/**
+ * returns the square root
+ * @name sqrt
+ * @return Integer containing the square root
+ */
+
+/**
+ * returns the signum
+ * @name sgn
+ * @return integer
+ */
+
+/**
+ * returns the absolute value
+ * @name abs
+ * @return Integer
+ */
+
+/**
+ * compares value to another Integer, double or integer
+ * @name cmp
+ * @param op compare to
+ * @return integer Returns a positive value if value > op, zero if value == op, and a negative value if value < op.  
+ */
+
+/**
+ * returns the addition of value with an operator
+ * @name add
+ * @param op added to value
+ * @return Integer value + op
+ */
+
+/**
+ * returns the subtraction of operator from value
+ * @name sub
+ * @param op
+ * @return Integer
+ */
+
+/**
+ * returns the multiplication of value with operator
+ * @name mul
+ * @param op
+ * @return Integer
+ */
+
+/**
+ * returns the dividion of value by operator
+ * @name div
+ * @param op
+ * @return Integer
+ */
 /**#@- }}} */
 /// }}}
 
