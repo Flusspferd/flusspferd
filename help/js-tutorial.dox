@@ -68,7 +68,7 @@ $ flusspferd source.js
  * @section js-tutorial-emacs Using inferior-flusspferd-mode
  * Flusspferd comes with an
  * <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode.
- * The flusspferd mode can be used to interactively develop
+ * The Flusspferd mode can be used to interactively develop
  * javascript code by sending it to the Flusspferd shell.
  *
  * See \ref emacs-install "Emacs Mode install instructions"
