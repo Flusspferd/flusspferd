@@ -5,7 +5,7 @@
  *
  */
 
-/**#@+ @methodOf posix# */
+/**#@+ @fieldOf posix# */
 /**
  * number of last error. See errno(3).
  *
@@ -13,6 +13,7 @@
  * @type int
  */
 
+/**#@+ @methodOf posix# */
 /**
  * return string describing error number. See strerror(3).
  *
