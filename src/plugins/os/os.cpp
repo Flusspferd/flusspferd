@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
+namespace {
 #ifdef POSIX
 void sleep_(unsigned ms) {
   timespec ts;
@@ -57,7 +58,6 @@ void sleep_(unsigned ms) {
 }
 #endif
 
-namespace {
 extern "C" void flusspferd_load(object os) {
   create_native_function(os, "system", &std::system);
   create_native_function(os, "sleep", &sleep_);
