@@ -21,6 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+var Util = exports;
+
 /**
  * Create an iterable object returning all objects in a range, starting
  * at "from", up to (not including) "to", incrementing by "by" in each step.
@@ -31,7 +33,7 @@ THE SOFTWARE.
  *
  * @class
  */
-exports.Range = function Util$Range(from, to, by) {
+Util.Range = function Util$Range(from, to, by) {
   // TODO: find out why this hack is needed / how to get rid of it
   var fun = new Function(
     'from', 'to', 'by',
