@@ -154,7 +154,7 @@ struct Integer : public flusspferd::native_object_base {
     else \
       throw flusspferd::exception("Wrong parameter type"); \
   } \
-  /**/
+  /* */
 
   OPERATOR(add, +)
   OPERATOR(sub, -)
@@ -166,6 +166,8 @@ struct Integer : public flusspferd::native_object_base {
 
 struct Rational : public flusspferd::native_object_base {
   struct class_info : flusspferd::class_info {
+    typedef boost::mpl::bool_<false> constructible;//FIXME
+
     static char const *constructor_name() {
       return "Rational";
     }
