@@ -106,6 +106,8 @@ namespace multi_precission {
       x.result = ::cmp(mp, v.get_double());
     else if(flusspferd::is_native<Integer>(v.get_object()))
       x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
+    else if(flusspferd::is_native<Rational>(v.get_object()))
+      x.result = ::cmp(mp, flusspferd::get_native<Rational>(v.get_object()).mp);
     else if(flusspferd::is_native<Float>(v.get_object()))
       x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
     else
