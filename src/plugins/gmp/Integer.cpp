@@ -20,8 +20,14 @@ namespace multi_precission {
         mp = v.get_int();
       else if(v.is_string())
         mp = v.to_std_string();
-      else
+      else if(flusspferd::is_native<Integer>(v.get_object()))
         mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+      else if(flusspferd::is_native<Rational>(v.get_object()))
+        mp = flusspferd::get_native<Rational>(v.get_object()).mp;
+      else if(flusspferd::is_native<Float>(v.get_object()))
+        mp = flusspferd::get_native<Float>(v.get_object()).mp;
+      else
+        throw flusspferd::exception("Wrong parameter type");
     }
     else if(x.arg.size() == 2) {
       flusspferd::value v = x.arg.front();
