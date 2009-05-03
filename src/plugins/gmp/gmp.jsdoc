@@ -4,6 +4,7 @@
  * @name gmp
  *
  * @see gmp.Integer
+ * @see gmp.Rational
  * @see gmp.Float
  */
 
@@ -110,6 +111,92 @@
  * @see gmp.Float
  * @class
  */
+/// }}}
+// gmp.Rational instance methods {{{
+/**#@+ @methodOf gmp.Rational# */
+/**
+ * returns the value as a double
+ * @name get_double()
+ * @return double
+ */
+
+/**
+ * returns the value as a string
+ * @name get_string()
+ * @return string
+ */
+
+/**
+ * returns the value as a string in a specific base
+ * @name get_string_base()
+ * @param base
+ * @return string
+ */
+
+/**
+ * Puts the object into canonical form
+ * @name canonicalize()
+ */
+
+/**
+ * returns the numerator
+ * @name get_num()
+ * @return gmp.Integer
+ */
+
+/**
+ * returns the denominator
+ * @name get_den()
+ * @return gmp.Integer
+ */
+
+/**
+ * returns the signum
+ * @name sgn()
+ * @return integer
+ */
+
+/**
+ * returns the absolute value
+ * @name abs()
+ * @return gmp.Rational
+ */
+
+/**
+ * compares value to another Float, double or integer
+ * @name cmp()
+ * @param op compare to
+ * @return integer Returns a positive value if value > op, zero if value == op, and a negative value if value < op.  
+ */
+
+/**
+ * returns the addition of value with an operator
+ * @name add()
+ * @param op added to value
+ * @return gmp.Rational value + op
+ */
+
+/**
+ * returns the subtraction of operator from value
+ * @name sub()
+ * @param op
+ * @return gmp.Rational
+ */
+
+/**
+ * returns the multiplication of value with operator
+ * @name mul()
+ * @param op
+ * @return gmp.Rational
+ */
+
+/**
+ * returns the dividion of value by operator
+ * @name div()
+ * @param op
+ * @return gmp.Rational
+ */
+/**#@- }}} */
 /// }}}
 
 // gmp.Float {{{
