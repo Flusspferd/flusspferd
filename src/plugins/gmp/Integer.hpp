@@ -69,7 +69,7 @@ struct Integer : public flusspferd::native_object_base {
   std::string get_string_base(int base) /*const*/;
 
   template<typename T>
-  Integer &create_integer(T mp) /*const*/ {
+  static Integer &create_integer(T mp) {
     return flusspferd::create_native_object<Integer>(object(), mpz_class(mp));
   }
 

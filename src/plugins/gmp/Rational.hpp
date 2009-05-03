@@ -28,7 +28,11 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include <gmpxx.h>
 
+//#include "Integer.hpp"
+
 namespace multi_precission {
+class Integer;
+
 struct Rational : public flusspferd::native_object_base {
   struct class_info : flusspferd::class_info {
     static char const *constructor_name() {
@@ -41,24 +45,19 @@ struct Rational : public flusspferd::native_object_base {
 
     static object create_prototype() {
       flusspferd::object proto = flusspferd::create_object();
-      // create_native_method(proto, "fits_int", &Rational::fits_int);
-      // create_native_method(proto, "get_int", &Rational::get_int);
-      // create_native_method(proto, "get_double", &Rational::get_double);
-      // create_native_method(proto, "get_string", &Rational::get_string);
-      // create_native_method(proto, "get_string_base", &Rational::get_string_base);
-      // create_native_method(proto, "get_prec", &Rational::get_prec);
-      // create_native_method(proto, "set_prec", &Rational::set_prec);
-      // create_native_method(proto, "sqrt", &Rational::sqrt);
-      // create_native_method(proto, "sgn", &Rational::sgn);
-      // create_native_method(proto, "abs", &Rational::abs);
-      // create_native_method(proto, "ceil", &Rational::ceil);
-      // create_native_method(proto, "floor", &Rational::floor);
-      // create_native_method(proto, "trunc", &Rational::trunc);
-      // create_native_method(proto, "cmp", &Rational::cmp);
-      // create_native_method(proto, "add", &Rational::add);
-      // create_native_method(proto, "sub", &Rational::sub);
-      // create_native_method(proto, "mul", &Rational::mul);
-      // create_native_method(proto, "div", &Rational::div);
+      create_native_method(proto, "get_double", &Rational::get_double);
+      create_native_method(proto, "get_string", &Rational::get_string);
+      create_native_method(proto, "get_string_base", &Rational::get_string_base);
+      create_native_method(proto, "sgn", &Rational::sgn);
+      create_native_method(proto, "abs", &Rational::abs);
+      create_native_method(proto, "canonicalize", &Rational::canonicalize);
+      create_native_method(proto, "get_num", &Rational::get_num);
+      create_native_method(proto, "get_den", &Rational::get_den);
+      create_native_method(proto, "cmp", &Rational::cmp);
+      create_native_method(proto, "add", &Rational::add);
+      create_native_method(proto, "sub", &Rational::sub);
+      create_native_method(proto, "mul", &Rational::mul);
+      create_native_method(proto, "div", &Rational::div);
       return proto;
     }
   };
@@ -66,6 +65,30 @@ struct Rational : public flusspferd::native_object_base {
 
   Rational(flusspferd::object const &self, mpq_class const &mp);
   Rational(flusspferd::object const &self, flusspferd::call_context &x);
+
+  double get_double() /*const*/;
+  std::string get_string() /*const*/;
+  std::string get_string_base(int base) /*const*/;
+
+  template<typename T>
+  static Rational &create_rational(T mp) {
+    return flusspferd::create_native_object<Rational>(object(), mpq_class(mp));
+  }
+
+  int sgn() /*const*/;
+  Rational &abs() /*const*/;
+  void canonicalize();
+  
+  Integer &get_num() /*const*/;
+  Integer &get_den() /*const*/;
+
+  // operators
+  void cmp(flusspferd::call_context &x) /*const*/;
+
+  void add(flusspferd::call_context &x) /*const*/;
+  void sub(flusspferd::call_context &x) /*const*/;
+  void mul(flusspferd::call_context &x) /*const*/;
+  void div(flusspferd::call_context &x) /*const*/;
 };
 }
 
