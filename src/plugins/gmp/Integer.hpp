@@ -74,53 +74,17 @@ struct Integer : public flusspferd::native_object_base {
   }
 
   // this should be external but js doesn't support overloading!
-  Integer &sqrt() /*const*/ {
-    return create_integer(::sqrt(mp));
-  }
+  Integer &sqrt() /*const*/;
+  int sgn() /*const*/;
+  Integer &abs() /*const*/;
 
-  int sgn() /*const*/ {
-    return ::sgn(mp);
-  }
+  // operators
+  void cmp(flusspferd::call_context &x) /*const*/;
 
-  Integer &abs() /*const*/ {
-    return create_integer(::abs(mp));
-  }
-
-  void cmp(flusspferd::call_context &x) /*const*/ {
-    if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected one parameter!");
-    flusspferd::value v = x.arg.front();
-    if(v.is_int())
-      x.result = ::cmp(mp, v.get_int());
-    else if(v.is_double())
-      x.result = ::cmp(mp, v.get_double());
-    else
-      x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
-  }
-
-// TODO Float
-#define OPERATOR(name, op)                            \
-  void name (flusspferd::call_context &x) /*const*/ { \
-    if(x.arg.empty() || x.arg.size() > 1)             \
-      throw flusspferd::exception("Expected on parameter"); \
-    flusspferd::value v = x.arg.front();                    \
-    if(v.is_int())                                          \
-      x.result = create_integer(mp op v.get_int());           \
-    else if(v.is_double())                                  \
-      x.result = create_integer(mp op v.get_double());        \
-    else if(flusspferd::is_native<Integer>(v.get_object())) \
-      x.result = create_integer(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
-    else \
-      throw flusspferd::exception("Wrong parameter type"); \
-  } \
-  /* */
-
-  OPERATOR(add, +)
-  OPERATOR(sub, -)
-  OPERATOR(mul, *)
-  OPERATOR(div, /)
-
-#undef OPERATOR
+  void add(flusspferd::call_context &x) /*const*/;
+  void sub(flusspferd::call_context &x) /*const*/;
+  void mul(flusspferd::call_context &x) /*const*/;
+  void div(flusspferd::call_context &x) /*const*/;
 };
 }
 

@@ -112,18 +112,20 @@ namespace multi_precission {
       throw flusspferd::exception("Wrong parameter type");
   }
 
-#define OPERATOR(name, op)                                      \
-  void Float::name (flusspferd::call_context &x) /*const*/ {    \
-    if(x.arg.empty() || x.arg.size() > 1)                       \
-      throw flusspferd::exception("Expected on parameter");     \
-    flusspferd::value v = x.arg.front();                        \
-    if(v.is_int())                                              \
-      x.result = create_float(mp op v.get_int());               \
-    else if(v.is_double())                                      \
-      x.result = create_float(mp op v.get_double());            \
+#define OPERATOR(name, op)                                              \
+  void Float:: name (flusspferd::call_context &x) /*const*/ {           \
+    if(x.arg.empty() || x.arg.size() > 1)                               \
+      throw flusspferd::exception("Expected on parameter");             \
+    flusspferd::value v = x.arg.front();                                \
+    if(v.is_int())                                                      \
+      x.result = create_float(mp op v.get_int());                       \
+    else if(v.is_double())                                              \
+      x.result = create_float(mp op v.get_double());                    \
     else if(flusspferd::is_native<Integer>(v.get_object()))             \
       x.result = create_float(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
-    else if(flusspferd::is_native<Float>(v.get_object())) \
+    else if(flusspferd::is_native<Rational>(v.get_object()))            \
+      x.result = create_float(mp op flusspferd::get_native<Rational>(v.get_object()).mp); \
+    else if(flusspferd::is_native<Float>(v.get_object()))               \
       x.result = create_float(mp op flusspferd::get_native<Float>(v.get_object()).mp); \
     else \
       throw flusspferd::exception("Wrong parameter type");      \
@@ -146,6 +148,8 @@ namespace multi_precission {
       mp = v.to_std_string();
     else if(flusspferd::is_native<Integer>(v.get_object()))
       mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+    else if(flusspferd::is_native<Rational>(v.get_object()))
+      mp = flusspferd::get_native<Rational>(v.get_object()).mp;
     else if(flusspferd::is_native<Float>(v.get_object()))
       mp = flusspferd::get_native<Float>(v.get_object()).mp;
     else
