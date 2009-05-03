@@ -44,7 +44,9 @@ struct Rational : public flusspferd::native_object_base {
     static object create_prototype() {
       flusspferd::object proto = flusspferd::create_object();
       create_native_method(proto, "get_double", &Rational::get_double);
+      create_native_method(proto, "toDouble", &Rational::get_double);
       create_native_method(proto, "get_string", &Rational::get_string);
+      create_native_method(proto, "toString", &Rational::get_string);
       create_native_method(proto, "get_string_base", &Rational::get_string_base);
       create_native_method(proto, "sgn", &Rational::sgn);
       create_native_method(proto, "abs", &Rational::abs);

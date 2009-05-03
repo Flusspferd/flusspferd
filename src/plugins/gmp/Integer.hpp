@@ -43,8 +43,11 @@ struct Integer : public flusspferd::native_object_base {
       flusspferd::object proto = flusspferd::create_object();
       create_native_method(proto, "fits_int", &Integer::fits_int);
       create_native_method(proto, "get_int", &Integer::get_int);
+      create_native_method(proto, "toInt", &Integer::get_int);
       create_native_method(proto, "get_double", &Integer::get_double);
+      create_native_method(proto, "toDouble", &Integer::get_double);
       create_native_method(proto, "get_string", &Integer::get_string);
+      create_native_method(proto, "toString", &Integer::get_string);
       create_native_method(proto, "get_string_base", &Integer::get_string_base);
       create_native_method(proto, "sqrt", &Integer::sqrt);
       create_native_method(proto, "sgn", &Integer::sgn);

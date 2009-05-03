@@ -43,8 +43,11 @@ struct Float : public flusspferd::native_object_base {
       flusspferd::object proto = flusspferd::create_object();
       create_native_method(proto, "fits_int", &Float::fits_int);
       create_native_method(proto, "get_int", &Float::get_int);
+      create_native_method(proto, "toInt", &Float::get_int);
       create_native_method(proto, "get_double", &Float::get_double);
+      create_native_method(proto, "toDouble", &Float::get_double);
       create_native_method(proto, "get_string", &Float::get_string);
+      create_native_method(proto, "toString", &Float::get_string);
       create_native_method(proto, "get_string_base", &Float::get_string_base);
       create_native_method(proto, "get_prec", &Float::get_prec);
       create_native_method(proto, "set_prec", &Float::set_prec);
