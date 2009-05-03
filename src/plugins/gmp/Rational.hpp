@@ -28,8 +28,6 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include <gmpxx.h>
 
-//#include "Integer.hpp"
-
 namespace multi_precission {
 class Integer;
 
