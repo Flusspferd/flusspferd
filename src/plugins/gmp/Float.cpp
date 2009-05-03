@@ -1,7 +1,7 @@
-#ifndef FLUSSPFERD_PLUGIN_GMP_FLOAT_IMPL_HPP
-#define FLUSSPFERD_PLUGIN_GMP_FLOAT_IMPL_HPP
-
 #include "Float.hpp"
+
+#include "Integer.hpp"
+#include "Rational.hpp"
 
 using namespace flusspferd;
 
@@ -41,6 +41,102 @@ namespace multi_precission {
       throw flusspferd::exception("Wrong number of arguments!");
   }
 
+  bool Float::fits_int() /*const*/ {
+    return mp.fits_sint_p();
+  }
+
+  int Float::get_int() /*const*/ {
+    assert(fits_int());
+    return mp.get_si();
+  }
+
+  double Float::get_double() /*const*/ {
+    return mp.get_d();
+  }
+
+  std::string Float::get_string() /*const*/ {
+    mp_exp_t expo; // TODO handle expo
+    return mp.get_str(expo);
+  }
+
+  std::string Float::get_string_base(int base) /*const*/ {
+    mp_exp_t expo; // TODO handle expo
+    return mp.get_str(expo, base);
+  }
+
+  int Float::get_prec() /*const*/ {
+    return mp.get_prec();
+  }
+
+  void Float::set_prec(int p) {
+    mp.set_prec(p);
+  }
+
+  Float &Float::sqrt() /*const*/ {
+    return create_float(::sqrt(mp));
+  }
+
+  int Float::sgn() /*const*/ {
+    return ::sgn(mp);
+  }
+
+  Float &Float::abs() /*const*/ {
+    return create_float(::abs(mp));
+  }
+
+  Float &Float::ceil() /*const*/ {
+    return create_float(::ceil(mp));
+  }
+
+  Float &Float::floor() /*const*/ {
+    return create_float(::floor(mp));
+  }
+
+  Float &Float::trunc() /*const*/ {
+    return create_float(::trunc(mp));
+  }
+
+  void Float::cmp(flusspferd::call_context &x) /*const*/ {
+    if(x.arg.empty() || x.arg.size() > 1)
+      throw flusspferd::exception("Expected one parameter");
+    flusspferd::value v = x.arg.front();
+    if(v.is_int())
+      x.result = ::cmp(mp, v.get_int());
+    else if(v.is_double())
+      x.result = ::cmp(mp, v.get_double());
+    else if(flusspferd::is_native<Integer>(v.get_object()))
+      x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
+    else if(flusspferd::is_native<Float>(v.get_object()))
+      x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
+    else
+      throw flusspferd::exception("Wrong parameter type");
+  }
+
+#define OPERATOR(name, op)                                      \
+  void Float::name (flusspferd::call_context &x) /*const*/ {    \
+    if(x.arg.empty() || x.arg.size() > 1)                       \
+      throw flusspferd::exception("Expected on parameter");     \
+    flusspferd::value v = x.arg.front();                        \
+    if(v.is_int())                                              \
+      x.result = create_float(mp op v.get_int());               \
+    else if(v.is_double())                                      \
+      x.result = create_float(mp op v.get_double());            \
+    else if(flusspferd::is_native<Integer>(v.get_object()))             \
+      x.result = create_float(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
+    else if(flusspferd::is_native<Float>(v.get_object())) \
+      x.result = create_float(mp op flusspferd::get_native<Float>(v.get_object()).mp); \
+    else \
+      throw flusspferd::exception("Wrong parameter type");      \
+  } \
+  /**/
+
+  OPERATOR(add, +)
+  OPERATOR(sub, -)
+  OPERATOR(mul, *)
+  OPERATOR(div, /)
+
+#undef OPERATOR
+
   void Float::init_with_value(value v) {
     if(v.is_double())
       mp = v.get_double();
@@ -57,4 +153,3 @@ namespace multi_precission {
   }
 }
 
-#endif

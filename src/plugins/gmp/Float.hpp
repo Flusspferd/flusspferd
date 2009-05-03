@@ -28,9 +28,6 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include <gmpxx.h>
 
-#include "Integer.hpp"
-#include "Rational.hpp"
-
 namespace multi_precission {
 struct Float : public flusspferd::native_object_base {
   struct class_info : flusspferd::class_info {
@@ -70,105 +67,38 @@ struct Float : public flusspferd::native_object_base {
   Float(flusspferd::object const &self, mpf_class const &mp);
   Float(flusspferd::object const &self, flusspferd::call_context &x);
 
-  bool fits_int() /*const*/ {
-    return mp.fits_sint_p();
-  }
-  int get_int() /*const*/ {
-    assert(fits_int());
-    return mp.get_si();
-  }
-  double get_double() /*const*/ {
-    return mp.get_d();
-  }
-  std::string get_string() /*const*/ {
-    mp_exp_t expo; // TODO handle expo
-    return mp.get_str(expo);
-  }
-  std::string get_string_base(int base) /*const*/ {
-    mp_exp_t expo; // TODO handle expo
-    return mp.get_str(expo, base);
-  }
-  int get_prec() /*const*/ {
-    return mp.get_prec();
-  }
-  void set_prec(int p) {
-    mp.set_prec(p);
-  }
+  bool fits_int() /*const*/;
+  int get_int() /*const*/;
+  double get_double() /*const*/;
+  std::string get_string() /*const*/;
+  std::string get_string_base(int base) /*const*/;
+  int get_prec() /*const*/;
+  void set_prec(int p);
 
   template<typename T>
-  Float &create_float(T mp) /*const*/ {
+  Float &create_float(T mp) const {
     return flusspferd::create_native_object<Float>(object(), mpf_class(mp));
   }
 
   // this should be external but js doesn't support overloading!
-  Float &sqrt() /*const*/ {
-    return create_float(::sqrt(mp));
-  }
-
-  int sgn() /*const*/ {
-    return ::sgn(mp);
-  }
-
-  Float &abs() /*const*/ {
-    return create_float(::abs(mp));
-  }
-
-  Float &ceil() /*const*/ {
-    return create_float(::ceil(mp));
-  }
-
-  Float &floor() /*const*/ {
-    return create_float(::floor(mp));
-  }
+  Float &sqrt() /*const*/;
+  int sgn() /*const*/;
+  Float &abs() /*const*/;
+  Float &ceil() /*const*/;
+  Float &floor() /*const*/;
 
   // hypot
 
-  Float &trunc() /*const*/ {
-    return create_float(::trunc(mp));
-  }
+  Float &trunc() /*const*/;
 
   // operators
-  void cmp(flusspferd::call_context &x) /*const*/ {
-    if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected one parameter");
-    flusspferd::value v = x.arg.front();
-    if(v.is_int())
-      x.result = ::cmp(mp, v.get_int());
-    else if(v.is_double())
-      x.result = ::cmp(mp, v.get_double());
-    else if(flusspferd::is_native<Integer>(v.get_object()))
-      x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
-    else if(flusspferd::is_native<Float>(v.get_object()))
-      x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
-    else
-      throw flusspferd::exception("Wrong parameter type");
-  }
-
-#define OPERATOR(name, op)                            \
-  void name (flusspferd::call_context &x) /*const*/ { \
-    if(x.arg.empty() || x.arg.size() > 1)             \
-      throw flusspferd::exception("Expected on parameter"); \
-    flusspferd::value v = x.arg.front();                    \
-    if(v.is_int())                                          \
-      x.result = create_float(mp op v.get_int());           \
-    else if(v.is_double())                                  \
-      x.result = create_float(mp op v.get_double());        \
-    else if(flusspferd::is_native<Integer>(v.get_object())) \
-      x.result = create_float(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
-    else if(flusspferd::is_native<Float>(v.get_object())) \
-      x.result = create_float(mp op flusspferd::get_native<Float>(v.get_object()).mp); \
-    else \
-      throw flusspferd::exception("Wrong parameter type"); \
-  } \
-  /**/
-
-  OPERATOR(add, +)
-  OPERATOR(sub, -)
-  OPERATOR(mul, *)
-  OPERATOR(div, /)
-
-#undef OPERATOR
-  private:
+  void cmp(flusspferd::call_context &x) /*const*/;
+  void add(flusspferd::call_context &x) /*const*/;
+  void sub(flusspferd::call_context &x) /*const*/;
+  void mul(flusspferd::call_context &x) /*const*/;
+  void div(flusspferd::call_context &x) /*const*/;
+  
+private:
   void init_with_value(flusspferd::value v);
 };
 }
