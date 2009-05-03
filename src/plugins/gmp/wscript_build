@@ -24,7 +24,7 @@
 libtype = 'shlib'
 
 obj = bld.new_task_gen('cxx', libtype)
-obj.source = ['gmp.cpp', 'Float.cpp']
+obj.source = ['gmp.cpp', 'Float.cpp', 'Integer.cpp', 'Rational.cpp']
 obj.includes = ['../../../include', '.']
 obj.uselib_local = 'flusspferd'
 obj.uselib = 'JS_H GMP'
