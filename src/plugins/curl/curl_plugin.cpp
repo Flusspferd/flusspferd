@@ -29,16 +29,14 @@ using namespace flusspferd;
 // Put everything in an anon-namespace so typeid wont clash ever.
 namespace {
 
-class curl : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, curl)
+  (full_name, "cURL")
+  (constructor_name, "cURL")
+  (augment_constructor, 1)
+  (methods, (setMethod)(perform))
+)
 public:
-  struct class_info : public flusspferd::class_info {
-    static char const *full_name() { return "cURL"; }
-    typedef boost::mpl::bool_<true> constructible;
-    static char const *constructor_name() { return "cURL"; }
-    static void augment_constructor(object &ctor);
-    static object create_prototype();
-  };
-
   curl(object const &obj, call_context &x);
   virtual ~curl();
 
@@ -61,9 +59,9 @@ protected:
   // TODO: Support setting CURLOPT_INFILESIZE for PUT methods
 
 private: // JS methods
-  void set_method(string &meth);
+  void setMethod(string &meth);
   int perform();
-};
+FLUSSPFERD_CLASS_DESCRIPTION_END()
 
 
 template<size_t (curl::*Method)(void*, size_t)>
@@ -103,16 +101,6 @@ void curl::class_info::augment_constructor(object &ctor)
 }
 
 ///////////////////////////
-object curl::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "setMethod", &curl::set_method);
-  create_native_method(proto, "perform", &curl::perform);
-
-  return proto;
-}
-
-///////////////////////////
 curl::curl(object const &obj, call_context &) 
   : native_object_base(obj),
     error_buffer(NULL)
@@ -146,7 +134,7 @@ curl::~curl() {
 }
 
 ///////////////////////////
-void curl::set_method(string &f_meth) {
+void curl::setMethod(string &f_meth) {
   int ok = CURLE_OK;
   std::string meth = f_meth.to_string();
 
