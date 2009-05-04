@@ -53,20 +53,22 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (5, ( \
+  (6, ( \
     ~cpp_name~,            /* name */ \
     ~constructor_name~,    /* constructor name */ \
     ~constructor_arity~,   /* constructor arity */ \
     ~full_name~,           /* full name */ \
-    BOOST_PP_NIL           /* methods */ \
+    BOOST_PP_NIL,          /* methods */ \
+    0                      /* augment constructor */ \
   )) \
   /* */
 
-#define FLUSSPFERD_CD_PARAM__cpp_name           0
-#define FLUSSPFERD_CD_PARAM__constructor_name   1
-#define FLUSSPFERD_CD_PARAM__constructor_arity  2
-#define FLUSSPFERD_CD_PARAM__full_name          3
-#define FLUSSPFERD_CD_PARAM__methods            4
+#define FLUSSPFERD_CD_PARAM__cpp_name               0
+#define FLUSSPFERD_CD_PARAM__constructor_name       1
+#define FLUSSPFERD_CD_PARAM__constructor_arity      2
+#define FLUSSPFERD_CD_PARAM__full_name              3
+#define FLUSSPFERD_CD_PARAM__methods                4
+#define FLUSSPFERD_CD_PARAM__augment_constructor    5
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -85,7 +87,8 @@ THE SOFTWARE.
   p_constructor_name, \
   p_constructor_arity, \
   p_full_name, \
-  p_methods \
+  p_methods, \
+  p_augment_constructor \
 ) \
   class p_cpp_name { \
     struct class_info : ::flusspferd::class_info_base { \
@@ -103,6 +106,10 @@ THE SOFTWARE.
           p_cpp_name, \
           p_methods) \
       } \
+      BOOST_PP_EXPR_IF( \
+        p_augment_constructor, \
+        static void augment_constructor(::flusspferd::object &); \
+      ) \
     }; \
   /* */
 
