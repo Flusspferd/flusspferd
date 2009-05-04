@@ -98,14 +98,27 @@ THE SOFTWARE.
       } \
       static ::flusspferd::object create_prototype() { \
         ::flusspferd::object proto = ::flusspferd::create_object(); \
-        ~~~ p_methods \
+        BOOST_PP_SEQ_FOR_EACH( \
+          FLUSSPFERD_CD_METHOD, \
+          p_cpp_name, \
+          p_methods) \
       } \
     }; \
-  }; \
+  /* */
+
+#define FLUSSPFERD_CD_METHOD(r, p_cpp_name, element) \
+  ::flusspferd::create_native_method( \
+      proto, \
+      BOOST_PP_STRINGIZE(element), \
+      & p_cpp_name :: element); \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
   FLUSSPFERD_CLASS_DESCRIPTION_A(FLUSSPFERD_CD_PARAM(tuple_seq)) \
+  /* */
+
+#define FLUSSPFERD_CLASS_DESCRIPTION_END() \
+  }; \
   /* */
 
 #endif
