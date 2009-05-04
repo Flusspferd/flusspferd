@@ -31,6 +31,7 @@ THE SOFTWARE.
 #endif
 
 #include <cerrno>
+#include <cstdio>
 
 using namespace flusspferd;
 
