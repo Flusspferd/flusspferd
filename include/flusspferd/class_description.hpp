@@ -24,6 +24,9 @@ THE SOFTWARE.
 #ifndef FLUSSFPERD_CLASS_DESCRIPTION_HPP
 #define FLUSSFPERD_CLASS_DESCRIPTION_HPP
 
+#ifndef PREPROC_DEBUG
+#include "class.hpp"
+#endif
 #include <boost/preprocessor.hpp>
 
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS2(x, y) \
@@ -50,14 +53,20 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (2, ( \
-    ~name~,      /* name */ \
-    BOOST_PP_NIL /* methods */ \
+  (5, ( \
+    ~cpp_name~,            /* name */ \
+    ~constructor_name~,    /* constructor name */ \
+    ~constructor_arity~,   /* constructor arity */ \
+    ~full_name~,           /* full name */ \
+    BOOST_PP_NIL           /* methods */ \
   )) \
   /* */
 
-#define FLUSSPFERD_CD_PARAM__name      0
-#define FLUSSPFERD_CD_PARAM__methods   1
+#define FLUSSPFERD_CD_PARAM__cpp_name           0
+#define FLUSSPFERD_CD_PARAM__constructor_name   1
+#define FLUSSPFERD_CD_PARAM__constructor_arity  2
+#define FLUSSPFERD_CD_PARAM__full_name          3
+#define FLUSSPFERD_CD_PARAM__methods            4
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -68,13 +77,31 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION_A(array) \
-  FLUSSPFERD_CLASS_DESCRIPTION_P( \
-    BOOST_PP_ARRAY_ELEM(0, array), \
-    BOOST_PP_ARRAY_ELEM(1, array)) \
+  BOOST_PP_EXPAND(FLUSSPFERD_CLASS_DESCRIPTION_P BOOST_PP_ARRAY_DATA(array)) \
   /* */
 
-#define FLUSSPFERD_CLASS_DESCRIPTION_P(name, methods) \
-  { name, methods }
+#define FLUSSPFERD_CLASS_DESCRIPTION_P( \
+  p_cpp_name, \
+  p_constructor_name, \
+  p_constructor_arity, \
+  p_full_name, \
+  p_methods \
+) \
+  class p_cpp_name { \
+    struct class_info : ::flusspferd::class_info_base { \
+      static char const *constructor_name() { \
+        return (p_constructor_name); \
+      } \
+      typedef ::boost::mpl::size_t< (p_constructor_arity) > constructor_arity; \
+      static char const *full_name() { \
+        return (p_full_name); \
+      } \
+      static ::flusspferd::object create_prototype() { \
+        ::flusspferd::object proto = ::flusspferd::create_object(); \
+        ~~~ p_methods \
+      } \
+    }; \
+  }; \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
