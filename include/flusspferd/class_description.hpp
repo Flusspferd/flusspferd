@@ -57,7 +57,7 @@ THE SOFTWARE.
   (6, ( \
     ~cpp_name~,            /* name */ \
     ~constructor_name~,    /* constructor name */ \
-    ~constructor_arity~,   /* constructor arity */ \
+    0,                     /* constructor arity */ \
     ~full_name~,           /* full name */ \
     BOOST_PP_NIL,          /* methods */ \
     0                      /* augment constructor */ \
