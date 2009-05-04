@@ -93,7 +93,7 @@ THE SOFTWARE.
 ) \
   class p_cpp_name : public ::flusspferd::native_object_base { \
   public: \
-    struct class_info : ::flusspferd::class_info_base { \
+    struct class_info : ::flusspferd::class_info { \
       static char const *constructor_name() { \
         return (p_constructor_name); \
       } \
@@ -107,6 +107,7 @@ THE SOFTWARE.
           FLUSSPFERD_CD_METHOD, \
           p_cpp_name, \
           p_methods) \
+        return proto; \
       } \
       BOOST_PP_EXPR_IF( \
         p_augment_constructor, \
