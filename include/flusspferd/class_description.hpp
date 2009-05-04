@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "class.hpp"
+#include "native_object_base.hpp"
 #endif
 #include <boost/preprocessor.hpp>
 
@@ -90,7 +91,8 @@ THE SOFTWARE.
   p_methods, \
   p_augment_constructor \
 ) \
-  class p_cpp_name { \
+  class p_cpp_name : public ::flusspferd::native_object_base { \
+  public: \
     struct class_info : ::flusspferd::class_info_base { \
       static char const *constructor_name() { \
         return (p_constructor_name); \
@@ -111,6 +113,7 @@ THE SOFTWARE.
         static void augment_constructor(::flusspferd::object &); \
       ) \
     }; \
+  private: \
   /* */
 
 #define FLUSSPFERD_CD_METHOD(r, p_cpp_name, element) \
