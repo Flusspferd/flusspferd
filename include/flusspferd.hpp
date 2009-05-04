@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "flusspferd/blob.hpp"
 #include "flusspferd/call_context.hpp"
 #include "flusspferd/class.hpp"
+#include "flusspferd/class_description.hpp"
 #include "flusspferd/context.hpp"
 #include "flusspferd/convert.hpp"
 #include "flusspferd/create.hpp"
