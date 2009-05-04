@@ -182,9 +182,9 @@ public:
   /* */
 
 #define FLUSSPFERD_CALL_N_2(n, f_name, arg_type) \
-  BOOST_PP_IF(n, template< BOOST_PP_EMPTY, BOOST_PP_EMPTY)() \
+  BOOST_PP_EXPR_IF(n, template<) \
   BOOST_PP_ENUM_PARAMS(n, typename T) \
-  BOOST_PP_IF(n, > BOOST_PP_EMPTY, BOOST_PP_EMPTY) () \
+  BOOST_PP_EXPR_IF(n, >) \
   value f_name( \
     arg_type x \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n, T, const &arg)) \
