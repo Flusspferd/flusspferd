@@ -45,7 +45,7 @@ class function;
 class array;
 class native_object_base;
 class native_function_base;
-
+#ifndef IN_DOXYGEN
 namespace detail {
 
 template<typename T, typename Condition = void>
@@ -223,7 +223,7 @@ template<typename T>
 struct convert_ptr<T, native_function_base>;
 
 }
-
+#endif
 template<typename T>
 class convert : private detail::convert<T>, private boost::noncopyable {
 private:
