@@ -35,8 +35,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "cURL")
   (augment_constructor, 1)
   (methods,
-    ("setMethod", set_method)
-    ("perform", perform)
+    ("setMethod", (bind, set_method))
+    ("perform", (bind, perform))
   )
 )
 public:

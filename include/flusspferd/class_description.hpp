@@ -133,10 +133,28 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_METHOD(r, p_cpp_name, p_method) \
+  BOOST_PP_CAT( \
+    FLUSSPFERD_CD_METHOD__, \
+    BOOST_PP_TUPLE_ELEM(2, 0, BOOST_PP_TUPLE_ELEM(2, 1, p_method)) \
+  ) ( \
+    p_cpp_name, \
+    BOOST_PP_TUPLE_ELEM(2, 0, p_method), \
+    BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_TUPLE_ELEM(2, 1, p_method)) \
+  ) \
+  /* */
+
+#define FLUSSPFERD_CD_METHOD__bind(p_cpp_name, p_method_name, p_bound) \
   ::flusspferd::create_native_method( \
       proto, \
-      BOOST_PP_TUPLE_ELEM(2, 0, p_method), \
-      & p_cpp_name :: BOOST_PP_TUPLE_ELEM(2, 1, p_method)); \
+      (p_method_name), \
+      & p_cpp_name :: p_bound); \
+  /* */
+
+#define FLUSSPFERD_CD_METHOD__alias(p_cpp_name, p_method_name, p_alias) \
+  proto.define_property( \
+    (p_method_name), \
+    proto.get_property((p_alias)), \
+    ::flusspferd::dont_enumerate); \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
