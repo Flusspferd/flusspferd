@@ -35,7 +35,7 @@ using namespace flusspferd;
 using namespace flusspferd::io;
 
 stream::stream(object const &o, std::streambuf *p)
-  : native_object_base(o), streambuf_(p)
+  : base_type(o), streambuf_(p)
 {
 }
 

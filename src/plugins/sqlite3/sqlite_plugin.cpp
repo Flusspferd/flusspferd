@@ -44,23 +44,21 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "SQLite3")
   (methods,
     ("cursor", bind, cursor)
-    ("close", bind, close)
-  )
+    ("close", bind, close))
   (constructor_properties,
     ("version", constant, SQLITE_VERSION_NUMBER)
-    ("versionStr", constant, string(SQLITE_VERSION))
-  )
-)
+    ("versionStr", constant, string(SQLITE_VERSION))))
+{
 public:
   sqlite3(object const &obj, call_context &x);
   ~sqlite3();
 
-private: // JS methods
+public: // JS methods
   ::sqlite3 *db;
 
   void close();
   void cursor(call_context &x);
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 FLUSSPFERD_CLASS_DESCRIPTION(
   (cpp_name, sqlite3_cursor)
@@ -72,8 +70,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("reset", bind, reset)
     ("next", bind, next)
     ("bind", bind, bind)
-  )
-)
+  ))
+{
 public:
   sqlite3_cursor(object const &obj, sqlite3_stmt *sth);
   ~sqlite3_cursor();
@@ -93,12 +91,12 @@ private:
   void bind_dict(object &o, size_t num_binds);
   void do_bind_param(int n, value v);
 
-private: // JS methods
+public: // JS methods
   void close();
   void reset();
   object next();
   void bind(call_context &x);
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 FLUSSPFERD_LOADER(container) {
   object ctor = load_class<sqlite3>(container);
@@ -107,7 +105,7 @@ FLUSSPFERD_LOADER(container) {
 
 ///////////////////////////
 sqlite3::sqlite3(object const &obj, call_context &x)
-  : native_object_base(obj), 
+  : base_type(obj),
     db(NULL)
 {
   if (x.arg.size() == 0)
@@ -166,7 +164,7 @@ void sqlite3::cursor(call_context &x) {
 ///////////////////////////
 // 'Private' constructor that is called from sqlite3::cursor
 sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
-  : native_object_base(obj),
+  : base_type(obj),
     sth(_sth),
     state(CursorState_Init)
 {

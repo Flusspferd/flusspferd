@@ -53,6 +53,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("autoFlush", variable, false)
   )
 )
+{
 public:
   stream(object const &o, std::streambuf *b);
   ~stream();
@@ -60,7 +61,7 @@ public:
   std::streambuf *streambuf();
   void set_streambuf(std::streambuf *buf);
 
-private: // javascript methods
+public: // javascript methods
   string read_whole();
   string read(unsigned max_size);
 
@@ -76,7 +77,7 @@ private: // javascript methods
 
 private:
   std::streambuf *streambuf_;
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 }}
 

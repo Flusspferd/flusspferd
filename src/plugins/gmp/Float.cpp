@@ -7,11 +7,11 @@ using namespace flusspferd;
 
 namespace multi_precission {
   Float::Float(flusspferd::object const &self, mpf_class const &mp)
-    : flusspferd::native_object_base(self), mp(mp)
+    : base_type(self), mp(mp)
   { }
 
   Float::Float(flusspferd::object const &self, flusspferd::call_context &x)
-    : flusspferd::native_object_base(self)
+    : base_type(self)
   {
     if(x.arg.size() == 1) {
       init_with_value(x.arg.front());

@@ -59,6 +59,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("div",              bind,    div)
   )
 )
+{
 public:
   mpf_class mp;
 
@@ -98,7 +99,7 @@ public:
   
 private:
   void init_with_value(flusspferd::value v);
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 }
 

@@ -39,9 +39,12 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("perform", bind, perform)
   )
 )
+{
 public:
   curl(object const &obj, call_context &x);
   virtual ~curl();
+
+  static void augment_constructor(object &);
 
 protected:
   CURL *curlHandle;
@@ -61,11 +64,10 @@ protected:
 
   // TODO: Support setting CURLOPT_INFILESIZE for PUT methods
 
-private: // JS methods
+public: // JS methods
   void set_method(string &meth);
   int perform();
-FLUSSPFERD_CLASS_DESCRIPTION_END()
-
+};
 
 template<size_t (curl::*Method)(void*, size_t)>
 size_t curl::c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream) {
@@ -105,7 +107,7 @@ void curl::augment_constructor(object &ctor)
 
 ///////////////////////////
 curl::curl(object const &obj, call_context &) 
-  : native_object_base(obj),
+  : base_type(obj),
     error_buffer(NULL)
 {
   curlHandle = curl_easy_init();

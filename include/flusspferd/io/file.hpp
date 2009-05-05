@@ -43,22 +43,23 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("exists", bind_static, exists)
   )
 )
+{
 public:
   file(object const &, call_context &);
   ~file();
 
-private: // javascript methods
+public: // javascript methods
   void open(char const *name);
   void close();
 
-private: // constructor methods
+public: // constructor methods
   static void create(char const *name, boost::optional<int> mode);
   static bool exists(char const *name);
 
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 }}
 

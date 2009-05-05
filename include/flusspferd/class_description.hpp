@@ -30,6 +30,10 @@ THE SOFTWARE.
 #endif
 #include <boost/preprocessor.hpp>
 
+#ifndef FLUSSPFERD_PARAM_LIMIT
+#define FLUSSPFERD_PARAM_LIMIT 5
+#endif
+
 /* 2-tuple seq */
 
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS2(x, y) \
@@ -132,8 +136,10 @@ THE SOFTWARE.
   p_augment_constructor, \
   p_augment_prototype \
 ) \
-  class p_cpp_name : public p_base { \
+  template<typename Class> \
+  class BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
   public: \
+    typedef BOOST_PP_CAT(p_cpp_name, _base) base_type; \
     struct class_info : ::flusspferd::class_info { \
       typedef boost::mpl::bool_< (p_constructible) > constructible; \
       static char const *constructor_name() { \
@@ -147,95 +153,108 @@ THE SOFTWARE.
         ::flusspferd::object obj = ::flusspferd::create_object( \
             ::flusspferd::prototype< p_base >() \
           ); \
-        FLUSSPFERD_CD_METHODS(p_cpp_name, p_methods) \
-        FLUSSPFERD_CD_PROPERTIES(p_cpp_name, p_properties) \
+        FLUSSPFERD_CD_METHODS(p_methods) \
+        FLUSSPFERD_CD_PROPERTIES(p_properties) \
         BOOST_PP_EXPR_IF( \
           p_augment_prototype, \
-          p_cpp_name :: augment_prototype(obj);) \
+          Class :: augment_prototype(obj);) \
         return obj; \
       } \
       static void augment_constructor(::flusspferd::object &obj) { \
         (void)obj; \
-        FLUSSPFERD_CD_METHODS(p_cpp_name, p_constructor_methods) \
-        FLUSSPFERD_CD_PROPERTIES(p_cpp_name, p_constructor_properties) \
+        FLUSSPFERD_CD_METHODS(p_constructor_methods) \
+        FLUSSPFERD_CD_PROPERTIES(p_constructor_properties) \
         BOOST_PP_EXPR_IF( \
           p_augment_constructor, \
-          p_cpp_name :: augment_constructor(obj);) \
+          Class :: augment_constructor(obj);) \
       } \
       typedef boost::mpl::bool_< (p_custom_enumerate) > custom_enumerate; \
     }; \
-    BOOST_PP_EXPR_IF( \
-      p_augment_constructor, \
-      static void augment_constructor(::flusspferd::object &o);) \
-    BOOST_PP_EXPR_IF( \
-      p_augment_prototype, \
-      static void augment_prototype(::flusspferd::object &proto);) \
-  private: \
+    BOOST_PP_REPEAT( \
+      BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT), \
+      FLUSSPFERD_CD_CTOR_FWD, \
+      (BOOST_PP_CAT(p_cpp_name, _base), p_base)) \
+  }; \
+  class p_cpp_name \
+  : \
+    public BOOST_PP_CAT(p_cpp_name, _base) < p_cpp_name > \
   /* */
 
-#define FLUSSPFERD_CD_METHODS(p_cpp_name, p_methods) \
+#define FLUSSPFERD_CD_CTOR_FWD(z, n, d) \
+  BOOST_PP_EXPR_IF(n, template<) \
+  BOOST_PP_ENUM_PARAMS(n, typename P) \
+  BOOST_PP_EXPR_IF(n, >) \
+  BOOST_PP_TUPLE_ELEM(2, 0, d) \
+  ( \
+    BOOST_PP_ENUM_BINARY_PARAMS(n, P, const &p) \
+  ) \
+  : \
+    BOOST_PP_TUPLE_ELEM(2, 1, d) \
+    ( \
+      BOOST_PP_ENUM_PARAMS(n, p) \
+    ) \
+  { } \
+  /* */
+
+#define FLUSSPFERD_CD_METHODS(p_methods) \
   BOOST_PP_SEQ_FOR_EACH( \
     FLUSSPFERD_CD_METHOD, \
-    p_cpp_name, \
+    ~, \
     FLUSSPFERD_PP_GEN_TUPLE3SEQ(p_methods)) \
   /* */
 
-#define FLUSSPFERD_CD_METHOD(r, p_cpp_name, p_method) \
+#define FLUSSPFERD_CD_METHOD(r, d, p_method) \
   BOOST_PP_CAT( \
     FLUSSPFERD_CD_METHOD__, \
     BOOST_PP_TUPLE_ELEM(3, 1, p_method) \
   ) ( \
-    p_cpp_name, \
     BOOST_PP_TUPLE_ELEM(3, 0, p_method), \
     BOOST_PP_TUPLE_ELEM(3, 2, p_method) \
   ) \
   /* */
 
-#define FLUSSPFERD_CD_METHOD__bind(p_cpp_name, p_method_name, p_bound) \
+#define FLUSSPFERD_CD_METHOD__bind(p_method_name, p_bound) \
   ::flusspferd::create_native_method( \
       obj, \
       (p_method_name), \
-      & p_cpp_name :: p_bound); \
+      & Class :: p_bound); \
   /* */
 
-#define FLUSSPFERD_CD_METHOD__bind_static(p_cpp_name, p_method_name, p_bound) \
+#define FLUSSPFERD_CD_METHOD__bind_static(p_method_name, p_bound) \
   ::flusspferd::create_native_function( \
       obj, \
       (p_method_name), \
-      & p_cpp_name :: p_bound); \
+      & Class :: p_bound); \
   /* */
 
-#define FLUSSPFERD_CD_METHOD__alias(p_cpp_name, p_method_name, p_alias) \
+#define FLUSSPFERD_CD_METHOD__alias(p_method_name, p_alias) \
   obj.define_property( \
     (p_method_name), \
     obj.get_property((p_alias)), \
     ::flusspferd::dont_enumerate); \
   /* */
 
-#define FLUSSPFERD_CD_METHOD__none(p_cpp_name, p_method_name, p_param) \
+#define FLUSSPFERD_CD_METHOD__none(p_method_name, p_param) \
   /* */
 
-#define FLUSSPFERD_CD_PROPERTIES(p_cpp_name, p_properties) \
+#define FLUSSPFERD_CD_PROPERTIES(p_properties) \
   BOOST_PP_SEQ_FOR_EACH( \
     FLUSSPFERD_CD_PROPERTY, \
-    p_cpp_name, \
+    ~, \
     FLUSSPFERD_PP_GEN_TUPLE3SEQ(p_properties)) \
   /* */
 
-#define FLUSSPFERD_CD_PROPERTY(r, p_cpp_name, p_property) \
+#define FLUSSPFERD_CD_PROPERTY(r, d, p_property) \
   BOOST_PP_CAT( \
     FLUSSPFERD_CD_PROPERTY__, \
     BOOST_PP_TUPLE_ELEM(3, 1, p_property) \
   ) ( \
-    p_cpp_name, \
     BOOST_PP_TUPLE_ELEM(3, 0, p_property), \
     BOOST_PP_TUPLE_ELEM(3, 2, p_property) \
   ) \
   /* */
 
-#define FLUSSPFERD_CD_PROPERTY__getter_setter( \
-  p_cpp_name, p_property_name, p_param \
-) \
+#define FLUSSPFERD_CD_PROPERTY__getter_setter(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
     ::flusspferd::property_attributes( \
@@ -243,41 +262,37 @@ THE SOFTWARE.
       ::flusspferd::create_native_method( \
         ::flusspferd::object(), \
         "$get_" p_property_name, \
-        & p_cpp_name :: \
+        & Class :: \
         BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
       ), \
       ::flusspferd::create_native_method( \
         ::flusspferd::object(), \
         "$set_" p_property_name, \
-        & p_cpp_name :: \
+        & Class :: \
         BOOST_PP_TUPLE_ELEM(2, 1, p_param) \
       ) \
     ) \
   ); \
   /* */
 
-#define FLUSSPFERD_CD_PROPERTY__constant(p_cpp_name, p_property_name, p_param) \
+#define FLUSSPFERD_CD_PROPERTY__constant(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
     (p_param), \
     ::flusspferd::read_only_property | ::flusspferd::permanent_property); \
   /* */
 
-#define FLUSSPFERD_CD_PROPERTY__variable(p_cpp_name, p_property_name, p_param) \
+#define FLUSSPFERD_CD_PROPERTY__variable(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
     (p_param)); \
   /* */
 
-#define FLUSSPFERD_CD_PROPERTY__none(p_cpp_name, p_property_name, p_param) \
+#define FLUSSPFERD_CD_PROPERTY__none(p_property_name, p_param) \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
   FLUSSPFERD_CLASS_DESCRIPTION_A(FLUSSPFERD_CD_PARAM(tuple_seq)) \
-  /* */
-
-#define FLUSSPFERD_CLASS_DESCRIPTION_END() \
-  }; \
   /* */
 
 #endif

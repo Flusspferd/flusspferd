@@ -54,6 +54,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("div",              bind,   div)
   )
 )
+{
 public:
   mpz_class mp;
 
@@ -83,7 +84,7 @@ public:
   void sub(flusspferd::call_context &x) /*const*/;
   void mul(flusspferd::call_context &x) /*const*/;
   void div(flusspferd::call_context &x) /*const*/;
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 }
 

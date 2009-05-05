@@ -45,6 +45,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("rootElement", getter_setter, (get_root_element, set_root_element))
   )
 )
+{
 public:
   document(object const &, call_context &);
   document(object const &, xmlDocPtr doc);
@@ -69,7 +70,10 @@ private: // JS methods
 private: // JS properties
   void set_root_element(object const &);
   object get_root_element();
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+
+private:
+  friend class class_info;
+};
 
 }}
 

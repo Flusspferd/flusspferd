@@ -49,6 +49,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "Environment")
   (custom_enumerate, true)
 )
+{
 public:
   environment(object const &obj, call_context &);
 
@@ -56,7 +57,7 @@ protected:
   boost::any enumerate_start(int &n); 
   value enumerate_next(boost::any &iter);
   bool property_resolve(value const &id, unsigned access);
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 FLUSSPFERD_LOADER(exports) {
   local_root_scope scope;
@@ -67,7 +68,7 @@ FLUSSPFERD_LOADER(exports) {
 }
 
 environment::environment(object const &obj, call_context &)
-  : native_object_base(obj)
+  : base_type(obj)
 {
 }
 

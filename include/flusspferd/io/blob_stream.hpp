@@ -40,6 +40,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("getBlob", bind, get_blob)
   )
 )
+{
 public:
   blob_stream(object const &, call_context &);
   ~blob_stream();
@@ -47,13 +48,13 @@ public:
 protected:
   void trace(tracer &);
 
-private: // javascript methods
+public: // javascript methods
   blob &get_blob();
 
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-FLUSSPFERD_CLASS_DESCRIPTION_END()
+};
 
 }}
 

@@ -43,7 +43,7 @@ xmlDocPtr document::c_from_js(object const &obj) {
 }
 
 document::document(object const &obj, xmlDocPtr ptr)
-  : node(obj, xmlNodePtr(ptr))
+  : base_type(obj, xmlNodePtr(ptr))
 {
   init();
 }
@@ -56,7 +56,7 @@ static xmlDocPtr new_doc(call_context &) {
 }
 
 document::document(object const &obj, call_context &x)
-  : node(obj, xmlNodePtr(new_doc(x)))
+  : base_type(obj, xmlNodePtr(new_doc(x)))
 {
   init();
 }

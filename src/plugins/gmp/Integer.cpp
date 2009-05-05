@@ -6,11 +6,11 @@
 
 namespace multi_precission {
   Integer::Integer(flusspferd::object const &self, mpz_class const &mp)
-    : flusspferd::native_object_base(self), mp(mp)
+    : base_type(self), mp(mp)
   { }
 
   Integer::Integer(flusspferd::object const &self, flusspferd::call_context &x)
-    : flusspferd::native_object_base(self)
+    : base_type(self)
   {
     if(x.arg.size() == 1) {
       flusspferd::value v = x.arg.front();
