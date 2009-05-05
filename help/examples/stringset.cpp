@@ -4,29 +4,20 @@
 #include <set>
 #include <string>
 
-class StringSet : public flusspferd::native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+    (cpp_name, StringSet)
+    (full_name, "StringSet")
+    (constructor_name, "StringSet")
+    (methods,
+        ("dump", bind, dump)
+        ("add", bind, add)
+        ("delete", bind, delete_)
+        ("toArray", bind, to_array)))
+{
 public:
-    struct class_info : flusspferd::class_info {
-        static char const *constructor_name() {
-            return "StringSet";
-        }
-
-        static char const *full_name() {
-            return "StringSet";
-        }
-
-        static object create_prototype() {
-            flusspferd::object proto = flusspferd::create_object();
-            create_native_method(proto, "dump", &StringSet::dump);
-            create_native_method(proto, "add", &StringSet::add);
-            create_native_method(proto, "delete", &StringSet::delete_);
-            create_native_method(proto, "toArray", &StringSet::to_array);
-            return proto;
-        }
-    };
-
     StringSet(flusspferd::object const &self, flusspferd::call_context &x)
-            : flusspferd::native_object_base(self) {
+        : base_type(self)
+    {
         std::cout << "Creating StringSet" << std::endl;
 
         for (flusspferd::arguments::iterator it = x.arg.begin();
@@ -40,7 +31,7 @@ public:
         std::cout << "Destroying StringSet" << std::endl;
     }
 
-private:
+public:
     typedef std::set<std::string> container;
     typedef container::iterator iterator;
 
