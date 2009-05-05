@@ -74,15 +74,14 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (11, ( \
+  (10, ( \
     ~cpp_name~,                        /* name */ \
     ::flusspferd::native_object_base,  /* base class */ \
     ~constructor_name~,                /* constructor name */ \
     0,                                 /* constructor arity */ \
     true,                              /* constructible */ \
     ~full_name~,                       /* full name */ \
-    ~methods~,                         /* methods */ \
-    0,                                 /* NO methods */ \
+    (~, none, ~),                      /* methods */ \
     false,                             /* custom enumerate */ \
     0,                                 /* augment constructor (custom func.)*/\
     0                                  /* augment prototype (custom func.) */ \
@@ -96,10 +95,9 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__constructible          4
 #define FLUSSPFERD_CD_PARAM__full_name              5
 #define FLUSSPFERD_CD_PARAM__methods                6
-#define FLUSSPFERD_CD_PARAM__no_methods             7
-#define FLUSSPFERD_CD_PARAM__custom_enumerate       8
-#define FLUSSPFERD_CD_PARAM__augment_constructor    9
-#define FLUSSPFERD_CD_PARAM__augment_prototype     10
+#define FLUSSPFERD_CD_PARAM__custom_enumerate       7
+#define FLUSSPFERD_CD_PARAM__augment_constructor    8
+#define FLUSSPFERD_CD_PARAM__augment_prototype      9
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -121,7 +119,6 @@ THE SOFTWARE.
   p_constructible, \
   p_full_name, \
   p_methods, \
-  p_no_methods, \
   p_custom_enumerate, \
   p_augment_constructor, \
   p_augment_prototype \
@@ -141,11 +138,7 @@ THE SOFTWARE.
         ::flusspferd::object proto = ::flusspferd::create_object( \
             ::flusspferd::prototype< p_base >() \
           ); \
-        BOOST_PP_IF( \
-          p_no_methods, \
-          BOOST_PP_TUPLE_EAT(2), \
-          FLUSSPFERD_CD_METHODS \
-        ) (p_cpp_name, p_methods) \
+        FLUSSPFERD_CD_METHODS(p_cpp_name, p_methods) \
         BOOST_PP_EXPR_IF( \
           p_augment_prototype, \
           p_cpp_name :: augment_prototype(proto);) \
@@ -198,6 +191,9 @@ THE SOFTWARE.
     (p_method_name), \
     proto.get_property((p_alias)), \
     ::flusspferd::dont_enumerate); \
+  /* */
+
+#define FLUSSPFERD_CD_METHOD__none(p_cpp_name, p_method_name, p_param) \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \

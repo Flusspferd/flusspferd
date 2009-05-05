@@ -47,7 +47,6 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (cpp_name, environment)
   (constructor_name, "Environment")
   (full_name, "Environment")
-  (no_methods, 1)
   (custom_enumerate, true)
 )
 public:
