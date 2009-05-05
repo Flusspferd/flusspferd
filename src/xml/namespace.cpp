@@ -50,7 +50,7 @@ object namespace_::create(xmlNsPtr ptr) {
 }
 
 namespace_::namespace_(object const &obj, xmlNsPtr ptr)
-  : native_object_base(obj), ptr(ptr)
+  : base_type(obj), ptr(ptr)
 {
   if (!ptr->_private)
     ptr->_private = static_cast<object *>(this);
@@ -58,7 +58,7 @@ namespace_::namespace_(object const &obj, xmlNsPtr ptr)
 }
 
 namespace_::namespace_(object const &obj, call_context &x)
-  : native_object_base(obj)
+  : base_type(obj)
 {
   local_root_scope scope;
 
@@ -108,28 +108,6 @@ namespace_::~namespace_() {
   if (ptr && !ptr->context && ptr->_private == static_cast<object *>(this)) {
     xmlFreeNs(ptr);
   }
-}
-
-object namespace_::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "toString", &namespace_::to_string);
-
-  proto.define_property(
-    "href",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &namespace_::get_href),
-      create_native_method(object(), "", &namespace_::set_href)));
-
-  proto.define_property(
-    "prefix",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &namespace_::get_prefix),
-      create_native_method(object(), "", &namespace_::set_prefix)));
-
-  return proto;
 }
 
 void namespace_::init() {
