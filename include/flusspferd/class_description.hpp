@@ -74,7 +74,7 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (8, ( \
+  (9, ( \
     ~cpp_name~,            /* name */ \
     ~constructor_name~,    /* constructor name */ \
     0,                     /* constructor arity */ \
@@ -82,7 +82,8 @@ THE SOFTWARE.
     ~methods~,             /* methods */ \
     0,                     /* NO methods */ \
     0,                     /* augment constructor */ \
-    true                   /* constructible */ \
+    true,                  /* constructible */ \
+    false                  /* custom enumerate */ \
   )) \
   /* */
 
@@ -94,6 +95,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__no_methods             5
 #define FLUSSPFERD_CD_PARAM__augment_constructor    6
 #define FLUSSPFERD_CD_PARAM__constructible          7
+#define FLUSSPFERD_CD_PARAM__custom_enumerate       8
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -115,7 +117,8 @@ THE SOFTWARE.
   p_methods, \
   p_no_methods, \
   p_augment_constructor, \
-  p_constructible \
+  p_constructible, \
+  p_custom_enumerate \
 ) \
   class p_cpp_name : public ::flusspferd::native_object_base { \
   public: \
@@ -141,6 +144,7 @@ THE SOFTWARE.
         p_augment_constructor, \
         static void augment_constructor(::flusspferd::object &); \
       ) \
+      typedef boost::mpl::bool_< (p_custom_enumerate) > custom_enumerate; \
     }; \
   private: \
   /* */
