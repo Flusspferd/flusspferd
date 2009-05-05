@@ -26,11 +26,27 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
+#include "../class_description.hpp"
 #include <streambuf>
 
 namespace flusspferd { namespace io {
 
-class stream : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, stream)
+  (full_name, "IO.Stream")
+  (constructor_name, "Stream")
+  (constructible, false)
+  (methods,
+    ("readWhole", bind, read_whole)
+    ("read", bind, read)
+    ("readWholeBlob", bind, read_whole_blob)
+    ("readBlob", bind, read_blob)
+    ("write", bind, write)
+    ("flush", bind, flush)
+    ("print", bind, print)
+    ("readLine", bind, read_line)
+  )
+)
 public:
   stream(object const &o, std::streambuf *b);
   ~stream();
@@ -38,16 +54,7 @@ public:
   std::streambuf *streambuf();
   void set_streambuf(std::streambuf *buf);
 
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "IO.Stream"; }
-    typedef boost::mpl::bool_<false> constructible;
-    static char const *constructor_name() { return "Stream"; }
-    static object create_prototype();
-  };
-
 private: // javascript methods
-  void close();
-
   string read_whole();
   string read(unsigned max_size);
 
