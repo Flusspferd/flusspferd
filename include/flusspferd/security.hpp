@@ -26,15 +26,18 @@ THE SOFTWARE.
 
 #include "native_object_base.hpp"
 #include "class.hpp"
+#include "class_description.hpp"
 
 namespace flusspferd {
 
-class security : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, security)
+  (full_name, "$security")
+  (constructor_name, "")
+  (constructible, false)
+)
+{
 public:
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "$security"; }
-  };
-
   static security &create(object container);
   static security &get();
 

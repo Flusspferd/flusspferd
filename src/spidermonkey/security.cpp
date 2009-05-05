@@ -63,7 +63,7 @@ public:
 };
 
 security::security(object const &obj)
-  : native_object_base(obj), p(new impl)
+  : base_type(obj), p(new impl)
 {}
 
 security::~security()
