@@ -74,7 +74,7 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (11, ( \
+  (13, ( \
     ~cpp_name~,                        /* name */ \
     ::flusspferd::native_object_base,  /* base class */ \
     ~constructor_name~,                /* constructor name */ \
@@ -83,23 +83,27 @@ THE SOFTWARE.
     ~full_name~,                       /* full name */ \
     (~, none, ~),                      /* methods */ \
     (~, none, ~),                      /* constructor methods */ \
+    (~, none, ~),                      /* properties */ \
+    (~, none, ~),                      /* constructor properties */ \
     false,                             /* custom enumerate */ \
     0,                                 /* augment constructor (custom func.)*/\
     0                                  /* augment prototype (custom func.) */ \
   )) \
   /* */
 
-#define FLUSSPFERD_CD_PARAM__cpp_name               0
-#define FLUSSPFERD_CD_PARAM__base                   1
-#define FLUSSPFERD_CD_PARAM__constructor_name       2
-#define FLUSSPFERD_CD_PARAM__constructor_arity      3
-#define FLUSSPFERD_CD_PARAM__constructible          4
-#define FLUSSPFERD_CD_PARAM__full_name              5
-#define FLUSSPFERD_CD_PARAM__methods                6
-#define FLUSSPFERD_CD_PARAM__constructor_methods    7
-#define FLUSSPFERD_CD_PARAM__custom_enumerate       8
-#define FLUSSPFERD_CD_PARAM__augment_constructor    9
-#define FLUSSPFERD_CD_PARAM__augment_prototype     10
+#define FLUSSPFERD_CD_PARAM__cpp_name                 0
+#define FLUSSPFERD_CD_PARAM__base                     1
+#define FLUSSPFERD_CD_PARAM__constructor_name         2
+#define FLUSSPFERD_CD_PARAM__constructor_arity        3
+#define FLUSSPFERD_CD_PARAM__constructible            4
+#define FLUSSPFERD_CD_PARAM__full_name                5
+#define FLUSSPFERD_CD_PARAM__methods                  6
+#define FLUSSPFERD_CD_PARAM__constructor_methods      7
+#define FLUSSPFERD_CD_PARAM__properties               8
+#define FLUSSPFERD_CD_PARAM__constructor_properties   9
+#define FLUSSPFERD_CD_PARAM__custom_enumerate        10
+#define FLUSSPFERD_CD_PARAM__augment_constructor     11
+#define FLUSSPFERD_CD_PARAM__augment_prototype       12
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -122,6 +126,8 @@ THE SOFTWARE.
   p_full_name, \
   p_methods, \
   p_constructor_methods, \
+  p_properties, \
+  p_constructor_properties, \
   p_custom_enumerate, \
   p_augment_constructor, \
   p_augment_prototype \
@@ -142,6 +148,7 @@ THE SOFTWARE.
             ::flusspferd::prototype< p_base >() \
           ); \
         FLUSSPFERD_CD_METHODS(p_cpp_name, p_methods) \
+        FLUSSPFERD_CD_PROPERTIES(p_cpp_name, p_properties) \
         BOOST_PP_EXPR_IF( \
           p_augment_prototype, \
           p_cpp_name :: augment_prototype(obj);) \
@@ -150,6 +157,7 @@ THE SOFTWARE.
       static void augment_constructor(::flusspferd::object &obj) { \
         (void)obj; \
         FLUSSPFERD_CD_METHODS(p_cpp_name, p_constructor_methods) \
+        FLUSSPFERD_CD_PROPERTIES(p_cpp_name, p_constructor_properties) \
         BOOST_PP_EXPR_IF( \
           p_augment_constructor, \
           p_cpp_name :: augment_constructor(obj);) \
@@ -205,6 +213,50 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_METHOD__none(p_cpp_name, p_method_name, p_param) \
+  /* */
+
+#define FLUSSPFERD_CD_PROPERTIES(p_cpp_name, p_properties) \
+  BOOST_PP_SEQ_FOR_EACH( \
+    FLUSSPFERD_CD_PROPERTY, \
+    p_cpp_name, \
+    FLUSSPFERD_PP_GEN_TUPLE3SEQ(p_properties)) \
+  /* */
+
+#define FLUSSPFERD_CD_PROPERTY(r, p_cpp_name, p_property) \
+  BOOST_PP_CAT( \
+    FLUSSPFERD_CD_PROPERTY__, \
+    BOOST_PP_TUPLE_ELEM(3, 1, p_property) \
+  ) ( \
+    p_cpp_name, \
+    BOOST_PP_TUPLE_ELEM(3, 0, p_property), \
+    BOOST_PP_TUPLE_ELEM(3, 2, p_property) \
+  ) \
+  /* */
+
+#define FLUSSPFERD_CD_PROPERTY__getter_setter( \
+  p_cpp_name, p_property_name, p_param \
+) \
+  obj.define_property( \
+    (p_property_name), \
+    ::flusspferd::property_attributes( \
+      ::flusspferd::permanent_shared_property, \
+      ::flusspferd::create_native_method( \
+        ::flusspferd::object(), \
+        "$get_" p_property_name, \
+        & p_cpp_name :: \
+        BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
+      ), \
+      ::flusspferd::create_native_method( \
+        ::flusspferd::object(), \
+        "$set_" p_property_name, \
+        & p_cpp_name :: \
+        BOOST_PP_TUPLE_ELEM(2, 1, p_param) \
+      ) \
+    ) \
+  ); \
+  /* */
+
+#define FLUSSPFERD_CD_PROPERTY__none(p_cpp_name, p_property_name, p_param) \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
