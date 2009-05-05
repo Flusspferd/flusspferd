@@ -72,21 +72,13 @@ static blob &get_arg(call_context &x) {
 }
 
 blob_stream::blob_stream(object const &obj, call_context &x)
-  : stream(obj, 0), p(new impl(get_arg(x)))
+  : base_type(obj, (std::streambuf*)0), p(new impl(get_arg(x)))
 {
   set_streambuf(&p->buf);
 }
 
 blob_stream::~blob_stream()
 {}
-
-object blob_stream::class_info::create_prototype() {
-  object proto = create_object(flusspferd::prototype<stream>());
-
-  create_native_method(proto, "getBlob", &blob_stream::get_blob);
-
-  return proto;
-}
 
 void blob_stream::trace(tracer &trc) {
   trc("blob", p->blob_);

@@ -26,22 +26,25 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
+#include "../class_description.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class namespace_ : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, namespace_)
+  (full_name, "XML.Namespace")
+  (constructor_name, "Namespace")
+  (constructor_arity, 3)
+  (methods,
+    ("toString", bind, to_string))
+  (properties,
+    ("href", getter_setter, (get_href, set_href))
+    ("prefix", getter_setter, (get_prefix, set_prefix)))
+)
+{
 public:
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.Namespace"; }
-
-    static char const *constructor_name() { return "Namespace"; }
-    typedef boost::mpl::size_t<3> constructor_arity;
-
-    static object create_prototype();
-  };
-
   namespace_(object const &, call_context &);
   namespace_(object const &, xmlNsPtr ptr);
   ~namespace_();
@@ -60,10 +63,10 @@ protected:
 private:
   void init();
 
-private: // JS methods
+public: // JS methods
   string to_string();
 
-private: // JS properties
+public: // JS properties
   boost::optional<std::string> get_href();
   void set_href(boost::optional<std::string> const &x);
   boost::optional<std::string> get_prefix();

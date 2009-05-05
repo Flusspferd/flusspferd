@@ -25,29 +25,24 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_REFERENCE_HPP
 
 #include "node.hpp"
+#include "../class_description.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class reference_ : public node {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, reference_)
+  (base, node)
+  (full_name, "XML.Reference")
+  (constructor_name, "Reference")
+  (constructor_arity, 2)
+)
+{
 public:
-  struct class_info : node::class_info {
-    static char const *full_name() { return "XML.Reference"; }
-
-    static char const *constructor_name() { return "Reference"; }
-    typedef boost::mpl::size_t<2> constructor_arity;
-
-    static object create_prototype();
-  };
-
   reference_(object const &, call_context &);
   reference_(object const &, xmlNodePtr doc);
   ~reference_();
-
-private: // JS methods
-
-private: // JS properties
 };
 
 }}

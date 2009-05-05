@@ -37,13 +37,13 @@ static htmlDocPtr new_doc(call_context &) {
 }
 
 html_document::html_document(object const &obj, call_context &x)
-  : document(obj, new_doc(x))
+  : base_type(obj, new_doc(x))
 {
   init();
 }
 
 html_document::html_document(object const &obj, htmlDocPtr ptr)
-  : document(obj, ptr)
+  : base_type(obj, ptr)
 {
   init();
 }
@@ -52,14 +52,6 @@ html_document::~html_document() {
 }
 
 void html_document::init() {
-}
-
-object html_document::class_info::create_prototype() {
-  object proto = create_object(flusspferd::prototype<document>());
-
-  create_native_method(proto, "dump", &html_document::dump);
-
-  return proto;
 }
 
 string html_document::dump() {

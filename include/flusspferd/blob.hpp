@@ -25,10 +25,12 @@ THE SOFTWARE.
 
 #include "native_object_base.hpp"
 #include "class.hpp"
+#include "class_description.hpp"
 #include <vector>
 
 namespace flusspferd {
 
+#ifdef IN_DOXYGEN
 /**
  * Binary data storage class.
  *
@@ -40,8 +42,36 @@ namespace flusspferd {
  *
  * @ingroup jsext
  */
-class blob : public native_object_base {
+class blob {
+#else
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, blob)
+  (full_name, "Blob")
+  (constructor_name, "Blob")
+  (constructor_arity, 1)
+  (augment_prototype, 1)
+  (methods,
+    ("append", bind, append)
+    ("toArray", bind, to_array)
+    ("clone", bind, clone)
+    ("slice", bind, slice)
+    ("asUtf8", bind, as_utf8)
+    ("asUtf16", bind, as_utf16)
+    ("get", bind, get_index)
+    ("set", bind, set_index))
+  (properties,
+    ("length", getter_setter, (get_length, set_length)))
+  (constructor_methods,
+    ("fromUtf8", bind_static, from_utf8)
+    ("fromUtf16", bind_static, from_utf16))
+)
+{
+#endif
 public:
+  friend class class_info;
+
+  static void augment_prototype(object &proto);
+
   /**
    * Javascript constructor.
    *
@@ -65,19 +95,6 @@ public:
 
   /// Destructor.
   ~blob();
-
-  /**
-   * Javascript class info.
-   */
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "Blob"; }
-
-    static char const *constructor_name() { return "Blob"; }
-    typedef boost::mpl::size_t<1> constructor_arity;
-
-    static object create_prototype();
-    static void augment_constructor(object &);
-  };
 
   /**
    * Access the data.

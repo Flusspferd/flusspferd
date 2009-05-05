@@ -26,45 +26,41 @@ THE SOFTWARE.
 
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/class_description.hpp"
 #include <gmpxx.h>
 
 namespace multi_precission {
-struct Float : public flusspferd::native_object_base {
-  struct class_info : flusspferd::class_info {
-    static char const *constructor_name() {
-      return "Float";
-    }
 
-    static char const *full_name() {
-      return "Float";
-    }
-
-    static object create_prototype() {
-      flusspferd::object proto = flusspferd::create_object();
-      create_native_method(proto, "fits_int", &Float::fits_int);
-      create_native_method(proto, "get_int", &Float::get_int);
-      create_native_method(proto, "toInt", &Float::get_int);
-      create_native_method(proto, "get_double", &Float::get_double);
-      create_native_method(proto, "toDouble", &Float::get_double);
-      create_native_method(proto, "get_string", &Float::get_string);
-      create_native_method(proto, "toString", &Float::get_string);
-      create_native_method(proto, "get_string_base", &Float::get_string_base);
-      create_native_method(proto, "get_prec", &Float::get_prec);
-      create_native_method(proto, "set_prec", &Float::set_prec);
-      create_native_method(proto, "sqrt", &Float::sqrt);
-      create_native_method(proto, "sgn", &Float::sgn);
-      create_native_method(proto, "abs", &Float::abs);
-      create_native_method(proto, "ceil", &Float::ceil);
-      create_native_method(proto, "floor", &Float::floor);
-      create_native_method(proto, "trunc", &Float::trunc);
-      create_native_method(proto, "cmp", &Float::cmp);
-      create_native_method(proto, "add", &Float::add);
-      create_native_method(proto, "sub", &Float::sub);
-      create_native_method(proto, "mul", &Float::mul);
-      create_native_method(proto, "div", &Float::div);
-      return proto;
-    }
-  };
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, Float)
+  (constructor_name, "Float")
+  (full_name, "gmp.Float")
+  (methods,
+    ("fits_int",         bind,    fits_int)
+    ("get_int",          bind,    get_int)
+    ("toInt",            alias,   "get_int")
+    ("get_double",       bind,    get_double)
+    ("toDouble",         alias,   "get_double")
+    ("get_string",       bind,    get_string)
+    ("toString",         alias,   "get_string")
+    ("get_string_base",  bind,    get_string_base)
+    ("get_prec",         bind,    get_prec)
+    ("set_prec",         bind,    set_prec)
+    ("sqrt",             bind,    sqrt)
+    ("sgn",              bind,    sgn)
+    ("abs",              bind,    abs)
+    ("ceil",             bind,    ceil)
+    ("floor",            bind,    floor)
+    ("trunc",            bind,    trunc)
+    ("cmp",              bind,    cmp)
+    ("add",              bind,    add)
+    ("sub",              bind,    sub)
+    ("mul",              bind,    mul)
+    ("div",              bind,    div)
+  )
+)
+{
+public:
   mpf_class mp;
 
   Float(flusspferd::object const &self, mpf_class const &mp);
@@ -104,6 +100,7 @@ struct Float : public flusspferd::native_object_base {
 private:
   void init_with_value(flusspferd::value v);
 };
+
 }
 
 #endif

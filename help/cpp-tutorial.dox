@@ -283,29 +283,33 @@ void my_function(call_context &x) {
  *
  * @until <set>
  *
- * Our "set of strings" class needs to inherit from
- * flusspferd::native_object_base to be used from Javascript.
+ * We use the macro #FLUSSPFERD_CLASS_DESCRIPTION for describing the class to
+ * Flusspferd. It takes multiple named parameters (yes, that's possible in C++),
+ * the first in our invocation being cpp_name: It indicates the name of the
+ * class in the C++ source code.
  *
- * @skip StringSet
- * @until public:
+ * @note #FLUSSPFERD_CLASS_DESCRIPTION will create two classes: @c StringSet and
+ *       @c StringSet_base.
  *
- * Inside this class, we have to tell Flusspferd the name of the class'
- * constructor and the full identifying name of the class.
+ * @skip FLUSSPFERD_CLASS_DESCRIPTION
+ * @until cpp_name
  *
- * @skip class_info
- * @until full_name
+ * The parameters @c full_name and @c constructor_name define the complete
+ * identifier (system-unique!) of the class respectively the name of the
+ * constructor inside the container passed to flusspferd::load_class.
  *
- * As we intend to add our class methods to the prototype, we have to write
- * a function for creating the prototype.
+ * @skip full_name
+ * @until constructor_name
  *
- * @skip create_prototype
- * @until create_object
+ * With @c methods, we can bind Javascript method names to C++ methods.
  *
- * With @ref create_function "flusspferd::create_native_method etc." we can add
- * the methods to our prototype and return it.
+ * @skip methods
+ * @until {
  *
- * @skip create_native_method
- * @until }
+ * Here begins the class @c StringSet.
+ *
+ * @skip public
+ * @until public
  *
  * Below is the constructor that will be called from Javascript. Note that
  * the first parameter has to be passed to flusspferd::native_object_base.
@@ -330,7 +334,7 @@ void my_function(call_context &x) {
  *
  * A few <code>typedef</code>s for the data types we use internally:
  *
- * @skip private
+ * @skip public
  * @until iterator
  *
  * The first three methods should be pretty straight-forward:

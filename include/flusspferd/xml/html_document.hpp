@@ -25,26 +25,26 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_HTML_DOCUMENT_HPP
 
 #include "document.hpp"
+#include "../class_description.hpp"
 #include <libxml/HTMLtree.h>
 
 namespace flusspferd { namespace xml {
 
-class html_document : public document {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, html_document)
+  (base, document)
+  (full_name, "XML.HTML.Document")
+  (constructor_name, "Document")
+  (methods,
+    ("dump", bind, dump))
+)
+{
 public:
-  struct class_info : node::class_info {
-    static char const *full_name() { return "XML.HTML.Document"; }
-
-    static char const *constructor_name() { return "Document"; }
-    typedef boost::mpl::size_t<0> constructor_arity;
-
-    static object create_prototype();
-  };
-
   html_document(object const &, call_context &);
   html_document(object const &, htmlDocPtr doc);
   ~html_document();
 
-private:
+public: // JS methods
   string dump();
 
 private:

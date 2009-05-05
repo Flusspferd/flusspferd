@@ -29,18 +29,22 @@ using namespace flusspferd;
 // Put everything in an anon-namespace so typeid wont clash ever.
 namespace {
 
-class curl : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, curl)
+  (full_name, "cURL")
+  (constructor_name, "cURL")
+  (augment_constructor, 1)
+  (methods,
+    ("setMethod", bind, set_method)
+    ("perform", bind, perform)
+  )
+)
+{
 public:
-  struct class_info : public flusspferd::class_info {
-    static char const *full_name() { return "cURL"; }
-    typedef boost::mpl::bool_<true> constructible;
-    static char const *constructor_name() { return "cURL"; }
-    static void augment_constructor(object &ctor);
-    static object create_prototype();
-  };
-
   curl(object const &obj, call_context &x);
   virtual ~curl();
+
+  static void augment_constructor(object &);
 
 protected:
   CURL *curlHandle;
@@ -60,11 +64,10 @@ protected:
 
   // TODO: Support setting CURLOPT_INFILESIZE for PUT methods
 
-private: // JS methods
+public: // JS methods
   void set_method(string &meth);
   int perform();
 };
-
 
 template<size_t (curl::*Method)(void*, size_t)>
 size_t curl::c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream) {
@@ -77,7 +80,7 @@ FLUSSPFERD_LOADER(container) {
 }
 
 ///////////////////////////
-void curl::class_info::augment_constructor(object &ctor)
+void curl::augment_constructor(object &ctor)
 {
   curl_version_info_data* data = curl_version_info(CURLVERSION_NOW);
 
@@ -103,18 +106,8 @@ void curl::class_info::augment_constructor(object &ctor)
 }
 
 ///////////////////////////
-object curl::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "setMethod", &curl::set_method);
-  create_native_method(proto, "perform", &curl::perform);
-
-  return proto;
-}
-
-///////////////////////////
 curl::curl(object const &obj, call_context &) 
-  : native_object_base(obj),
+  : base_type(obj),
     error_buffer(NULL)
 {
   curlHandle = curl_easy_init();

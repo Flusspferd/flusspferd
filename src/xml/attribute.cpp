@@ -33,7 +33,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 attribute_::attribute_(object const &obj, xmlAttrPtr ptr)
-  : node(obj, xmlNodePtr(ptr))
+  : base_type(obj, xmlNodePtr(ptr))
 {
   init();
 }
@@ -79,7 +79,7 @@ static xmlAttrPtr new_attribute_(call_context &x) {
 }
 
 attribute_::attribute_(object const &obj, call_context &x)
-  : node(obj, xmlNodePtr(new_attribute_(x)))
+  : base_type(obj, xmlNodePtr(new_attribute_(x)))
 {
   init();
 }
@@ -88,23 +88,6 @@ attribute_::~attribute_()
 {}
 
 void attribute_::init() {
-}
-
-object attribute_::class_info::create_prototype() {
-  local_root_scope scope;
-
-  object proto = create_object(flusspferd::prototype<node>());
-
-  create_native_method(proto, "addContent", &attribute_::add_content);
-
-  proto.define_property(
-    "content",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &attribute_::get_content),
-      create_native_method(object(), "", &attribute_::set_content)));
-
-  return proto;
 }
 
 void attribute_::add_content(string const &content) {

@@ -26,40 +26,36 @@ THE SOFTWARE.
 
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/class_description.hpp"
 #include <gmpxx.h>
 
 namespace multi_precission {
-struct Integer : public flusspferd::native_object_base {
-  struct class_info : flusspferd::class_info {
-    static char const *constructor_name() {
-      return "Integer";
-    }
 
-    static char const *full_name() {
-      return "Integer";
-    }
-
-    static object create_prototype() {
-      flusspferd::object proto = flusspferd::create_object();
-      create_native_method(proto, "fits_int", &Integer::fits_int);
-      create_native_method(proto, "get_int", &Integer::get_int);
-      create_native_method(proto, "toInt", &Integer::get_int);
-      create_native_method(proto, "get_double", &Integer::get_double);
-      create_native_method(proto, "toDouble", &Integer::get_double);
-      create_native_method(proto, "get_string", &Integer::get_string);
-      create_native_method(proto, "toString", &Integer::get_string);
-      create_native_method(proto, "get_string_base", &Integer::get_string_base);
-      create_native_method(proto, "sqrt", &Integer::sqrt);
-      create_native_method(proto, "sgn", &Integer::sgn);
-      create_native_method(proto, "abs", &Integer::abs);
-      create_native_method(proto, "cmp", &Integer::cmp);
-      create_native_method(proto, "add", &Integer::add);
-      create_native_method(proto, "sub", &Integer::sub);
-      create_native_method(proto, "mul", &Integer::mul);
-      create_native_method(proto, "div", &Integer::div);
-      return proto;
-    }
-  };
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, Integer)
+  (constructor_name, "Integer")
+  (full_name, "gmp.Integer")
+  (methods,
+    ("fits_int",         bind,   fits_int)
+    ("get_int",          bind,   get_int)
+    ("toInt",            alias,  "get_int")
+    ("get_double",       bind,   get_double)
+    ("toDouble",         alias,  "get_double")
+    ("get_string",       bind,   get_string)
+    ("toString",         alias,  "get_string")
+    ("get_string_base",  bind,   get_string_base)
+    ("sqrt",             bind,   sqrt)
+    ("sgn",              bind,   sgn)
+    ("abs",              bind,   abs)
+    ("cmp",              bind,   cmp)
+    ("add",              bind,   add)
+    ("sub",              bind,   sub)
+    ("mul",              bind,   mul)
+    ("div",              bind,   div)
+  )
+)
+{
+public:
   mpz_class mp;
 
   Integer(flusspferd::object const &self, mpz_class const &mp);
@@ -89,6 +85,7 @@ struct Integer : public flusspferd::native_object_base {
   void mul(flusspferd::call_context &x) /*const*/;
   void div(flusspferd::call_context &x) /*const*/;
 };
+
 }
 
 #endif

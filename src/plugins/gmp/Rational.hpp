@@ -26,41 +26,37 @@ THE SOFTWARE.
 
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/class_description.hpp"
 #include <gmpxx.h>
 
 namespace multi_precission {
+
 class Integer;
 
-struct Rational : public flusspferd::native_object_base {
-  struct class_info : flusspferd::class_info {
-    static char const *constructor_name() {
-      return "Rational";
-    }
-
-    static char const *full_name() {
-      return "Rational";
-    }
-
-    static object create_prototype() {
-      flusspferd::object proto = flusspferd::create_object();
-      create_native_method(proto, "get_double", &Rational::get_double);
-      create_native_method(proto, "toDouble", &Rational::get_double);
-      create_native_method(proto, "get_string", &Rational::get_string);
-      create_native_method(proto, "toString", &Rational::get_string);
-      create_native_method(proto, "get_string_base", &Rational::get_string_base);
-      create_native_method(proto, "sgn", &Rational::sgn);
-      create_native_method(proto, "abs", &Rational::abs);
-      create_native_method(proto, "canonicalize", &Rational::canonicalize);
-      create_native_method(proto, "get_num", &Rational::get_num);
-      create_native_method(proto, "get_den", &Rational::get_den);
-      create_native_method(proto, "cmp", &Rational::cmp);
-      create_native_method(proto, "add", &Rational::add);
-      create_native_method(proto, "sub", &Rational::sub);
-      create_native_method(proto, "mul", &Rational::mul);
-      create_native_method(proto, "div", &Rational::div);
-      return proto;
-    }
-  };
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, Rational)
+  (constructor_name, "Rational")
+  (full_name, "gmp.Rational")
+  (methods,
+    ("get_double",        bind,   get_double)
+    ("toDouble",          alias,  "get_double")
+    ("get_string",        bind,   get_string)
+    ("toString",          alias,  "get_string")
+    ("get_string_base",   bind,   get_string_base)
+    ("sgn",               bind,   sgn)
+    ("abs",               bind,   abs)
+    ("canonicalize",      bind,   canonicalize)
+    ("get_num",           bind,   get_num)
+    ("get_den",           bind,   get_den)
+    ("cmp",               bind,   cmp)
+    ("add",               bind,   add)
+    ("sub",               bind,   sub)
+    ("mul",               bind,   mul)
+    ("div",               bind,   div)
+  )
+)
+{
+public:
   mpq_class mp;
 
   Rational(flusspferd::object const &self, mpq_class const &mp);
@@ -90,6 +86,7 @@ struct Rational : public flusspferd::native_object_base {
   void mul(flusspferd::call_context &x) /*const*/;
   void div(flusspferd::call_context &x) /*const*/;
 };
+
 }
 
 #endif

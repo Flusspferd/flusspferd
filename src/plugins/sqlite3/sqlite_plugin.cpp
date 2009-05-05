@@ -38,38 +38,41 @@ void raise_sqlite_error(sqlite3* db);
 // Classes
 ///////////////////////////
 
-class sqlite3 : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, sqlite3)
+  (full_name, "SQLite3")
+  (constructor_name, "SQLite3")
+  (methods,
+    ("cursor", bind, cursor)
+    ("close", bind, close))
+  (constructor_properties,
+    ("version", constant, SQLITE_VERSION_NUMBER)
+    ("versionStr", constant, string(SQLITE_VERSION))))
+{
 public:
-  struct class_info : public flusspferd::class_info {
-    static char const *full_name() { return "SQLite3"; }
-    typedef boost::mpl::bool_<true> constructible;
-    static char const *constructor_name() { return "SQLite3"; }
-    static void augment_constructor(object &ctor);
-    static object create_prototype();
-  };
-
   sqlite3(object const &obj, call_context &x);
   ~sqlite3();
 
-protected:
-  //void trace(tracer &);
-
-private: // JS methods
+public: // JS methods
   ::sqlite3 *db;
 
   void close();
   void cursor(call_context &x);
 };
 
-class sqlite3_cursor : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, sqlite3_cursor)
+  (constructible, false)
+  (full_name, "SQLite3.Cursor")
+  (constructor_name, "Cursor")
+  (methods,
+    ("close", bind, close)
+    ("reset", bind, reset)
+    ("next", bind, next)
+    ("bind", bind, bind)
+  ))
+{
 public:
-  struct class_info : public flusspferd::class_info {
-    typedef boost::mpl::bool_<false> constructible;
-    static char const *full_name() { return "SQLite3.Cursor"; }
-    static char const* constructor_name() { return "Cursor"; }
-    static object create_prototype();
-  };
-
   sqlite3_cursor(object const &obj, sqlite3_stmt *sth);
   ~sqlite3_cursor();
 
@@ -88,7 +91,7 @@ private:
   void bind_dict(object &o, size_t num_binds);
   void do_bind_param(int n, value v);
 
-private: // JS methods
+public: // JS methods
   void close();
   void reset();
   object next();
@@ -96,35 +99,13 @@ private: // JS methods
 };
 
 FLUSSPFERD_LOADER(container) {
-  load_class<sqlite3>(container);
-}
-
-///////////////////////////
-// Set version properties on constructor object
-void sqlite3::class_info::augment_constructor(object &ctor)
-{
-  // Set static properties on the constructor
-  ctor.define_property("version", SQLITE_VERSION_NUMBER, 
-      read_only_property | permanent_property);
-  ctor.define_property("versionStr", string(SQLITE_VERSION), 
-      read_only_property | permanent_property);
-
+  object ctor = load_class<sqlite3>(container);
   load_class<sqlite3_cursor>(ctor);
 }
 
 ///////////////////////////
-object sqlite3::class_info::create_prototype()
-{
-  object proto = create_object();
-
-  create_native_method(proto, "cursor", &sqlite3::cursor);
-  create_native_method(proto, "close", &sqlite3::close);
-  return proto;  
-}
-
-///////////////////////////
 sqlite3::sqlite3(object const &obj, call_context &x)
-  : native_object_base(obj), 
+  : base_type(obj),
     db(NULL)
 {
   if (x.arg.size() == 0)
@@ -181,21 +162,9 @@ void sqlite3::cursor(call_context &x) {
 }
 
 ///////////////////////////
-object sqlite3_cursor::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "close", &sqlite3_cursor::close);
-  create_native_method(proto, "reset", &sqlite3_cursor::reset);
-  create_native_method(proto, "next", &sqlite3_cursor::next);
-  create_native_method(proto, "bind", &sqlite3_cursor::bind);
-
-  return proto;
-}
-
-///////////////////////////
 // 'Private' constructor that is called from sqlite3::cursor
 sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
-  : native_object_base(obj),
+  : base_type(obj),
     sth(_sth),
     state(CursorState_Init)
 {

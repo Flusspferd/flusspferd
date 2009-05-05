@@ -7,11 +7,11 @@ using namespace flusspferd;
 
 namespace multi_precission {
   Rational::Rational(flusspferd::object const &self, mpq_class const &mp)
-    : flusspferd::native_object_base(self), mp(mp)
+    : base_type(self), mp(mp)
   { }
 
   Rational::Rational(flusspferd::object const &self, flusspferd::call_context &x)
-    : flusspferd::native_object_base(self)
+    : base_type(self)
   {
     if(x.arg.size() == 1) {
       flusspferd::value v = x.arg.front();

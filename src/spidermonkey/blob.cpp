@@ -32,13 +32,13 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 blob::blob(object const &obj, unsigned char const *data, std::size_t length)
-  : native_object_base(obj), data_(data, data+length)
+  : base_type(obj), data_(data, data+length)
 {
   init();
 }
 
 blob::blob(object const &obj, call_context &x)
-  : native_object_base(obj)
+  : base_type(obj)
 {
   init();
 
@@ -71,38 +71,12 @@ unsigned char blob::el_from_value(value const &v) {
   return (unsigned char) x;
 }
 
-void blob::class_info::augment_constructor(object &ctor) {
-  create_native_function(ctor, "fromUtf8", &blob::from_utf8);
-  create_native_function(ctor, "fromUtf16", &blob::from_utf16);
-}
-
 void blob::init() {
 }
 
 blob::~blob() {}
 
-object blob::class_info::create_prototype() {
-  flusspferd::local_root_scope scope;
-
-  object proto = create_object();
-
-  create_native_method(proto, "append", &blob::append);
-  create_native_method(proto, "toArray", &blob::to_array);
-  create_native_method(proto, "clone", &blob::clone);
-  create_native_method(proto, "slice", &blob::slice);
-  create_native_method(proto, "asUtf8", &blob::as_utf8);
-  create_native_method(proto, "asUtf16", &blob::as_utf16);
-  create_native_method(proto, "get", &blob::get_index);
-  create_native_method(proto, "set", &blob::set_index);
-
-  proto.define_property(
-    "length",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "$get_length", &blob::get_length),
-      create_native_method(object(), "$set_length", &blob::set_length)
-    ));
-
+void blob::augment_prototype(object &proto) {
   static const char* js_iterator =
     "function() { return require('Util/Range').Range(0, this.length) }";
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
@@ -138,7 +112,6 @@ object blob::class_info::create_prototype() {
 
   proto.define_property("pairs", value(), 
       property_attributes(dont_enumerate, pairs_fn));
-  return proto;
 }
 
 void blob::set_length(value data) {

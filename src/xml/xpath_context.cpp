@@ -51,7 +51,7 @@ private:
 }
 
 xpath_context::xpath_context(object const &obj, call_context &x)
-  : native_object_base(obj)
+  : base_type(obj)
 {
   local_root_scope scope;
   value doc_v = x.arg[0];
@@ -82,19 +82,6 @@ xpath_context::xpath_context(object const &obj, call_context &x)
 
 xpath_context::~xpath_context() {
   xmlXPathFreeContext(xpath_ctx);
-}
-
-object xpath_context::class_info::create_prototype() {
-  object proto = create_object();
-
-  proto.define_property(
-    "current",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &xpath_context::get_current),
-      create_native_method(object(), "", &xpath_context::set_current)));
-
-  return proto;
 }
 
 void xpath_context::self_call(call_context &x) {

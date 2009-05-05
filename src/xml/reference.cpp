@@ -32,7 +32,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 reference_::reference_(object const &obj, xmlNodePtr ptr)
-  : node(obj, ptr)
+  : base_type(obj, ptr)
 {}
 
 static xmlNodePtr new_reference(call_context &x) {
@@ -65,17 +65,8 @@ static xmlNodePtr new_reference(call_context &x) {
 }
 
 reference_::reference_(object const &obj, call_context &x)
-  : node(obj, new_reference(x))
+  : base_type(obj, new_reference(x))
 {}
 
 reference_::~reference_()
 {}
-
-object reference_::class_info::create_prototype() {
-  local_root_scope scope;
-
-  object proto = create_object(flusspferd::prototype<node>());
-
-  return proto;
-}
-

@@ -27,25 +27,26 @@ THE SOFTWARE.
 #include "../native_object_base.hpp"
 #include "../class.hpp"
 #include "../blob.hpp"
+#include "../class_description.hpp"
 #include <libxml/parser.h>
 
 namespace flusspferd { namespace xml {
 
-class push_parser : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, push_parser)
+  (full_name, "XML.PushParser")
+  (constructor_name, "PushParser")
+  (constructor_arity, 1)
+  (methods,
+    ("push", bind, push)
+    ("terminate", bind, terminate))
+)
+{
 public:
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.PushParser"; }
-
-    static char const *constructor_name() { return "PushParser"; }
-    typedef boost::mpl::size_t<1> constructor_arity;
-
-    static object create_prototype();
-  };
-
   push_parser(object const &, call_context &);
   ~push_parser();
 
-private: // JS methods
+public: // JS methods
   void push(blob &, bool);
   value terminate();
 

@@ -26,27 +26,28 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
+#include "../class_description.hpp"
 #include <libxml/xpath.h>
 
 namespace flusspferd { namespace xml {
 
-class xpath_context : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, xpath_context)
+  (full_name, "XML.XPath")
+  (constructor_name, "XPath")
+  (constructor_arity, 1)
+  (properties,
+    ("current", getter_setter, (get_current, set_current)))
+)
+{
 public:
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.XPath"; }
-    static char const *constructor_name() { return "XPath"; }
-    typedef boost::mpl::size_t<1> constructor_arity;
-
-    static object create_prototype();
-  };
-
   xpath_context(object const &, call_context &);
   ~xpath_context();
 
 private: // JS methods
   void self_call(call_context &);
 
-private: // JS properties
+public: // JS properties
   object get_current();
   void set_current(object);
 

@@ -35,11 +35,8 @@ using namespace flusspferd;
 using namespace flusspferd::io;
 
 stream::stream(object const &o, std::streambuf *p)
-  : native_object_base(o), streambuf_(p)
+  : base_type(o), streambuf_(p)
 {
-  define_property("fieldSeparator", string(" "));
-  define_property("recordSeparator", string("\n"));
-  define_property("autoFlush", false);
 }
 
 stream::~stream()
@@ -51,23 +48,6 @@ void stream::set_streambuf(std::streambuf *p) {
 
 std::streambuf *stream::streambuf() {
   return streambuf_;
-}
-
-object stream::class_info::create_prototype() {
-  local_root_scope scope;
-
-  object proto = create_object();
-
-  create_native_method(proto, "readWhole", &stream::read_whole);
-  create_native_method(proto, "read", &stream::read);
-  create_native_method(proto, "readWholeBlob", &stream::read_whole_blob);
-  create_native_method(proto, "readBlob", &stream::read_blob);
-  create_native_method(proto, "write", &stream::write);
-  create_native_method(proto, "flush", &stream::flush);
-  create_native_method(proto, "print", &stream::print);
-  create_native_method(proto, "readLine", &stream::read_line);
-
-  return proto;
 }
 
 string stream::read_whole() {

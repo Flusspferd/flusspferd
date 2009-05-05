@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/security.hpp"
 #include "flusspferd/modules.hpp"
+#include "flusspferd/class_description.hpp"
 
 #if defined(__APPLE__)
 #  include <crt_externs.h> 
@@ -42,15 +43,14 @@ using namespace flusspferd;
 
 namespace {
 
-class environment : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, environment)
+  (constructor_name, "Environment")
+  (full_name, "Environment")
+  (custom_enumerate, true)
+)
+{
 public:
-  struct class_info : public flusspferd::class_info {
-    typedef boost::mpl::bool_<true> constructible;
-    typedef boost::mpl::bool_<true> custom_enumerate;
-    static char const *constructor_name() { return "Environment"; }
-    static char const *full_name() { return "Environment"; }
-  };
-
   environment(object const &obj, call_context &);
 
 protected:
@@ -68,7 +68,7 @@ FLUSSPFERD_LOADER(exports) {
 }
 
 environment::environment(object const &obj, call_context &)
-  : native_object_base(obj)
+  : base_type(obj)
 {
 }
 

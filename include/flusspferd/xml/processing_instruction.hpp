@@ -25,22 +25,21 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
 
 #include "node.hpp"
+#include "../class_description.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class processing_instruction : public node {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, processing_instruction)
+  (base, node)
+  (full_name, "XML.ProcessingInstruction")
+  (constructor_name, "ProcessingInstruction")
+  (constructor_arity, 3)
+)
+{
 public:
-  struct class_info : node::class_info {
-    static char const *full_name() { return "XML.ProcessingInstruction"; }
-
-    static char const *constructor_name() { return "ProcessingInstruction"; }
-    typedef boost::mpl::size_t<3> constructor_arity;
-
-    static object create_prototype();
-  };
-
   processing_instruction(object const &, call_context &);
   processing_instruction(object const &, xmlNodePtr pi);
   ~processing_instruction();
