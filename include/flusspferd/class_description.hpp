@@ -275,6 +275,21 @@ THE SOFTWARE.
   ); \
   /* */
 
+#define FLUSSPFERD_CD_PROPERTY__getter(p_property_name, p_param) \
+  obj.define_property( \
+    (p_property_name), \
+    ::flusspferd::property_attributes( \
+      ::flusspferd::permanent_shared_property \
+      | ::flusspferd::read_only_property, \
+      ::flusspferd::create_native_method( \
+        ::flusspferd::object(), \
+        "$get_" p_property_name, \
+        & Class :: p_param \
+      ) \
+    ) \
+  ); \
+  /* */
+
 #define FLUSSPFERD_CD_PROPERTY__constant(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
