@@ -47,9 +47,6 @@ using namespace flusspferd::io;
 class file::impl {
 public:
   std::fstream stream;
-
-  static void create(char const *name, boost::optional<int> mode);
-  static bool exists(char const *name);
 };
 
 file::file(object const &obj, call_context &x)
@@ -66,8 +63,8 @@ file::~file()
 {}
 
 void file::augment_constructor(object &constructor) {
-  create_native_function(constructor, "create", &impl::create);
-  create_native_function(constructor, "exists", &impl::exists);
+  create_native_function(constructor, "create", &file::create);
+  create_native_function(constructor, "exists", &file::exists);
 }
 
 void file::open(char const *name) {
@@ -91,7 +88,7 @@ void file::close() {
   delete_property("fileName");
 }
 
-void file::impl::create(char const *name, boost::optional<int> mode) {
+void file::create(char const *name, boost::optional<int> mode) {
   security &sec = security::get();
 
   if (!sec.check_path(name, security::CREATE))
@@ -101,7 +98,7 @@ void file::impl::create(char const *name, boost::optional<int> mode) {
     throw exception("Could not create file");
 }
 
-bool file::impl::exists(char const *name) {
+bool file::exists(char const *name) {
   security &sec = security::get();
 
   if (!sec.check_path(name, security::ACCESS))
@@ -109,4 +106,3 @@ bool file::impl::exists(char const *name) {
 
   return boost::filesystem::exists(name);
 }
-
