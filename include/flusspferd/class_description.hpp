@@ -138,21 +138,21 @@ THE SOFTWARE.
         return (p_full_name); \
       } \
       static ::flusspferd::object create_prototype() { \
-        ::flusspferd::object proto = ::flusspferd::create_object( \
+        ::flusspferd::object obj = ::flusspferd::create_object( \
             ::flusspferd::prototype< p_base >() \
           ); \
         FLUSSPFERD_CD_METHODS(p_cpp_name, p_methods) \
         BOOST_PP_EXPR_IF( \
           p_augment_prototype, \
-          p_cpp_name :: augment_prototype(proto);) \
-        return proto; \
+          p_cpp_name :: augment_prototype(obj);) \
+        return obj; \
       } \
-      static void augment_constructor(::flusspferd::object &o) { \
-        (void)o; \
+      static void augment_constructor(::flusspferd::object &obj) { \
+        (void)obj; \
         FLUSSPFERD_CD_METHODS(p_cpp_name, p_constructor_methods) \
         BOOST_PP_EXPR_IF( \
           p_augment_constructor, \
-          p_cpp_name :: augment_constructor(o);) \
+          p_cpp_name :: augment_constructor(obj);) \
       } \
       typedef boost::mpl::bool_< (p_custom_enumerate) > custom_enumerate; \
     }; \
@@ -185,15 +185,22 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_CD_METHOD__bind(p_cpp_name, p_method_name, p_bound) \
   ::flusspferd::create_native_method( \
-      proto, \
+      obj, \
+      (p_method_name), \
+      & p_cpp_name :: p_bound); \
+  /* */
+
+#define FLUSSPFERD_CD_METHOD__bind_static(p_cpp_name, p_method_name, p_bound) \
+  ::flusspferd::create_native_function( \
+      obj, \
       (p_method_name), \
       & p_cpp_name :: p_bound); \
   /* */
 
 #define FLUSSPFERD_CD_METHOD__alias(p_cpp_name, p_method_name, p_alias) \
-  proto.define_property( \
+  obj.define_property( \
     (p_method_name), \
-    proto.get_property((p_alias)), \
+    obj.get_property((p_alias)), \
     ::flusspferd::dont_enumerate); \
   /* */
 

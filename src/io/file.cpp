@@ -62,11 +62,6 @@ file::file(object const &obj, call_context &x)
 file::~file()
 {}
 
-void file::augment_constructor(object &constructor) {
-  create_native_function(constructor, "create", &file::create);
-  create_native_function(constructor, "exists", &file::exists);
-}
-
 void file::open(char const *name) {
   security &sec = security::get();
 

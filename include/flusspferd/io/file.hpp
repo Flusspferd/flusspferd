@@ -34,10 +34,13 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "IO.File")
   (constructor_name, "File")
   (constructor_arity, 1)
-  (augment_constructor, 1)
   (methods,
     ("open", bind, open)
     ("close", bind, close)
+  )
+  (constructor_methods,
+    ("create", bind_static, create)
+    ("exists", bind_static, exists)
   )
 )
 public:
