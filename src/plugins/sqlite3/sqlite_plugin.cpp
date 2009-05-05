@@ -42,10 +42,13 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (cpp_name, sqlite3)
   (full_name, "SQLite3")
   (constructor_name, "SQLite3")
-  (augment_constructor, 1)
   (methods,
     ("cursor", bind, cursor)
     ("close", bind, close)
+  )
+  (constructor_properties,
+    ("version", constant, SQLITE_VERSION_NUMBER)
+    ("versionStr", constant, string(SQLITE_VERSION))
   )
 )
 public:
@@ -98,19 +101,7 @@ private: // JS methods
 FLUSSPFERD_CLASS_DESCRIPTION_END()
 
 FLUSSPFERD_LOADER(container) {
-  load_class<sqlite3>(container);
-}
-
-///////////////////////////
-// Set version properties on constructor object
-void sqlite3::augment_constructor(object &ctor)
-{
-  // Set static properties on the constructor
-  ctor.define_property("version", SQLITE_VERSION_NUMBER, 
-      read_only_property | permanent_property);
-  ctor.define_property("versionStr", string(SQLITE_VERSION), 
-      read_only_property | permanent_property);
-
+  object ctor = load_class<sqlite3>(container);
   load_class<sqlite3_cursor>(ctor);
 }
 
