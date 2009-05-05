@@ -138,19 +138,19 @@ THE SOFTWARE.
         ::flusspferd::object proto = ::flusspferd::create_object( \
             ::flusspferd::prototype< p_base >() \
           ); \
-        BOOST_PP_IIF( \
+        BOOST_PP_IF( \
           p_no_methods, \
           BOOST_PP_TUPLE_EAT(2), \
           FLUSSPFERD_CD_METHODS \
         ) (p_cpp_name, p_methods) \
         return proto; \
       } \
-      BOOST_PP_EXPR_IF( \
-        p_augment_constructor, \
-        static void augment_constructor(::flusspferd::object &o) { \
-          p_cpp_name :: augment_constructor(o); \
-        } \
-      ) \
+      static void augment_constructor(::flusspferd::object &o) { \
+        (void)o; \
+        BOOST_PP_EXPR_IF( \
+          p_augment_constructor, \
+          p_cpp_name :: augment_constructor(o);) \
+      } \
       typedef boost::mpl::bool_< (p_custom_enumerate) > custom_enumerate; \
     }; \
     BOOST_PP_EXPR_IF( \
