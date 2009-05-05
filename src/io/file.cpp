@@ -65,20 +65,9 @@ file::file(object const &obj, call_context &x)
 file::~file()
 {}
 
-void file::class_info::augment_constructor(object constructor) {
+void file::class_info::augment_constructor(object &constructor) {
   create_native_function(constructor, "create", &impl::create);
   create_native_function(constructor, "exists", &impl::exists);
-}
-
-object file::class_info::create_prototype() {
-  local_root_scope scope;
-
-  object proto = create_object(flusspferd::prototype<stream>());
-
-  create_native_method(proto, "open", &file::open);
-  create_native_method(proto, "close", &file::close);
-
-  return proto;
 }
 
 void file::open(char const *name) {

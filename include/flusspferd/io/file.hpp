@@ -25,28 +25,24 @@ THE SOFTWARE.
 #define FLUSSPFERD_IO_FILE_CLASS_HPP
 
 #include "stream.hpp"
-#include <boost/mpl/size_t.hpp>
-#include <boost/mpl/bool.hpp>
 
 namespace flusspferd { namespace io {
 
-class file : public stream {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, file)
+  (base, stream)
+  (full_name, "IO.File")
+  (constructor_name, "File")
+  (constructor_arity, 1)
+  (augment_constructor, 1)
+  (methods,
+    ("open", bind, open)
+    ("close", bind, close)
+  )
+)
 public:
   file(object const &, call_context &);
   ~file();
-
-  struct class_info : flusspferd::class_info  {
-    static char const *full_name() { return "IO.File"; }
-
-    typedef boost::mpl::bool_<true> constructible;
-
-    static char const *constructor_name() { return "File"; }
-    typedef boost::mpl::size_t<1> constructor_arity;
-
-    static object create_prototype();
-
-    static void augment_constructor(object);
-  };
 
 private: // javascript methods
   void open(char const *name);
@@ -55,7 +51,7 @@ private: // javascript methods
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-};
+FLUSSPFERD_CLASS_DESCRIPTION_END()
 
 }}
 

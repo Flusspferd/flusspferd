@@ -80,14 +80,6 @@ blob_stream::blob_stream(object const &obj, call_context &x)
 blob_stream::~blob_stream()
 {}
 
-object blob_stream::class_info::create_prototype() {
-  object proto = create_object(flusspferd::prototype<stream>());
-
-  create_native_method(proto, "getBlob", &blob_stream::get_blob);
-
-  return proto;
-}
-
 void blob_stream::trace(tracer &trc) {
   trc("blob", p->blob_);
 }

@@ -30,18 +30,19 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace io {
 
-class blob_stream : public stream {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, blob_stream)
+  (base, stream)
+  (full_name, "IO.BlobStream")
+  (constructor_name, "BlobStream")
+  (constructor_arity, 1)
+  (methods,
+    ("getBlob", bind, get_blob)
+  )
+)
 public:
   blob_stream(object const &, call_context &);
   ~blob_stream();
-
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "IO.BlobStream"; }
-    static char const *constructor_name() { return "BlobStream"; }
-    typedef boost::mpl::size_t<1> constructor_arity;
-
-    static object create_prototype();
-  };
 
 protected:
   void trace(tracer &);
@@ -52,7 +53,7 @@ private: // javascript methods
 private:
   class impl;
   boost::scoped_ptr<impl> p;
-};
+FLUSSPFERD_CLASS_DESCRIPTION_END()
 
 }}
 

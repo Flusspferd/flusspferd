@@ -70,8 +70,7 @@ private: // javascript methods
 
 private:
   std::streambuf *streambuf_;
-};
-
+FLUSSPFERD_CLASS_DESCRIPTION_END()
 
 }}
 
