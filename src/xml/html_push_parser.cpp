@@ -31,7 +31,7 @@ using namespace flusspferd;
 using namespace flusspferd::xml;
 
 html_push_parser::html_push_parser(object const &obj, call_context &x)
-  : native_object_base(obj), parser(0)
+  : base_type(obj), parser(0)
 {
   local_root_scope scope;
 
@@ -62,15 +62,6 @@ html_push_parser::~html_push_parser() {
     xmlFreeDoc(parser->myDoc);
     xmlFreeParserCtxt(parser);
   }
-}
-
-object html_push_parser::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "push", &html_push_parser::push);
-  create_native_method(proto, "terminate", &html_push_parser::terminate);
-
-  return proto;
 }
 
 void html_push_parser::push(blob &b, bool t) {
