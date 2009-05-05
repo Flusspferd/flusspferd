@@ -112,7 +112,7 @@ xmlNodePtr node::c_from_js(object const &obj) {
 }
 
 node::node(object const &obj, xmlNodePtr ptr)
-  : native_object_base(obj), ptr(ptr)
+  : base_type(obj), ptr(ptr)
 {
   ptr->_private = static_cast<object*>(this);
   create_all_children(ptr);
@@ -121,7 +121,7 @@ node::node(object const &obj, xmlNodePtr ptr)
 }
 
 node::node(object const &obj, call_context &x)
-  : native_object_base(obj)
+  : base_type(obj)
 {
   local_root_scope scope;
 
@@ -202,137 +202,6 @@ node::~node() {
 }
 
 void node::init() {
-//FIXME
-#if 0
-  if (ptr->type  == XML_ELEMENT_NODE || ptr->type == XML_ATTRIBUTE_NODE) {
-    define_native_property("namespace", RW, &node::prop_namespace);
-    define_native_property("namespaces", RO, &node::prop_namespaces);
-  }
-#endif
-}
-
-object node::class_info::create_prototype() {
-  object proto = create_object();
-
-  create_native_method(proto, "copy", &node::copy);
-  create_native_method(proto, "unlink", &node::unlink);
-  create_native_method(proto, "purge", &node::purge);
-  create_native_method(proto, "addContent", &node::add_content);
-  create_native_method(proto, "addChild", &node::add_child);
-  create_native_method(proto, "addChildList", &node::add_child_list);
-  create_native_method(proto, "addNode", &node::add_node);
-  create_native_method(proto, "addNamespace", &node::add_namespace);
-  create_native_method(proto, "addAttribute", &node::add_attribute);
-  create_native_method(proto, "setAttribute", &node::set_attribute);
-  create_native_method(proto, "unsetAttribute", &node::unset_attribute);
-  create_native_method(proto, "findAttribute", &node::find_attribute);
-  create_native_method(proto, "getAttribute", &node::get_attribute);
-  create_native_method(proto, "searchNamespaceByPrefix",
-                       &node::search_namespace_by_prefix);
-  create_native_method(proto, "searchNamespaceByURI",
-                       &node::search_namespace_by_uri);
-  create_native_method(proto, "toString", &node::to_string);
-
-  proto.define_property(
-    "name",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_name),
-      create_native_method(object(), "", &node::set_name)));
-
-  proto.define_property(
-    "type",
-    property_attributes(
-      permanent_shared_property | read_only_property,
-      create_native_method(object(), "", &node::get_type)));
-
-  proto.define_property(
-    "document",
-    property_attributes(
-      permanent_shared_property | read_only_property,
-      create_native_method(object(), "", &node::get_document)));
-
-  proto.define_property(
-    "lang",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_lang),
-      create_native_method(object(), "", &node::set_lang)));
-
-  proto.define_property(
-    "content",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_content),
-      create_native_method(object(), "", &node::set_content)));
-
-  proto.define_property(
-    "parent",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_parent),
-      create_native_method(object(), "", &node::set_parent)));
-
-  proto.define_property(
-    "nextSibling",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_next_sibling),
-      create_native_method(object(), "", &node::set_next_sibling)));
-
-  proto.define_property(
-    "previousSibling",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_previous_sibling),
-      create_native_method(object(), "", &node::set_previous_sibling)));
-
-  proto.define_property(
-    "firstChild",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_first_child),
-      create_native_method(object(), "", &node::set_first_child)));
-
-  proto.define_property(
-    "lastChild",
-    property_attributes(
-      permanent_shared_property | read_only_property,
-      create_native_method(object(), "", &node::get_last_child)));
-
-  proto.define_property(
-    "firstSibling",
-    property_attributes(
-      permanent_shared_property | read_only_property,
-      create_native_method(object(), "", &node::get_first_sibling)));
-
-  proto.define_property(
-    "lastSibling",
-    property_attributes(
-      permanent_shared_property | read_only_property,
-      create_native_method(object(), "", &node::get_last_sibling)));
-
-  proto.define_property(
-    "firstAttribute",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_first_attribute),
-      create_native_method(object(), "", &node::set_first_attribute)));
-
-  proto.define_property(
-    "namespace",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &node::get_namespace),
-      create_native_method(object(), "", &node::set_namespace)));
-
-  proto.define_property(
-    "namespaces",
-    property_attributes(
-      permanent_shared_property | read_only_property,
-      create_native_method(object(), "", &node::get_namespaces)));
-
-  return proto;
 }
 
 static void trace_children(tracer &trc, xmlNodePtr ptr) {

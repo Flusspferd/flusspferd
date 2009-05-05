@@ -26,13 +26,52 @@ THE SOFTWARE.
 
 #include "../native_object_base.hpp"
 #include "../class.hpp"
+#include "../class_description.hpp"
 #include <boost/noncopyable.hpp>
-#include <boost/mpl/size_t.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class node : public native_object_base {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, node)
+  (full_name, "XML.Node")
+  (constructor_name, "Node")
+  (constructor_arity, 3)
+  (methods,
+    ("copy", bind, copy)
+    ("unlink", bind, unlink)
+    ("purge", bind, purge)
+    ("addContent", bind, add_content)
+    ("addChild", bind, add_child)
+    ("addChildList", bind, add_child_list)
+    ("addNode", bind, add_node)
+    ("addNamespace", bind, add_namespace)
+    ("addAttribute", bind, add_attribute)
+    ("setAttribute", bind, set_attribute)
+    ("unsetAttribute", bind, unset_attribute)
+    ("findAttribute", bind, find_attribute)
+    ("getAttribute", bind, get_attribute)
+    ("searchNamespaceByPrefix", bind, search_namespace_by_prefix)
+    ("searchNamespaceByURI", bind, search_namespace_by_uri)
+    ("toString", bind, to_string))
+  (properties,
+    ("name", getter_setter, (get_name, set_name))
+    ("type", getter, get_type)
+    ("document", getter, get_document)
+    ("lang", getter_setter, (get_lang, set_lang))
+    ("content", getter_setter, (get_content, set_content))
+    ("parent", getter_setter, (get_parent, set_parent))
+    ("nextSibling", getter_setter, (get_next_sibling, set_next_sibling))
+    ("previousSibling", getter_setter,
+      (get_previous_sibling, set_previous_sibling))
+    ("firstChild", getter_setter, (get_first_child, set_first_child))
+    ("lastChild", getter, get_last_child)
+    ("firstSibling", getter, get_first_sibling)
+    ("firstAttribute", getter_setter,
+      (get_first_attribute, set_first_attribute))
+    ("namespace", getter_setter, (get_namespace, set_namespace))
+    ("namespaces", getter, get_namespaces)))
+{
 public:
   node(object const &o, xmlNodePtr ptr);
   node(object const &o, call_context &x);
@@ -45,15 +84,6 @@ public:
   xmlNodePtr c_obj() const { return ptr; }
   void set_c_obj(xmlNodePtr ptr) { this->ptr = ptr; }
 
-  struct class_info : flusspferd::class_info {
-    static char const *full_name() { return "XML.Node"; }
-
-    static char const *constructor_name() { return "Node"; }
-    typedef boost::mpl::size_t<3> constructor_arity;
-
-    static object create_prototype();
-  };
-
 public:
   static xmlNodePtr c_from_js(object const &v);
 
@@ -63,7 +93,7 @@ protected:
 private:
   void init();
 
-private: // JS methods
+public: // JS methods
   object copy(bool recursive);
   void unlink();
   void purge();
@@ -81,7 +111,7 @@ private: // JS methods
   object search_namespace_by_uri(string const &href);
   string to_string();
 
-private: // JS properties
+public: // JS properties
   std::string get_name();
   void set_name(std::string const &);
 
