@@ -54,14 +54,15 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (7, ( \
+  (8, ( \
     ~cpp_name~,            /* name */ \
     ~constructor_name~,    /* constructor name */ \
     0,                     /* constructor arity */ \
     ~full_name~,           /* full name */ \
     ~methods~,             /* methods */ \
     0,                     /* NO methods */ \
-    0                      /* augment constructor */ \
+    0,                     /* augment constructor */ \
+    true                   /* constructible */ \
   )) \
   /* */
 
@@ -72,6 +73,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__methods                4
 #define FLUSSPFERD_CD_PARAM__no_methods             5
 #define FLUSSPFERD_CD_PARAM__augment_constructor    6
+#define FLUSSPFERD_CD_PARAM__constructible          7
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -92,11 +94,13 @@ THE SOFTWARE.
   p_full_name, \
   p_methods, \
   p_no_methods, \
-  p_augment_constructor \
+  p_augment_constructor, \
+  p_constructible \
 ) \
   class p_cpp_name : public ::flusspferd::native_object_base { \
   public: \
     struct class_info : ::flusspferd::class_info { \
+      typedef boost::mpl::bool_< (p_constructible) > constructible; \
       static char const *constructor_name() { \
         return (p_constructor_name); \
       } \
