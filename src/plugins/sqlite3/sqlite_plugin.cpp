@@ -44,8 +44,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "SQLite3")
   (augment_constructor, 1)
   (methods,
-    ("cursor", (bind, cursor))
-    ("close", (bind, close))
+    ("cursor", bind, cursor)
+    ("close", bind, close)
   )
 )
 public:
@@ -65,10 +65,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "SQLite3.Cursor")
   (constructor_name, "Cursor")
   (methods,
-    ("close", (bind, close))
-    ("reset", (bind, reset))
-    ("next", (bind, next))
-    ("bind", (bind, bind))
+    ("close", bind, close)
+    ("reset", bind, reset)
+    ("next", bind, next)
+    ("bind", bind, bind)
   )
 )
 public:

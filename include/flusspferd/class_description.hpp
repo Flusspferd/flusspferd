@@ -30,6 +30,8 @@ THE SOFTWARE.
 #endif
 #include <boost/preprocessor.hpp>
 
+/* 2-tuple seq */
+
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS2(x, y) \
   ((x, y)) \
   FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS
@@ -43,6 +45,24 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ(x) \
   BOOST_PP_CAT(FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
+
+/* 3-tuple seq */
+
+#define FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS2(x, y, z) \
+  ((x, y, z)) \
+  FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS
+
+#define FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS(x, y, z) \
+  ((x, y, z)) \
+  FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS2
+
+#define FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS_ELIM
+#define FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS2_ELIM
+
+#define FLUSSPFERD_PP_GEN_TUPLE3SEQ(x) \
+  BOOST_PP_CAT(FLUSSPFERD_PP_GEN_TUPLE3SEQ_PROCESS x, _ELIM)
+
+/* -- */
 
 #define FLUSSPFERD_CD_PARAM_FOLD(s, state, elem) \
   BOOST_PP_ARRAY_REPLACE( \
@@ -129,17 +149,17 @@ THE SOFTWARE.
   BOOST_PP_SEQ_FOR_EACH( \
     FLUSSPFERD_CD_METHOD, \
     p_cpp_name, \
-    FLUSSPFERD_PP_GEN_TUPLE2SEQ(p_methods)) \
+    FLUSSPFERD_PP_GEN_TUPLE3SEQ(p_methods)) \
   /* */
 
 #define FLUSSPFERD_CD_METHOD(r, p_cpp_name, p_method) \
   BOOST_PP_CAT( \
     FLUSSPFERD_CD_METHOD__, \
-    BOOST_PP_TUPLE_ELEM(2, 0, BOOST_PP_TUPLE_ELEM(2, 1, p_method)) \
+    BOOST_PP_TUPLE_ELEM(3, 1, p_method) \
   ) ( \
     p_cpp_name, \
-    BOOST_PP_TUPLE_ELEM(2, 0, p_method), \
-    BOOST_PP_TUPLE_ELEM(2, 1, BOOST_PP_TUPLE_ELEM(2, 1, p_method)) \
+    BOOST_PP_TUPLE_ELEM(3, 0, p_method), \
+    BOOST_PP_TUPLE_ELEM(3, 2, p_method) \
   ) \
   /* */
 
