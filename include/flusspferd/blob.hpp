@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+#ifdef IN_DOXYGEN
 /**
  * Binary data storage class.
  *
@@ -41,6 +42,8 @@ namespace flusspferd {
  *
  * @ingroup jsext
  */
+class blob {
+#else
 FLUSSPFERD_CLASS_DESCRIPTION(
   (cpp_name, blob)
   (full_name, "Blob")
@@ -63,6 +66,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("fromUtf16", bind_static, from_utf16))
 )
 {
+#endif
 public:
   friend class class_info;
 
