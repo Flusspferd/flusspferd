@@ -32,6 +32,7 @@ namespace flusspferd {
 
 class value;
 class object;
+class native_object_base;
 
 /**
  * Javascript %context.
@@ -162,6 +163,11 @@ public:
     return constructor(T::class_info::full_name());
   }
 };
+
+template<>
+inline object context::prototype<native_object_base>() const {
+  return object();
+}
 
 /**
  * Compare two context%s for inequality.
