@@ -114,23 +114,13 @@ void document::trace(tracer &trc) {
 void document::init() {
 }
 
-object document::class_info::create_prototype() {
-  local_root_scope scope;
-
-  object proto = create_object(flusspferd::prototype<node>());
-
-  create_native_method(proto, "dump", &document::dump);
-  create_native_method(proto, "copy", &document::copy);
-  create_native_method(proto, "toString", &document::to_string);
-
+void document::augment_prototype(object &proto) {
   proto.define_property(
     "rootElement",
     property_attributes(
       permanent_shared_property,
       create_native_method(object(), "", &document::get_root_element),
       create_native_method(object(), "", &document::set_root_element)));
-
-  return proto;
 }
 
 string document::dump() {
@@ -164,10 +154,6 @@ object document::copy(bool recursive) {
     throw exception("Could not copy XML document");
 
   return create_native_object<document>(prototype(), copy);
-}
-
-value document::to_string() {
-  return call("dump");
 }
 
 void document::set_root_element(object const &data) {

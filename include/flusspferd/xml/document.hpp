@@ -25,23 +25,25 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_DOCUMENT_HPP
 
 #include "node.hpp"
+#include "flusspferd/class_description.hpp"
 #include <boost/noncopyable.hpp>
-#include <boost/mpl/size_t.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class document : public node {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, document)
+  (base, node)
+  (full_name, "XML.Document")
+  (constructor_name, "Document")
+  (augment_prototype, 1)
+  (methods,
+    ("dump", bind, dump)
+    ("copy", bind, copy)
+    ("toString", alias, "dump")
+  )
+)
 public:
-  struct class_info : node::class_info {
-    static char const *full_name() { return "XML.Document"; }
-
-    static char const *constructor_name() { return "Document"; }
-    typedef boost::mpl::size_t<0> constructor_arity;
-
-    static object create_prototype();
-  };
-
   document(object const &, call_context &);
   document(object const &, xmlDocPtr doc);
   ~document();
@@ -61,12 +63,11 @@ private:
 private: // JS methods
   string dump();
   object copy(bool recursive);
-  value to_string();
 
 private: // JS properties
   void set_root_element(object const &);
   object get_root_element();
-};
+FLUSSPFERD_CLASS_DESCRIPTION_END()
 
 }}
 
