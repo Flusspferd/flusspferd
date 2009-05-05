@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "../native_object_base.hpp"
 #include "../class.hpp"
 #include "../class_description.hpp"
+#include "../string.hpp"
 #include <streambuf>
 
 namespace flusspferd { namespace io {
@@ -45,6 +46,11 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("flush", bind, flush)
     ("print", bind, print)
     ("readLine", bind, read_line)
+  )
+  (properties,
+    ("fieldSeparator", variable, string(" "))
+    ("recordSeparator", variable, string("\n"))
+    ("autoFlush", variable, false)
   )
 )
 public:

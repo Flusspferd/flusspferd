@@ -37,9 +37,6 @@ using namespace flusspferd::io;
 stream::stream(object const &o, std::streambuf *p)
   : native_object_base(o), streambuf_(p)
 {
-  define_property("fieldSeparator", string(" "));
-  define_property("recordSeparator", string("\n"));
-  define_property("autoFlush", false);
 }
 
 stream::~stream()
