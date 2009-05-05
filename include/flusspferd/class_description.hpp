@@ -76,29 +76,29 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM_INITIAL \
   (11, ( \
     ~cpp_name~,                        /* name */ \
+    ::flusspferd::native_object_base,  /* base class */ \
     ~constructor_name~,                /* constructor name */ \
     0,                                 /* constructor arity */ \
+    true,                              /* constructible */ \
     ~full_name~,                       /* full name */ \
     ~methods~,                         /* methods */ \
     0,                                 /* NO methods */ \
-    0,                                 /* augment constructor (custom func.)*/ \
-    true,                              /* constructible */ \
     false,                             /* custom enumerate */ \
-    ::flusspferd::native_object_base,  /* base class */ \
+    0,                                 /* augment constructor (custom func.)*/\
     0                                  /* augment prototype (custom func.) */ \
   )) \
   /* */
 
 #define FLUSSPFERD_CD_PARAM__cpp_name               0
-#define FLUSSPFERD_CD_PARAM__constructor_name       1
-#define FLUSSPFERD_CD_PARAM__constructor_arity      2
-#define FLUSSPFERD_CD_PARAM__full_name              3
-#define FLUSSPFERD_CD_PARAM__methods                4
-#define FLUSSPFERD_CD_PARAM__no_methods             5
-#define FLUSSPFERD_CD_PARAM__augment_constructor    6
-#define FLUSSPFERD_CD_PARAM__constructible          7
+#define FLUSSPFERD_CD_PARAM__base                   1
+#define FLUSSPFERD_CD_PARAM__constructor_name       2
+#define FLUSSPFERD_CD_PARAM__constructor_arity      3
+#define FLUSSPFERD_CD_PARAM__constructible          4
+#define FLUSSPFERD_CD_PARAM__full_name              5
+#define FLUSSPFERD_CD_PARAM__methods                6
+#define FLUSSPFERD_CD_PARAM__no_methods             7
 #define FLUSSPFERD_CD_PARAM__custom_enumerate       8
-#define FLUSSPFERD_CD_PARAM__base                   9
+#define FLUSSPFERD_CD_PARAM__augment_constructor    9
 #define FLUSSPFERD_CD_PARAM__augment_prototype     10
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
@@ -115,15 +115,15 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_CLASS_DESCRIPTION_P( \
   p_cpp_name, \
+  p_base, \
   p_constructor_name, \
   p_constructor_arity, \
+  p_constructible, \
   p_full_name, \
   p_methods, \
   p_no_methods, \
-  p_augment_constructor, \
-  p_constructible, \
   p_custom_enumerate, \
-  p_base, \
+  p_augment_constructor, \
   p_augment_prototype \
 ) \
   class p_cpp_name : public p_base { \
