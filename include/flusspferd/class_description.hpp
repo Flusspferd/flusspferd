@@ -263,6 +263,12 @@ THE SOFTWARE.
     ::flusspferd::read_only_property | ::flusspferd::permanent_property); \
   /* */
 
+#define FLUSSPFERD_CD_PROPERTY__variable(p_cpp_name, p_property_name, p_param) \
+  obj.define_property( \
+    (p_property_name), \
+    (p_param)); \
+  /* */
+
 #define FLUSSPFERD_CD_PROPERTY__none(p_cpp_name, p_property_name, p_param) \
   /* */
 
