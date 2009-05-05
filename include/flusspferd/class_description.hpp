@@ -74,7 +74,7 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (10, ( \
+  (11, ( \
     ~cpp_name~,                        /* name */ \
     ::flusspferd::native_object_base,  /* base class */ \
     ~constructor_name~,                /* constructor name */ \
@@ -82,6 +82,7 @@ THE SOFTWARE.
     true,                              /* constructible */ \
     ~full_name~,                       /* full name */ \
     (~, none, ~),                      /* methods */ \
+    (~, none, ~),                      /* constructor methods */ \
     false,                             /* custom enumerate */ \
     0,                                 /* augment constructor (custom func.)*/\
     0                                  /* augment prototype (custom func.) */ \
@@ -95,9 +96,10 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__constructible          4
 #define FLUSSPFERD_CD_PARAM__full_name              5
 #define FLUSSPFERD_CD_PARAM__methods                6
-#define FLUSSPFERD_CD_PARAM__custom_enumerate       7
-#define FLUSSPFERD_CD_PARAM__augment_constructor    8
-#define FLUSSPFERD_CD_PARAM__augment_prototype      9
+#define FLUSSPFERD_CD_PARAM__constructor_methods    7
+#define FLUSSPFERD_CD_PARAM__custom_enumerate       8
+#define FLUSSPFERD_CD_PARAM__augment_constructor    9
+#define FLUSSPFERD_CD_PARAM__augment_prototype     10
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -119,6 +121,7 @@ THE SOFTWARE.
   p_constructible, \
   p_full_name, \
   p_methods, \
+  p_constructor_methods, \
   p_custom_enumerate, \
   p_augment_constructor, \
   p_augment_prototype \
@@ -146,6 +149,7 @@ THE SOFTWARE.
       } \
       static void augment_constructor(::flusspferd::object &o) { \
         (void)o; \
+        FLUSSPFERD_CD_METHODS(p_cpp_name, p_constructor_methods) \
         BOOST_PP_EXPR_IF( \
           p_augment_constructor, \
           p_cpp_name :: augment_constructor(o);) \
