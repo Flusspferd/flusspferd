@@ -78,7 +78,7 @@ FLUSSPFERD_LOADER(container) {
 }
 
 ///////////////////////////
-void curl::class_info::augment_constructor(object &ctor)
+void curl::augment_constructor(object &ctor)
 {
   curl_version_info_data* data = curl_version_info(CURLVERSION_NOW);
 

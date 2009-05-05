@@ -65,7 +65,7 @@ file::file(object const &obj, call_context &x)
 file::~file()
 {}
 
-void file::class_info::augment_constructor(object &constructor) {
+void file::augment_constructor(object &constructor) {
   create_native_function(constructor, "create", &impl::create);
   create_native_function(constructor, "exists", &impl::exists);
 }

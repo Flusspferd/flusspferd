@@ -103,7 +103,7 @@ FLUSSPFERD_LOADER(container) {
 
 ///////////////////////////
 // Set version properties on constructor object
-void sqlite3::class_info::augment_constructor(object &ctor)
+void sqlite3::augment_constructor(object &ctor)
 {
   // Set static properties on the constructor
   ctor.define_property("version", SQLITE_VERSION_NUMBER, 

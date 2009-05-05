@@ -147,10 +147,15 @@ THE SOFTWARE.
       } \
       BOOST_PP_EXPR_IF( \
         p_augment_constructor, \
-        static void augment_constructor(::flusspferd::object &); \
+        static void augment_constructor(::flusspferd::object &o) { \
+          p_cpp_name :: augment_constructor(o); \
+        } \
       ) \
       typedef boost::mpl::bool_< (p_custom_enumerate) > custom_enumerate; \
     }; \
+    BOOST_PP_EXPR_IF( \
+      p_augment_constructor, \
+      static void augment_constructor(::flusspferd::object &o);) \
   private: \
   /* */
 
