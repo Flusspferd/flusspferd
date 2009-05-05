@@ -74,16 +74,17 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (9, ( \
-    ~cpp_name~,            /* name */ \
-    ~constructor_name~,    /* constructor name */ \
-    0,                     /* constructor arity */ \
-    ~full_name~,           /* full name */ \
-    ~methods~,             /* methods */ \
-    0,                     /* NO methods */ \
-    0,                     /* augment constructor */ \
-    true,                  /* constructible */ \
-    false                  /* custom enumerate */ \
+  (10, ( \
+    ~cpp_name~,                        /* name */ \
+    ~constructor_name~,                /* constructor name */ \
+    0,                                 /* constructor arity */ \
+    ~full_name~,                       /* full name */ \
+    ~methods~,                         /* methods */ \
+    0,                                 /* NO methods */ \
+    0,                                 /* augment constructor */ \
+    true,                              /* constructible */ \
+    false,                             /* custom enumerate */ \
+    ::flusspferd::native_object_base   /* base class */ \
   )) \
   /* */
 
@@ -96,6 +97,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__augment_constructor    6
 #define FLUSSPFERD_CD_PARAM__constructible          7
 #define FLUSSPFERD_CD_PARAM__custom_enumerate       8
+#define FLUSSPFERD_CD_PARAM__base                   9
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -118,9 +120,10 @@ THE SOFTWARE.
   p_no_methods, \
   p_augment_constructor, \
   p_constructible, \
-  p_custom_enumerate \
+  p_custom_enumerate, \
+  p_base \
 ) \
-  class p_cpp_name : public ::flusspferd::native_object_base { \
+  class p_cpp_name : public p_base { \
   public: \
     struct class_info : ::flusspferd::class_info { \
       typedef boost::mpl::bool_< (p_constructible) > constructible; \
@@ -132,7 +135,9 @@ THE SOFTWARE.
         return (p_full_name); \
       } \
       static ::flusspferd::object create_prototype() { \
-        ::flusspferd::object proto = ::flusspferd::create_object(); \
+        ::flusspferd::object proto = ::flusspferd::create_object( \
+            ::flusspferd::prototype< p_base >() \
+          ); \
         BOOST_PP_IIF( \
           p_no_methods, \
           BOOST_PP_TUPLE_EAT(2), \
