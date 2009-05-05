@@ -42,6 +42,8 @@ You can generate the documentation with
 
 $ ./util/docs.sh
 
+The generated documentation is in ./build/html/.
+
 Using Flusspferd
 ----------------
 
