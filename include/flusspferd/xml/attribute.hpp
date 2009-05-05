@@ -25,23 +25,25 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_ATTRIBUTE_HPP
 
 #include "node.hpp"
+#include "../class_description.hpp"
 #include <boost/noncopyable.hpp>
-#include <boost/mpl/size_t.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-class attribute_ : public node {
+FLUSSPFERD_CLASS_DESCRIPTION(
+  (cpp_name, attribute_)
+  (base, node)
+  (full_name, "XML.Attribute")
+  (constructor_name, "Attribute")
+  (constructor_arity, 4)
+  (methods,
+    ("addContent", bind, add_content))
+  (properties,
+    ("content", getter_setter, (get_content, set_content)))
+)
+{
 public:
-  struct class_info : node::class_info {
-    static char const *full_name() { return "XML.Attribute"; }
-
-    static char const *constructor_name() { return "Attribute"; }
-    typedef boost::mpl::size_t<4> constructor_arity;
-
-    static object create_prototype();
-  };
-
   attribute_(object const &, call_context &);
   attribute_(object const &, xmlAttrPtr attr);
   ~attribute_();
@@ -53,10 +55,10 @@ public:
 private:
   void init();
 
-private: // JS methods
+public: // JS methods
   void add_content(string const &);
 
-private: // JS properties
+public: // JS properties
   void set_content(value const &);
   value get_content();
 };
