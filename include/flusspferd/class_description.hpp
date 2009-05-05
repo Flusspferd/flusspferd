@@ -74,17 +74,18 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (10, ( \
+  (11, ( \
     ~cpp_name~,                        /* name */ \
     ~constructor_name~,                /* constructor name */ \
     0,                                 /* constructor arity */ \
     ~full_name~,                       /* full name */ \
     ~methods~,                         /* methods */ \
     0,                                 /* NO methods */ \
-    0,                                 /* augment constructor */ \
+    0,                                 /* augment constructor (custom func.)*/ \
     true,                              /* constructible */ \
     false,                             /* custom enumerate */ \
-    ::flusspferd::native_object_base   /* base class */ \
+    ::flusspferd::native_object_base,  /* base class */ \
+    0                                  /* augment prototype (custom func.) */ \
   )) \
   /* */
 
@@ -98,6 +99,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__constructible          7
 #define FLUSSPFERD_CD_PARAM__custom_enumerate       8
 #define FLUSSPFERD_CD_PARAM__base                   9
+#define FLUSSPFERD_CD_PARAM__augment_prototype     10
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -121,7 +123,8 @@ THE SOFTWARE.
   p_augment_constructor, \
   p_constructible, \
   p_custom_enumerate, \
-  p_base \
+  p_base, \
+  p_augment_prototype \
 ) \
   class p_cpp_name : public p_base { \
   public: \
@@ -143,6 +146,9 @@ THE SOFTWARE.
           BOOST_PP_TUPLE_EAT(2), \
           FLUSSPFERD_CD_METHODS \
         ) (p_cpp_name, p_methods) \
+        BOOST_PP_EXPR_IF( \
+          p_augment_prototype, \
+          p_cpp_name :: augment_prototype(proto);) \
         return proto; \
       } \
       static void augment_constructor(::flusspferd::object &o) { \
@@ -156,6 +162,9 @@ THE SOFTWARE.
     BOOST_PP_EXPR_IF( \
       p_augment_constructor, \
       static void augment_constructor(::flusspferd::object &o);) \
+    BOOST_PP_EXPR_IF( \
+      p_augment_prototype, \
+      static void augment_prototype(::flusspferd::object &proto);) \
   private: \
   /* */
 
