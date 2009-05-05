@@ -114,15 +114,6 @@ void document::trace(tracer &trc) {
 void document::init() {
 }
 
-void document::augment_prototype(object &proto) {
-  proto.define_property(
-    "rootElement",
-    property_attributes(
-      permanent_shared_property,
-      create_native_method(object(), "", &document::get_root_element),
-      create_native_method(object(), "", &document::set_root_element)));
-}
-
 string document::dump() {
   xmlChar *doc_txt = 0;
   int doc_txt_len = 0;

@@ -36,11 +36,13 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, node)
   (full_name, "XML.Document")
   (constructor_name, "Document")
-  (augment_prototype, 1)
   (methods,
     ("dump", bind, dump)
     ("copy", bind, copy)
     ("toString", alias, "dump")
+  )
+  (properties,
+    ("rootElement", getter_setter, (get_root_element, set_root_element))
   )
 )
 public:
