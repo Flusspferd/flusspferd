@@ -34,7 +34,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "cURL")
   (constructor_name, "cURL")
   (augment_constructor, 1)
-  (methods, (setMethod)(perform))
+  (methods,
+    ("setMethod", set_method)
+    ("perform", perform)
+  )
 )
 public:
   curl(object const &obj, call_context &x);
@@ -59,7 +62,7 @@ protected:
   // TODO: Support setting CURLOPT_INFILESIZE for PUT methods
 
 private: // JS methods
-  void setMethod(string &meth);
+  void set_method(string &meth);
   int perform();
 FLUSSPFERD_CLASS_DESCRIPTION_END()
 
@@ -134,7 +137,7 @@ curl::~curl() {
 }
 
 ///////////////////////////
-void curl::setMethod(string &f_meth) {
+void curl::set_method(string &f_meth) {
   int ok = CURLE_OK;
   std::string meth = f_meth.to_string();
 

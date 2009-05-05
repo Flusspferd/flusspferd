@@ -42,7 +42,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS2_ELIM
 
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ(x) \
-  BOOST_PP_CAT(BOOST_PP_EXPAND(FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS x), _ELIM)
+  BOOST_PP_CAT(FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS x, _ELIM)
 
 #define FLUSSPFERD_CD_PARAM_FOLD(s, state, elem) \
   BOOST_PP_ARRAY_REPLACE( \
@@ -125,14 +125,14 @@ THE SOFTWARE.
   BOOST_PP_SEQ_FOR_EACH( \
     FLUSSPFERD_CD_METHOD, \
     p_cpp_name, \
-    p_methods) \
+    FLUSSPFERD_PP_GEN_TUPLE2SEQ(p_methods)) \
   /* */
 
-#define FLUSSPFERD_CD_METHOD(r, p_cpp_name, element) \
+#define FLUSSPFERD_CD_METHOD(r, p_cpp_name, p_method) \
   ::flusspferd::create_native_method( \
       proto, \
-      BOOST_PP_STRINGIZE(element), \
-      & p_cpp_name :: element); \
+      BOOST_PP_TUPLE_ELEM(2, 0, p_method), \
+      & p_cpp_name :: BOOST_PP_TUPLE_ELEM(2, 1, p_method)); \
   /* */
 
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
