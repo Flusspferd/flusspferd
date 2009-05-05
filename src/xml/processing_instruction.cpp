@@ -34,7 +34,7 @@ using namespace flusspferd::xml;
 processing_instruction::processing_instruction(
     object const &obj, xmlNodePtr ptr
   )
-  : node(obj, ptr)
+  : base_type(obj, ptr)
 {}
 
 static xmlNodePtr new_processing_instruction(call_context &x) {
@@ -63,17 +63,8 @@ static xmlNodePtr new_processing_instruction(call_context &x) {
 }
 
 processing_instruction::processing_instruction(object const &o, call_context &x)
-  : node(o, new_processing_instruction(x))
+  : base_type(o, new_processing_instruction(x))
 {}
 
 processing_instruction::~processing_instruction()
 {}
-
-object processing_instruction::class_info::create_prototype() {
-  local_root_scope scope;
-
-  object proto = create_object(flusspferd::prototype<node>());
-
-  return proto;
-}
-
