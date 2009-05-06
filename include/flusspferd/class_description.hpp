@@ -317,11 +317,38 @@ THE SOFTWARE.
 #else // IN_DOXYGEN
 
 /**
- * Bla.
+ * Generate a @ref flusspferd::load_class "loadable" class named @p cpp_name.
+ *
+ * @note Also generates a template class <code>cpp_name<em>_base</em>&lt;T&gt;
+ * </code>.
+ *
+ * @code
+ * FLUSSPFERD_CLASS_DESCRIPTION(
+ *   cpp_name,
+ *   (parameter_name_1, parameter_value_1)
+ *   (parameter_name_2, parameter_value_2)
+ *   ...
+ * )
+ * {
+ *   CONTENTS
+ * };
+ * @endcode
+ *
+ * @param cpp_name The name of the generated class.
+ * @param named_parameters A sequence of named parameters in the form
+ *                 <code>(parameter1_name, parameter2_value)
+ *                 (parameter2_name, parameter2_value) ...</code>
+ *
+ * <dl><dt><b>Named parameters:</b></dt>
+ * <dd><dl>
+ * <dt><em>full_name</em></dt>
+ * <dd><b>{String}</b> The full, identifying name of the class, must be
+ *     system-unique.</dd>
+ * </dl></dd></dl>
  *
  * @ingroup classes
  */
-#define FLUSSPFERD_CLASS_DESCRIPTION(cpp_name, named_parameter_list) ...
+#define FLUSSPFERD_CLASS_DESCRIPTION(cpp_name, named_parameters) ...
 
 #endif // IN_DOXYGEN
 
