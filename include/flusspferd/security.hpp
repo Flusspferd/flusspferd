@@ -31,11 +31,10 @@ THE SOFTWARE.
 namespace flusspferd {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, security)
+  security,
   (full_name, "$security")
   (constructor_name, "")
-  (constructible, false)
-)
+  (constructible, false))
 {
 public:
   static security &create(object container);

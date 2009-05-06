@@ -31,15 +31,13 @@ THE SOFTWARE.
 namespace flusspferd { namespace io {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, blob_stream)
+  blob_stream,
   (base, stream)
   (full_name, "IO.BlobStream")
   (constructor_name, "BlobStream")
   (constructor_arity, 1)
   (methods,
-    ("getBlob", bind, get_blob)
-  )
-)
+    ("getBlob", bind, get_blob)))
 {
 public:
   blob_stream(object const &, call_context &);

@@ -33,7 +33,7 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, node)
+  node,
   (full_name, "XML.Node")
   (constructor_name, "Node")
   (constructor_arity, 3)

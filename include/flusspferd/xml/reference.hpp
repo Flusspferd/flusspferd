@@ -32,12 +32,11 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, reference_)
+  reference_,
   (base, node)
   (full_name, "XML.Reference")
   (constructor_name, "Reference")
-  (constructor_arity, 2)
-)
+  (constructor_arity, 2))
 {
 public:
   reference_(object const &, call_context &);

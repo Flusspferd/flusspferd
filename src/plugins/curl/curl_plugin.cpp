@@ -30,7 +30,7 @@ using namespace flusspferd;
 namespace {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, curl)
+  curl,
   (full_name, "cURL")
   (constructor_name, "cURL")
   (augment_constructor, 1)

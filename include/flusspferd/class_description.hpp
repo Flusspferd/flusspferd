@@ -305,8 +305,13 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PROPERTY__none(p_property_name, p_param) \
   /* */
 
-#define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
-  FLUSSPFERD_CLASS_DESCRIPTION_A(FLUSSPFERD_CD_PARAM(tuple_seq)) \
+#define FLUSSPFERD_CLASS_DESCRIPTION(p_cpp_name, tuple_seq) \
+  FLUSSPFERD_CLASS_DESCRIPTION_A( \
+    FLUSSPFERD_CD_PARAM( \
+      tuple_seq \
+      (cpp_name, p_cpp_name) \
+    ) \
+  ) \
   /* */
 
 #else // IN_DOXYGEN
@@ -316,7 +321,7 @@ THE SOFTWARE.
  *
  * @ingroup classes
  */
-#define FLUSSPFERD_CLASS_DESCRIPTION(named_parameter_list) ...
+#define FLUSSPFERD_CLASS_DESCRIPTION(cpp_name, named_parameter_list) ...
 
 #endif // IN_DOXYGEN
 

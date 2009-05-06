@@ -32,7 +32,7 @@ THE SOFTWARE.
 namespace multi_precission {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, Integer)
+  Integer,
   (constructor_name, "Integer")
   (full_name, "gmp.Integer")
   (methods,
@@ -51,9 +51,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("add",              bind,   add)
     ("sub",              bind,   sub)
     ("mul",              bind,   mul)
-    ("div",              bind,   div)
-  )
-)
+    ("div",              bind,   div)))
 {
 public:
   mpz_class mp;

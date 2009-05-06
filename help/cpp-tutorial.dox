@@ -284,15 +284,17 @@ void my_function(call_context &x) {
  * @until <set>
  *
  * We use the macro #FLUSSPFERD_CLASS_DESCRIPTION for describing the class to
- * Flusspferd. It takes multiple named parameters (yes, that's possible in C++),
- * the first in our invocation being cpp_name: It indicates the name of the
- * class in the C++ source code.
+ * Flusspferd. It takes one unnamed parameter and multiple named parameters
+ * (yes, that's possible in C++).
+ *
+ * The first (unnamed) parameter @c cpp_name indicates the name of the class in
+ * the C++ source code.
  *
  * @note #FLUSSPFERD_CLASS_DESCRIPTION will create two classes: @c StringSet and
  *       @c StringSet_base.
  *
  * @skip FLUSSPFERD_CLASS_DESCRIPTION
- * @until cpp_name
+ * @until StringSet
  *
  * The parameters @c full_name and @c constructor_name define the complete
  * identifier (system-unique!) of the class respectively the name of the

@@ -32,13 +32,12 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, xpath_context)
+  xpath_context,
   (full_name, "XML.XPath")
   (constructor_name, "XPath")
   (constructor_arity, 1)
   (properties,
-    ("current", getter_setter, (get_current, set_current)))
-)
+    ("current", getter_setter, (get_current, set_current))))
 {
 public:
   xpath_context(object const &, call_context &);

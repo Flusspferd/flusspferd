@@ -33,14 +33,13 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, push_parser)
+  push_parser,
   (full_name, "XML.PushParser")
   (constructor_name, "PushParser")
   (constructor_arity, 1)
   (methods,
     ("push", bind, push)
-    ("terminate", bind, terminate))
-)
+    ("terminate", bind, terminate)))
 {
 public:
   push_parser(object const &, call_context &);

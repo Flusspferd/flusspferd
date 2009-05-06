@@ -44,7 +44,7 @@ using namespace flusspferd;
 namespace {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, environment)
+  environment,
   (constructor_name, "Environment")
   (full_name, "Environment")
   (custom_enumerate, true)

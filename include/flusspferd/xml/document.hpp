@@ -32,19 +32,16 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, document)
+  document,
   (base, node)
   (full_name, "XML.Document")
   (constructor_name, "Document")
   (methods,
     ("dump", bind, dump)
     ("copy", bind, copy)
-    ("toString", alias, "dump")
-  )
+    ("toString", alias, "dump"))
   (properties,
-    ("rootElement", getter_setter, (get_root_element, set_root_element))
-  )
-)
+    ("rootElement", getter_setter, (get_root_element, set_root_element))))
 {
 public:
   document(object const &, call_context &);

@@ -33,7 +33,7 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, namespace_)
+  namespace_,
   (full_name, "XML.Namespace")
   (constructor_name, "Namespace")
   (constructor_arity, 3)
@@ -41,8 +41,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toString", bind, to_string))
   (properties,
     ("href", getter_setter, (get_href, set_href))
-    ("prefix", getter_setter, (get_prefix, set_prefix)))
-)
+    ("prefix", getter_setter, (get_prefix, set_prefix))))
 {
 public:
   namespace_(object const &, call_context &);

@@ -5,7 +5,7 @@
 #include <string>
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-    (cpp_name, StringSet)
+    StringSet,
     (full_name, "StringSet")
     (constructor_name, "StringSet")
     (methods,

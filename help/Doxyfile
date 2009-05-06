@@ -211,7 +211,7 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = 
 INCLUDE_FILE_PATTERNS  = 
 PREDEFINED             = IN_DOXYGEN \
-                         FLUSSPFERD_CLASS_DESCRIPTION(x):=
+                         "FLUSSPFERD_CLASS_DESCRIPTION(cpp_name,named_parameters):=class cpp_name"
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------

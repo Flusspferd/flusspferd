@@ -32,12 +32,11 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, processing_instruction)
+  processing_instruction,
   (base, node)
   (full_name, "XML.ProcessingInstruction")
   (constructor_name, "ProcessingInstruction")
-  (constructor_arity, 3)
-)
+  (constructor_arity, 3))
 {
 public:
   processing_instruction(object const &, call_context &);

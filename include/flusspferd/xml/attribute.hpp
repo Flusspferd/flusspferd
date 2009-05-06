@@ -32,7 +32,7 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, attribute_)
+  attribute_,
   (base, node)
   (full_name, "XML.Attribute")
   (constructor_name, "Attribute")
@@ -40,8 +40,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (methods,
     ("addContent", bind, add_content))
   (properties,
-    ("content", getter_setter, (get_content, set_content)))
-)
+    ("content", getter_setter, (get_content, set_content))))
 {
 public:
   attribute_(object const &, call_context &);

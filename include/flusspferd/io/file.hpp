@@ -29,20 +29,17 @@ THE SOFTWARE.
 namespace flusspferd { namespace io {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, file)
+  file,
   (base, stream)
   (full_name, "IO.File")
   (constructor_name, "File")
   (constructor_arity, 1)
   (methods,
     ("open", bind, open)
-    ("close", bind, close)
-  )
+    ("close", bind, close))
   (constructor_methods,
     ("create", bind_static, create)
-    ("exists", bind_static, exists)
-  )
-)
+    ("exists", bind_static, exists)))
 {
 public:
   file(object const &, call_context &);

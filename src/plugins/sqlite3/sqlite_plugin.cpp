@@ -39,7 +39,7 @@ void raise_sqlite_error(sqlite3* db);
 ///////////////////////////
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, sqlite3)
+  sqlite3,
   (full_name, "SQLite3")
   (constructor_name, "SQLite3")
   (methods,
@@ -61,7 +61,7 @@ public: // JS methods
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, sqlite3_cursor)
+  sqlite3_cursor,
   (constructible, false)
   (full_name, "SQLite3.Cursor")
   (constructor_name, "Cursor")
@@ -69,8 +69,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("close", bind, close)
     ("reset", bind, reset)
     ("next", bind, next)
-    ("bind", bind, bind)
-  ))
+    ("bind", bind, bind)))
 {
 public:
   sqlite3_cursor(object const &obj, sqlite3_stmt *sth);

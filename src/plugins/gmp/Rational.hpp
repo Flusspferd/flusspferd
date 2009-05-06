@@ -34,7 +34,7 @@ namespace multi_precission {
 class Integer;
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, Rational)
+  Rational,
   (constructor_name, "Rational")
   (full_name, "gmp.Rational")
   (methods,
@@ -52,9 +52,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("add",               bind,   add)
     ("sub",               bind,   sub)
     ("mul",               bind,   mul)
-    ("div",               bind,   div)
-  )
-)
+    ("div",               bind,   div)))
 {
 public:
   mpq_class mp;

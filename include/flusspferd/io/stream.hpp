@@ -33,7 +33,7 @@ THE SOFTWARE.
 namespace flusspferd { namespace io {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, stream)
+  stream,
   (full_name, "IO.Stream")
   (constructor_name, "Stream")
   (constructible, false)
@@ -45,14 +45,11 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("write", bind, write)
     ("flush", bind, flush)
     ("print", bind, print)
-    ("readLine", bind, read_line)
-  )
+    ("readLine", bind, read_line))
   (properties,
     ("fieldSeparator", variable, string(" "))
     ("recordSeparator", variable, string("\n"))
-    ("autoFlush", variable, false)
-  )
-)
+    ("autoFlush", variable, false)))
 {
 public:
   stream(object const &o, std::streambuf *b);

@@ -31,13 +31,12 @@ THE SOFTWARE.
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  (cpp_name, html_document)
+  html_document,
   (base, document)
   (full_name, "XML.HTML.Document")
   (constructor_name, "Document")
   (methods,
-    ("dump", bind, dump))
-)
+    ("dump", bind, dump)))
 {
 public:
   html_document(object const &, call_context &);
