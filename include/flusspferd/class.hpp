@@ -116,7 +116,7 @@ struct class_info {
   typedef boost::mpl::bool_<true> constructible;
 
   /**
-   * Whether the class overrides the standarddont_enumerate hooks.
+   * Whether the class overrides the standard enumerate hooks.
    *
    * Should be enabled when the class overrides
    * native_object_base::enumerate_start and native_object_base::enumerate_next.
