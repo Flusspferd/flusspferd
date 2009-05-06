@@ -356,7 +356,9 @@ THE SOFTWARE.
  * <dd><dl>
  * <dt><em>base</em> (optional)</dt>
  * <dd><b>{Class}</b> The (indirect) base class. Must be derived from
- *     flusspferd::native_object_base.
+ *     flusspferd::native_object_base and contain a valid class_info.
+ *     The class' prototype will be used as the prototype of the generated
+ *     prototype (i.e., @c instanceof works).
  *     <br>Default: flusspferd::native_object_base.
  * </dd>
  * <dt><em>constructor_name</em> (required)</dt>
