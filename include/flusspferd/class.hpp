@@ -105,6 +105,8 @@ void load_class(
  * constructor arity, no augmentation and an empty prototype. You will always
  * have to define the @c constructor_name and @c full_name yourself.
  *
+ * @see FLUSSPFERD_CLASS_DESCRIPTION
+ *
  * @ingroup classes
  */
 struct class_info {
