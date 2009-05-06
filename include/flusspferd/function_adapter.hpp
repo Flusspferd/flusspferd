@@ -32,11 +32,8 @@ THE SOFTWARE.
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/function.hpp>
 #endif
+#include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
-
-#ifndef FLUSSPFERD_PARAM_LIMIT
-#define FLUSSPFERD_PARAM_LIMIT 5
-#endif
 
 namespace flusspferd {
 

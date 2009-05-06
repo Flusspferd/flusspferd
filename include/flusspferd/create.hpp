@@ -34,11 +34,8 @@ THE SOFTWARE.
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #endif
+#include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
-
-#ifndef FLUSSPFERD_PARAM_LIMIT
-#define FLUSSPFERD_PARAM_LIMIT 5
-#endif
 
 namespace flusspferd {
 

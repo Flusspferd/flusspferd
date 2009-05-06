@@ -28,11 +28,8 @@ THE SOFTWARE.
 #include "class.hpp"
 #include "native_object_base.hpp"
 #endif
+#include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
-
-#ifndef FLUSSPFERD_PARAM_LIMIT
-#define FLUSSPFERD_PARAM_LIMIT 5
-#endif
 
 /* 2-tuple seq */
 
