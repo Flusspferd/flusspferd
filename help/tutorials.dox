@@ -37,6 +37,7 @@ THE SOFTWARE.
  *   - @ref cpp-tutorial-gc
  *   - @ref cpp-tutorial-functions
  *   - @ref cpp-tutorial-classes
+ *     - @ref cpp-tutorial-classes-without-macro
  *   - @ref cpp-tutorial-modules
  *
  * - @subpage js-tutorial

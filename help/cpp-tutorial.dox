@@ -31,6 +31,7 @@ THE SOFTWARE.
  * - \subpage cpp-tutorial-gc
  * - \subpage cpp-tutorial-functions
  * - \subpage cpp-tutorial-classes
+ *   - \ref cpp-tutorial-classes-without-macro
  * - \subpage cpp-tutorial-modules
  *
  */
@@ -272,10 +273,7 @@ void my_function(call_context &x) {
  *
  * As a simple example, we have chosen a "set of strings".
  *
- * A brief look at the whole program and then we shall look at it piece by
- * piece.
- *
- * @include "stringset.cpp"
+ * @note You can find the source in <code>help/examples/stringset.cpp</code>
  *
  * Let's begin the walk through. First, as always, the required headers.
  *
@@ -392,13 +390,29 @@ As Array: ["c", "d"]
 Destroying StringSet
 @endverbatim
  * 
+ * Next: \subpage cpp-tutorial-classes-without-macro
+ */
+
+/**
+ * @page cpp-tutorial-classes-without-macro "Without macros please"
+ *
+ * Previous: \ref cpp-tutorial-classes
+ *
+ * If, for some reason, you don't want to use #FLUSSPFERD_CLASS_DESCRIPTION,
+ * or if it is not possible for some reason, you can <b>of course</b> write
+ * the required code yourself.
+ *
+ * @include "stringset2.cpp"
+ *
+ * @see classes, flusspferd::class_info
+ *
  * Next: \ref cpp-tutorial-modules
  */
 
 /**
  * @page cpp-tutorial-modules Using and writing loadable modules
  *
- * Previous: \ref cpp-tutorial-classes
+ * Previous: \ref cpp-tutorial-classes-without-macro
  *
  * Loading a module - and using it - is easy:
  *
