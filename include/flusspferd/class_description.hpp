@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
 
+#ifndef IN_DOXYGEN
+
 /* 2-tuple seq */
 
 #define FLUSSPFERD_PP_GEN_TUPLE2SEQ_PROCESS2(x, y) \
@@ -306,5 +308,16 @@ THE SOFTWARE.
 #define FLUSSPFERD_CLASS_DESCRIPTION(tuple_seq) \
   FLUSSPFERD_CLASS_DESCRIPTION_A(FLUSSPFERD_CD_PARAM(tuple_seq)) \
   /* */
+
+#else // IN_DOXYGEN
+
+/**
+ * Bla.
+ *
+ * @ingroup classes
+ */
+#define FLUSSPFERD_CLASS_DESCRIPTION(named_parameter_list) ...
+
+#endif // IN_DOXYGEN
 
 #endif
