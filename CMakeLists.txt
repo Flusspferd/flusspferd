@@ -37,6 +37,16 @@ EXECUTE_PROCESS(
 
 MESSAGE(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
+#######################
+
+INCLUDE (CheckIncludeFile)
+INCLUDE (CheckCXXCompilerFlag)
+INCLUDE (CheckCXXSourceCompiles)
+INCLUDE (CheckCXXSourceRuns)
+INCLUDE (FindPkgConfig)
+
+## Boost ##############
+
 FIND_PACKAGE(Boost 1.36.0 COMPONENTS
     unit_test_framework
     thread
@@ -58,3 +68,16 @@ ENDIF()
 IF(NOT Boost_FOUND)
 	MESSAGE(STATUS "Boost not found!")
 ENDIF()
+
+## POSIX ##############
+
+CHECK_CXX_SOURCE_RUNS(
+	"#include <unistd.h>
+	 #include <cstdlib>
+	 int main()
+	 {
+	   return _POSIX_VERSION >= 200100
+	          ? EXIT_SUCCESS
+		  : EXIT_FAILURE;
+	 }"
+	 FLUSSPFERD_HAVE_POSIX)
