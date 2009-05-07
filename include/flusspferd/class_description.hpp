@@ -335,15 +335,15 @@ THE SOFTWARE.
  *
  * <dl><dt><b>Usage template:</b></dt><dd>
  * @code
- * FLUSSPFERD_CLASS_DESCRIPTION(
- *   cpp_name,
- *   (parameter_name_1, parameter_value_1)
- *   (parameter_name_2, parameter_value_2)
- *   ...
- * )
- * {
- *   CONTENTS
- * };
+FLUSSPFERD_CLASS_DESCRIPTION(
+    cpp_name,
+    (parameter_name_1, parameter_value_1)
+    (parameter_name_2, parameter_value_2)
+    ...
+)
+{
+    CONTENTS
+};
  * @endcode
  * </dd></dl>
  *
