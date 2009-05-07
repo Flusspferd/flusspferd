@@ -1,8 +1,6 @@
+FLUSSPFERD-VERSION-FILE
 .configure
 build/*
-html/*
-include/flusspferd/implementation
-naturaldocs/Data/*
 *.swp
 *~
 .lock-wscript
