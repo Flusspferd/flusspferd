@@ -39,6 +39,7 @@ EXECUTE_PROCESS(
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ADD_DEFINITIONS("-DFLUSSPFERD_VERSION=\\\"${FLUSSPFERD_VERSION}\\\"")
+ADD_DEFINITIONS("-DINSTALL_PREFIX=\\\"${CMAKE_INSTALL_PREFIX}\\\"")
 
 MESSAGE(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
@@ -132,3 +133,13 @@ ADD_LIBRARY(
     flusspferd
     SHARED
     ${flusspferd_library_sources})
+
+## Programs ###########
+
+ADD_EXECUTABLE(
+    flusspferd-shell
+    src/programs/flusspferd.cpp)
+
+TARGET_LINK_LIBRARIES(
+    flusspferd-shell
+    flusspferd)
