@@ -38,6 +38,8 @@ EXECUTE_PROCESS(
     OUTPUT_VARIABLE FLUSSPFERD_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+ADD_DEFINITIONS("-DFLUSSPFERD_VERSION=\\\"${FLUSSPFERD_VERSION}\\\"")
+
 MESSAGE(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
 #######################
@@ -56,8 +58,7 @@ IF (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS ("-pedantic-errors -Wall -Wextra -Wconversion"
     "-Wfloat-equal -Wredundant-decls -Wstrict-null-sentinel -Winit-self"
     "-Woverloaded-virtual -Wnon-virtual-dtor -Wctor-dtor-privacy"
-    "-Wsign-promo -Wstrict-aliasing=1 -Wmissing-declarations"
-    "-Wold-style-cast")
+    "-Wsign-promo -Wstrict-aliasing=1")
 
     IF(ENABLE_DEBUG_WARNINGS)
         ADD_DEFINITIONS("-Wpadded -Weffc++")
@@ -114,4 +115,20 @@ CHECK_CXX_SOURCE_RUNS(
               ? EXIT_SUCCESS
           : EXIT_FAILURE;
      }"
-     FLUSSPFERD_HAVE_POSIX)
+    FLUSSPFERD_HAVE_POSIX)
+
+## Spidermonkey #######
+
+ADD_DEFINITIONS(-DXP_UNIX)
+
+## Library ############
+
+FILE(
+    GLOB
+    flusspferd_library_sources
+    ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp)
+
+ADD_LIBRARY(
+    flusspferd
+    SHARED
+    ${flusspferd_library_sources})
