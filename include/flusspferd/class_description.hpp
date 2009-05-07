@@ -454,6 +454,35 @@ FLUSSPFERD_CLASS_DESCRIPTION(
  *     </dl>
  * </dd></dl>
  *
+ * <dl><dt><b>Example:</b></dt>
+ * <dd>
+ * @code
+FLUSSPFERD_CLASS_DESCRIPTION(
+    my_class,
+    (full_name, "MyModule.MyClass")
+    (constructor_name, "MyClass")
+    (methods,
+        ("myMethod", bind, my_method)
+        ("anotherName", alias, "myMethod"))
+   (constructor_methods,
+        ("constructorMethod", bind_static, constructor_method))
+   (constructor_properties,
+        ("VERSION", constant, flusspferd::string("1.0"))))
+{
+    double my_method(double parameter) {
+        return parameter * 2;
+    }
+    static double constructor_method(double parameter1, int parameter2) {
+        return parameter1 + parameter1;
+    }
+};
+
+void some_function() {
+    flusspferd::load_class<my_class>();
+}
+@endcode
+ * </dd></dl>
+ *
  * @see flusspferd::load_class, flusspferd::class_info
  *
  * @ingroup classes
