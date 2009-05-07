@@ -122,6 +122,11 @@ CHECK_CXX_SOURCE_RUNS(
 
 ADD_DEFINITIONS(-DXP_UNIX)
 
+FIND_LIBRARY(
+    SPIDERMONKEY_LIBRARY
+    NAMES js mozjs js32
+    DOC "Spidermonkey library")
+
 ## Library ############
 
 FILE(
@@ -133,6 +138,10 @@ ADD_LIBRARY(
     flusspferd
     SHARED
     ${flusspferd_library_sources})
+
+TARGET_LINK_LIBRARIES(
+    flusspferd
+    ${SPIDERMONKEY_LIBRARY})
 
 ## Programs ###########
 
