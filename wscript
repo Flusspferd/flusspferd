@@ -28,24 +28,12 @@ import TaskGen
 DEFAULT_VERSION = 'dev'
 
 def get_version():
-    try:
-        if os.access("version", os.F_OK):
-            file = open("version", "r")
-            ver = file.readline().strip()
-            return ver
-        if os.access(".git", os.F_OK):
-            ver = subprocess.Popen(
-                ["git", "describe", "--abbrev=4", "HEAD"],
-                stdout=subprocess.PIPE).communicate()[0]
-            ver = re.match('v(\d.*)', ver).group(1)
-            dirty = subprocess.Popen(
-                ["git", "diff", "--raw", "--name-only", "HEAD"],
-                stdout=subprocess.PIPE).communicate()[0]
-            if dirty:
-                ver += '-dirty'
-            return ver
-    except:
-        pass
+    os.system("./flusspferd-version.sh")
+    if os.access("FLUSSPFERD-VERSION-FILE", os.F_OK):
+        file = open("FLUSSPFERD-VERSION-FILE", "r")
+        ver = file.readline().strip()
+        ver = ver.replace("FLUSSPFERD_VERSION = ", "")
+        return ver
     return DEFAULT_VERSION
 
 APPNAME = 'flusspferd'
