@@ -45,6 +45,37 @@ INCLUDE (CheckCXXSourceCompiles)
 INCLUDE (CheckCXXSourceRuns)
 INCLUDE (FindPkgConfig)
 
+## Compiler options ###
+
+IF (CMAKE_COMPILER_IS_GNUCXX)
+    OPTION (ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
+
+    ADD_DEFINITIONS ("-pedantic-errors -Wall -Wextra -Wconversion"
+    "-Wfloat-equal -Wredundant-decls -Wstrict-null-sentinel -Winit-self"
+    "-Woverloaded-virtual -Wnon-virtual-dtor -Wctor-dtor-privacy"
+    "-Wsign-promo -Wstrict-aliasing=1 -Wmissing-declarations"
+    "-Wold-style-cast")
+
+    IF(ENABLE_DEBUG_WARNINGS)
+        ADD_DEFINITIONS("-Wpadded -Weffc++")
+    ENDIF()
+
+    ADD_DEFINITIONS(-D BOOST_FILESYSTEM_NO_DEPRECATED)
+
+    SET (CMAKE_CXX_FLAGS_RELEASE "-O3 -fomit-frame-pointer -DNDEBUG")
+    SET (CMAKE_CXX_FLAGS_DEBUG "-g")
+
+    ADD_DEFINITIONS ("-Wno-long-long -ansi")
+
+    SET (CMAKE_REQUIRED_FLAGS "")
+ELSEIF (MSVC)
+    ADD_DEFINITIONS ("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4714 /EHa")
+    SET (WINLIBS projects/windows/lib32)
+    SET (WININCLUDES ${CMAKE_SOURCE_DIR}/${WINLIBS})
+ENDIF ()
+
+INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
+
 ## Boost ##############
 
 FIND_PACKAGE(Boost 1.36.0 COMPONENTS
