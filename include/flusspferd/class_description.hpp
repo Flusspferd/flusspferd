@@ -413,7 +413,46 @@ THE SOFTWARE.
  *     <br>Default: 0</dd>
  * </dl></dd></dl>
  *
- * @em TODO Explain method and property types.
+ * <dl><dt><b>Method types:</b></dt>
+ * <dd>The parameters @c methods and @c constructor_methods take sequences with elements of
+ *     the form <code>(method_name, <b>type</b>, parameter)</code>, where @c type is one of
+ *     the identifiers mentioned below.
+ *     <br><br>
+ *     <dl>
+ *     <dt><code>(?, <b>none</b>, ?)</code></dt>
+ *     <dd>Generates no method. Used as a dummy of the form <code>(~, none, ~)</code>
+ *         because empty sequences are not valid.</dd>
+ *     <dt><code>(name, <b>bind</b>, method)</code></dt>
+ *     <dd>Binds the method with name @p name to non-static method @c cpp_name::method.</dd>
+ *     <dt><code>(name, <b>bind_static</b>, method)</code></dt>
+ *     <dd>Binds the method with name @p name to the static method @c cpp_name::method.</dd>
+ *     <dt><code>(name, <b>alias</b>, alias_name)</code></dt>
+ *     <dd>Copies the method @p alias_name into a property with name @p name. The method
+ *         @p alias_name must be already defined @em above this method.</dd>
+ *     </dl>
+ * </dd></dl>
+ *
+ * <dl><dt><b>Property types:</b></dt>
+ * <dd>The parameters @c properties and @c constructor_properties take sequences with elements
+ *     of the form <code>(property_name, <b>type</b>, parameter)</code>, where @c type is one
+ *     of the identifiers mentioned below.
+ *     <br><br>
+ *     <dl>
+ *     <dt><code>(?, <b>none</b>, ?)</code></dt>
+ *     <dd>Generates no property. Used as a dummy of the form <code>(~, none, ~)</code>
+ *         because empty sequences are not valid.</dd>
+ *     <dt><code>(name, <b>getter_setter</b>, (getter, setter))</code></dt>
+ *     <dd>Generates a property that is accessed through the accessors (non-static methods)
+ *         @p cpp_name::getter and @p cpp_name::setter.</dd>
+ *     <dt><code>(name, <b>getter</b>, getter)</code></dt>
+ *     <dd>Generates a @em constant property that is accessed through the non-static method
+ *         @p cpp_name::getter.</dd>
+ *     <dt><code>(name, <b>variable</b>, initial_value)</code></dt>
+ *     <dd>Generates a standard property with the initial value @p initial_value.</dd>
+ *     <dt><code>(name, <b>constant</b>, value)</code></dt>
+ *     <dd>Generates a constant property with the value @p value.</dd>
+ *     </dl>
+ * </dd></dl>
  *
  * @see flusspferd::load_class, flusspferd::class_info
  *
