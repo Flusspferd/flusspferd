@@ -43,6 +43,12 @@ FIND_PACKAGE(Boost 1.36.0 COMPONENTS
     filesystem
     system)
 
+IF(Boost_INCLUDE_DIR)
+	INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+ELSE()
+	MESSAGE(STATUS "Boost headers not found. You will have to specify them in your build environment or you can use -DBOOST_ROOT= or -DBoost_INCLUDE_DIR to tell cmake where your boost installation is.")
+ENDIF()
+
 IF(NOT Boost_FOUND)
 	MESSAGE(STATUS "Boost not found!")
 ENDIF()
