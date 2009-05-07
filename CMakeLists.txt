@@ -29,6 +29,14 @@ IF(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
 ENDIF()
 
+EXECUTE_PROCESS(
+    COMMAND "${flusspferd_SOURCE_DIR}/flusspferd-version.sh"
+    WORKING_DIRECTORY "${flusspferd_SOURCE_DIR}"
+    OUTPUT_VARIABLE FLUSSPFERD_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+message(STATUS "Version " ${FLUSSPFERD_VERSION})
+
 FIND_PACKAGE(Boost 1.36.0 COMPONENTS
     unit_test_framework
     thread
