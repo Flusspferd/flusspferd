@@ -21,12 +21,12 @@
 # THE SOFTWARE.
 #
 
-PROJECT(flusspferd CXX)
+PROJECT(Flusspferd CXX)
 
 SET (CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 
 IF(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
-    message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
+    MESSAGE(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
 ENDIF()
 
 EXECUTE_PROCESS(
@@ -35,7 +35,7 @@ EXECUTE_PROCESS(
     OUTPUT_VARIABLE FLUSSPFERD_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-message(STATUS "Version " ${FLUSSPFERD_VERSION})
+MESSAGE(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
 FIND_PACKAGE(Boost 1.36.0 COMPONENTS
     unit_test_framework
@@ -44,5 +44,5 @@ FIND_PACKAGE(Boost 1.36.0 COMPONENTS
     system)
 
 IF(NOT Boost_FOUND)
-	message(STATUS "Boost not found!")
+	MESSAGE(STATUS "Boost not found!")
 ENDIF()
