@@ -22,4 +22,4 @@
 #
 
 mkdir build 2>/dev/null
-cd build && cmake ..
+cd build && cmake "$@" ..
