@@ -20,7 +20,13 @@
 # THE SOFTWARE.
 #
 
-.PHONY: all
+.PHONY: all clean install
 
 all:
 	$(MAKE) -C build
+
+clean:
+	$(MAKE) -C build clean
+
+install:
+	$(MAKE) -C build install
