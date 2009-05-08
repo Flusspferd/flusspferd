@@ -241,3 +241,20 @@ ADD_LIBRARY(
 TARGET_LINK_LIBRARIES(
     flusspferd-io
     flusspferd)
+
+## XML ######################################################################
+
+FILE(
+    GLOB
+    flusspferd_xml_sources
+    ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
+
+ADD_LIBRARY(
+    flusspferd-xml
+    SHARED
+    ${flusspferd_xml_sources})
+
+TARGET_LINK_LIBRARIES(
+    flusspferd-xml
+    flusspferd
+    ${LIBXML2_LIBRARIES})
