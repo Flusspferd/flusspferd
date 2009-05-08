@@ -217,3 +217,19 @@ TARGET_LINK_LIBRARIES(
     flusspferd-shell
     flusspferd
     ${LIBEDIT_LIBRARIES})
+
+## IO ######################################################################
+
+FILE(
+    GLOB
+    flusspferd_io_sources
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
+
+ADD_LIBRARY(
+    flusspferd-io
+    SHARED
+    ${flusspferd_io_sources})
+
+TARGET_LINK_LIBRARIES(
+    flusspferd-io
+    flusspferd)
