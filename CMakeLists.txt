@@ -187,6 +187,14 @@ IF(LIBEDIT_FOUND)
     ADD_DEFINITIONS(-DHAVE_EDITLINE)
 ENDIF()
 
+## libxml2 #################################################################
+
+PKG_CHECK_MODULES(LIBXML2 libxml-2.0>=2.6.0)
+
+IF(LIBXML2_FOUND)
+    ADD_DEFINITIONS(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
+ENDIF()
+
 ## Library ##################################################################
 
 FILE(
