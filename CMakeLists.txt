@@ -84,6 +84,17 @@ ENDIF ()
 
 INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
 
+## PkgConfig ##########
+
+FIND_PACKAGE(PkgConfig)
+
+## libdl ##############
+
+FIND_LIBRARY(
+    DL_LIBRARY
+    NAMES dl
+    DOC "libdl library")
+
 ## Boost ##############
 
 SET(Boost_ADDITIONAL_VERSIONS "1.39" "1.39.0")
@@ -168,6 +179,14 @@ ENDIF()
 
 ADD_DEFINITIONS(${SPIDERMONKEY_DEFINITIONS})
 
+## libedit ############
+
+PKG_CHECK_MODULES(LIBEDIT libedit)
+
+IF(LIBEDIT_FOUND)
+    ADD_DEFINITIONS(-DHAVE_EDITLINE)
+ENDIF()
+
 ## Library ############
 
 FILE(
@@ -182,6 +201,7 @@ ADD_LIBRARY(
 
 TARGET_LINK_LIBRARIES(
     flusspferd
+    ${DL_LIBRARY}
     ${SPIDERMONKEY_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
@@ -195,4 +215,5 @@ ADD_EXECUTABLE(
 
 TARGET_LINK_LIBRARIES(
     flusspferd-shell
-    flusspferd)
+    flusspferd
+    ${LIBEDIT_LIBRARIES})
