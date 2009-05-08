@@ -46,7 +46,7 @@ ADD_DEFINITIONS("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
 MESSAGE(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
-#######################
+#############################################################################
 
 INCLUDE (CheckIncludeFile)
 INCLUDE (CheckCXXCompilerFlag)
@@ -84,18 +84,18 @@ ENDIF ()
 
 INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
 
-## PkgConfig ##########
+## PkgConfig ################################################################
 
 FIND_PACKAGE(PkgConfig)
 
-## libdl ##############
+## libdl ####################################################################
 
 FIND_LIBRARY(
     DL_LIBRARY
     NAMES dl
     DOC "libdl library")
 
-## Boost ##############
+## Boost ####################################################################
 
 SET(Boost_ADDITIONAL_VERSIONS "1.39" "1.39.0")
 SET(Boost_USE_MULTITHREADED ON)
@@ -122,7 +122,7 @@ IF(NOT Boost_FOUND)
     MESSAGE(STATUS "Boost not found!")
 ENDIF()
 
-## POSIX ##############
+## POSIX ####################################################################
 
 CHECK_CXX_SOURCE_RUNS(
     "#include <unistd.h>
@@ -135,7 +135,7 @@ CHECK_CXX_SOURCE_RUNS(
      }"
     FLUSSPFERD_HAVE_POSIX)
 
-## Spidermonkey #######
+## Spidermonkey #############################################################
 
 SET(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DJS_C_STRINGS_ARE_UTF8)
 
@@ -179,7 +179,7 @@ ENDIF()
 
 ADD_DEFINITIONS(${SPIDERMONKEY_DEFINITIONS})
 
-## libedit ############
+## libedit ##################################################################
 
 PKG_CHECK_MODULES(LIBEDIT libedit)
 
@@ -187,7 +187,7 @@ IF(LIBEDIT_FOUND)
     ADD_DEFINITIONS(-DHAVE_EDITLINE)
 ENDIF()
 
-## Library ############
+## Library ##################################################################
 
 FILE(
     GLOB
@@ -207,7 +207,7 @@ TARGET_LINK_LIBRARIES(
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY})
 
-## Programs ###########
+## Programs #################################################################
 
 ADD_EXECUTABLE(
     flusspferd-shell
