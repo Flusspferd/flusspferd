@@ -21,5 +21,11 @@
 # THE SOFTWARE.
 #
 
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]
+then
+	cmake --help 2>&1 | sed -e 's/^  *cmake/    .\/configure/' -e 's/<path-to-.*>//'
+	exit 2
+fi
+
 mkdir build 2>/dev/null
 cd build && cmake "$@" ..
