@@ -259,3 +259,12 @@ TARGET_LINK_LIBRARIES(
     flusspferd-xml
     flusspferd
     ${LIBXML2_LIBRARIES})
+
+## Install ##################################################################
+
+install(
+    TARGETS
+    flusspferd
+    flusspferd-shell
+    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
