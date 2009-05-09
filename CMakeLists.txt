@@ -110,13 +110,13 @@ FIND_PACKAGE(Boost 1.36.0 COMPONENTS
 IF(Boost_INCLUDE_DIR)
     INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 ELSE()
-    MESSAGE(FATAL_ERROR "Boost headers not found. You will have to specify them in your build environment or you can use -DBOOST_ROOT= or -DBoost_INCLUDE_DIR to tell cmake where your boost installation is.")
+    MESSAGE(FATAL_ERROR "Boost headers not found. You will have to specify them in your build environment or you can use -DBOOST_ROOT or -DBOOST_INCLUDE_DIR to tell cmake where your boost installation is.")
 ENDIF()
 
 IF(Boost_LIBRARY_DIRS)
     LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
 ELSE()
-    MESSAGE(FATAL_ERROR "Boost libraries not found. Please set -DBoost_LIBRARY_DIR manually.")
+    MESSAGE(FATAL_ERROR "Boost libraries not found. Please set -DBOOST_ROOT or -DBOOST_LIBRARY_DIR manually.")
 ENDIF()
 
 IF(NOT Boost_FOUND)
