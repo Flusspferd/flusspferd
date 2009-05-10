@@ -84,10 +84,6 @@ ENDIF ()
 
 INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
 
-## PkgConfig ################################################################
-
-FIND_PACKAGE(PkgConfig)
-
 ## libdl ####################################################################
 
 FIND_LIBRARY(
