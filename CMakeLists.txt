@@ -134,6 +134,10 @@ CHECK_CXX_SOURCE_RUNS(
 
 ## Spidermonkey #############################################################
 
+SET(SPIDERMONKEY_INCLUDE CACHE PATH "Spidermonkey include directory")
+
+INCLUDE_DIRECTORIES(${SPIDERMONKEY_INCLUDE})
+
 SET(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DJS_C_STRINGS_ARE_UTF8)
 
 FIND_LIBRARY(
