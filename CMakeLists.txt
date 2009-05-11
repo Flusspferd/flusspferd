@@ -35,6 +35,9 @@ ENDIF()
 SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
+SET (INSTALL_EXECUTABLES_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+SET (INSTALL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+
 EXECUTE_PROCESS(
     COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
     WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
@@ -192,6 +195,10 @@ TARGET_LINK_LIBRARIES(
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY})
 
+INSTALL(TARGETS
+    flusspferd
+    LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+
 ## Programs #################################################################
 
 ADD_EXECUTABLE(
@@ -207,6 +214,10 @@ TARGET_LINK_LIBRARIES(
     flusspferd-shell
     flusspferd
     ${LIBEDIT_LIBRARIES})
+
+INSTALL(TARGETS
+    flusspferd-shell
+    RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 
 ## IO ######################################################################
 
@@ -288,12 +299,3 @@ FOREACH(PLUGIN ${PLUGINS})
         ${${PLUGIN}_LIBRARIES})
 
 ENDFOREACH()
-
-## Install ##################################################################
-
-install(
-    TARGETS
-    flusspferd
-    flusspferd-shell
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
