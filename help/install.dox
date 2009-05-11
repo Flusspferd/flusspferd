@@ -66,23 +66,18 @@ $ git clone git://github.com/ruediger/flusspferd.git
 $ cd flusspferd
 @endverbatim
  *
- * To get an overview of all possible options, run
- *
  * @verbatim
-$ ./waf --help
+$ ./configure
+$ make
+$ sudo make install
 @endverbatim
  *
- * Especially if you have installed your dependencies in unusual paths, you
- * might need to specify additional options.
+ * You can use @p -DCMAKE_INSTALL_PREFIX=/usr (or with another path in place of
+ * @p /usr) if you don't want to install Flusspferd in the default path
+ * (@p /usr/local).
  *
- * If you don't need special options, we should configure the project now (this is like ./configure in autotools based projects) and then build and install it.
- * We will install into /usr (/usr/local is the default). Use @p --prefix to change the place where Flusspferd should be installed.
- *
- * @verbatim
-$ ./waf configure --prefix=/usr --enable-io --enable-xml
-$ ./waf build
-$ sudo ./waf install
-@endverbatim
+ * If you have installed your dependencies in unusual paths, or your system
+ * is unusual in another way, you might need to specify additional options.
  *
  * @section results Test the results
  *
@@ -116,17 +111,6 @@ Hello world!
  * For the purposes of this tutorial, we have not enabled all parts of
  * Flusspferd. We have omitted several modules which you can choose to
  * activate if you have the necessary dependencies.
- *
- * @subsection make Install using ./configure and make
- *
- * If you want to use make instead of waf to compile flusspferd, you can do this
- * too.
- *
- * @verbatim
-$ ./configure --prefix=/usr --enable-xml --enable-io
-$ make
-$ sudo make install
-@endverbatim
  *
  * @subsection ubu Install on Ubuntu 8.10
  *
