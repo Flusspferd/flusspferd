@@ -72,9 +72,9 @@ $ make
 $ sudo make install
 @endverbatim
  *
- * You can use @p -DCMAKE_INSTALL_PREFIX=/usr (or with another path in place of
- * @p /usr) if you don't want to install Flusspferd in the default path
- * (@p /usr/local).
+ * You can use @p -DCMAKE_INSTALL_PREFIX=/opt/local (or with another path in place of
+ * @p /opt/local) if you don't want to install Flusspferd in the default path
+ * @p /usr/local.
  *
  * If you have installed your dependencies in unusual paths, or your system
  * is unusual in another way, you might need to specify additional options.
