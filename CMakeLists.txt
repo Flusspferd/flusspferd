@@ -163,6 +163,10 @@ ENDIF()
 
 PKG_CHECK_MODULES(SQLITE3 sqlite3>=3.4.0)
 
+## libcurl #################################################################
+
+FIND_PACKAGE(CURL)
+
 ## Library ##################################################################
 
 FILE(
@@ -237,7 +241,10 @@ TARGET_LINK_LIBRARIES(
 SET(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
 SET(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
 
-FOREACH(PLUGIN os posix environment sqlite3)
+SET(curl_LIBRARIES ${CURL_LIBRARIES})
+SET(curl_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR})
+
+FOREACH(PLUGIN os posix environment sqlite3 curl)
 
 FILE(GLOB
     ${PLUGIN}_sources
@@ -259,6 +266,11 @@ SET_PROPERTY(
     TARGET ${PLUGIN}_PLUGIN
     PROPERTY DEFINITIONS
     ${${PLUGIN}_DEFINITIONS})
+
+SET_PROPERTY(
+    TARGET ${PLUGIN}_PLUGIN
+    PROPERTY INCLUDE_DIRECTORIES
+    ${${PLUGIN}_INCLUDE_DIRECTORIES})
 
 TARGET_LINK_LIBRARIES(
     ${PLUGIN}_PLUGIN
