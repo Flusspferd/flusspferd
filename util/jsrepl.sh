@@ -1,2 +1,2 @@
 #!/bin/sh
-./build/bin/flusspferd-shell -c ./src/js/jsrepl_dev.js "$@"
+./build/bin/flusspferd -c ./src/js/jsrepl_dev.js "$@"

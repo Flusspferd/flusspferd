@@ -185,6 +185,11 @@ ADD_EXECUTABLE(
     flusspferd-shell
     src/programs/flusspferd.cpp)
 
+SET_PROPERTY(
+    TARGET flusspferd-shell
+    PROPERTY OUTPUT_NAME
+    flusspferd)
+
 TARGET_LINK_LIBRARIES(
     flusspferd-shell
     flusspferd
