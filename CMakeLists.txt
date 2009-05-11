@@ -93,11 +93,25 @@ ENDIF ()
 
 INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
 
+## POSIX ####################################################################
+
+CHECK_CXX_SOURCE_RUNS(
+    "#include <unistd.h>
+     #include <cstdlib>
+     int main()
+     {
+       return _POSIX_VERSION >= 200100
+              ? EXIT_SUCCESS
+          : EXIT_FAILURE;
+     }"
+    FLUSSPFERD_HAVE_POSIX)
+
 ## libdl ####################################################################
 
-SET(DL_REQUIRED TRUE)
-FIND_PACKAGE(DL)
-INCLUDE_DIRECTORIES(${DL_INCLUDE_DIR})
+IF(FLUSSPFERD_HAVE_POSIX)
+    FIND_PACKAGE(DL REQUIRED)
+    INCLUDE_DIRECTORIES(${DL_INCLUDE_DIR})
+ENDIF()
 
 ## Boost ####################################################################
 
@@ -126,19 +140,6 @@ ENDIF()
 IF(NOT Boost_FOUND)
     MESSAGE(STATUS "Boost not found!")
 ENDIF()
-
-## POSIX ####################################################################
-
-CHECK_CXX_SOURCE_RUNS(
-    "#include <unistd.h>
-     #include <cstdlib>
-     int main()
-     {
-       return _POSIX_VERSION >= 200100
-              ? EXIT_SUCCESS
-          : EXIT_FAILURE;
-     }"
-    FLUSSPFERD_HAVE_POSIX)
 
 ## Spidermonkey #############################################################
 
@@ -337,7 +338,11 @@ ENDIF()
 
 ## Plugins #################################################################
 
-SET(PLUGINS os posix environment)
+SET(PLUGINS os environment)
+
+IF(FLUSSPFERD_HAVE_POSIX)
+    SET(PLUGINS ${PLUGINS} posix)
+ENDIF()
 
 IF(SQLITE3_FOUND)
     SET(PLUGINS ${PLUGINS} SQLite3)
