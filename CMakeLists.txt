@@ -93,8 +93,6 @@ FIND_LIBRARY(
 
 ## Boost ####################################################################
 
-SET(Boost_ADDITIONAL_VERSIONS
-    "1.39" "1.39.0" "1.38" "1.38.0" "1.37" "1.37.0" "1.36" "1.36.0")
 SET(Boost_USE_MULTITHREADED ON)
 
 FIND_PACKAGE(Boost 1.36.0 COMPONENTS
