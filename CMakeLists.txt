@@ -228,6 +228,17 @@ TARGET_LINK_LIBRARIES(
     flusspferd
     ${LIBXML2_LIBRARIES})
 
+## Plugins #################################################################
+
+ADD_LIBRARY(
+    os
+    MODULE
+    src/plugins/os/os.cpp)
+
+TARGET_LINK_LIBRARIES(
+    os
+    flusspferd)
+
 ## Install ##################################################################
 
 install(
