@@ -154,7 +154,7 @@ ADD_DEFINITIONS(${SPIDERMONKEY_DEFINITIONS})
 
 ## libedit ##################################################################
 
-PKG_CHECK_MODULES(LIBEDIT libedit)
+FIND_PACKAGE(Libedit)
 
 IF(LIBEDIT_FOUND)
     ADD_DEFINITIONS(-DHAVE_EDITLINE)
