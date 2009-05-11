@@ -1,0 +1,82 @@
+# vim:ts=4:sw=4:expandtab:autoindent:
+#
+# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+IF(SPIDERMONKEY_INCLUDE_DIR AND SPIDERMONKEY_LIBRARIES)
+    SET(Spidermonkey_FIND_QUIETLY TRUE)
+ENDIF()
+
+SET(
+    SPIDERMONKEY_DEFINITIONS
+    -DXP_UNIX -DJS_C_STRINGS_ARE_UTF8
+    CACHE STRING "Spidermonkey definitions")
+
+FIND_PATH(SPIDERMONKEY_INCLUDE_DIR js/jsapi.h)
+
+FIND_LIBRARY(
+    SPIDERMONKEY_LIBRARY
+    NAMES js mozjs js32
+    DOC "Spidermonkey library")
+
+SET(SPIDERMONKEY_LIBRARIES ${SPIDERMONKEY_LIBRARY})
+
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(
+    Spidermonkey
+    DEFAULT_MSG
+    SPIDERMONKEY_LIBRARIES
+    SPIDERMONKEY_INCLUDE_DIR)
+
+IF(SPIDERMONKEY_FOUND)
+
+    SET(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
+    SET(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
+    CHECK_CXX_SOURCE_RUNS(
+        "#include <js/jsapi.h>
+         #include <stdio.h>
+         #include <stdlib.h>
+         int main() {
+             return ((void*) JS_BeginRequest) ? EXIT_SUCCESS : EXIT_FAILURE;
+         }"
+        SPIDERMONKEY_THREADSAFE)
+
+    IF(SPIDERMONKEY_THREADSAFE)
+        SET(
+            SPIDERMONKEY_DEFINITIONS
+            ${SPIDERMONKEY_DEFINITIONS} -DJS_THREADSAFE)
+    ENDIF()
+
+    SET(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
+    SET(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
+    CHECK_CXX_SOURCE_RUNS(
+        "#include <js/jsapi.h>
+         int main() {
+         #if JS_VERSION >= 180
+           // JS 1.8 allows this to be set at runtime
+           return 0;
+         # else
+           return JS_CStringsAreUTF8() ? 0 : 1;
+         #endif
+         }"
+        SPIDERMONKEY_UTF8)
+
+ENDIF()

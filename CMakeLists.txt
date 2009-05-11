@@ -132,48 +132,14 @@ CHECK_CXX_SOURCE_RUNS(
 
 ## Spidermonkey #############################################################
 
-SET(SPIDERMONKEY_INCLUDE CACHE PATH "Spidermonkey include directory")
+FIND_PACKAGE(Spidermonkey)
 
-INCLUDE_DIRECTORIES(${SPIDERMONKEY_INCLUDE})
-
-SET(SPIDERMONKEY_DEFINITIONS -DXP_UNIX -DJS_C_STRINGS_ARE_UTF8)
-
-FIND_LIBRARY(
-    SPIDERMONKEY_LIBRARY
-    NAMES js mozjs js32
-    DOC "Spidermonkey library")
-
-SET(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
-SET(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
-CHECK_CXX_SOURCE_RUNS(
-    "#include <js/jsapi.h>
-     #include <stdio.h>
-     #include <stdlib.h>
-     int main() {
-         return ((void*) JS_BeginRequest) ? EXIT_SUCCESS : EXIT_FAILURE;
-     }"
-    FLUSSPFERD_HAVE_SPIDERMONKEY_THREADSAFE)
-
-IF(FLUSSPFERD_HAVE_SPIDERMONKEY_THREADSAFE)
-    SET(SPIDERMONKEY_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS} -DJS_THREADSAFE)
+IF(NOT SPIDERMONKEY_FOUND)
+    MESSAGE(FATAL_ERROR "Spidermonkey required but not found")
 ENDIF()
 
-SET(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
-SET(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
-CHECK_CXX_SOURCE_RUNS(
-    "#include <js/jsapi.h>
-     int main() {
-     #if JS_VERSION >= 180
-       // JS 1.8 allows this to be set at runtime
-       return 0;
-     # else
-       return JS_CStringsAreUTF8() ? 0 : 1;
-     #endif
-     }"
-    FLUSSPFERD_HAVE_SPIDERMONKEY_C_STRINGS_ARE_UTF8)
-
-IF(NOT FLUSSPFERD_HAVE_SPIDERMONKEY_C_STRINGS_ARE_UTF8)
-    MESSAGE(FATAL_ERROR "Spidermonkey with UTF-8 support required!")
+IF(NOT SPIDERMONKEY_UTF8)
+    MESSAGE(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
 ENDIF()
 
 ADD_DEFINITIONS(${SPIDERMONKEY_DEFINITIONS})
@@ -209,7 +175,7 @@ ADD_LIBRARY(
 TARGET_LINK_LIBRARIES(
     flusspferd
     ${DL_LIBRARY}
-    ${SPIDERMONKEY_LIBRARY}
+    ${SPIDERMONKEY_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY})
