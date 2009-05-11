@@ -211,11 +211,11 @@ INSTALL(TARGETS
 
 IF(ENABLE_TESTS)
 
-    FILE(
-        GLOB
-        flusspferd_coverage_extra_sources
-        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
-        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
+#    FILE(
+#        GLOB
+#        flusspferd_coverage_extra_sources
+#        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
+#        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
 
     ADD_LIBRARY(
         flusspferd-coverage
@@ -257,6 +257,30 @@ TARGET_LINK_LIBRARIES(
 INSTALL(TARGETS
     flusspferd-shell
     RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
+
+## Tests ###################################################################
+
+IF(ENABLE_TESTS)
+
+    FILE(GLOB
+        TESTS
+        test/test_*.cpp)
+
+    FOREACH(TEST_SOURCE ${TESTS})
+        STRING(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
+        STRING(REGEX REPLACE "^test_" "" TEST_NAME TEST_OUTPUT)
+        ADD_EXECUTABLE(${TEST_OUTPUT} ${TEST_SOURCE})
+        SET_PROPERTY(
+            TARGET ${TEST_OUTPUT}
+            PROPERTY COMPILE_FLAGS
+            "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MODULE=${TEST_NAME}")
+        TARGET_LINK_LIBRARIES(
+            ${TEST_OUTPUT}
+            ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+            flusspferd-coverage)
+    ENDFOREACH()
+
+ENDIF()
 
 ## IO ######################################################################
 
