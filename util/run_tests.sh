@@ -34,12 +34,12 @@ LCOV_MODE=-z ./util/lcov.sh
 
 echo "PROGRESS: Running tests" 1>&2
 
-for prog in ./build/default/test/test_*
+for prog in ./build/bin/test_*
 do
   if [ -x $prog ]
   then
     echo "Testing '$prog'" 1>&2
-    ./util/start.sh $prog 2>&1
+    $prog 2>&1
   fi
 done
 
