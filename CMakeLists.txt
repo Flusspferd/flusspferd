@@ -54,7 +54,7 @@ INCLUDE (CheckCXXSourceCompiles)
 INCLUDE (CheckCXXSourceRuns)
 INCLUDE (FindPkgConfig)
 
-## Compiler options ###
+## Compiler options #########################################################
 
 IF (CMAKE_COMPILER_IS_GNUCXX)
     OPTION (ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
