@@ -37,8 +37,10 @@ SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 SET (INSTALL_EXECUTABLES_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET (INSTALL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+SET (INSTALL_LIBDATA_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd)
 SET (INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
 SET (INSTALL_HEADERS_PATH ${CMAKE_INSTALL_PREFIX}/include)
+SET (INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc)
 
 EXECUTE_PROCESS(
     COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
@@ -241,6 +243,10 @@ INSTALL(TARGETS
     flusspferd-io
     LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
+INSTALL(TARGETS
+    flusspferd-io
+    LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+
 ## XML ######################################################################
 
 FILE(
@@ -261,6 +267,10 @@ TARGET_LINK_LIBRARIES(
 INSTALL(TARGETS
     flusspferd-xml
     LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+
+INSTALL(TARGETS
+    flusspferd-xml
+    LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
 ## Plugins #################################################################
 
@@ -312,6 +322,29 @@ FOREACH(PLUGIN ${PLUGINS})
         ${PLUGIN}_PLUGIN
         LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
+    FILE(GLOB
+        ${PLUGIN}_JS_FILES
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
+
+    IF(${PLUGIN}_JS_FILES)
+        INSTALL(FILES
+            ${${PLUGIN}_JS_FILES}
+            DESTINATION ${INSTALL_MODULES_PATH})
+    ENDIF()
+
+ENDFOREACH()
+
+SET(JS_PLUGINS
+    Util Util/Array Util/Function Util/Range TestHarness HTTP/Headers)
+
+FOREACH(JS_PLUGIN ${JS_PLUGINS})
+
+    STRING(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
+
+    INSTALL(FILES
+        src/js/${JS_PLUGIN}.js
+        DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
+
 ENDFOREACH()
 
 ## Headers ##################################################################
@@ -320,3 +353,19 @@ INSTALL(
     DIRECTORY include/
     DESTINATION ${INSTALL_HEADERS_PATH}
     FILES_MATCHING PATTERN "*.hpp")
+
+## Prelude ##################################################################
+
+INSTALL(
+    FILES src/js/prelude.js
+    DESTINATION ${INSTALL_LIBDATA_PATH})
+
+## jsrepl.js ################################################################
+
+CONFIGURE_FILE(
+    ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
+    ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
+
+INSTALL(
+    FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
+    DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
