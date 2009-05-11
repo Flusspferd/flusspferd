@@ -151,13 +151,17 @@ IF(LIBEDIT_FOUND)
     ADD_DEFINITIONS(-DHAVE_EDITLINE)
 ENDIF()
 
-## libxml2 #################################################################
+## libxml2 ##################################################################
 
 PKG_CHECK_MODULES(LIBXML2 libxml-2.0>=2.6.0)
 
 IF(LIBXML2_FOUND)
     ADD_DEFINITIONS(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
 ENDIF()
+
+## sqlite3 ##################################################################
+
+PKG_CHECK_MODULES(SQLITE3 sqlite3>=3.4.0)
 
 ## Library ##################################################################
 
@@ -230,20 +234,36 @@ TARGET_LINK_LIBRARIES(
 
 ## Plugins #################################################################
 
-FOREACH(PLUGIN os posix environment)
+SET(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
+SET(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
+
+FOREACH(PLUGIN os posix environment sqlite3)
 
 FILE(GLOB
     ${PLUGIN}_sources
     ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
 
-ADD_LIBRARY(${PLUGIN} MODULE ${${PLUGIN}_sources})
+ADD_LIBRARY(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
 
 SET_PROPERTY(
-    TARGET ${PLUGIN}
+    TARGET ${PLUGIN}_PLUGIN
+    PROPERTY OUTPUT_NAME
+    ${PLUGIN})
+
+SET_PROPERTY(
+    TARGET ${PLUGIN}_PLUGIN
     PROPERTY LIBRARY_OUTPUT_DIRECTORY
     ${Flusspferd_BINARY_DIR}/modules)
 
-TARGET_LINK_LIBRARIES(${PLUGIN} flusspferd)
+SET_PROPERTY(
+    TARGET ${PLUGIN}_PLUGIN
+    PROPERTY DEFINITIONS
+    ${${PLUGIN}_DEFINITIONS})
+
+TARGET_LINK_LIBRARIES(
+    ${PLUGIN}_PLUGIN
+    flusspferd
+    ${${PLUGIN}_LIBRARIES})
 
 ENDFOREACH()
 
