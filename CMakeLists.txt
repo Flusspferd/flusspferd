@@ -230,7 +230,7 @@ TARGET_LINK_LIBRARIES(
 
 ## Plugins #################################################################
 
-FOREACH(PLUGIN os posix)
+FOREACH(PLUGIN os posix environment)
 
 FILE(GLOB
     ${PLUGIN}_sources
