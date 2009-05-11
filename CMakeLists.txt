@@ -63,6 +63,8 @@ INCLUDE (FindPkgConfig)
 
 ## Compiler options #########################################################
 
+SET (ENABLE_TESTS ON CACHE BOOL "Compile the test suite")
+
 IF (CMAKE_COMPILER_IS_GNUCXX)
     OPTION (ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
@@ -191,17 +193,50 @@ ADD_LIBRARY(
     SHARED
     ${flusspferd_library_sources})
 
-TARGET_LINK_LIBRARIES(
-    flusspferd
+SET(
+    flusspferd_LIBS
     ${DL_LIBRARIES}
     ${SPIDERMONKEY_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY})
 
+TARGET_LINK_LIBRARIES(flusspferd ${flusspferd_LIBS})
+
 INSTALL(TARGETS
     flusspferd
     LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+
+## Library - coverage variant ###############################################
+
+IF(ENABLE_TESTS)
+
+    FILE(
+        GLOB
+        flusspferd_coverage_extra_sources
+        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
+        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
+
+    ADD_LIBRARY(
+        flusspferd-coverage
+        SHARED
+        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
+
+    TARGET_LINK_LIBRARIES(flusspferd-coverage ${flusspferd_LIBS})
+
+    SET(COV_FLAGS "-fprofile-arcs -ftest-coverage")
+
+    SET_PROPERTY(
+        TARGET flusspferd-coverage
+        PROPERTY COMPILE_FLAGS
+        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
+
+    SET_PROPERTY(
+        TARGET flusspferd-coverage
+        PROPERTY LINK_FLAGS
+        ${COV_FLAGS})
+
+ENDIF()
 
 ## Programs #################################################################
 
