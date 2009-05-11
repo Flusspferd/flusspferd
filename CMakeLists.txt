@@ -163,9 +163,14 @@ ENDIF()
 
 PKG_CHECK_MODULES(SQLITE3 sqlite3>=3.4.0)
 
-## libcurl #################################################################
+## libcurl ##################################################################
 
 FIND_PACKAGE(CURL)
+
+## GMP ######################################################################
+
+FIND_PACKAGE(GMP REQUIRED)
+FIND_PACKAGE(GMPXX REQUIRED)
 
 ## Library ##################################################################
 
@@ -238,13 +243,16 @@ TARGET_LINK_LIBRARIES(
 
 ## Plugins #################################################################
 
-SET(PLUGINS os posix environment SQLite3 cURL)
+SET(PLUGINS os posix environment SQLite3 cURL gmp)
 
 SET(SQLite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
 SET(SQLite3_LIBRARIES ${SQLITE3_LIBRARIES})
 
 SET(cURL_LIBRARIES ${CURL_LIBRARIES})
 SET(cURL_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR})
+
+SET(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
+SET(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
 
 FOREACH(PLUGIN ${PLUGINS})
 
