@@ -131,11 +131,8 @@ CHECK_CXX_SOURCE_RUNS(
 
 ## Spidermonkey #############################################################
 
+SET(Spidermonkey_REQUIRED TRUE)
 FIND_PACKAGE(Spidermonkey)
-
-IF(NOT SPIDERMONKEY_FOUND)
-    MESSAGE(FATAL_ERROR "Spidermonkey required but not found")
-ENDIF()
 
 IF(NOT SPIDERMONKEY_UTF8)
     MESSAGE(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
