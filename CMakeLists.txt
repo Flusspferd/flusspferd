@@ -86,10 +86,9 @@ INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
 
 ## libdl ####################################################################
 
-FIND_LIBRARY(
-    DL_LIBRARY
-    NAMES dl
-    DOC "libdl library")
+SET(DL_REQUIRED TRUE)
+FIND_PACKAGE(DL)
+INCLUDE_DIRECTORIES(${DL_INCLUDE_DIR})
 
 ## Boost ####################################################################
 
@@ -174,7 +173,7 @@ ADD_LIBRARY(
 
 TARGET_LINK_LIBRARIES(
     flusspferd
-    ${DL_LIBRARY}
+    ${DL_LIBRARIES}
     ${SPIDERMONKEY_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
