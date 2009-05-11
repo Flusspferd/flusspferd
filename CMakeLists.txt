@@ -37,6 +37,7 @@ SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 SET (INSTALL_EXECUTABLES_PATH ${CMAKE_INSTALL_PREFIX}/bin)
 SET (INSTALL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+SET (INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
 
 EXECUTE_PROCESS(
     COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
@@ -235,6 +236,10 @@ TARGET_LINK_LIBRARIES(
     flusspferd-io
     flusspferd)
 
+INSTALL(TARGETS
+    flusspferd-io
+    LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+
 ## XML ######################################################################
 
 FILE(
@@ -251,6 +256,10 @@ TARGET_LINK_LIBRARIES(
     flusspferd-xml
     flusspferd
     ${LIBXML2_LIBRARIES})
+
+INSTALL(TARGETS
+    flusspferd-xml
+    LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
 ## Plugins #################################################################
 
@@ -297,5 +306,9 @@ FOREACH(PLUGIN ${PLUGINS})
         ${PLUGIN}_PLUGIN
         flusspferd
         ${${PLUGIN}_LIBRARIES})
+
+    INSTALL(TARGETS
+        ${PLUGIN}_PLUGIN
+        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
 ENDFOREACH()
