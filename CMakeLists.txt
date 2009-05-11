@@ -230,11 +230,22 @@ TARGET_LINK_LIBRARIES(
 
 ## Plugins #################################################################
 
-ADD_LIBRARY(os MODULE src/plugins/os/os.cpp)
-TARGET_LINK_LIBRARIES(os flusspferd)
+FOREACH(PLUGIN os posix)
 
-ADD_LIBRARY(posix MODULE src/plugins/posix/posix.cpp)
-TARGET_LINK_LIBRARIES(posix flusspferd)
+FILE(GLOB
+    ${PLUGIN}_sources
+    ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
+
+ADD_LIBRARY(${PLUGIN} MODULE ${${PLUGIN}_sources})
+
+SET_PROPERTY(
+    TARGET ${PLUGIN}
+    PROPERTY LIBRARY_OUTPUT_DIRECTORY
+    ${Flusspferd_BINARY_DIR}/modules)
+
+TARGET_LINK_LIBRARIES(${PLUGIN} flusspferd)
+
+ENDFOREACH()
 
 ## Install ##################################################################
 
