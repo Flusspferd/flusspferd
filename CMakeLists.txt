@@ -249,28 +249,32 @@ INSTALL(TARGETS
 
 ## XML ######################################################################
 
-FILE(
-    GLOB
-    flusspferd_xml_sources
-    ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
+IF(LIBXML2_FOUND)
 
-ADD_LIBRARY(
-    flusspferd-xml
-    SHARED
-    ${flusspferd_xml_sources})
+    FILE(
+        GLOB
+        flusspferd_xml_sources
+        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
 
-TARGET_LINK_LIBRARIES(
-    flusspferd-xml
-    flusspferd
-    ${LIBXML2_LIBRARIES})
+    ADD_LIBRARY(
+        flusspferd-xml
+        SHARED
+        ${flusspferd_xml_sources})
 
-INSTALL(TARGETS
-    flusspferd-xml
-    LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+    TARGET_LINK_LIBRARIES(
+        flusspferd-xml
+        flusspferd
+        ${LIBXML2_LIBRARIES})
 
-INSTALL(TARGETS
-    flusspferd-xml
-    LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+    INSTALL(TARGETS
+        flusspferd-xml
+        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+
+    INSTALL(TARGETS
+        flusspferd-xml
+        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+
+ENDIF()
 
 ## Plugins #################################################################
 
