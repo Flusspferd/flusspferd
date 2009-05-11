@@ -138,6 +138,7 @@ IF(NOT SPIDERMONKEY_UTF8)
     MESSAGE(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
 ENDIF()
 
+INCLUDE_DIRECTORIES(${SPIDERMONKEY_INCLUDE_DIR})
 ADD_DEFINITIONS(${SPIDERMONKEY_DEFINITIONS})
 
 ## libedit ##################################################################
