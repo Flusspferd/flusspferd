@@ -29,7 +29,7 @@ require.paths.push(
   'src/plugins/posix',
   'src/plugins/os',
   'src/plugins/gmp',
-  'build/lib'
+  'build/modules'
 );
 
 require.alias['XML'] = 'flusspferd-xml'
