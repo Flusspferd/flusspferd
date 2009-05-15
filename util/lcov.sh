@@ -26,5 +26,5 @@ lcov ${LCOV_MODE:="-c"} -b ./build -d ./build -q -o ./build/coverage.info
 
 if [ "$LCOV_MODE" = "-z" ]
 then
-  find ./build -name '*.gcda' -exec rm {} \+
+    find ./build -name '*.gcda' -print0|xargs -0 rm -f
 fi
