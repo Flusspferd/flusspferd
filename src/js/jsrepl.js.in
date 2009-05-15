@@ -21,6 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths = ['.', '@PREFIX@/lib/flusspferd/modules'];
+require.paths = ['.', '@INSTALL_MODULES_PATH@'];
 
-prelude = '@PREFIX@/lib/flusspferd/prelude.js';
+require.alias['XML'] = 'flusspferd-xml'
+require.alias['IO'] = 'flusspferd-io'
+
+prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';

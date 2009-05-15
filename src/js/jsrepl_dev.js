@@ -24,13 +24,13 @@ THE SOFTWARE.
 // Set default paths to the plugin dirs
 require.paths.push(
   'src/js',
-  'src/plugins/sqlite3', 'build/default/src/plugins/sqlite3',
-  'src/plugins/curl', 'build/default/src/plugins/curl',
-  'src/plugins/posix', 'build/default/src/plugins/posix',
-  'src/plugins/os', 'build/default/src/plugins/os',
-  'src/plugins/gmp', 'build/default/src/plugins/gmp',
-  'build/default/src/plugins/environment',
-  'build/default/src'
+  'src/plugins/sqlite3',
+  'src/plugins/curl',
+  'src/plugins/posix',
+  'src/plugins/os',
+  'src/plugins/gmp',
+  'build/modules',
+  'build/lib'
 );
 
 require.alias['XML'] = 'flusspferd-xml'

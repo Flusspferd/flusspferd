@@ -39,8 +39,6 @@ THE SOFTWARE.
 #endif
 #endif
 
-#include "config.h"
-
 namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
 

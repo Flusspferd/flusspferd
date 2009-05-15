@@ -22,7 +22,6 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/version.hpp"
-#include "config.h"
 
 std::string flusspferd::version() {
   return FLUSSPFERD_VERSION;

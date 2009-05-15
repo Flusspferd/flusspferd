@@ -50,12 +50,6 @@ THE SOFTWARE.
 #define DIRSEP2 '\0'
 #define SHLIBPREFIX "lib"
 
-#ifdef APPLE
-#define SHLIBSUFFIX ".dylib"
-#else
-#define SHLIBSUFFIX ".so"
-#endif
-
 using namespace flusspferd;
 
 namespace algo = boost::algorithm;
@@ -198,7 +192,7 @@ void require(call_context &x) {
     }
 
     std::string so_name, js_name;
-    so_name = "/" + process_name(key, "", SHLIBPREFIX, SHLIBSUFFIX, DIRSEP1);
+    so_name = "/" + process_name(key, "", SHLIBPREFIX, FLUSSPFERD_MODULE_SUFFIX, DIRSEP1);
     js_name = "/" + process_name(key, "", "", ".js", DIRSEP1);
 
     for (size_t i = 0; i < len; i++) {

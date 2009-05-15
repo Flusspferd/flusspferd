@@ -1,6 +1,6 @@
-# vim:ts=4:sw=4:expandtab:autoindent:filetype=python:
+# vim:ts=4:sw=4:expandtab:autoindent:
 #
-# Copyright (c) 2008 Ash Berlin
+# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,21 @@
 # THE SOFTWARE.
 #
 
-libtype = 'shlib'
+IF(LIBEDIT_INCLUDE_DIR)
+  SET(Libedit_FIND_QUIETLY TRUE)
+ENDIF()
 
-obj = bld.new_task_gen('cxx', libtype)
-obj.source = ['curl_plugin.cpp']
-obj.includes = ['../../../include', '.']
-obj.uselib_local = 'flusspferd'
-obj.uselib = 'JS_H CURL'
-obj.target = 'cURL'
-obj.install_path = '${PREFIX}/lib/flusspferd/modules'
+FIND_PATH(LIBEDIT_INCLUDE_DIR editline/readline.h)
 
-bld.install_files('${PREFIX}/lib/flusspferd/modules', 'cURL.js');
+FIND_LIBRARY(LIBEDIT_LIBRARY NAMES edit)
 
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Libedit DEFAULT_MSG LIBEDIT_LIBRARY LIBEDIT_INCLUDE_DIR)
+
+IF(LIBEDIT_FOUND)
+  SET( LIBEDIT_LIBRARIES ${LIBEDIT_LIBRARY} )
+ELSE(LIBEDIT_FOUND)
+  SET( LIBEDIT_LIBRARIES )
+ENDIF(LIBEDIT_FOUND)
+
+MARK_AS_ADVANCED( LIBEDIT_LIBRARY LIBEDIT_INCLUDE_DIR )

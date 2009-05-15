@@ -1,6 +1,5 @@
 #!/bin/sh
 
-VF=FLUSSPFERD-VERSION-FILE
 DEF_VER=dev
 
 LF='
@@ -28,14 +27,4 @@ fi
 
 VN=`expr "$VN" : v*'\(.*\)'`
 
-if test -r $VF
-then
-	VC=`sed -e 's/^FLUSSPFERD_VERSION = //' <$VF`
-else
-	VC=unset
-fi
-test "$VN" = "$VC" || {
-	echo >&2 "FLUSSPFERD_VERSION = $VN"
-	echo "FLUSSPFERD_VERSION = $VN" >$VF
-}
-
+echo "$VN"
