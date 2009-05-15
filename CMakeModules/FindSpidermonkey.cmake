@@ -60,11 +60,9 @@ IF(SPIDERMONKEY_FOUND)
     SET(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
     SET(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
     CHECK_CXX_SOURCE_RUNS(
-        "#include <js/jsapi.h>
-         #include <stdio.h>
-         #include <stdlib.h>
+        "extern \"C\" void js_GetCurrentThread();
          int main() {
-             return ((void*) JS_BeginRequest) ? EXIT_SUCCESS : EXIT_FAILURE;
+             return ((void*)js_GetCurrentThread) != 0 ? 0 : 1;
          }"
         SPIDERMONKEY_THREADSAFE)
 
