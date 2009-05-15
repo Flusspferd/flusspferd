@@ -661,12 +661,18 @@ ELSE (_boost_IN_CACHE)
   # ------------------------------------------------------------------------
   
   SET(_boost_LIBRARIES_SEARCH_DIRS
-    C:/boost/lib
-    C:/boost
-    "$ENV{ProgramFiles}/boost/boost_${Boost_MAJOR_VERSION}_${Boost_MINOR_VERSION}_${Boost_SUBMINOR_VERSION}/lib"
-    "$ENV{ProgramFiles}/boost"
+    /usr/local/lib
+    /usr/lib
     /sw/local/lib
   )
+  IF( WIN32 )
+      SET(_boost_LIBRARIES_SEARCH_DIRS
+        C:/boost/lib
+        C:/boost
+        "$ENV{ProgramFiles}/boost/boost_${Boost_MAJOR_VERSION}_${Boost_MINOR_VERSION}_${Boost_SUBMINOR_VERSION}/lib"
+        "$ENV{ProgramFiles}/boost"
+        ${_boost_LIBRARIES_SEARCH_DIRS})
+  ENDIF( WIN32 )
   IF( BOOST_ROOT )
     SET(_boost_LIBRARIES_SEARCH_DIRS 
       ${BOOST_ROOT}/lib 
