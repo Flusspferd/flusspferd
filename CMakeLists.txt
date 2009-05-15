@@ -175,6 +175,7 @@ ENDIF()
 ## sqlite3 ##################################################################
 
 PKG_CHECK_MODULES(SQLITE3 sqlite3>=3.4.0)
+LINK_DIRECTORIES(${SQLITE3_LIBRARY_DIRS})
 
 ## libcurl ##################################################################
 
