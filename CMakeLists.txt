@@ -68,9 +68,9 @@ SET (ENABLE_TESTS ON CACHE BOOL "Compile the test suite")
 IF (CMAKE_COMPILER_IS_GNUCXX)
     OPTION (ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
-    ADD_DEFINITIONS ("-pedantic-errors -Wall -Wextra -Wconversion"
-    "-Wfloat-equal -Wredundant-decls -Wstrict-null-sentinel -Winit-self"
-    "-Woverloaded-virtual -Wnon-virtual-dtor -Wctor-dtor-privacy"
+    ADD_DEFINITIONS ("-pedantic-errors -Wall -Wextra"
+    "-Wredundant-decls -Wstrict-null-sentinel -Winit-self"
+    "-Woverloaded-virtual -Wnon-virtual-dtor"
     "-Wsign-promo -Wstrict-aliasing=1")
 
     IF(ENABLE_DEBUG_WARNINGS)
