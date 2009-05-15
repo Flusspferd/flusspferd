@@ -65,16 +65,7 @@ THE SOFTWARE.
 $ g++ $(pkg-config --cflags --libs flusspferd) myfile.cpp
 @endverbatim
  *
- * If you use <a href="http://code.google.com/p/waf">Waf</a>, you can use
- * Flusspferd by calling check_cfg on the configuration object:
- *
- * @verbatim
-conf.check_cfg(
-               package = 'flusspferd',
-               uselib_store='FLUSSPFERD',
-               args='--cflags --libs',
-               mandatory=1)
-@endverbatim
+ * If you use a build system, you can use its pkg-config integration.
  *
  * Let's go with the simple method of shelling out to @c pkg-config for
  * now. We don't recommend that you use this method for any serious development,

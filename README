@@ -18,7 +18,7 @@ Requirements
 - Linux or Mac OS X or another POSIX system
 - Spidermonkey 1.7+
 - Boost 1.36+
-- Python 2.5+ (for the build system)
+- cmake 2.6+ (Build system)
 
 Optionally:
 - libedit (BSD)
@@ -33,10 +33,14 @@ You can build Flusspferd (thanks to our wrappers) with
 
 $ ./configure && make && sudo make install
 
-as you probably are accustomed to. Alternatively, you can build Flusspferd with
-Waf:
+as you probably are accustomed to. You might have to pass some parameters to
+./configure:
 
-$ ./waf configure && ./waf build && sudo ./waf install
+  -DBOOST_ROOT=/path/to/boost
+  -DSPIDERMONKEY_ROOT=/path/to/spidermonkey
+
+These parameters are passed directly to cmake, i.e. you can also pass other
+parameters that cmake understands.
 
 You can generate the documentation with
 

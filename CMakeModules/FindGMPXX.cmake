@@ -1,6 +1,6 @@
-# vim:ts=4:sw=4:expandtab:autoindent:filetype=python:
+# vim:ts=4:sw=4:expandtab:autoindent:
 #
-# Copyright (c) 2008 Ash Berlin
+# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,21 @@
 # THE SOFTWARE.
 #
 
-libtype = 'shlib'
+IF(GMPXX_INCLUDE_DIR)
+  SET(GMPXX_FIND_QUIETLY TRUE)
+ENDIF()
 
-obj = bld.new_task_gen('cxx', libtype)
-obj.source = ['posix.cpp']
-obj.includes = ['../../../include', '.']
-obj.uselib_local = 'flusspferd'
-obj.uselib = 'JS_H POSIX'
-obj.target = 'posix'
-obj.install_path = '${PREFIX}/lib/flusspferd/modules'
+FIND_PATH(GMPXX_INCLUDE_DIR gmpxx.h)
 
+FIND_LIBRARY(GMPXX_LIBRARY NAMES gmpxx)
+
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(GMPXX DEFAULT_MSG GMPXX_LIBRARY GMPXX_INCLUDE_DIR)
+
+IF(GMPXX_FOUND)
+  SET( GMPXX_LIBRARIES ${GMPXX_LIBRARY} )
+ELSE(GMPXX_FOUND)
+  SET( GMPXX_LIBRARIES )
+ENDIF(GMPXX_FOUND)
+
+MARK_AS_ADVANCED( GMPXX_LIBRARY GMPXX_INCLUDE_DIR )
