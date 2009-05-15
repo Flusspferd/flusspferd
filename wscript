@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-import sys, os, subprocess, re
+import sys, os, re
 import Utils, Options, Scripting
 import TaskGen
 
