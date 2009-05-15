@@ -78,9 +78,11 @@ IF(SPIDERMONKEY_FOUND)
         SET(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
         SET(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
         CHECK_CXX_SOURCE_RUNS(
-            "extern \"C\" void js_GetCurrentThread();
+            "#include <stdio.h>
+             extern \"C\" void js_GetCurrentThread();
              int main() {
-                 return ((void*)js_GetCurrentThread) != 0 ? 0 : 1;
+                 printf(\"%p\", (void*)js_GetCurrentThread);
+                 return (void*)js_GetCurrentThread ? 0 : 1;
              }"
             SPIDERMONKEY_THREADSAFE)
 
