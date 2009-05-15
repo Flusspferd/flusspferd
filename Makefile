@@ -30,3 +30,6 @@ clean:
 
 install:
 	$(MAKE) -C build install
+
+distclean:
+	rm -rf build/
