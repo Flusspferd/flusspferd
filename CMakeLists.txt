@@ -162,6 +162,7 @@ FIND_PACKAGE(Libedit)
 
 IF(LIBEDIT_FOUND)
     ADD_DEFINITIONS(-DHAVE_EDITLINE)
+    INCLUDE_DIRECTORIES(${LIBEDIT_INCLUDE_DIR})
 ENDIF()
 
 ## libxml2 ##################################################################
@@ -170,11 +171,14 @@ PKG_CHECK_MODULES(LIBXML2 libxml-2.0>=2.6.0)
 
 IF(LIBXML2_FOUND)
     ADD_DEFINITIONS(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
+    INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIRS})
+    LINK_DIRECTORIES(${LIBXML2_LIBRARY_DIRS})
 ENDIF()
 
 ## sqlite3 ##################################################################
 
 PKG_CHECK_MODULES(SQLITE3 sqlite3>=3.4.0)
+INCLUDE_DIRECTORIES(${SQLITE3_INCLUDE_DIRS})
 LINK_DIRECTORIES(${SQLITE3_LIBRARY_DIRS})
 
 ## libcurl ##################################################################
