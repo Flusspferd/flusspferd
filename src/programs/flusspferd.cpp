@@ -59,9 +59,11 @@ class flusspferd_repl {
 
   int argc;
   char ** argv;
+
+  enum Type { File, Expression };
   
-  // Returns list of file(s) to execute
-  std::list<std::string> parse_cmdline();
+  // Returns list of files / expressions to execute
+  std::list<std::pair<std::string, Type> > parse_cmdline();
   void load_config();
 
   bool getline(std::string &source, const char* prompt = "> ");
@@ -110,15 +112,21 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 }
 
 int flusspferd_repl::run() {
-  std::list<std::string> files = parse_cmdline();
+  std::list<std::pair<std::string, Type> > files = parse_cmdline();
 
   if (!config_loaded)
     load_config();
 
-  typedef std::list<std::string>::const_iterator iter;
+  typedef std::list<std::pair<std::string, Type> >::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
-    const std::string &file = *i;
-    flusspferd::execute(file.c_str());
+    switch (i->second) {
+    case File:
+      flusspferd::execute(i->first.c_str());
+      break;
+    case Expression:
+      flusspferd::evaluate(i->first, "[command line]", 0);
+      break;
+    }
   }
   
   if (!interactive)
@@ -151,7 +159,7 @@ int flusspferd_repl::run() {
     }
 
     try {
-      flusspferd::value v = flusspferd::evaluate(source, "typein", startline);
+      flusspferd::value v = flusspferd::evaluate(source, "[typein]", startline);
       if (!v.is_undefined())
         std::cout << v << '\n';
     }
@@ -182,6 +190,9 @@ void print_help(char const *argv0) {
 "    -0                       (Interactive) machine command mode (separator\n"
 "                             '\\0').\n"
 "\n"
+"    -e <expr>\n"
+"    --expression <expr>      Evaluate the expression.\n"
+"\n"
 "    -f <file>\n"
 "    --file <file>            Run this file before standard script handling.\n"
 "\n"
@@ -206,12 +217,13 @@ void flusspferd_repl::load_config() {
   }
 }
 
-std::list<std::string> flusspferd_repl::parse_cmdline() {
+std::list<std::pair<std::string, flusspferd_repl::Type> >
+flusspferd_repl::parse_cmdline() {
   bool interactive_set = false;
   flusspferd::array args = flusspferd::create_array();
   co.global().set_property("arguments", args);
 
-  std::list<std::string> files;
+  std::list<std::pair<std::string, Type> > files;
 
   int i=1;
 
@@ -275,7 +287,25 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
           load_config();
         if (!interactive_set)
           interactive = false;
-        files.push_back(file);
+        files.push_back(std::make_pair(file, File));
+      }
+      else if (std::strcmp(argv[i], "-e") == 0 ||
+               std::strcmp(argv[i], "--expression") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected expression after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        std::string file = argv[i];
+        if (!config_loaded)
+          load_config();
+        if (!interactive_set)
+          interactive = false;
+        files.push_back(std::make_pair(file, Expression));
       }
     }
     else
@@ -295,7 +325,7 @@ std::list<std::string> flusspferd_repl::parse_cmdline() {
       interactive = true;
     }
     else {
-      files.push_back(file);
+      files.push_back(std::make_pair(file, File));
     }
 
     int x=0;
