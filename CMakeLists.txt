@@ -445,7 +445,7 @@ INSTALL(
     FILES src/js/prelude.js
     DESTINATION ${INSTALL_LIBDATA_PATH})
 
-## jsrepl.js ################################################################
+## Configured files##########################################################
 
 CONFIGURE_FILE(
     ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
@@ -454,3 +454,12 @@ CONFIGURE_FILE(
 INSTALL(
     FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
     DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
+
+CONFIGURE_FILE(
+    ${Flusspferd_SOURCE_DIR}/flusspferd.pc.in
+    ${Flusspferd_BINARY_DIR}/flusspferd.pc
+    @ONLY)
+
+INSTALL(
+    FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
