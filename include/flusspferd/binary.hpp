@@ -37,7 +37,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "Binary")
   (constructible, 0)
   (methods,
-    ("toByteArray", bind, to_byte_array)))
+    ("toByteArray", bind, to_byte_array)
+    ("toArray", bind, to_array)))
 {
 protected:
   typedef unsigned char element_type;
@@ -52,6 +53,7 @@ protected:
 
 public:
   object to_byte_array();
+  array to_array();
 
 private:
   std::vector<unsigned char> v_data;

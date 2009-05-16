@@ -108,6 +108,14 @@ object binary::to_byte_array() {
   return create_native_object<byte_array>(object(), *this);
 }
 
+array binary::to_array() {
+  std::size_t n = get_length();
+  array a = create_array(n);
+  for (std::size_t i = 0; i < n; ++i)
+    a.set_element(i, v_data[i]);
+  return a;
+}
+
 // -- byte_string -----------------------------------------------------------
 
 byte_string::byte_string(object const &o, call_context &x)
