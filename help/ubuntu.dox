@@ -93,9 +93,8 @@ $ sudo rm -rf /usr/local/include/js/ /usr/local/lib/libjs.*
 $ git clone git://github.com/ruediger/flusspferd.git
 $ cd flusspferd/
 $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-$ ./configure --enable-tests
-$ ./waf
-$ make test
+$ ./configure -DENABLE_TESTS=OFF
+$ make
 $ sudo make install
 @endverbatim
  *
