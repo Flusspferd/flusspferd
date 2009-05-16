@@ -34,6 +34,26 @@ void flusspferd::load_binary_module(object container) {
   load_class<byte_array>(exports);
 }
 
+// -- util ------------------------------------------------------------------
+
+static int get_byte(value byte_) {
+  int byte;
+  if (byte_.is_int()) {
+    byte = byte_.get_int();
+    if (byte < 0 || byte > 255)
+      throw exception("Byte is outside the valid range for bytes");
+    return byte;
+  }
+  object byte_o = byte_.to_object();
+  if (byte_o.is_null())
+    throw exception("Not a valid byte");
+  binary &byte_bin = flusspferd::get_native<binary>(byte_o);
+  if (byte_bin.get_length() != 1)
+    throw exception("Byte must not be a non single-element Binary");
+  byte = byte_bin.get_const_data()[0];
+  return byte;
+}
+
 // -- binary ----------------------------------------------------------------
 
 binary::binary(object const &o, call_context &x)
@@ -114,6 +134,40 @@ array binary::to_array() {
   for (std::size_t i = 0; i < n; ++i)
     a.set_element(i, v_data[i]);
   return a;
+}
+
+int binary::index_of(
+  value byte_, boost::optional<int> start_, boost::optional<int> stop_)
+{
+  int byte = get_byte(byte_);
+  int start = start_.get_value_or(0);
+  if (start < 0)
+    start = 0;
+  int stop = stop_.get_value_or(get_length() - 1);
+  if (std::size_t(stop) >= get_length())
+    stop = get_length() - 1;
+
+  for (; start <= stop; ++start)
+    if (v_data[start] == byte)
+      return start;
+  return -1;
+}
+
+int binary::last_index_of(
+  value byte_, boost::optional<int> start_, boost::optional<int> stop_)
+{
+  int byte = get_byte(byte_);
+  int start = start_.get_value_or(0);
+  if (start < 0)
+    start = 0;
+  int stop = stop_.get_value_or(get_length() - 1);
+  if (std::size_t(stop) >= get_length())
+    stop = get_length() - 1;
+
+  for (; start <= stop; --stop)
+    if (v_data[stop] == byte)
+      return stop;
+  return -1;
 }
 
 // -- byte_string -----------------------------------------------------------
