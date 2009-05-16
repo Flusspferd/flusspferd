@@ -49,6 +49,7 @@ protected:
 
   binary(object const &o, call_context &x);
   binary(object const &o, binary const &o);
+  binary(object const &o, element_type const *p, std::size_t n);
 
   vector_type &get_data();
   std::size_t set_length(std::size_t);
@@ -83,17 +84,20 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (methods, 
     ("toString", bind, to_string)
     ("toByteString", bind, to_byte_string)
-    ("charCodeAt", alias, "byteAt"))
+    ("charCodeAt", alias, "byteAt")
+    ("charAt", bind, char_at))
   (properties,
     ("length", getter, get_length)))
 {
 public:
   byte_string(object const &o, call_context &x);
   byte_string(object const &o, binary const &o);
+  byte_string(object const &o, element_type const *p, std::size_t n);
 
 public:
   std::string to_string();
   object to_byte_string();
+  object char_at(int offset);
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -111,6 +115,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 public:
   byte_array(object const &o, call_context &x);
   byte_array(object const &o, binary const &o);
+  byte_array(object const &o, element_type const *p, std::size_t n);
 
 public:
   std::string to_string();
