@@ -61,6 +61,17 @@ public:
   byte_string(object const &o, call_context &x);
 };
 
+FLUSSPFERD_CLASS_DESCRIPTION(
+  byte_array,
+  (full_name, "binary.ByteArray")
+  (constructor_name, "ByteArray")
+  (constructor_arity, 2)
+  (base, binary))
+{
+public:
+  byte_array(object const &o, call_context &x);
+};
+
 }
 
 #endif
