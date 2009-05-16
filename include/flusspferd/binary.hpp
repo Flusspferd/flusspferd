@@ -35,18 +35,30 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   binary,
   (full_name, "binary.Binary")
   (constructor_name, "Binary")
-  (constructible, 0)
-)
+  (constructible, 0))
 {
 protected:
   typedef unsigned char element_type;
   typedef std::vector<element_type> vector_type;
+
+  binary(object const &, call_context &x);
 
   vector_type &get_data();
   std::size_t get_length() const;
 
 private:
   std::vector<unsigned char> v_data;
+};
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+  byte_string,
+  (full_name, "binary.ByteString")
+  (constructor_name, "ByteString")
+  (constructor_arity, 2)
+  (base, binary))
+{
+public:
+  byte_string(object const &o, call_context &x);
 };
 
 }
