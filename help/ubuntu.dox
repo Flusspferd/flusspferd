@@ -99,16 +99,15 @@ $ sudo make install
 @endverbatim
  *
  * @subsection sqlite Building Flusspferd with SQLite support
- * Support for SQLite is autodetected during configuration (unless
- * @p --disable-sqlite is set). To compile with SQLite support you
- * have to install the SQLite 3's dev-files
+ * Support for SQLite is autodetected during configuration. To compile with
+ * SQLite support you have to install the SQLite 3's dev-files
  * @verbatim
 $ sudo apt-get install libsqlite3-dev
 @endverbatim
  *
  * @subsection xml Building Flusspferd with XML support
- * Support for XML is enabled during configuration time when
- * libxml2's dev-files are available
+ * Support for XML is enabled during configuration time when libxml2's dev-files
+ * are available
  * @verbatim
 $ sudo apt-get install libxml2-dev
 @endverbatim
