@@ -22,6 +22,8 @@ THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
 
+static char const *DEFAULT_ENCODING = "UTF-8";
+
 using namespace flusspferd;
 
 void flusspferd::load_binary_module(object container) {
@@ -39,6 +41,15 @@ binary::binary(object const &o, call_context &x)
   if (data.is_undefined_or_null())
     return;
 
+  if (data.is_number()) {
+    if (!data.is_int())
+      throw exception("Cannot create binary with non-integer size");
+    int i = data.get_int();
+    if (i < 0 || i > 2147483647)
+      throw exception("Cannot create binary with invalid size");
+    v_data.resize(i);
+  }
+
   if (data.is_object()) {
     object o = data.to_object();
 
@@ -50,17 +61,28 @@ binary::binary(object const &o, call_context &x)
       for (std::size_t i = 0; i < n; ++i) {
         value x = a.get_element(i);
         if (!x.is_int())
-          throw exception("Can only instantiate Binary from Array of bytes");
+          throw exception("Can only create Binary from Array of bytes");
         int e = x.get_int();
         if (e < 0 || e > 255)
-          throw exception("Can only instantiate Binary from Array of bytes");
+          throw exception("Can only create Binary from Array of bytes");
         v[i] = e;
       }
     } else {
-      binary &b = flusspferd::get_native<binary>(o);
-      v_data = b.v_data;
+      try {
+        binary &b = flusspferd::get_native<binary>(o);
+        v_data = b.v_data;
+        return;
+      } catch (flusspferd::exception&) {
+      }
     }
   }
+
+  string encoding =
+    x.arg[1].is_undefined_or_null() ? DEFAULT_ENCODING : string(x.arg[1]);
+
+  string text = data.to_string();
+
+  //TODO
 }
 
 binary::vector_type &binary::get_data() {
