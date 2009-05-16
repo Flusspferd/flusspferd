@@ -27,6 +27,40 @@ using namespace flusspferd;
 void flusspferd::load_binary_module(object container) {
   object exports = container.get_property("exports").to_object();
   load_class<binary>(exports);
+  load_class<byte_string>(exports);
+}
+
+// -- binary ----------------------------------------------------------------
+
+binary::binary(object const &o, call_context &x)
+  : base_type(o)
+{
+  value data = x.arg[0];
+  if (data.is_undefined_or_null())
+    return;
+
+  if (data.is_object()) {
+    object o = data.to_object();
+
+    if (o.is_array()) {
+      array a(o);
+      std::size_t n = a.length();
+      vector_type &v = get_data();
+      v.resize(n);
+      for (std::size_t i = 0; i < n; ++i) {
+        value x = a.get_element(i);
+        if (!x.is_int())
+          throw exception("Can only instantiate Binary from Array of bytes");
+        int e = x.get_int();
+        if (e < 0 || e > 255)
+          throw exception("Can only instantiate Binary from Array of bytes");
+        v[i] = e;
+      }
+    } else {
+      binary &b = flusspferd::get_native<binary>(o);
+      v_data = b.v_data;
+    }
+  }
 }
 
 binary::vector_type &binary::get_data() {
@@ -35,4 +69,11 @@ binary::vector_type &binary::get_data() {
 
 std::size_t binary::get_length() const {
   return v_data.size();
+}
+
+// -- byte_string -----------------------------------------------------------
+
+byte_string::byte_string(object const &o, call_context &x)
+  : base_type(o, boost::ref(x))
+{
 }
