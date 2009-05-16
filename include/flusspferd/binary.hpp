@@ -44,7 +44,8 @@ protected:
   binary(object const &, call_context &x);
 
   vector_type &get_data();
-  std::size_t get_length() const;
+  std::size_t get_length();
+  std::size_t set_length(std::size_t);
 
 private:
   std::vector<unsigned char> v_data;
@@ -57,7 +58,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_arity, 2)
   (base, binary)
   (methods, 
-    ("toString", bind, to_string)))
+    ("toString", bind, to_string))
+  (properties,
+    ("length", getter, get_length)))
 {
 public:
   byte_string(object const &o, call_context &x);
@@ -73,7 +76,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_arity, 2)
   (base, binary)
   (methods,
-    ("toString", bind, to_string)))
+    ("toString", bind, to_string))
+  (properties,
+    ("length", getter_setter, (get_length, set_length))))
 {
 public:
   byte_array(object const &o, call_context &x);
