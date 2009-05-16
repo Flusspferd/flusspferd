@@ -38,7 +38,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructible, 0)
   (methods,
     ("toByteArray", bind, to_byte_array)
-    ("toArray", bind, to_array)))
+    ("toArray", bind, to_array)
+    ("indexOf", bind, index_of)
+    ("lastIndexOf", bind, last_index_of)))
 {
 protected:
   typedef unsigned char element_type;
@@ -48,12 +50,22 @@ protected:
   binary(object const &o, binary const &o);
 
   vector_type &get_data();
-  std::size_t get_length();
   std::size_t set_length(std::size_t);
+
+public:
+  std::size_t get_length();
+
+  vector_type const &get_const_data() { return get_data(); }
 
 public:
   object to_byte_array();
   array to_array();
+
+  int index_of(
+    value byte, boost::optional<int> start, boost::optional<int> stop);
+
+  int last_index_of(
+    value byte, boost::optional<int> start, boost::optional<int> stop);
 
 private:
   std::vector<unsigned char> v_data;
