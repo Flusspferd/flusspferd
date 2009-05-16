@@ -40,7 +40,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toByteArray", bind, to_byte_array)
     ("toArray", bind, to_array)
     ("indexOf", bind, index_of)
-    ("lastIndexOf", bind, last_index_of)))
+    ("lastIndexOf", bind, last_index_of)
+    ("byteAt", bind, byte_at)))
 {
 protected:
   typedef unsigned char element_type;
@@ -67,6 +68,8 @@ public:
   int last_index_of(
     value byte, boost::optional<int> start, boost::optional<int> stop);
 
+  int byte_at(int offset);
+
 private:
   std::vector<unsigned char> v_data;
 };
@@ -79,7 +82,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods, 
     ("toString", bind, to_string)
-    ("toByteString", bind, to_byte_string))
+    ("toByteString", bind, to_byte_string)
+    ("charCodeAt", alias, "byteAt"))
   (properties,
     ("length", getter, get_length)))
 {
