@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/array.hpp"
+#include "flusspferd/binary.hpp"
 #include "flusspferd/blob.hpp"
 #include "flusspferd/call_context.hpp"
 #include "flusspferd/class.hpp"
