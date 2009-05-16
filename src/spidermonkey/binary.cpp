@@ -115,10 +115,19 @@ byte_string::byte_string(object const &o, call_context &x)
 {
 }
 
+byte_string::byte_string(object const &o, binary const &b)
+  : base_type(o, b)
+{
+}
+
 std::string byte_string::to_string() {
   std::ostringstream stream;
   stream << "[ByteString " << get_length() << "]";
   return stream.str();
+}
+
+object byte_string::to_byte_string() {
+  return *this;
 }
 
 // -- byte_array ------------------------------------------------------------
@@ -137,4 +146,8 @@ std::string byte_array::to_string() {
   std::ostringstream stream;
   stream << "[ByteArray " << get_length() << "]";
   return stream.str();
+}
+
+object byte_array::to_byte_string() {
+  return create_native_object<byte_string>(object(), *this);
 }

@@ -63,15 +63,18 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods, 
     ("toString", bind, to_string)
-    ("toByteArray", bind, to_byte_array))
+    ("toByteArray", bind, to_byte_array)
+    ("toByteString", bind, to_byte_string))
   (properties,
     ("length", getter, get_length)))
 {
 public:
   byte_string(object const &o, call_context &x);
+  byte_string(object const &o, binary const &o);
 
 public:
   std::string to_string();
+  object to_byte_string();
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -82,7 +85,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods,
     ("toString", bind, to_string)
-    ("toByteArray", bind, to_byte_array))
+    ("toByteArray", bind, to_byte_array)
+    ("toByteString", bind, to_byte_string))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -92,6 +96,7 @@ public:
 
 public:
   std::string to_string();
+  object to_byte_string();
 };
 
 }
