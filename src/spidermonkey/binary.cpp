@@ -111,6 +111,10 @@ binary::binary(object const &o, binary const &b)
   : base_type(o), v_data(b.v_data)
 {}
 
+binary::binary(object const &o, element_type const *p, std::size_t n)
+  : base_type(o), v_data(p, p + n)
+{}
+
 binary::vector_type &binary::get_data() {
   return v_data;
 }
@@ -180,13 +184,15 @@ int binary::byte_at(int offset) {
 
 byte_string::byte_string(object const &o, call_context &x)
   : base_type(o, boost::ref(x))
-{
-}
+{}
 
 byte_string::byte_string(object const &o, binary const &b)
   : base_type(o, b)
-{
-}
+{}
+
+byte_string::byte_string(object const &o, element_type const *p, std::size_t n)
+  : base_type(o, p, n)
+{}
 
 std::string byte_string::to_string() {
   std::ostringstream stream;
@@ -198,17 +204,25 @@ object byte_string::to_byte_string() {
   return *this;
 }
 
+object byte_string::char_at(int offset) {
+  if (offset < 0 || std::size_t(offset) > get_length())
+    throw exception("Offset outside range", "RangeError");
+  return create_native_object<byte_string>(object(), &get_data()[offset], 1);
+}
+
 // -- byte_array ------------------------------------------------------------
 
 byte_array::byte_array(object const &o, call_context &x)
   : base_type(o, boost::ref(x))
-{
-}
+{}
 
 byte_array::byte_array(object const &o, binary const &b)
   : base_type(o, b)
-{
-}
+{}
+
+byte_array::byte_array(object const &o, element_type const *p, std::size_t n)
+  : base_type(o, p, n)
+{}
 
 std::string byte_array::to_string() {
   std::ostringstream stream;
