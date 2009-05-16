@@ -31,4 +31,4 @@ Description: Javascript Bindings for C++
 Version: @FLUSSPFERD_VERSION@
 # Requires:
 Libs: -L${libdir} -lflusspferd
-Cflags: -I${includedir}
+Cflags: -I${includedir} @FLUSSPFERD_EXTERNAL_CFLAGS@
