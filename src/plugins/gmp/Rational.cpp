@@ -5,7 +5,7 @@
 
 using namespace flusspferd;
 
-namespace multi_precission {
+namespace multi_precision {
   Rational::Rational(flusspferd::object const &self, mpq_class const &mp)
     : base_type(self), mp(mp)
   { }

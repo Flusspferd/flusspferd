@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/class_description.hpp"
 #include <gmpxx.h>
 
-namespace multi_precission {
+namespace multi_precision {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
   Integer,
