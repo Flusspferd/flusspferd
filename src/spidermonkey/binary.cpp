@@ -170,6 +170,12 @@ int binary::last_index_of(
   return -1;
 }
 
+int binary::byte_at(int offset) {
+  if (offset < 0 || std::size_t(offset) > get_length())
+    throw exception("Offset outside range", "RangeError");
+  return v_data[offset];
+}
+
 // -- byte_string -----------------------------------------------------------
 
 byte_string::byte_string(object const &o, call_context &x)
