@@ -55,10 +55,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "binary.ByteString")
   (constructor_name, "ByteString")
   (constructor_arity, 2)
-  (base, binary))
+  (base, binary)
+  (methods, 
+    ("toString", bind, to_string)))
 {
 public:
   byte_string(object const &o, call_context &x);
+
+public:
+  std::string to_string();
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -66,10 +71,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "binary.ByteArray")
   (constructor_name, "ByteArray")
   (constructor_arity, 2)
-  (base, binary))
+  (base, binary)
+  (methods,
+    ("toString", bind, to_string)))
 {
 public:
   byte_array(object const &o, call_context &x);
+
+public:
+  std::string to_string();
 };
 
 }

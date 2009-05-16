@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
+#include <sstream>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 
@@ -101,9 +102,21 @@ byte_string::byte_string(object const &o, call_context &x)
 {
 }
 
+std::string byte_string::to_string() {
+  std::ostringstream stream;
+  stream << "[ByteString " << get_length() << "]";
+  return stream.str();
+}
+
 // -- byte_array ------------------------------------------------------------
 
 byte_array::byte_array(object const &o, call_context &x)
   : base_type(o, boost::ref(x))
 {
+}
+
+std::string byte_array::to_string() {
+  std::ostringstream stream;
+  stream << "[ByteArray " << get_length() << "]";
+  return stream.str();
 }
