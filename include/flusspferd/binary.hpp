@@ -35,7 +35,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   binary,
   (full_name, "binary.Binary")
   (constructor_name, "Binary")
-  (constructible, 0))
+  (constructible, 0)
+  (methods,
+    ("toByteArray", bind, to_byte_array)))
 {
 protected:
   typedef unsigned char element_type;
@@ -63,7 +65,6 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods, 
     ("toString", bind, to_string)
-    ("toByteArray", bind, to_byte_array)
     ("toByteString", bind, to_byte_string))
   (properties,
     ("length", getter, get_length)))
@@ -85,7 +86,6 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods,
     ("toString", bind, to_string)
-    ("toByteArray", bind, to_byte_array)
     ("toByteString", bind, to_byte_string))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
