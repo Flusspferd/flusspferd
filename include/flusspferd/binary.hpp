@@ -41,11 +41,15 @@ protected:
   typedef unsigned char element_type;
   typedef std::vector<element_type> vector_type;
 
-  binary(object const &, call_context &x);
+  binary(object const &o, call_context &x);
+  binary(object const &o, binary const &o);
 
   vector_type &get_data();
   std::size_t get_length();
   std::size_t set_length(std::size_t);
+
+public:
+  object to_byte_array();
 
 private:
   std::vector<unsigned char> v_data;
@@ -58,7 +62,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_arity, 2)
   (base, binary)
   (methods, 
-    ("toString", bind, to_string))
+    ("toString", bind, to_string)
+    ("toByteArray", bind, to_byte_array))
   (properties,
     ("length", getter, get_length)))
 {
@@ -76,12 +81,14 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_arity, 2)
   (base, binary)
   (methods,
-    ("toString", bind, to_string))
+    ("toString", bind, to_string)
+    ("toByteArray", bind, to_byte_array))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
 public:
   byte_array(object const &o, call_context &x);
+  byte_array(object const &o, binary const &o);
 
 public:
   std::string to_string();
