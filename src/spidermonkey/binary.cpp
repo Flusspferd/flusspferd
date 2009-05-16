@@ -30,6 +30,7 @@ void flusspferd::load_binary_module(object container) {
   object exports = container.get_property("exports").to_object();
   load_class<binary>(exports);
   load_class<byte_string>(exports);
+  load_class<byte_array>(exports);
 }
 
 // -- binary ----------------------------------------------------------------
@@ -96,6 +97,13 @@ std::size_t binary::get_length() const {
 // -- byte_string -----------------------------------------------------------
 
 byte_string::byte_string(object const &o, call_context &x)
+  : base_type(o, boost::ref(x))
+{
+}
+
+// -- byte_array ------------------------------------------------------------
+
+byte_array::byte_array(object const &o, call_context &x)
   : base_type(o, boost::ref(x))
 {
 }
