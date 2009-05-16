@@ -91,7 +91,12 @@ binary::vector_type &binary::get_data() {
   return v_data;
 }
 
-std::size_t binary::get_length() const {
+std::size_t binary::get_length() {
+  return v_data.size();
+}
+
+std::size_t binary::set_length(std::size_t n) {
+  v_data.resize(n);
   return v_data.size();
 }
 
