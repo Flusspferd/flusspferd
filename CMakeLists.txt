@@ -21,84 +21,84 @@
 # THE SOFTWARE.
 #
 
-PROJECT(Flusspferd CXX)
+project(Flusspferd CXX)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6)
 
-SET (CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
-SET (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
+set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
-IF(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
-    MESSAGE(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
-ENDIF()
+if(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+    message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
+endif()
 
-SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
-SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-SET (INSTALL_EXECUTABLES_PATH ${CMAKE_INSTALL_PREFIX}/bin)
-SET (INSTALL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX}/lib)
-SET (INSTALL_LIBDATA_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd)
-SET (INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
-SET (INSTALL_HEADERS_PATH ${CMAKE_INSTALL_PREFIX}/include)
-SET (INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc)
+set(INSTALL_EXECUTABLES_PATH ${CMAKE_INSTALL_PREFIX}/bin)
+set(INSTALL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX}/lib)
+set(INSTALL_LIBDATA_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd)
+set(INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
+set(INSTALL_HEADERS_PATH ${CMAKE_INSTALL_PREFIX}/include)
+set(INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc)
 
-EXECUTE_PROCESS(
+execute_process(
     COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
     WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
     OUTPUT_VARIABLE FLUSSPFERD_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-ADD_DEFINITIONS("-DFLUSSPFERD_VERSION=\"${FLUSSPFERD_VERSION}\"")
-ADD_DEFINITIONS("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
+add_definitions("-DFLUSSPFERD_VERSION=\"${FLUSSPFERD_VERSION}\"")
+add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
-MESSAGE(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
+message(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
-SET(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
-ADD_DEFINITIONS("-DFLUSSPFERD_MODULE_SUFFIX=\"${CMAKE_SHARED_MODULE_SUFFIX}\"")
+set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+add_definitions("-DFLUSSPFERD_MODULE_SUFFIX=\"${CMAKE_SHARED_MODULE_SUFFIX}\"")
 
 #############################################################################
 
-INCLUDE (CheckIncludeFile)
-INCLUDE (CheckCXXCompilerFlag)
-INCLUDE (CheckCXXSourceCompiles)
-INCLUDE (CheckCXXSourceRuns)
-INCLUDE (FindPkgConfig)
+include(CheckIncludeFile)
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceCompiles)
+include(CheckCXXSourceRuns)
+include(FindPkgConfig)
 
 ## Compiler options #########################################################
 
-SET (ENABLE_TESTS ON CACHE BOOL "Compile the test suite")
+set(ENABLE_TESTS ON CACHE BOOL "Compile the test suite")
 
-IF (CMAKE_COMPILER_IS_GNUCXX)
-    OPTION (ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
+if(CMAKE_COMPILER_IS_GNUCXX)
+    option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
-    ADD_DEFINITIONS ("-pedantic-errors -Wall -Wextra"
+    add_definitions("-pedantic-errors -Wall -Wextra"
     "-Wredundant-decls -Wstrict-null-sentinel -Winit-self"
     "-Woverloaded-virtual -Wnon-virtual-dtor"
     "-Wsign-promo -Wstrict-aliasing=1")
 
-    IF(ENABLE_DEBUG_WARNINGS)
-        ADD_DEFINITIONS("-Wpadded -Weffc++")
-    ENDIF()
+    if(ENABLE_DEBUG_WARNINGS)
+        add_definitions("-Wpadded -Weffc++")
+    endif()
 
-    ADD_DEFINITIONS(-D BOOST_FILESYSTEM_NO_DEPRECATED)
+    add_definitions(-D BOOST_FILESYSTEM_NO_DEPRECATED)
 
-    SET (CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-    SET (CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
-    ADD_DEFINITIONS ("-Wno-long-long -ansi")
+    add_definitions("-Wno-long-long -ansi")
 
-    SET (CMAKE_REQUIRED_FLAGS "")
-ELSEIF (MSVC)
-    ADD_DEFINITIONS ("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4714 /EHa")
-    SET (WINLIBS projects/windows/lib32)
-    SET (WININCLUDES ${CMAKE_SOURCE_DIR}/${WINLIBS})
-ENDIF ()
+    set(CMAKE_REQUIRED_FLAGS "")
+elseif(MSVC)
+    add_definitions("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4714 /EHa")
+    set(WINLIBS projects/windows/lib32)
+    set(WININCLUDES ${CMAKE_SOURCE_DIR}/${WINLIBS})
+endif()
 
-INCLUDE_DIRECTORIES (${Flusspferd_SOURCE_DIR}/include)
+include_directories(${Flusspferd_SOURCE_DIR}/include)
 
 ## POSIX ####################################################################
 
-CHECK_CXX_SOURCE_RUNS(
+check_cxx_source_runs(
     "#include <unistd.h>
      #include <cstdlib>
      int main()
@@ -111,98 +111,98 @@ CHECK_CXX_SOURCE_RUNS(
 
 ## libdl ####################################################################
 
-IF(FLUSSPFERD_HAVE_POSIX)
-    FIND_PACKAGE(DL REQUIRED)
-    INCLUDE_DIRECTORIES(${DL_INCLUDE_DIR})
-ENDIF()
+if(FLUSSPFERD_HAVE_POSIX)
+    find_package(DL REQUIRED)
+    include_directories(${DL_INCLUDE_DIR})
+endif()
 
 ## Boost ####################################################################
 
-SET(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_MULTITHREADED ON)
 
-SET(Boost_FIND_REQUIRED TRUE)
+set(Boost_FIND_REQUIRED TRUE)
 
-FIND_PACKAGE(Boost 1.36.0 COMPONENTS
+find_package(Boost 1.36.0 COMPONENTS
     unit_test_framework
     thread
     filesystem
     system)
 
-IF(Boost_INCLUDE_DIR)
-    INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
-ELSE()
-    MESSAGE(FATAL_ERROR "Boost headers not found. You will have to specify them in your build environment or you can use -DBOOST_ROOT or -DBOOST_INCLUDE_DIR to tell cmake where your boost installation is.")
-ENDIF()
+if(Boost_INCLUDE_DIR)
+    include_directories(${Boost_INCLUDE_DIR})
+else()
+    message(FATAL_ERROR "Boost headers not found. You will have to specify them in your build environment or you can use -DBOOST_ROOT or -DBOOST_INCLUDE_DIR to tell cmake where your boost installation is.")
+endif()
 
-IF(Boost_LIBRARY_DIRS)
-    LINK_DIRECTORIES(${Boost_LIBRARY_DIRS})
-ELSE()
-    MESSAGE(FATAL_ERROR "Boost libraries not found. Please set -DBOOST_ROOT or -DBOOST_LIBRARY_DIR manually.")
-ENDIF()
+if(Boost_LIBRARY_DIRS)
+    link_directories(${Boost_LIBRARY_DIRS})
+else()
+    message(FATAL_ERROR "Boost libraries not found. Please set -DBOOST_ROOT or -DBOOST_LIBRARY_DIR manually.")
+endif()
 
-IF(NOT Boost_FOUND)
-    MESSAGE(STATUS "Boost not found!")
-ENDIF()
+if(NOT Boost_FOUND)
+    message(STATUS "Boost not found!")
+endif()
 
 ## Spidermonkey #############################################################
 
-SET(Spidermonkey_REQUIRED TRUE)
-FIND_PACKAGE(Spidermonkey)
+set(Spidermonkey_REQUIRED TRUE)
+find_package(Spidermonkey)
 
-IF(NOT SPIDERMONKEY_UTF8)
-    MESSAGE(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
-ENDIF()
+if(NOT SPIDERMONKEY_UTF8)
+    message(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
+endif()
 
-INCLUDE_DIRECTORIES(${SPIDERMONKEY_INCLUDE_DIR})
-ADD_DEFINITIONS(${SPIDERMONKEY_DEFINITIONS})
+include_directories(${SPIDERMONKEY_INCLUDE_DIR})
+add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
 ## libedit ##################################################################
 
-FIND_PACKAGE(Libedit)
+find_package(Libedit)
 
-IF(LIBEDIT_FOUND)
-    ADD_DEFINITIONS(-DHAVE_EDITLINE)
-    INCLUDE_DIRECTORIES(${LIBEDIT_INCLUDE_DIR})
-ENDIF()
+if(LIBEDIT_FOUND)
+    add_definitions(-DHAVE_EDITLINE)
+    include_directories(${LIBEDIT_INCLUDE_DIR})
+endif()
 
 ## libxml2 ##################################################################
 
-PKG_CHECK_MODULES(LIBXML2 libxml-2.0>=2.6.0)
+pkg_check_modules(LIBXML2 libxml-2.0>=2.6.0)
 
-IF(LIBXML2_FOUND)
-    ADD_DEFINITIONS(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
-    INCLUDE_DIRECTORIES(${LIBXML2_INCLUDE_DIRS})
-    LINK_DIRECTORIES(${LIBXML2_LIBRARY_DIRS})
-ENDIF()
+if(LIBXML2_FOUND)
+    add_definitions(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
+    include_directories(${LIBXML2_INCLUDE_DIRS})
+    link_directories(${LIBXML2_LIBRARY_DIRS})
+endif()
 
 ## sqlite3 ##################################################################
 
-PKG_CHECK_MODULES(SQLITE3 sqlite3>=3.4.0)
-INCLUDE_DIRECTORIES(${SQLITE3_INCLUDE_DIRS})
-LINK_DIRECTORIES(${SQLITE3_LIBRARY_DIRS})
+pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
+include_directories(${SQLITE3_INCLUDE_DIRS})
+link_directories(${SQLITE3_LIBRARY_DIRS})
 
 ## libcurl ##################################################################
 
-FIND_PACKAGE(CURL)
+find_package(CURL)
 
 ## GMP ######################################################################
 
-FIND_PACKAGE(GMP)
-FIND_PACKAGE(GMPXX)
+find_package(GMP)
+find_package(GMPXX)
 
 ## Library ##################################################################
 
-FILE(
+file(
     GLOB
     flusspferd_library_sources
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp)
 
-ADD_LIBRARY(
+add_library(
     flusspferd
     SHARED
     ${flusspferd_library_sources})
 
-SET(
+set(
     flusspferd_LIBS
     ${DL_LIBRARIES}
     ${SPIDERMONKEY_LIBRARIES}
@@ -210,263 +210,263 @@ SET(
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY})
 
-TARGET_LINK_LIBRARIES(flusspferd ${flusspferd_LIBS})
+target_link_libraries(flusspferd ${flusspferd_LIBS})
 
-INSTALL(TARGETS
+install(TARGETS
     flusspferd
     LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
 ## Library - coverage variant ###############################################
 
-IF(ENABLE_TESTS)
+if(ENABLE_TESTS)
 
-#    FILE(
+#    file(
 #        GLOB
 #        flusspferd_coverage_extra_sources
 #        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
 #        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
 
-    ADD_LIBRARY(
+    add_library(
         flusspferd-coverage
         SHARED
         ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
 
-    TARGET_LINK_LIBRARIES(flusspferd-coverage ${flusspferd_LIBS})
+    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
 
-    SET(COV_FLAGS "-fprofile-arcs -ftest-coverage")
+    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
 
-    SET_PROPERTY(
+    set_property(
         TARGET flusspferd-coverage
         PROPERTY COMPILE_FLAGS
         "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
 
-    SET_PROPERTY(
+    set_property(
         TARGET flusspferd-coverage
         PROPERTY LINK_FLAGS
         ${COV_FLAGS})
 
-ENDIF()
+endif()
 
 ## Programs #################################################################
 
-ADD_EXECUTABLE(
+add_executable(
     flusspferd-shell
     src/programs/flusspferd.cpp)
 
-SET_PROPERTY(
+set_property(
     TARGET flusspferd-shell
     PROPERTY OUTPUT_NAME
     flusspferd)
 
-TARGET_LINK_LIBRARIES(
+target_link_libraries(
     flusspferd-shell
     flusspferd
     ${LIBEDIT_LIBRARIES})
 
-INSTALL(TARGETS
+install(TARGETS
     flusspferd-shell
     RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 
 ## Tests ###################################################################
 
-IF(ENABLE_TESTS)
+if(ENABLE_TESTS)
 
-    FILE(GLOB
+    file(GLOB
         TESTS
         test/test_*.cpp)
 
-    FOREACH(TEST_SOURCE ${TESTS})
-        STRING(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
-        STRING(REGEX REPLACE "^test_" "" TEST_NAME TEST_OUTPUT)
-        ADD_EXECUTABLE(${TEST_OUTPUT} ${TEST_SOURCE})
-        SET_PROPERTY(
+    foreach(TEST_SOURCE ${TESTS})
+        string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
+        string(REGEX REPLACE "^test_" "" TEST_NAME TEST_OUTPUT)
+        add_executable(${TEST_OUTPUT} ${TEST_SOURCE})
+        set_property(
             TARGET ${TEST_OUTPUT}
             PROPERTY COMPILE_FLAGS
             "-DBOOST_TEST_DYN_LINK -DBOOST_TEST_MODULE=${TEST_NAME}")
-        TARGET_LINK_LIBRARIES(
+        target_link_libraries(
             ${TEST_OUTPUT}
             ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
             flusspferd-coverage)
-    ENDFOREACH()
+    endforeach()
 
-ENDIF()
+endif()
 
 ## IO ######################################################################
 
-FILE(
+file(
     GLOB
     flusspferd_io_sources
     ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
 
-ADD_LIBRARY(
+add_library(
     flusspferd-io
     SHARED
     ${flusspferd_io_sources})
 
-TARGET_LINK_LIBRARIES(
+target_link_libraries(
     flusspferd-io
     flusspferd)
 
-INSTALL(TARGETS
+install(TARGETS
     flusspferd-io
     LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
-INSTALL(TARGETS
+install(TARGETS
     flusspferd-io
     LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
 ## XML ######################################################################
 
-IF(LIBXML2_FOUND)
+if(LIBXML2_FOUND)
 
-    FILE(
+    file(
         GLOB
         flusspferd_xml_sources
         ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
 
-    ADD_LIBRARY(
+    add_library(
         flusspferd-xml
         SHARED
         ${flusspferd_xml_sources})
 
-    TARGET_LINK_LIBRARIES(
+    target_link_libraries(
         flusspferd-xml
         flusspferd
         ${LIBXML2_LIBRARIES})
 
-    INSTALL(TARGETS
+    install(TARGETS
         flusspferd-xml
         LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
-    INSTALL(TARGETS
+    install(TARGETS
         flusspferd-xml
         LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
-ENDIF()
+endif()
 
 ## Plugins #################################################################
 
-SET(PLUGINS os environment)
+set(PLUGINS os environment)
 
-IF(FLUSSPFERD_HAVE_POSIX)
-    SET(PLUGINS ${PLUGINS} posix)
-ENDIF()
+if(FLUSSPFERD_HAVE_POSIX)
+    set(PLUGINS ${PLUGINS} posix)
+endif()
 
-IF(SQLITE3_FOUND)
-    SET(PLUGINS ${PLUGINS} SQLite3)
-    SET(SQLite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
-    SET(SQLite3_LIBRARIES ${SQLITE3_LIBRARIES})
-ENDIF()
+if(SQLITE3_FOUND)
+    set(PLUGINS ${PLUGINS} SQLite3)
+    set(SQLite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
+    set(SQLite3_LIBRARIES ${SQLITE3_LIBRARIES})
+endif()
 
-IF(CURL_FOUND)
-    SET(PLUGINS ${PLUGINS} cURL)
-    SET(cURL_LIBRARIES ${CURL_LIBRARIES})
-    SET(cURL_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR})
-ENDIF()
+if(CURL_FOUND)
+    set(PLUGINS ${PLUGINS} cURL)
+    set(cURL_LIBRARIES ${CURL_LIBRARIES})
+    set(cURL_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR})
+endif()
 
-IF(GMP_FOUND AND GMPXX_FOUND)
-    SET(PLUGINS ${PLUGINS} gmp)
-    SET(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
-    SET(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
-ENDIF()
+if(GMP_FOUND AND GMPXX_FOUND)
+    set(PLUGINS ${PLUGINS} gmp)
+    set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
+    set(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
+endif()
 
-FOREACH(PLUGIN ${PLUGINS})
+foreach(PLUGIN ${PLUGINS})
 
-    FILE(GLOB
+    file(GLOB
         ${PLUGIN}_sources
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
 
-    ADD_LIBRARY(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
+    add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
 
-    SET_PROPERTY(
+    set_property(
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY OUTPUT_NAME
         ${PLUGIN})
 
-    SET_PROPERTY(
+    set_property(
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY LIBRARY_OUTPUT_DIRECTORY
         ${Flusspferd_BINARY_DIR}/modules)
 
-    SET_PROPERTY(
+    set_property(
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY DEFINITIONS
         ${${PLUGIN}_DEFINITIONS})
 
-    SET_PROPERTY(
+    set_property(
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY INCLUDE_DIRECTORIES
         ${${PLUGIN}_INCLUDE_DIRECTORIES})
 
-    TARGET_LINK_LIBRARIES(
+    target_link_libraries(
         ${PLUGIN}_PLUGIN
         flusspferd
         ${${PLUGIN}_LIBRARIES})
 
-    INSTALL(TARGETS
+    install(TARGETS
         ${PLUGIN}_PLUGIN
         LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
-    FILE(GLOB
+    file(GLOB
         ${PLUGIN}_JS_FILES
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
 
-    IF(${PLUGIN}_JS_FILES)
-        INSTALL(FILES
+    if(${PLUGIN}_JS_FILES)
+        install(FILES
             ${${PLUGIN}_JS_FILES}
             DESTINATION ${INSTALL_MODULES_PATH})
-    ENDIF()
+    endif()
 
-ENDFOREACH()
+endforeach()
 
-SET(JS_PLUGINS
+set(JS_PLUGINS
     Util Util/Array Util/Function Util/Range TestHarness HTTP/Headers)
 
-FOREACH(JS_PLUGIN ${JS_PLUGINS})
+foreach(JS_PLUGIN ${JS_PLUGINS})
 
-    STRING(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
+    string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
 
-    INSTALL(FILES
+    install(FILES
         src/js/${JS_PLUGIN}.js
         DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
 
-ENDFOREACH()
+endforeach()
 
 ## Headers ##################################################################
 
-INSTALL(
+install(
     DIRECTORY include/
     DESTINATION ${INSTALL_HEADERS_PATH}
     FILES_MATCHING PATTERN "*.hpp")
 
 ## Prelude ##################################################################
 
-INSTALL(
+install(
     FILES src/js/prelude.js
     DESTINATION ${INSTALL_LIBDATA_PATH})
 
 ## Configured files##########################################################
 
-CONFIGURE_FILE(
+configure_file(
     ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
     ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
 
-INSTALL(
+install(
     FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
     DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
 
-SET(FLUSSPFERD_EXTERNAL_CFLAGS
+set(FLUSSPFERD_EXTERNAL_CFLAGS
     "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
-FOREACH(_FLAG @SPIDERMONKEY_DEFINITIONS@)
-    SET(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")
-ENDFOREACH()
+foreach(_FLAG @SPIDERMONKEY_DEFINITIONS@)
+    set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")
+endforeach()
 
-CONFIGURE_FILE(
+configure_file(
     ${Flusspferd_SOURCE_DIR}/flusspferd.pc.in
     ${Flusspferd_BINARY_DIR}/flusspferd.pc
     @ONLY)
 
-INSTALL(
+install(
     FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
     DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
