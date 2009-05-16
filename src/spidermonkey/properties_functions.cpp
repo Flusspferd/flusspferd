@@ -1,6 +1,6 @@
 // vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
-Copyright (c) 2008 Aristid Breitkreuz, Ruediger Sonderfeld, Ash Berlin
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
