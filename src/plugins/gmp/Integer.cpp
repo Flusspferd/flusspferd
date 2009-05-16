@@ -4,7 +4,7 @@
 #include "Float.hpp"
 #include "Rational.hpp"
 
-namespace multi_precission {
+namespace multi_precision {
   Integer::Integer(flusspferd::object const &self, mpz_class const &mp)
     : base_type(self), mp(mp)
   { }

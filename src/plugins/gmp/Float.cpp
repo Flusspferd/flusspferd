@@ -5,7 +5,7 @@
 
 using namespace flusspferd;
 
-namespace multi_precission {
+namespace multi_precision {
   Float::Float(flusspferd::object const &self, mpf_class const &mp)
     : base_type(self), mp(mp)
   { }
