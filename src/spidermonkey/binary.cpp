@@ -87,6 +87,10 @@ binary::binary(object const &o, call_context &x)
   //TODO
 }
 
+binary::binary(object const &o, binary const &b)
+  : base_type(o), v_data(b.v_data)
+{}
+
 binary::vector_type &binary::get_data() {
   return v_data;
 }
@@ -98,6 +102,10 @@ std::size_t binary::get_length() {
 std::size_t binary::set_length(std::size_t n) {
   v_data.resize(n);
   return v_data.size();
+}
+
+object binary::to_byte_array() {
+  return create_native_object<byte_array>(object(), *this);
 }
 
 // -- byte_string -----------------------------------------------------------
@@ -117,6 +125,11 @@ std::string byte_string::to_string() {
 
 byte_array::byte_array(object const &o, call_context &x)
   : base_type(o, boost::ref(x))
+{
+}
+
+byte_array::byte_array(object const &o, binary const &b)
+  : base_type(o, b)
 {
 }
 
