@@ -166,25 +166,26 @@ int flusspferd_repl::run() {
 
 void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
-    " [option] ... [file | -] [arg] ...\n\n"
-    "Options\n"
-    "    -h                       displays this message\n"
-    "\n"
-    "    -v\n"
-    "    --version                print version and exit\n"
-    "\n"
-    "    -c <file>\n"
-    "    --config <file>          load config from file\n"
-    "\n"
-    "    -i\n"
-    "    --interactive            enter interactive mode (after files)\n"
-    "\n"
-    "    -0                       (interactive) machine command mode (separator '\\0')\n"
-    "\n"
-    "    -f <file>\n"
-    "    --file <file>            run this file before standard script handling\n"
-    "\n"
-    "    --                       stop processing arguments\n\n";
+" [option] ... [file | -] [arg] ...\n\n"
+"Options\n"
+"    -h                       Displays this message.\n"
+"\n"
+"    -v\n"
+"    --version                Print version and exit.\n"
+"\n"
+"    -c <file>\n"
+"    --config <file>          Load config from file.\n"
+"\n"
+"    -i\n"
+"    --interactive            Enter interactive mode (after files).\n"
+"\n"
+"    -0                       (Interactive) machine command mode (separator\n"
+"                             '\\0').\n"
+"\n"
+"    -f <file>\n"
+"    --file <file>            Run this file before standard script handling.\n"
+"\n"
+"    --                       Stop processing options.\n\n";
 }
 
 void print_version() {
