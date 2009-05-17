@@ -336,3 +336,11 @@ void byte_array::append(call_context &x) {
   do_append(x.arg);
   x.result = *this;
 }
+
+int byte_array::pop() {
+  if (get_data().empty())
+    throw exception("Cannot pop() from empty ByteArray");
+  int result = get_data().back();
+  get_data().pop_back();
+  return result;
+}

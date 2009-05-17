@@ -126,7 +126,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (methods,
     ("toString", bind, to_string)
     ("toByteString", bind, to_byte_string)
-    ("append", bind, append))
+    ("append", bind, append)
+    ("push", alias, "append")
+    ("pop", bind, pop))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -141,6 +143,7 @@ public:
   std::string to_string();
   object to_byte_string();
   void append(call_context &x);
+  int pop();
 };
 
 }
