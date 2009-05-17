@@ -52,7 +52,7 @@ protected:
   binary(object const &o, binary const &o);
   binary(object const &o, element_type const *p, std::size_t n);
 
-  virtual object create(element_type const *p, std::size_t n) = 0;
+  virtual binary &create(element_type const *p, std::size_t n) = 0;
 
 protected:
   vector_type &get_data();
@@ -102,7 +102,7 @@ public:
   byte_string(object const &o, binary const &o);
   byte_string(object const &o, element_type const *p, std::size_t n);
 
-  virtual object create(element_type const *p, std::size_t n);
+  virtual binary &create(element_type const *p, std::size_t n);
 
 public:
   std::string to_string();
@@ -129,7 +129,7 @@ public:
   byte_array(object const &o, binary const &o);
   byte_array(object const &o, element_type const *p, std::size_t n);
 
-  virtual object create(element_type const *p, std::size_t n);
+  virtual binary &create(element_type const *p, std::size_t n);
 
 public:
   std::string to_string();
