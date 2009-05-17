@@ -235,6 +235,36 @@ object byte_string::char_at(int offset) {
   return create(&get_data()[offset], 1);
 }
 
+object byte_string::substr(int start, boost::optional<int> length_) {
+  if (start < 0)
+    start += get_length();
+  if (start < 0)
+    start = 0;
+  if (std::size_t(start) >= get_length())
+    start = get_length();
+  int length = length_.get_value_or(get_length() - start);
+  if (length < 0)
+    length = 0;
+  if (std::size_t(length) > get_length() - start)
+    length = get_length() - start;
+  return create(&get_data()[start], length);
+}
+
+object byte_string::substring(int first, boost::optional<int> last_) {
+  if (first < 0)
+    first = 0;
+  if (std::size_t(first) > get_length())
+    first = get_length();
+  int last = last_.get_value_or(get_length());
+  if (last < 0)
+    last = 0;
+  if (std::size_t(last) > get_length())
+    last = get_length();
+  if (last < first)
+    std::swap(first, last);
+  return create(&get_data()[first], last - first);
+}
+
 // -- byte_array ------------------------------------------------------------
 
 byte_array::byte_array(object const &o, call_context &x)
