@@ -365,3 +365,24 @@ byte_array &byte_array::reverse() {
   std::reverse(get_data().begin(), get_data().end());
   return *this;
 }
+
+namespace {
+  struct compare_helper {
+    object &compare;
+
+    bool operator()(unsigned char a, unsigned char b) {
+      double val = compare.call(flusspferd::scope_chain(), a, b).to_number();
+      return val < 0;
+    }
+  };
+}
+
+binary &byte_array::sort(object compare) {
+  if (compare.is_null()) {
+    std::sort(get_data().begin(), get_data().end());
+  } else {
+    compare_helper h = { compare };
+    std::sort(get_data().begin(), get_data().end(), h);
+  }
+  return *this;
+}
