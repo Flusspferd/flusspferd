@@ -91,7 +91,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toString", bind, to_string)
     ("toByteString", bind, to_byte_string)
     ("charCodeAt", alias, "byteAt")
-    ("charAt", bind, char_at))
+    ("charAt", bind, char_at)
+    ("substr", bind, substr)
+    ("substring", bind, substring))
   (properties,
     ("length", getter, get_length)))
 {
@@ -106,6 +108,8 @@ public:
   std::string to_string();
   object to_byte_string();
   object char_at(int offset);
+  object substr(int start, boost::optional<int> length);
+  object substring(int first, boost::optional<int> last);
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
