@@ -131,7 +131,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("pop", bind, pop)
     ("prepend", bind, prepend)
     ("unshift", alias, "prepend")
-    ("shift", bind, shift))
+    ("shift", bind, shift)
+    ("reverse", bind, reverse))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -149,6 +150,7 @@ public:
   int pop();
   void prepend(call_context &x);
   int shift();
+  byte_array &reverse();
 };
 
 }
