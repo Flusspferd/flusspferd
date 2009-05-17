@@ -344,3 +344,19 @@ int byte_array::pop() {
   get_data().pop_back();
   return result;
 }
+
+void byte_array::prepend(call_context &x) {
+  vector_type tmp;
+  tmp.swap(get_data());
+  do_append(x.arg);
+  get_data().insert(get_data().end(), tmp.begin(), tmp.end());
+  x.result = *this;
+}
+
+int byte_array::shift() {
+  if (get_data().empty())
+    throw exception("Cannot pop() from empty ByteArray");
+  int result = get_data().front();
+  get_data().erase(get_data().begin());
+  return result;
+}

@@ -128,7 +128,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toByteString", bind, to_byte_string)
     ("append", bind, append)
     ("push", alias, "append")
-    ("pop", bind, pop))
+    ("pop", bind, pop)
+    ("prepend", bind, prepend)
+    ("unshift", alias, "prepend")
+    ("shift", bind, shift))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -144,6 +147,8 @@ public:
   object to_byte_string();
   void append(call_context &x);
   int pop();
+  void prepend(call_context &x);
+  int shift();
 };
 
 }
