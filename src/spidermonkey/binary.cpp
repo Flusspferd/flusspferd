@@ -201,6 +201,45 @@ object binary::slice(int begin, boost::optional<int> end_) {
   return create(&v_data[begin], end - begin);
 }
 
+void binary::concat(call_context &x) {
+  local_root_scope scope;
+  binary &res = create(&v_data[0], v_data.size()); //copy
+  res.do_append(x.arg);
+  x.result = res;
+}
+
+void binary::do_append(arguments &arg) {
+  vector_type &out = v_data;
+  for (arguments::iterator it = arg.begin(); it != arg.end(); ++it) {
+    value el = *it;
+    if (el.is_int()) {
+      int x = el.get_int();
+      if (x < 0 || x > 255)
+        throw exception("Outside byte range", "Range error");
+      out.push_back(element_type(x));
+    } else if (el.is_object()) {
+      object o = el.get_object();
+      if (o.is_array()) {
+        array a(o);
+        std::size_t n = a.length();
+        out.reserve(out.size() + n);
+        for (std::size_t i = 0; i < n; ++i) {
+          value v = a.get_element(i);
+          if (!v.is_int())
+            throw exception("Must be Array of Numbers");
+          int x = v.get_int();
+          if (x < 0 || x > 255)
+            throw exception("Outside byte range", "Range error");
+          out.push_back(element_type(x));
+        }
+      } else {
+        binary &x = flusspferd::get_native<binary>(o);
+        out.insert(out.end(), x.v_data.begin(), x.v_data.end());
+      }
+    }
+  }
+}
+
 // -- byte_string -----------------------------------------------------------
 
 byte_string::byte_string(object const &o, call_context &x)
@@ -291,4 +330,9 @@ std::string byte_array::to_string() {
 
 object byte_array::to_byte_string() {
   return create_native_object<byte_string>(object(), *this);
+}
+
+void byte_array::append(call_context &x) {
+  do_append(x.arg);
+  x.result = *this;
 }

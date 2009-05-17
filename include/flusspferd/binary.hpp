@@ -42,7 +42,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("indexOf", bind, index_of)
     ("lastIndexOf", bind, last_index_of)
     ("byteAt", bind, byte_at)
-    ("slice", bind, slice)))
+    ("slice", bind, slice)
+    ("concat", bind, concat)))
 {
 protected:
   typedef unsigned char element_type;
@@ -57,6 +58,8 @@ protected:
 protected:
   vector_type &get_data();
   std::size_t set_length(std::size_t);
+
+  void do_append(arguments &x);
 
 public:
   std::size_t get_length();
@@ -76,6 +79,8 @@ public:
   int byte_at(int offset);
 
   object slice(int begin, boost::optional<int> end);
+
+  void concat(call_context &x);
 
 private:
   std::vector<unsigned char> v_data;
@@ -120,7 +125,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods,
     ("toString", bind, to_string)
-    ("toByteString", bind, to_byte_string))
+    ("toByteString", bind, to_byte_string)
+    ("append", bind, append))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -134,6 +140,7 @@ public:
 public:
   std::string to_string();
   object to_byte_string();
+  void append(call_context &x);
 };
 
 }
