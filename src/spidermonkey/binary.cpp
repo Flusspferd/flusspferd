@@ -348,6 +348,21 @@ object byte_string::substring(int first, boost::optional<int> last_) {
   return create(&get_data()[first], last - first);
 }
 
+std::string byte_string::to_source() {
+  std::ostringstream out;
+  out << "(ByteString([";
+  for (vector_type::iterator it = get_data().begin();
+      it != get_data().end();
+      ++it)
+  {
+    if (it != get_data().begin())
+      out << ",";
+    out << int(*it);
+  }
+  out << "]))";
+  return out.str();
+}
+
 // -- byte_array ------------------------------------------------------------
 
 byte_array::byte_array(object const &o, call_context &x)
@@ -433,4 +448,19 @@ binary &byte_array::sort(object compare) {
     std::sort(get_data().begin(), get_data().end(), h);
   }
   return *this;
+}
+
+std::string byte_array::to_source() {
+  std::ostringstream out;
+  out << "(ByteArray([";
+  for (vector_type::iterator it = get_data().begin();
+      it != get_data().end();
+      ++it)
+  {
+    if (it != get_data().begin())
+      out << ",";
+    out << int(*it);
+  }
+  out << "]))";
+  return out.str();
 }
