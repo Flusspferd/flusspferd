@@ -132,7 +132,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("prepend", bind, prepend)
     ("unshift", alias, "prepend")
     ("shift", bind, shift)
-    ("reverse", bind, reverse))
+    ("reverse", bind, reverse)
+    ("sort", bind, sort))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -151,6 +152,7 @@ public:
   void prepend(call_context &x);
   int shift();
   byte_array &reverse();
+  binary &sort(object compare);
 };
 
 }
