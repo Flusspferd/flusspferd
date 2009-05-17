@@ -360,3 +360,8 @@ int byte_array::shift() {
   get_data().erase(get_data().begin());
   return result;
 }
+
+byte_array &byte_array::reverse() {
+  std::reverse(get_data().begin(), get_data().end());
+  return *this;
+}
