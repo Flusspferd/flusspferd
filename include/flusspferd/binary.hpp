@@ -41,7 +41,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toArray", bind, to_array)
     ("indexOf", bind, index_of)
     ("lastIndexOf", bind, last_index_of)
-    ("byteAt", bind, byte_at)))
+    ("byteAt", bind, byte_at)
+    ("slice", bind, slice)))
 {
 protected:
   typedef unsigned char element_type;
@@ -51,11 +52,11 @@ protected:
   binary(object const &o, binary const &o);
   binary(object const &o, element_type const *p, std::size_t n);
 
+  virtual object create(element_type const *p, std::size_t n) = 0;
+
+protected:
   vector_type &get_data();
   std::size_t set_length(std::size_t);
-
-  std::pair<element_type const *, std::size_t>
-  slice(int begin, boost::optional<int> end);
 
 public:
   std::size_t get_length();
@@ -74,6 +75,8 @@ public:
 
   int byte_at(int offset);
 
+  object slice(int begin, boost::optional<int> end);
+
 private:
   std::vector<unsigned char> v_data;
 };
@@ -88,8 +91,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toString", bind, to_string)
     ("toByteString", bind, to_byte_string)
     ("charCodeAt", alias, "byteAt")
-    ("charAt", bind, char_at)
-    ("slice", bind, slice))
+    ("charAt", bind, char_at))
   (properties,
     ("length", getter, get_length)))
 {
@@ -98,11 +100,12 @@ public:
   byte_string(object const &o, binary const &o);
   byte_string(object const &o, element_type const *p, std::size_t n);
 
+  virtual object create(element_type const *p, std::size_t n);
+
 public:
   std::string to_string();
   object to_byte_string();
   object char_at(int offset);
-  object slice(int begin, boost::optional<int> end);
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -113,8 +116,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods,
     ("toString", bind, to_string)
-    ("toByteString", bind, to_byte_string)
-    ("slice", bind, slice))
+    ("toByteString", bind, to_byte_string))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -123,10 +125,11 @@ public:
   byte_array(object const &o, binary const &o);
   byte_array(object const &o, element_type const *p, std::size_t n);
 
+  virtual object create(element_type const *p, std::size_t n);
+
 public:
   std::string to_string();
   object to_byte_string();
-  object slice(int begin, boost::optional<int> end);
 };
 
 }

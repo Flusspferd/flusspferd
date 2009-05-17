@@ -180,8 +180,7 @@ int binary::byte_at(int offset) {
   return v_data[offset];
 }
 
-std::pair<binary::element_type const *, std::size_t>
-binary::slice(int begin, boost::optional<int> end_) {
+object binary::slice(int begin, boost::optional<int> end_) {
   int n = get_length();
 
   if (begin < 0)
@@ -199,7 +198,7 @@ binary::slice(int begin, boost::optional<int> end_) {
   if (end < begin)
     end = begin;
 
-  return std::make_pair(&v_data[begin], end - begin);
+  return create(&v_data[begin], end - begin);
 }
 
 // -- byte_string -----------------------------------------------------------
@@ -216,6 +215,10 @@ byte_string::byte_string(object const &o, element_type const *p, std::size_t n)
   : base_type(o, p, n)
 {}
 
+object byte_string::create(element_type const *p, std::size_t n) {
+  return create_native_object<byte_string>(object(), p, n);
+}
+
 std::string byte_string::to_string() {
   std::ostringstream stream;
   stream << "[ByteString " << get_length() << "]";
@@ -229,12 +232,7 @@ object byte_string::to_byte_string() {
 object byte_string::char_at(int offset) {
   if (offset < 0 || std::size_t(offset) > get_length())
     throw exception("Offset outside range", "RangeError");
-  return create_native_object<byte_string>(object(), &get_data()[offset], 1);
-}
-
-object byte_string::slice(int begin, boost::optional<int> end) {
-  std::pair<element_type const *, std::size_t> p = binary::slice(begin, end);
-  return create_native_object<byte_string>(object(), p.first, p.second);
+  return create(&get_data()[offset], 1);
 }
 
 // -- byte_array ------------------------------------------------------------
@@ -251,6 +249,10 @@ byte_array::byte_array(object const &o, element_type const *p, std::size_t n)
   : base_type(o, p, n)
 {}
 
+object byte_array::create(element_type const *p, std::size_t n) {
+  return create_native_object<byte_array>(object(), p, n);
+}
+
 std::string byte_array::to_string() {
   std::ostringstream stream;
   stream << "[ByteArray " << get_length() << "]";
@@ -259,9 +261,4 @@ std::string byte_array::to_string() {
 
 object byte_array::to_byte_string() {
   return create_native_object<byte_string>(object(), *this);
-}
-
-object byte_array::slice(int begin, boost::optional<int> end) {
-  std::pair<element_type const *, std::size_t> p = binary::slice(begin, end);
-  return create_native_object<byte_array>(object(), p.first, p.second);
 }
