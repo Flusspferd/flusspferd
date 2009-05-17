@@ -215,7 +215,7 @@ byte_string::byte_string(object const &o, element_type const *p, std::size_t n)
   : base_type(o, p, n)
 {}
 
-object byte_string::create(element_type const *p, std::size_t n) {
+binary &byte_string::create(element_type const *p, std::size_t n) {
   return create_native_object<byte_string>(object(), p, n);
 }
 
@@ -279,7 +279,7 @@ byte_array::byte_array(object const &o, element_type const *p, std::size_t n)
   : base_type(o, p, n)
 {}
 
-object byte_array::create(element_type const *p, std::size_t n) {
+binary &byte_array::create(element_type const *p, std::size_t n) {
   return create_native_object<byte_array>(object(), p, n);
 }
 
