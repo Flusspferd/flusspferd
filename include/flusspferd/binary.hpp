@@ -55,6 +55,12 @@ protected:
 
   virtual binary &create(element_type const *p, std::size_t n) = 0;
 
+  virtual value element(element_type byte) = 0;
+
+protected:
+  void property_op(property_mode mode, value const &id, value &data);
+  bool property_resolve(value const &id, unsigned access);
+
 protected:
   vector_type &get_data();
   std::size_t set_length(std::size_t);
@@ -108,6 +114,7 @@ public:
   byte_string(object const &o, element_type const *p, std::size_t n);
 
   virtual binary &create(element_type const *p, std::size_t n);
+  virtual value element(element_type byte);
 
 public:
   std::string to_string();
@@ -143,6 +150,7 @@ public:
   byte_array(object const &o, element_type const *p, std::size_t n);
 
   virtual binary &create(element_type const *p, std::size_t n);
+  virtual value element(element_type byte);
 
 public:
   std::string to_string();
