@@ -54,6 +54,9 @@ protected:
   vector_type &get_data();
   std::size_t set_length(std::size_t);
 
+  std::pair<element_type const *, std::size_t>
+  slice(int begin, boost::optional<int> end);
+
 public:
   std::size_t get_length();
 
@@ -85,7 +88,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toString", bind, to_string)
     ("toByteString", bind, to_byte_string)
     ("charCodeAt", alias, "byteAt")
-    ("charAt", bind, char_at))
+    ("charAt", bind, char_at)
+    ("slice", bind, slice))
   (properties,
     ("length", getter, get_length)))
 {
@@ -98,6 +102,7 @@ public:
   std::string to_string();
   object to_byte_string();
   object char_at(int offset);
+  object slice(int begin, boost::optional<int> end);
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -108,7 +113,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (base, binary)
   (methods,
     ("toString", bind, to_string)
-    ("toByteString", bind, to_byte_string))
+    ("toByteString", bind, to_byte_string)
+    ("slice", bind, slice))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -120,6 +126,7 @@ public:
 public:
   std::string to_string();
   object to_byte_string();
+  object slice(int begin, boost::optional<int> end);
 };
 
 }

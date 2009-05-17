@@ -180,6 +180,28 @@ int binary::byte_at(int offset) {
   return v_data[offset];
 }
 
+std::pair<binary::element_type const *, std::size_t>
+binary::slice(int begin, boost::optional<int> end_) {
+  int n = get_length();
+
+  if (begin < 0)
+    begin = n + begin;
+
+  int end = end_.get_value_or(n);
+  if (end < 0)
+    end = n + end;
+
+  if (begin > n)
+    begin = n;
+  if (end > n)
+    end = n;
+
+  if (end < begin)
+    end = begin;
+
+  return std::make_pair(&v_data[begin], end - begin);
+}
+
 // -- byte_string -----------------------------------------------------------
 
 byte_string::byte_string(object const &o, call_context &x)
@@ -210,6 +232,11 @@ object byte_string::char_at(int offset) {
   return create_native_object<byte_string>(object(), &get_data()[offset], 1);
 }
 
+object byte_string::slice(int begin, boost::optional<int> end) {
+  std::pair<element_type const *, std::size_t> p = binary::slice(begin, end);
+  return create_native_object<byte_string>(object(), p.first, p.second);
+}
+
 // -- byte_array ------------------------------------------------------------
 
 byte_array::byte_array(object const &o, call_context &x)
@@ -232,4 +259,9 @@ std::string byte_array::to_string() {
 
 object byte_array::to_byte_string() {
   return create_native_object<byte_string>(object(), *this);
+}
+
+object byte_array::slice(int begin, boost::optional<int> end) {
+  std::pair<element_type const *, std::size_t> p = binary::slice(begin, end);
+  return create_native_object<byte_array>(object(), p.first, p.second);
 }
