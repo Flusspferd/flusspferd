@@ -104,7 +104,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("charCodeAt", alias, "byteAt")
     ("charAt", bind, char_at)
     ("substr", bind, substr)
-    ("substring", bind, substring))
+    ("substring", bind, substring)
+    ("toSource", bind, to_source))
   (properties,
     ("length", getter, get_length)))
 {
@@ -122,6 +123,7 @@ public:
   object char_at(int offset);
   object substr(int start, boost::optional<int> length);
   object substring(int first, boost::optional<int> last);
+  std::string to_source();
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -140,7 +142,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("unshift", alias, "prepend")
     ("shift", bind, shift)
     ("reverse", bind, reverse)
-    ("sort", bind, sort))
+    ("sort", bind, sort)
+    ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
 {
@@ -161,6 +164,7 @@ public:
   int shift();
   byte_array &reverse();
   binary &sort(object compare);
+  std::string to_source();
 };
 
 }
