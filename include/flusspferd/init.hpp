@@ -126,6 +126,15 @@ inline object global() {
 }
 
 /**
+ * Get the global object of the current context.
+ *
+ * @see current_context, context::scope_chain
+ */
+inline object scope_chain() {
+  return current_context().scope_chain();
+}
+
+/**
  * Run the garbage collector on the current context.
  *
  * @see current_context, context::gc
