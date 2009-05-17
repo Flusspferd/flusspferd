@@ -115,6 +115,46 @@ binary::binary(object const &o, element_type const *p, std::size_t n)
   : base_type(o), v_data(p, p + n)
 {}
 
+bool binary::property_resolve(value const &id, unsigned /*flags*/) {
+  if (!id.is_int())
+    return false;
+
+  int uid = id.get_int();
+
+  if (uid < 0)
+    return false;
+
+  if (size_t(uid) > v_data.size())
+    return false;
+ 
+  value v = element(v_data[uid]);
+  define_property(id.to_string(), v, permanent_shared_property);
+  return true;
+}
+
+void binary::property_op(property_mode mode, value const &id, value &x) {
+  int index;
+  if (id.is_int()) {
+    index = id.get_int();
+  } else {
+    this->native_object_base::property_op(mode, id, x);
+    return;
+  }
+
+  if (index < 0 || std::size_t(index) >= v_data.size())
+    throw exception("Out of bounds of Blob");
+
+  switch (mode) {
+  case property_get:
+    x = element(v_data[index]);
+    break;
+  case property_set:
+    v_data[index] = get_byte(x);
+    break;
+  default: break;
+  };
+}
+
 binary::vector_type &binary::get_data() {
   return v_data;
 }
@@ -258,6 +298,10 @@ binary &byte_string::create(element_type const *p, std::size_t n) {
   return create_native_object<byte_string>(object(), p, n);
 }
 
+value byte_string::element(element_type e) {
+  return create(&e, 1);
+}
+
 std::string byte_string::to_string() {
   std::ostringstream stream;
   stream << "[ByteString " << get_length() << "]";
@@ -320,6 +364,10 @@ byte_array::byte_array(object const &o, element_type const *p, std::size_t n)
 
 binary &byte_array::create(element_type const *p, std::size_t n) {
   return create_native_object<byte_array>(object(), p, n);
+}
+
+value byte_array::element(element_type e) {
+  return value(int(e));
 }
 
 std::string byte_array::to_string() {
