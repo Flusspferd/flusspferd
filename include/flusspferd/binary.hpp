@@ -147,6 +147,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("reverse", bind, reverse)
     ("sort", bind, sort)
     ("erase", bind, erase)
+    ("replace", bind, replace)
+    ("insert", bind, insert)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -169,6 +171,8 @@ public:
   byte_array &reverse();
   binary &sort(object compare);
   int erase(int begin, boost::optional<int> end);
+  void replace(call_context &x);
+  void insert(call_context &x);
   std::string to_source();
 };
 
