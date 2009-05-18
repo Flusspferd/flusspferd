@@ -70,6 +70,9 @@ protected:
   std::pair<std::size_t, std::size_t>
   range(int begin, boost::optional<int> end);
 
+  std::pair<std::size_t, std::size_t>
+  length_range(int begin, boost::optional<int> length);
+
   void debug_rep(std::ostream &o);
 
 public:
@@ -151,6 +154,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("erase", bind, erase)
     ("replace", bind, replace)
     ("insert", bind, insert)
+    ("splice", bind, splice)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -175,6 +179,7 @@ public:
   int erase(int begin, boost::optional<int> end);
   void replace(call_context &x);
   void insert(call_context &x);
+  void splice(call_context &x);
   std::string to_source();
 };
 

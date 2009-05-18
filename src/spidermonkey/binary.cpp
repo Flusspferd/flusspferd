@@ -243,6 +243,22 @@ binary::range(int begin, boost::optional<int> end_) {
   return std::pair<std::size_t, std::size_t>(begin, end);
 }
 
+std::pair<std::size_t, std::size_t>
+binary::length_range(int start, boost::optional<int> length_) {
+  if (start < 0)
+    start += get_length();
+  if (start < 0)
+    start = 0;
+  if (std::size_t(start) >= get_length())
+    start = get_length();
+  int length = length_.get_value_or(get_length() - start);
+  if (length < 0)
+    length = 0;
+  if (std::size_t(length) > get_length() - start)
+    length = get_length() - start;
+  return std::pair<std::size_t, std::size_t>(start, start + length);
+}
+
 object binary::slice(int begin, boost::optional<int> end) {
   std::pair<std::size_t, std::size_t> x = range(begin, end);
   return create(&v_data[x.first], x.second - x.first);
@@ -341,19 +357,9 @@ object byte_string::char_at(int offset) {
   return create(&get_data()[offset], 1);
 }
 
-object byte_string::substr(int start, boost::optional<int> length_) {
-  if (start < 0)
-    start += get_length();
-  if (start < 0)
-    start = 0;
-  if (std::size_t(start) >= get_length())
-    start = get_length();
-  int length = length_.get_value_or(get_length() - start);
-  if (length < 0)
-    length = 0;
-  if (std::size_t(length) > get_length() - start)
-    length = get_length() - start;
-  return create(&get_data()[start], length);
+object byte_string::substr(int start, boost::optional<int> length) {
+  std::pair<std::size_t, std::size_t> x = length_range(start, length);
+  return create(&get_data()[x.first], x.second - x.first);
 }
 
 object byte_string::substring(int first, boost::optional<int> last_) {
@@ -510,6 +516,17 @@ void byte_array::insert(call_context &x) {
     arg.push_back(*it);
   x.arg = arg;
   replace(x);
+}
+
+void byte_array::splice(call_context &x) {
+  int begin = x.arg[0].to_integral_number(32, true);
+  boost::optional<int> length;
+  if (!x.arg[1].is_undefined_or_null())
+    length = x.arg[1].to_integral_number(32, true);
+  std::pair<std::size_t, std::size_t> r = length_range(begin, length);
+  root_object o(create(&get_data()[r.first], r.second - r.first));
+  replace(x);
+  x.result = o;
 }
 
 std::string byte_array::to_source() {
