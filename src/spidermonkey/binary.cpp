@@ -220,7 +220,8 @@ int binary::byte_at(int offset) {
   return v_data[offset];
 }
 
-object binary::slice(int begin, boost::optional<int> end_) {
+std::pair<std::size_t, std::size_t>
+binary::range(int begin, boost::optional<int> end_) {
   int n = get_length();
 
   if (begin < 0)
@@ -238,7 +239,12 @@ object binary::slice(int begin, boost::optional<int> end_) {
   if (end < begin)
     end = begin;
 
-  return create(&v_data[begin], end - begin);
+  return std::pair<std::size_t, std::size_t>(begin, end);
+}
+
+object binary::slice(int begin, boost::optional<int> end) {
+  std::pair<std::size_t, std::size_t> x = range(begin, end);
+  return create(&v_data[x.first], x.second - x.first);
 }
 
 void binary::concat(call_context &x) {
@@ -448,6 +454,12 @@ binary &byte_array::sort(object compare) {
     std::sort(get_data().begin(), get_data().end(), h);
   }
   return *this;
+}
+
+int byte_array::erase(int begin, boost::optional<int> end) {
+  std::pair<std::size_t, std::size_t> x = range(begin, end);
+  get_data().erase(get_data().begin() + x.first, get_data().begin() + x.second);
+  return x.second - x.first;
 }
 
 std::string byte_array::to_source() {

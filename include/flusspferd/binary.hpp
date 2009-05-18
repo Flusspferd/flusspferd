@@ -67,6 +67,9 @@ protected:
 
   void do_append(arguments &x);
 
+  std::pair<std::size_t, std::size_t>
+  range(int begin, boost::optional<int> end);
+
 public:
   std::size_t get_length();
 
@@ -143,6 +146,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("shift", bind, shift)
     ("reverse", bind, reverse)
     ("sort", bind, sort)
+    ("erase", bind, erase)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -164,6 +168,7 @@ public:
   int shift();
   byte_array &reverse();
   binary &sort(object compare);
+  int erase(int begin, boost::optional<int> end);
   std::string to_source();
 };
 
