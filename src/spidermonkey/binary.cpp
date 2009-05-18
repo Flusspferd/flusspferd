@@ -462,6 +462,37 @@ int byte_array::erase(int begin, boost::optional<int> end) {
   return get_length();
 }
 
+void byte_array::replace(call_context &x) {
+  int begin = x.arg[0].to_integral_number(32, true);
+  boost::optional<int> end;
+  if (!x.arg[1].is_undefined_or_null())
+    end = x.arg[1].to_integral_number(32, true);
+  std::pair<std::size_t, std::size_t> r = range(begin, end);
+  vector_type tmp(get_data().begin() + r.second, get_data().end());
+  get_data().erase(get_data().begin() + r.first, get_data().end());
+  arguments arg;
+  for (std::size_t i = 2; i < x.arg.size(); ++i)
+    arg.push_back(x.arg[i]);
+  do_append(arg);
+  get_data().insert(get_data().end(), tmp.begin(), tmp.end());
+  x.result = int(get_length());
+}
+
+void byte_array::insert(call_context &x) {
+  if (x.arg.empty()) {
+    x.result = int(get_length());
+    return;
+  }
+  arguments arg;
+  arguments::iterator it = x.arg.begin();
+  arg.push_back(*it);
+  arg.push_back(*it);
+  while (++it != x.arg.end())
+    arg.push_back(*it);
+  x.arg = arg;
+  replace(x);
+}
+
 std::string byte_array::to_source() {
   std::ostringstream out;
   out << "(ByteArray([";
