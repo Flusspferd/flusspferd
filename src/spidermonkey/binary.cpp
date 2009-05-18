@@ -403,7 +403,7 @@ object byte_array::to_byte_string() {
 
 void byte_array::append(call_context &x) {
   do_append(x.arg);
-  x.result = *this;
+  x.result = int(get_length());
 }
 
 int byte_array::pop() {
@@ -419,7 +419,7 @@ void byte_array::prepend(call_context &x) {
   tmp.swap(get_data());
   do_append(x.arg);
   get_data().insert(get_data().end(), tmp.begin(), tmp.end());
-  x.result = *this;
+  x.result = int(get_length());
 }
 
 int byte_array::shift() {
@@ -459,7 +459,7 @@ binary &byte_array::sort(object compare) {
 int byte_array::erase(int begin, boost::optional<int> end) {
   std::pair<std::size_t, std::size_t> x = range(begin, end);
   get_data().erase(get_data().begin() + x.first, get_data().begin() + x.second);
-  return x.second - x.first;
+  return get_length();
 }
 
 std::string byte_array::to_source() {
