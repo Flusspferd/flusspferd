@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
 #include <sstream>
+#include <algorithm>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 
@@ -286,6 +287,20 @@ void binary::do_append(arguments &arg) {
   }
 }
 
+void binary::debug_rep(std::ostream &stream) {
+  stream << "length:" << v_data.size();
+  std::size_t n = std::min(v_data.size(), std::size_t(10));
+  if (n)
+    stream << " -- ";
+  for (std::size_t i = 0; i < n; ++i) {
+    if (i)
+      stream << ',';
+    stream << int(v_data[i]);
+  }
+  if (n < v_data.size())
+    stream << "...";
+}
+
 // -- byte_string -----------------------------------------------------------
 
 byte_string::byte_string(object const &o, call_context &x)
@@ -310,7 +325,9 @@ value byte_string::element(element_type e) {
 
 std::string byte_string::to_string() {
   std::ostringstream stream;
-  stream << "[ByteString " << get_length() << "]";
+  stream << "[ByteString ";
+  debug_rep(stream);
+  stream << "]";
   return stream.str();
 }
 
@@ -393,7 +410,9 @@ value byte_array::element(element_type e) {
 
 std::string byte_array::to_string() {
   std::ostringstream stream;
-  stream << "[ByteArray " << get_length() << "]";
+  stream << "[ByteArray ";
+  debug_rep(stream);
+  stream << "]";
   return stream.str();
 }
 

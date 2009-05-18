@@ -70,6 +70,8 @@ protected:
   std::pair<std::size_t, std::size_t>
   range(int begin, boost::optional<int> end);
 
+  void debug_rep(std::ostream &o);
+
 public:
   std::size_t get_length();
 
