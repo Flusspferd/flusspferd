@@ -525,6 +525,8 @@ void byte_array::splice(call_context &x) {
     length = x.arg[1].to_integral_number(32, true);
   std::pair<std::size_t, std::size_t> r = length_range(begin, length);
   root_object o(create(&get_data()[r.first], r.second - r.first));
+  x.arg[0] = int(r.first);
+  x.arg[1] = int(r.second);
   replace(x);
   x.result = o;
 }
