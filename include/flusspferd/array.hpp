@@ -25,6 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_ARRAY_HPP
 
 #include "object.hpp"
+#include <boost/utility/in_place_factory.hpp>
 
 namespace flusspferd {
 
@@ -69,11 +70,11 @@ struct detail::convert<array> {
   typedef to_value_helper<array> to_value;
 
   struct from_value {
-    root_array root;
+    boost::optional<root_array> root;
 
     array perform(value const &v) {
-      root = array(v.to_object());
-      return root;
+      root = boost::in_place(array(v.to_object()));
+      return root.get();
     }
   };
 };

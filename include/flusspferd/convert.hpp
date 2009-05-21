@@ -68,11 +68,11 @@ struct convert_ptr{
   struct from_value {
     typename convert<O>::from_value base;
 
-    O holder;
+    boost::optional<O> holder;
 
     T *perform(value const &v) {
       holder = base.perform(v);
-      return &holder;
+      return &holder.get();
     }
   };
 };
