@@ -321,22 +321,13 @@ array binary::split(value delim, object options) {
       std::size_t n = arr.length();
 
       for (std::size_t i = 0; i < n; ++i) {
-        value delim = arr.get_element(i);
-
-        if (delim.is_int()) { // Array element: Number
-          if (delim.get_int() < 0 || delim.get_int() > 255)
-            throw exception("Outside byte range", "RangeError");
-
-          element_type e = delim.get_int();
-          delims.push_back(&create(&e, 1));
-
-        } else if (delim.is_object()) { // Array element: Binary
-          binary &b = flusspferd::get_native<binary>(delim.get_object());
-          delims.push_back(&b);
-        }
-
+        binary &new_delim =
+          create_native_object<byte_string>(object(), (element_type*)0, 0);
+        arguments arg;
+        arg.push_back(arr.get_element(i));
+        new_delim.do_append(arg);
+        delims.push_back(&new_delim);
       }
-
     } else { // Binary
       binary &b = flusspferd::get_native<binary>(obj);
       delims.push_back(&b);
