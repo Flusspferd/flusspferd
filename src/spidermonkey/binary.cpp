@@ -21,12 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
+#include <boost/xpressive/xpressive_static.hpp>
+#include <boost/xpressive/traits/null_regex_traits.hpp>
 #include <sstream>
 #include <algorithm>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 
 using namespace flusspferd;
+namespace xpressive = boost::xpressive;
 
 void flusspferd::load_binary_module(object container) {
   object exports = container.get_property("exports").to_object();
@@ -292,7 +295,7 @@ void binary::do_append(arguments &arg) {
             throw exception("Must be Array of Numbers");
           int x = v.get_int();
           if (x < 0 || x > 255)
-            throw exception("Outside byte range", "Range error");
+            throw exception("Outside byte range", "RangeError");
           out.push_back(element_type(x));
         }
       } else {
@@ -301,6 +304,103 @@ void binary::do_append(arguments &arg) {
       }
     }
   }
+}
+
+array binary::split(value delim, object options) {
+  local_root_scope scope;
+  std::vector<binary*> delims;
+
+  // Parse the delimiter into the vector of delims.
+  if (delim.is_int()) { // single Number
+    if (delim.get_int() < 0 || delim.get_int() > 255)
+      throw exception("Outside byte range", "RangeError");
+    element_type e = delim.get_int();
+    delims.push_back(&create(&e, 1));
+  } else if (delim.is_object()) {
+    object obj = delim.get_object();
+
+    if (obj.is_array()) { // Array
+      array arr(obj);
+      std::size_t n = arr.length();
+
+      for (std::size_t i = 0; i < n; ++i) {
+        value delim = arr.get_element(i);
+
+        if (delim.is_int()) { // Array element: Number
+          if (delim.get_int() < 0 || delim.get_int() > 255)
+            throw exception("Outside byte range", "RangeError");
+
+          element_type e = delim.get_int();
+          delims.push_back(&create(&e, 1));
+
+        } else if (delim.is_object()) { // Array element: Binary
+          binary &b = flusspferd::get_native<binary>(delim.get_object());
+          delims.push_back(&b);
+        }
+
+      }
+
+    } else { // Binary
+      binary &b = flusspferd::get_native<binary>(obj);
+      delims.push_back(&b);
+    }
+  }
+
+  if (delims.empty())
+    throw exception("Need at least one valid delimiter");
+
+  // Options
+  std::size_t count = std::numeric_limits<std::size_t>::max();
+  bool include_delimiter = false;
+
+  // (only search options if the options object is not null)
+  if (!options.is_null()) {
+    // "count" option
+    value count_ = options.get_property("count");
+    if (!count_.is_undefined_or_null())
+      count = count_.to_integral_number(32, 0);
+
+    // "includeDelimiter" option
+    value include_delimiter_ = options.get_property("includeDelimiter");
+    if (!include_delimiter_.is_undefined_or_null())
+      include_delimiter = include_delimiter_.to_boolean();
+  }
+
+  // create a Regular Expression to match all delims
+
+  xpressive::null_regex_traits<element_type> nul;
+
+  std::vector<binary*>::iterator delim_it = delims.begin();
+
+  typedef xpressive::basic_regex<vector_type::iterator> regex;
+
+  regex expr = xpressive::imbue(nul)((**delim_it).get_data());
+
+  while (++delim_it != delims.end()) {
+    expr |= xpressive::imbue(nul)((**delim_it).get_data());
+  }
+
+  // make xpressive tokenizer
+
+  std::vector<int> subs;
+  subs.push_back(-1);
+  if (include_delimiter)
+    subs.push_back(0);
+
+  xpressive::regex_token_iterator<vector_type::iterator> token_it(
+    v_data.begin(), v_data.end(), expr, subs);
+
+  xpressive::regex_token_iterator<vector_type::iterator> end;
+
+  // iterate over the tokens
+
+  array results = create_array();
+
+  for (std::size_t i = 0; token_it != end && i < count; ++i, ++token_it) {
+    results.call("push", create(&*token_it->first, token_it->length()));
+  }
+
+  return results;
 }
 
 void binary::debug_rep(std::ostream &stream) {
