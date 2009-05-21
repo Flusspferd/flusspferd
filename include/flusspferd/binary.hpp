@@ -97,7 +97,7 @@ public:
   void concat(call_context &x);
 
 private:
-  std::vector<unsigned char> v_data;
+  vector_type v_data;
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
