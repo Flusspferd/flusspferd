@@ -43,7 +43,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("lastIndexOf", bind, last_index_of)
     ("byteAt", bind, byte_at)
     ("slice", bind, slice)
-    ("concat", bind, concat)))
+    ("concat", bind, concat)
+    ("split", bind, split)))
 {
 protected:
   typedef unsigned char element_type;
@@ -95,6 +96,8 @@ public:
   object slice(int begin, boost::optional<int> end);
 
   void concat(call_context &x);
+
+  array split(value delim, object options);
 
 private:
   vector_type v_data;
