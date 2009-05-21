@@ -392,6 +392,22 @@ std::string byte_string::to_source() {
   return out.str();
 }
 
+byte_string &byte_string::join(array &arr, binary &delimiter)
+{
+  byte_string &res =
+    create_native_object<byte_string>(object(), (element_type*) 0, 0);
+  root_object root_obj(res);
+  std::size_t n = arr.length();
+  for (std::size_t i = 0; i < n; ++i) {
+    arguments arg;
+    if (i > 0)
+      arg.push_back(delimiter);
+    arg.push_back(arr.get_element(i));
+    res.do_append(arg);
+  }
+  return res;
+}
+
 // -- byte_array ------------------------------------------------------------
 
 byte_array::byte_array(object const &o, call_context &x)
