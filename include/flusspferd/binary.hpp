@@ -115,7 +115,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("substring", bind, substring)
     ("toSource", bind, to_source))
   (properties,
-    ("length", getter, get_length)))
+    ("length", getter, get_length))
+  (constructor_methods,
+    ("join", bind_static, join)))
 {
 public:
   byte_string(object const &o, call_context &x);
@@ -132,6 +134,8 @@ public:
   object substr(int start, boost::optional<int> length);
   object substring(int first, boost::optional<int> last);
   std::string to_source();
+
+  static byte_string &join(array &arr, binary &delim);
 };
 
 FLUSSPFERD_CLASS_DESCRIPTION(
