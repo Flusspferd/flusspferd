@@ -448,8 +448,8 @@ ELSE (_boost_IN_CACHE)
 
   IF( BOOST_ROOT )
     SET(_boost_INCLUDE_SEARCH_DIRS 
-      ${BOOST_ROOT}/include 
-      ${BOOST_ROOT}
+      "${BOOST_ROOT}/include"
+      "${BOOST_ROOT}"
       ${_boost_INCLUDE_SEARCH_DIRS})
   ENDIF( BOOST_ROOT )
 
@@ -675,8 +675,8 @@ ELSE (_boost_IN_CACHE)
   ENDIF( WIN32 )
   IF( BOOST_ROOT )
     SET(_boost_LIBRARIES_SEARCH_DIRS 
-      ${BOOST_ROOT}/lib 
-      ${BOOST_ROOT}/stage/lib 
+      "${BOOST_ROOT}/lib"
+      "${BOOST_ROOT}/stage/lib"
       ${_boost_LIBRARIES_SEARCH_DIRS})
   ENDIF( BOOST_ROOT )
 
