@@ -55,8 +55,12 @@ protected:
   binary(object const &o, element_type const *p, std::size_t n);
 
   virtual binary &create(element_type const *p, std::size_t n) = 0;
-
   virtual value element(element_type byte) = 0;
+
+  template<typename It>
+  binary &create_range(It begin, It end) {
+    return create(&*begin, end - begin);
+  }
 
 protected:
   void property_op(property_mode mode, value const &id, value &data);

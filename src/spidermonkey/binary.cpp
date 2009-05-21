@@ -21,15 +21,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
-#include <boost/xpressive/xpressive_static.hpp>
-#include <boost/xpressive/traits/null_regex_traits.hpp>
 #include <sstream>
 #include <algorithm>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 
 using namespace flusspferd;
-namespace xpressive = boost::xpressive;
 
 void flusspferd::load_binary_module(object container) {
   object exports = container.get_property("exports").to_object();
@@ -366,39 +363,46 @@ array binary::split(value delim, object options) {
       include_delimiter = include_delimiter_.to_boolean();
   }
 
-  // create a Regular Expression to match all delims
+  // Main loop
 
-  xpressive::null_regex_traits<element_type> nul;
-
-  std::vector<binary*>::iterator delim_it = delims.begin();
-
-  typedef xpressive::basic_regex<vector_type::iterator> regex;
-
-  regex expr = xpressive::imbue(nul)((**delim_it).get_data());
-
-  while (++delim_it != delims.end()) {
-    expr |= xpressive::imbue(nul)((**delim_it).get_data());
-  }
-
-  // make xpressive tokenizer
-
-  std::vector<int> subs;
-  subs.push_back(-1);
-  if (include_delimiter)
-    subs.push_back(0);
-
-  xpressive::regex_token_iterator<vector_type::iterator> token_it(
-    v_data.begin(), v_data.end(), expr, subs);
-
-  xpressive::regex_token_iterator<vector_type::iterator> end;
-
-  // iterate over the tokens
+  typedef vector_type::iterator iterator;
+  iterator pos = v_data.begin();
 
   array results = create_array();
 
-  for (std::size_t i = 0; token_it != end && i < count; ++i, ++token_it) {
-    results.call("push", create(&*token_it->first, token_it->length()));
+  // Loop only through the first count-1 elements
+  for (std::size_t n = 1; n < count; ++n) {
+    // Search for the first occurring delimiter
+    std::size_t delim_id = delims.size();
+    iterator first_found = v_data.end();
+    for (std::size_t i = 0; i < delims.size(); ++i) {
+      binary &delim = *delims[i];
+      iterator found = std::search(
+        pos, v_data.end(),
+        delim.get_data().begin(), delim.get_data().end());
+      if (found < first_found) {
+        first_found = found;
+        delim_id = i;
+      }
+    }
+
+    // No delimiter found
+    if (delim_id == delims.size())
+      break;
+
+    // Add element
+    results.call("push", create_range(pos, first_found));
+
+    // Possible add delimiter
+    if (include_delimiter)
+      results.call("push", *delims[delim_id]);
+
+    // Advance position _after_ the delimiter.
+    pos = first_found + delims[delim_id]->get_length();
   }
+
+  // Add last element, possibly containing delimiters
+  results.call("push", create_range(pos, v_data.end()));
 
   return results;
 }
