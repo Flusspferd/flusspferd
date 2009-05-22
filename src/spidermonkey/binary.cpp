@@ -323,6 +323,7 @@ array binary::split(value delim, object options) {
       for (std::size_t i = 0; i < n; ++i) {
         binary &new_delim =
           create_native_object<byte_string>(object(), (element_type*)0, 0);
+        new_delim.set_property("delimiter", true);
         arguments arg;
         arg.push_back(arr.get_element(i));
         new_delim.do_append(arg);
@@ -383,8 +384,11 @@ array binary::split(value delim, object options) {
     if (delim_id == delims.size())
       break;
 
+    binary &elem = create_range(pos, first_found);
+    elem.set_property("delimiter", false);
+
     // Add element
-    results.call("push", create_range(pos, first_found));
+    results.call("push", elem);
 
     // Possible add delimiter
     if (include_delimiter)
