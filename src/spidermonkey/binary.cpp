@@ -21,6 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
+#include "flusspferd/evaluate.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -115,6 +116,45 @@ binary::binary(object const &o, binary const &b)
 binary::binary(object const &o, element_type const *p, std::size_t n)
   : base_type(o), v_data(p, p + n)
 {}
+
+void binary::augment_prototype(object &proto) {
+  static const char* js_iterator =
+    "function() { return require('Util/Range').Range(0, this.length) }";
+  value iter_val = evaluate(js_iterator, strlen(js_iterator));
+  proto.define_property("__iterator__", iter_val);
+
+  static const char* js_val_iter =
+    "var i = 0;"
+    "while (i < this.length) {"
+    "  yield this.byteAt(i); i++;"
+    "}"
+    ;
+  function values_fn =
+    create_function(
+      "values",
+      0,
+      std::vector<std::string>(),
+      string(js_val_iter),
+      __FILE__,
+      __LINE__);
+
+  proto.define_property("values", value(),
+      property_attributes(dont_enumerate, values_fn));
+
+  static const char* js_pairs_iter =
+    "function() {"
+    "  var i = 0;"
+    "  while (i < this.length) {"
+    "    yield [i, this.byteAt(i)]; i++;"
+    "  }"
+    "}";
+
+  function pairs_fn =
+      evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object();
+
+  proto.define_property("pairs", value(),
+      property_attributes(dont_enumerate, pairs_fn));
+}
 
 bool binary::property_resolve(value const &id, unsigned /*flags*/) {
   if (!id.is_int())
