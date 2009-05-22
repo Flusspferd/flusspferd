@@ -326,11 +326,13 @@ array binary::split(value delim, object options) {
         arguments arg;
         arg.push_back(arr.get_element(i));
         new_delim.do_append(arg);
-        delims.push_back(&new_delim);
+        if (new_delim.get_length() > 0)
+          delims.push_back(&new_delim);
       }
     } else { // Binary
       binary &b = flusspferd::get_native<binary>(obj);
-      delims.push_back(&b);
+      if (b.get_length() > 0)
+        delims.push_back(&b);
     }
   }
 
