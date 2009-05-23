@@ -36,6 +36,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "binary.Binary")
   (constructor_name, "Binary")
   (constructible, 0)
+  (augment_prototype, 1)
   (methods,
     ("toByteArray", bind, to_byte_array)
     ("toArray", bind, to_array)
@@ -46,6 +47,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("concat", bind, concat)
     ("split", bind, split)))
 {
+public:
+  static void augment_prototype(object &);
+
 protected:
   typedef unsigned char element_type;
   typedef std::vector<element_type> vector_type;
