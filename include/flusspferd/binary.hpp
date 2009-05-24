@@ -174,6 +174,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("forEach", bind, for_each)
     ("every", bind, every)
     ("some", bind, some)
+    ("count", bind, count)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -203,6 +204,7 @@ public:
   void for_each(function callback, object thisObj);
   bool every(function callback, object thisObj);
   bool some(function callback, object thisObj);
+  int count(function callback, object thisObj);
   std::string to_source();
 };
 
