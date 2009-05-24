@@ -716,7 +716,6 @@ void byte_array::for_each(function callback, object thisObj) {
     callback.call(thisObj, v[i], i, *this);
 }
 
-
 bool byte_array::every(function callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
@@ -728,6 +727,19 @@ bool byte_array::every(function callback, object thisObj) {
       return false;
 
   return true;
+}
+
+bool byte_array::some(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    if (callback.call(thisObj, v[i], i, *this).to_boolean())
+      return true;
+
+  return false;
 }
 
 std::string byte_array::to_source() {
