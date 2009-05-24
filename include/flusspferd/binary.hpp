@@ -55,7 +55,7 @@ protected:
   typedef std::vector<element_type> vector_type;
 
   binary(object const &o, call_context &x);
-  binary(object const &o, binary const &o);
+  binary(object const &o, binary const &b);
   binary(object const &o, element_type const *p, std::size_t n);
 
   virtual binary &create(element_type const *p, std::size_t n) = 0;
@@ -132,7 +132,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 public:
   byte_string(object const &o, call_context &x);
-  byte_string(object const &o, binary const &o);
+  byte_string(object const &o, binary const &b);
   byte_string(object const &o, element_type const *p, std::size_t n);
 
   virtual binary &create(element_type const *p, std::size_t n);
@@ -176,7 +176,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 public:
   byte_array(object const &o, call_context &x);
-  byte_array(object const &o, binary const &o);
+  byte_array(object const &o, binary const &b);
   byte_array(object const &o, element_type const *p, std::size_t n);
 
   virtual binary &create(element_type const *p, std::size_t n);
