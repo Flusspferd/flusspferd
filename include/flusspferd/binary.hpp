@@ -170,6 +170,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("replace", bind, replace)
     ("insert", bind, insert)
     ("splice", bind, splice)
+    ("filter", bind, filter)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -195,6 +196,7 @@ public:
   void replace(call_context &x);
   void insert(call_context &x);
   void splice(call_context &x);
+  byte_array &filter(function callback, object thisObj);
   std::string to_source();
 };
 

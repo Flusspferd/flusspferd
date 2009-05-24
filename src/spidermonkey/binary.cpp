@@ -688,6 +688,24 @@ void byte_array::splice(call_context &x) {
   x.result = o;
 }
 
+byte_array &byte_array::filter(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  byte_array &result =
+    create_native_object<byte_array>(object(), (element_type*)0, 0);
+  root_object root_obj(result);
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    if (callback.call(thisObj, v[i], i, *this).to_boolean())
+      result.get_data().push_back(v[i]);
+  }
+
+  return result;
+}
+
 std::string byte_array::to_source() {
   std::ostringstream out;
   out << "(ByteArray([";
