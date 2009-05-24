@@ -742,6 +742,21 @@ bool byte_array::some(function callback, object thisObj) {
   return false;
 }
 
+int byte_array::count(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  int n = 0;
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    if (callback.call(thisObj, v[i], i, *this).to_boolean())
+      ++n;
+
+  return n;
+}
+
 std::string byte_array::to_source() {
   std::ostringstream out;
   out << "(ByteArray([";
