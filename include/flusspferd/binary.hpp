@@ -171,6 +171,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("insert", bind, insert)
     ("splice", bind, splice)
     ("filter", bind, filter)
+    ("forEach", bind, for_each)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -197,6 +198,7 @@ public:
   void insert(call_context &x);
   void splice(call_context &x);
   byte_array &filter(function callback, object thisObj);
+  void for_each(function callback, object thisObj);
   std::string to_source();
 };
 
