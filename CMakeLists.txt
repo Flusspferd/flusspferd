@@ -28,6 +28,9 @@ cmake_minimum_required(VERSION 2.6)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
+message(STATUS "Source: ${CMAKE_SOURCE_DIR}")
+message(STATUS "Binary: ${CMAKE_BINARY_DIR}")
+
 if(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
 endif()
@@ -124,6 +127,10 @@ endif()
 
 set(Boost_USE_MULTITHREADED ON)
 
+if(WIN32)
+    set(Boost_USE_STATIC_LIBS ON)
+endif()
+
 set(Boost_FIND_REQUIRED TRUE)
 
 find_package(Boost 1.36.0 COMPONENTS
@@ -216,9 +223,11 @@ set(
 
 target_link_libraries(flusspferd ${flusspferd_LIBS})
 
-install(TARGETS
-    flusspferd
-    LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+if(NOT WIN32)
+    install(TARGETS
+        flusspferd
+        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+endif()
 
 ## Library - coverage variant ###############################################
 
@@ -267,9 +276,11 @@ target_link_libraries(
     flusspferd
     ${LIBEDIT_LIBRARIES})
 
-install(TARGETS
-    flusspferd-shell
-    RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
+if(NOT WIN32)
+    install(TARGETS
+        flusspferd-shell
+        RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
+endif()
 
 ## Tests ###################################################################
 
@@ -311,13 +322,15 @@ target_link_libraries(
     flusspferd-io
     flusspferd)
 
-install(TARGETS
-    flusspferd-io
-    LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+if(NOT WIN32)
+    install(TARGETS
+        flusspferd-io
+        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
-install(TARGETS
-    flusspferd-io
-    LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+    install(TARGETS
+        flusspferd-io
+        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+endif()
 
 ## XML ######################################################################
 
@@ -338,13 +351,15 @@ if(LIBXML2_FOUND)
         flusspferd
         ${LIBXML2_LIBRARIES})
 
-    install(TARGETS
-        flusspferd-xml
-        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+    if(NOT WIN32)
+        install(TARGETS
+            flusspferd-xml
+            LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 
-    install(TARGETS
-        flusspferd-xml
-        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+        install(TARGETS
+            flusspferd-xml
+            LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+    endif()
 
 endif()
 
@@ -407,70 +422,80 @@ foreach(PLUGIN ${PLUGINS})
         flusspferd
         ${${PLUGIN}_LIBRARIES})
 
-    install(TARGETS
-        ${PLUGIN}_PLUGIN
-        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+    if(NOT WIN32)
+        install(TARGETS
+            ${PLUGIN}_PLUGIN
+            LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
-    file(GLOB
-        ${PLUGIN}_JS_FILES
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
+        file(GLOB
+            ${PLUGIN}_JS_FILES
+            ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
 
-    if(${PLUGIN}_JS_FILES)
-        install(FILES
-            ${${PLUGIN}_JS_FILES}
-            DESTINATION ${INSTALL_MODULES_PATH})
+        if(${PLUGIN}_JS_FILES)
+            install(FILES
+                ${${PLUGIN}_JS_FILES}
+                DESTINATION ${INSTALL_MODULES_PATH})
+        endif()
     endif()
 
 endforeach()
 
-set(JS_PLUGINS
-    Util Util/Array Util/Function Util/Range TestHarness HTTP/Headers)
+if(NOT WIN32)
+    set(JS_PLUGINS
+        Util Util/Array Util/Function Util/Range TestHarness HTTP/Headers)
 
-foreach(JS_PLUGIN ${JS_PLUGINS})
+    foreach(JS_PLUGIN ${JS_PLUGINS})
 
-    string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
+        string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
 
-    install(FILES
-        src/js/${JS_PLUGIN}.js
-        DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
+        install(FILES
+            src/js/${JS_PLUGIN}.js
+            DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
 
-endforeach()
+    endforeach()
+endif()
 
 ## Headers ##################################################################
 
-install(
-    DIRECTORY include/
-    DESTINATION ${INSTALL_HEADERS_PATH}
-    FILES_MATCHING PATTERN "*.hpp")
+if(NOT WIN32)
+    install(
+        DIRECTORY include/
+        DESTINATION ${INSTALL_HEADERS_PATH}
+        FILES_MATCHING PATTERN "*.hpp")
+endif()
 
 ## Prelude ##################################################################
 
-install(
-    FILES src/js/prelude.js
-    DESTINATION ${INSTALL_LIBDATA_PATH})
+if(NOT WIN32)
+    install(
+        FILES src/js/prelude.js
+        DESTINATION ${INSTALL_LIBDATA_PATH})
+endif()
 
 ## Configured files##########################################################
 
-configure_file(
-    ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
-    ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
+if(NOT WIN32)
+    configure_file(
+        ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
+        ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
 
-install(
-    FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
-    DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
+    install(
+        FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
+        DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
 
-set(FLUSSPFERD_EXTERNAL_CFLAGS
-    "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
+    set(FLUSSPFERD_EXTERNAL_CFLAGS
+        "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
-foreach(_FLAG @SPIDERMONKEY_DEFINITIONS@)
-    set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")
-endforeach()
+    foreach(_FLAG @SPIDERMONKEY_DEFINITIONS@)
+        set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")
+    endforeach()
 
-configure_file(
-    ${Flusspferd_SOURCE_DIR}/flusspferd.pc.in
-    ${Flusspferd_BINARY_DIR}/flusspferd.pc
-    @ONLY)
+    configure_file(
+        ${Flusspferd_SOURCE_DIR}/flusspferd.pc.in
+        ${Flusspferd_BINARY_DIR}/flusspferd.pc
+        @ONLY)
 
-install(
-    FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
-    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+    install(
+        FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+endif()
