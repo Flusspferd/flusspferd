@@ -716,6 +716,20 @@ void byte_array::for_each(function callback, object thisObj) {
     callback.call(thisObj, v[i], i, *this);
 }
 
+
+bool byte_array::every(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    if (!callback.call(thisObj, v[i], i, *this).to_boolean())
+      return false;
+
+  return true;
+}
+
 std::string byte_array::to_source() {
   std::ostringstream out;
   out << "(ByteArray([";
