@@ -781,6 +781,32 @@ byte_array &byte_array::map(function callback, object thisObj) {
   return result;
 }
 
+value byte_array::reduce(function callback, value initial_value) {
+  root_value result(initial_value);
+
+  vector_type &v = get_data();
+  object obj = flusspferd::scope_chain();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    result = callback.call(obj, result, v[i], i, *this);
+
+  return result;
+}
+
+value byte_array::reduce_right(function callback, value initial_value) {
+  root_value result(initial_value);
+
+  vector_type &v = get_data();
+  object obj = flusspferd::scope_chain();
+
+  std::size_t i = v.size();
+
+  while (i--)
+    result = callback.call(obj, result, v[i], i, *this);
+
+  return result;
+}
+
 std::string byte_array::to_source() {
   std::ostringstream out;
   out << "(ByteArray([";

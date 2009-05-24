@@ -176,6 +176,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("some", bind, some)
     ("count", bind, count)
     ("map", bind, map)
+    ("reduce", bind, reduce)
+    ("reduceRight", bind, reduce_right)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -207,6 +209,8 @@ public:
   bool some(function callback, object thisObj);
   int count(function callback, object thisObj);
   byte_array &map(function callback, object thisObj);
+  value reduce(function callback, value initial_value);
+  value reduce_right(function callback, value initial_value);
   std::string to_source();
 };
 
