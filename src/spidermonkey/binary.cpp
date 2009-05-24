@@ -757,6 +757,30 @@ int byte_array::count(function callback, object thisObj) {
   return n;
 }
 
+byte_array &byte_array::map(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  byte_array &result =
+    create_native_object<byte_array>(object(), (element_type*)0, 0);
+  root_object root_obj(result);
+
+  vector_type &v = get_data();
+
+  result.get_data().reserve(v.size());
+
+  root_value x;
+
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    x = callback.call(thisObj, v[i], i, *this);
+    arguments arg;
+    arg.push_back(x);
+    result.do_append(arg);
+  }
+
+  return result;
+}
+
 std::string byte_array::to_source() {
   std::ostringstream out;
   out << "(ByteArray([";

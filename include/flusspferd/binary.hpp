@@ -175,6 +175,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("every", bind, every)
     ("some", bind, some)
     ("count", bind, count)
+    ("map", bind, map)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -205,6 +206,7 @@ public:
   bool every(function callback, object thisObj);
   bool some(function callback, object thisObj);
   int count(function callback, object thisObj);
+  byte_array &map(function callback, object thisObj);
   std::string to_source();
 };
 
