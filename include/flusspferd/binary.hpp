@@ -172,6 +172,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("splice", bind, splice)
     ("filter", bind, filter)
     ("forEach", bind, for_each)
+    ("every", bind, every)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -199,6 +200,7 @@ public:
   void splice(call_context &x);
   byte_array &filter(function callback, object thisObj);
   void for_each(function callback, object thisObj);
+  bool every(function callback, object thisObj);
   std::string to_source();
 };
 
