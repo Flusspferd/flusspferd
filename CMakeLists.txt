@@ -73,7 +73,13 @@ include(FindPkgConfig)
 
 ## Compiler options #########################################################
 
-set(ENABLE_TESTS ON CACHE BOOL "Compile the test suite")
+if(WIN32)
+    set(_ENABLE_TESTS_DEFAULT OFF)
+else()
+    set(_ENABLE_TESTS_DEFAULT ON)
+endif()
+
+set(ENABLE_TESTS ${_ENABLE_TESTS_DEFAULT} CACHE BOOL "Compile the test suite")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
