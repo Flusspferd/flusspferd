@@ -45,6 +45,7 @@ class function;
 class array;
 class native_object_base;
 class native_function_base;
+
 #ifndef IN_DOXYGEN
 namespace detail {
 
@@ -188,6 +189,19 @@ struct convert< boost::optional<T> > {
       return base.perform(v);
     }
   };
+};
+
+template<typename T>
+struct convert< detail::root<T> > {
+  struct to_value {
+    typename convert<T>::to_value base;
+
+    value perform(detail::root<T> const &x) {
+      return base.perform(x);
+    }
+  };
+
+  typedef typename convert<T>::from_value from_value;
 };
 
 template<typename T, std::size_t N>
