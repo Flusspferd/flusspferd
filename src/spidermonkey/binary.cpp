@@ -642,7 +642,7 @@ int byte_array::erase(int begin, boost::optional<int> end) {
   return get_length();
 }
 
-void byte_array::replace(call_context &x) {
+void byte_array::displace(call_context &x) {
   int begin = x.arg[0].to_integral_number(32, true);
   boost::optional<int> end;
   if (!x.arg[1].is_undefined_or_null())
@@ -670,7 +670,7 @@ void byte_array::insert(call_context &x) {
   while (++it != x.arg.end())
     arg.push_back(*it);
   x.arg = arg;
-  replace(x);
+  displace(x);
 }
 
 void byte_array::splice(call_context &x) {
@@ -682,7 +682,7 @@ void byte_array::splice(call_context &x) {
   root_object o(create(&get_data()[r.first], r.second - r.first));
   x.arg[0] = int(r.first);
   x.arg[1] = int(r.second);
-  replace(x);
+  displace(x);
   x.result = o;
 }
 
