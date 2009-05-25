@@ -31,6 +31,8 @@ namespace flusspferd {
 
 void load_binary_module(object container);
 
+class byte_string;
+
 FLUSSPFERD_CLASS_DESCRIPTION(
   binary,
   (full_name, "binary.Binary")
@@ -43,6 +45,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("indexOf", bind, index_of)
     ("lastIndexOf", bind, last_index_of)
     ("byteAt", bind, byte_at)
+    ("charAt", alias, "byteAt")
+    ("get", bind, get)
     ("slice", bind, slice)
     ("concat", bind, concat)
     ("split", bind, split)))
@@ -99,7 +103,9 @@ public:
   int last_index_of(
     value byte, boost::optional<int> start, boost::optional<int> stop);
 
-  int byte_at(int offset);
+  byte_string &byte_at(int offset);
+
+  int get(int offset);
 
   object slice(int begin, boost::optional<int> end);
 
@@ -120,8 +126,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (methods, 
     ("toString", bind, to_string)
     ("toByteString", bind, to_byte_string)
-    ("charCodeAt", alias, "byteAt")
-    ("charAt", bind, char_at)
+    ("charCodeAt", alias, "get")
     ("substr", bind, substr)
     ("substring", bind, substring)
     ("toSource", bind, to_source))
@@ -141,7 +146,6 @@ public:
 public:
   std::string to_string();
   object to_byte_string();
-  object char_at(int offset);
   object substr(int start, boost::optional<int> length);
   object substring(int first, boost::optional<int> last);
   std::string to_source();
@@ -167,9 +171,17 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("reverse", bind, reverse)
     ("sort", bind, sort)
     ("erase", bind, erase)
-    ("replace", bind, replace)
+    ("displace", bind, displace)
     ("insert", bind, insert)
     ("splice", bind, splice)
+    ("filter", bind, filter)
+    ("forEach", bind, for_each)
+    ("every", bind, every)
+    ("some", bind, some)
+    ("count", bind, count)
+    ("map", bind, map)
+    ("reduce", bind, reduce)
+    ("reduceRight", bind, reduce_right)
     ("toSource", bind, to_source))
   (properties,
     ("length", getter_setter, (get_length, set_length))))
@@ -192,9 +204,17 @@ public:
   byte_array &reverse();
   binary &sort(object compare);
   int erase(int begin, boost::optional<int> end);
-  void replace(call_context &x);
+  void displace(call_context &x);
   void insert(call_context &x);
   void splice(call_context &x);
+  byte_array &filter(function callback, object thisObj);
+  void for_each(function callback, object thisObj);
+  bool every(function callback, object thisObj);
+  bool some(function callback, object thisObj);
+  int count(function callback, object thisObj);
+  byte_array &map(function callback, object thisObj);
+  value reduce(function callback, value initial_value);
+  value reduce_right(function callback, value initial_value);
   std::string to_source();
 };
 
