@@ -171,7 +171,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("reverse", bind, reverse)
     ("sort", bind, sort)
     ("erase", bind, erase)
-    ("replace", bind, replace)
+    ("displace", bind, displace)
     ("insert", bind, insert)
     ("splice", bind, splice)
     ("filter", bind, filter)
@@ -204,7 +204,7 @@ public:
   byte_array &reverse();
   binary &sort(object compare);
   int erase(int begin, boost::optional<int> end);
-  void replace(call_context &x);
+  void displace(call_context &x);
   void insert(call_context &x);
   void splice(call_context &x);
   byte_array &filter(function callback, object thisObj);
