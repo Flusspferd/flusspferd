@@ -255,7 +255,13 @@ int binary::last_index_of(
   return -1;
 }
 
-int binary::byte_at(int offset) {
+byte_string &binary::byte_at(int offset) {
+  if (offset < 0 || std::size_t(offset) > get_length())
+    throw exception("Offset outside range", "RangeError");
+  return create_native_object<byte_string>(object(), &v_data[offset], 1);
+}
+
+int binary::get(int offset) {
   if (offset < 0 || std::size_t(offset) > get_length())
     throw exception("Offset outside range", "RangeError");
   return v_data[offset];
@@ -490,12 +496,6 @@ std::string byte_string::to_string() {
 
 object byte_string::to_byte_string() {
   return *this;
-}
-
-object byte_string::char_at(int offset) {
-  if (offset < 0 || std::size_t(offset) > get_length())
-    throw exception("Offset outside range", "RangeError");
-  return create(&get_data()[offset], 1);
 }
 
 object byte_string::substr(int start, boost::optional<int> length) {
