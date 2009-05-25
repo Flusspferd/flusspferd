@@ -235,7 +235,7 @@ void require(call_context &x) {
 
         flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-        func(exports);
+        func(exports, x.function);
 
         // The exports reference might have been changed.
         module_cache.set_property(key, exports);
