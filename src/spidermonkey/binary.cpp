@@ -255,7 +255,13 @@ int binary::last_index_of(
   return -1;
 }
 
-int binary::byte_at(int offset) {
+byte_string &binary::byte_at(int offset) {
+  if (offset < 0 || std::size_t(offset) > get_length())
+    throw exception("Offset outside range", "RangeError");
+  return create_native_object<byte_string>(object(), &v_data[offset], 1);
+}
+
+int binary::get(int offset) {
   if (offset < 0 || std::size_t(offset) > get_length())
     throw exception("Offset outside range", "RangeError");
   return v_data[offset];
@@ -363,7 +369,6 @@ array binary::split(value delim, object options) {
       for (std::size_t i = 0; i < n; ++i) {
         binary &new_delim =
           create_native_object<byte_string>(object(), (element_type*)0, 0);
-        new_delim.set_property("delimiter", true);
         arguments arg;
         arg.push_back(arr.get_element(i));
         new_delim.do_append(arg);
@@ -425,7 +430,6 @@ array binary::split(value delim, object options) {
       break;
 
     binary &elem = create_range(pos, first_found);
-    elem.set_property("delimiter", false);
 
     // Add element
     results.call("push", elem);
@@ -490,12 +494,6 @@ std::string byte_string::to_string() {
 
 object byte_string::to_byte_string() {
   return *this;
-}
-
-object byte_string::char_at(int offset) {
-  if (offset < 0 || std::size_t(offset) > get_length())
-    throw exception("Offset outside range", "RangeError");
-  return create(&get_data()[offset], 1);
 }
 
 object byte_string::substr(int start, boost::optional<int> length) {
@@ -644,7 +642,7 @@ int byte_array::erase(int begin, boost::optional<int> end) {
   return get_length();
 }
 
-void byte_array::replace(call_context &x) {
+void byte_array::displace(call_context &x) {
   int begin = x.arg[0].to_integral_number(32, true);
   boost::optional<int> end;
   if (!x.arg[1].is_undefined_or_null())
@@ -672,7 +670,7 @@ void byte_array::insert(call_context &x) {
   while (++it != x.arg.end())
     arg.push_back(*it);
   x.arg = arg;
-  replace(x);
+  displace(x);
 }
 
 void byte_array::splice(call_context &x) {
@@ -684,8 +682,127 @@ void byte_array::splice(call_context &x) {
   root_object o(create(&get_data()[r.first], r.second - r.first));
   x.arg[0] = int(r.first);
   x.arg[1] = int(r.second);
-  replace(x);
+  displace(x);
   x.result = o;
+}
+
+byte_array &byte_array::filter(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  byte_array &result =
+    create_native_object<byte_array>(object(), (element_type*)0, 0);
+  root_object root_obj(result);
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    if (callback.call(thisObj, v[i], i, *this).to_boolean())
+      result.get_data().push_back(v[i]);
+  }
+
+  return result;
+}
+
+void byte_array::for_each(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    callback.call(thisObj, v[i], i, *this);
+}
+
+bool byte_array::every(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    if (!callback.call(thisObj, v[i], i, *this).to_boolean())
+      return false;
+
+  return true;
+}
+
+bool byte_array::some(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    if (callback.call(thisObj, v[i], i, *this).to_boolean())
+      return true;
+
+  return false;
+}
+
+int byte_array::count(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  vector_type &v = get_data();
+
+  int n = 0;
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    if (callback.call(thisObj, v[i], i, *this).to_boolean())
+      ++n;
+
+  return n;
+}
+
+byte_array &byte_array::map(function callback, object thisObj) {
+  if (thisObj.is_null())
+    thisObj = flusspferd::scope_chain();
+
+  byte_array &result =
+    create_native_object<byte_array>(object(), (element_type*)0, 0);
+  root_object root_obj(result);
+
+  vector_type &v = get_data();
+
+  result.get_data().reserve(v.size());
+
+  root_value x;
+
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    x = callback.call(thisObj, v[i], i, *this);
+    arguments arg;
+    arg.push_back(x);
+    result.do_append(arg);
+  }
+
+  return result;
+}
+
+value byte_array::reduce(function callback, value initial_value) {
+  root_value result(initial_value);
+
+  vector_type &v = get_data();
+  object obj = flusspferd::scope_chain();
+
+  for (std::size_t i = 0; i < v.size(); ++i)
+    result = callback.call(obj, result, v[i], i, *this);
+
+  return result;
+}
+
+value byte_array::reduce_right(function callback, value initial_value) {
+  root_value result(initial_value);
+
+  vector_type &v = get_data();
+  object obj = flusspferd::scope_chain();
+
+  std::size_t i = v.size();
+
+  while (i--)
+    result = callback.call(obj, result, v[i], i, *this);
+
+  return result;
 }
 
 std::string byte_array::to_source() {
