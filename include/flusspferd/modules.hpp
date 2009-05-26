@@ -39,7 +39,7 @@ namespace flusspferd {
  * @ingroup loadable_modules
  * @ingroup jsext
  */
-void load_require_function(object container = flusspferd::global());
+void load_require_function(object container);
 
 /**
  * The prototype for module loader functions.

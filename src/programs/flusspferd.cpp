@@ -97,10 +97,11 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     argv(argv)
 {
   flusspferd::object g = flusspferd::global();
+  flusspferd::security::create(flusspferd::global().prototype()),
 
   flusspferd::load_class<flusspferd::blob>();
 
-  flusspferd::load_require_function();
+  flusspferd::load_require_function(flusspferd::global().prototype());
   flusspferd::object require_fn = g.get_property("require").to_object();
 
   flusspferd::load_properties_functions();
@@ -221,7 +222,7 @@ void flusspferd_repl::load_config() {
   flusspferd::value prelude = co.global().get_property("prelude");
   
   if (!prelude.is_undefined_or_null()) {
-    flusspferd::execute(prelude.to_string().c_str());
+    flusspferd::execute(prelude.to_string().c_str(), flusspferd::global().prototype());
   }
 }
 
