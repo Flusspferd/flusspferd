@@ -126,7 +126,8 @@ void binary::augment_prototype(object &proto) {
   static const char* js_val_iter =
     "var i = 0;"
     "while (i < this.length) {"
-    "  yield this.byteAt(i); i++;"
+    "  yield this[i];"
+    "  ++i;"
     "}"
     ;
   function values_fn =
@@ -145,7 +146,8 @@ void binary::augment_prototype(object &proto) {
     "function() {"
     "  var i = 0;"
     "  while (i < this.length) {"
-    "    yield [i, this.byteAt(i)]; i++;"
+    "    yield [i, this[i]];"
+    "    ++i;"
     "  }"
     "}";
 
