@@ -149,7 +149,7 @@ void require(call_context &x) {
     x.function.set_property("id", flusspferd::string(key));
 
     value alias_v = x.function.get_property("alias");
-  
+
     if (alias_v.is_object() && !alias_v.is_null()) {
       object alias = alias_v.get_object();
       if (alias.has_own_property(key)) {
@@ -161,7 +161,7 @@ void require(call_context &x) {
     module_cache = x.function.get_property("module_cache").to_object();
     if (module_cache.is_null())
       throw exception("No valid module cache");
- 
+
     if (module_cache.has_own_property(key)) {
       x.result = module_cache.get_property(key);
       return;
@@ -227,7 +227,7 @@ void require(call_context &x) {
 
         if (!symbol) {
           std::stringstream ss;
-          ss << "Unable to load library '" << fullpath.c_str() 
+          ss << "Unable to load library '" << fullpath.c_str()
              << "': " << dlerror();
           throw exception(ss.str().c_str());
         }
@@ -249,7 +249,7 @@ void require(call_context &x) {
     for (size_t i = 0; i < len; i++) {
       std::string path = paths.get_element(i).to_std_string();
       std::string fullpath = path + js_name;
-  
+
       if (sec.check_path(fullpath, security::READ) &&
           boost::filesystem::exists(fullpath))
       {
