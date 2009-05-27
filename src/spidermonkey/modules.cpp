@@ -170,10 +170,6 @@ void require(call_context &x) {
     object classes_object = flusspferd::global().prototype();
     object ctx = flusspferd::create_object(classes_object);
 
-    // Perhaps this should be a 'sub'-security object that
-    // wraps/inherites/instanceOf the previous security token
-    flusspferd::security::create(ctx);
-
     object exports = flusspferd::create_object();
     ctx.define_property(
       "exports",
