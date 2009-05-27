@@ -90,17 +90,19 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
-    security(flusspferd::security::create(flusspferd::global())),
+    // Security token goes in shared global
+    security(flusspferd::security::create(flusspferd::global().prototype())),
     running(false),
     exit_code(0),
     argc(argc),
     argv(argv)
 {
   flusspferd::object g = flusspferd::global();
-  flusspferd::security::create(flusspferd::global().prototype()),
 
   flusspferd::load_class<flusspferd::blob>();
 
+  // Put the require function in the shared global so it is available to
+  // sub-modules too
   flusspferd::load_require_function(flusspferd::global().prototype());
   flusspferd::object require_fn = g.get_property("require").to_object();
 
