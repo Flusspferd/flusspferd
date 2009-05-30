@@ -32,16 +32,10 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::io;
 
-#ifndef FLUSSPFERD_COVERAGE
-FLUSSPFERD_LOADER(container) {
-  load_io(container);
-}
-#endif
-
-object flusspferd::io::load_io(object container) {
+object flusspferd::io::load_io_module(object container) {
   local_root_scope scope;
 
-  object IO = container;
+  object IO = container.get_property("exports").to_object();
 
   load_class<stream>(IO);
   load_class<file>(IO);

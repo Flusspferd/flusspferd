@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/parse.hpp"
-#include "flusspferd/xml/node.hpp"
+#include "parse.hpp"
+#include "node.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/string.hpp"
 #include <libxml/parser.h>

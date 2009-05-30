@@ -25,7 +25,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_ATTRIBUTE_HPP
 
 #include "node.hpp"
-#include "../class_description.hpp"
+#include "flusspferd/class_description.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 

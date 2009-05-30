@@ -21,18 +21,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PARSE_HPP
-#define FLUSSPFERD_XML_PARSE_HPP
+#ifndef FLUSSPFERD_XML_REFERENCE_HPP
+#define FLUSSPFERD_XML_REFERENCE_HPP
 
-#include "../object.hpp"
-#include "../blob.hpp"
+#include "node.hpp"
+#include "flusspferd/class_description.hpp"
+#include <boost/noncopyable.hpp>
+#include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
-object parse_blob(blob &b, object options);
-object parse_file(string filename, object options);
-object html_parse_blob(blob &b, object options);
-object html_parse_file(string filename, object options);
+FLUSSPFERD_CLASS_DESCRIPTION(
+  reference_,
+  (base, node)
+  (full_name, "XML.Reference")
+  (constructor_name, "Reference")
+  (constructor_arity, 2))
+{
+public:
+  reference_(object const &, call_context &);
+  reference_(object const &, xmlNodePtr doc);
+  ~reference_();
+};
 
 }}
 

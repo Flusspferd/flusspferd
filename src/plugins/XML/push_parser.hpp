@@ -21,37 +21,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_CONTEXT_HPP
-#define FLUSSPFERD_XML_CONTEXT_HPP
+#ifndef FLUSSPFERD_XML_PUSH_PARSER_HPP
+#define FLUSSPFERD_XML_PUSH_PARSER_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../class_description.hpp"
-#include <libxml/xpath.h>
+#include "flusspferd/blob.hpp"
+#include "flusspferd/class_description.hpp"
+#include <libxml/parser.h>
 
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  xpath_context,
-  (full_name, "XML.XPath")
-  (constructor_name, "XPath")
+  push_parser,
+  (full_name, "XML.PushParser")
+  (constructor_name, "PushParser")
   (constructor_arity, 1)
-  (properties,
-    ("current", getter_setter, (get_current, set_current))))
+  (methods,
+    ("push", bind, push)
+    ("terminate", bind, terminate)))
 {
 public:
-  xpath_context(object const &, call_context &);
-  ~xpath_context();
+  push_parser(object const &, call_context &);
+  ~push_parser();
 
-private: // JS methods
-  void self_call(call_context &);
-
-public: // JS properties
-  object get_current();
-  void set_current(object);
+public: // JS methods
+  void push(blob &, bool);
+  value terminate();
 
 private:
-  xmlXPathContextPtr xpath_ctx;
+  void terminate2();
+
+  xmlParserCtxtPtr parser;
 };
 
 }}

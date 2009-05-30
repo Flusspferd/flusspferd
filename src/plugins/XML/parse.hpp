@@ -21,59 +21,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_NAMESPACE_HPP
-#define FLUSSPFERD_XML_NAMESPACE_HPP
+#ifndef FLUSSPFERD_XML_PARSE_HPP
+#define FLUSSPFERD_XML_PARSE_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../class_description.hpp"
-#include <boost/noncopyable.hpp>
-#include <libxml/tree.h>
+#include "flusspferd/object.hpp"
+#include "flusspferd/blob.hpp"
 
 namespace flusspferd { namespace xml {
 
-FLUSSPFERD_CLASS_DESCRIPTION(
-  namespace_,
-  (full_name, "XML.Namespace")
-  (constructor_name, "Namespace")
-  (constructor_arity, 3)
-  (methods,
-    ("toString", bind, to_string))
-  (properties,
-    ("href", getter_setter, (get_href, set_href))
-    ("prefix", getter_setter, (get_prefix, set_prefix))))
-{
-public:
-  namespace_(object const &, call_context &);
-  namespace_(object const &, xmlNsPtr ptr);
-  ~namespace_();
-
-  static object create(xmlNsPtr ptr);
-
-  xmlNsPtr c_obj() const {
-    return ptr;
-  }
-
-  static xmlNsPtr c_from_js(object const &o);
-
-protected:
-  void trace(tracer &);
-
-private:
-  void init();
-
-public: // JS methods
-  string to_string();
-
-public: // JS properties
-  boost::optional<std::string> get_href();
-  void set_href(boost::optional<std::string> const &x);
-  boost::optional<std::string> get_prefix();
-  void set_prefix(boost::optional<std::string> const &x);
-
-private:
-  xmlNsPtr ptr;
-};
+object parse_blob(blob &b, object options);
+object parse_file(string filename, object options);
+object html_parse_blob(blob &b, object options);
+object html_parse_file(string filename, object options);
 
 }}
 

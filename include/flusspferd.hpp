@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "flusspferd/convert.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/encodings.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/function_adapter.hpp"
