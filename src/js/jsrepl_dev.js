@@ -34,6 +34,5 @@ require.paths.push(
 );
 
 require.alias['XML'] = 'flusspferd-xml'
-require.alias['IO'] = 'flusspferd-io'
 
 prelude = 'src/js/prelude.js';

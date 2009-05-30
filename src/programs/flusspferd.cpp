@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
+#include "flusspferd/io/io.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
@@ -120,6 +121,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     preload, "encodings",
     &flusspferd::load_encodings_module);
 
+  flusspferd::create_native_method(
+    preload, "IO",
+    &flusspferd::io::load_io_module);
 
   flusspferd::gc();
 }

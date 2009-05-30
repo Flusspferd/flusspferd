@@ -215,7 +215,8 @@ find_package(GMPXX)
 file(
     GLOB
     flusspferd_library_sources
-    ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp)
+    ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
 
 add_library(
     flusspferd
@@ -314,32 +315,6 @@ if(ENABLE_TESTS)
             flusspferd-coverage)
     endforeach()
 
-endif()
-
-## IO ######################################################################
-
-file(
-    GLOB
-    flusspferd_io_sources
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
-
-add_library(
-    flusspferd-io
-    SHARED
-    ${flusspferd_io_sources})
-
-target_link_libraries(
-    flusspferd-io
-    flusspferd)
-
-if(NOT WIN32)
-    install(TARGETS
-        flusspferd-io
-        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
-
-    install(TARGETS
-        flusspferd-io
-        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 endif()
 
 ## XML ######################################################################
