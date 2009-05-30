@@ -218,9 +218,15 @@ file(
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
 
+if(WIN32)
+    set(FLUSSPFERD_LIBRARY_TYPE STATIC)
+else()
+    set(FLUSSPFERD_LIBRARY_TYPE SHARED)
+endif()
+
 add_library(
     flusspferd
-    SHARED
+    ${FLUSSPFERD_LIBRARY_TYPE}
     ${flusspferd_library_sources})
 
 set(
