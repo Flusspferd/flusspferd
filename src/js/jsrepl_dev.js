@@ -24,15 +24,10 @@ THE SOFTWARE.
 // Set default paths to the plugin dirs
 require.paths.push(
   'src/js',
-  'src/plugins/sqlite3',
-  'src/plugins/curl',
-  'src/plugins/posix',
-  'src/plugins/os',
-  'src/plugins/gmp',
+  'src/plugins/SQLite3',
+  'src/plugins/cURL',
   'build/modules',
   'build/lib'
 );
-
-require.alias['XML'] = 'flusspferd-xml'
 
 prelude = 'src/js/prelude.js';

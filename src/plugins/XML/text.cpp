@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
+#include "text.hpp"
+#include "node.hpp"
+#include "document.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"

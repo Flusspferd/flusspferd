@@ -21,47 +21,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_ATTRIBUTE_HPP
-#define FLUSSPFERD_XML_ATTRIBUTE_HPP
-
+#include "reference.hpp"
 #include "node.hpp"
-#include "../class_description.hpp"
-#include <boost/noncopyable.hpp>
-#include <libxml/tree.h>
+#include "document.hpp"
+#include "flusspferd/local_root_scope.hpp"
+#include "flusspferd/string.hpp"
+#include "flusspferd/exception.hpp"
 
-namespace flusspferd { namespace xml {
+using namespace flusspferd;
+using namespace flusspferd::xml;
 
-FLUSSPFERD_CLASS_DESCRIPTION(
-  attribute_,
-  (base, node)
-  (full_name, "XML.Attribute")
-  (constructor_name, "Attribute")
-  (constructor_arity, 4)
-  (methods,
-    ("addContent", bind, add_content))
-  (properties,
-    ("content", getter_setter, (get_content, set_content))))
-{
-public:
-  attribute_(object const &, call_context &);
-  attribute_(object const &, xmlAttrPtr attr);
-  ~attribute_();
+reference_::reference_(object const &obj, xmlNodePtr ptr)
+  : base_type(obj, ptr)
+{}
 
-  xmlAttrPtr c_obj() const {
-    return xmlAttrPtr(node::c_obj());
-  }
+static xmlNodePtr new_reference(call_context &x) {
+  local_root_scope scope;
 
-private:
-  void init();
+  object doc_o = x.arg[0].to_object();
+  xmlDocPtr doc = document::c_from_js(doc_o);
 
-public: // JS methods
-  void add_content(string const &);
+  value text_v = x.arg[!doc ? 0 : 1];
 
-public: // JS properties
-  void set_content(value const &);
-  value get_content();
-};
+  if (!text_v.is_string())
+    throw exception("Could not create XML entity reference: "
+                    "name has to be a string");
 
-}}
+  string text = text_v.get_string();
 
-#endif
+  xmlChar const *data = (xmlChar const *) text.c_str();
+
+  xmlNodePtr result = 0;
+
+  if (text.substr(0, 1) == "#" || text.substr(0, 2) == "&#")
+    result = xmlNewCharRef(doc, data);
+  else
+    result = xmlNewReference(doc, data);
+
+  if (!result)
+    throw exception("Could not create XML entity reference");
+
+  return result;
+}
+
+reference_::reference_(object const &obj, call_context &x)
+  : base_type(obj, new_reference(x))
+{}
+
+reference_::~reference_()
+{}

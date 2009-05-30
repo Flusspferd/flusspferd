@@ -317,37 +317,6 @@ if(ENABLE_TESTS)
 
 endif()
 
-## XML ######################################################################
-
-if(LIBXML2_FOUND)
-
-    file(
-        GLOB
-        flusspferd_xml_sources
-        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
-
-    add_library(
-        flusspferd-xml
-        SHARED
-        ${flusspferd_xml_sources})
-
-    target_link_libraries(
-        flusspferd-xml
-        flusspferd
-        ${LIBXML2_LIBRARIES})
-
-    if(NOT WIN32)
-        install(TARGETS
-            flusspferd-xml
-            LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
-
-        install(TARGETS
-            flusspferd-xml
-            LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
-    endif()
-
-endif()
-
 ## Plugins #################################################################
 
 set(PLUGINS os environment)
@@ -372,6 +341,11 @@ if(GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
     set(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
+endif()
+
+if(LIBXML2_FOUND)
+    set(PLUGINS ${PLUGINS} XML)
+    set(XML_LIBRARIES ${LIBXML2_LIBRARIES})
 endif()
 
 foreach(PLUGIN ${PLUGINS})

@@ -21,38 +21,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PUSH_PARSER_HPP
-#define FLUSSPFERD_XML_PUSH_PARSER_HPP
+#ifndef FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
+#define FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../blob.hpp"
-#include "../class_description.hpp"
-#include <libxml/parser.h>
+#include "node.hpp"
+#include "flusspferd/class_description.hpp"
+#include <boost/noncopyable.hpp>
+#include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  push_parser,
-  (full_name, "XML.PushParser")
-  (constructor_name, "PushParser")
-  (constructor_arity, 1)
-  (methods,
-    ("push", bind, push)
-    ("terminate", bind, terminate)))
+  processing_instruction,
+  (base, node)
+  (full_name, "XML.ProcessingInstruction")
+  (constructor_name, "ProcessingInstruction")
+  (constructor_arity, 3))
 {
 public:
-  push_parser(object const &, call_context &);
-  ~push_parser();
-
-public: // JS methods
-  void push(blob &, bool);
-  value terminate();
-
-private:
-  void terminate2();
-
-  xmlParserCtxtPtr parser;
+  processing_instruction(object const &, call_context &);
+  processing_instruction(object const &, xmlNodePtr pi);
+  ~processing_instruction();
 };
 
 }}

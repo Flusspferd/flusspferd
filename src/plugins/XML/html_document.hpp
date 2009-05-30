@@ -21,18 +21,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PARSE_HPP
-#define FLUSSPFERD_XML_PARSE_HPP
+#ifndef FLUSSPFERD_XML_HTML_DOCUMENT_HPP
+#define FLUSSPFERD_XML_HTML_DOCUMENT_HPP
 
-#include "../object.hpp"
-#include "../blob.hpp"
+#include "document.hpp"
+#include "flusspferd/class_description.hpp"
+#include <libxml/HTMLtree.h>
 
 namespace flusspferd { namespace xml {
 
-object parse_blob(blob &b, object options);
-object parse_file(string filename, object options);
-object html_parse_blob(blob &b, object options);
-object html_parse_file(string filename, object options);
+FLUSSPFERD_CLASS_DESCRIPTION(
+  html_document,
+  (base, document)
+  (full_name, "XML.HTML.Document")
+  (constructor_name, "Document")
+  (methods,
+    ("dump", bind, dump)))
+{
+public:
+  html_document(object const &, call_context &);
+  html_document(object const &, htmlDocPtr doc);
+  ~html_document();
+
+public: // JS methods
+  string dump();
+
+private:
+  void init();
+};
 
 }}
 

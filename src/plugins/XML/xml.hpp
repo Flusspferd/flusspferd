@@ -21,38 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_CONTEXT_HPP
-#define FLUSSPFERD_XML_CONTEXT_HPP
+#ifndef FLUSSPFERD_XML_XML_HPP
+#define FLUSSPFERD_XML_XML_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../class_description.hpp"
-#include <libxml/xpath.h>
+#include "flusspferd/init.hpp"
+#include "flusspferd/object.hpp"
 
 namespace flusspferd { namespace xml {
 
-FLUSSPFERD_CLASS_DESCRIPTION(
-  xpath_context,
-  (full_name, "XML.XPath")
-  (constructor_name, "XPath")
-  (constructor_arity, 1)
-  (properties,
-    ("current", getter_setter, (get_current, set_current))))
-{
-public:
-  xpath_context(object const &, call_context &);
-  ~xpath_context();
-
-private: // JS methods
-  void self_call(call_context &);
-
-public: // JS properties
-  object get_current();
-  void set_current(object);
-
-private:
-  xmlXPathContextPtr xpath_ctx;
-};
+object load_xml(object container = global());
 
 }}
 
