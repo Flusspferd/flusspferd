@@ -22,7 +22,6 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
-#include "flusspferd/encodings.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
