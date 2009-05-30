@@ -129,6 +129,10 @@ if(FLUSSPFERD_HAVE_POSIX)
     include_directories(${DL_INCLUDE_DIR})
 endif()
 
+## iconv ####################################################################
+
+find_package(ICONV REQUIRED)
+
 ## Boost ####################################################################
 
 set(Boost_USE_MULTITHREADED ON)
@@ -222,6 +226,7 @@ add_library(
 set(
     flusspferd_LIBS
     ${DL_LIBRARIES}
+    ${ICONV_LIBRARIES}
     ${SPIDERMONKEY_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
