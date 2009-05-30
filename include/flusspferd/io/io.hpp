@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace io {
 
-object load_io(object container = global());
+object load_io_module(object container);
 
 }}
 

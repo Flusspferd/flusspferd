@@ -20,41 +20,23 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#ifndef FLUSSPFERD_ENCODINGS_HPP
+#define FLUSSPFERD_ENCODINGS_HPP
 
-#ifndef FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
-#define FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
+#include "string.hpp"
+#include "binary.hpp"
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../blob.hpp"
-#include "../class_description.hpp"
-#include <libxml/HTMLparser.h>
+namespace flusspferd {
 
-namespace flusspferd { namespace xml {
+  void load_encodings_module(object container);
+  namespace encodings {
 
-FLUSSPFERD_CLASS_DESCRIPTION(
-  html_push_parser,
-  (full_name, "XML.HTML.PushParser")
-  (constructor_name, "PushParser")
-  (constructor_arity, 1)
-  (methods,
-    ("push", bind, push)
-    ("terminate", bind, terminate)))
-{
-public:
-  html_push_parser(object const &, call_context &);
-  ~html_push_parser();
+    string convert_to_string(const char* enc, binary const &source);
+    object convert_from_string(const char* enc, string const &source);
+    object convert(const char* fromEnc, const char* toEnc, binary const &source);
+  }
 
-public: // JS methods
-  void push(blob &, bool);
-  value terminate();
-
-private:
-  void terminate2();
-
-  htmlParserCtxtPtr parser;
-};
-
-}}
+}
 
 #endif
+

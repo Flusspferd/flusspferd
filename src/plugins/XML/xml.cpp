@@ -21,19 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/xml.hpp"
-#include "flusspferd/xml/xpath_context.hpp"
-#include "flusspferd/xml/parse.hpp"
-#include "flusspferd/xml/push_parser.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/reference.hpp"
-#include "flusspferd/xml/attribute.hpp"
-#include "flusspferd/xml/processing_instruction.hpp"
-#include "flusspferd/xml/html_document.hpp"
-#include "flusspferd/xml/html_push_parser.hpp"
+#include "xml.hpp"
+#include "xpath_context.hpp"
+#include "parse.hpp"
+#include "push_parser.hpp"
+#include "node.hpp"
+#include "document.hpp"
+#include "text.hpp"
+#include "namespace.hpp"
+#include "reference.hpp"
+#include "attribute.hpp"
+#include "processing_instruction.hpp"
+#include "html_document.hpp"
+#include "html_push_parser.hpp"
 #include "flusspferd/function_adapter.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/create.hpp"
@@ -48,11 +48,9 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-#ifndef FLUSSPFERD_COVERAGE
 FLUSSPFERD_LOADER(container) {
   load_xml(container);
 }
-#endif
 
 static void safety_io_callbacks();
 

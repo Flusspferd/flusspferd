@@ -21,29 +21,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
-#define FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
+#include "flusspferd/binary.hpp"
+#include "flusspferd/encodings.hpp"
+#include "flusspferd/create.hpp"
 
-#include "node.hpp"
-#include "../class_description.hpp"
-#include <boost/noncopyable.hpp>
-#include <libxml/tree.h>
+using namespace flusspferd;
 
-namespace flusspferd { namespace xml {
+void flusspferd::load_encodings_module(object container) {
+  object exports = container.get_property("exports").to_object();
 
-FLUSSPFERD_CLASS_DESCRIPTION(
-  processing_instruction,
-  (base, node)
-  (full_name, "XML.ProcessingInstruction")
-  (constructor_name, "ProcessingInstruction")
-  (constructor_arity, 3))
-{
-public:
-  processing_instruction(object const &, call_context &);
-  processing_instruction(object const &, xmlNodePtr pi);
-  ~processing_instruction();
-};
+  // Load the binary module
+  global().call("require", "binary");
 
-}}
+  create_native_function(
+    exports,
+    "convertToString", &encodings::convert_to_string);
 
-#endif
+  create_native_function(
+    exports,
+    "convertFromString", &encodings::convert_from_string);
+
+  //create_native_function( exports, "convert", &encodings::convert);
+}
+
+string encodings::convert_to_string(const char *, binary const &) {
+  return string();
+}
+
+
+object encodings::convert_from_string(const char* enc, string const &source) {
+  size_t n = 0;
+  return create_native_object<byte_string>(object(), (unsigned char*)"", n);
+}
+
+object encodings::convert(const char*fromEnc, const char *toEnc,
+    binary const &source) {
+
+  size_t n = 0;
+  return create_native_object<byte_string>(object(), (unsigned char*)"", n);
+}

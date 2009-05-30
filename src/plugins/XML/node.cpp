@@ -21,14 +21,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/xml/html_document.hpp"
-#include "flusspferd/xml/text.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/reference.hpp"
-#include "flusspferd/xml/processing_instruction.hpp"
-#include "flusspferd/xml/attribute.hpp"
+#include "node.hpp"
+#include "document.hpp"
+#include "html_document.hpp"
+#include "text.hpp"
+#include "namespace.hpp"
+#include "reference.hpp"
+#include "processing_instruction.hpp"
+#include "attribute.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/tracer.hpp"

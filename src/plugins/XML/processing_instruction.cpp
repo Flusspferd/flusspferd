@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/reference.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
+#include "processing_instruction.hpp"
+#include "node.hpp"
+#include "document.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"
@@ -31,42 +31,40 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-reference_::reference_(object const &obj, xmlNodePtr ptr)
+processing_instruction::processing_instruction(
+    object const &obj, xmlNodePtr ptr
+  )
   : base_type(obj, ptr)
 {}
 
-static xmlNodePtr new_reference(call_context &x) {
+static xmlNodePtr new_processing_instruction(call_context &x) {
   local_root_scope scope;
 
-  object doc_o = x.arg[0].to_object();
-  xmlDocPtr doc = document::c_from_js(doc_o);
+  xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
 
-  value text_v = x.arg[!doc ? 0 : 1];
+  std::size_t offset = !doc ? 0 : 1;
 
-  if (!text_v.is_string())
-    throw exception("Could not create XML entity reference: "
-                    "name has to be a string");
+  if (!x.arg[offset].is_string() || !x.arg[offset + 1].is_string())
+    throw exception("Could not create XML processing instruction: "
+                    "name and content have to be strings");
 
-  string text = text_v.get_string();
+  string name = x.arg[offset].get_string();
+  string text = x.arg[offset + 1].get_string();
 
-  xmlChar const *data = (xmlChar const *) text.c_str();
+  xmlChar const *name_ = (xmlChar const *) name.c_str();
+  xmlChar const *text_ = (xmlChar const *) text.c_str();
 
-  xmlNodePtr result = 0;
-
-  if (text.substr(0, 1) == "#" || text.substr(0, 2) == "&#")
-    result = xmlNewCharRef(doc, data);
-  else
-    result = xmlNewReference(doc, data);
+  xmlNodePtr result = xmlNewDocPI(doc, name_, text_);
 
   if (!result)
-    throw exception("Could not create XML entity reference");
+    throw exception("Could not create XML processing instruction");
 
   return result;
 }
 
-reference_::reference_(object const &obj, call_context &x)
-  : base_type(obj, new_reference(x))
+processing_instruction::processing_instruction(object const &o, call_context &x)
+  : base_type(o, new_processing_instruction(x))
 {}
 
-reference_::~reference_()
+processing_instruction::~processing_instruction()
 {}

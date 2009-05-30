@@ -84,10 +84,9 @@ set(ENABLE_TESTS ${_ENABLE_TESTS_DEFAULT} CACHE BOOL "Compile the test suite")
 if(CMAKE_COMPILER_IS_GNUCXX)
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
-    add_definitions("-pedantic-errors -Wall -Wextra"
-    "-Wredundant-decls -Wstrict-null-sentinel -Winit-self"
-    "-Woverloaded-virtual -Wnon-virtual-dtor"
-    "-Wsign-promo -Wstrict-aliasing=1")
+    add_definitions("-pedantic-errors -Wall -Wextra -Wstrict-null-sentinel"
+    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo"
+    "-Wstrict-aliasing=1")
 
     if(ENABLE_DEBUG_WARNINGS)
         add_definitions("-Wpadded -Weffc++")
@@ -128,6 +127,10 @@ if(FLUSSPFERD_HAVE_POSIX)
     find_package(DL REQUIRED)
     include_directories(${DL_INCLUDE_DIR})
 endif()
+
+## iconv ####################################################################
+
+find_package(Iconv REQUIRED)
 
 ## Boost ####################################################################
 
@@ -212,7 +215,8 @@ find_package(GMPXX)
 file(
     GLOB
     flusspferd_library_sources
-    ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp)
+    ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
 
 add_library(
     flusspferd
@@ -222,6 +226,7 @@ add_library(
 set(
     flusspferd_LIBS
     ${DL_LIBRARIES}
+    ${ICONV_LIBRARIES}
     ${SPIDERMONKEY_LIBRARIES}
     ${Boost_THREAD_LIBRARY}
     ${Boost_FILESYSTEM_LIBRARY}
@@ -312,63 +317,6 @@ if(ENABLE_TESTS)
 
 endif()
 
-## IO ######################################################################
-
-file(
-    GLOB
-    flusspferd_io_sources
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
-
-add_library(
-    flusspferd-io
-    SHARED
-    ${flusspferd_io_sources})
-
-target_link_libraries(
-    flusspferd-io
-    flusspferd)
-
-if(NOT WIN32)
-    install(TARGETS
-        flusspferd-io
-        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
-
-    install(TARGETS
-        flusspferd-io
-        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
-endif()
-
-## XML ######################################################################
-
-if(LIBXML2_FOUND)
-
-    file(
-        GLOB
-        flusspferd_xml_sources
-        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
-
-    add_library(
-        flusspferd-xml
-        SHARED
-        ${flusspferd_xml_sources})
-
-    target_link_libraries(
-        flusspferd-xml
-        flusspferd
-        ${LIBXML2_LIBRARIES})
-
-    if(NOT WIN32)
-        install(TARGETS
-            flusspferd-xml
-            LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
-
-        install(TARGETS
-            flusspferd-xml
-            LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
-    endif()
-
-endif()
-
 ## Plugins #################################################################
 
 set(PLUGINS os environment)
@@ -393,6 +341,11 @@ if(GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
     set(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
+endif()
+
+if(LIBXML2_FOUND)
+    set(PLUGINS ${PLUGINS} XML)
+    set(XML_LIBRARIES ${LIBXML2_LIBRARIES})
 endif()
 
 foreach(PLUGIN ${PLUGINS})
