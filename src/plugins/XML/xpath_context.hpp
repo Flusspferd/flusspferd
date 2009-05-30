@@ -21,60 +21,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/html_document.hpp"
-#include "flusspferd/string.hpp"
+#ifndef FLUSSPFERD_XML_CONTEXT_HPP
+#define FLUSSPFERD_XML_CONTEXT_HPP
 
-using namespace flusspferd;
-using namespace flusspferd::xml;
+#include "flusspferd/class_description.hpp"
+#include <libxml/xpath.h>
 
-static htmlDocPtr new_doc(call_context &) {
-  htmlDocPtr ptr = htmlNewDoc(0, 0);
+namespace flusspferd { namespace xml {
 
-  if (!ptr)
-    throw exception("Could not create HTML document");
-
-  return ptr;
-}
-
-html_document::html_document(object const &obj, call_context &x)
-  : base_type(obj, new_doc(x))
+FLUSSPFERD_CLASS_DESCRIPTION(
+  xpath_context,
+  (full_name, "XML.XPath")
+  (constructor_name, "XPath")
+  (constructor_arity, 1)
+  (properties,
+    ("current", getter_setter, (get_current, set_current))))
 {
-  init();
-}
+public:
+  xpath_context(object const &, call_context &);
+  ~xpath_context();
 
-html_document::html_document(object const &obj, htmlDocPtr ptr)
-  : base_type(obj, ptr)
-{
-  init();
-}
+private: // JS methods
+  void self_call(call_context &);
 
-html_document::~html_document() {
-}
+public: // JS properties
+  object get_current();
+  void set_current(object);
 
-void html_document::init() {
-}
+private:
+  xmlXPathContextPtr xpath_ctx;
+};
 
-string html_document::dump() {
-  string result;
+}}
 
-  xmlOutputBufferPtr buf = xmlAllocOutputBuffer(0);
-
-  if (!buf)
-    throw exception("Could not dump HTML document");
-
-  try {
-    htmlDocContentDumpFormatOutput(buf, c_obj(), 0, 1);
-
-    char *data = (char*) buf->buffer->content;
-    std::size_t size = buf->buffer->use;
-
-    result = string(data, size);
-  } catch (...) {
-    xmlOutputBufferClose(buf);
-    throw;
-  }
-
-  xmlOutputBufferClose(buf);
-
-  return result;
-}
+#endif

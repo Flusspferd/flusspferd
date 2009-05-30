@@ -21,33 +21,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_HTML_DOCUMENT_HPP
-#define FLUSSPFERD_XML_HTML_DOCUMENT_HPP
+#ifndef FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
+#define FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
 
-#include "document.hpp"
-#include "../class_description.hpp"
-#include <libxml/HTMLtree.h>
+#include "flusspferd/blob.hpp"
+#include "flusspferd/class_description.hpp"
+#include <libxml/HTMLparser.h>
 
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  html_document,
-  (base, document)
-  (full_name, "XML.HTML.Document")
-  (constructor_name, "Document")
+  html_push_parser,
+  (full_name, "XML.HTML.PushParser")
+  (constructor_name, "PushParser")
+  (constructor_arity, 1)
   (methods,
-    ("dump", bind, dump)))
+    ("push", bind, push)
+    ("terminate", bind, terminate)))
 {
 public:
-  html_document(object const &, call_context &);
-  html_document(object const &, htmlDocPtr doc);
-  ~html_document();
+  html_push_parser(object const &, call_context &);
+  ~html_push_parser();
 
 public: // JS methods
-  string dump();
+  void push(blob &, bool);
+  value terminate();
 
 private:
-  void init();
+  void terminate2();
+
+  htmlParserCtxtPtr parser;
 };
 
 }}

@@ -21,50 +21,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/processing_instruction.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/document.hpp"
-#include "flusspferd/local_root_scope.hpp"
+#include "html_document.hpp"
 #include "flusspferd/string.hpp"
-#include "flusspferd/exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-processing_instruction::processing_instruction(
-    object const &obj, xmlNodePtr ptr
-  )
+static htmlDocPtr new_doc(call_context &) {
+  htmlDocPtr ptr = htmlNewDoc(0, 0);
+
+  if (!ptr)
+    throw exception("Could not create HTML document");
+
+  return ptr;
+}
+
+html_document::html_document(object const &obj, call_context &x)
+  : base_type(obj, new_doc(x))
+{
+  init();
+}
+
+html_document::html_document(object const &obj, htmlDocPtr ptr)
   : base_type(obj, ptr)
-{}
+{
+  init();
+}
 
-static xmlNodePtr new_processing_instruction(call_context &x) {
-  local_root_scope scope;
+html_document::~html_document() {
+}
 
-  xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
+void html_document::init() {
+}
 
-  std::size_t offset = !doc ? 0 : 1;
+string html_document::dump() {
+  string result;
 
-  if (!x.arg[offset].is_string() || !x.arg[offset + 1].is_string())
-    throw exception("Could not create XML processing instruction: "
-                    "name and content have to be strings");
+  xmlOutputBufferPtr buf = xmlAllocOutputBuffer(0);
 
-  string name = x.arg[offset].get_string();
-  string text = x.arg[offset + 1].get_string();
+  if (!buf)
+    throw exception("Could not dump HTML document");
 
-  xmlChar const *name_ = (xmlChar const *) name.c_str();
-  xmlChar const *text_ = (xmlChar const *) text.c_str();
+  try {
+    htmlDocContentDumpFormatOutput(buf, c_obj(), 0, 1);
 
-  xmlNodePtr result = xmlNewDocPI(doc, name_, text_);
+    char *data = (char*) buf->buffer->content;
+    std::size_t size = buf->buffer->use;
 
-  if (!result)
-    throw exception("Could not create XML processing instruction");
+    result = string(data, size);
+  } catch (...) {
+    xmlOutputBufferClose(buf);
+    throw;
+  }
+
+  xmlOutputBufferClose(buf);
 
   return result;
 }
-
-processing_instruction::processing_instruction(object const &o, call_context &x)
-  : base_type(o, new_processing_instruction(x))
-{}
-
-processing_instruction::~processing_instruction()
-{}

@@ -21,8 +21,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/node.hpp"
+#include "namespace.hpp"
+#include "node.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/tracer.hpp"

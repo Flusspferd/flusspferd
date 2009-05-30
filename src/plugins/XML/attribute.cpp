@@ -21,10 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/xml/attribute.hpp"
-#include "flusspferd/xml/node.hpp"
-#include "flusspferd/xml/namespace.hpp"
-#include "flusspferd/xml/text.hpp"
+#include "attribute.hpp"
+#include "node.hpp"
+#include "namespace.hpp"
+#include "text.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/exception.hpp"

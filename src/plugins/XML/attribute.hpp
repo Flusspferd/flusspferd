@@ -21,38 +21,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
-#define FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
+#ifndef FLUSSPFERD_XML_ATTRIBUTE_HPP
+#define FLUSSPFERD_XML_ATTRIBUTE_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../blob.hpp"
-#include "../class_description.hpp"
-#include <libxml/HTMLparser.h>
+#include "node.hpp"
+#include "flusspferd/class_description.hpp"
+#include <boost/noncopyable.hpp>
+#include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  html_push_parser,
-  (full_name, "XML.HTML.PushParser")
-  (constructor_name, "PushParser")
-  (constructor_arity, 1)
+  attribute_,
+  (base, node)
+  (full_name, "XML.Attribute")
+  (constructor_name, "Attribute")
+  (constructor_arity, 4)
   (methods,
-    ("push", bind, push)
-    ("terminate", bind, terminate)))
+    ("addContent", bind, add_content))
+  (properties,
+    ("content", getter_setter, (get_content, set_content))))
 {
 public:
-  html_push_parser(object const &, call_context &);
-  ~html_push_parser();
+  attribute_(object const &, call_context &);
+  attribute_(object const &, xmlAttrPtr attr);
+  ~attribute_();
 
-public: // JS methods
-  void push(blob &, bool);
-  value terminate();
+  xmlAttrPtr c_obj() const {
+    return xmlAttrPtr(node::c_obj());
+  }
 
 private:
-  void terminate2();
+  void init();
 
-  htmlParserCtxtPtr parser;
+public: // JS methods
+  void add_content(string const &);
+
+public: // JS properties
+  void set_content(value const &);
+  value get_content();
 };
 
 }}

@@ -23,6 +23,4 @@ THE SOFTWARE.
 
 require.paths = ['.', '@INSTALL_MODULES_PATH@'];
 
-require.alias['XML'] = 'flusspferd-xml'
-
 prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';

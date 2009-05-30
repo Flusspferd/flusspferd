@@ -24,9 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_XML_NODE_HPP
 #define FLUSSPFERD_XML_NODE_HPP
 
-#include "../native_object_base.hpp"
-#include "../class.hpp"
-#include "../class_description.hpp"
+#include "flusspferd/class_description.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 

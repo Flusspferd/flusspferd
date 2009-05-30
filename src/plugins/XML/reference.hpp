@@ -21,27 +21,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
-#define FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
+#ifndef FLUSSPFERD_XML_REFERENCE_HPP
+#define FLUSSPFERD_XML_REFERENCE_HPP
 
 #include "node.hpp"
-#include "../class_description.hpp"
+#include "flusspferd/class_description.hpp"
 #include <boost/noncopyable.hpp>
 #include <libxml/tree.h>
 
 namespace flusspferd { namespace xml {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  processing_instruction,
+  reference_,
   (base, node)
-  (full_name, "XML.ProcessingInstruction")
-  (constructor_name, "ProcessingInstruction")
-  (constructor_arity, 3))
+  (full_name, "XML.Reference")
+  (constructor_name, "Reference")
+  (constructor_arity, 2))
 {
 public:
-  processing_instruction(object const &, call_context &);
-  processing_instruction(object const &, xmlNodePtr pi);
-  ~processing_instruction();
+  reference_(object const &, call_context &);
+  reference_(object const &, xmlNodePtr doc);
+  ~reference_();
 };
 
 }}
