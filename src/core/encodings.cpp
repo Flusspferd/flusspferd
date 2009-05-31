@@ -24,16 +24,14 @@ THE SOFTWARE.
 #include <iconv.h>
 #include <errno.h>
 #include <sstream>
+#include <boost/algorithm/string.hpp>
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
 #include "flusspferd/create.hpp"
 
 
-
+using namespace boost;
 using namespace flusspferd;
-
-// If no direct conversion is possible, do it via utf8. Helper method
-object convert_via_utf8(const char* toEnc, const char* fromEnc, binary const &source);
 
 void flusspferd::load_encodings_module(object container) {
   object exports = container.get_property_object("exports");
@@ -52,25 +50,43 @@ void flusspferd::load_encodings_module(object container) {
   create_native_function( exports, "convert", &encodings::convert);
 }
 
-string encodings::convert_to_string(const char *, binary &) {
+// HELPER METHODS
+// If no direct conversion is possible, do it via utf8. Helper method
+binary::vector_type do_convert(iconv_t conv, binary::vector_type const &in);
+object convert_via_utf8(std::string toEnc, std::string fromEnc,
+                        binary const &source);
+
+
+string
+encodings::convert_to_string(std::string &enc, binary &source_binary) {
+
+  binary::vector_type const &source = source_binary.get_const_data();
+
+  to_lower(enc);
+  if (enc == "utf-8") {
+    return string( (char*)&source[0], source.size());
+  }
+  else if (enc != "utf-16") {
+    // Not UTF-8 or UTF-16, so convert to utf-16
+  }
   return string();
 }
 
 
-object encodings::convert_from_string(const char*, string const &) {
-
-
+object
+encodings::convert_from_string(std::string &, binary const &) {
   size_t n = 0;
   return create_native_object<byte_string>(object(), (unsigned char*)"", n);
 }
 
-object encodings::convert(const char*fromEnc, const char *toEnc,
+object encodings::convert(std::string &from, std::string &to,
     binary &source_binary)
 {
   binary::vector_type const &source = source_binary.get_const_data();
 
-
-  if ( strcmp(fromEnc, toEnc) == 0) {
+  to_lower(from);
+  to_lower(to);
+  if ( from == to ) {
     // Encodings are the same, just return a copy of the binary
     return create_native_object<byte_string>(
       object(),
@@ -79,51 +95,81 @@ object encodings::convert(const char*fromEnc, const char *toEnc,
     );
   }
 
-  iconv_t conv = iconv_open(toEnc, fromEnc);
+  iconv_t conv = iconv_open(to.c_str(), from.c_str());
 
   if (conv == (iconv_t)(-1)) {
     std::stringstream ss;
-    ss << "Unable to convert from \"" << fromEnc
-       << "\" to \"" << toEnc << "\"";
+    ss << "Unable to convert from \"" << from
+       << "\" to \"" << to << "\"";
     throw exception(ss.str().c_str());
   }
 
+  binary::vector_type buf = do_convert(conv, source);
+  return create_native_object<byte_string>(object(), &buf[0], buf.size());
+}
+// End JS methods
+
+binary::vector_type
+do_convert(iconv_t conv, binary::vector_type const &source) {
   binary::vector_type outbuf;
-  outbuf.reserve(source.size());
 
-  size_t out_left = outbuf.size(),
-         in_left  = source.size();
+  size_t out_left,
+         in_left = source.size();
 
-  // I'm sure this can be done nicer
+  out_left = in_left + in_left/16 + 32; // GPSEE's Wild-assed guess.
+
+  outbuf.resize(out_left);
+
   const unsigned char *inbytes  = &source[0],
                       *outbytes = &outbuf[0];
 
-  char **inptr  = (char**)&inbytes,
-       **outptr = (char**)&outbytes;
-
   while (in_left) {
-    size_t n = iconv(conv, inptr, &in_left, outptr, &out_left);
+    size_t n = iconv(conv,
+                     (char**)&inbytes, &in_left,
+                     (char**)&outbytes, &out_left
+                    );
 
     if (n == (size_t)(-1)) {
       switch (errno) {
-        case E2BIG: // Not enough space in output
-          break;
+        case E2BIG:
+          // Not enough space in output
+          // Use GPSEE's WAG again. +32 assumes no encoding needs more than 32
+          // bytes(!) pre character. Probably a safe bet.
+          size_t new_size = in_left + in_left/4 + 32,
+                 old_size = outbytes - &outbuf[0];
+
+          outbuf.resize(old_size + new_size);
+
+          // The vector has probably realloced, so recalculate outbytes
+          outbytes =  &outbuf[old_size];
+          out_left += new_size;
+
+          continue;
+
         case EILSEQ:
           // An invalid multibyte sequence has been encountered in the input.
         case EINVAL:
           // An incomplete multibyte sequence has been encountered in the input.
-          //
-          // Since we have provided the entire input, both these cases are the same.
+
+          // Since we have provided the entire input, both these cases are the
+          // same.
+          throw flusspferd::exception("convert error", "TypeError");
           break;
       }
     }
+
+    // Else all chars got converted
+    in_left -= n;
   }
-  return create_native_object<byte_string>(object(), &outbuf[0], outbuf.size());
+  outbuf.resize(outbytes - &outbuf[0]);
+  return outbuf;
 }
 
-object convert_via_utf8(const char* toEnc, const char* fromEnc, binary const &) {
-  iconv_t to_utf   = iconv_open("utf-8", fromEnc),
-          from_utf = iconv_open(toEnc, "utf-8");
+object
+convert_via_utf8(std::string const &to, std::string const &from, 
+                 binary const &source_bin) {
+  iconv_t to_utf   = iconv_open("utf-8", from.c_str()),
+          from_utf = iconv_open(to.c_str(), "utf-8");
 
   if (to_utf == (iconv_t)(-1) || from_utf == (iconv_t)(-1)) {
 
@@ -133,9 +179,9 @@ object convert_via_utf8(const char* toEnc, const char* fromEnc, binary const &) 
       iconv_close(from_utf);
 
     std::stringstream ss;
-    ss << "Unable to convert from \"" << fromEnc
-       << "\" to \"" << toEnc << "\"";
-    throw exception(ss.str().c_str());
+    ss << "Unable to convert from \"" << from
+       << "\" to \"" << to << "\"";
+    throw flusspferd::exception(ss.str().c_str());
   }
   return object();
 }
