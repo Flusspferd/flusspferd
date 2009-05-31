@@ -31,9 +31,9 @@ namespace flusspferd {
   void load_encodings_module(object container);
   namespace encodings {
 
-    string convert_to_string(const char* enc, binary const &source);
+    string convert_to_string(const char* enc, binary &source);
     object convert_from_string(const char* enc, string const &source);
-    object convert(const char* fromEnc, const char* toEnc, binary const &source);
+    object convert(const char* fromEnc, const char* toEnc, binary &source);
   }
 
 }
