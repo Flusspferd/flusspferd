@@ -215,6 +215,7 @@ find_package(GMPXX)
 file(
     GLOB
     flusspferd_library_sources
+    ${Flusspferd_SOURCE_DIR}/src/core/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
 
