@@ -34,5 +34,5 @@ flusspferd::detail::get_native_object_parameter_ptr(call_context &x) {
 
   convert<native_object_base &>::from_value from_value;
 
-  return from_value.perform(x.self);
+  return from_value.perform(value(x.self));
 }
