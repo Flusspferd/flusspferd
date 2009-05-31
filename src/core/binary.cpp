@@ -30,7 +30,7 @@ static char const *DEFAULT_ENCODING = "UTF-8";
 using namespace flusspferd;
 
 void flusspferd::load_binary_module(object container) {
-  object exports = container.get_property("exports").to_object();
+  object exports = container.get_property_object("exports");
   load_class<binary>(exports);
   load_class<byte_string>(exports);
   load_class<byte_array>(exports);

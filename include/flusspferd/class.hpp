@@ -55,7 +55,7 @@ struct class_constructor : native_function_base {
 
   void call(call_context &x) {
     x.result = flusspferd::create_native_object<T>(
-        x.function.get_property("prototype").to_object(),
+        x.function.get_property_object("prototype"),
         boost::ref(x));
   }
 };

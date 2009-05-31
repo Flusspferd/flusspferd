@@ -102,7 +102,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   flusspferd::load_class<flusspferd::blob>();
 
   flusspferd::load_require_function();
-  flusspferd::object require_fn = g.get_property("require").to_object();
+  flusspferd::object require_fn = g.get_property_object("require");
 
   flusspferd::load_properties_functions();
 
@@ -111,7 +111,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     phoenix::bind(&flusspferd_repl::quit, this, args::arg1));
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
-  flusspferd::object preload = require_fn.get_property("preload").to_object();
+  flusspferd::object preload = require_fn.get_property_object("preload");
 
   flusspferd::create_native_method(
     preload, "binary",

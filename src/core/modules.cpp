@@ -127,7 +127,7 @@ static std::string process_name(
 void require(call_context &x) {
   security &sec = security::get();
 
-  value paths_v = x.function.get_property("paths").to_object();
+  value paths_v = x.function.get_property_object("paths");
   if (!paths_v.is_object() || paths_v.is_null())
     throw exception("Unable to get search paths or it is not an object");
 
@@ -158,7 +158,7 @@ void require(call_context &x) {
       }
     }
 
-    module_cache = x.function.get_property("module_cache").to_object();
+    module_cache = x.function.get_property_object("module_cache");
     if (module_cache.is_null())
       throw exception("No valid module cache");
  

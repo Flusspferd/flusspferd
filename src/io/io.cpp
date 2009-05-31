@@ -35,7 +35,7 @@ using namespace flusspferd::io;
 object flusspferd::io::load_io_module(object container) {
   local_root_scope scope;
 
-  object IO = container.get_property("exports").to_object();
+  object IO = container.get_property_object("exports");
 
   load_class<stream>(IO);
   load_class<file>(IO);

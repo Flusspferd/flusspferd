@@ -28,7 +28,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 void flusspferd::load_encodings_module(object container) {
-  object exports = container.get_property("exports").to_object();
+  object exports = container.get_property_object("exports");
 
   // Load the binary module
   global().call("require", "binary");
