@@ -25,15 +25,16 @@ THE SOFTWARE.
 
 #include "string.hpp"
 #include "binary.hpp"
+#include <string>
 
 namespace flusspferd {
 
   void load_encodings_module(object container);
   namespace encodings {
 
-    string convert_to_string(const char* enc, binary &source);
-    object convert_from_string(const char* enc, string const &source);
-    object convert(const char* fromEnc, const char* toEnc, binary &source);
+    string convert_to_string(std::string &enc, binary &source);
+    object convert_from_string(std::string &enc, binary const &source);
+    object convert(std::string &from_enc, std::string &to_enc, binary &source);
   }
 
 }
