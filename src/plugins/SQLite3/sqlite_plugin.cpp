@@ -236,10 +236,10 @@ object sqlite3_cursor::next() {
     
     switch (type) {
       case SQLITE_INTEGER:
-        col = sqlite3_column_int(sth, i);
+        col = value(sqlite3_column_int(sth, i));
         break;
       case SQLITE_FLOAT:
-        col = sqlite3_column_double(sth, i);
+        col = value(sqlite3_column_double(sth, i));
         break;
       case SQLITE_NULL:
         col = object();

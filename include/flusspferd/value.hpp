@@ -51,21 +51,21 @@ public:
    *
    * @param b The value.
    */
-  value(bool b);
+  explicit value(bool b);
 
   /**
    * Create a new number value from an integer.
    *
    * @param i The integer value.
    */
-  value(int i);
+  explicit value(int i);
 
   /**
    * Create a new number value.
    *
    * @param d The value.
    */
-  value(double d);
+  explicit value(double d);
 
   /**
    * Create a new object value.
@@ -89,6 +89,19 @@ public:
     : Impl::value_impl(v)
   { }
 #endif
+
+  // Assignment operator.
+  value &operator=(value const &v) {
+    *static_cast<Impl::value_impl*>(this) = v;
+    return *this;
+  }
+
+  // Assignment operator.
+  template<typename T>
+  value &operator=(T const &x) {
+    *this = value(x);
+    return *this;
+  }
 
   /**
    * Bind to another value.

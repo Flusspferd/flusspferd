@@ -140,7 +140,7 @@ bool blob::property_resolve(value const &id, unsigned /*flags*/) {
   if (size_t(uid) > data_.size())
     return false;
  
-  value v = int(data_[uid]);
+  value v = value(int(data_[uid]));
   define_property(id.to_string(), v, permanent_shared_property);
   return true;
 }
@@ -159,7 +159,7 @@ void blob::property_op(property_mode mode, value const &id, value &x) {
 
   switch (mode) {
   case property_get:
-    x = int(data_[index]);
+    x = value(int(data_[index]));
     break;
   case property_set:
     data_[index] = el_from_value(x);
@@ -176,7 +176,7 @@ void blob::append(blob const &o) {
 object blob::to_array() {
   array arr = create_array(data_.size());
   for (std::size_t i = 0; i < data_.size(); ++i)
-    arr.set_element(i, int(data_[i]));
+    arr.set_element(i, value(int(data_[i])));
   return arr;
 }
 
@@ -234,12 +234,12 @@ value blob::set_index(int index, value x) {
   if (index < 0 || std::size_t(index) >= data_.size())
     throw exception("Out of bounds of Blob");
 
-  return data_[index] = el_from_value(x);
+  return value(int(data_[index] = el_from_value(x)));
 }
 
 value blob::get_index(int index) {
   if (index < 0 || std::size_t(index) >= data_.size())
     throw exception("Out of bounds of Blob");
 
-  return data_[index];
+  return value(int(data_[index]));
 }
