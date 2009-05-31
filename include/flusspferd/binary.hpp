@@ -54,9 +54,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 public:
   static void augment_prototype(object &);
 
-protected:
   typedef unsigned char element_type;
   typedef std::vector<element_type> vector_type;
+protected:
 
   binary(object const &o, call_context &x);
   binary(object const &o, binary const &b);

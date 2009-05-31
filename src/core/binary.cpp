@@ -70,7 +70,7 @@ binary::binary(object const &o, call_context &x)
       throw exception("Cannot create binary with non-integer size");
     int i = data.get_int();
     if (i < 0 || i > 2147483647)
-      throw exception("Cannot create binary with invalid size");
+      throw exception("Cannot create binary larger than 2147483647");
     v_data.resize(i);
   }
 
