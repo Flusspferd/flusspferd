@@ -326,7 +326,7 @@ void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
     if (!name) {
       // Possibly a '?' unnnamed param
       // TODO: This will break when n is > 2^31.
-      bind = o.get_property( value( int(n) ) );
+      bind = o.get_property( value(n) );
     } else {
       // Named param
       bind = o.get_property(name);
