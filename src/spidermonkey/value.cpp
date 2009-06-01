@@ -40,15 +40,6 @@ using namespace flusspferd;
 value::~value() { }
 value::value() : Impl::value_impl(JSVAL_VOID) { }
 
-value::value(object const &o)
-  : Impl::value_impl(OBJECT_TO_JSVAL(Impl::get_object(
-      const_cast<object&>(o))))
-{ }
-value::value(string const &s)
-  : Impl::value_impl(STRING_TO_JSVAL(Impl::get_string(
-      const_cast<string&>(s))))
-{ }
-
 bool value::is_null() const { return JSVAL_IS_NULL(get()); }
 bool value::is_undefined() const { return JSVAL_IS_VOID(get()); }
 bool value::is_int() const { return JSVAL_IS_INT(get()); }
@@ -157,4 +148,12 @@ Impl::value_impl Impl::value_impl::from_double(double num) {
 
 Impl::value_impl Impl::value_impl::from_boolean(bool x) {
   return wrap_jsval(BOOLEAN_TO_JSVAL(x));
+}
+
+Impl::value_impl Impl::value_impl::from_string(string const &s) {
+  return wrap_jsval(STRING_TO_JSVAL(Impl::get_string(const_cast<string&>(s))));
+}
+
+Impl::value_impl Impl::value_impl::from_object(object const &o) {
+  return wrap_jsval(OBJECT_TO_JSVAL(Impl::get_object(const_cast<object&>(o))));
 }

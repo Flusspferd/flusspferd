@@ -113,14 +113,18 @@ public:
    *
    * @param o The object.
    */
-  value(object const &o);
+  value(object const &o)
+  : Impl::value_impl(Impl::value_impl::from_object(o))
+  {}
 
   /**
    * Create a new string value.
    *
    * @param s The string.
    */
-  value(string const &s);
+  value(string const &s)
+  : Impl::value_impl(Impl::value_impl::from_string(s))
+  {}
 
   /// Destructor.
   ~value();
