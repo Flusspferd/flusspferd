@@ -79,14 +79,14 @@ encodings::convert_to_string(std::string &enc, binary &source_binary) {
     return string( reinterpret_cast<char16_t const*>(&source[0]), source.size()/2);
   }
   else {
-    // Not UTF-8 or UTF-16, so convert to utf-16
+    // Not UTF-8 or UTF-16, so convert to utf-8
 
-    // Except UTF-8 seems to suffer from a byte order issue. UTF-8 is less
+    // UTF-16 seems to suffer from a byte order issue. UTF-8 is less
     // error prone it seems. FIXME
     iconv_t conv = open_convert(enc, "utf-8");
-    binary::vector_type utf16 = do_convert(conv, source);
+    binary::vector_type utf8 = do_convert(conv, source);
     iconv_close(conv);
-    return string( reinterpret_cast<char const*>(&utf16[0]), utf16.size());
+    return string( reinterpret_cast<char const*>(&utf8[0]), utf8.size());
   }
   return string();
 }
