@@ -568,7 +568,7 @@ binary &byte_array::create(element_type const *p, std::size_t n) {
 }
 
 value byte_array::element(element_type e) {
-  return value(int(e));
+  return value(e);
 }
 
 std::string byte_array::to_string() {
