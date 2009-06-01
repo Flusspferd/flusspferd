@@ -467,7 +467,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_methods,
         ("constructorMethod", bind_static, constructor_method))
     (constructor_properties,
-        ("VERSION", constant, flusspferd::string("1.0"))))
+        ("VERSION", constant, "1.0")))
 {
     double my_method(double parameter) {
         return parameter * 2;
