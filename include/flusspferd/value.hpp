@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_floating_point.hpp>
+#include <boost/type_traits/is_convertible.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/logical.hpp>
 
@@ -36,6 +37,7 @@ namespace flusspferd {
 
 class object;
 class string;
+template<typename T> class convert;
 
 /**
  * Any Javascript value.
@@ -43,10 +45,6 @@ class string;
  * @ingroup value_types
  */
 class value : public Impl::value_impl {
-private:
-  template<typename T>
-  value(T *);
-
 public:
   /// Create a new value (Javascript: <code>undefined</code>).
   value();
@@ -83,6 +81,21 @@ public:
     >::type * = 0)
   : Impl::value_impl(Impl::value_impl::from_double(num))
   {}
+
+  template<typename OtherType>
+  explicit value(
+    OtherType const &val,
+    typename boost::disable_if<
+      typename boost::mpl::or_<
+        typename boost::is_integral<OtherType>::type,
+        typename boost::is_floating_point<OtherType>::type,
+        typename boost::is_convertible<OtherType, object>::type
+      >::type
+    >::type * = 0)
+  {
+    typename convert<OtherType>::to_value converter;
+    *this = converter.perform(val);
+  }
 #else
   /**
    * Create a new boolean value.
@@ -236,5 +249,7 @@ public:
 };
 
 }
+
+#include "convert.hpp"
 
 #endif /* FLUSSPFERD_VALUE_HPP */
