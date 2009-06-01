@@ -51,8 +51,14 @@ void flusspferd::load_encodings_module(object container) {
 }
 
 // HELPER METHODS
-// If no direct conversion is possible, do it via utf8. Helper method
+
+// Actually do the conversion.
 binary::vector_type do_convert(iconv_t conv, binary::vector_type const &in);
+
+// call iconv_open, or throw an error if it cant
+iconv_t open_convert(std::string const &from, std::string const &to);
+
+// If no direct conversion is possible, do it via utf8. Helper method
 object convert_via_utf8(std::string toEnc, std::string fromEnc,
                         binary const &source);
 
@@ -64,10 +70,23 @@ encodings::convert_to_string(std::string &enc, binary &source_binary) {
 
   to_lower(enc);
   if (enc == "utf-8") {
+    binary::vector_type const &source = source_binary.get_const_data();
     return string( (char*)&source[0], source.size());
   }
-  else if (enc != "utf-16") {
+  else if (enc == "utf-16") {
+    // TODO: Assert on the possible alignment issue here
+    binary::vector_type const &source = source_binary.get_const_data();
+    return string( reinterpret_cast<char16_t const*>(&source[0]), source.size()/2);
+  }
+  else {
     // Not UTF-8 or UTF-16, so convert to utf-16
+
+    // Except UTF-8 seems to suffer from a byte order issue. UTF-8 is less
+    // error prone it seems. FIXME
+    iconv_t conv = open_convert(enc, "utf-8");
+    binary::vector_type utf16 = do_convert(conv, source);
+    iconv_close(conv);
+    return string( reinterpret_cast<char const*>(&utf16[0]), utf16.size());
   }
   return string();
 }
@@ -95,16 +114,10 @@ object encodings::convert(std::string &from, std::string &to,
     );
   }
 
-  iconv_t conv = iconv_open(to.c_str(), from.c_str());
-
-  if (conv == (iconv_t)(-1)) {
-    std::stringstream ss;
-    ss << "Unable to convert from \"" << from
-       << "\" to \"" << to << "\"";
-    throw exception(ss.str().c_str());
-  }
+  iconv_t conv = open_convert(from, to);
 
   binary::vector_type buf = do_convert(conv, source);
+  iconv_close(conv);
   return create_native_object<byte_string>(object(), &buf[0], buf.size());
 }
 // End JS methods
@@ -165,9 +178,21 @@ do_convert(iconv_t conv, binary::vector_type const &source) {
   return outbuf;
 }
 
+iconv_t open_convert(std::string const &from, std::string const &to) {
+  iconv_t conv = iconv_open(to.c_str(), from.c_str());
+
+  if (conv == (iconv_t)(-1)) {
+    std::stringstream ss;
+    ss << "Unable to convert from \"" << from
+       << "\" to \"" << to << "\"";
+    throw flusspferd::exception(ss.str().c_str());
+  }
+  return conv;
+}
+
 object
 convert_via_utf8(std::string const &to, std::string const &from, 
-                 binary const &source_bin) {
+                 binary const &) {
   iconv_t to_utf   = iconv_open("utf-8", from.c_str()),
           from_utf = iconv_open(to.c_str(), "utf-8");
 
