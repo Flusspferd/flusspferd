@@ -144,10 +144,10 @@ do_convert(iconv_t conv, binary::vector_type const &source) {
 
     if (n == (size_t)(-1)) {
       switch (errno) {
-        case E2BIG:
+        case E2BIG: {
           // Not enough space in output
           // Use GPSEE's WAG again. +32 assumes no encoding needs more than 32
-          // bytes(!) pre character. Probably a safe bet.
+          // bytes(!) per character. Probably a safe bet.
           size_t new_size = in_left + in_left/4 + 32,
                  old_size = outbytes - &outbuf[0];
 
@@ -158,6 +158,7 @@ do_convert(iconv_t conv, binary::vector_type const &source) {
           out_left += new_size;
 
           continue;
+        }
 
         case EILSEQ:
           // An invalid multibyte sequence has been encountered in the input.
