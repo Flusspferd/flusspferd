@@ -207,6 +207,7 @@ struct convert< detail::root<T> > {
 template<typename T, std::size_t N>
 struct convert<T [N]> {
   typedef typename convert<T const *>::to_value to_value;
+  typedef void from_value;
 };
 
 template<>

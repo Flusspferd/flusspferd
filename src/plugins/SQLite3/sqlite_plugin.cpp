@@ -47,7 +47,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("close", bind, close))
   (constructor_properties,
     ("version", constant, SQLITE_VERSION_NUMBER)
-    ("versionStr", constant, string(SQLITE_VERSION))))
+    ("versionStr", constant, SQLITE_VERSION)))
 {
 public:
   sqlite3(object const &obj, call_context &x);
