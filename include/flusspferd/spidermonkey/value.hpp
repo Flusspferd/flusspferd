@@ -58,6 +58,8 @@ protected:
 
   static value_impl from_double(double num);
 
+  static value_impl from_boolean(bool x);
+
 public:
   value_impl(value_impl const &o) {
     if (o.ref == &o.val) {

@@ -26,8 +26,11 @@ THE SOFTWARE.
 
 #include "spidermonkey/value.hpp"
 #include <string>
+#include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <boost/mpl/logical.hpp>
 
 namespace flusspferd {
 
@@ -48,6 +51,39 @@ public:
   /// Create a new value (Javascript: <code>undefined</code>).
   value();
 
+#ifndef IN_DOXYGEN
+  template<typename BoolType>
+  explicit value(
+    BoolType const &x,
+    typename boost::enable_if<
+      typename boost::is_same<BoolType, bool>::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_boolean(x))
+  {}
+
+  template<typename IntegralType>
+  explicit value(
+    IntegralType const &num,
+    typename boost::enable_if<
+      typename boost::mpl::and_<
+        typename boost::is_integral<IntegralType>::type,
+        typename boost::mpl::not_<
+          typename boost::is_same<IntegralType, bool>::type
+        >::type
+      >::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_integer(num))
+  {}
+
+  template<typename FloatingPointType>
+  explicit value(
+    FloatingPointType const &num,
+    typename boost::enable_if<
+      typename boost::is_floating_point<FloatingPointType>::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_double(num))
+  {}
+#else
   /**
    * Create a new boolean value.
    *
@@ -55,31 +91,22 @@ public:
    */
   explicit value(bool b);
 
-#ifndef IN_DOXYGEN
-  template<typename IntegralType>
-  explicit value(
-    IntegralType const &num,
-    typename boost::enable_if<
-      typename boost::is_integral<IntegralType>::type
-    >::type * = 0)
-  : Impl::value_impl(Impl::value_impl::from_integer(num))
-  {}
-#else
   /**
    * Create a new number value from an integer.
    *
-   * @param i The integer value.
+   * @param num The integer value.
    */
   template<typename IntegralType>
   explicit value(IntegralType const &num);
-#endif
 
   /**
-   * Create a new number value.
+   * Create a new number value from a floating point number.
    *
-   * @param d The value.
+   * @param num The floating point value.
    */
-  explicit value(double d);
+  template<typename FloatingPointType>
+  explicit value(FloatingPointType const &num);
+#endif
 
   /**
    * Create a new object value.
