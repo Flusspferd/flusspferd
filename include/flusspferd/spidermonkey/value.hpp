@@ -28,6 +28,9 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+class string;
+class object;
+
 #ifndef IN_DOXYGEN
 
 namespace Impl {
@@ -55,10 +58,10 @@ protected:
 
   template<typename T>
   static value_impl from_integer(T const &num);
-
   static value_impl from_double(double num);
-
   static value_impl from_boolean(bool x);
+  static value_impl from_string(string const &x);
+  static value_impl from_object(object const &x);
 
 public:
   value_impl(value_impl const &o) {
