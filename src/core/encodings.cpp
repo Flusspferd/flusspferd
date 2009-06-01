@@ -93,9 +93,21 @@ encodings::convert_to_string(std::string &enc, binary &source_binary) {
 
 
 object
-encodings::convert_from_string(std::string &, binary const &) {
-  size_t n = 0;
-  return create_native_object<byte_string>(object(), (unsigned char*)"", n);
+encodings::convert_from_string(std::string &enc, string const str) {
+  binary::vector_type source;
+
+  iconv_t conv = open_convert("utf-16", enc);
+  char16_t const *char_data = str.data();
+
+  // TODO: maybe make do_convert take (unsigned char*, size_t)
+  source.reserve(str.length() * 2);
+  source.insert(source.begin(),
+                (unsigned char*)char_data, 
+                (unsigned char*)(char_data+str.length()) );
+
+  binary::vector_type const &out = do_convert(conv, source);
+  iconv_close(conv);
+  return create_native_object<byte_string>(object(), &out[0], out.size());
 }
 
 object encodings::convert(std::string &from, std::string &to,
