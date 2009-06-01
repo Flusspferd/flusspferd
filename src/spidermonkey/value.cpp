@@ -39,9 +39,7 @@ using namespace flusspferd;
 
 value::~value() { }
 value::value() : Impl::value_impl(JSVAL_VOID) { }
-value::value(bool b) : Impl::value_impl(BOOLEAN_TO_JSVAL(b)) { }
 
-value::value(double d) : Impl::value_impl(from_double(d)) { }
 value::value(object const &o)
   : Impl::value_impl(OBJECT_TO_JSVAL(Impl::get_object(
       const_cast<object&>(o))))
@@ -155,4 +153,8 @@ Impl::value_impl Impl::value_impl::from_double(double num) {
     throw exception("Could not convert integer to value");
   }
   return result;
+}
+
+Impl::value_impl Impl::value_impl::from_boolean(bool x) {
+  return wrap_jsval(BOOLEAN_TO_JSVAL(x));
 }
