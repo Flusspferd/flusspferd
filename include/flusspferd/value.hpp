@@ -26,6 +26,8 @@ THE SOFTWARE.
 
 #include "spidermonkey/value.hpp"
 #include <string>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace flusspferd {
 
@@ -53,12 +55,24 @@ public:
    */
   explicit value(bool b);
 
+#ifndef IN_DOXYGEN
+  template<typename IntegralType>
+  explicit value(
+    IntegralType const &num,
+    typename boost::enable_if<
+      typename boost::is_integral<IntegralType>::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_integer(num))
+  {}
+#else
   /**
    * Create a new number value from an integer.
    *
    * @param i The integer value.
    */
-  explicit value(int i);
+  template<typename IntegralType>
+  explicit value(IntegralType const &num);
+#endif
 
   /**
    * Create a new number value.
