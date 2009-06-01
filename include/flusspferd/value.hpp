@@ -49,6 +49,11 @@ public:
   /// Create a new value (Javascript: <code>undefined</code>).
   value();
 
+  /// Copy constructor.
+  value(value const &o)
+  : Impl::value_impl(o)
+  {}
+
 #ifndef IN_DOXYGEN
   template<typename BoolType>
   explicit value(
