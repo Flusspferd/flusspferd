@@ -142,7 +142,7 @@ struct convert<
     typename boost::enable_if<boost::is_integral<T> >::type
   >
 {
-  typedef to_value_helper<T, double> to_value;
+  typedef to_value_helper<T> to_value;
 
   struct from_value {
     typedef std::numeric_limits<T> limits;
@@ -159,7 +159,7 @@ struct convert<
     typename boost::enable_if<boost::is_float<T> >::type
   >
 {
-  typedef to_value_helper<T, double> to_value;
+  typedef to_value_helper<T> to_value;
 
   struct from_value {
     T perform(value const &v) {
