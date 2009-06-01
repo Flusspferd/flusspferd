@@ -150,7 +150,10 @@ struct convert<
     typedef std::numeric_limits<T> limits;
 
     T perform(value const &v) {
-      return v.to_integral_number(limits::digits, limits::is_signed);
+      double num = v.to_number();
+      if (num < double(limits::min()) || num > double(limits::max()))
+        throw exception("Not inside integer range", "RangeError");
+      return T(num);
     }
   };
 };
