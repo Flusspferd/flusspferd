@@ -78,19 +78,8 @@ binary::binary(object const &o, call_context &x)
     object o = data.to_object();
 
     if (o.is_array()) {
-      array a(o);
-      std::size_t n = a.length();
-      vector_type &v = get_data();
-      v.resize(n);
-      for (std::size_t i = 0; i < n; ++i) {
-        value x = a.get_element(i);
-        if (!x.is_int())
-          throw exception("Can only create Binary from Array of bytes");
-        int e = x.get_int();
-        if (e < 0 || e > 255)
-          throw exception("Can only create Binary from Array of bytes");
-        v[i] = e;
-      }
+      convert<vector_type>::from_value conv;
+      conv.perform(o).swap(v_data);
     } else {
       try {
         binary &b = flusspferd::get_native<binary>(o);
@@ -216,11 +205,7 @@ object binary::to_byte_array() {
 }
 
 array binary::to_array() {
-  std::size_t n = get_length();
-  array a = create_array(n);
-  for (std::size_t i = 0; i < n; ++i)
-    a.set_element(i, value(v_data[i]));
-  return a;
+  return array(value(v_data).to_object());
 }
 
 int binary::index_of(
