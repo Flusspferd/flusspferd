@@ -63,6 +63,6 @@ function test_convert() {
 
 //test_convertSameEnc();
 //test_convertToString();
-test_convertToStringUTF16();
+//test_convertToStringUTF16();
 test_convertToStringISO8859_15();
 //test_convert();
