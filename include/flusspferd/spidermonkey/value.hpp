@@ -53,6 +53,11 @@ protected:
   friend jsval *get_jsvalp(value_impl &v);
   friend value_impl wrap_jsvalp(jsval *p);
 
+  template<typename T>
+  static value_impl from_integer(T const &num);
+
+  static value_impl from_double(double num);
+
 public:
   value_impl(value_impl const &o) {
     if (o.ref == &o.val) {
@@ -88,6 +93,16 @@ inline jsval *get_jsvalp(value_impl &v) {
 
 inline value_impl wrap_jsvalp(jsval *p) {
   return value_impl(p);
+}
+
+template<typename T>
+value_impl value_impl::from_integer(T const &num) {
+  if (INT_FITS_IN_JSVAL(num)) {
+    return wrap_jsval(INT_TO_JSVAL(num));
+  } else {
+    //TODO: check range?
+    return from_double(num);
+  }
 }
 
 }

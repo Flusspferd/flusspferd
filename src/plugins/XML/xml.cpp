@@ -122,7 +122,7 @@ static void xml_constants(object XML) {
 #define CONST(x) \
   XML.define_property( \
     BOOST_PP_STRINGIZE(x), \
-    value(BOOST_PP_CAT(XML_, x)), \
+    value(int(BOOST_PP_CAT(XML_, x))), \
     read_only_property | permanent_property) \
   /* */
 
@@ -155,7 +155,7 @@ static void html_constants(object HTML) {
 #define CONST(x) \
   HTML.define_property( \
     BOOST_PP_STRINGIZE(x), \
-    value(BOOST_PP_CAT(HTML_, x)), \
+    value(int(BOOST_PP_CAT(HTML_, x))), \
     read_only_property | permanent_property) \
   /* */
 
