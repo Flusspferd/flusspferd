@@ -124,6 +124,18 @@ public:
    */
   template<typename FloatingPointType>
   explicit value(FloatingPointType const &num);
+
+  /**
+   * Create a new value from a (nearly) arbitrary C++ type value.
+   *
+   * Works with any type supported by flusspferd::convert. This overload will
+   * not be used for integral types, floating point types or types convertible
+   * to flusspferd::object.
+   *
+   * @param val The value to convert.
+   */
+  template<typename OtherType>
+  explicit value(OtherType const &val);
 #endif
 
   /**
