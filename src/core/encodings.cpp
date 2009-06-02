@@ -63,12 +63,10 @@ iconv_t open_convert(std::string const &from, std::string const &to);
 object convert_via_utf8(std::string toEnc, std::string fromEnc,
                         binary const &source);
 
-static const char16_t b1 = *(char16_t*)"\xff\xfe",
-                      b2 = 0xfffe;
+static char16_t const b1 = *(char16_t*)"\xff\xfe";
+static char16_t const b2 = 0xfffe;
 
-static const char * native_charset = b1 == b2
-                                   ? "utf-16be"
-                                   : "utf-16le";
+static char const * const native_charset = b1 == b2 ? "utf-16be" : "utf-16le";
 
 string
 encodings::convert_to_string(std::string &enc, binary &source_binary) {
