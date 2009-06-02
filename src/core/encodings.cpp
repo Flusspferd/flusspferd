@@ -63,10 +63,17 @@ iconv_t open_convert(std::string const &from, std::string const &to);
 object convert_via_utf8(std::string toEnc, std::string fromEnc,
                         binary const &source);
 
+static const char16_t b1 = *(char16_t*)"\xff\xfe",
+                      b2 = 0xfffe;
+
+static const char * native_charset = b1 == b2
+                                   ? "utf-16be"
+                                   : "utf-16le";
 
 string
 encodings::convert_to_string(std::string &enc, binary &source_binary) {
 
+  // TODO: We probably need to strip an BOMs from the output (for all paths)
   binary::vector_type const &source = source_binary.get_const_data();
 
   to_lower(enc);
@@ -74,20 +81,17 @@ encodings::convert_to_string(std::string &enc, binary &source_binary) {
     binary::vector_type const &source = source_binary.get_const_data();
     return string( (char*)&source[0], source.size());
   }
-  else if (enc == "utf-16") {
+  else if (enc == native_charset ) {
     // TODO: Assert on the possible alignment issue here
     binary::vector_type const &source = source_binary.get_const_data();
     return string( reinterpret_cast<char16_t const*>(&source[0]), source.size()/2);
   }
   else {
-    // Not UTF-8 or UTF-16, so convert to utf-8
-
-    // UTF-16 seems to suffer from a byte order issue. UTF-8 is less
-    // error prone it seems. FIXME
-    iconv_t conv = open_convert(enc, "utf-8");
-    binary::vector_type utf8 = do_convert(conv, &source[0], source.size());
+    // Not UTF-8 or UTF-16, so convert to utf-16
+    iconv_t conv = open_convert(enc, native_charset);
+    binary::vector_type utf16 = do_convert(conv, &source[0], source.size());
     iconv_close(conv);
-    return string( reinterpret_cast<char const*>(&utf8[0]), utf8.size());
+    return string(reinterpret_cast<char16_t const*>(&utf16[0]), utf16.size()/2);
   }
   return string();
 }
@@ -97,7 +101,7 @@ object
 encodings::convert_from_string(std::string &enc, string const str) {
   binary::vector_type source;
 
-  iconv_t conv = open_convert("utf-16", enc);
+  iconv_t conv = open_convert(native_charset, enc);
   const unsigned char *char_data = (const unsigned char*)str.data();
 
   binary::vector_type const &out = do_convert(conv, char_data, str.length()*2);
@@ -178,7 +182,12 @@ do_convert(iconv_t conv, binary::element_type const* data, size_t num_bytes) {
 
           // Since we have provided the entire input, both these cases are the
           // same.
-          throw flusspferd::exception("convert error", "TypeError");
+          size_t when = inbytes - data;
+          std::stringstream ss;
+          ss << "Convert Error: Invalid or incomplete multibyte"
+                " sequence after " << when
+             << (when == 1 ? " byte" : " bytes");
+          throw flusspferd::exception(ss.str().c_str(), "TypeError");
           break;
       }
     }
