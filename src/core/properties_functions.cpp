@@ -94,8 +94,8 @@ void ecma_define_own_property(object o, string p, object desc) {
   else
     flags = flags | read_only_property;
 
-  boost::optional<function const &> getter_fn = boost::none, 
-                                    setter_fn = boost::none;
+  boost::optional<function> getter_fn = boost::none, 
+                            setter_fn = boost::none;
   v = desc.get_property("getter");
   try {
     if (!v.is_undefined())
@@ -134,7 +134,12 @@ void ecma_define_own_property(object o, string p, object desc) {
 
   // Wasn't that easy
   if (is_accessor) {
-    o.define_property(p, property_attributes(flags, getter_fn, setter_fn));
+    o.define_property(
+      p,
+      property_attributes(
+        flags,
+        boost::optional<function const &>(getter_fn),
+        boost::optional<function const &>(setter_fn)));
   } else {
     value val = desc.has_property("value") 
               ? desc.get_property("value") 
