@@ -53,50 +53,52 @@ void flusspferd::load_encodings_module(object container) {
 // HELPER METHODS
 
 // Actually do the conversion.
-binary::vector_type do_convert(iconv_t conv, binary::element_type const* data, 
-                               size_t bytes);
+binary::vector_type do_convert(
+  iconv_t conv, binary::element_type const *data, size_t bytes);
 
 // call iconv_open, or throw an error if it cant
 iconv_t open_convert(std::string const &from, std::string const &to);
 
 // If no direct conversion is possible, do it via utf8. Helper method
-object convert_via_utf8(std::string toEnc, std::string fromEnc,
-                        binary const &source);
+object convert_via_utf8(
+  std::string const &from, std::string const &to, binary const &source);
 
 static char16_t const b1 = *(char16_t*)"\xff\xfe";
 static char16_t const b2 = 0xfffe;
 
 static char const * const native_charset = b1 == b2 ? "utf-16be" : "utf-16le";
 
-string
-encodings::convert_to_string(std::string &enc, binary &source_binary) {
-
+flusspferd::string
+encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
   // TODO: We probably need to strip an BOMs from the output (for all paths)
   binary::vector_type const &source = source_binary.get_const_data();
 
-  to_lower(enc);
+  std::string const &enc = to_lower_copy(enc_);
+  //TODO: Normalise encodings further than just to_lower.
+
   if (enc == "utf-8") {
     binary::vector_type const &source = source_binary.get_const_data();
     return string( (char*)&source[0], source.size());
-  }
-  else if (enc == native_charset ) {
+  } else if (enc == native_charset) {
     // TODO: Assert on the possible alignment issue here
     binary::vector_type const &source = source_binary.get_const_data();
-    return string( reinterpret_cast<char16_t const*>(&source[0]), source.size()/2);
-  }
-  else {
+    return string(
+      reinterpret_cast<char16_t const*>(&source[0]),
+      source.size()/sizeof(char16_t));
+  } else {
     // Not UTF-8 or UTF-16, so convert to utf-16
     iconv_t conv = open_convert(enc, native_charset);
     binary::vector_type utf16 = do_convert(conv, &source[0], source.size());
     iconv_close(conv);
-    return string(reinterpret_cast<char16_t const*>(&utf16[0]), utf16.size()/2);
+    return string(
+      reinterpret_cast<char16_t const*>(&utf16[0]),
+      utf16.size()/sizeof(char16_t));
   }
   return string();
 }
 
-
-object
-encodings::convert_from_string(std::string &enc, string const str) {
+object encodings::convert_from_string(std::string const &enc, string const &str)
+{
   binary::vector_type source;
 
   iconv_t conv = open_convert(native_charset, enc);
@@ -107,20 +109,20 @@ encodings::convert_from_string(std::string &enc, string const str) {
   return create_native_object<byte_string>(object(), &out[0], out.size());
 }
 
-object encodings::convert(std::string &from, std::string &to,
-    binary &source_binary)
+object encodings::convert(
+  std::string const &from_, std::string const &to_, binary &source_binary)
 {
   binary::vector_type const &source = source_binary.get_const_data();
 
-  to_lower(from);
-  to_lower(to);
-  if ( from == to ) {
+  std::string const &from = to_lower_copy(from_);
+  std::string const &to = to_lower_copy(to_);
+
+  if (from == to) {
     // Encodings are the same, just return a copy of the binary
     return create_native_object<byte_string>(
       object(),
       &source[0],
-      source.size()
-    );
+      source.size());
   }
 
   iconv_t conv = open_convert(from, to);
@@ -131,8 +133,9 @@ object encodings::convert(std::string &from, std::string &to,
 }
 // End JS methods
 
-binary::vector_type
-do_convert(iconv_t conv, binary::element_type const* data, size_t num_bytes) {
+binary::vector_type do_convert(
+  iconv_t conv, binary::element_type const* data, size_t num_bytes)
+{
   binary::vector_type outbuf;
 
   size_t out_left,
@@ -142,11 +145,11 @@ do_convert(iconv_t conv, binary::element_type const* data, size_t num_bytes) {
   //   The chance of a random string of bytes being valid UTF-8 and not pure
   //   ASCII is 3.9% for a two-byte sequence, 0.41% for a three-byte sequence
   //   and 0.026% for a four-byte sequence.
-  out_left = in_left + in_left/16 + 32; // GPSEE's Wild-assed guess.
+  out_left = in_left + in_left/16 + 32; // GPSEE's Wild-assed guess ("WAG").
 
   outbuf.resize(out_left);
 
-  const unsigned char *inbytes  = data,
+  unsigned char const *inbytes  = data,
                       *outbytes = &outbuf[0];
 
   while (in_left) {
@@ -170,7 +173,7 @@ do_convert(iconv_t conv, binary::element_type const* data, size_t num_bytes) {
           outbytes =  &outbuf[old_size];
           out_left += new_size;
 
-          continue;
+          break;
         }
 
         case EILSEQ:
@@ -188,10 +191,10 @@ do_convert(iconv_t conv, binary::element_type const* data, size_t num_bytes) {
           throw flusspferd::exception(ss.str().c_str(), "TypeError");
           break;
       }
+    } else {
+      // Else all chars got converted
+      in_left -= n;
     }
-
-    // Else all chars got converted
-    in_left -= n;
   }
   outbuf.resize(outbytes - &outbuf[0]);
   return outbuf;
@@ -209,9 +212,9 @@ iconv_t open_convert(std::string const &from, std::string const &to) {
   return conv;
 }
 
-object
-convert_via_utf8(std::string const &to, std::string const &from,
-                 binary const &) {
+object convert_via_utf8(
+  std::string const &from, std::string const &to, binary const &)
+{
   iconv_t to_utf   = iconv_open("utf-8", from.c_str()),
           from_utf = iconv_open(to.c_str(), "utf-8");
 

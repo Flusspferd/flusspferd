@@ -29,13 +29,15 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-  void load_encodings_module(object container);
-  namespace encodings {
+void load_encodings_module(object container);
 
-    string convert_to_string(std::string &enc, binary &source);
-    object convert_from_string(std::string &enc, string const source);
-    object convert(std::string &from_enc, std::string &to_enc, binary &source);
-  }
+namespace encodings {
+  string convert_to_string(std::string const &enc, binary &source);
+  object convert_from_string(
+    std::string const &enc, flusspferd::string const &source);
+  object convert(
+    std::string const &from_enc, std::string const &to_enc, binary &source);
+}
 
 }
 
