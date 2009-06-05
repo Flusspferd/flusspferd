@@ -290,7 +290,42 @@ binary &encodings::transcoder::push(
           (byte_string::element_type*)0,
           0));
 
+  do_push(input, output);
+
   return output;
+}
+
+void encodings::transcoder::do_push(binary &input, binary &output) {
+  binary::vector_type &in_v = input.get_data();
+
+  // A rough guess how much space might be needed for the new characters.
+  std::size_t out_estimate = in_v.size() + in_v.size()/16 + 32;
+
+  binary::vector_type &out_v = output.get_data();
+  std::size_t out_start = out_v.size();
+
+  out_v.resize(out_v.size() + out_estimate);
+
+  char *inbuf = reinterpret_cast<char*>(&in_v[0]);
+  char *outbuf = reinterpret_cast<char*>(&out_v[out_start]);
+
+  std::size_t inbytesleft = in_v.size();
+  std::size_t outbytesleft = out_estimate;
+
+  std::size_t n_chars = iconv(
+    p->conv,
+    &inbuf, &inbytesleft,
+    &outbuf, &outbytesleft);
+
+  if (n_chars == std::size_t(-1)) {
+    switch (errno) {
+    case EILSEQ:
+      throw exception("Invalid multi-byte sequence in input");
+
+    default:
+      throw exception("Unknown error in character conversion");
+    }
+  }
 }
 
 void encodings::transcoder::close() {

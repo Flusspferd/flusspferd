@@ -59,6 +59,7 @@ namespace encodings {
 
   private:
     void init(std::string const &from, std::string const &to);
+    void do_push(binary &input, binary &output);
 
   private:
     class impl;
