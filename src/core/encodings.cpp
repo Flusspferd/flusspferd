@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "flusspferd/encodings.hpp"
 #include "flusspferd/create.hpp"
 
-
 using namespace boost;
 using namespace flusspferd;
 
@@ -47,7 +46,11 @@ void flusspferd::load_encodings_module(object container) {
     exports,
     "convertFromString", &encodings::convert_from_string);
 
-  create_native_function( exports, "convert", &encodings::convert);
+  create_native_function(
+    exports,
+    "convert", &encodings::convert);
+
+  load_class<encodings::transcoder>(exports);
 }
 
 // HELPER METHODS
@@ -231,4 +234,64 @@ object convert_via_utf8(
     throw flusspferd::exception(ss.str().c_str());
   }
   return object();
+}
+
+class encodings::transcoder::impl {
+public:
+  impl()
+  : conv(iconv_t(-1))
+  {}
+
+  ~impl() {
+    if (conv != iconv_t(-1))
+      iconv_close(conv);
+  }
+
+  iconv_t conv;
+};
+
+encodings::transcoder::transcoder(object const &obj, call_context &x)
+: base_type(obj)
+{
+  init(x.arg[0].to_std_string(), x.arg[1].to_std_string());
+}
+
+encodings::transcoder::transcoder(
+  object const &obj, std::string const &from, std::string const &to)
+: base_type(obj)
+{
+  init(from, to);
+}
+
+encodings::transcoder::~transcoder() {
+}
+
+void encodings::transcoder::init(std::string const &from, std::string const &to)
+{
+  boost::scoped_ptr<impl> p(new impl);
+
+  p->conv = iconv_open(to.c_str(), from.c_str());
+
+  if (p->conv == iconv_t(-1))
+    throw exception("Could not create Transcoder with iconv");
+
+  this->p.swap(p);
+}
+
+binary &encodings::transcoder::push(
+  binary &input, boost::optional<byte_array&> const &output_)
+{
+  binary &output =
+    output_
+    ? static_cast<binary&>(output_.get())
+    : static_cast<binary&>(
+        create_native_object<byte_string>(
+          object(),
+          (byte_string::element_type*)0,
+          0));
+
+  return output;
+}
+
+void encodings::transcoder::close() {
 }
