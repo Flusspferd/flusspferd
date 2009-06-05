@@ -56,8 +56,8 @@ public:
 
   typedef unsigned char element_type;
   typedef std::vector<element_type> vector_type;
-protected:
 
+protected:
   binary(object const &o, call_context &x);
   binary(object const &o, binary const &b);
   binary(object const &o, element_type const *p, std::size_t n);
@@ -74,10 +74,15 @@ protected:
   void property_op(property_mode mode, value const &id, value &data);
   bool property_resolve(value const &id, unsigned access);
 
-protected:
+public:
   vector_type &get_data();
   std::size_t set_length(std::size_t);
 
+  std::size_t get_length();
+
+  vector_type const &get_const_data() { return get_data(); }
+
+protected:
   void do_append(arguments &x);
 
   std::pair<std::size_t, std::size_t>
@@ -87,11 +92,6 @@ protected:
   length_range(int begin, boost::optional<int> length);
 
   void debug_rep(std::ostream &o);
-
-public:
-  std::size_t get_length();
-
-  vector_type const &get_const_data() { return get_data(); }
 
 public:
   object to_byte_array();
