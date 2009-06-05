@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 #include "string.hpp"
 #include "binary.hpp"
+#include "class_description.hpp"
 #include <string>
 
 namespace flusspferd {
@@ -37,6 +38,32 @@ namespace encodings {
     std::string const &enc, flusspferd::string const &source);
   object convert(
     std::string const &from_enc, std::string const &to_enc, binary &source);
+
+  FLUSSPFERD_CLASS_DESCRIPTION(
+    transcoder,
+    (full_name, "encodings.Transcoder")
+    (constructor_name, "Transcoder")
+    (constructor_arity, 2)
+    (methods,
+      ("push", bind, push)
+      ("close", bind, close)))
+  {
+  public:
+    transcoder(object const &, std::string const &from, std::string const &to);
+    transcoder(object const &, call_context &);
+
+    ~transcoder();
+
+    binary &push(binary &input, boost::optional<byte_array&> const &output);
+    void close();
+
+  private:
+    void init(std::string const &from, std::string const &to);
+
+  private:
+    class impl;
+    boost::scoped_ptr<impl> p;
+  };
 }
 
 }
