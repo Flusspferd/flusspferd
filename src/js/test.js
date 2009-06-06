@@ -23,206 +23,40 @@ THE SOFTWARE.
 
 let equiv = require('./test/equiv').equiv;
 
-/**
- * Creates a new Test Suite
- * @constructor
- */
-const TestHarness = function Test$Harness(name, options) {
-
-  this.name = name;
-  this.tests = [];
-  this.asserts_failed = 0;
-  this.total_asserts = 0;
-  this.tests_failed = 0;
-  this.total_tests = 0;
-  this.nest = 0;
-
-  for (let [i,k] in Iterator(options || {} )) {
-    this[i] = k;
-  }
-
-  // Support Flusspferd's IO and the 'system' proposal from ServerJS
-  if (!this.outputStream) {
-    if (typeof(IO) !== undefined)
-      this.outputStream = IO.stdout;
-    else {
-      const sys = require('system');
-      this.outputStream = sys.stdout;
-    }
-  }
-
-  TestHarness.suites.push(this);
-}
-exports.Harness = TestHarness; 
-TestHarness.suites = [];
-
-TestHarness.go = function TestHarness$go() {
-  var suites_failed = [];
-  var suites = Array.slice(arguments);
-  if (suites.length == 0)
-    suites = this.suites;
-
-  if (suites.length == 0)
-    return;
-
-  for (var i in suites) {
-    var s = suites[i];
-    if (s.name === undefined)
-      s.name = 'Suite ' + i;
-    s.outputStream.print('#', s.name); 
-    
-    s.go();
-
-    if (s.tests_failed > 0)
-      suites_failed.push(s);
-  }
-
-  var msg;
-  if (suites_failed.length) {
-    msg = suites[0].red(suites_failed.length + '/' + suites.length, 'suites failed')
-  } else {
-    msg = suites[0].green(suites.length + '/' + suites.length, 'suites sucessful');
-  }
-  suites[0].outputStream.print(msg);
+function merge(ctor, obj) {
+  for (let [k,v] in Iterator(obj))
+    ctor[k] = v;
 }
 
-TestHarness.prototype = {
-  constructor: TestHarness,
+const TAPProducer = function TAPProducer() {
+  // TODO: ServerJS compliance
+  this.outputStream = IO.stdout;
+
+  var depth;
+  Object.defineProperty(this, "paddDepth", {
+
+    getter: function() { return depth },
+    setter: function(d) {
+      d = new Number(d).valueOf();
+      if (isNaN(d))
+        throw TypeError("paddDepth must be a number");
+      depth = d;
+      this.padding = this.getPadd();
+    },
+  });
+
+  this.paddDepth = 0;
+}
+
+
+
+merge(TAPProducer.prototype, {
+  paddStr: '  ',
 
   colourize: true,
 
-  same: function() {
-    var args = Array.slice(arguments);
-
-    var msg;
-    if (args.length > 2)
-      msg = args.pop();
-
-    return this.do_assert( {
-      type: 'same',
-      when: new Date(),
-      ok: !!equiv.apply(equiv, args),
-      message: msg,
-      default_msg: "arguments are the same"
-    });
-  },
-
-  instanceOf: function(obj, type, msg) {
-    var test = obj instanceof type;
-    return this.do_assert( {
-      type: 'instance_of',
-      ok: !!test,
-      when: new Date(),
-      message: msg,
-      default_msg: "object is instance of type"
-    });
-  },
-
-  ok: function ok(test, msg) {
-    if (arguments.length == 0) {
-      test = true; // If nothing is passed in, then assume its successful
-    }
-    return this.do_assert( {
-      type: 'ok',
-      ok: !!test,
-      when: new Date(),
-      message: msg,
-    } );
-  },
-
-  // Handle/print the assert
-  do_assert: function do_assert(a) {
-    this.current_test.asserts.push(a);
-    a.num = this.current_test.asserts.length;
-
-    // Padding to make numbers line up.
-    var plan = this.current_test.plan;
-    
-    if (a.num === 1) {
-      // First assert this test
-      if (isNaN(plan)) {
-        // Just print the newline
-        this.outputStream.print();
-      }
-    }
-
-    if (plan === undefined || isNaN(plan)) 
-      plan = a.num;
-
-    let data = [
-      a.ok ? this.green('ok') : this.red('not ok'),
-      a.num
-    ];
-
-    if (a.message !== undefined)
-      data.push('-', a.message)
-    else if ('default_msg' in a)
-      data.push('-', a.default_msg)
-
-    if (a.ok)
-      this.current_test.asserts_passed++;
-    else 
-      this.current_test.asserts_failed++;
-
-    this.outputStream.print(data);
-    return a.ok;
-  },
-
-  expect: function expect(count) {
-    if (this.current_test.asserts.length)
-      throw new Error('expect called after an assertion');
-    this.current_test.plan = new Number(count).valueOf();
-    if (isNaN(this.current_test.plan))
-      throw new Error('invalid plan - not a number');
-    this.outputStream.print(" 1.." + this.current_test.plan);
-  },
-
-  run: function run(name) {
-    this.current_test = { 
-      name: name, 
-      asserts: [],
-      asserts_passed: 0,
-      asserts_failed: 0,
-    };
-
-    if (this[name] instanceof Function === false) {
-      throw new Error(name + " is not a function");
-    }
-
-    this.tests.push(this.current_test);
-
-    // This writes without a trailing new line
-    this.outputStream.write(name + ":");
-
-    // If there's a 'plan' property of the function object, use it as the plan
-    if ('expect' in this[name]) {
-      this.expect(this[name].expect)
-    }
-
-    try {
-        this[name].apply(this);
-    }
-    catch (e) {
-      this.current_test.error = e;
-    }
-    this.finalize_test();
-    delete this.current_test;
-  },
-
-  go: function go() {
-    for (var n in this) {
-      if (this.hasOwnProperty(n) == false)
-        continue;
-      n = n.toString();
-
-      if (n.substr(0,5) === "test_")
-        this.run(n);
-    }
-    this.finalize();
-  },
-
-  green: function() {
-    var a = Array.prototype.slice.apply(arguments);
+  green: function green() {
+    var a = Array.slice.apply(arguments);
     if (a.length == 0 && a[0] instanceof Array)
       a = a[0];
 
@@ -232,8 +66,8 @@ TestHarness.prototype = {
     return '\x1b[32m' + a + '\x1b[0m';
   },
 
-  red: function() {
-    var a = Array.prototype.slice.apply(arguments);
+  red: function red() {
+    var a = Array.slice.apply(arguments);
     if (a.length == 1 && a[0] instanceof Array)
       a = a[0];
 
@@ -243,80 +77,266 @@ TestHarness.prototype = {
     return '\x1b[31m' + a + '\x1b[0m';
   },
 
-  finalize_test: function finalize_test() {
-    var test = this.current_test;
-    var msg = [];
-    this.asserts_failed += test.asserts_failed;
+  // Handle/print the assert
+  do_assert: function do_assert(a) {
+    
+    a.num = ++this._state.currentCase.numAsserts;
 
-    if (test.plan !== null && !isNaN(test.plan)) {
-      // Check the plan.
-      let plural = test.plan == 1 ? 'assert' : 'asserts';
+    let data = [a.num];
+    data.push(a.ok ? this.green('ok') : this.red('not ok'));
 
-      if (test.plan > test.asserts.length) {
-        // too many
-        test.passed = false;
-        msg = [test.name, 'expected', test.plan, plural, 'only got', 
-               test.asserts.length]; 
-        this.total_asserts += test.plan;
-        this.asserts_failed += test.plan - test.asserts.length;
-      } else if (test.plan < test.asserts.length) {
-        test.passed = false;
-        msg = [test.name, 'expected', test.plan, plural, 'but got', 
-               test.asserts.length]; 
-        this.total_asserts += test.asserts.length;
-        this.asserts_failed += test.asserts.length - test.plan;
-      }
-      else {
-        test.passed = test.asserts_failed == 0;
-        this.total_asserts += test.plan;
-      }
-    } 
+    if (a.message !== undefined)
+      data.push('-', a.message)
+    else if ('defaultMsg' in a)
+      data.push('-', a.defaultMsg)
 
-    if (test.error) {
-      // The test died.
+    if (!a.ok)
+      this._state.currentCase.assertsFailed.push(a);
 
-      // Possibly before it could plan, so add a \n
-      if (isNaN(test.plan) && test.asserts.length == 0)
-        this.outputStream.print();
-      
-      let e = this.current_test.error;
-      this.outputStream.print( this.red(test.name, 'died:') );
-      var e_msg = e.toString().replace(/\n/g, "\n  ");
-      let a = ['  ' + e_msg];
-      if (e.fileName) {
-        var stack = e.stack;
-        a.push("\n  ", stack.replace(/\n/g, "\n  "));
-      }
-      msg = this.red(a);
-      test.passed = false;
-    } 
-    else {
-      // No plan, no error.
-      test.passed = test.asserts_failed == 0;
-    }
-    if (msg.length) {
-      this.outputStream.print(msg);
-    }
+    this.print(data);
 
-    this.total_tests++;
-    if (!test.passed)
-      this.tests_failed++;
+    if (a.diag)
+      this.diag(a.diag);
+    return a.ok;
   },
 
-  // Print summary
-  finalize: function finalize() {
-    if (this.tests_failed == 0) {
-      this.outputStream.print(this.green('All tests successful'))
+  print: function print() {
+    var msg;
+    if (arguments[0] instanceof Array)
+      msg = arguments[0].join(" ");
+    else
+      msg = Array.join(arguments, " ");
+
+    this.outputStream.print(this.padding + msg)
+  },
+
+  diag: function diag(msg) {
+    this.outputStream.print(
+      msg.replace(/\n$/m, "")
+         .replace(/^/mg, this.padding + "# ")
+    );
+  },
+
+  getPadd: function getPadd() {
+    var i = 0;
+    return [this.paddStr for (i in Util.Range(0, this.paddDepth))].join('');
+  }
+});
+
+
+const Suite = function Suite(cases) {
+  this.__proto__.__proto__.constructor.call(this);
+  this._state = {
+    cases: [],
+    casesFailed: 0,
+    assertsFailed: [],
+    numAsserts: 0,
+    run: 0,
+    currentCase: undefined
+  }
+
+  if (!cases) {
+    return this;
+  }
+
+
+  // TODO: setup and teardown methods
+  for ([k,t] in Iterator(cases)) {
+
+    if (/^test_/.test(k) == false)
+      continue;
+    this._state.cases.push({
+      func: t,
+      name: k.replace(/^test_(.*)/, "$1"),
+      index: this._state.cases.length,
+      numAsserts: 0,
+      assertsFailed: []
+    });
+  }
+
+  this._state.plan = this._state.cases.length;
+}
+
+Suite.prototype.__proto__ = TAPProducer.prototype;
+
+merge(Suite.prototype, {
+
+  run: function run() {
+    if (!this._state.cases.length) {
+      throw new Error("Cannot run a Test.Suite without any test cases!");
+    }
+
+    var oldCurrent = exports.__currentSuite__;
+    try {
+      exports.__currentSuite__ = this;
+      for ([name,test] in Iterator(this._state.cases)) {
+        this.runCase( test);
+      }
+    }
+    finally {
+      currentSuite = oldCurrent;
+    }
+    this.finalize();
+  },
+
+  addSubSuite: function addSubSuite(s) {
+  },
+
+  runCase: function runCase(theCase) {
+    var asserts = exports.asserts,
+        depth = this.paddDepth,
+        error;
+
+    this.printPlan(this._state);
+
+    try {
+      this.diag(theCase.name + "...");
+      this.paddDepth = depth + 1;
+      try {
+        this._state.currentCase = theCase;
+        theCase.func.call(asserts, this);
+        this.printPlan(theCase);
+      }
+      finally {
+        this.paddDepth = depth;
+      }
+    }
+    catch (e) {
+      error = e;
+    }
+    this.finishCase(theCase, error)
+  },
+
+  finishCase: function finishCase(theCase, error) {
+    var failed = error || theCase.assertsFailed.length > 0;
+    if (error) {
       return;
     }
 
-    var msg = [this.tests_failed + "/" + this.total_tests, "tests",
-              "(" + this.asserts_failed + "/" + this.total_asserts,
-              "asserts)", "failed"];
+    this._state.currentCase = this._state;
+    this.do_assert( {
+      type: 'case',
+      when: new Date(),
+      ok: !failed,
+      message: theCase.name,
+    });
+    delete this._state.currentCase;
 
-    this.outputStream.print(this.red(msg))
+  },
+
+  printPlan: function printPlan(theCase) {
+    if (theCase.planned)
+      return;
+
+    if ("plan" in theCase == false)
+      theCase.plan = theCase.numAsserts;
+
+    this.print("1.." + theCase.plan);
+    theCase.planned = true;
+  },
+
+  finalize: function finalize() {
+    //this.diag(this._state.toSource());
   }
+})
+
+exports.Suite = Suite;
+exports.Runner = function Runner() {
+  var suite;
+  var args = Array.slice(arguments);
+  if (args.length == 1 && args[0] instanceof Suite) {
+    builder = args[0];
+  }
+  else if (args.every(function(x) { return x instanceof Suite })) {
+    suite = new Suite();
+    args.forEach(suite.addSubSuite, builder);
+  }
+  else if (args[0] instanceof Object) {
+    suite = new Suite(args[0]);
+  }
+  else {
+    throw new TypeError("Invalid arguments to test.Runner");
+  }
+
+  return suite.run();
+};
+
+var currentSuite;
+Object.defineProperty( exports, "__currentSuite__", {
+  getter: function() { return currentSuite },
+  setter: function(x) {
+    if (x instanceof Suite)
+      return currentSuite = x;
+    throw new TypeError("__currentSuite__ must be an instanceof test.Suite");
+  },
+  configurable: false,
+  enumerable: false,
+});
+
+
+
+
+const Asserts = function() {
 }
+
+merge(Asserts.prototype, {
+  same: function() {
+    var args = Array.slice(arguments);
+
+    var msg;
+    if (args.length > 2)
+      msg = args.pop();
+
+    return exports.__currentSuite__.do_assert( {
+      type: 'same',
+      when: new Date(),
+      ok: !!equiv.apply(equiv, args),
+      message: msg,
+      defaultMsg: "arguments are the same",
+      wanted: args[0],
+      got: args.slice(1),
+      diag: "Wanted: " + args[0].toSource()
+                       + args.slice(1).map(function(i) {
+                            return "\n   Got: " + i.toSource()
+                         })
+    });
+  },
+
+  instanceOf: function(obj, type, msg) {
+    var test = obj instanceof type;
+    return exports.__currentSuite__.do_assert( {
+      type: 'instanceof',
+      ok: !!test,
+      when: new Date(),
+      message: msg,
+      defaultMsg: "object is instance of type"
+    });
+  },
+
+  ok: function ok(test, msg) {
+    if (arguments.length == 0) {
+      test = true; // If nothing is passed in, then assume its successful
+    }
+    return exports.__currentSuite__.do_assert( {
+      type: 'ok',
+      ok: !!test,
+      when: new Date(),
+      message: msg,
+    } );
+  },
+
+  expects: function expects(count) {
+    return exports.__currentSuite__.expects(count);
+  },
+
+  diag: function diag() {
+    var suite = exports.__currentSuite__;
+    suite.diag.apply(diag, arguments);
+  }
+
+});
+
+exports.asserts = new Asserts();
 
 
 /*

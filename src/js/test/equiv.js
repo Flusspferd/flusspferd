@@ -68,11 +68,6 @@ function bindCallbacks(o, callbacks, args) {
     }
 }
 
-// Equiv
-// Test for equality any JavaScript type.
-// Discussions and reference: http://philrathe.com/articles/equiv
-// Test suites: http://philrathe.com/tests/equiv
-// Author: Philippe Rathé <prathe@gmail.com>
 var equiv = function () {
 
     var innerEquiv; // the real equiv function
