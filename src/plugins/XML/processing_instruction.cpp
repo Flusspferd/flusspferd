@@ -21,37 +21,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/io/io.hpp"
-#include "flusspferd/io/file.hpp"
-#include "flusspferd/io/blob_stream.hpp"
+#include "processing_instruction.hpp"
+#include "node.hpp"
+#include "document.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/class.hpp"
-#include "flusspferd/modules.hpp"
-#include <iostream>
+#include "flusspferd/string.hpp"
+#include "flusspferd/exception.hpp"
 
 using namespace flusspferd;
-using namespace flusspferd::io;
+using namespace flusspferd::xml;
 
-object flusspferd::io::load_io_module(object container) {
+processing_instruction::processing_instruction(
+    object const &obj, xmlNodePtr ptr
+  )
+  : base_type(obj, ptr)
+{}
+
+static xmlNodePtr new_processing_instruction(call_context &x) {
   local_root_scope scope;
 
-  object IO = container.get_property_object("exports");
+  xmlDocPtr doc = document::c_from_js(x.arg[0].to_object());
 
-  load_class<stream>(IO);
-  load_class<file>(IO);
-  load_class<blob_stream>(IO);
+  std::size_t offset = !doc ? 0 : 1;
 
-  IO.define_property(
-    "stdout",
-    create_native_object<stream>(object(), std::cout.rdbuf()));
+  if (!x.arg[offset].is_string() || !x.arg[offset + 1].is_string())
+    throw exception("Could not create XML processing instruction: "
+                    "name and content have to be strings");
 
-  IO.define_property(
-    "stderr",
-    create_native_object<stream>(object(), std::cerr.rdbuf()));
+  string name = x.arg[offset].get_string();
+  string text = x.arg[offset + 1].get_string();
 
-  IO.define_property(
-    "stdin",
-    create_native_object<stream>(object(), std::cin.rdbuf()));
+  xmlChar const *name_ = (xmlChar const *) name.c_str();
+  xmlChar const *text_ = (xmlChar const *) text.c_str();
 
-  return IO;
+  xmlNodePtr result = xmlNewDocPI(doc, name_, text_);
+
+  if (!result)
+    throw exception("Could not create XML processing instruction");
+
+  return result;
 }
+
+processing_instruction::processing_instruction(object const &o, call_context &x)
+  : base_type(o, new_processing_instruction(x))
+{}
+
+processing_instruction::~processing_instruction()
+{}

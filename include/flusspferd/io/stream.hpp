@@ -47,8 +47,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("print", bind, print)
     ("readLine", bind, read_line))
   (properties,
-    ("fieldSeparator", variable, string(" "))
-    ("recordSeparator", variable, string("\n"))
+    ("fieldSeparator", variable, " ")
+    ("recordSeparator", variable, "\n")
     ("autoFlush", variable, false)))
 {
 public:

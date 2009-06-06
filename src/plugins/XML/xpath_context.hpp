@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -21,6 +21,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths = ['.', '@INSTALL_MODULES_PATH@'];
+#ifndef FLUSSPFERD_XML_CONTEXT_HPP
+#define FLUSSPFERD_XML_CONTEXT_HPP
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+#include "flusspferd/class_description.hpp"
+#include <libxml/xpath.h>
+
+namespace flusspferd { namespace xml {
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+  xpath_context,
+  (full_name, "XML.XPath")
+  (constructor_name, "XPath")
+  (constructor_arity, 1)
+  (properties,
+    ("current", getter_setter, (get_current, set_current))))
+{
+public:
+  xpath_context(object const &, call_context &);
+  ~xpath_context();
+
+private: // JS methods
+  void self_call(call_context &);
+
+public: // JS properties
+  object get_current();
+  void set_current(object);
+
+private:
+  xmlXPathContextPtr xpath_ctx;
+};
+
+}}
+
+#endif

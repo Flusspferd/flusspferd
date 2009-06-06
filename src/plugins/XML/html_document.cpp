@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -21,6 +21,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths = ['.', '@INSTALL_MODULES_PATH@'];
+#include "html_document.hpp"
+#include "flusspferd/string.hpp"
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+using namespace flusspferd;
+using namespace flusspferd::xml;
+
+static htmlDocPtr new_doc(call_context &) {
+  htmlDocPtr ptr = htmlNewDoc(0, 0);
+
+  if (!ptr)
+    throw exception("Could not create HTML document");
+
+  return ptr;
+}
+
+html_document::html_document(object const &obj, call_context &x)
+  : base_type(obj, new_doc(x))
+{
+  init();
+}
+
+html_document::html_document(object const &obj, htmlDocPtr ptr)
+  : base_type(obj, ptr)
+{
+  init();
+}
+
+html_document::~html_document() {
+}
+
+void html_document::init() {
+}
+
+string html_document::dump() {
+  string result;
+
+  xmlOutputBufferPtr buf = xmlAllocOutputBuffer(0);
+
+  if (!buf)
+    throw exception("Could not dump HTML document");
+
+  try {
+    htmlDocContentDumpFormatOutput(buf, c_obj(), 0, 1);
+
+    char *data = (char*) buf->buffer->content;
+    std::size_t size = buf->buffer->use;
+
+    result = string(data, size);
+  } catch (...) {
+    xmlOutputBufferClose(buf);
+    throw;
+  }
+
+  xmlOutputBufferClose(buf);
+
+  return result;
+}

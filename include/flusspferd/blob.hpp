@@ -64,7 +64,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 )
 {
 public:
-  friend class class_info;
+  friend struct class_info;
 
   static void augment_prototype(object &proto);
 

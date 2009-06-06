@@ -69,7 +69,7 @@ FLUSSPFERD_LOADER(posix) {
   function set_errno = create_native_function(errno_obj, "set", &errno_setter);
   property_attributes errno_attr(permanent_shared_property,
                                  get_errno, set_errno);
-  posix.define_property("errno", errno, errno_attr);
+  posix.define_property("errno", value(errno), errno_attr);
   create_native_function(posix, "strerror", &strerror_);
   create_native_function(posix, "perror", &std::perror);
 }

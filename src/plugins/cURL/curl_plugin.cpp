@@ -99,7 +99,7 @@ void curl::augment_constructor(object &ctor)
   //protocols.seal(false);
   // Arse. Can't in 1.8
 
-  ctor.define_property("versionHex", (int)data->version_num,
+  ctor.define_property("versionHex", value((int)data->version_num),
                        read_only_property);
   ctor.define_property("versionStr", string( (const char*)data->version),
                        read_only_property);

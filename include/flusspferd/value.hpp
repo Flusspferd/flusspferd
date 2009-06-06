@@ -26,11 +26,18 @@ THE SOFTWARE.
 
 #include "spidermonkey/value.hpp"
 #include <string>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_floating_point.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/mpl/logical.hpp>
 
 namespace flusspferd {
 
 class object;
 class string;
+template<typename T> class convert;
 
 /**
  * Any Javascript value.
@@ -38,48 +45,116 @@ class string;
  * @ingroup value_types
  */
 class value : public Impl::value_impl {
-private:
-  template<typename T>
-  value(T *);
-
 public:
   /// Create a new value (Javascript: <code>undefined</code>).
   value();
 
+  /// Copy constructor.
+  value(value const &o)
+  : Impl::value_impl(o)
+  {}
+
+#ifndef IN_DOXYGEN
+  template<typename BoolType>
+  explicit value(
+    BoolType const &x,
+    typename boost::enable_if<
+      typename boost::is_same<BoolType, bool>::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_boolean(x))
+  {}
+
+  template<typename IntegralType>
+  explicit value(
+    IntegralType const &num,
+    typename boost::enable_if<
+      typename boost::mpl::and_<
+        typename boost::is_integral<IntegralType>::type,
+        typename boost::mpl::not_<
+          typename boost::is_same<IntegralType, bool>::type
+        >::type
+      >::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_integer(num))
+  {}
+
+  template<typename FloatingPointType>
+  explicit value(
+    FloatingPointType const &num,
+    typename boost::enable_if<
+      typename boost::is_floating_point<FloatingPointType>::type
+    >::type * = 0)
+  : Impl::value_impl(Impl::value_impl::from_double(num))
+  {}
+
+  template<typename OtherType>
+  explicit value(
+    OtherType const &val,
+    typename boost::disable_if<
+      typename boost::mpl::or_<
+        typename boost::is_integral<OtherType>::type,
+        typename boost::is_floating_point<OtherType>::type,
+        typename boost::is_convertible<OtherType, object>::type
+      >::type
+    >::type * = 0)
+  {
+    typename convert<OtherType>::to_value converter;
+    *this = converter.perform(val);
+  }
+#else
   /**
    * Create a new boolean value.
    *
    * @param b The value.
    */
-  value(bool b);
+  explicit value(bool b);
 
   /**
    * Create a new number value from an integer.
    *
-   * @param i The integer value.
+   * @param num The integer value.
    */
-  value(int i);
+  template<typename IntegralType>
+  explicit value(IntegralType const &num);
 
   /**
-   * Create a new number value.
+   * Create a new number value from a floating point number.
    *
-   * @param d The value.
+   * @param num The floating point value.
    */
-  value(double d);
+  template<typename FloatingPointType>
+  explicit value(FloatingPointType const &num);
+
+  /**
+   * Create a new value from a (nearly) arbitrary C++ type value.
+   *
+   * Works with any type supported by flusspferd::convert. This overload will
+   * not be used for integral types, floating point types or types convertible
+   * to flusspferd::object.
+   *
+   * @param val The value to convert.
+   */
+  template<typename OtherType>
+  explicit value(OtherType const &val);
+#endif
 
   /**
    * Create a new object value.
    *
    * @param o The object.
    */
-  value(object const &o);
+  value(object const &o)
+  : Impl::value_impl(Impl::value_impl::from_object(o))
+  {}
 
   /**
    * Create a new string value.
    *
    * @param s The string.
    */
-  value(string const &s);
+  value(string const &s)
+  : Impl::value_impl(Impl::value_impl::from_string(s))
+  {}
 
   /// Destructor.
   ~value();
@@ -89,6 +164,19 @@ public:
     : Impl::value_impl(v)
   { }
 #endif
+
+  // Assignment operator.
+  value &operator=(value const &v) {
+    *static_cast<Impl::value_impl*>(this) = v;
+    return *this;
+  }
+
+  // Assignment operator.
+  template<typename T>
+  value &operator=(T const &x) {
+    *this = value(x);
+    return *this;
+  }
 
   /**
    * Bind to another value.
@@ -178,5 +266,7 @@ public:
 };
 
 }
+
+#include "convert.hpp"
 
 #endif /* FLUSSPFERD_VALUE_HPP */

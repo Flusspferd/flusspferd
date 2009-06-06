@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
+#include "flusspferd/io/io.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
@@ -103,7 +104,8 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   // Put the require function in the shared global so it is available to
   // sub-modules too
-  flusspferd::load_require_function(flusspferd::global().prototype());
+  flusspferd::load_require_function(g.prototype());
+
   flusspferd::object require_fn = g.get_property("require").to_object();
 
   flusspferd::load_properties_functions();
@@ -113,11 +115,19 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     phoenix::bind(&flusspferd_repl::quit, this, args::arg1));
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
 
-  flusspferd::object preload = require_fn.get_property("preload").to_object();
+  flusspferd::object preload = require_fn.get_property_object("preload");
 
   flusspferd::create_native_method(
     preload, "binary",
     &flusspferd::load_binary_module);
+
+  flusspferd::create_native_method(
+    preload, "encodings",
+    &flusspferd::load_encodings_module);
+
+  flusspferd::create_native_method(
+    preload, "IO",
+    &flusspferd::io::load_io_module);
 
   flusspferd::gc();
 }
