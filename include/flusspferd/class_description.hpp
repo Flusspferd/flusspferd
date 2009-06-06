@@ -292,14 +292,14 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PROPERTY__constant(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
-    (p_param), \
+    ::flusspferd::value((p_param)), \
     ::flusspferd::read_only_property | ::flusspferd::permanent_property); \
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__variable(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
-    (p_param)); \
+    ::flusspferd::value((p_param))); \
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__none(p_property_name, p_param) \
@@ -467,7 +467,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_methods,
         ("constructorMethod", bind_static, constructor_method))
     (constructor_properties,
-        ("VERSION", constant, flusspferd::string("1.0"))))
+        ("VERSION", constant, "1.0")))
 {
     double my_method(double parameter) {
         return parameter * 2;

@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -21,6 +21,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths = ['.', '@INSTALL_MODULES_PATH@'];
+#ifndef FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
+#define FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+#include "flusspferd/blob.hpp"
+#include "flusspferd/class_description.hpp"
+#include <libxml/HTMLparser.h>
+
+namespace flusspferd { namespace xml {
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+  html_push_parser,
+  (full_name, "XML.HTML.PushParser")
+  (constructor_name, "PushParser")
+  (constructor_arity, 1)
+  (methods,
+    ("push", bind, push)
+    ("terminate", bind, terminate)))
+{
+public:
+  html_push_parser(object const &, call_context &);
+  ~html_push_parser();
+
+public: // JS methods
+  void push(blob &, bool);
+  value terminate();
+
+private:
+  void terminate2();
+
+  htmlParserCtxtPtr parser;
+};
+
+}}
+
+#endif

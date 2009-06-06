@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -21,6 +21,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths = ['.', '@INSTALL_MODULES_PATH@'];
+#include "flusspferd/function_adapter.hpp"
+#include "flusspferd/native_object_base.hpp"
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+using namespace flusspferd;
+
+native_object_base &
+flusspferd::detail::get_native_object_parameter_ptr(call_context &x) {
+  native_object_base *p = x.self_native;
+  if (p)
+    return *p;
+
+  convert<native_object_base &>::from_value from_value;
+
+  return from_value.perform(value(x.self));
+}

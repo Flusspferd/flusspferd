@@ -340,6 +340,17 @@ FLUSSPFERD_CALLS(call, object const &)
   value get_property(value const &id) const;
 
   /**
+   * Get a property (as an object).
+   *
+   * @param id The property's name / ID.
+   * @return The current value (as an object).
+   */
+  template<typename T>
+  object get_property_object(T const &id) const {
+    return get_property(id).to_object();
+  }
+
+  /**
    * Check whether a property exists on the object or any of its prototypes.
    *
    * @param name The property's name.

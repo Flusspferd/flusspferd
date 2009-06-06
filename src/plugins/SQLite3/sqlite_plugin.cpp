@@ -47,7 +47,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("close", bind, close))
   (constructor_properties,
     ("version", constant, SQLITE_VERSION_NUMBER)
-    ("versionStr", constant, string(SQLITE_VERSION))))
+    ("versionStr", constant, SQLITE_VERSION)))
 {
 public:
   sqlite3(object const &obj, call_context &x);
@@ -236,10 +236,10 @@ object sqlite3_cursor::next() {
     
     switch (type) {
       case SQLITE_INTEGER:
-        col = sqlite3_column_int(sth, i);
+        col = value(sqlite3_column_int(sth, i));
         break;
       case SQLITE_FLOAT:
-        col = sqlite3_column_double(sth, i);
+        col = value(sqlite3_column_double(sth, i));
         break;
       case SQLITE_NULL:
         col = object();
@@ -326,7 +326,7 @@ void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
     if (!name) {
       // Possibly a '?' unnnamed param
       // TODO: This will break when n is > 2^31.
-      bind = o.get_property( value( int(n) ) );
+      bind = o.get_property( value(n) );
     } else {
       // Named param
       bind = o.get_property(name);

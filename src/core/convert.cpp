@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -20,7 +20,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#include "flusspferd/convert.hpp"
+#include "flusspferd/array.hpp"
+#include "flusspferd/create.hpp"
 
-require.paths = ['.', '@INSTALL_MODULES_PATH@'];
+using namespace flusspferd;
+using detail::convert_container_base;
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+value convert_container_base::to_value::start() {
+  return create_array();
+}
+
+void convert_container_base::to_value::add(value obj, value el) {
+  obj.to_object().call("push", el);
+}
+
+std::size_t convert_container_base::from_value::length(value obj_v) {
+  array arr(obj_v.to_object());
+  return arr.length();
+}
+
+value convert_container_base::from_value::element(value obj_v, std::size_t i) {
+  array arr(obj_v.to_object());
+  return arr.get_element(i);
+}

@@ -39,25 +39,6 @@ using namespace flusspferd;
 
 value::~value() { }
 value::value() : Impl::value_impl(JSVAL_VOID) { }
-value::value(bool b) : Impl::value_impl(BOOLEAN_TO_JSVAL(b)) { }
-value::value(int i) : Impl::value_impl(INT_TO_JSVAL(i)) { }
-
-static jsval from_double(double d) {
-  jsval ret;
-  if (!JS_NewNumberValue(Impl::current_context(), d, &ret))
-    throw exception("Conversion from double to value failed");
-  return ret;
-}
-
-value::value(double d) : Impl::value_impl(from_double(d)) { }
-value::value(object const &o)
-  : Impl::value_impl(OBJECT_TO_JSVAL(Impl::get_object(
-      const_cast<object&>(o))))
-{ }
-value::value(string const &s)
-  : Impl::value_impl(STRING_TO_JSVAL(Impl::get_string(
-      const_cast<string&>(s))))
-{ }
 
 bool value::is_null() const { return JSVAL_IS_NULL(get()); }
 bool value::is_undefined() const { return JSVAL_IS_VOID(get()); }
@@ -155,3 +136,24 @@ void value::unbind() {
   setp(getvalp());
 }
 
+Impl::value_impl Impl::value_impl::from_double(double num) {
+  value_impl result;
+  if (!JS_NewNumberValue(
+        Impl::current_context(), jsdouble(num), result.getp()))
+  {
+    throw exception("Could not convert integer to value");
+  }
+  return result;
+}
+
+Impl::value_impl Impl::value_impl::from_boolean(bool x) {
+  return wrap_jsval(BOOLEAN_TO_JSVAL(x));
+}
+
+Impl::value_impl Impl::value_impl::from_string(string const &s) {
+  return wrap_jsval(STRING_TO_JSVAL(Impl::get_string(const_cast<string&>(s))));
+}
+
+Impl::value_impl Impl::value_impl::from_object(object const &o) {
+  return wrap_jsval(OBJECT_TO_JSVAL(Impl::get_object(const_cast<object&>(o))));
+}

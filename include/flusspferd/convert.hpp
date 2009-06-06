@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include <boost/type_traits/remove_cv.hpp>
 #include <boost/optional.hpp>
 #include <limits>
+#include <vector>
+#include <list>
 
 namespace flusspferd {
 
@@ -142,13 +144,16 @@ struct convert<
     typename boost::enable_if<boost::is_integral<T> >::type
   >
 {
-  typedef to_value_helper<T, double> to_value;
+  typedef to_value_helper<T> to_value;
 
   struct from_value {
     typedef std::numeric_limits<T> limits;
 
     T perform(value const &v) {
-      return v.to_integral_number(limits::digits, limits::is_signed);
+      double num = v.to_number();
+      if (num < double(limits::min()) || num > double(limits::max()))
+        throw exception("Not inside integer range", "RangeError");
+      return T(num);
     }
   };
 };
@@ -159,7 +164,7 @@ struct convert<
     typename boost::enable_if<boost::is_float<T> >::type
   >
 {
-  typedef to_value_helper<T, double> to_value;
+  typedef to_value_helper<T> to_value;
 
   struct from_value {
     T perform(value const &v) {
@@ -207,6 +212,7 @@ struct convert< detail::root<T> > {
 template<typename T, std::size_t N>
 struct convert<T [N]> {
   typedef typename convert<T const *>::to_value to_value;
+  typedef void from_value;
 };
 
 template<>
@@ -235,6 +241,64 @@ struct convert_ptr<T, native_object_base>;
 
 template<typename T>
 struct convert_ptr<T, native_function_base>;
+
+struct convert_container_base {
+  struct to_value {
+    value start();
+    void add(value obj, value x);
+  };
+
+  struct from_value {
+    std::size_t length(value obj);
+    value element(value obj, std::size_t i);
+  };
+};
+
+template<typename Container>
+struct convert_container {
+  struct to_value {
+    convert_container_base::to_value base;
+
+    root_value root;
+
+    typename convert<typename Container::value_type>::to_value item_converter;
+
+    value perform(Container const &cont) {
+      root = base.start();
+      for (typename Container::const_iterator it = cont.begin();
+          it != cont.end();
+          ++it)
+      {
+        base.add(root, item_converter.perform(*it));
+      }
+      return root;
+    }
+  };
+
+  struct from_value {
+    convert_container_base::from_value base;
+
+    typename convert<typename Container::value_type>::from_value
+      item_converter;
+
+    Container perform(value val) {
+      Container result;
+      std::size_t length = base.length(val);
+      result.reserve(length);
+      for (std::size_t i = 0; i < length; ++i)
+        result.push_back(item_converter.perform(base.element(val, i)));
+      return result;
+    }
+  };
+};
+
+template<typename T, typename A>
+struct convert< std::vector<T, A> >
+: convert_container< std::vector<T, A> > {};
+
+template<typename T, typename A>
+struct convert< std::list<T, A> >
+: convert_container< std::list<T, A> > {};
 
 }
 #endif

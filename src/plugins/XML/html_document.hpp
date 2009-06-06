@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
 
@@ -21,6 +21,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths = ['.', '@INSTALL_MODULES_PATH@'];
+#ifndef FLUSSPFERD_XML_HTML_DOCUMENT_HPP
+#define FLUSSPFERD_XML_HTML_DOCUMENT_HPP
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+#include "document.hpp"
+#include "flusspferd/class_description.hpp"
+#include <libxml/HTMLtree.h>
+
+namespace flusspferd { namespace xml {
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+  html_document,
+  (base, document)
+  (full_name, "XML.HTML.Document")
+  (constructor_name, "Document")
+  (methods,
+    ("dump", bind, dump)))
+{
+public:
+  html_document(object const &, call_context &);
+  html_document(object const &, htmlDocPtr doc);
+  ~html_document();
+
+public: // JS methods
+  string dump();
+
+private:
+  void init();
+};
+
+}}
+
+#endif

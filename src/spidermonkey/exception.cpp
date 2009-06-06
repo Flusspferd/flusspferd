@@ -44,12 +44,12 @@ namespace {
 
     if (JS_GetPendingException(cx, &v)) {
       value val = Impl::wrap_jsval(v);
-      ret += ": exception `" + val.to_string().to_string() + '\'';
+      ret += ": exception `" + val.to_std_string() + '\'';
       if (val.is_object()) {
         object o = val.to_object();
         if(o.has_property("fileName"))
-          ret += " at " + o.get_property("fileName").to_string().to_string()
-              +  ":" + o.get_property("lineNumber").to_string().to_string();
+          ret += " at " + o.get_property("fileName").to_std_string()
+              +  ":" + o.get_property("lineNumber").to_std_string();
       }
       return ret;
     }
@@ -94,7 +94,7 @@ exception::exception(char const *what, std::string const &type)
 }
 
 exception::exception(value const &val)
-  : std::runtime_error(string(val).to_string()), p(new impl)
+  : std::runtime_error(val.to_std_string()), p(new impl)
 {
   p->exception_value.reset(new root_value(val));
   p->ctx = current_context();
