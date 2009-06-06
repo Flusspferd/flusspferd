@@ -107,8 +107,10 @@ void ecma_define_own_property(object o, string p, object desc) {
 
   v = desc.get_property("setter");
   try {
-    if (!v.is_undefined())
+    if (!v.is_undefined()) {
       setter_fn = v.to_object();
+      flags = flags &~ read_only_property;
+    }
   } catch (exception &e) {
     // TODO: This should be a TypeError
     throw exception("setter must be a function");
