@@ -158,7 +158,7 @@ bool binary::property_resolve(value const &id, unsigned /*flags*/) {
   if (uid < 0)
     return false;
 
-  if (size_t(uid) > v_data.size())
+  if (size_t(uid) >= v_data.size())
     return false;
  
   value v = element(v_data[uid]);
