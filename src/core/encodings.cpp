@@ -251,6 +251,7 @@ void encodings::transcoder::do_push(binary &input, binary::vector_type &out_v) {
         throw exception("Invalid multi-byte sequence in input");
 
       case E2BIG:
+        out_v.resize(out_v.size() - out_estimate);
         out_estimate *= 2;
         break;
 
