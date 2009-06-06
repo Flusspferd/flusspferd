@@ -1,10 +1,16 @@
 #!/bin/sh
 VER=`./flusspferd-version.sh`
-echo $VER > version
-FILES="version `git ls-files|egrep -v '^.git'`"
+FILES=`git ls-files|egrep -v '^.git'`
 PREFIX="/tmp/flusspferd-$VER/"
-rm -r $PREFIX || exit 1
+
+if [ -d $PREFIX ]
+then
+	rm -r $PREFIX || exit 1
+fi
+
 mkdir $PREFIX
+echo $VER > $PREFIX/version
+
 for file in $FILES
 do
 	dir=`dirname $file`
