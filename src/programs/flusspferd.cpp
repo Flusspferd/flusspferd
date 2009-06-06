@@ -102,13 +102,12 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::load_class<flusspferd::blob>();
 
-  // Put the require function in the shared global so it is available to
-  // sub-modules too
+  // Put the require and properties functions in the shared global so it is
+  // available to sub-modules too
   flusspferd::load_require_function(g.prototype());
+  flusspferd::load_properties_functions(g.prototype());
 
   flusspferd::object require_fn = g.get_property_object("require");
-
-  flusspferd::load_properties_functions();
 
   flusspferd::create_native_function<void (int)>(
     g, "quit",
