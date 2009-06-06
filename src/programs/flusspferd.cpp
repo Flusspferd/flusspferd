@@ -106,7 +106,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   // sub-modules too
   flusspferd::load_require_function(g.prototype());
 
-  flusspferd::object require_fn = g.get_property("require").to_object();
+  flusspferd::object require_fn = g.get_property_object("require");
 
   flusspferd::load_properties_functions();
 
