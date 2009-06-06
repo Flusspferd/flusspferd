@@ -49,7 +49,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("get", bind, get)
     ("slice", bind, slice)
     ("concat", bind, concat)
-    ("split", bind, split)))
+    ("split", bind, split)
+    ("decodeToString", bind, decode_to_string)))
 {
 public:
   static void augment_prototype(object &);
@@ -96,22 +97,16 @@ protected:
 public:
   object to_byte_array();
   array to_array();
-
   int index_of(
     value byte, boost::optional<int> start, boost::optional<int> stop);
-
   int last_index_of(
     value byte, boost::optional<int> start, boost::optional<int> stop);
-
   byte_string &byte_at(int offset);
-
   int get(int offset);
-
   object slice(int begin, boost::optional<int> end);
-
   void concat(call_context &x);
-
   array split(value delim, object options);
+  string decode_to_string(std::string const &enc);
 
 private:
   vector_type v_data;

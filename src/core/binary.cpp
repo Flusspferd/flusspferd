@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 #include "flusspferd/binary.hpp"
 #include "flusspferd/evaluate.hpp"
+#include "flusspferd/encodings.hpp"
 #include <sstream>
 #include <algorithm>
 
@@ -34,6 +35,7 @@ void flusspferd::load_binary_module(object container) {
   load_class<binary>(exports);
   load_class<byte_string>(exports);
   load_class<byte_array>(exports);
+  container.call("require", "encodings");
 }
 
 // -- util ------------------------------------------------------------------
@@ -449,6 +451,10 @@ void binary::debug_rep(std::ostream &stream) {
   }
   if (n < v_data.size())
     stream << "...";
+}
+
+string binary::decode_to_string(std::string const &enc) {
+  return encodings::convert_to_string(enc, *this);
 }
 
 // -- byte_string -----------------------------------------------------------
