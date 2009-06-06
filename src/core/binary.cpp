@@ -76,6 +76,7 @@ binary::binary(object const &o, call_context &x)
     if (i > 2147483647)
       throw exception("Cannot create binary larger than 2147483647 bytes");
     v_data.resize(i);
+    return;
   }
 
   if (data.is_object()) {
@@ -84,6 +85,7 @@ binary::binary(object const &o, call_context &x)
     if (o.is_array()) {
       convert<vector_type>::from_value conv;
       conv.perform(o).swap(v_data);
+      return;
     } else {
       try {
         binary &b = flusspferd::get_native<binary>(o);
@@ -94,12 +96,17 @@ binary::binary(object const &o, call_context &x)
     }
   }
 
-  string encoding =
-    x.arg[1].is_undefined_or_null() ? DEFAULT_ENCODING : string(x.arg[1]);
+  std::string encoding =
+    x.arg[1].is_undefined_or_null()
+    ? DEFAULT_ENCODING
+    : x.arg[1].to_std_string();
 
-  string text = data.to_string();
+  root_string text(data.to_string());
 
-  //TODO
+  arguments arg;
+  arg.push_root(encodings::convert_from_string(encoding, text));
+
+  do_append(arg);
 }
 
 binary::binary(object const &o, binary const &b)
