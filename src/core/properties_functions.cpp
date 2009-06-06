@@ -27,7 +27,7 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-// An implementation like [[DefineOwnProperty]] from ES3.1 spec
+// An implementation like [[DefineOwnProperty]] from ES5 spec 8.12.10
 void ecma_define_own_property(object o, string p, object desc);
 
 void flusspferd::load_properties_functions(object container) {
@@ -43,10 +43,13 @@ void flusspferd::load_properties_functions(object container) {
       ecma_define_own_property);
 }
 
+
+// This doesn't quite match the exact behaviour of the spec, but it hopefully
+// captures the intent.
 void ecma_define_own_property(object o, string p, object desc) {
   local_root_scope scope;
 
-  // TODO: Check if obj is sealed
+  // TODO: Check if obj is sealed/not extensible
 
   property_attributes attrs;
   bool current = o.has_own_property(p) && o.get_property_attributes(p, attrs);
@@ -113,13 +116,13 @@ void ecma_define_own_property(object o, string p, object desc) {
   } catch (exception &e) {
     throw exception("setter must be a function", "TypeError");
   }
-  
+
   is_data = desc.has_property("writable") || desc.has_property("value");
   is_accessor = (getter_fn || setter_fn);
   if ( is_accessor && is_data )
-  {
-    // 10. If either descObj.[[Getter]] or descObj.[[Setter]] are present, then
-    //   a. If either descObj.[[Value]] or descObj.[[Writable]] are present,
+  { // S.8.10.5
+    // 9. If either desc.[[Get]] or desc.[[Set]] are present, then
+    //   a. If either desc.[[Value]] or desc.[[Writable]] are present,
     //      then throw a TypeError exception.
     throw exception(
       "cannot mix value or writable with getter or setter",
@@ -142,10 +145,10 @@ void ecma_define_own_property(object o, string p, object desc) {
         boost::optional<function const &>(getter_fn),
         boost::optional<function const &>(setter_fn)));
   } else {
-    value val = desc.has_property("value") 
+    value val = desc.has_property("value")
               ? desc.get_property("value") 
               : current
-              ? o.get_property(p) 
+              ? o.get_property(p)
               : value();
     o.define_property(p, val, property_attributes(flags));
   }
