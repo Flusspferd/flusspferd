@@ -1,9 +1,5 @@
+version
 FLUSSPFERD-VERSION-FILE
-.configure
 build/*
 *.swp
 *~
-.lock-wscript
-.waf-*
-waf-*
-.localsettings.mak
