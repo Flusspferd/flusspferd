@@ -46,7 +46,8 @@ namespace encodings {
     (constructor_arity, 2)
     (methods,
       ("push", bind, push)
-      ("close", bind, close)))
+      ("close", bind, close)
+      ("pushAccumulate", bind, push_accumulate)))
   {
   public:
     transcoder(object const &, std::string const &from, std::string const &to);
@@ -55,11 +56,16 @@ namespace encodings {
     ~transcoder();
 
     binary &push(binary &input, boost::optional<byte_array&> const &output);
-    void close();
+    void push_accumulate(binary &input);
+    binary &close(boost::optional<byte_array&> const &output);
 
   private:
     void init(std::string const &from, std::string const &to);
-    void do_push(binary &input, binary &output);
+    void do_push(binary &input, binary::vector_type &output);
+    binary &get_output_binary(boost::optional<byte_array&> const &output);
+    void append_accumulator(binary &output);
+
+    void trace(tracer &trc);
 
   private:
     class impl;

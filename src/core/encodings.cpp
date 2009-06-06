@@ -21,13 +21,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/binary.hpp"
+#include "flusspferd/encodings.hpp"
+#include "flusspferd/create.hpp"
 #include <iconv.h>
 #include <errno.h>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
-#include "flusspferd/binary.hpp"
-#include "flusspferd/encodings.hpp"
-#include "flusspferd/create.hpp"
 
 using namespace boost;
 using namespace flusspferd;
@@ -55,186 +55,58 @@ void flusspferd::load_encodings_module(object container) {
 
 // HELPER METHODS
 
-// Actually do the conversion.
-binary::vector_type do_convert(
-  iconv_t conv, binary::element_type const *data, size_t bytes);
-
-// call iconv_open, or throw an error if it cant
-iconv_t open_convert(std::string const &from, std::string const &to);
-
-// If no direct conversion is possible, do it via utf8. Helper method
-object convert_via_utf8(
-  std::string const &from, std::string const &to, binary const &source);
-
 static char16_t const b1 = *(char16_t*)"\xff\xfe";
 static char16_t const b2 = 0xfffe;
 
 static char const * const native_charset = b1 == b2 ? "utf-16be" : "utf-16le";
 
+// JAVASCRIPT METHODS
+
 flusspferd::string
 encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
-  // TODO: We probably need to strip an BOMs from the output (for all paths)
-  binary::vector_type const &source = source_binary.get_const_data();
+  transcoder &trans =
+    create_native_object<transcoder>(object(), enc_, native_charset);
+  root_object root_obj(trans);
 
-  std::string const &enc = to_lower_copy(enc_);
-  //TODO: Normalise encodings further than just to_lower.
+  trans.push_accumulate(source_binary);
 
-  if (enc == "utf-8") {
-    binary::vector_type const &source = source_binary.get_const_data();
-    return string( (char*)&source[0], source.size());
-  } else if (enc == native_charset) {
-    // TODO: Assert on the possible alignment issue here
-    binary::vector_type const &source = source_binary.get_const_data();
-    return string(
-      reinterpret_cast<char16_t const*>(&source[0]),
-      source.size()/sizeof(char16_t));
-  } else {
-    // Not UTF-8 or UTF-16, so convert to utf-16
-    iconv_t conv = open_convert(enc, native_charset);
-    binary::vector_type utf16 = do_convert(conv, &source[0], source.size());
-    iconv_close(conv);
-    return string(
-      reinterpret_cast<char16_t const*>(&utf16[0]),
-      utf16.size()/sizeof(char16_t));
-  }
-  return string();
+  binary &out = trans.close(boost::none);
+
+  return flusspferd::string(
+    reinterpret_cast<char16_t const *>(&out.get_data()[0]),
+    out.get_length() / sizeof(char16_t));
 }
 
 object encodings::convert_from_string(std::string const &enc, string const &str)
 {
-  binary::vector_type source;
+  transcoder &trans =
+    create_native_object<transcoder>(object(), native_charset, enc);
+  root_object root_obj(trans);
 
-  iconv_t conv = open_convert(native_charset, enc);
-  const unsigned char *char_data = (const unsigned char*)str.data();
+  binary &source_binary = create_native_object<byte_string>(
+    object(), 
+    reinterpret_cast<binary::element_type const *>(str.data()),
+    str.size() * sizeof(char16_t));
+  root_object root_obj2(source_binary);
 
-  binary::vector_type const &out = do_convert(conv, char_data, str.length()*2);
-  iconv_close(conv);
-  return create_native_object<byte_string>(object(), &out[0], out.size());
+  trans.push_accumulate(source_binary);
+
+  return trans.close(boost::none);
 }
 
 object encodings::convert(
   std::string const &from_, std::string const &to_, binary &source_binary)
 {
-  binary::vector_type const &source = source_binary.get_const_data();
+  transcoder &trans =
+    create_native_object<transcoder>(object(), from_, to_);
+  root_object root_obj(trans);
 
-  std::string const &from = to_lower_copy(from_);
-  std::string const &to = to_lower_copy(to_);
+  trans.push_accumulate(source_binary);
 
-  if (from == to) {
-    // Encodings are the same, just return a copy of the binary
-    return create_native_object<byte_string>(
-      object(),
-      &source[0],
-      source.size());
-  }
-
-  iconv_t conv = open_convert(from, to);
-
-  binary::vector_type buf = do_convert(conv, &source[0], source.size());
-  iconv_close(conv);
-  return create_native_object<byte_string>(object(), &buf[0], buf.size());
-}
-// End JS methods
-
-binary::vector_type do_convert(
-  iconv_t conv, binary::element_type const* data, size_t num_bytes)
-{
-  binary::vector_type outbuf;
-
-  size_t out_left,
-         in_left = num_bytes;
-
-  // Wikipedia says this:
-  //   The chance of a random string of bytes being valid UTF-8 and not pure
-  //   ASCII is 3.9% for a two-byte sequence, 0.41% for a three-byte sequence
-  //   and 0.026% for a four-byte sequence.
-  out_left = in_left + in_left/16 + 32; // GPSEE's Wild-assed guess ("WAG").
-
-  outbuf.resize(out_left);
-
-  unsigned char const *inbytes  = data,
-                      *outbytes = &outbuf[0];
-
-  while (in_left) {
-    size_t n = iconv(conv,
-                     (char**)&inbytes, &in_left,
-                     (char**)&outbytes, &out_left
-                    );
-
-    if (n == (size_t)(-1)) {
-      switch (errno) {
-        case E2BIG: {
-          // Not enough space in output
-          // Use GPSEE's WAG again. +32 assumes no encoding needs more than 32
-          // bytes(!) per character. Probably a safe bet.
-          size_t new_size = in_left + in_left/4 + 32,
-                 old_size = outbytes - &outbuf[0];
-
-          outbuf.resize(old_size + new_size);
-
-          // The vector has probably realloced, so recalculate outbytes
-          outbytes =  &outbuf[old_size];
-          out_left += new_size;
-
-          break;
-        }
-
-        case EILSEQ:
-          // An invalid multibyte sequence has been encountered in the input.
-        case EINVAL:
-          // An incomplete multibyte sequence has been encountered in the input.
-
-          // Since we have provided the entire input, both these cases are the
-          // same.
-          size_t when = inbytes - data;
-          std::stringstream ss;
-          ss << "Convert Error: Invalid or incomplete multibyte"
-                " sequence after " << when
-             << (when == 1 ? " byte" : " bytes");
-          throw flusspferd::exception(ss.str().c_str(), "TypeError");
-          break;
-      }
-    } else {
-      // Else all chars got converted
-      in_left -= n;
-    }
-  }
-  outbuf.resize(outbytes - &outbuf[0]);
-  return outbuf;
+  return trans.close(boost::none);
 }
 
-iconv_t open_convert(std::string const &from, std::string const &to) {
-  iconv_t conv = iconv_open(to.c_str(), from.c_str());
-
-  if (conv == (iconv_t)(-1)) {
-    std::stringstream ss;
-    ss << "Unable to convert from \"" << from
-       << "\" to \"" << to << "\"";
-    throw flusspferd::exception(ss.str().c_str());
-  }
-  return conv;
-}
-
-object convert_via_utf8(
-  std::string const &from, std::string const &to, binary const &)
-{
-  iconv_t to_utf   = iconv_open("utf-8", from.c_str()),
-          from_utf = iconv_open(to.c_str(), "utf-8");
-
-  if (to_utf == (iconv_t)(-1) || from_utf == (iconv_t)(-1)) {
-
-    if (to_utf)
-      iconv_close(to_utf);
-    if (from_utf)
-      iconv_close(from_utf);
-
-    std::stringstream ss;
-    ss << "Unable to convert from \"" << from
-       << "\" to \"" << to << "\"";
-    throw flusspferd::exception(ss.str().c_str());
-  }
-  return object();
-}
+// TRANSCODER
 
 class encodings::transcoder::impl {
 public:
@@ -247,8 +119,14 @@ public:
       iconv_close(conv);
   }
 
+  binary::vector_type accumulator;
+  binary::vector_type multibyte_part;
+
   iconv_t conv;
 };
+
+void encodings::transcoder::trace(tracer &trc) {
+}
 
 encodings::transcoder::transcoder(object const &obj, call_context &x)
 : base_type(obj)
@@ -281,7 +159,56 @@ void encodings::transcoder::init(std::string const &from, std::string const &to)
 binary &encodings::transcoder::push(
   binary &input, boost::optional<byte_array&> const &output_)
 {
-  binary &output =
+  binary &output = get_output_binary(output_);
+
+  root_object root_obj(output);
+
+  append_accumulator(output);
+  do_push(input, output.get_data());
+
+  return output;
+}
+
+void encodings::transcoder::push_accumulate(binary &input) {
+  do_push(input, p->accumulator);
+}
+
+binary &encodings::transcoder::close(
+  boost::optional<byte_array&> const &output_)
+{
+  if (!p->multibyte_part.empty())
+    throw exception("Invalid multibyte sequence at the end of input");
+
+  binary &output = get_output_binary(output_);
+
+  root_object root_obj(output);
+
+  append_accumulator(output);
+
+  if (p->conv != iconv_t(-1)) {
+    binary::vector_type &out_v = output.get_data();
+    std::size_t start = out_v.size();
+    // 32 bytes should suffice for the initial state shift
+    std::size_t outlen = 32;
+    out_v.resize(out_v.size() + outlen);
+    char *outbuf = reinterpret_cast<char*>(&out_v[start]);
+    if (iconv(p->conv, 0, 0, &outbuf, &outlen) == std::size_t(-1))
+      throw exception("Adding closing character sequence failed");
+    out_v.resize(out_v.size() - outlen);
+
+    if (iconv_close(p->conv) == -1)
+      throw exception("Closing character set conversion descriptor failed");
+
+    p->conv = iconv_t(-1);
+  }
+
+  return output;
+}
+
+binary &encodings::transcoder::get_output_binary(
+  boost::optional<byte_array&> const &output_)
+{
+  return
     output_
     ? static_cast<binary&>(output_.get())
     : static_cast<binary&>(
@@ -289,44 +216,68 @@ binary &encodings::transcoder::push(
           object(),
           (byte_string::element_type*)0,
           0));
-
-  do_push(input, output);
-
-  return output;
 }
 
-void encodings::transcoder::do_push(binary &input, binary &output) {
-  binary::vector_type &in_v = input.get_data();
+
+void encodings::transcoder::do_push(binary &input, binary::vector_type &out_v) {
+  binary::vector_type &in_v =
+    p->multibyte_part.empty() ? input.get_data() : p->multibyte_part;
+
+  if (!p->multibyte_part.empty())
+    in_v.insert(in_v.end(), input.get_data().begin(), input.get_data().end());
 
   // A rough guess how much space might be needed for the new characters.
   std::size_t out_estimate = in_v.size() + in_v.size()/16 + 32;
 
-  binary::vector_type &out_v = output.get_data();
   std::size_t out_start = out_v.size();
 
-  out_v.resize(out_v.size() + out_estimate);
+  for (;;) {
+    out_v.resize(out_v.size() + out_estimate);
 
-  char *inbuf = reinterpret_cast<char*>(&in_v[0]);
-  char *outbuf = reinterpret_cast<char*>(&out_v[out_start]);
+    char *inbuf = reinterpret_cast<char*>(&in_v[0]);
+    char *outbuf = reinterpret_cast<char*>(&out_v[out_start]);
 
-  std::size_t inbytesleft = in_v.size();
-  std::size_t outbytesleft = out_estimate;
+    std::size_t inbytesleft = in_v.size();
+    std::size_t outbytesleft = out_estimate;
 
-  std::size_t n_chars = iconv(
-    p->conv,
-    &inbuf, &inbytesleft,
-    &outbuf, &outbytesleft);
+    std::size_t n_chars = iconv(
+      p->conv,
+      &inbuf, &inbytesleft,
+      &outbuf, &outbytesleft);
 
-  if (n_chars == std::size_t(-1)) {
-    switch (errno) {
-    case EILSEQ:
-      throw exception("Invalid multi-byte sequence in input");
+    if (n_chars == std::size_t(-1)) {
+      switch (errno) {
+      case EILSEQ:
+        throw exception("Invalid multi-byte sequence in input");
 
-    default:
-      throw exception("Unknown error in character conversion");
+      case E2BIG:
+        out_estimate *= 2;
+        break;
+
+      case EINVAL:
+        p->multibyte_part.assign(outbuf, outbuf + outbytesleft);
+        out_v.resize(out_v.size() - outbytesleft);
+        return;
+
+      default:
+        throw exception("Unknown error in character conversion");
+      }
+    } else {
+      out_v.resize(out_v.size() - outbytesleft);
+      return;
     }
   }
 }
 
-void encodings::transcoder::close() {
+void encodings::transcoder::append_accumulator(binary &output) {
+  binary::vector_type &out_v = output.get_data();
+
+  if (!p->accumulator.empty()) {
+    if (!out_v.empty()) {
+      out_v.insert(out_v.end(), p->accumulator.begin(), p->accumulator.end());
+      binary::vector_type().swap(p->accumulator);
+    } else {
+      out_v.swap(p->accumulator);
+    }
+  }
 }
