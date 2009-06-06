@@ -148,6 +148,16 @@ void encodings::transcoder::init(std::string const &from, std::string const &to)
 {
   boost::scoped_ptr<impl> p(new impl);
 
+  define_property(
+    "sourceCharset",
+    flusspferd::value(from),
+    property_attributes(read_only_property | permanent_property));
+
+  define_property(
+    "destinationCharset",
+    flusspferd::value(to),
+    property_attributes(read_only_property | permanent_property));
+
   p->conv = iconv_open(to.c_str(), from.c_str());
 
   if (p->conv == iconv_t(-1))
