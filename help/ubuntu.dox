@@ -60,22 +60,28 @@ $ cd ..
  * The Spidermonkey packages that come with Ubuntu are broken and Flusspferd
  * won't work with them. This might not be the fault of the Ubuntu maintainers
  * since building Spidermonkey is a bit messy due to the lack of a proper build
- * system. The situation is improving with Spidermonkey 1.8 but since 1.8 is
+ * system. The situation is improving with Spidermonkey 1.8.1 but since 1.8.1 is
  * not finally released at the time and due to major changes (Tracemonkey) is
- * not that stable at the moment we will stick with Spidermonkey 1.7. If you
- * really need speed or want the newest stuff just checkout Spidermonkey 1.8
+ * not that stable at the moment we will stick with Spidermonkey 1.8rc1 (which
+ * isn't as similar to 1.8.1 as you might think). If you really need speed or
+ * want the newest stuff just checkout Spidermonkey 1.8.1.
+ *
  * Flusspferd should work with it.
  *
  * @verbatim
-$ wget http://ftp.mozilla.org/pub/mozilla.org/js/js-1.7.0.tar.gz
-$ tar xzf js-1.7.0.tar.gz
+$ wget http://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz
+$ tar xzf js-1.8.0-rc1.tar.gz
 $ cd js/src/
-$ make DEFINES=-DJS_C_STRINGS_ARE_UTF8 -f Makefile.ref
+$ make -f Makefile.ref
 $ sudo mkdir /usr/local/include/js
 $ sudo cp *.h *.tbl Linux_All_DBG.OBJ/*.h /usr/local/include/js/
 $ sudo cp Linux_All_DBG.OBJ/libjs.* /usr/local/lib/
 $ cd ../..
 @endverbatim
+ *
+ * <a href="https://developer.mozilla.org/En/SpiderMonkey/Build_Documentation">
+ * There is more detailed build documentation over at the Mozilla Developer
+ * Center Wiki</a>.
  *
  * @subsection rmspidermonkey Removing Spidermonkey
  * Since Spidermonkey doesn't come with an install target we have to copy
