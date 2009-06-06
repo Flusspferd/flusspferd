@@ -101,8 +101,7 @@ void ecma_define_own_property(object o, string p, object desc) {
     if (!v.is_undefined())
       getter_fn = v.to_object();
   } catch (exception &e) {
-    // TODO: This should be a TypeError
-    throw exception("getter must be a function");
+    throw exception("getter must be a function", "TypeError");
   }
 
   v = desc.get_property("setter");
@@ -112,8 +111,7 @@ void ecma_define_own_property(object o, string p, object desc) {
       flags = flags &~ read_only_property;
     }
   } catch (exception &e) {
-    // TODO: This should be a TypeError
-    throw exception("setter must be a function");
+    throw exception("setter must be a function", "TypeError");
   }
   
   is_data = desc.has_property("writable") || desc.has_property("value");
@@ -123,8 +121,9 @@ void ecma_define_own_property(object o, string p, object desc) {
     // 10. If either descObj.[[Getter]] or descObj.[[Setter]] are present, then
     //   a. If either descObj.[[Value]] or descObj.[[Writable]] are present,
     //      then throw a TypeError exception.
-    // TODO: This should be a TypeError
-    throw exception("cannot mix value or writable with getter or setter");
+    throw exception(
+      "cannot mix value or writable with getter or setter",
+      "TypeError");
   }
 
   // Steps 7, 10a and 11a basically say you can't change anything on a
