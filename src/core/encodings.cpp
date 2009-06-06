@@ -36,7 +36,7 @@ void flusspferd::load_encodings_module(object container) {
   object exports = container.get_property_object("exports");
 
   // Load the binary module
-  global().call("require", "binary");
+  container.call("require", "binary");
 
   create_native_function(
     exports,
