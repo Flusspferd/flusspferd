@@ -314,7 +314,8 @@ merge(Asserts.prototype, {
       ok: !!test,
       when: new Date(),
       message: msg,
-      defaultMsg: "object is instance of type"
+      defaultMsg: "is instanceof "
+                  + (type.name || "correct type")
     });
   },
 
