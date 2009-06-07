@@ -53,7 +53,6 @@ class flusspferd_repl {
 
   flusspferd::context co;
   flusspferd::current_context_scope scope;
-  flusspferd::security &security;
 
   bool running;
   int exit_code;
@@ -91,16 +90,16 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
-    // Security token goes in shared global
-    security(flusspferd::security::create(flusspferd::global().prototype())),
     running(false),
     exit_code(0),
     argc(argc),
     argv(argv)
 {
+  flusspferd::load_class<flusspferd::blob>();
+
   flusspferd::object g = flusspferd::global();
 
-  flusspferd::load_class<flusspferd::blob>();
+  flusspferd::security::create(g.prototype());
 
   // Put the require and properties functions in the shared global so it is
   // available to sub-modules too
