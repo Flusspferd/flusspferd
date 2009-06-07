@@ -95,14 +95,14 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     argc(argc),
     argv(argv)
 {
-  flusspferd::load_class<flusspferd::blob>();
-
   flusspferd::object g = flusspferd::global();
+
+  // g.prototype() is available everywhere
 
   flusspferd::security::create(g.prototype());
 
-  // Put the require and properties functions in the shared global so it is
-  // available to sub-modules too
+  flusspferd::load_class<flusspferd::blob>(g.prototype());//TODO: delete
+
   flusspferd::load_require_function(g.prototype());
   flusspferd::load_properties_functions(g.prototype());
 
