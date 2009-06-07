@@ -281,25 +281,30 @@ const Asserts = function() {
 
 merge(Asserts.prototype, {
   same: function() {
-    var args = Array.slice(arguments);
+    var args = Array.slice(arguments),
+        msg,
+        ok = !!equiv.apply(equiv, args);
 
-    var msg;
     if (args.length > 2)
       msg = args.pop();
 
-    return exports.__currentSuite__.do_assert( {
+    var a = {
       type: 'same',
       when: new Date(),
-      ok: !!equiv.apply(equiv, args),
+      ok: ok,
       message: msg,
       defaultMsg: "arguments are the same",
-      wanted: args[0],
-      got: args.slice(1),
-      diag: "Wanted: " + args[0].toSource()
-                       + args.slice(1).map(function(i) {
-                            return "\n   Got: " + i.toSource()
-                         })
-    });
+    };
+
+    if (!ok) {
+      a.wanted = args[0];
+      a.got = args.slice(1);
+      a.diag = "Wanted: " + args[0].toSource()
+                          + args.slice(1).map(function(i) {
+                              return "\n   Got: " + i.toSource()
+                            });
+    }
+    return exports.__currentSuite__.do_assert(a);
   },
 
   instanceOf: function(obj, type, msg) {
