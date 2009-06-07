@@ -241,7 +241,7 @@ merge(Suite.prototype, {
 })
 
 exports.Suite = Suite;
-exports.Runner = function Runner() {
+exports.runner = function runner() {
   var suite;
   var args = Array.slice(arguments);
   if (args.length == 1 && args[0] instanceof Suite) {
@@ -255,7 +255,7 @@ exports.Runner = function Runner() {
     suite = new Suite(args[0]);
   }
   else {
-    throw new TypeError("Invalid arguments to test.Runner");
+    throw new TypeError("Invalid arguments to test.runner");
   }
 
   return suite.run();
