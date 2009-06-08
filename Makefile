@@ -22,14 +22,18 @@
 
 .PHONY: all clean install
 
-all:
+all: build
 	$(MAKE) -C build
 
-clean:
+clean: build
 	$(MAKE) -C build clean
 
-install:
+install: build
 	$(MAKE) -C build install
 
 distclean:
 	rm -rf build/
+
+build:
+	@echo "Please run ./configure (with appropriate parameters)!"
+	@exit 1
