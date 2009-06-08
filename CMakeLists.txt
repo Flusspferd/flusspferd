@@ -366,6 +366,7 @@ if(LIBXML2_FOUND)
 endif()
 
 foreach(PLUGIN ${PLUGINS})
+    message(STATUS "Plugin: ${PLUGIN} (will be built)")
 
     file(GLOB
         ${PLUGIN}_sources
@@ -475,3 +476,5 @@ if(NOT WIN32)
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 endif()
+
+message(STATUS "Configuration SUCCESSFUL. No fatal errors.")
