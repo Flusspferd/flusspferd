@@ -1,0 +1,37 @@
+Release Notes
+=============
+
+0.6 Series
+----------
+
+0.6: Major release (git: v0.6)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Major features:
+
+- FLUSSPFERD_CLASS_DESCRIPTION - an easy way of defining Javascript classes.
+- Improved value and type conversions.
+- More ServerJS compatible modules: 'binary' and 'encodings'.
+- Changed build system to cmake (this should make it easier to get Windows
+  support).
+
+Also, there are many more bugfixes and some API breaking changes.
+
+0.5 Series
+----------
+
+0.5.1: Bugfix release (git: v0.5.1)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Changes since 0.5:
+
+- Fix bug that made flusspferd not compile when spidermonkey was not compiled with JS_THREADSAFE.
+- Change set of distributed files (include Makefile, don't include .configure).
+- Documentation improvements.
+
+0.5: First release (git: v0.5)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is our first released version.
+
+Notably, Flusspferd now supports SecurableModules.
