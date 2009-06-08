@@ -14,6 +14,9 @@ Major features:
 - More ServerJS compatible modules: 'binary' and 'encodings'.
 - Changed build system to cmake (this should make it easier to get Windows
   support).
+- Other new modules, like (rudimentary) GMP support.
+
+This list is not necessarily a complete list of features.
 
 Also, there are many more bugfixes and some API breaking changes.
 
