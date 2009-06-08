@@ -112,7 +112,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_REQUIRED_FLAGS "")
 
     check_cxx_source_compiles(
-        "#if __GNUC__ < 4 || __GNUC_MINOR__ < 2
+        "#if __GNUC__ < 4
         #error \"GCC too old\"
         #endif
         int main() {}"
