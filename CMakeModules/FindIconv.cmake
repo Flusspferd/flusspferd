@@ -53,6 +53,7 @@ endif(ICONV_FOUND)
 
 if(ICONV_FOUND)
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+    set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
     check_cxx_source_compiles(
         "#include <iconv.h>
          int main() {
@@ -62,6 +63,7 @@ if(ICONV_FOUND)
         ICONV_ACCEPTS_NONCONST_INPUT)
 
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+    set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
     check_cxx_source_compiles(
         "#include <iconv.h>
          int main() {
