@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-let equiv = require('./test/equiv').equiv;
+let {equiv:equiv} = require('./test/equiv');
 
 function merge(ctor, obj) {
   for (let [k,v] in Iterator(obj))
@@ -97,6 +97,8 @@ merge(TAPProducer.prototype, {
 
     if (a.diag)
       this.diag(a.diag);
+    if (a.errorDiag)
+      this.diag(a.errorDiag, this.red);
     return a.ok;
   },
 
@@ -110,11 +112,19 @@ merge(TAPProducer.prototype, {
     this.outputStream.print(this.padding + msg)
   },
 
-  diag: function diag(msg) {
-    this.outputStream.print(
-      msg.replace(/\n$/m, "")
-         .replace(/^/mg, this.padding + "# ")
-    );
+  diag: function diag(msg,filter) {
+    var self = this,
+        lines = msg.split(/\n/)
+
+    lines = lines.map(function(l) {
+      return self.padding + ("# " + l)
+    });
+
+    if (filter)
+      lines = lines.map(function(x) { return filter.call(self,x) });
+    lines = lines.join("\n");
+
+    this.outputStream.print(lines);
   },
 
   getPadd: function getPadd() {
@@ -209,11 +219,26 @@ merge(Suite.prototype, {
 
   finishCase: function finishCase(theCase, error) {
     var failed = error || theCase.assertsFailed.length > 0;
+    this._state.currentCase = this._state;
     if (error) {
+
+      var diag = "case terminated with exception:\n"
+               + error.toString();
+
+      if (error.fileName) {
+        diag += "\n  " +  error.stack.replace(/\n/g, "\n  ");
+      }
+
+      this.do_assert( {
+        type: 'case',
+        when: new Date(),
+        errorDiag: diag,
+        ok: !failed,
+        message: theCase.name,
+      });
       return;
     }
 
-    this._state.currentCase = this._state;
     this.do_assert( {
       type: 'case',
       when: new Date(),
@@ -282,11 +307,11 @@ const Asserts = function() {
 merge(Asserts.prototype, {
   same: function() {
     var args = Array.slice(arguments),
-        msg,
-        ok = !!equiv.apply(equiv, args);
+        msg;
 
     if (args.length > 2)
       msg = args.pop();
+    var ok = !!equiv.apply(equiv, args);
 
     var a = {
       type: 'same',
@@ -299,9 +324,16 @@ merge(Asserts.prototype, {
     if (!ok) {
       a.wanted = args[0];
       a.got = args.slice(1);
-      a.diag = "Wanted: " + args[0].toSource()
+      a.diag = "Wanted: " + (args[0] === undefined
+                             ? "undefined"
+                             : args[0].toSource())
+
                           + args.slice(1).map(function(i) {
-                              return "\n   Got: " + i.toSource()
+                              return "\n   Got: "
+                                   + (i === undefined
+                                          ? "undefined"
+                                          : i.toSource()
+                                     )
                             });
     }
     return exports.__currentSuite__.do_assert(a);
@@ -337,7 +369,7 @@ merge(Asserts.prototype, {
 
   diag: function diag() {
     var suite = exports.__currentSuite__;
-    suite.diag.apply(diag, arguments);
+    suite.diag.apply(suite, arguments);
   }
 
 });
