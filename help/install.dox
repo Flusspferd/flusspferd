@@ -29,7 +29,7 @@ THE SOFTWARE.
  * Before installing Flusspferd, you need to install its dependencies.
  *
  * @li Linux or Mac OS X (possibly other POSIX systems work too),
- * @li <a href="http://www.python.org/">Python</a> 2.5 or higher - required for the build system,
+ * @li <a href="http://www.cmake.org/">cmake</a> 2.6 or higher,
  * @li <a href="http://www.boost.org/">Boost</a> 1.36 or higher,
  * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
  *     1.7 or higher 
