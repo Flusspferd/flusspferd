@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-project(Flusspferd CXX)
+project(Flusspferd)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -141,6 +141,10 @@ endif()
 ## iconv ####################################################################
 
 find_package(Iconv REQUIRED)
+
+if(ICONV_ACCEPTS_NONCONST_INPUT)
+    add_definitions(-DICONV_ACCEPTS_NONCONST_INPUT)
+endif()
 
 ## Boost ####################################################################
 

@@ -239,7 +239,14 @@ void encodings::transcoder::do_push(binary &input, binary::vector_type &out_v) {
   for (;;) {
     out_v.resize(out_v.size() + out_estimate);
 
-    char *inbuf = reinterpret_cast<char*>(&in_v[0]);
+#ifdef ICONV_ACCEPTS_NONCONST_INPUT
+    char *inbuf;
+#else
+    char const *inbuf;
+#endif
+
+    inbuf = reinterpret_cast<char *>(&in_v[0]);
+
     char *outbuf = reinterpret_cast<char*>(&out_v[out_start]);
 
     std::size_t inbytesleft = in_v.size();

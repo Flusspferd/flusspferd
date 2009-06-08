@@ -21,21 +21,54 @@
 # THE SOFTWARE.
 #
 
+Include(CheckFunctionExists)
+include(CheckCXXSourceCompiles)
+
 if(ICONV_INCLUDE_DIR)
   set(ICONV_FIND_QUIETLY TRUE)
 endif()
 
 find_path(ICONV_INCLUDE_DIR iconv.h)
 
-find_library(ICONV_LIBRARY NAMES iconv)
+if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
+    set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+    check_function_exists(iconv ICONV_IN_GLIBC)
+endif()
+
+if(NOT ICONV_IN_GLIBC)
+    find_library(ICONV_LIBRARY NAMES iconv)
+    set(ICONV_TEST ${ICONV_LIBRARY})
+else()
+    set(ICONV_TEST "In glibc")
+endif()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(ICONV DEFAULT_MSG ICONV_LIBRARY ICONV_INCLUDE_DIR)
+find_package_handle_standard_args(ICONV DEFAULT_MSG ICONV_TEST ICONV_INCLUDE_DIR)
 
 if(ICONV_FOUND)
   set(ICONV_LIBRARIES ${ICONV_LIBRARY})
 else(ICONV_FOUND)
   set(ICONV_LIBRARIES)
 endif(ICONV_FOUND)
+
+if(ICONV_FOUND)
+    set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+    check_cxx_source_compiles(
+        "#include <iconv.h>
+         int main() {
+            char *p = 0;
+            iconv(iconv_t(-1), &p, 0, 0, 0);
+         }"
+        ICONV_ACCEPTS_NONCONST_INPUT)
+
+    set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+    check_cxx_source_compiles(
+        "#include <iconv.h>
+         int main() {
+            char const *p = 0;
+            iconv(iconv_t(-1), &p, 0, 0, 0);
+         }"
+        ICONV_ACCEPTS_CONST_INPUT)
+endif()
 
 mark_as_advanced(ICONV_LIBRARY ICONV_INCLUDE_DIR)
