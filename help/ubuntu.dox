@@ -29,9 +29,13 @@ THE SOFTWARE.
  * distributions (especially Debian and other Debian clones).
  *
  * @section precond Preconditions
- * First of all we need to install the build tools and git
+ *
+ * First of all we need to install the build tools and git (git only if you
+ * wish to use an unreleased version of flusspferd).
+ *
  * @verbatim
-$ sudo apt-get install build-essential git-core
+$ sudo apt-get install build-essential cmake
+$ sudo apt-get install git-core
 @endverbatim
  * It's not necessary but to get a more comfortable REPL/Shell it's highly
  * recommended to install libedit
