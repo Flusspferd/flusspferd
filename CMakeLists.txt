@@ -110,6 +110,17 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions("-Wno-long-long -ansi")
 
     set(CMAKE_REQUIRED_FLAGS "")
+
+    check_cxx_source_compiles(
+        "#if __GNUC__ < 4 || __GNUC_MINOR__ < 2
+        #error \"GCC too old\"
+        #endif
+        int main() {}"
+        GCC_VERSION_OK)
+
+    if(NOT GCC_VERSION_OK)
+        message(FATAL_ERROR "GCC Version too old! Get a newer GCC.")
+    endif()
 elseif(MSVC)
     add_definitions("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4714 /EHa")
     set(WINLIBS projects/windows/lib32)
