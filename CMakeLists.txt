@@ -125,7 +125,7 @@ check_cxx_source_runs(
      #include <cstdlib>
      int main()
      {
-       return _POSIX_VERSION >= 200100
+       return _POSIX_VERSION >= 199506
               ? EXIT_SUCCESS
           : EXIT_FAILURE;
      }"
