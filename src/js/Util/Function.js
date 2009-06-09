@@ -30,6 +30,8 @@ THE SOFTWARE.
  * function myfunc() { ... }
  * bound = myfunc.bind(myobj)
  * bound() // calls myfunc with myobj as "this"
+ *
+ * @name Function.prototype.bind
  */
 Function.prototype.bind = function bind(obj) {
   var fun = this;
@@ -45,6 +47,8 @@ Function.prototype.bind = function bind(obj) {
  * @param {Object} obj   The object that contains the method and also the object
  *                       to bind the method to.
  * @param {string} name  The method name.
+ *
+ * @name Function.bind
  */
 Function.bind = function bind(obj, name) {
   var fun = obj[name];
