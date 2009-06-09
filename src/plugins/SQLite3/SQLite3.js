@@ -51,7 +51,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
  *
  * ==Example:==
  * {{{
- * require('SQLite3');
+ * const SQLite3 = require('sqlite3').SQLite3;
  * var db = new SQLite3('./my_db.sqlite');
  * var c = db.cursor('SELECT * FROM table_1 WHERE id IN (?,?)');
  * c.bind([4,6]);
@@ -122,16 +122,15 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    * bind params are 1 based. However when an array is passed the first bind
    * param is pulled from the 0th element of the array, etc.
    *
-   * SQLite bind params are 1 based.  However when an array is passed the first
-   * bind param is pulled from the 0th element of the array, etc.
-   *
    * @name bind
    *
    * @param binds bind parameters
    */
 
   /**
-   * Get next row from this cursor.
+   * Get next row from this cursor. This is the alternative way of getting at
+   * the results if you don't like the iterator style (or if the JS engine
+   * doesn't support it).
    *
    * @returns Next row as an array, or null when end of results reached.
    *
