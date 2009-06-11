@@ -44,7 +44,7 @@ void load_require_function(object container);
 /**
  * The prototype for module loader functions.
  *
- * Modules should define a function @c flusspferd_load (with 
+ * Modules should define a function @c flusspferd_load (with
  * <code>extern "C"</code>) with this signature.
  *
  * Example:
@@ -54,17 +54,18 @@ void load_require_function(object container);
  *
  * @ingroup loadable_modules
  */
-typedef void (*flusspferd_load_t)(object &exports, function const &);
+typedef void (*flusspferd_load_t)(object &exports, object &context);
 
 /**
  * Define a module loader.
  *
  * @param exports The object containing the module exports.
+ * @param context The root object for the module's scope.
  */
 #define FLUSSPFERD_LOADER(exports) \
   extern "C" void flusspferd_load( \
     ::flusspferd::object &exports, \
-    ::flusspferd::function const &require)
+    ::flusspferd::object &context)
 
 }
 
