@@ -48,8 +48,8 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-FLUSSPFERD_LOADER(container) {
-  load_xml(container);
+FLUSSPFERD_LOADER_SIMPLE(exports) {
+  load_xml(exports);
 }
 
 static void safety_io_callbacks();

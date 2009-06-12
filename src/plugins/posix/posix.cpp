@@ -49,7 +49,7 @@ std::string strerror_(int errno_) {
   return std::strerror(errno_);
 }
 
-FLUSSPFERD_LOADER(posix) {
+FLUSSPFERD_LOADER_SIMPLE(posix) {
   local_root_scope scope;
 
 #ifdef HAVE_FORK

@@ -61,7 +61,7 @@ void sleep_(unsigned ms) {
 
 }
 
-FLUSSPFERD_LOADER(os) {
+FLUSSPFERD_LOADER_SIMPLE(os) {
   create_native_function(os, "system", &std::system);
   create_native_function(os, "sleep", &sleep_);
 }

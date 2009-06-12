@@ -2,6 +2,6 @@
 #include <iostream>
 #include <ostream>
 
-FLUSSPFERD_LOADER(exports) {
+FLUSSPFERD_LOADER_SIMPLE(exports) {
     std::cout << "Module loaded!" << std::endl;
 }
