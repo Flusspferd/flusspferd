@@ -75,8 +75,11 @@ size_t curl::c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream) {
   return (self->*Method)(ptr, size * nmemb);
 }
 
-FLUSSPFERD_LOADER_SIMPLE(exports) {
-  load_class<curl>(exports);
+FLUSSPFERD_LOADER(container, context) {
+  // Ensure the binary module is loaded
+  context.call("require", "binary");
+
+  load_class<curl>(container);
 }
 
 ///////////////////////////
@@ -84,7 +87,7 @@ void curl::augment_constructor(object &ctor)
 {
   curl_version_info_data* data = curl_version_info(CURLVERSION_NOW);
 
-  if (!data) 
+  if (!data)
     // Very unlikely to happen, but deal with it
     throw exception("Unable to get curl_version_info");
 
@@ -106,7 +109,7 @@ void curl::augment_constructor(object &ctor)
 }
 
 ///////////////////////////
-curl::curl(object const &obj, call_context &) 
+curl::curl(object const &obj, call_context &)
   : base_type(obj),
     error_buffer(NULL)
 {
@@ -116,7 +119,7 @@ curl::curl(object const &obj, call_context &)
     throw exception("curl_easy_init() failed");
 
   error_buffer = new char[CURL_ERROR_SIZE];
-  
+
   curl_callback_t fn_ptr =  &curl::c_handle_curl<&curl::handle_curl_data>;
   curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, fn_ptr);
 
@@ -186,15 +189,18 @@ int curl::perform() {
 
 
 size_t curl::handle_curl_data( void *data, size_t nbytes) {
-  // See if we have a 'dataReceived' callback defined 
+  // See if we have a 'dataReceived' callback defined
   value cb = get_property("dataReceived");
 
   if (cb.is_function()) {
     object obj = cb.to_object();
 
-    apply(obj,
-      create_native_object<blob>(
-        object(), (unsigned char const *) data, nbytes));
+    binary &source_binary = create_native_object<byte_string>(
+      object(),
+      reinterpret_cast<binary::element_type const *>(data),
+      nbytes);
+    root_object rooted_blob(source_binary);
+    apply(obj, rooted_blob);
   }
 
   return nbytes;
