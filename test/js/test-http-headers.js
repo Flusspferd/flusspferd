@@ -23,8 +23,8 @@ THE SOFTWARE.
 
 require.paths.push('src/js');
 
-_t = require('TestHarness')
-_h = require('HTTP/Headers')
+_t = require('testharness')
+_h = require('http/headers')
 
 HTTP = _h.HTTP
 

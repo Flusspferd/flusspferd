@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 require.paths.push('src/js');
 
-_t = require('TestHarness');
+_t = require('testharness');
 
 t = new _t.TestHarness();
 

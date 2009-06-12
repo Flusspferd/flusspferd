@@ -31,7 +31,7 @@ THE SOFTWARE.
  *
  * == Example: ==
  * {{{
- * require('cURL')
+ * const cURL = require('curl').cURL;
  * c = new cURL();
  * c.url = 'http://www.google.com';
  * var status = c.perform();
@@ -50,9 +50,9 @@ THE SOFTWARE.
   try {
     var cURL = exports.cURL; // get cURL as exported from the binary module
 
-    // If we have HTTP/Headers, define a default header callback that
+    // If we have http/headers, define a default header callback that
     // creates 
-    require('HTTP/Headers');
+    HTTP = require('http/headers');
 
     /** 
      * Array of protocols by the linked version of libcurl.

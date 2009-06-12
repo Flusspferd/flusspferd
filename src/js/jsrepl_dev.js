@@ -24,8 +24,8 @@ THE SOFTWARE.
 // Set default paths to the plugin dirs
 require.paths.push(
   'src/js',
-  'src/plugins/SQLite3',
-  'src/plugins/cURL',
+  'src/plugins/sqlite3',
+  'src/plugins/curl',
   'build/modules',
   'build/lib'
 );
