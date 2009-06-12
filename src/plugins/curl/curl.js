@@ -52,7 +52,7 @@ THE SOFTWARE.
 
     // If we have http/headers, define a default header callback that
     // creates 
-    HTTP = require('http/headers');
+    var HTTPHeaders = require('http/headers').HTTP.Headers;
 
     /** 
      * Array of protocols by the linked version of libcurl.
@@ -152,7 +152,7 @@ THE SOFTWARE.
             [undefined, this.protocol, this.status, this.statusMessage] = match;
           }
 
-          this.headers = HTTP.Headers.parse(this.header_buffer);
+          this.headers = HTTPHeaders.parse(this.header_buffer);
           delete this.header_buffer;
         }
         catch (e) 
@@ -192,7 +192,7 @@ THE SOFTWARE.
       delete this.protocol;
       delete this.status;
       delete this.statusMessage;
-      this.responseBlob = new Blob(0);
+      this.responseBlob = require('binary').ByteArray(0);
       return perform.old.apply(this, arguments);
     }
     cURL.prototype.perform.old = old_perform;
