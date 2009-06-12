@@ -1,0 +1,7 @@
+Flusspferd Changelog
+====================
+
+Release 0.7
+-----------
+
+2009-06-12 FLUSSPFERD_MODULE_LOADER gets passed the context object as its second parameter
