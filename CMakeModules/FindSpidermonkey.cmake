@@ -60,12 +60,26 @@ find_library(
 
 set(SPIDERMONKEY_LIBRARIES ${SPIDERMONKEY_LIBRARY})
 
+set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})
+set(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
+set(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
+check_cxx_source_runs(
+    "#include <js/jsapi.h>
+     int main() {
+        JSRuntime *rt = JS_NewRuntime(8L * 1024L * 1024L);
+        if (!rt)
+            return 1;
+        return 0;
+     }"
+    SPIDERMONKEY_RUNS)
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(
     Spidermonkey
     DEFAULT_MSG
     SPIDERMONKEY_LIBRARIES
-    SPIDERMONKEY_INCLUDE_DIR)
+    SPIDERMONKEY_INCLUDE_DIR
+    SPIDERMONKEY_RUNS)
 
 if(SPIDERMONKEY_FOUND)
     set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})
