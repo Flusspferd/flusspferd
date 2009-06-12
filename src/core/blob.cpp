@@ -78,7 +78,7 @@ blob::~blob() {}
 
 void blob::augment_prototype(object &proto) {
   static const char* js_iterator =
-    "function() { return require('Util/Range').Range(0, this.length) }";
+    "function() { return require('util/range').Range(0, this.length) }";
   value iter_val = evaluate(js_iterator, strlen(js_iterator));
   proto.define_property("__iterator__", iter_val);
 

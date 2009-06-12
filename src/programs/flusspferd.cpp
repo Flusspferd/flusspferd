@@ -124,7 +124,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     &flusspferd::load_encodings_module);
 
   flusspferd::create_native_method(
-    preload, "IO",
+    preload, "io",
     &flusspferd::io::load_io_module);
 
   flusspferd::gc();

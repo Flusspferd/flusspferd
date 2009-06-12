@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-_array = require('./Util/Array');
+_array = require('./util/array');
 
-_function = require('./Util/Function');
+_function = require('./util/function');
 
-_range = require('./Util/Range');
+_range = require('./util/range');
 exports.Range = _range.Range;
