@@ -59,7 +59,7 @@ protected:
   bool property_resolve(value const &id, unsigned access);
 };
 
-FLUSSPFERD_LOADER(exports) {
+FLUSSPFERD_LOADER_SIMPLE(exports) {
   local_root_scope scope;
   load_class<environment>(create_object());
 

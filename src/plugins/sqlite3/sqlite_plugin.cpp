@@ -97,8 +97,8 @@ public: // JS methods
   void bind(call_context &x);
 };
 
-FLUSSPFERD_LOADER(container) {
-  object ctor = load_class<sqlite3>(container);
+FLUSSPFERD_LOADER_SIMPLE(exports) {
+  object ctor = load_class<sqlite3>(exports);
   load_class<sqlite3_cursor>(ctor);
 }
 

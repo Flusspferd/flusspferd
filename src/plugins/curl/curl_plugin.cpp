@@ -75,8 +75,8 @@ size_t curl::c_handle_curl(void *ptr, size_t size, size_t nmemb, void *stream) {
   return (self->*Method)(ptr, size * nmemb);
 }
 
-FLUSSPFERD_LOADER(container) {
-  load_class<curl>(container);
+FLUSSPFERD_LOADER_SIMPLE(exports) {
+  load_class<curl>(exports);
 }
 
 ///////////////////////////

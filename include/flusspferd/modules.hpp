@@ -62,11 +62,24 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
  * @param exports The object containing the module exports.
  * @param context The root object for the module's scope.
  */
-#define FLUSSPFERD_LOADER(exports) \
-  extern "C" void flusspferd_load( \
+#define FLUSSPFERD_LOADER(exports, context) \
+  extern "C" \
+  void flusspferd_load( \
     ::flusspferd::object &exports, \
     ::flusspferd::object &context)
 
+/**
+ * Define a module loader ("simple": without context parameter).
+ *
+ * @param exports The object containing the module exports.
+ *
+ * @ingroup loadable_modules
+ */
+#define FLUSSPFERD_LOADER_SIMPLE(exports) \
+  extern "C" \
+  void flusspferd_load( \
+    ::flusspferd::object &exports, \
+    ::flusspferd::object &)
 }
 
 #endif

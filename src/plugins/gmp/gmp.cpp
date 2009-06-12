@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-FLUSSPFERD_LOADER(gmp) {
+FLUSSPFERD_LOADER_SIMPLE(gmp) {
   load_class<multi_precision::Integer>(gmp);
   load_class<multi_precision::Rational>(gmp);
   load_class<multi_precision::Float>(gmp);
