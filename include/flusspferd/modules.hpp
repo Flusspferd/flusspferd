@@ -37,20 +37,18 @@ namespace flusspferd {
  * @param container The object to load the function into.
  *
  * @ingroup loadable_modules
- * @ingroup jsext
  */
 void load_require_function(object container);
 
 /**
  * The prototype for module loader functions.
  *
- * Modules should define a function @c flusspferd_load (with
+ * Modules should define a %function @c flusspferd_load (with
  * <code>extern "C"</code>) with this signature.
  *
- * Example:
- * @dontinclude help/examples/dummy_module.cpp
- * @skip extern "C"
- * @until }
+ * However, they should <b>not</b> define this %function directly but rather
+ * use either #FLUSSPFERD_LOADER or #FLUSSPFERD_LOADER_SIMPLE, which will adapt
+ * to changes in the signature.
  *
  * @ingroup loadable_modules
  */
@@ -59,8 +57,23 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
 /**
  * Define a module loader.
  *
+ * The parameter @p context contains the module's scope, which includes
+ * the @c require function. You can access it with
+ *
+ * @code
+ * context.get_property_object("require")
+ * @endcode
+ *
+ * or
+ *
+ * @code
+ * context.call("require", "module-name")
+ * @endcode
+ *
  * @param exports The object containing the module exports.
  * @param context The root object for the module's scope.
+ *
+ * @ingroup loadable_modules
  */
 #define FLUSSPFERD_LOADER(exports, context) \
   extern "C" \
