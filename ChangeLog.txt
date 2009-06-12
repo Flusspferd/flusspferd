@@ -4,7 +4,9 @@ Flusspferd Change Log
 Release 0.6.1
 -------------
 
-[Nothing yet]
+2009-06-13:
+- Some plugins can now be enabled/disabled (PLUGIN_XXX) and required
+  (FORCE_PLUGINS) in cmake.
 
 Releases 0.5, 0.5.1, 0.6
 ------------------------
