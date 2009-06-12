@@ -472,7 +472,7 @@ endforeach()
 
 if(NOT WIN32)
     set(JS_PLUGINS
-        Util Util/Array Util/Function Util/Range TestHarness HTTP/Headers)
+        util util/array util/function util/range testharness http/headers)
 
     foreach(JS_PLUGIN ${JS_PLUGINS})
 
