@@ -1,7 +1,12 @@
-Flusspferd Changelog
-====================
+Flusspferd Change Log
+=====================
 
 Release 0.6.1
 -------------
 
 [Nothing yet]
+
+Releases 0.5, 0.5.1, 0.6
+------------------------
+
+There was no change log for these releases.
