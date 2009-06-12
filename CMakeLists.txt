@@ -89,7 +89,10 @@ else()
     set(_ENABLE_TESTS_DEFAULT ON)
 endif()
 
-set(ENABLE_TESTS ${_ENABLE_TESTS_DEFAULT} CACHE BOOL "Compile the test suite")
+option(
+    ENABLE_TESTS
+    "Compile the test suite"
+    ${_ENABLE_TESTS_DEFAULT})
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
@@ -128,6 +131,17 @@ elseif(MSVC)
 endif()
 
 include_directories(${Flusspferd_SOURCE_DIR}/include)
+
+## Plugin options ###########################################################
+
+option(
+    FORCE_PLUGINS
+    "Fail configuration if some enabled plugins could not be configured"
+    OFF)
+option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
+option(PLUGIN_CURL "Build cURL plugin" ON)
+option(PLUGIN_GMP "Build GMP plugin" ON)
+option(PLUGIN_XML "Build XML plugin" ON)
 
 ## POSIX ####################################################################
 
@@ -212,28 +226,52 @@ endif()
 
 ## libxml2 ##################################################################
 
-pkg_check_modules(LIBXML2 libxml-2.0>=2.6.0)
+if(PLUGIN_XML)
+    pkg_check_modules(LIBXML2 libxml-2.0>=2.6.0)
 
-if(LIBXML2_FOUND)
-    add_definitions(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
-    include_directories(${LIBXML2_INCLUDE_DIRS})
-    link_directories(${LIBXML2_LIBRARY_DIRS})
+    if(LIBXML2_FOUND)
+        add_definitions(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
+        include_directories(${LIBXML2_INCLUDE_DIRS})
+        link_directories(${LIBXML2_LIBRARY_DIRS})
+    elseif(FORCE_PLUGINS)
+        message(SEND_ERROR "XML plugin required but libxml2 not found")
+    endif()
 endif()
 
 ## sqlite3 ##################################################################
 
-pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
-include_directories(${SQLITE3_INCLUDE_DIRS})
-link_directories(${SQLITE3_LIBRARY_DIRS})
+if(PLUGIN_SQLITE3)
+    pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
+    include_directories(${SQLITE3_INCLUDE_DIRS})
+    link_directories(${SQLITE3_LIBRARY_DIRS})
+
+    if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
+        message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
+    endif()
+endif()
 
 ## libcurl ##################################################################
 
-find_package(CURL)
+if(PLUGIN_CURL)
+    find_package(CURL)
+
+    if(FORCE_PLUGINS AND NOT CURL_FOUND)
+        message(SEND_ERROR "CURL plugin required but cURL not found")
+    endif()
+endif()
 
 ## GMP ######################################################################
 
-find_package(GMP)
-find_package(GMPXX)
+if(PLUGIN_GMP)
+    find_package(GMP)
+    find_package(GMPXX)
+
+    if(FORCE_PLUGINS)
+        if(NOT GMP_FOUND OR NOT GMPXX_FOUND)
+            message(SEND_ERROR "GMP plugin required but GMP/GMPXX not found")
+        endif()
+    endif()
+endif()
 
 ## Library ##################################################################
 
@@ -357,25 +395,25 @@ if(FLUSSPFERD_HAVE_POSIX)
     set(PLUGINS ${PLUGINS} posix)
 endif()
 
-if(SQLITE3_FOUND)
+if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
     set(PLUGINS ${PLUGINS} SQLite3)
     set(SQLite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
     set(SQLite3_LIBRARIES ${SQLITE3_LIBRARIES})
 endif()
 
-if(CURL_FOUND)
+if(PLUGIN_CURL AND CURL_FOUND)
     set(PLUGINS ${PLUGINS} cURL)
     set(cURL_LIBRARIES ${CURL_LIBRARIES})
     set(cURL_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR})
 endif()
 
-if(GMP_FOUND AND GMPXX_FOUND)
+if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
     set(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
 endif()
 
-if(LIBXML2_FOUND)
+if(PLUGIN_XML AND LIBXML2_FOUND)
     set(PLUGINS ${PLUGINS} XML)
     set(XML_LIBRARIES ${LIBXML2_LIBRARIES})
 endif()
