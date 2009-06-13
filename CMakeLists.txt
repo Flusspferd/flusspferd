@@ -105,7 +105,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         add_definitions("-Wpadded -Weffc++")
     endif()
 
-    add_definitions(-D BOOST_FILESYSTEM_NO_DEPRECATED)
+    add_definitions(-DBOOST_FILESYSTEM_NO_DEPRECATED)
 
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
