@@ -229,11 +229,7 @@ endif()
 if(PLUGIN_XML)
     find_package(LibXml2)
 
-    if(LIBXML2_FOUND)
-        add_definitions(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
-        include_directories(${LIBXML2_INCLUDE_DIRS})
-        link_directories(${LIBXML2_LIBRARY_DIRS})
-    elseif(FORCE_PLUGINS)
+    if(FORCE_PLUGINS AND NOT LIBXML2_FOUND)
         message(SEND_ERROR "XML plugin required but libxml2 not found")
     endif()
 endif()
@@ -404,18 +400,19 @@ endif()
 if(PLUGIN_CURL AND CURL_FOUND)
     set(PLUGINS ${PLUGINS} curl)
     set(curl_LIBRARIES ${CURL_LIBRARIES})
-    set(curl_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR})
+    include_directories(${CURL_INCLUDE_DIR})
 endif()
 
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
-    set(gmp_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR})
+    include_directories(${GMP_INCLUDE_DIR})
 endif()
 
 if(PLUGIN_XML AND LIBXML2_FOUND)
     set(PLUGINS ${PLUGINS} xml)
     set(xml_LIBRARIES ${LIBXML2_LIBRARIES})
+    include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
 foreach(PLUGIN ${PLUGINS})
@@ -441,11 +438,6 @@ foreach(PLUGIN ${PLUGINS})
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY DEFINITIONS
         ${${PLUGIN}_DEFINITIONS})
-
-    set_property(
-        TARGET ${PLUGIN}_PLUGIN
-        PROPERTY INCLUDE_DIRECTORIES
-        ${${PLUGIN}_INCLUDE_DIRECTORIES})
 
     target_link_libraries(
         ${PLUGIN}_PLUGIN
