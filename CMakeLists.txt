@@ -73,6 +73,10 @@ message(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 add_definitions("-DFLUSSPFERD_MODULE_SUFFIX=\"${CMAKE_SHARED_MODULE_SUFFIX}\"")
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions("-DDEBUG")
+endif()
+
 #############################################################################
 
 include(CheckIncludeFile)
