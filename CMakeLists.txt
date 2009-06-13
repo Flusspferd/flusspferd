@@ -227,7 +227,7 @@ endif()
 ## libxml2 ##################################################################
 
 if(PLUGIN_XML)
-    pkg_check_modules(LIBXML2 libxml-2.0>=2.6.0)
+    find_package(LibXml2)
 
     if(LIBXML2_FOUND)
         add_definitions(-DHAVE_LIBXML2 ${LIBXML2_CFLAGS})
