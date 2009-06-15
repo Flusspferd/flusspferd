@@ -25,7 +25,19 @@ if(GMP_INCLUDE_DIR)
   set(GMP_FIND_QUIETLY TRUE)
 endif()
 
+find_path(
+    GMP_INCLUDE_DIR
+    gmp.h
+    PATHS "${GMP_ROOT}/include"
+    NO_DEFAULT_PATH)
+
 find_path(GMP_INCLUDE_DIR gmp.h)
+
+find_library(
+    GMP_LIBRARY
+    NAMES gmp
+    PATHS "${GMP_ROOT}/lib"
+    NO_DEFAULT_PATH)
 
 find_library(GMP_LIBRARY NAMES gmp)
 
