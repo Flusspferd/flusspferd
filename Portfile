@@ -5,7 +5,7 @@ PortSystem          1.0
 
 
 name                flusspferd
-version             0.5.1
+version             0.6
 categories          devel
 maintainers         flusspferd.org:team
 description         Flusspferd
@@ -13,18 +13,12 @@ long_description    Flusspferd provides Javascript bindings for C++.
 homepage            http://flusspferd.org/
 platforms           darwin
 
-distfiles           flusspferd-0.5.1.tar.bz2
+distfiles           flusspferd-0.6.tar.bz2
 master_sites        sourceforge
 use_bzip2           yes
-checksums           md5     fec1f222d9c479e3c8b43108f7656f5e \
-                    sha1    8a7499142f28246a0073080d390c68f37608e3d2 \
-                    rmd160  b1c758b1626539d9c7df287d77a2bd6eeb14bb02
 
 #fetch.type          git
 #git.url             git://github.com/ruediger/flusspferd.git
-
-depends_build       port:python25 \
-                    port:git-core
 
 depends_lib         port:spidermonkey \
                     port:boost
@@ -61,7 +55,7 @@ configure {
 #}
 
 build {
-    system "cd ${worksrcpath} && python2.5 ./waf"
+    system "cd ${worksrcpath} && make"
 }
 
 destroot {
