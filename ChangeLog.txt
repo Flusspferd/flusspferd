@@ -1,0 +1,7 @@
+Flusspferd Changelog
+====================
+
+Release 0.6.1
+-------------
+
+[Nothing yet]
