@@ -4,15 +4,18 @@ Flusspferd Change Log
 Release 0.7
 -----------
 
-2009-06-13:
-- Some plugins can now be enabled/disabled (PLUGIN_XXX) and required
-  (FORCE_PLUGINS) in cmake.
-
 2009-06-12:
 - Lower-case module names for included modules (it remains case-sensitive).
 - FLUSSPFERD_LOADER gets passed the context object as its second parameter.
 - Split FLUSSPFERD_LOADER into FLUSSPFERD_LOADER (2 parameters) and
   FLUSSPFERD_LOADER_SIMPLE (1 parameter).
+
+Release 0.6.1
+-------------
+
+2009-06-13:
+- Some plugins can now be enabled/disabled (PLUGIN_XXX) and required
+  (FORCE_PLUGINS) in cmake.
 
 Releases 0.5, 0.5.1, 0.6
 ------------------------
