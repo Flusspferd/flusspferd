@@ -4,6 +4,12 @@ Release Notes
 0.6 Series
 ----------
 
+0.6.1: Bugfix release (git: v0.6.1)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Apart from some very minor tweaks, this release mainly brings the ability to
+manually enable and disable plugins in the build system.
+
 0.6: Major release (git: v0.6)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
