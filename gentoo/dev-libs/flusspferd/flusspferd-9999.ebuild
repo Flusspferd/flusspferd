@@ -50,9 +50,10 @@ src_configure() {
 
 src_compile() {
 	cd build
-	emake || die "emake failed"
+	emake VERBOSE=1 || die "emake failed"
 }
 
 src_install() {
-	emake install DESTDIR="${D}" || die "emake install failed" 
+	cd build
+	emake VERBOSE=1 install DESTDIR="${D}" || die "emake install failed" 
 }
