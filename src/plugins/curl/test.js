@@ -21,15 +21,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-i = new requireer();
+const curl = require('curl')
 
-i.context = this;
-
-i.load('curl')
-
-c = new cURL();
-c.dataReceived = function(blob) {
-  this.dataLen += blob.length;
+c = new curl.cURL();
+c.dataReceived = function(binary) {
+  IO.stdout.write(binary)
+  this.dataLen += binary.length;
 }
 
 c.url = 'http://www.google.co.uk';
@@ -38,5 +35,7 @@ c.perform = function() {
   return this.__proto__.perform.call(this);
 }
 c.perform();
+
+print();
 print(c.dataLen);
 
