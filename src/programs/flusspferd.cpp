@@ -101,8 +101,6 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::security::create(g.prototype());
 
-  flusspferd::load_class<flusspferd::blob>(g.prototype());//TODO: delete
-
   flusspferd::load_require_function(g.prototype());
   flusspferd::load_properties_functions(g.prototype());
 
