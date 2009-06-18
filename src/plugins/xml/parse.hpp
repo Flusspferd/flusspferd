@@ -25,13 +25,13 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_PARSE_HPP
 
 #include "flusspferd/object.hpp"
-#include "flusspferd/blob.hpp"
+#include "flusspferd/binary.hpp"
 
 namespace flusspferd { namespace xml {
 
-object parse_blob(blob &b, object options);
+object parse_binary(binary &b, object options);
 object parse_file(string filename, object options);
-object html_parse_blob(blob &b, object options);
+object html_parse_binary(binary &b, object options);
 object html_parse_file(string filename, object options);
 
 }}

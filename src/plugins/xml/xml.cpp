@@ -48,7 +48,8 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::xml;
 
-FLUSSPFERD_LOADER_SIMPLE(exports) {
+FLUSSPFERD_LOADER(exports, context) {
+  context.call("require", "binary");
   load_xml(exports);
 }
 
@@ -89,7 +90,7 @@ object flusspferd::xml::load_xml(object container) {
 
   load_class<push_parser>(XML);
 
-  create_native_function(XML, "parseBlob", &parse_blob);
+  create_native_function(XML, "parseBinary", &parse_binary);
   create_native_function(XML, "parse", &parse_file);
 
   object XPath = load_class<xpath_context>(XML);
@@ -98,7 +99,7 @@ object flusspferd::xml::load_xml(object container) {
 
   load_class<html_document>(HTML);
   load_class<html_push_parser>(HTML);
-  create_native_function(HTML, "parseBlob", &html_parse_blob);
+  create_native_function(HTML, "parseBinary", &html_parse_binary);
   create_native_function(HTML, "parse", &html_parse_file);
 
   html_constants(HTML);
