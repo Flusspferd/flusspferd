@@ -41,10 +41,10 @@ THE SOFTWARE.
  *   c.url = c.header.Location;
  *   status = c.perform();
  * }
- * IO.stdout.write(c.responseBlob);
+ * IO.stdout.write(c.responseBinary);
  * }}}
  *
- * Link to [[Blob]]
+ * Link to [[Binary]]
  */
 (function() {
   try {
@@ -100,11 +100,11 @@ THE SOFTWARE.
      */
     /**
      * Binary response content. If you replace the
-     * [[#dataReceived]] callback than you will have to update this blob
+     * [[#dataReceived]] callback than you will have to update this binary.
      * yourself.
-     * @name responseBlob
+     * @name responseBinary
      * @fieldOf cURL.prototype
-     * @type Blob
+     * @type Binary
      */
 
     /**
@@ -169,13 +169,13 @@ THE SOFTWARE.
 
   /**
    * Called when a chunk of body data is available. The default implementation
-   * simply appends each chunk of data into [[#responseBlob]].
+   * simply appends each chunk of data into [[#responseBinary]].
    * @event
    *
-   * @param {Blob} blob chunk of response data
+   * @param {Binary} Binary chunk of response data.
    */
   cURL.prototype.dataReceived = function (blob) {
-    this.responseBlob.append(blob);
+    this.responseBinary.append(blob);
   }
 
   if (cURL.prototype.perform.old === undefined) {
@@ -184,7 +184,7 @@ THE SOFTWARE.
      * Perform the request on [[#url]].
      *
      * Before the request starts the [[#headers]], [[#protocol]], [[#status]],
-     * [[#statusMessage]] and the [[#responseBlob]] properties are cleared
+     * [[#statusMessage]] and the [[#responseBinary]] properties are cleared
      */
     cURL.prototype.perform = function perform() {
       this.header_buffer = "";
@@ -192,7 +192,7 @@ THE SOFTWARE.
       delete this.protocol;
       delete this.status;
       delete this.statusMessage;
-      this.responseBlob = require('binary').ByteArray(0);
+      this.responseBinary = require('binary').ByteArray(0);
       return perform.old.apply(this, arguments);
     }
     cURL.prototype.perform.old = old_perform;
