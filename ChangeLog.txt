@@ -7,6 +7,7 @@ Release 0.7
 2009-06-18:
 - Remove Blob and use Binary everywhere.
 - Adapted (method/class) names that contained Blob to use Binary instead.
+- Eliminate the IO and XML global variables.
 
 2009-06-12:
 - Lower-case module names for included modules (it remains case-sensitive).

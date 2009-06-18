@@ -83,21 +83,23 @@ $ flusspferd source.js
  *
  * Previous: \ref js-tutorial-invoke
  *
- * There is an IO function that you have probably already encountered: @c print.
+ * There is an I/O function that you have probably already encountered:
+ * @c print.
  *
  * @verbatim
 > print("OK: ", [1,2,3,4])
 OK: 1 2 3 4
-> IO.stdout.print("Same.")
+> require("io").stdout.print("Same.")
 Same.
 @endverbatim
  *
- * In fact, @c print is exactly the same as @c IO.stdout.print, if @c prelude.js
- * has been loaded. @c IO.stdout.print is available in module @c IO, so if you
- * don't use @c prelude.js, you can do the following:
+ * In fact, @c print is a short form for the latter syntax. However, the print
+ * abbreviation is not available in modules. To spare you the hassle of typing
+ * require("io").stdout.print everytime, you can assign the module to a
+ * variable.
  *
  * @verbatim
-IO = require("io");
+const IO = require("io");
 IO.stdout.print("Works!");
 @endverbatim
  *
@@ -112,16 +114,16 @@ bcd
  *
  * (Where @c abcd is input.)
  *
- * Again, @c readLine is just an alias for @c IO.stdin.readLine.
+ * Again, @c readLine is just an alias for @c require("io").stdin.readLine.
  *
- * The @c IO module exposes three streams by default:
+ * The @c io module exposes three streams by default:
  *
- * - @c IO.stdin
- * - @c IO.stdout
- * - @c IO.stderr
+ * - @c stdin
+ * - @c stdout
+ * - @c stderr
  *
  * There are many more things that you can do with this module, see
- * <a href="js/IO">the documentation for <code>IO</code></a>.
+ * <a href="js/IO">the documentation for <code>io</code></a>.
  *
  * Next: \ref js-tutorial-xml
  *
@@ -135,6 +137,7 @@ bcd
  * Let us begin by loading an XML document from Jeni Tennison's website:
  *
  * @verbatim
+> XML = require("XML")
 > doc = XML.parse("http://www.jenitennison.com/index.xml")
 <?xml version="1.0" encoding="UTF-16"?>
 <?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>

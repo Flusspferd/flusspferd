@@ -21,27 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// Required requires
-// ================
+(function() {
 
-Util = require('util');
+require('util');
 
-// Optional requires
-// ================
+var IO = require('io');
 
-try {
-  IO = require('io');
+this.print = Function.bind(IO.stdout, 'print');
+this.readLine = Function.bind(IO.stdin, 'readLine');
 
-  print = Function.bind(IO.stdout, 'print');
-  readLine = Function.bind(IO.stdin, 'readLine');
-} catch (e) {
-  // TODO: do something?
-}
-
-try {
-  XML = require('xml');
-} catch (e) {
-  // TODO: do something?
-}
+})();
 
 true;
