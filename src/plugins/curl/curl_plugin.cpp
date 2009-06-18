@@ -199,8 +199,8 @@ size_t curl::handle_curl_data( void *data, size_t nbytes) {
       object(),
       reinterpret_cast<binary::element_type const *>(data),
       nbytes);
-    root_object rooted_blob(source_binary);
-    apply(obj, rooted_blob);
+    root_object root_obj(source_binary);
+    apply(obj, source_binary);
   }
 
   return nbytes;

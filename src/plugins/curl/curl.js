@@ -174,8 +174,8 @@ THE SOFTWARE.
    *
    * @param {Binary} Binary chunk of response data.
    */
-  cURL.prototype.dataReceived = function (blob) {
-    this.responseBinary.append(blob);
+  cURL.prototype.dataReceived = function (binary) {
+    this.responseBinary.append(binary);
   }
 
   if (cURL.prototype.perform.old === undefined) {
