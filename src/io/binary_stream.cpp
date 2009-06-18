@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/io/blob_stream.hpp"
+#include "flusspferd/io/binary_stream.hpp"
 #include "flusspferd/tracer.hpp"
 #include <boost/iostreams/stream_buffer.hpp>
 #include <boost/iostreams/concepts.hpp>
@@ -32,12 +32,12 @@ using namespace flusspferd::io;
 
 namespace {
 
-struct blob_device : 
+struct binary_device : 
   boost::iostreams::device<
     boost::iostreams::bidirectional_seekable>
 {
-  explicit blob_device(blob &blob_)
-    : v(blob_.get()), pos_read(0), pos_write(0)
+  explicit binary_device(binary &binary_)
+    : v(binary_.get_data()), pos_read(0), pos_write(0), read_only(true)
   {}
 
   std::streamsize read(char *s, std::streamsize n);
@@ -50,45 +50,50 @@ struct blob_device :
   std::vector<unsigned char> &v;
   std::size_t pos_read;
   std::size_t pos_write;
+
+  bool read_only;
 };
 
 }
 
-class blob_stream::impl {
+class binary_stream::impl {
 public:
-  impl(blob &blob_)
-    : blob_(blob_), buf(blob_device(blob_), 0)
+  impl(binary &binary_)
+    : binary_(binary_), buf(binary_device(binary_), 0)
   {}
 
-  blob &blob_;
-  boost::iostreams::stream_buffer<blob_device> buf;
+  binary &binary_;
+  boost::iostreams::stream_buffer<binary_device> buf;
 };
 
-static blob &get_arg(call_context &x) {
+static binary &get_arg(call_context &x) {
   if (!x.arg[0].is_object() || x.arg[0].is_null())
     throw exception("Could not create BlobStream without Blob");
   object obj = x.arg[0].get_object();
-  return flusspferd::get_native<blob>(obj);
+  return flusspferd::get_native<binary>(obj);
 }
 
-blob_stream::blob_stream(object const &obj, call_context &x)
+binary_stream::binary_stream(object const &obj, call_context &x)
   : base_type(obj, (std::streambuf*)0), p(new impl(get_arg(x)))
 {
+  if (dynamic_cast<byte_array*>(&p->binary_)) {
+    p->buf->read_only = false;
+  }
   set_streambuf(&p->buf);
 }
 
-blob_stream::~blob_stream()
+binary_stream::~binary_stream()
 {}
 
-void blob_stream::trace(tracer &trc) {
-  trc("blob", p->blob_);
+void binary_stream::trace(tracer &trc) {
+  trc("binary", p->binary_);
 }
 
-blob &blob_stream::get_blob() {
-  return p->blob_;
+binary &binary_stream::get_binary() {
+  return p->binary_;
 }
 
-std::streamsize blob_device::read(char *data, std::streamsize n) {
+std::streamsize binary_device::read(char *data, std::streamsize n) {
   if (pos_read >= v.size())
     return -1;
   std::size_t n_left = v.size() - pos_read;
@@ -101,7 +106,10 @@ std::streamsize blob_device::read(char *data, std::streamsize n) {
   return n;
 }
 
-std::streamsize blob_device::write(char const *data, std::streamsize n) {
+std::streamsize binary_device::write(char const *data, std::streamsize n) {
+  if (read_only)
+    return -1;
+
   if (n < 0)
     n = 0;
   if (pos_write + n >= v.size())
@@ -111,7 +119,7 @@ std::streamsize blob_device::write(char const *data, std::streamsize n) {
   return n;
 }
 
-std::streampos blob_device::seek(
+std::streampos binary_device::seek(
     boost::iostreams::stream_offset off,
     std::ios::seekdir way,
     std::ios::openmode which)
