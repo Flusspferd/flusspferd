@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "../class.hpp"
 #include "../class_description.hpp"
 #include "../string.hpp"
+#include "../binary.hpp"
 #include <streambuf>
 
 namespace flusspferd { namespace io {
@@ -40,8 +41,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (methods,
     ("readWhole", bind, read_whole)
     ("read", bind, read)
-    ("readWholeBlob", bind, read_whole_blob)
-    ("readBlob", bind, read_blob)
+    ("readWholeBinary", bind, read_whole_binary)
+    ("readBinary", bind, read_binary)
     ("write", bind, write)
     ("flush", bind, flush)
     ("print", bind, print)
@@ -62,8 +63,8 @@ public: // javascript methods
   string read_whole();
   string read(unsigned max_size);
 
-  object read_whole_blob();
-  object read_blob(unsigned max_size);
+  object read_whole_binary(boost::optional<byte_array&> output);
+  object read_binary(unsigned max_size, boost::optional<byte_array&> output);
 
   void write(value const &);
 

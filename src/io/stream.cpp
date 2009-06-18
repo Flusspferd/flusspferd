@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"
-#include "flusspferd/blob.hpp"
+#include "flusspferd/binary.hpp"
 #include <boost/scoped_array.hpp>
 #include <cstdlib>
 
@@ -66,23 +66,34 @@ string stream::read_whole() {
   return string(data);
 }
 
-object stream::read_whole_blob() {
+object stream::read_whole_binary(boost::optional<byte_array&> output_) {
+  binary &output =
+    output_
+    ? static_cast<binary&>(output_.get())
+    : static_cast<binary&>(
+        create_native_object<byte_string>(
+          object(),
+          static_cast<binary::element_type*>(0),
+          0));
+  root_object root_obj(output);
+
   unsigned const N = 4096;
 
-  std::vector<char> data;
+  binary::vector_type &data = output.get_data();
 
   std::streamsize length;
 
   do {
     data.resize(data.size() + N);
-    length = streambuf_->sgetn(&data[data.size() - N], N);
+    length = streambuf_->sgetn(
+      reinterpret_cast<char*>(&data[data.size() - N]),
+      N);
     if (length < 0)
       length = 0;
     data.resize(data.size() - N + length);
   } while (length > 0);
 
-  return create_native_object<blob>(
-      object(), (unsigned char const *)&data[0], data.size());
+  return output;
 }
 
 string stream::read(unsigned size) {
@@ -99,20 +110,34 @@ string stream::read(unsigned size) {
   return string(buf.get());
 }
 
-object stream::read_blob(unsigned size) {
+object stream::read_binary(unsigned size, boost::optional<byte_array&> output_)
+{
   if (!size)
     size = 4096;
 
-  boost::scoped_array<char> buf(new char[size]);
+  binary &output =
+    output_
+    ? static_cast<binary&>(output_.get())
+    : static_cast<binary&>(
+        create_native_object<byte_string>(
+          object(),
+          static_cast<binary::element_type*>(0),
+          0));
+  root_object root_obj(output);
 
-  std::streamsize length = streambuf_->sgetn(buf.get(), size);
+  binary::vector_type &data = output.get_data();
+
+  data.resize(data.size() + size);
+
+  std::streamsize length = streambuf_->sgetn(
+    reinterpret_cast<char *>(&data[data.size() - size]),
+    size);
   if (length < 0)
     length = 0;
 
-  return create_native_object<blob>(
-      object(),
-      (unsigned char const *) buf.get(),
-      length);
+  data.resize(data.size() - size + length);
+
+  return output;
 }
 
 void stream::write(value const &data) {
@@ -121,8 +146,8 @@ void stream::write(value const &data) {
     char const *str = text.c_str();
     streambuf_->sputn(text.c_str(), std::strlen(str));
   } else if (data.is_object()) {
-    blob &b = flusspferd::get_native<blob>(data.get_object());
-    streambuf_->sputn((char const*) b.data(), b.size());
+    binary &b = flusspferd::get_native<binary>(data.get_object());
+    streambuf_->sputn((char const*) &b.get_data()[0], b.get_length());
   } else {
     throw exception("Cannot write non-object non-string value to Stream");
   }
