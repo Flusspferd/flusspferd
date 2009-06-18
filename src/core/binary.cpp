@@ -185,7 +185,7 @@ void binary::property_op(property_mode mode, value const &id, value &x) {
   }
 
   if (index < 0 || std::size_t(index) >= v_data.size())
-    throw exception("Out of bounds of Blob");
+    throw exception("Out of bounds of binary");//TODO
 
   switch (mode) {
   case property_get:
