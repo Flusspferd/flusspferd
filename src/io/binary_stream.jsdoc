@@ -15,7 +15,7 @@
  */
 
 /**
- * Access the wrapped Blob object.
+ * Access the wrapped Binary object.
  * @name getBinary
  * @type Binary
  * @methodOf IO.BinaryStream

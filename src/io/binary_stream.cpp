@@ -68,7 +68,7 @@ public:
 
 static binary &get_arg(call_context &x) {
   if (!x.arg[0].is_object() || x.arg[0].is_null())
-    throw exception("Could not create BlobStream without Blob");
+    throw exception("Could not create BinaryStream without Binary");
   object obj = x.arg[0].get_object();
   return flusspferd::get_native<binary>(obj);
 }
