@@ -25,29 +25,28 @@ THE SOFTWARE.
 #define FLUSSPFERD_IO_BLOB_STREAM_HPP
 
 #include "stream.hpp"
-#include "../class.hpp"
-#include "../blob.hpp"
+#include "../binary.hpp"
 
 namespace flusspferd { namespace io {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  blob_stream,
+  binary_stream,
   (base, stream)
-  (full_name, "IO.BlobStream")
-  (constructor_name, "BlobStream")
+  (full_name, "IO.BinaryStream")
+  (constructor_name, "BinaryStream")
   (constructor_arity, 1)
   (methods,
-    ("getBlob", bind, get_blob)))
+    ("getBinary", bind, get_binary)))
 {
 public:
-  blob_stream(object const &, call_context &);
-  ~blob_stream();
+  binary_stream(object const &, call_context &);
+  ~binary_stream();
 
 protected:
   void trace(tracer &);
 
 public: // javascript methods
-  blob &get_blob();
+  binary &get_binary();
 
 private:
   class impl;

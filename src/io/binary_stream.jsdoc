@@ -1,0 +1,22 @@
+// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+/**
+ * [[IO.Stream]] interface to [[Binary]].
+ * See [[IO.Stream]] for the other methods on this class.
+ *
+ * Will only write to ByteArray binaries, ByteString binaries are read-only.
+ *
+ * @name IO.BinaryStream
+ * @constructor
+ *
+ * @param {Binary} binary Binary to wrap in a stream.
+ *
+ * @class
+ * @extends IO.Stream
+ */
+
+/**
+ * Access the wrapped Blob object.
+ * @name getBinary
+ * @type Binary
+ * @methodOf IO.BinaryStream
+ */

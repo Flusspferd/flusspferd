@@ -23,7 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/io/io.hpp"
 #include "flusspferd/io/file.hpp"
-#include "flusspferd/io/blob_stream.hpp"
+#include "flusspferd/io/binary_stream.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/modules.hpp"
@@ -39,7 +39,7 @@ object flusspferd::io::load_io_module(object container) {
 
   load_class<stream>(IO);
   load_class<file>(IO);
-  load_class<blob_stream>(IO);
+  load_class<binary_stream>(IO);
 
   IO.define_property(
     "stdout",
