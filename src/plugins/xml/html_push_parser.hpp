@@ -24,7 +24,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
 #define FLUSSPFERD_XML_HTML_PUSH_PARSER_HPP
 
-#include "flusspferd/blob.hpp"
+#include "flusspferd/binary.hpp"
 #include "flusspferd/class_description.hpp"
 #include <libxml/HTMLparser.h>
 
@@ -44,7 +44,7 @@ public:
   ~html_push_parser();
 
 public: // JS methods
-  void push(blob &, bool);
+  void push(binary &, bool);
   value terminate();
 
 private:

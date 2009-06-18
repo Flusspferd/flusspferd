@@ -64,11 +64,15 @@ push_parser::~push_parser() {
   }
 }
 
-void push_parser::push(blob &b, bool t) {
+void push_parser::push(binary &b, bool t) {
   if (!parser)
     throw exception("Could not parse chunk: parser is empty");
 
-  int status = xmlParseChunk(parser, (char *) b.data(), b.size(), t);
+  int status = xmlParseChunk(
+    parser,
+    reinterpret_cast<char *>(&b.get_data()[0]),
+    b.get_length(),
+    t);
 
   if (status != XML_ERR_OK)
     throw exception("Could not parse chunk");
