@@ -5,7 +5,7 @@
  *
  * @see IO.Stream
  * @see IO.File
- * @see IO.BlobStream
+ * @see IO.BinaryStream
  */
 
 // IO.Stream {{{
@@ -32,9 +32,10 @@
   /**
    * Read binary data
    *
-   * @name readBlob
-   * @type Blob
+   * @name readBinary
+   * @type Binary
    * @param [size=4096] number of bytes to read.
+   * @param {ByteArray} [output] If defined/non-null, the output data will be appended to this ByteArray. Otherwise, a new ByteString will be created.
    */
 
   /**
@@ -56,17 +57,18 @@
   /**
    * Read entire stream contents as binary data.
    *
-   * @name readWholeBlob
-   * @type Blob
+   * @name readWholeBinary
+   * @type Binary
+   * @param {ByteArray} [output] If defined/non-null, the output data will be appended to this ByteArray. Otherwise, a new ByteString will be created.
    */
 
   /**
    * Write either a string, in which case the UTF-8 byte sequence is
-   * written, or else a Blob where the raw binary data is written.
+   * written, or else a Binary where the raw binary data is written.
    *
    * @name write
    *
-   * @param data stringOrBlob
+   * @param data stringOrBinary
    */
 
   /**
