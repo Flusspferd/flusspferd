@@ -33,6 +33,8 @@ using namespace flusspferd;
 using namespace flusspferd::io;
 
 object flusspferd::io::load_io_module(object container) {
+  container.call("require", "binary");
+
   local_root_scope scope;
 
   object IO = container.get_property_object("exports");
