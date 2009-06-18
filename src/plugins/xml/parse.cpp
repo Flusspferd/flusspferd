@@ -60,11 +60,16 @@ struct opt {
 
 }
 
-object flusspferd::xml::parse_blob(blob &b, object options) {
+object flusspferd::xml::parse_binary(binary &b, object options) {
   opt x(options);
 
   xmlDocPtr doc =
-    xmlReadMemory((char*) b.data(), b.size(), x.url, x.encoding, x.flags);
+    xmlReadMemory(
+      reinterpret_cast<char*>(&b.get_data()[0]),
+      b.get_length(),
+      x.url,
+      x.encoding,
+      x.flags);
 
   if (!doc)
     throw exception("Could not parse XML document");
@@ -84,11 +89,16 @@ object flusspferd::xml::parse_file(string filename, object options) {
   return node::create(xmlNodePtr(doc));
 }
 
-object flusspferd::xml::html_parse_blob(blob &b, object options) {
+object flusspferd::xml::html_parse_binary(binary &b, object options) {
   opt x(options);
 
   htmlDocPtr doc =
-    htmlReadMemory((char*) b.data(), b.size(), x.url, x.encoding, x.flags);
+    htmlReadMemory(
+      reinterpret_cast<char*>(&b.get_data()[0]),
+      b.get_length(),
+      x.url,
+      x.encoding,
+      x.flags);
 
   if (!doc)
     throw exception("Could not parse HTML document");
