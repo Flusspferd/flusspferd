@@ -47,6 +47,7 @@ THE SOFTWARE.
 #include "flusspferd/function.hpp"
 #include "flusspferd/modules.hpp"
 #include "flusspferd/init.hpp"
+#include "flusspferd/load_core.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/native_function_base.hpp"
 #include "flusspferd/native_function.hpp"

@@ -22,7 +22,6 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
-#include "flusspferd/io/io.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
@@ -102,29 +101,13 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::security::create(g.prototype());
 
-  flusspferd::load_require_function(g.prototype());
-  flusspferd::load_properties_functions(g.prototype());
-
-  flusspferd::object require_fn = g.get_property_object("require");
+  flusspferd::load_core(g.prototype());
 
   flusspferd::create_native_function<void (int)>(
     g, "quit",
     phoenix::bind(&flusspferd_repl::quit, this, args::arg1));
+
   flusspferd::create_native_function(g, "gc", &flusspferd::gc);
-
-  flusspferd::object preload = require_fn.get_property_object("preload");
-
-  flusspferd::create_native_method(
-    preload, "binary",
-    &flusspferd::load_binary_module);
-
-  flusspferd::create_native_method(
-    preload, "encodings",
-    &flusspferd::load_encodings_module);
-
-  flusspferd::create_native_method(
-    preload, "io",
-    &flusspferd::io::load_io_module);
 
   flusspferd::gc();
 }
