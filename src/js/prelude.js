@@ -30,6 +30,6 @@ var IO = require('io');
 this.print = Function.bind(IO.stdout, 'print');
 this.readLine = Function.bind(IO.stdin, 'readLine');
 
-}).apply(this.__proto__);
+})();
 
 true;
