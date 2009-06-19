@@ -8,6 +8,7 @@ Release 0.7
 - Add -I command line switch for specifying module paths.
 - Add -M command line switch for loading modules (with 'require').
 - Add permanent history to the shell.
+- Add ServerJS 'system' module (https://wiki.mozilla.org/ServerJS/System).
 
 2009-06-18:
 - Remove Blob and use Binary everywhere.

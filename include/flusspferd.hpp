@@ -60,6 +60,7 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
+#include "flusspferd/system.hpp"
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/value_io.hpp"

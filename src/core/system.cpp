@@ -21,40 +21,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/load_core.hpp"
-#include "flusspferd/modules.hpp"
-#include "flusspferd/properties_functions.hpp"
-#include "flusspferd/binary.hpp"
-#include "flusspferd/encodings.hpp"
 #include "flusspferd/system.hpp"
-#include "flusspferd/io/io.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/object.hpp"
 
 using namespace flusspferd;
 
-void flusspferd::load_core(object const &scope_) {
-  object scope = scope_;
+void flusspferd::load_system_module(object &context) {
+  object exports = context.get_property_object("exports");
 
-  flusspferd::load_require_function(scope);
-  flusspferd::load_properties_functions(scope);
+  object IO = context.call("require", "io").to_object();
 
-  flusspferd::object require_fn = scope.get_property_object("require");
+  exports.define_property(
+    "stdin",
+    IO.get_property("stdin"),
+    read_only_property);
 
-  flusspferd::object preload = require_fn.get_property_object("preload");
+  exports.define_property(
+    "stdout",
+    IO.get_property("stdout"),
+    read_only_property);
 
-  flusspferd::create_native_method(
-    preload, "binary",
-    &flusspferd::load_binary_module);
+  exports.define_property(
+    "stderr",
+    IO.get_property("stderr"),
+    read_only_property);
 
-  flusspferd::create_native_method(
-    preload, "encodings",
-    &flusspferd::load_encodings_module);
-
-  flusspferd::create_native_method(
-    preload, "io",
-    &flusspferd::io::load_io_module);
-
-  flusspferd::create_native_method(
-    preload, "system",
-    &flusspferd::load_system_module);
+  try {
+    exports.define_property(
+      "env",
+      context.call("require", "environment"),
+      read_only_property);
+  } catch (exception&) {
+  }
 }
