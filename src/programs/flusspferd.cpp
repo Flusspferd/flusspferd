@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <cstdlib>
 #include <list>
 
 #ifdef HAVE_EDITLINE
@@ -160,6 +161,18 @@ int flusspferd_repl::run() {
   if (!interactive)
     return exit_code;
 
+  char *HOME = std::getenv("HOME");
+
+  std::string history_file;
+
+  if (HOME)
+    history_file = std::string(HOME) + "/.flusspferd_history";
+
+#ifdef HAVE_EDITLINE
+  if (!machine_mode)
+    read_history(history_file.c_str());
+#endif
+
   std::string source;
   unsigned int line = 0;
 
@@ -196,6 +209,11 @@ int flusspferd_repl::run() {
     }
     flusspferd::gc();
   }
+
+#ifdef HAVE_EDITLINE
+  if (!machine_mode)
+    write_history(history_file.c_str());
+#endif
 
   return exit_code;
 }
