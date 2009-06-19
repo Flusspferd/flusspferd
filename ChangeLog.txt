@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.7
 -----------
 
+2009-06-19:
+- Add -I command line switch for specifying module paths.
+
 2009-06-18:
 - Remove Blob and use Binary everywhere.
 - Adapted (method/class) names that contained Blob to use Binary instead.

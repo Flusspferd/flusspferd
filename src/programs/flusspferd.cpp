@@ -60,7 +60,7 @@ class flusspferd_repl {
   int argc;
   char ** argv;
 
-  enum Type { File, Expression };
+  enum Type { File, Expression, IncludePath };
   
   // Returns list of files / expressions to execute
   std::list<std::pair<std::string, Type> > parse_cmdline();
@@ -143,6 +143,13 @@ int flusspferd_repl::run() {
     case Expression:
       flusspferd::evaluate(i->first, "[command line]", 0);
       break;
+    case IncludePath:
+      flusspferd::global()
+          .prototype()
+          .get_property_object("require")
+          .get_property_object("paths")
+          .call("unshift", i->first);
+      break;
     }
   }
   
@@ -212,6 +219,8 @@ void print_help(char const *argv0) {
 "\n"
 "    -f <file>\n"
 "    --file <file>            Run this file before standard script handling.\n"
+"\n"
+"    -I <path>\n              Add include path."
 "\n"
 "    --                       Stop processing options.\n\n";
 }
@@ -320,6 +329,19 @@ flusspferd_repl::parse_cmdline() {
           interactive = false;
         files.push_back(std::make_pair(file, Expression));
       }
+      else if (std::strcmp(argv[i], "-I") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected expression after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        std::string path = argv[i];
+        files.push_back(std::make_pair(path, IncludePath));
+      }
       else
       {
         print_help(argv[0]);
@@ -351,6 +373,7 @@ flusspferd_repl::parse_cmdline() {
       args.set_element(x++, flusspferd::string(argv[i]));
     }
 
+    //TODO: use args
   }
 
   return files;
