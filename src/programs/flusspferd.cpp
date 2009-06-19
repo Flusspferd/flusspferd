@@ -253,8 +253,6 @@ void flusspferd_repl::load_config() {
 std::list<std::pair<std::string, flusspferd_repl::Type> >
 flusspferd_repl::parse_cmdline() {
   bool interactive_set = false;
-  flusspferd::array args = flusspferd::create_array();
-  co.global().set_property("arguments", args);
 
   std::list<std::pair<std::string, Type> > files;
 
@@ -372,6 +370,13 @@ flusspferd_repl::parse_cmdline() {
       break; // Not an option, stop looking for one
   }
 
+  flusspferd::array args =
+    flusspferd::global()
+      .call("require", "system").to_object()
+      .get_property_object("args");
+
+  args.set_element(0, flusspferd::value(""));
+
   if (i < argc) {
     // some cmd line args left.
     // first one is file
@@ -385,12 +390,14 @@ flusspferd_repl::parse_cmdline() {
       files.push_back(std::make_pair(file, File));
     }
 
-    int x=0;
-    for (; i < argc; ++i) {
-      args.set_element(x++, flusspferd::string(argv[i]));
-    }
+    args.set_element(0, flusspferd::value(file));
 
-    //TODO: use args
+    int x = 1;
+    for (; i < argc; ++i) {
+      args.set_element(
+        x++,
+        flusspferd::value(const_cast<char const*>(argv[i])));
+    }
   }
 
   return files;

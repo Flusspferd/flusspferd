@@ -23,6 +23,7 @@ THE SOFTWARE.
 
 #include "flusspferd/system.hpp"
 #include "flusspferd/object.hpp"
+#include "flusspferd/create.hpp"
 
 using namespace flusspferd;
 
@@ -53,4 +54,6 @@ void flusspferd::load_system_module(object &context) {
       read_only_property);
   } catch (exception&) {
   }
+
+  exports.define_property("args", create_array(), read_only_property);
 }
