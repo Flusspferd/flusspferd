@@ -300,8 +300,6 @@ flusspferd_repl::parse_cmdline() {
           throw std::runtime_error(msg);
         }
         std::string file = argv[i];
-        if (!config_loaded)
-          load_config();
         if (!interactive_set)
           interactive = false;
         files.push_back(std::make_pair(file, File));
@@ -318,8 +316,6 @@ flusspferd_repl::parse_cmdline() {
           throw std::runtime_error(msg);
         }
         std::string file = argv[i];
-        if (!config_loaded)
-          load_config();
         if (!interactive_set)
           interactive = false;
         files.push_back(std::make_pair(file, Expression));
