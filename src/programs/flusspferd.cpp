@@ -81,7 +81,7 @@ public:
 };
 
 flusspferd_repl::flusspferd_repl(int argc, char **argv)
-  : interactive(false),
+  : interactive(true),
     machine_mode(false),
     //file("typein"),
     in(std::cin.rdbuf()),
@@ -371,10 +371,7 @@ flusspferd_repl::parse_cmdline() {
       break; // Not an option, stop looking for one
   }
 
-  if (i >= argc) {
-    if (!interactive_set)
-      interactive = files.empty();
-  } else {
+  if (i < argc) {
     // some cmd line args left.
     // first one is file
     // others go into arguments array
