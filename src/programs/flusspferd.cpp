@@ -320,6 +320,11 @@ flusspferd_repl::parse_cmdline() {
           interactive = false;
         files.push_back(std::make_pair(file, Expression));
       }
+      else
+      {
+        print_help(argv[0]);
+        throw std::runtime_error(std::string("invalid option: ")+argv[i]+"\n");
+      }
     }
     else
       break; // Not an option, stop looking for one
