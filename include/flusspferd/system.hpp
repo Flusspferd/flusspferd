@@ -21,40 +21,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/load_core.hpp"
-#include "flusspferd/modules.hpp"
-#include "flusspferd/properties_functions.hpp"
-#include "flusspferd/binary.hpp"
-#include "flusspferd/encodings.hpp"
-#include "flusspferd/system.hpp"
-#include "flusspferd/io/io.hpp"
-#include "flusspferd/create.hpp"
+#ifndef FLUSSPFERD_SYSTEM_HPP
+#define FLUSSPFERD_SYSTEM_HPP
 
-using namespace flusspferd;
+namespace flusspferd {
 
-void flusspferd::load_core(object const &scope_) {
-  object scope = scope_;
+class object;
 
-  flusspferd::load_require_function(scope);
-  flusspferd::load_properties_functions(scope);
+void load_system_module(object &context);
 
-  flusspferd::object require_fn = scope.get_property_object("require");
-
-  flusspferd::object preload = require_fn.get_property_object("preload");
-
-  flusspferd::create_native_method(
-    preload, "binary",
-    &flusspferd::load_binary_module);
-
-  flusspferd::create_native_method(
-    preload, "encodings",
-    &flusspferd::load_encodings_module);
-
-  flusspferd::create_native_method(
-    preload, "io",
-    &flusspferd::io::load_io_module);
-
-  flusspferd::create_native_method(
-    preload, "system",
-    &flusspferd::load_system_module);
 }
+
+#endif
