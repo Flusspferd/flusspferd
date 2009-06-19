@@ -60,7 +60,7 @@ class flusspferd_repl {
   int argc;
   char ** argv;
 
-  enum Type { File, Expression, IncludePath };
+  enum Type { File, Expression, IncludePath, Module };
   
   // Returns list of files / expressions to execute
   std::list<std::pair<std::string, Type> > parse_cmdline();
@@ -134,6 +134,11 @@ int flusspferd_repl::run() {
   if (!config_loaded)
     load_config();
 
+  flusspferd::object require_obj =
+      flusspferd::global()
+        .prototype()
+        .get_property_object("require");
+
   typedef std::list<std::pair<std::string, Type> >::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     switch (i->second) {
@@ -144,11 +149,10 @@ int flusspferd_repl::run() {
       flusspferd::evaluate(i->first, "[command line]", 0);
       break;
     case IncludePath:
-      flusspferd::global()
-          .prototype()
-          .get_property_object("require")
-          .get_property_object("paths")
-          .call("unshift", i->first);
+      require_obj.get_property_object("paths").call("unshift", i->first);
+      break;
+    case Module:
+      require_obj.call(flusspferd::global(), i->first);
       break;
     }
   }
@@ -221,6 +225,8 @@ void print_help(char const *argv0) {
 "    --file <file>            Run this file before standard script handling.\n"
 "\n"
 "    -I <path>\n              Add include path."
+"\n"
+"    -M <module>\n            Load module."
 "\n"
 "    --                       Stop processing options.\n\n";
 }
@@ -341,6 +347,19 @@ flusspferd_repl::parse_cmdline() {
         }
         std::string path = argv[i];
         files.push_back(std::make_pair(path, IncludePath));
+      }
+      else if (std::strcmp(argv[i], "-M") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected expression after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        std::string path = argv[i];
+        files.push_back(std::make_pair(path, Module));
       }
       else
       {
