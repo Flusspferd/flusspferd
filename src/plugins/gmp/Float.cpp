@@ -54,14 +54,34 @@ namespace multi_precision {
     return mp.get_d();
   }
 
-  std::string Float::get_string() /*const*/ {
-    mp_exp_t expo; // TODO handle expo
-    return mp.get_str(expo);
+  std::string Float::toString() /* const */ {
+    mp_exp_t expo;
+    std::string str = mp.get_str(expo);
+    assert(expo >= 0);
+    if(static_cast<std::size_t>(expo) >= str.size()) {
+      return str + ".0";
+    }
+    else {
+      return str.substr(0, expo) + '.' + str.substr(expo);
+    }
   }
 
-  std::string Float::get_string_base(int base) /*const*/ {
-    mp_exp_t expo; // TODO handle expo
-    return mp.get_str(expo, base);
+  object Float::get_string() /*const*/ {
+    mp_exp_t expo;
+    std::string str = mp.get_str(expo);
+    object x = create_object();
+    x.set_property("string", value(str));
+    x.set_property("exp", value(expo));
+    return x;
+  }
+
+  object Float::get_string_base(int base) /*const*/ {
+    mp_exp_t expo;
+    std::string str = mp.get_str(expo, base);
+    object x = create_object();
+    x.set_property("string", value(str));
+    x.set_property("exp", value(expo));
+    return x;
   }
 
   int Float::get_prec() /*const*/ {
