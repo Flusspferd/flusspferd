@@ -42,7 +42,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("get_double",       bind,    get_double)
     ("toDouble",         alias,   "get_double")
     ("get_string",       bind,    get_string)
-    ("toString",         alias,   "get_string")
+    ("toString",         bind,    toString)
     ("get_string_base",  bind,    get_string_base)
     ("get_prec",         bind,    get_prec)
     ("set_prec",         bind,    set_prec)
@@ -67,8 +67,9 @@ public:
   bool fits_int() /*const*/;
   int get_int() /*const*/;
   double get_double() /*const*/;
-  std::string get_string() /*const*/;
-  std::string get_string_base(int base) /*const*/;
+  std::string toString() /* const */;
+  object get_string() /*const*/;
+  object get_string_base(int base) /*const*/;
   int get_prec() /*const*/;
   void set_prec(int p);
 
