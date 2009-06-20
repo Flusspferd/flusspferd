@@ -234,6 +234,8 @@ endif()
 ## GNU/readline #############################################################
 
 if(USE_READLINE)
+  message("WARNING: GNU/readline is GPL licensed.")
+
   find_package(Readline)
 
   if(READLINE_FOUND)
