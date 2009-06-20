@@ -154,8 +154,8 @@ int flusspferd_repl::run() {
 #ifdef HAVE_EDITLINE
   std::string history_file;
   if (!machine_mode && !no_global_history) {
-    char const *const HOME = std::getenv("HOME"); 
-    if (HOME) {
+    char const * const HOME = std::getenv("HOME"); 
+    if (HOME && *HOME) {
       history_file = std::string(HOME) + "/.flusspferd_history";
       read_history(history_file.c_str());
     }
