@@ -108,7 +108,7 @@ $ make
 $ sudo make install
 @endverbatim
  *
- * Note that you can pass -DUSE_READLINE if you want Flusspferd to use
+ * Note that you can pass -DUSE_READLINE=ON if you want Flusspferd to use
  * GNU/readline, which we don't use by default because it has a GPL
  * license.
  *
