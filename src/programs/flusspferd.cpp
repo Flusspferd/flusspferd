@@ -454,6 +454,7 @@ bool flusspferd_repl::getline(std::string &source, const char* prompt) {
         add_history(linep);
     source = linep;
     source += '\n';
+    std::free(linep);
     return true;
   } 
   else
