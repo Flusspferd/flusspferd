@@ -16,11 +16,17 @@ Loads config from file
 .I config-file
 .IP -i
 Enter interactive mode (after files)
-.IP -O
+.IP -0
 Machine command mode (separator '\\0')
+.IO "-e expression"
+Evaluate expression
 .IP "-f file"
 run this file before standard script handling
+.IP "-I path"
+Add include path
+.IO "-M module"
+Load module
 .IP --
-stop processing arguments
+stop processing options
 .SH AUTHOR
 Flusspferd Team <team -AT- flusspferd -DOT- org>
