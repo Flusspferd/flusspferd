@@ -61,6 +61,8 @@ class flusspferd_repl {
   bool running;
   int exit_code;
 
+  bool no_global_history;
+
   int argc;
   char ** argv;
 
@@ -96,6 +98,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     scope(flusspferd::current_context_scope(co)),
     running(false),
     exit_code(0),
+    no_global_history(false),
     argc(argc),
     argv(argv)
 {
@@ -148,16 +151,15 @@ int flusspferd_repl::run() {
   if (!interactive)
     return exit_code;
 
-  char *HOME = std::getenv("HOME");
-
-  std::string history_file;
-
-  if (HOME)
-    history_file = std::string(HOME) + "/.flusspferd_history";
-
 #ifdef HAVE_EDITLINE
-  if (!machine_mode)
-    read_history(history_file.c_str());
+  std::string history_file;
+  if (!machine_mode && !no_global_history) {
+    char const *const HOME = std::getenv("HOME"); 
+    if (HOME) {
+      history_file = std::string(HOME) + "/.flusspferd_history";
+      read_history(history_file.c_str());
+    }
+  }
 #endif
 
   std::string source;
@@ -198,7 +200,7 @@ int flusspferd_repl::run() {
   }
 
 #ifdef HAVE_EDITLINE
-  if (!machine_mode)
+  if (!machine_mode && !no_global_history && !history_file.empty())
     write_history(history_file.c_str());
 #endif
 
@@ -232,6 +234,8 @@ void print_help(char const *argv0) {
 "    -I <path>\n              Add include path."
 "\n"
 "    -M <module>\n            Load module."
+"\n"
+"    --no-global-history\n    Do not load a global history in interactive mode\n"
 "\n"
 "    --                       Stop processing options.\n\n";
 }
@@ -363,6 +367,10 @@ flusspferd_repl::parse_cmdline() {
         }
         std::string path = argv[i];
         files.push_back(std::make_pair(path, Module));
+      }
+      else if (std::strcmp(argv[i], "--no-global-history") == 0)
+      {
+        no_global_history = true;
       }
       else
       {
