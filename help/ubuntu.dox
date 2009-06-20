@@ -108,6 +108,10 @@ $ make
 $ sudo make install
 @endverbatim
  *
+ * Note that you can pass -DUSE_READLINE if you want Flusspferd to use
+ * GNU/readline, which we don't use by default because it has a GPL
+ * license.
+ *
  * @subsection sqlite Building Flusspferd with SQLite support
  * Support for SQLite is autodetected during configuration. To compile with
  * SQLite support you have to install the SQLite 3's dev-files
