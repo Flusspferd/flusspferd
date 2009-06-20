@@ -6,6 +6,13 @@
  * @see gmp.Integer
  * @see gmp.Rational
  * @see gmp.Float
+ *
+ * == Example: ==
+ * {{{
+ * const GMP = require('gmp');
+ * f = GMP.Float(2);
+ * require('io').stdout.print(f.sqrt());
+ * }}}
  */
 
 // gmp.Integer {{{
@@ -37,15 +44,22 @@
 
 /**
  * returns the value as a string
- * @name get_string
+ * @name toString
  * @return string
+ *
+
+/**
+ * returns an object containing the string without decimal point as a property
+ * called "string" and the exponent as a property called "exp". See mpf_get_str.
+ * @name get_string
+ * @return object
  */
 
 /**
- * returns the value as a string in a specific base
+ * returns the value (similar to get_string) as a string in a specific base
  * @name get_string_base
  * @param base
- * @return string
+ * @return object
  */
 
 /**
