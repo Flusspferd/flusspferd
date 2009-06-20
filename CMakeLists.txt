@@ -146,6 +146,7 @@ option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 option(PLUGIN_XML "Build XML plugin" ON)
+option(USE_READLINE "Build with GNU/readline instead of libedit" OFF)
 
 ## POSIX ####################################################################
 
@@ -221,11 +222,24 @@ add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
 ## libedit ##################################################################
 
-find_package(Libedit)
+if(NOT USE_READLINE)
+  find_package(Libedit)
 
-if(LIBEDIT_FOUND)
+  if(LIBEDIT_FOUND)
     add_definitions(-DHAVE_EDITLINE)
     include_directories(${LIBEDIT_INCLUDE_DIR})
+  endif()
+endif()
+
+## GNU/readline #############################################################
+
+if(USE_READLINE)
+  find_package(Readline)
+
+  if(READLINE_FOUND)
+    add_definitions(-DHAVE_READLINE)
+    include_directories(${READLINE_INCLUDE_DIR})
+  endif()
 endif()
 
 ## libxml2 ##################################################################
@@ -352,10 +366,17 @@ set_property(
     PROPERTY OUTPUT_NAME
     flusspferd)
 
-target_link_libraries(
+if(NOT USE_READLINE)
+  target_link_libraries(
     flusspferd-shell
     flusspferd
     ${LIBEDIT_LIBRARIES})
+else()
+  target_link_libraries(
+    flusspferd-shell
+    flusspferd
+    ${READLINE_LIBRARIES})
+endif()
 
 if(NOT WIN32)
     install(TARGETS
