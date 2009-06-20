@@ -167,7 +167,6 @@ int flusspferd_repl::run() {
                                  + "' because $HOME is not set");
       }
     }
-    std::cout << "HISTORY FILE: " << history_file << '\n'; // DEBUG
     read_history(history_file.c_str());
   }
 #endif
