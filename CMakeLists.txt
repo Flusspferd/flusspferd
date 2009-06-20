@@ -547,6 +547,10 @@ if(NOT WIN32)
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+
+    install(
+        FILES ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
 endif()
 
 message(STATUS "Configuration SUCCESSFUL. No fatal errors.")
