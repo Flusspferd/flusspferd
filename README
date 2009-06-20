@@ -38,6 +38,7 @@ as you probably are accustomed to. You might have to pass some parameters to
 
   -DBOOST_ROOT=/path/to/boost
   -DSPIDERMONKEY_ROOT=/path/to/spidermonkey
+  -DUSE_READLINE (if you want to use GNU/readline instead of editline)
 
 These parameters are passed directly to cmake, i.e. you can also pass other
 parameters that cmake understands.

@@ -39,6 +39,7 @@ THE SOFTWARE.
  * Recommended, but optional:
  *
  * @li <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell,
+ * @li @b or GNU/readline (attention, GPL!),
  * @li <a href="http://xmlsoft.org/">libxml2</a> 2.6 or higher (for the XML plugin),
  * @li <a href="http://curl.haxx.se">cURL</a> (for the cURL plugin),
  * @li <a href="http://www.sqlite.org">SQLite 3</a> 3.4 or higher (for the SQLite3 plugin).
@@ -75,6 +76,8 @@ $ sudo make install
  * You can use @p -DCMAKE_INSTALL_PREFIX=/opt/local (or with another path in place of
  * @p /opt/local) if you don't want to install Flusspferd in the default path
  * @p /usr/local.
+ *
+ * If you want to use GNU/readline, pass -DUSE_READLINE.
  *
  * If you have installed your dependencies in unusual paths, or your system
  * is unusual in another way, you might need to specify additional options.
