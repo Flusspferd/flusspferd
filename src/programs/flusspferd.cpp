@@ -44,6 +44,10 @@ THE SOFTWARE.
 #define HAVE_EDITLINE
 #endif
 
+#ifndef HISTORY_FILE_DEFAULT
+#define HISTORY_FILE_DEFAULT "~/.flusspferd-history"
+#endif
+
 namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
 
@@ -61,7 +65,7 @@ class flusspferd_repl {
   bool running;
   int exit_code;
 
-  bool no_global_history;
+  std::string history_file;
 
   int argc;
   char ** argv;
@@ -98,7 +102,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     scope(flusspferd::current_context_scope(co)),
     running(false),
     exit_code(0),
-    no_global_history(false),
+    history_file(HISTORY_FILE_DEFAULT),
     argc(argc),
     argv(argv)
 {
@@ -152,13 +156,19 @@ int flusspferd_repl::run() {
     return exit_code;
 
 #ifdef HAVE_EDITLINE
-  std::string history_file;
-  if (!machine_mode && !no_global_history) {
-    char const * const HOME = std::getenv("HOME"); 
-    if (HOME && *HOME) {
-      history_file = std::string(HOME) + "/.flusspferd_history";
-      read_history(history_file.c_str());
+  if (!machine_mode && !history_file.empty()) {
+    if(history_file.size() > 1 && history_file[0] == '~') {
+      char const *const HOME = std::getenv("HOME"); 
+      if (HOME && *HOME) {
+        history_file = std::string(HOME) + history_file.substr(1);
+      }
+      else {
+        throw std::runtime_error("Couldn't open history file `" + history_file
+                                 + "' because $HOME is not set");
+      }
     }
+    std::cout << "HISTORY FILE: " << history_file << '\n'; // DEBUG
+    read_history(history_file.c_str());
   }
 #endif
 
@@ -200,7 +210,7 @@ int flusspferd_repl::run() {
   }
 
 #ifdef HAVE_EDITLINE
-  if (!machine_mode && !no_global_history && !history_file.empty())
+  if (!machine_mode && !history_file.empty())
     write_history(history_file.c_str());
 #endif
 
@@ -235,7 +245,9 @@ void print_help(char const *argv0) {
 "\n"
 "    -M <module>\n            Load module."
 "\n"
-"    --no-global-history\n    Do not load a global history in interactive mode\n"
+"    --no-global-history\n    Do not use a global history in interactive mode\n"
+"\n"
+"    --history-file <file>\n  Sets history file (default: ~/.flusspferd-history)\n"
 "\n"
 "    --                       Stop processing options.\n\n";
 }
@@ -370,7 +382,19 @@ flusspferd_repl::parse_cmdline() {
       }
       else if (std::strcmp(argv[i], "--no-global-history") == 0)
       {
-        no_global_history = true;
+        history_file.clear();
+      }
+      else if (std::strcmp(argv[i], "--history-file") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected expression after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        history_file = argv[i];
       }
       else
       {
