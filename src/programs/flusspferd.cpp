@@ -29,8 +29,9 @@ THE SOFTWARE.
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include <string>
 #include <cstdlib>
+#include <cctype>
+#include <string>
 #include <list>
 
 #ifdef HAVE_EDITLINE
@@ -438,6 +439,19 @@ flusspferd_repl::parse_cmdline() {
   return files;
 }
 
+namespace {
+  bool all_whitespace_p(char const *in) {
+    assert(in);
+    while(*in) {
+      if(!std::isspace(*in)) {
+        return false;
+      }
+      ++in;
+    }
+    return true;
+  }
+}
+
 bool flusspferd_repl::getline(std::string &source, const char* prompt) {
   if (machine_mode) {
     return std::getline(in, source, '\0');
@@ -450,7 +464,7 @@ bool flusspferd_repl::getline(std::string &source, const char* prompt) {
       std::cout << std::endl;
       return false;
     }
-    if (linep[0] != '\0')
+    if (linep[0] != '\0' && !all_whitespace_p(linep))
         add_history(linep);
     source = linep;
     source += '\n';
