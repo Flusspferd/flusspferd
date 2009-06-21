@@ -1,11 +1,10 @@
-// vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
+// -*- mode: js2; -*- vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
 /**
  * @namespace gmp - GNU Multiple Precision Arithmetic Library
  * @name gmp
  *
- * @see gmp.Integer
- * @see gmp.Rational
- * @see gmp.Float
+ * @class
+ * Bignum Arithmetic
  *
  * == Example: ==
  * {{{
@@ -13,6 +12,11 @@
  * f = GMP.Float(2);
  * require('io').stdout.print(f.sqrt());
  * }}}
+ *
+ * @see gmp.Integer
+ * @see gmp.Rational
+ * @see gmp.Float
+ *
  */
 
 // gmp.Integer {{{
