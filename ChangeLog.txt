@@ -5,16 +5,10 @@ Release 0.7
 -----------
 
 2009-06-20:
-- Fixed memory leak when libedit/readline was used in the shell
-- Lines containing only spaces are not added to the history anymore
-- Added --no-global-history command line switch for deactivating the permanent
-  history
-- Added --history-file command line switch for setting the history file
-- Fixed gmp.Float.toString() to do what is expected and changed
-  gmp.Float.get_string() to return the exponent
 - Added optional GNU/readline support (useful due to bugs in libedit).
-  But be careful GNU/readline is GPL licensed and linking it with
-  flusspferd reduces flusspferd to a GPL license!
+- Added --no-global-history command line switch for deactivating the permanent
+  history.
+- Added --history-file command line switch for setting the history file.
 
 2009-06-19:
 - Add -I command line switch for specifying module paths.
