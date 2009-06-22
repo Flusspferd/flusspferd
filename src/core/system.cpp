@@ -24,27 +24,30 @@ THE SOFTWARE.
 #include "flusspferd/system.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/io/stream.hpp"
+#include <iostream>
+#include <ostream>
 
 using namespace flusspferd;
 
 void flusspferd::load_system_module(object &context) {
   object exports = context.get_property_object("exports");
 
-  object IO = context.call("require", "io").to_object();
-
-  exports.define_property(
-    "stdin",
-    IO.get_property("stdin"),
-    read_only_property | permanent_property);
+  context.call("require", "io");
 
   exports.define_property(
     "stdout",
-    IO.get_property("stdout"),
+    create_native_object<io::stream>(object(), std::cout.rdbuf()),
     read_only_property | permanent_property);
 
   exports.define_property(
     "stderr",
-    IO.get_property("stderr"),
+    create_native_object<io::stream>(object(), std::cerr.rdbuf()),
+    read_only_property | permanent_property);
+
+  exports.define_property(
+    "stdin",
+    create_native_object<io::stream>(object(), std::cin.rdbuf()),
     read_only_property | permanent_property);
 
   try {

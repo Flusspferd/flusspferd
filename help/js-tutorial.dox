@@ -89,18 +89,18 @@ $ flusspferd source.js
  * @verbatim
 > print("OK: ", [1,2,3,4])
 OK: 1 2 3 4
-> require("io").stdout.print("Same.")
+> require("system").stdout.print("Same.")
 Same.
 @endverbatim
  *
  * In fact, @c print is a short form for the latter syntax. However, the print
  * abbreviation is not available in modules. To spare you the hassle of typing
- * require("io").stdout.print everytime, you can assign the module to a
+ * require("system").stdout.print everytime, you can assign the module to a
  * variable.
  *
  * @verbatim
-const IO = require("io");
-IO.stdout.print("Works!");
+const sys = require("system");
+sys.stdout.print("Works!");
 @endverbatim
  *
  * The other global function that is exposed as part of @c prelude.js is
@@ -114,16 +114,16 @@ bcd
  *
  * (Where @c abcd is input.)
  *
- * Again, @c readLine is just an alias for @c require("io").stdin.readLine.
+ * Again, @c readLine is just an alias for @c require("system").stdin.readLine.
  *
- * The @c io module exposes three streams by default:
+ * The @c system module exposes three streams by default:
  *
  * - @c stdin
  * - @c stdout
  * - @c stderr
  *
- * There are many more things that you can do with this module, see
- * <a href="js/IO">the documentation for <code>io</code></a>.
+ * There are many more things that you can do with this and the 'io' module,
+ * see <a href="js/IO">the documentation for <code>io</code></a>.
  *
  * Next: \ref js-tutorial-xml
  *

@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.7
 -----------
 
+2009-06-22:
+- IO.stdin/stdout/stderr removed in favor of those in the 'system' module
+
 2009-06-20:
 - Added optional GNU/readline support (useful due to bugs in libedit).
 - Added --no-global-history command line switch for deactivating the permanent
