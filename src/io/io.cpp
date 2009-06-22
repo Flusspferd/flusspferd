@@ -27,7 +27,6 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/class.hpp"
 #include "flusspferd/modules.hpp"
-#include <iostream>
 
 using namespace flusspferd;
 using namespace flusspferd::io;
@@ -42,18 +41,6 @@ object flusspferd::io::load_io_module(object container) {
   load_class<stream>(IO);
   load_class<file>(IO);
   load_class<binary_stream>(IO);
-
-  IO.define_property(
-    "stdout",
-    create_native_object<stream>(object(), std::cout.rdbuf()));
-
-  IO.define_property(
-    "stderr",
-    create_native_object<stream>(object(), std::cerr.rdbuf()));
-
-  IO.define_property(
-    "stdin",
-    create_native_object<stream>(object(), std::cin.rdbuf()));
 
   return IO;
 }

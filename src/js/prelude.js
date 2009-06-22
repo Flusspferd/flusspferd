@@ -26,9 +26,10 @@ THE SOFTWARE.
 require('util');
 
 var IO = require('io');
+var sys = require('system');
 
-this.print = Function.bind(IO.stdout, 'print');
-this.readLine = Function.bind(IO.stdin, 'readLine');
+this.print = Function.bind(sys.stdout, 'print');
+this.readLine = Function.bind(sys.stdin, 'readLine');
 
 })();
 
