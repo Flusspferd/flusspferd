@@ -414,7 +414,7 @@ flusspferd_repl::parse_cmdline() {
       .call("require", "system").to_object()
       .get_property_object("args");
 
-  args.set_element(0, flusspferd::value(""));
+  args.set_element(0, flusspferd::value("-"));
 
   if (i < argc) {
     // some cmd line args left.
