@@ -406,6 +406,9 @@ flusspferd_repl::parse_cmdline() {
       break; // Not an option, stop looking for one
   }
 
+  if (!config_loaded)
+    load_config();
+
   flusspferd::array args =
     flusspferd::global()
       .call("require", "system").to_object()
