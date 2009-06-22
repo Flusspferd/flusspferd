@@ -35,25 +35,28 @@ void flusspferd::load_system_module(object &context) {
   exports.define_property(
     "stdin",
     IO.get_property("stdin"),
-    read_only_property);
+    read_only_property | permanent_property);
 
   exports.define_property(
     "stdout",
     IO.get_property("stdout"),
-    read_only_property);
+    read_only_property | permanent_property);
 
   exports.define_property(
     "stderr",
     IO.get_property("stderr"),
-    read_only_property);
+    read_only_property | permanent_property);
 
   try {
     exports.define_property(
       "env",
       context.call("require", "environment"),
-      read_only_property);
-  } catch (exception&) {
+      read_only_property | permanent_property);
+  } catch (exception &) {
   }
 
-  exports.define_property("args", create_array(), read_only_property);
+  exports.define_property(
+    "args",
+    create_array(),
+    read_only_property | permanent_property);
 }
