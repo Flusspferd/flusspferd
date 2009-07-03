@@ -551,6 +551,10 @@ if(NOT WIN32)
     install(
         FILES ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
         DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
+
+    install(
+        FILES ${Flusspferd_SOURCE_DIR}/misc/emacs/flusspferd.el
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/emacs/site-lisp)
 endif()
 
 message(STATUS "Configuration SUCCESSFUL. No fatal errors.")
