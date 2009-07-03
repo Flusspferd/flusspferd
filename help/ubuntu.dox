@@ -22,42 +22,28 @@ THE SOFTWARE.
 */
 
 /**
- * @page ubuntu How to install Flusspferd on Ubuntu 8.10
+ * @page ubuntu How to install Flusspferd on Ubuntu 9.04
  *
- * This document describes how to build Flusspferd on Ubuntu 8.10. But of course
- * most of this can be used on older Ubuntu versions or other Linux
- * distributions (especially Debian and other Debian clones).
+ * This document describes how to build Flusspferd on Ubuntu 9.04. For older
+ * versions, you might need to compile some prerequisites yourself.
  *
  * @section precond Preconditions
  *
- * First of all we need to install the build tools and git (git only if you
- * wish to use an unreleased version of flusspferd).
+ * First of all we need to install the build tools, Boost 1.37 and Git
+ * (optionally).
  *
  * @verbatim
 $ sudo apt-get install build-essential cmake
-$ sudo apt-get install git-core
+$ sudo apt-get install libboost1.37-dev libboost-system1.37-dev libboost-thread1.37.0 libboost-filesystem1.37-dev
+$ sudo apt-get install libboost-test1.37-dev # optional
+$ sudo apt-get install git-core # optional
 @endverbatim
+ *
  * It's not necessary but to get a more comfortable REPL/Shell it's highly
  * recommended to install libedit
+ *
  * @verbatim
 $ sudo apt-get install libedit-dev
-@endverbatim
- *
- * @section boost Building Boost
- * Unfortunately the <a href="http://www.boost.org/">Boost</a> packages that
- * come with Ubuntu are outdated and Flusspferd won't work with them. So we
- * need to compile our own version of Boost.
- *
- * Note: In Ubuntu 9.04 (Jaunty) there are <a href="http://packages.ubuntu.com/search?keywords=boost+1.37&searchon=names&suite=jaunty&section=all">Boost 1.37</a> packages which should work!
- *
- * @verbatim
-$ wget http://downloads.sourceforge.net/boost/boost_1_38_0.tar.bz2
-$ tar xjf boost_1_38_0.tar.bz2
-$ cd boost_1_38_0/
-$ ./configure
-$ make
-$ sudo make install
-$ cd ..
 @endverbatim
  *
  * @section spidermonkey Building Spidermonkey
@@ -65,12 +51,13 @@ $ cd ..
  * won't work with them. This might not be the fault of the Ubuntu maintainers
  * since building Spidermonkey is a bit messy due to the lack of a proper build
  * system. The situation is improving with Spidermonkey 1.8.1 but since 1.8.1 is
- * not finally released at the time and due to major changes (Tracemonkey) is
- * not that stable at the moment we will stick with Spidermonkey 1.8rc1 (which
- * isn't as similar to 1.8.1 as you might think). If you really need speed or
- * want the newest stuff just checkout Spidermonkey 1.8.1.
+ * not finally released at the time and because, due to major changes
+ * (Tracemonkey), it is not that stable at the moment we will stick with
+ * Spidermonkey 1.8rc1 (which isn't as similar to 1.8.1 as you might think).
+ * If you really need speed or want the newest stuff, just check out
+ * Spidermonkey 1.8.1.
  *
- * Flusspferd should work with it.
+ * Flusspferd should work with all versions of Spidermonkey from 1.7 upwards.
  *
  * @verbatim
 $ wget http://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz
@@ -91,30 +78,42 @@ $ cd ../..
  * Since Spidermonkey doesn't come with an install target we have to copy
  * the files per hand. If for some reason you want to remove spidermonkey
  * from your system again (note that Flusspferd depends on Spidermonkey during
- * the runtime), you have to remove it per hand, too.
+ * the runtime), you have to remove it by hand, too.
  *
  * @verbatim
 $ sudo rm -rf /usr/local/include/js/ /usr/local/lib/libjs.*
 @endverbatim
  *
  * @section flusspferd Building Flusspferd
- * Finally we come to Flusspferd.
+ *
+ * If you have downloaded a <a href="https://sourceforge.net/projects/flusspferd/files/">
+ * release file</a>, you should unpack it. Alternatively, you can use git:
+ *
  * @verbatim
 $ git clone git://github.com/ruediger/flusspferd.git
 $ cd flusspferd/
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+@endverbatim
+ *
+ * Now we can build and install Flusspferd.
+ *
+ * @note Please note that plugins are by default automatically detected and you
+ *       need to install @em all their dependencies @em first.
+ *
+@verbatim
 $ ./configure -DENABLE_TESTS=OFF
 $ make
 $ sudo make install
 @endverbatim
  *
- * Note that you can pass -DUSE_READLINE=ON if you want Flusspferd to use
- * GNU/readline, which we don't use by default because it has a GPL
+ * You can pass -DUSE_READLINE=ON to ./configure if you want Flusspferd
+ * to use GNU/readline, which we don't use by default because it has a GPL
  * license.
  *
  * @subsection sqlite Building Flusspferd with SQLite support
+ *
  * Support for SQLite is autodetected during configuration. To compile with
  * SQLite support you have to install the SQLite 3's dev-files
+ *
  * @verbatim
 $ sudo apt-get install libsqlite3-dev
 @endverbatim
