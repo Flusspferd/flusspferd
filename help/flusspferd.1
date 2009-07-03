@@ -1,36 +1,36 @@
-.TH FLUSSPFERD 1 "June 2009"
+.TH FLUSSPFERD 1 "July 2009"
 .SH NAME
 flusspferd \- interactive Javascript shell/repl
 .SH SYNOPSIS
-.B flusspferd [option] ... [
-.I file
-.B |-] [arg] ...
+.B flusspferd [\fIoption\fR] ... [\fIfile\fR|-] [\fIarg\fR] ...
 .SH DESCRIPTION
+.PP
 flusspferd is an interactive Javascript shell/repl based on the Flusspferd
 Javascript library. It can be used to run and test Javascript code.
 .SH OPTIONS
-.IP -h
+.IP \fB-h\fR
 Displays a help message
-.IP "-c config-file"
-Loads config from file
-.I config-file
-.IP -i
+.IP "\fB-c\fR \fIconfig-file\fR"
+Loads config from file \fIconfig-file\fR
+.IP \fB-i\fR
 Enter interactive mode (after files)
-.IP -0
+.IP \fB-0\fR
 Machine command mode (separator '\\0')
-.IO "-e expression"
+.IO "\fB-e\fR \fIexpression\fR"
 Evaluate expression
-.IP "-f file"
+.IP "\fB-f\fR \fIfile\fR"
 run this file before standard script handling
-.IP "-I path"
+.IP "\fB-I\fR \fIpath\fR"
 Add include path
-.IP "-M module"
+.IP "\fB-M\fR \fImodule\fR"
 Load module
-.IP --no-global-history
+.IP \fB--no-global-history\fR
 Do not use a global history in interactive mode
-.IP "--history-file file"
+.IP "\fB--history-file\fR \fIfile\fR"
 Sets history file (default: ~/.flusspferd-history)
-.IP --
+.IP \fB--\fR
 stop processing options
+.SH SEE ALSO
+For more information see our homepage at \fIhttp://www.flusspferd.org\fR
 .SH AUTHOR
 Flusspferd Team <team -AT- flusspferd -DOT- org>
