@@ -34,7 +34,7 @@ THE SOFTWARE.
  *
  * @verbatim
 $ sudo apt-get install build-essential cmake
-$ sudo apt-get install libboost1.37-dev libboost-system1.37-dev libboost-thread1.37.0-dev libboost-filesystem1.37-dev
+$ sudo apt-get install libboost1.37-dev libboost-system1.37-dev libboost-thread1.37-dev libboost-filesystem1.37-dev
 $ sudo apt-get install libboost-test1.37-dev # optional
 $ sudo apt-get install git-core # optional
 @endverbatim
