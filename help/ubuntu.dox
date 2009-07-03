@@ -35,15 +35,25 @@ THE SOFTWARE.
  * @verbatim
 $ sudo apt-get install build-essential cmake
 $ sudo apt-get install libboost1.37-dev libboost-system1.37-dev libboost-thread1.37-dev libboost-filesystem1.37-dev
-$ sudo apt-get install libboost-test1.37-dev # optional
-$ sudo apt-get install git-core # optional
 @endverbatim
  *
  * It's not necessary but to get a more comfortable REPL/Shell it's highly
  * recommended to install libedit
  *
  * @verbatim
-$ sudo apt-get install libedit-dev
+$ sudo apt-get install libedit-dev   # optional but recommended
+@endverbatim
+ *
+ * If you want to run Flusspferd's unit test system you also need the
+ * Boost.Test Library and to messure test coverage you need lcov
+ * @verbatim
+$ sudo apt-get install libboost-test1.37-dev lcov   # optional
+@endverbatim
+ *
+ * If you want to use the most current (but probably unstable) version of
+ * Flusspferd you also need the git version control system
+ * @verbatim
+$ sudo apt-get install git-core   # optional
 @endverbatim
  *
  * @section spidermonkey Building Spidermonkey
@@ -77,7 +87,10 @@ $ cd ../..
  * @section flusspferd Building Flusspferd
  *
  * If you have downloaded a <a href="https://sourceforge.net/projects/flusspferd/files/">
- * release file</a>, you should unpack it. Alternatively, you can use git:
+ * release file</a>, you should unpack it.
+ *
+ * Alternatively, you can use git to check out the newest (but probably
+ * unstable) version of flusspferd:
  *
  * @verbatim
 $ git clone git://github.com/ruediger/flusspferd.git
@@ -89,7 +102,7 @@ $ cd flusspferd/
  * @note Please note that plugins are by default automatically detected and you
  *       need to install @em all their dependencies @em first.
  *
-@verbatim
+ * @verbatim
 $ ./configure -DENABLE_TESTS=OFF
 $ make
 $ sudo make install
@@ -98,6 +111,15 @@ $ sudo make install
  * You can pass -DUSE_READLINE=ON to ./configure if you want Flusspferd
  * to use GNU/readline, which we don't use by default because it has a GPL
  * license.
+ *
+ * If you want to run the global version of Flusspferd you will also have to
+ * tell the system where to find the library
+ *
+ * @verbatim
+$ echo /usr/local/lib > local.conf
+$ sudo mv local.conf /etc/ld.so.conf.d/
+$ sudo ldconfig
+@endverbatim
  *
  * @subsection sqlite Building Flusspferd with SQLite support
  *
@@ -123,5 +145,12 @@ $ sudo apt-get install libcurl4-gnutls-dev
  * or
  * @verbatim
 $ sudo apt-get install libcurl4-openssl-dev
+@endverbatim
+ *
+ * @subsection gmp Building Flusspferd with GMP support
+ * Support for GMP is enabled during configuration time when GMP's and GMPXX's
+ * dev-files are found. You can install them with
+ * @verbatim
+$ sudo apt-get install libgmp3-dev
 @endverbatim
  */
