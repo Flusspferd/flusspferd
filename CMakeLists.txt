@@ -554,7 +554,7 @@ if(NOT WIN32)
       DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
       COMMENT "Compressing manpage")
     add_custom_target(
-      MANPAGE ALL 
+      MANPAGE 
       DEPENDS flusspferd.1.gz)
 
     install(
@@ -570,7 +570,7 @@ if(NOT WIN32)
         DEPENDS ${Flusspferd_SOURCE_DIR}/misc/emacs/flusspferd.el
         COMMENT "Byte compiling Emacs code")
       add_custom_target(
-        EMACS_MODE ALL
+        EMACS_MODE
         DEPENDS flusspferd.elc)
       install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.elc
