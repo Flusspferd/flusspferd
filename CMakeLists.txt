@@ -548,8 +548,17 @@ if(NOT WIN32)
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
+    add_custom_command(
+      OUTPUT flusspferd.1.gz
+      COMMAND gzip -9 -c ${Flusspferd_SOURCE_DIR}/help/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
+      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
+      COMMENT "Compressing manpage")
+    add_custom_target(
+      MANPAGE ALL 
+      DEPENDS flusspferd.1.gz)
+
     install(
-        FILES ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
+        FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
         DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
 
     install(
