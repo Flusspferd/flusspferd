@@ -562,7 +562,8 @@ if(NOT WIN32)
         DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
 
     find_program(EMACS NAMES emacs)
-    if(NOT EMACS-NOTFOUND)
+    if(NOT EMACS STREQUAL "EMACS-NOTFOUND")
+      message(STATUS "WILL install Emacs mode")
       add_custom_command(
         OUTPUT flusspferd.elc
         COMMAND emacs -batch -q -f batch-byte-compile ${Flusspferd_SOURCE_DIR}/misc/emacs/flusspferd.el
