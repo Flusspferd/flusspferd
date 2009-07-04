@@ -5,10 +5,10 @@ Release 0.7
 -----------
 
 2009-07-04:
-- Emacs mode is installed (again) and byte compiled if emacs is found
+- Emacs mode is installed (again) and byte compiled if emacs is found.
 
 2009-06-22:
-- IO.stdin/stdout/stderr removed in favor of those in the 'system' module
+- IO.stdin/stdout/stderr removed in favor of the same in the 'system' module.
 
 2009-06-20:
 - Added optional GNU/readline support (useful due to bugs in libedit).
