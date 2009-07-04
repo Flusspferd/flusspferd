@@ -146,7 +146,24 @@ option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 option(PLUGIN_XML "Build XML plugin" ON)
-option(USE_READLINE "Build with GNU/readline instead of libedit" OFF)
+set(
+    LINE_EDITOR
+    "libedit"
+    CACHE
+    STRING
+    "Select the line editor (none, libedit, readline)"
+)
+option(
+    FORCE_LINE_EDITOR
+    "Fail configuration if the specified line editor is not available"
+    OFF)
+
+if(
+  (NOT (${LINE_EDITOR} STREQUAL "none")) AND
+  (NOT (${LINE_EDITOR} STREQUAL "libedit")) AND
+  (NOT (${LINE_EDITOR} STREQUAL "readline")))
+    message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
+endif()
 
 ## POSIX ####################################################################
 
@@ -222,18 +239,22 @@ add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
 ## libedit ##################################################################
 
-if(NOT USE_READLINE)
+if(LINE_EDITOR STREQUAL "libedit")
   find_package(Libedit)
 
   if(LIBEDIT_FOUND)
     add_definitions(-DHAVE_EDITLINE)
     include_directories(${LIBEDIT_INCLUDE_DIR})
   endif()
+
+  if(FORCE_LINE_EDITOR AND NOT LIBEDIT_FOUND)
+        message(SEND_ERROR "libedit required but it was not found")
+  endif()
 endif()
 
 ## GNU/readline #############################################################
 
-if(USE_READLINE)
+if(LINE_EDITOR STREQUAL "readline")
   message("WARNING: GNU/readline is GPL licensed.")
 
   find_package(Readline)
@@ -241,6 +262,10 @@ if(USE_READLINE)
   if(READLINE_FOUND)
     add_definitions(-DHAVE_READLINE)
     include_directories(${READLINE_INCLUDE_DIR})
+  endif()
+
+  if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
+        message(SEND_ERROR "readline required but it was not found")
   endif()
 endif()
 
