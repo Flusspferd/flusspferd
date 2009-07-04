@@ -421,12 +421,10 @@ flusspferd_repl::parse_cmdline() {
     // first one is file
     // others go into arguments array
     std::string file = argv[i++];
-    if (file == "-") {
-      // TODO: Maybe check if stdin is actualy connected to a terminal?
-      interactive = true;
-    }
-    else {
+    if (file != "-") { // TODO: Maybe check if stdin is actualy connected to a terminal?
       files.push_back(std::make_pair(file, File));
+      if (!interactive_set)
+        interactive = false;
     }
 
     args.set_element(0, flusspferd::value(file));
