@@ -158,10 +158,13 @@ option(
     "Fail configuration if the specified line editor is not available"
     OFF)
 
-if(
-  (NOT (${LINE_EDITOR} STREQUAL "none")) AND
-  (NOT (${LINE_EDITOR} STREQUAL "libedit")) AND
-  (NOT (${LINE_EDITOR} STREQUAL "readline")))
+if(LINE_EDITOR STREQUAL "none")
+    # OK
+elseif(LINE_EDITOR STREQUAL "libedit")
+    # OK
+elseif(LINE_EDITOR STREQUAL "readline")
+    # OK
+else()
     message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
 endif()
 
@@ -393,7 +396,7 @@ set_property(
     PROPERTY OUTPUT_NAME
     flusspferd)
 
-if(NOT (${LINE_EDITOR} STREQUAL "readline"))
+if(NOT LINE_EDITOR STREQUAL "readline")
   target_link_libraries(
     flusspferd-shell
     flusspferd
