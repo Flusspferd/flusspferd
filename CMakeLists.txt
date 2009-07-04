@@ -157,6 +157,7 @@ option(
     FORCE_LINE_EDITOR
     "Fail configuration if the specified line editor is not available"
     OFF)
+option(CREATE_DOCUMENTATION "Create Documentation for Flusspferd" OFF)
 
 if(NOT LINE_EDITOR STREQUAL "none" AND
    NOT LINE_EDITOR STREQUAL "libedit" AND
@@ -543,6 +544,20 @@ if(NOT WIN32)
     install(
         FILES src/js/prelude.js
         DESTINATION ${INSTALL_LIBDATA_PATH})
+endif()
+
+## Documentation ############################################################
+
+if(NOT WIN32)
+  if(CREATE_DOCUMENTATION)
+    message(STATUS "WILL create and install documentation")
+    add_custom_target(DOCS ALL
+      COMMAND ${Flusspferd_SOURCE_DIR}/util/docs.sh
+      WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR})
+    install(
+      DIRECTORY ${Flusspferd_BINARY_DIR}/html/
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/flusspferd/)
+  endif()
 endif()
 
 ## Configured files##########################################################
