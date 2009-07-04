@@ -158,14 +158,10 @@ option(
     "Fail configuration if the specified line editor is not available"
     OFF)
 
-if(LINE_EDITOR STREQUAL "none")
-    # OK
-elseif(LINE_EDITOR STREQUAL "libedit")
-    # OK
-elseif(LINE_EDITOR STREQUAL "readline")
-    # OK
-else()
-    message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
+if(NOT LINE_EDITOR STREQUAL "none" AND
+   NOT LINE_EDITOR STREQUAL "libedit" AND
+   NOT LINE_EDITOR STREQUAL "readline")
+ message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
 endif()
 
 ## POSIX ####################################################################
