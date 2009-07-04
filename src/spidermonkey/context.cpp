@@ -166,11 +166,25 @@ bool context::is_valid() const {
 }
 
 object context::global() {
-  return Impl::wrap_object(JS_GetGlobalObject(p->context));
+  JSObject *o = JS_GetGlobalObject(p->context);
+  if (!o) {
+    throw exception("No global object");
+  }
+  return Impl::wrap_object(o);
 }
 
 object context::scope_chain() {
-  return Impl::wrap_object(JS_GetScopeChain(p->context));
+  JSObject *o = JS_GetScopeChain(p->context);
+  if (!o) {
+    // Weird! In Spidermonkey 1.7, sometimes it seems like JS_GetScopeChain
+    // returns NULL without setting an error.
+    // In that case, we simply return the global object. It caused a problem.
+    if (JS_IsExceptionPending(p->context))
+      throw exception("No scope chain");
+    else
+      return this->global();
+  }
+  return Impl::wrap_object(o);
 }
 
 void context::add_prototype(std::string const &name, object const &proto) {
