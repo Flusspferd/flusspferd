@@ -393,7 +393,7 @@ set_property(
     PROPERTY OUTPUT_NAME
     flusspferd)
 
-if(NOT USE_READLINE)
+if(NOT (${LINE_EDITOR} STREQUAL "readline"))
   target_link_libraries(
     flusspferd-shell
     flusspferd
