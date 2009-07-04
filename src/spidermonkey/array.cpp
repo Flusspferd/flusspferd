@@ -39,6 +39,8 @@ array &array::operator=(object const &o) {
 }
 
 void array::check() {
+  if (is_null())
+    throw exception("Object is null");
   if (!JS_IsArrayObject(Impl::current_context(), get()))
     throw exception("Object is not array");
 }
