@@ -36,9 +36,6 @@ THE SOFTWARE.
 
 #ifdef HAVE_EDITLINE
 #include <editline/readline.h>
-#ifdef HAVE_EDITLINE_HISTORY_H
-#include <editline/history.h>
-#endif
 #elif HAVE_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
