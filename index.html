@@ -49,10 +49,10 @@ function init() {
 
 	var headings = dojo.query("h1,h2");
 
-	make_headings(["h1", "h2"], ul, headings, 0, headings.length);
+	make_headings(["h1", "h2", "h3", "h4"], ul, headings, 0, headings.length, "");
 }
 
-function make_headings(types, ul, headings, start, end) {
+function make_headings(types, ul, headings, start, end, old_prefix) {
 	var type = types.shift();
 
 	var idx = [];
@@ -66,11 +66,19 @@ function make_headings(types, ul, headings, start, end) {
 	idx.push(end);
 
 	for (var i = 0; i < idx.length - 1; ++i) {
-		var li = dojo.create("li", {"innerHTML": headings[idx[i]].innerHTML}, ul);
+		var heading = headings[idx[i]];
+
+		var prefix = old_prefix + (type == "h1" ? "" : ((i + 1) + "."));
+
+		var num = document.createTextNode(prefix.length > 0 ? prefix + " " : "");
+
+		dojo.place(num, heading, "first");
+
+		var li = dojo.create("li", {"innerHTML": heading.innerHTML}, ul);
 
 		if (idx[i+1] - idx[i] > 1) {
 			var ul2 = dojo.create("ul", {}, li);
-			make_headings(types, ul2, headings, idx[i] + 1, idx[i+1]);
+			make_headings(types, ul2, headings, idx[i] + 1, idx[i+1], prefix);
 		}
 	}
 }
