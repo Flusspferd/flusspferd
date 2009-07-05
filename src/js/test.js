@@ -22,6 +22,7 @@ THE SOFTWARE.
 */
 
 let {equiv:equiv} = require('./test/equiv');
+let Util = require('util');
 
 function merge(ctor, obj) {
   for (let [k,v] in Iterator(obj))
@@ -30,7 +31,7 @@ function merge(ctor, obj) {
 
 const TAPProducer = function TAPProducer() {
   // TODO: ServerJS compliance
-  this.outputStream = IO.stdout;
+  this.outputStream = require('system').stdout;
 
   var depth;
   Object.defineProperty(this, "paddDepth", {
