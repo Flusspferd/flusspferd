@@ -25,7 +25,6 @@ THE SOFTWARE.
 
 require('util');
 
-var IO = require('io');
 var sys = require('system');
 
 this.print = Function.bind(sys.stdout, 'print');
