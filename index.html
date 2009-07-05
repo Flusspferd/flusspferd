@@ -47,7 +47,7 @@ function init() {
 	toc.innerHTML = "<ul></ul>";
 	var ul = dojo.query("ul", toc)[0];
 
-	var headings = dojo.query("h1,h2");
+	var headings = dojo.query(".heading");
 
 	make_headings(["h1", "h2", "h3", "h4"], ul, headings, 0, headings.length, "");
 }
@@ -92,7 +92,7 @@ dojo.addOnLoad(init);
 
 <div id="page">
  <div id="header">
-  <h1><a class="inthead" href="#">Flusspferd</a></h1>
+  <h1 class="heading"><a class="inthead" href="#">Flusspferd</a></h1>
   <p style="font-size: 110%;">Javascript bindings for C++</p>
  </div>
 
@@ -114,24 +114,24 @@ dojo.addOnLoad(init);
       this animal naming tradition: Spidermonkey, <a href="http://www.mozilla.org/rhino/">Rhino</a>, <a href="http://en.wikipedia.org/wiki/Squirrelfish">Squirrelfish</a> and now
       Flusspferd.</p>
 
-   <h2 id="toc"><a class="inthead" href="#toc">Table of contents</a></h2>
+   <h2 id="toc" class="heading"><a class="inthead" href="#toc">Table of contents</a></h2>
    <div class="subcontent" id="toc-div">
    <span class="error">The table of contents can only be displayed when Javascript is enabled.</span>
    </div>
 
-   <h2 id="releases"><a class="inthead" href="#releases">Releases</a></h2>
+   <h2 id="releases" class="heading"><a class="inthead" href="#releases">Releases</a></h2>
 
    <div class="subcontent">
     <p>You can download our releases from <a href="https://sourceforge.net/project/showfiles.php?group_id=255938">Sourceforge</a> or you can retrieve them
        by checking out <span class="tt">v<i>RELEASE</i></span> in our git repository.</p>
 
-    <h3 id="v0.6.1"><a class="inthead" href="#v0.6.1">Minor: 0.6.1 <small>(2009-06-18)</small></a></h3>
+    <h3 id="v0.6.1" class="heading"><a class="inthead" href="#v0.6.1">Minor: 0.6.1 <small>(2009-06-18)</small></a></h3>
 
     <p>Apart from some very minor tweaks, this release mainly brings the ability to manually enable and disable plugins in the build system.</p>
 
     <p><small><a href="http://sourceforge.net/project/showfiles.php?group_id=255938">Download from Sourceforge.</a></small></p>
 
-    <h3 id="v0.6"><a class="inthead" href="#v0.6">Major: 0.6 <small>(2009-06-08)</small></a></h3>
+    <h3 id="v0.6" class="heading"><a class="inthead" href="#v0.6">Major: 0.6 <small>(2009-06-08)</small></a></h3>
 
     <p>Major features:</p>
 
@@ -149,7 +149,7 @@ dojo.addOnLoad(init);
 
     <p><small><a href="http://sourceforge.net/project/showfiles.php?group_id=255938">Download from Sourceforge.</a></small></p>
  
-    <h3 id="v0.5.1"><a class="inthead" href="#v0.5.1">Bugfix: 0.5.1 <small>(2009-04-28)</small></a></h3>
+    <h3 id="v0.5.1" class="heading"><a class="inthead" href="#v0.5.1">Bugfix: 0.5.1 <small>(2009-04-28)</small></a></h3>
 
     <p>Changes since 0.5:</p>
 
@@ -161,14 +161,14 @@ dojo.addOnLoad(init);
 
     <p><small><a href="http://sourceforge.net/project/showfiles.php?group_id=255938">Download from Sourceforge.</a></small></p>
 
-    <h3 id="v0.5"><a class="inthead" href="#v0.5">Major: 0.5 <small>(2009-04-27)</small></a></h3>
+    <h3 id="v0.5" class="heading"><a class="inthead" href="#v0.5">Major: 0.5 <small>(2009-04-27)</small></a></h3>
 
     <p>0.5 was released on April 27, 2009. It is our first release.</p>
 
     <p><small><a href="http://sourceforge.net/project/showfiles.php?group_id=255938">Download from Sourceforge.</a></small></p>
    </div>
 
-   <h2 id="code"><a class="inthead" href="#code">Code</a></h2>
+   <h2 id="code" class="heading"><a class="inthead" href="#code">Code</a></h2>
    <div class="subcontent">
      <p>The easiest way to get Flusspferd is to get one of our <a href="#releases">releases</a> from Sourceforge. If you want the most recent sources, you
 	can either fetch the code from our git repository:</p>
@@ -191,7 +191,7 @@ dojo.addOnLoad(init);
      </p>
    </div>
 
-   <h2 id="documentation"><a class="inthead" href="#documentation">Documentation</a></h2>
+   <h2 id="documentation" class="heading"><a class="inthead" href="#documentation">Documentation</a></h2>
    <div class="subcontent">
      <p>Flusspferd comes with <a href="http://docs.flusspferd.org/">online documentation</a> which is generated from
         <a href="http://github.com/ruediger/flusspferd/tree/master">the current source</a>:</p>
@@ -202,7 +202,7 @@ dojo.addOnLoad(init);
      </ul>
    </div>
 
-   <h2 id="services"><a class="inthead" href="#services">Services</a></h2>
+   <h2 id="services" class="heading"><a class="inthead" href="#services">Services</a></h2>
    <div class="subcontent">
      <p>You can find Flusspferd on</p>
      <ul>
@@ -214,7 +214,7 @@ dojo.addOnLoad(init);
      </ul>
    </div>
 
-   <h2 id="related"><a class="inthead" href="#related">Related projects</a></h2>
+   <h2 id="related" class="heading"><a class="inthead" href="#related">Related projects</a></h2>
    <div class="subcontent">
     <p>First of all, it should be mentioned that many of Flusspferd's core Javascript classes are based on the <a href="https://wiki.mozilla.org/ServerJS">
        ServerJS standardisation project.</a></p>
@@ -230,13 +230,13 @@ dojo.addOnLoad(init);
     </ul>
    </div>
 
-   <h2 id="bug"><a class="inthead" href="#bug">Reporting Bugs</a></h2>
+   <h2 id="bug" class="heading"><a class="inthead" href="#bug">Reporting Bugs</a></h2>
    <div class="subcontent">
    <p>Please report bugs in Flusspferd on <a href="http://redmine.flusspferd.org/projects/flusspferd/issues">our Redmine tracker</a> or on our
       <a href="http://groups.google.com/group/flusspferd">Google Group</a>.</p>
    </div>
 
-   <h2 id="contact"><a class="inthead" href="#contact">Contact</a></h2>
+   <h2 id="contact" class="heading"><a class="inthead" href="#contact">Contact</a></h2>
    <div class="subcontent">
    <p>We have a discussion group / mailing list on Google Groups.</p>
 
