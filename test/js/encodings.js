@@ -105,7 +105,9 @@ exports.test_katakanaTranscoder_Chunks = function() {
   );
 
   // Rest of the data
-  a = c.push(katakana_shift_jis.slice(2)),
+  c.push(katakana_shift_jis.slice(2), a);
+
+  c.close(a);
 
   asserts.same(
     a.toArray(),
