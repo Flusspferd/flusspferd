@@ -50,6 +50,8 @@ function init() {
 	var headings = dojo.query(".heading");
 
 	make_headings(["h1", "h2", "h3", "h4"], ul, headings, 0, headings.length, "");
+
+	dojo.query("a", ul).removeClass("inthead");
 }
 
 function make_headings(types, ul, headings, start, end, old_prefix) {
