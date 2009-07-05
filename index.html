@@ -34,14 +34,59 @@ a.inthead { color: black; }
 a.inthead:hover { text-decoration: none; color: black; background: #EAEDF4; }
 h3 a.inthead:hover { color: black; background: #FFFFFF; }
 img { border: none; }
+.error { color: #CC2222; font-weight: bold }
 </style>
+
+<script type="text/javascript"
+    src="http://ajax.googleapis.com/ajax/libs/dojo/1.3/dojo/dojo.xd.js">
+</script>
+
+<script>
+function init() {
+	var toc = dojo.byId("toc-div");
+	toc.innerHTML = "<ul></ul>";
+	var ul = dojo.query("ul", toc)[0];
+
+	var headings = dojo.query("h1,h2");
+
+	make_headings(["h1", "h2"], ul, headings, 0, headings.length);
+}
+
+function make_headings(types, ul, headings, start, end) {
+	var type = types.shift();
+
+	var idx = [];
+
+	for (var i = start; i < end; ++i) {
+		var x = headings[i];
+		if (x.tagName.toLowerCase() == type)
+			idx.push(i);
+	}
+
+	idx.push(end);
+
+	console.log(idx);
+
+	for (var i = 0; i < idx.length - 1; ++i) {
+		var li = dojo.create("li", {"innerHTML": headings[idx[i]].innerHTML}, ul);
+
+		if (idx[i+1] - idx[i] > 1) {
+			var ul2 = dojo.create("ul", {}, li);
+			make_headings(types, ul2, headings, idx[i] + 1, idx[i+1]);
+		}
+	}
+}
+
+dojo.addOnLoad(init);
+</script>
+
 </head>
 
 <body>
 
 <div id="page">
  <div id="header">
-  <h1>Flusspferd</h1>
+  <h1><a class="inthead" href="#">Flusspferd</a></h1>
   <p style="font-size: 110%;">Javascript bindings for C++</p>
  </div>
 
@@ -62,6 +107,11 @@ img { border: none; }
       The reason we chose this word is that <a href="http://oreilly.com/catalog/9781565925779/index.html">a book on Javascript</a> shows a hippo on its cover, and Javascript has
       this animal naming tradition: Spidermonkey, <a href="http://www.mozilla.org/rhino/">Rhino</a>, <a href="http://en.wikipedia.org/wiki/Squirrelfish">Squirrelfish</a> and now
       Flusspferd.</p>
+
+   <h2 id="toc"><a class="inthead" href="#toc">Table of contents</a></h2>
+   <div class="subcontent" id="toc-div">
+   <span class="error">The table of contents can only be displayed when Javascript is enabled.</span>
+   </div>
 
    <h2 id="releases"><a class="inthead" href="#releases">Releases</a></h2>
 
