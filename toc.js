@@ -1,3 +1,5 @@
+var use_prefix = false;//TODO: decide on this
+
 function init() {
 	var toc = dojo.byId("toc-div");
 	toc.innerHTML = "<ul></ul>";
@@ -30,7 +32,10 @@ function make_headings(types, ul, headings, start, end, old_prefix) {
 	for (var i = 0; i < idx.length - 1; ++i) {
 		var heading = headings[idx[i]];
 
-		var prefix = old_prefix + (type == "h1" ? "" : ((i + 1) + "."));
+		var prefix = old_prefix;
+
+		if (use_prefix)
+			prefix += type == "h1" ? "" : ((i + 1) + ".");
 
 		var num = document.createTextNode(prefix.length > 0 ? prefix + " " : "");
 
