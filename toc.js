@@ -11,6 +11,8 @@ function init() {
 }
 
 function make_headings(types, ul, headings, start, end, old_prefix) {
+	dojo.style(ul, "listStyle", "none");
+
 	var type = types.shift();
 
 	var idx = [];
