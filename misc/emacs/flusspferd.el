@@ -166,6 +166,7 @@
                   (split-string flusspferd-options))))
       (save-excursion
         (set-buffer flusspferd-buffer)
+		(local-set-key "\C-a" 'comint-bol)
         (inferior-flusspferd-mode))))
   (when (interactive-p)
       (switch-to-buffer flusspferd-buffer-name)))
