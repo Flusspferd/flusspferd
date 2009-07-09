@@ -441,8 +441,16 @@ require('somemodule');
 > require('dummy_module')
 Module loaded!
 [object Object]
-> require('dummy_module')
+> mod = require('dummy_module')
 [object Object]
+> mod.doNothingUseful()
+Yup, this is a function that does nothing useful.
+> mod.variable
+true
 @endverbatim
+ *
+ * @see <a href="https://wiki.mozilla.org/ServerJS/Modules/SecurableModules">
+ *      SecurableModules</a>, which is the foundation of Flusspferd's module
+ *      support.
  *
  */
