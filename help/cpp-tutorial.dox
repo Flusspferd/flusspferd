@@ -421,7 +421,7 @@ require('somemodule');
 @endverbatim
  *
  * And you can also write your own modules. Either by simply putting a file
- * named @c <module-name>.js in a directory in <code>$importer.paths</code> -
+ * named @c <module-name>.js in a directory in <code>require.paths</code> -
  * or, more relevant to this tutorial, by compiling a shared object or dynamic
  * library (the name pattern is lib<module-name>.so or lib<module-name>.dylib
  * there).
