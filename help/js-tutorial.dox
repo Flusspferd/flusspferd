@@ -72,14 +72,16 @@ $ flusspferd source.js
  *
  * @verbatim
 #!/usr/bin/env flusspferd
-// C style example of flusspferd printing the command line arguments
-function print_args(argc, argv) {
-  for (var i=0; i<argc; i++) {
-    print(argv[i]);
+function print_args(args) {
+  // args.length is equivalent to argc in c
+  print("There are", args.length, "argument(s)");
+
+  for (var i=0; i<args.length; i++) {
+    print(args[i]);
   }
 }
 var system = require('system');
-print_args(system.args.length, system.args);
+print_args(system.args);
 
 @endverbatim
  *
