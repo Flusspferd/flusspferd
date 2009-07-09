@@ -65,6 +65,24 @@ $ flusspferd source.js
  *
  * For more options, run <code>%flusspferd -h</code>.
  *
+ * @section Command line arguments
+ * Arguments given on the command line after the script name  are available as
+ * a normal JavaScript array on the system module called @c args. For
+ * example:
+ *
+ * @verbatim
+#!/usr/bin/env flusspferd
+// C style example of flusspferd printing the command line arguments
+function print_args(argc, argv) {
+  for (var i=0; i<argc; i++) {
+    print(argv[i]);
+  }
+}
+var system = require('system');
+print_args(system.args.length, system.args);
+
+@endverbatim
+ *
  * @section js-tutorial-emacs Using inferior-flusspferd-mode
  * Flusspferd comes with an
  * <a href="http://www.gnu.org/software/emacs/">Emacs</a> mode.
