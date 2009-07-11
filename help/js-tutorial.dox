@@ -67,7 +67,8 @@ $ flusspferd source.js
  *
  * For more options, run <code>%flusspferd -h</code>.
  *
- * @section Command line arguments
+ * @section cmdarg Command line arguments
+ *
  * Arguments given on the command line after the script name  are available as
  * a normal JavaScript array on the system module called @c args. For
  * example:
