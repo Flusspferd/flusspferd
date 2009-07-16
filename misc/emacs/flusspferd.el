@@ -1,6 +1,6 @@
 ;;; flusspferd.el --- Interactive interface to the Flusspferd REPL
 ;; Copyright (C) 2009
-;;   Rüdiger Sonderfeld, Aristid Breitkreuz
+;;   Rüdiger Sonderfeld, Aristid Breitkreuz, Moritz Ulrich
 ;;
 ;; Author: Rüdiger Sonderfeld <ruediger at c-plusplus dot de>
 ;; Homepage: http://flusspferd.org
