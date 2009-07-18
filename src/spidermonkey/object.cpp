@@ -339,6 +339,18 @@ bool object::is_array() const {
   return JS_IsArrayObject(Impl::current_context(), get_const());
 }
 
+bool object::is_generator() const {
+  if (is_null())
+    return false;
+
+  // There seems to be no way with the SM API to get the standard Generator
+  // JSClass back. SO make a best effort guess
+  JSClass *our_class = JS_GET_CLASS(ctx, get_const());
+
+  return strcmp(our_class->name, "Generator") == 0
+      && get_property("next").is_function();
+}
+
 bool object::get_property_attributes(
     string const &name, property_attributes &attrs)
 {

@@ -91,7 +91,17 @@ public:
    * @return Whether the object is an array.
    */
   bool is_array() const;
-  
+
+  /**
+   * Check if the object is a generator (i.e. return from a function which uses
+   * yield). Due to limitations in the current Spidermonkey API there is a very
+   * small chance this cant return true erroneously, but only if someone has
+   * gone out of their way to make it happen.
+   *
+   * @return Wether the object is a generator.
+   */
+  bool is_generator() const;
+
   /**
    * Seal the object.
    *
