@@ -440,7 +440,7 @@ endif()
 
 ## Plugins #################################################################
 
-set(PLUGINS os environment)
+set(PLUGINS os)
 
 if(FLUSSPFERD_HAVE_POSIX)
     set(PLUGINS ${PLUGINS} posix)

@@ -30,7 +30,41 @@ THE SOFTWARE.
 #include <iostream>
 #include <ostream>
 
+
+#if defined(__APPLE__)
+#  include <crt_externs.h>
+#  define environ (*_NSGetEnviron())
+#elif defined(XP_WIN)
+extern char** _environ;
+#  define environ _environ
+#else
+extern char** environ;
+# endif
+
 using namespace flusspferd;
+
+// The class for sys.env
+FLUSSPFERD_CLASS_DESCRIPTION(
+  environment,
+  (constructor_name, "Environment")
+  (full_name, "system.Environment")
+  (custom_enumerate, true)
+  (methods,
+      ("toString", bind, to_string)
+  )
+)
+{
+public:
+  environment(object const &obj, call_context &);
+
+  string to_string();
+
+protected:
+  boost::any enumerate_start(int &n);
+  value enumerate_next(boost::any &iter);
+  bool property_resolve(value const &id, unsigned access);
+};
+
 
 void flusspferd::load_system_module(object &context) {
   object exports = context.get_property_object("exports");
@@ -52,16 +86,61 @@ void flusspferd::load_system_module(object &context) {
     create_native_object<io::stream>(object(), std::cin.rdbuf()),
     read_only_property | permanent_property);
 
-  try {
-    exports.define_property(
-      "env",
-      context.call("require", "environment"),
-      read_only_property | permanent_property);
-  } catch (exception &) {
-  }
+
+  load_class<environment>(create_object());
+  call_context x;
+
+  exports.define_property(
+    "env",
+    create_native_object<environment>(object(), boost::ref(x)),
+    read_only_property | permanent_property
+  );
 
   exports.define_property(
     "args",
     create_array(),
     read_only_property | permanent_property);
+}
+
+
+environment::environment(object const &obj, call_context &)
+  : base_type(obj)
+{
+}
+
+bool environment::property_resolve(value const &id, unsigned)
+{
+  string name = id.to_string();
+  if (name == "__iterator__")
+    return false;
+
+  char *val = getenv(name.c_str());
+  if (!val) 
+    return false;
+
+  define_property(name, string(val));
+  return true;
+}
+
+boost::any environment::enumerate_start(int &n) {
+  n = 0; // We dont know how many
+  return boost::any(environ);
+}
+
+value environment::enumerate_next(boost::any &iter) {
+  char **env = boost::any_cast<char**>(iter);
+
+  if (*env == 0)
+    return value();
+  
+  char* eq_c = strchr(*env, '=');
+  string s = string(*env, eq_c - *env);
+
+  iter = ++env;
+
+  return s;
+}
+
+string environment::to_string() {
+  return "[object sys.Environment]";
 }
