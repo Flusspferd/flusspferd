@@ -171,6 +171,7 @@ void require(call_context &x) {
 
     object classes_object = flusspferd::global().prototype();
     object ctx = flusspferd::create_object(classes_object);
+    ctx.set_parent(classes_object);
 
     object exports = flusspferd::create_object();
     ctx.define_property(

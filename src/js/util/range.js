@@ -35,10 +35,21 @@ var Util = exports;
  *
  * @class
  */
-Util.Range = function Util$Range(from, to, by) {
-  // TODO: find out why this hack is needed / how to get rid of it
-  var fun = new Function(
-    'from', 'to', 'by',
-    'var i = from; by = by || 1; while (i < to) { yield i; i += by; }');
-  return fun(from, to, by);
+Util.Range = function Range(from,to, by) {
+  var i = from;
+  by = by || 1;
+  var r;
+  function RangeInstance() {
+    while (i < to) {
+      // Store properties too.
+      r[i] = i;
+      yield i;
+      i += by;
+    }
+  };
+  r = new RangeInstance();
+  r.__iterator__ = function() { return r };
+
+  return r;
 }
+
