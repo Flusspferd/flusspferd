@@ -23,7 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-if (!exports.HTTP) exports.HTTP = {};
 
 (function () {
 
@@ -40,10 +39,10 @@ if (!exports.HTTP) exports.HTTP = {};
   var request_headers = "Accept Accept-Charset Accept-Encoding Accept-Language \
           Authorization Expect From Host If-Match If-Modified-Since \
           If-None-Match If-Range If-Unmodified-Since Max-Forwards \
-          Proxy-Authorization  Range Referer TE User-Agent".split(/\s+/);
+          Proxy-Authorization  Range Referer TE User-Agent Cookie".split(/\s+/);
 
   var response_headers = "Accept-Ranges Age ETag Location Proxy-Authenticate \
-          Retry-After Server Vary WWW-Authenticate".split(/\s+/);
+          Retry-After Server Vary WWW-Authenticate Set-Cookie Set-Cookie2".split(/\s+/);
 
   var entity_headers = "Allow Content-Encoding Content-Language Content-Length \
           Content-Location Content-MD5 Content-Range Content-Type Expires \
@@ -159,7 +158,7 @@ if (!exports.HTTP) exports.HTTP = {};
     }
   }
 
-  exports.HTTP.Headers = hdrs; 
+  exports.Headers = hdrs; 
 
 })()
 
