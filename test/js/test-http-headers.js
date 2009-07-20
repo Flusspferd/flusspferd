@@ -23,34 +23,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths.push('src/js');
+const asserts = require('test').asserts,
+      HTTP = require('http/headers');
 
-_t = require('testharness')
-_h = require('http/headers')
+if (!this.exports) this.exports = {};
 
-HTTP = _h.HTTP
-
-t = new _t.TestHarness();
-
-t.test_simple = function() {
-  this.expect(1);
+exports.test_simple = function() {
   const hdr_str = "Content-type: text/html; charset=utf8\r\n";
-  this.same(
+  asserts.same(
     HTTP.Headers.parse(hdr_str),
     new HTTP.Headers({"Content-Type": "text/html; charset=utf8"})
   );
 }
 
-t.test_multiline = function() {
-  this.expect(1);
+exports.test_multiline = function() {
   const hdr_str = "Set-Cookie: value=foo\r\n   bar;path=/\r\n";
 
   got = HTTP.Headers.parse(hdr_str);
-  this.same(
+  asserts.same(
     got,
     new HTTP.Headers({"Set-Cookie": "value=foo bar;path=/"}),
     "multi-line header parsed okay"
   );
 }
 
-t.go();
+require('test').runner(exports);
