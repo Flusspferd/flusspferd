@@ -23,45 +23,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/load_core.hpp"
-#include "flusspferd/modules.hpp"
-#include "flusspferd/properties_functions.hpp"
-#include "flusspferd/binary.hpp"
-#include "flusspferd/encodings.hpp"
-#include "flusspferd/system.hpp"
 #include "flusspferd/getopt.hpp"
-#include "flusspferd/io/io.hpp"
+#include "flusspferd/object.hpp"
+#include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 
-using namespace flusspferd;
+void flusspferd::load_getopt_module(object container) {
+  object exports = container.get_property_object("exports");
 
-void flusspferd::load_core(object const &scope_) {
-  object scope = scope_;
+  flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
+}
 
-  flusspferd::load_require_function(scope);
-  flusspferd::load_properties_functions(scope);
-
-  flusspferd::object require_fn = scope.get_property_object("require");
-
-  flusspferd::object preload = require_fn.get_property_object("preload");
-
-  flusspferd::create_native_method(
-    preload, "binary",
-    &flusspferd::load_binary_module);
-
-  flusspferd::create_native_method(
-    preload, "encodings",
-    &flusspferd::load_encodings_module);
-
-  flusspferd::create_native_method(
-    preload, "io",
-    &flusspferd::io::load_io_module);
-
-  flusspferd::create_native_method(
-    preload, "system",
-    &flusspferd::load_system_module);
-
-  flusspferd::create_native_method(
-    preload, "getopt",
-    &flusspferd::load_getopt_module);
+flusspferd::object flusspferd::getopt(
+  object spec, boost::optional<array const &> const &arguments)
+{
+  // TODO
+  return flusspferd::object();
 }
