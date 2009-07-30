@@ -70,7 +70,7 @@ class flusspferd_repl {
   int argc;
   char ** argv;
 
-  enum Type { File, Expression, IncludePath, Module };
+  enum Type { File, Expression, IncludePath, Module, MainModule };
   
   // Returns list of files / expressions to execute
   std::list<std::pair<std::string, Type> > parse_cmdline();
@@ -147,6 +147,10 @@ int flusspferd_repl::run() {
       require_obj.get_property_object("paths").call("unshift", i->first);
       break;
     case Module:
+      require_obj.call(flusspferd::global(), i->first);
+      break;
+    case MainModule:
+      // TODO: make the module aware that it is the main module
       require_obj.call(flusspferd::global(), i->first);
       break;
     }
@@ -243,6 +247,9 @@ void print_help(char const *argv0) {
 "    -I <path>\n              Add include path."
 "\n"
 "    -M <module>\n            Load module."
+"\n"
+"    -m <module>\n"
+"    --main <module>\n         Load module as the main module."
 "\n"
 "    --no-global-history\n    Do not use a global history in interactive mode\n"
 "\n"
@@ -378,6 +385,22 @@ flusspferd_repl::parse_cmdline() {
         }
         std::string path = argv[i];
         files.push_back(std::make_pair(path, Module));
+      }
+      else if (std::strcmp(argv[i], "-m") == 0 ||
+               std::strcmp(argv[i], "--main") == 0)
+      {
+        ++i;
+        if (i == argc) {
+          print_help(argv[0]);
+          std::string msg = "expected expression after ";
+          msg += argv[i-1];
+          msg += " option\n";
+          throw std::runtime_error(msg);
+        }
+        std::string path = argv[i];
+        files.push_back(std::make_pair(path, MainModule));
+        if (!interactive_set)
+          interactive = false;
       }
       else if (std::strcmp(argv[i], "--no-global-history") == 0)
       {
