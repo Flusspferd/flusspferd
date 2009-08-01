@@ -102,6 +102,11 @@ option(
     ${_ENABLE_TESTS_DEFAULT})
 
 if(CMAKE_COMPILER_IS_GNUCXX)
+    # MinGW doesn't set this by default
+    if(WIN32)
+        add_definitions(-DWIN32)
+    endif()
+
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
     add_definitions("-pedantic-errors -Wall -Wextra"
@@ -326,11 +331,7 @@ file(
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
 
-if(WIN32)
-    set(FLUSSPFERD_LIBRARY_TYPE STATIC)
-else()
-    set(FLUSSPFERD_LIBRARY_TYPE SHARED)
-endif()
+set(FLUSSPFERD_LIBRARY_TYPE SHARED)
 
 add_library(
     flusspferd

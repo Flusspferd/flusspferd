@@ -42,15 +42,23 @@ THE SOFTWARE.
 #include <string>
 #include <sstream>
 #include <list>
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <dlfcn.h>
-#endif
 
+#ifdef WIN32
+
+#include <windows.h>
+#define DIRSEP1 '/'
+#define DIRSEP2 '\\'
+#define SHLIBPREFIX ""
+
+#else
+
+#include <dlfcn.h>
 #define DIRSEP1 '/'
 #define DIRSEP2 '\0'
 #define SHLIBPREFIX "lib"
+
+#endif
+
 
 using namespace flusspferd;
 

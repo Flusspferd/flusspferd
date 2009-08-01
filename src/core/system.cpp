@@ -34,9 +34,12 @@ THE SOFTWARE.
 #if defined(__APPLE__)
 #  include <crt_externs.h>
 #  define environ (*_NSGetEnviron())
-#elif defined(XP_WIN)
+#elif defined(_MSC_VER)
 extern char** _environ;
 #  define environ _environ
+#elif defined(WIN32)
+// TODO: FixMe
+char ** environ = NULL;
 #else
 extern char** environ;
 # endif
