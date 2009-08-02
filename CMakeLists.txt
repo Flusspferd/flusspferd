@@ -352,7 +352,12 @@ target_link_libraries(flusspferd ${flusspferd_LIBS})
 if(NOT WIN32)
     install(TARGETS
         flusspferd
-        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+        RUNTIME DESTINATION ${INSTALL_LIBRARIES_PATH})
+else()
+    # dll's need to live with the exe on windows.
+    install(TARGETS
+        flusspferd
+        RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 endif()
 
 ## Library - coverage variant ###############################################
@@ -409,11 +414,9 @@ else()
     ${READLINE_LIBRARIES})
 endif()
 
-if(NOT WIN32)
     install(TARGETS
         flusspferd-shell
         RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
-endif()
 
 ## Tests ###################################################################
 
@@ -500,7 +503,6 @@ foreach(PLUGIN ${PLUGINS})
         flusspferd
         ${${PLUGIN}_LIBRARIES})
 
-    if(NOT WIN32)
         install(TARGETS
             ${PLUGIN}_PLUGIN
             LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
@@ -514,11 +516,9 @@ foreach(PLUGIN ${PLUGINS})
                 ${${PLUGIN}_JS_FILES}
                 DESTINATION ${INSTALL_MODULES_PATH})
         endif()
-    endif()
 
 endforeach()
 
-if(NOT WIN32)
     set(JS_PLUGINS
         util util/array util/function util/range test test/equiv http/headers)
 
@@ -531,24 +531,19 @@ if(NOT WIN32)
             DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
 
     endforeach()
-endif()
 
 ## Headers ##################################################################
 
-if(NOT WIN32)
     install(
         DIRECTORY include/
         DESTINATION ${INSTALL_HEADERS_PATH}
         FILES_MATCHING PATTERN "*.hpp")
-endif()
 
 ## Prelude ##################################################################
 
-if(NOT WIN32)
     install(
         FILES src/js/prelude.js
         DESTINATION ${INSTALL_LIBDATA_PATH})
-endif()
 
 ## Documentation ############################################################
 
@@ -566,7 +561,6 @@ endif()
 
 ## Configured files##########################################################
 
-if(NOT WIN32)
     configure_file(
         ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
         ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
@@ -575,6 +569,7 @@ if(NOT WIN32)
         FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
         DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
 
+if(NOT WIN32)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
         "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
