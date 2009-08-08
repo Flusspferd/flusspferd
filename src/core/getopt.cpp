@@ -35,8 +35,17 @@ void flusspferd::load_getopt_module(object container) {
 }
 
 flusspferd::object flusspferd::getopt(
-  object spec, boost::optional<array const &> const &arguments)
+  object spec, boost::optional<array const &> const &arguments_)
 {
+  if (!arguments_) {
+    object sys = flusspferd::global().call("require", "system").to_object();
+    array args(sys.get_property_object("args"));
+    return getopt(spec, args);
+  }
+
+  array const &arguments = arguments_.get();
+
   // TODO
+
   return flusspferd::object();
 }
