@@ -27,6 +27,10 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/property_iterator.hpp"
+#include <iostream>
+
+using namespace flusspferd;
 
 void flusspferd::load_getopt_module(object container) {
   object exports = container.get_property_object("exports");
@@ -34,16 +38,27 @@ void flusspferd::load_getopt_module(object container) {
   flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
 }
 
-flusspferd::object flusspferd::getopt(
-  object spec, boost::optional<array const &> const &arguments_)
+struct optspec {
+  optspec(object const &spec) {
+    for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+      std::string name = it->to_std_string();
+      std::cout << name << std::endl;
+    }
+  }
+};
+
+object flusspferd::getopt(
+  object spec_, boost::optional<array const &> const &arguments_)
 {
   if (!arguments_) {
     object sys = flusspferd::global().call("require", "system").to_object();
     array args(sys.get_property_object("args"));
-    return getopt(spec, args);
+    return getopt(spec_, args);
   }
 
   array const &arguments = arguments_.get();
+
+  optspec spec(spec_);
 
   // TODO
 
