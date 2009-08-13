@@ -110,9 +110,13 @@ value flusspferd::execute(char const *filename, object const &scope_) {
  
   if (!ok) {
     exception e("Script execution failed");
-    if (!e.empty())
+    if (!e.empty()) {
+      JS_DestroyScript(cx, script);
       throw e;
+    }
   }
+
+  JS_DestroyScript(cx, script);
 
   return result;
 }
