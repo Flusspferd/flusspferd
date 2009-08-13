@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include <iostream>
+#include <map>
 
 using namespace flusspferd;
 
@@ -39,10 +40,31 @@ void flusspferd::load_getopt_module(object container) {
 }
 
 struct optspec {
+  std::map<std::string, int> options;
+
   optspec(object const &spec) {
     for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
       std::string name = it->to_std_string();
+
+      int data = 0;
+
+      options.insert(std::make_pair(name, data));
       std::cout << name << std::endl;
+
+      object item = spec.get_property_object(name);
+
+      if (!item.is_null()) {
+        value aliases = item.get_property("alias");
+        if (aliases.is_undefined_or_null())
+          aliases = item.get_property("aliases");
+
+        if (aliases.is_string()) {
+          options.insert(std::make_pair(aliases.to_std_string(), data));
+        } else if (aliases.is_object()) {
+          object aliases_o = aliases.get_object();
+
+        }
+      }
     }
   }
 };
