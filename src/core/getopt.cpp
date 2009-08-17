@@ -58,10 +58,10 @@ struct optspec {
         if (aliases.is_undefined_or_null())
           aliases = item.get_property("aliases");
 
-        if (aliases.is_string()) {
+        if (!aliases.is_array()) {
           options.insert(std::make_pair(aliases.to_std_string(), data));
-        } else if (aliases.is_object()) {
-          object aliases_o = aliases.get_object();
+        } else {
+          array aliases_a(aliases.get_object());
 
         }
       }
