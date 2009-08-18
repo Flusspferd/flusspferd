@@ -28,6 +28,9 @@ THE SOFTWARE.
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/property_iterator.hpp"
+#include "flusspferd/root.hpp"
+#include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <iostream>
 #include <map>
 
@@ -40,16 +43,26 @@ void flusspferd::load_getopt_module(object container) {
 }
 
 struct optspec {
-  std::map<std::string, int> options;
+  struct item_type {
+    enum argument_type { required = 1, optional = 2, none = 0 };
+    argument_type argument;
+    root_function callback;
+  };
+  typedef boost::shared_ptr<item_type> item_pointer;
+  typedef std::map<std::string, item_pointer> map_type;
+
+  map_type options;
 
   optspec(object const &spec) {
+    if (spec.is_null())
+      throw exception("Getopt specification must be a valid object");
+
     for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
       std::string name = it->to_std_string();
 
-      int data = 0;
+      item_pointer data(new item_type);
 
-      options.insert(std::make_pair(name, data));
-      std::cout << name << std::endl;
+      options.insert(map_type::value_type(name, data));
 
       object item = spec.get_property_object(name);
 
@@ -58,11 +71,33 @@ struct optspec {
         if (aliases.is_undefined_or_null())
           aliases = item.get_property("aliases");
 
-        if (!aliases.is_object() || !aliases.get_object().is_array()) {
-          options.insert(std::make_pair(aliases.to_std_string(), data));
-        } else {
-          array aliases_a(aliases.get_object());
+        if (!aliases.is_undefined_or_null()) {
+          if (!aliases.is_object() || !aliases.get_object().is_array()) {
+            options.insert(map_type::value_type(aliases.to_std_string(), data));
+          } else {
+            array aliases_a(aliases.get_object());
+            for (std::size_t i = 0; i < aliases_a.length(); ++i)
+              options.insert(map_type::value_type(
+                aliases_a.get_element(i).to_std_string(), data));
+          }
+        }
 
+        object callback = item.get_property_object("callback");
+        if (!callback.is_null()) {
+          data->callback = function(callback);
+        }
+
+        if (item.has_property("argument")) {
+          std::string argument = item.get_property("argument").to_std_string();
+          boost::algorithm::to_lower(argument);
+          if (argument == "none")
+            data->argument = item_type::none;
+          else if (argument == "required")
+            data->argument = item_type::required;
+          else if (argument == "optional")
+            data->argument = item_type::optional;
+          else
+            throw exception("Invalid argument type. Must be one of 'required', 'optional' or 'none'.");
         }
       }
     }
@@ -81,6 +116,9 @@ object flusspferd::getopt(
   array const &arguments = arguments_.get();
 
   optspec spec(spec_);
+
+  for (optspec::map_type::iterator it = spec.options.begin(); it != spec.options.end(); ++it)
+    std::cout << it->first << ": " << &*it->second << std::endl;
 
   // TODO
 
