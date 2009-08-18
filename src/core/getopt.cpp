@@ -42,6 +42,7 @@ void flusspferd::load_getopt_module(object container) {
   flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
 }
 
+namespace {
 struct optspec {
   struct item_type {
     enum argument_type { required = 1, optional = 2, none = 0 };
@@ -52,8 +53,12 @@ struct optspec {
   typedef std::map<std::string, item_pointer> map_type;
 
   map_type options;
+  array const &arguments;
+  object result;
 
-  optspec(object const &spec) {
+  optspec(object const &spec, array const &arguments)
+    : arguments(arguments)
+  {
     if (spec.is_null())
       throw exception("Getopt specification must be a valid object");
 
@@ -102,7 +107,27 @@ struct optspec {
       }
     }
   }
+
+  void handle_option(std::string const &opt, std::size_t &pos) {
+    std::size_t eq = opt.find('=');
+    std::string name = opt.substr(0, eq);
+    if (!result.has_property(name))
+      result.set_property(name, create_array());
+    array arr(result.get_property_object(name));
+    arr.call("push", value());
+  }
+
+  void handle_short(std::string const &opt, std::size_t &pos) {
+    for (std::size_t i = 0; i < opt.size(); ++i) {
+      std::string name(1, opt[i]);
+      if (!result.has_property(name))
+        result.set_property(name, create_array());
+      array arr(result.get_property_object(name));
+      arr.call("push", value());
+    }
+  }
 };
+}
 
 object flusspferd::getopt(
   object spec_, boost::optional<array const &> const &arguments_)
@@ -115,12 +140,32 @@ object flusspferd::getopt(
 
   array const &arguments = arguments_.get();
 
-  optspec spec(spec_);
+  optspec spec(spec_, arguments);
 
   for (optspec::map_type::iterator it = spec.options.begin(); it != spec.options.end(); ++it)
     std::cout << it->first << ": " << &*it->second << std::endl;
 
-  // TODO
+  spec.result = create_object();
 
-  return flusspferd::object();
+  array result_arguments = create_array();
+  spec.result.set_property("_", result_arguments);
+
+  bool accept_options = true;
+
+  for (std::size_t i = 0; i < arguments.length(); ++i) {
+    std::string arg = arguments.get_element(i).to_std_string();
+    if (accept_options && arg.size() >= 2 && arg[0] == '-') {
+      if (arg[1] == '-')
+        if (arg.size() == 2)
+          accept_options = false;
+        else
+          spec.handle_option(arg.substr(2), i);
+      else
+        spec.handle_short(arg.substr(1), i);
+    } else {
+      result_arguments.call("push", arg);
+    }
+  }
+
+  return spec.result;
 }
