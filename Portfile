@@ -7,20 +7,21 @@ name                flusspferd
 version             0.6.1
 categories          devel
 maintainers         flusspferd.org:team
-description         Flusspferd
-long_description    Flusspferd provides Javascript bindings for C++.
+description         provides Javascript bindings for C++.
+long_description    ${name} ${description}
 homepage            http://flusspferd.org/
-platforms           darwin
 
-distfiles           flusspferd-0.6.1.tar.bz2
+platforms           darwin
+depends_build       port:cmake
+depends_lib         port:spidermonkey \
+                    port:boost
+
 master_sites        sourceforge
 use_bzip2           yes
 checksums           md5     43e0941621b1b562d13c79106306e4cc \
                     sha1    264a9d90ba11313413b7261a40bb11af4f5b9c06 \
                     rmd160  45231caea624063acca5243264d7adbea886db14
 
-depends_lib         port:spidermonkey \
-                    port:boost
 default_variants    test
 
 configure.args      -DCMAKE_INSTALL_PREFIX=${prefix} \
