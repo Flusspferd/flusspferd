@@ -9,7 +9,7 @@ Release 0.7
 
 2009-07-19:
 - Remove environment plugin. Env variables are now only available via
-  require('system').env (ServerJS compatability)
+  require('system').env (CommonJS compatability)
 
 2009-07-04:
 - Emacs mode is installed (again) and byte compiled if emacs is found.
@@ -30,7 +30,7 @@ Release 0.7
 - Add -I command line switch for specifying module paths.
 - Add -M command line switch for loading modules (with 'require').
 - Add permanent history to the shell.
-- Add ServerJS 'system' module (https://wiki.mozilla.org/ServerJS/System).
+- Add CommonJS 'system' module (https://wiki.mozilla.org/ServerJS/System).
 
 2009-06-18:
 - Remove Blob and use Binary everywhere.
