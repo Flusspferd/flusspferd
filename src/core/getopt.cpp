@@ -48,6 +48,8 @@ struct optspec {
     enum argument_type { required = 1, optional = 2, none = 0 };
     argument_type argument;
     root_function callback;
+
+    item_type() : argument(none) {}
   };
   typedef boost::shared_ptr<item_type> item_pointer;
   typedef std::map<std::string, item_pointer> map_type;
@@ -102,7 +104,8 @@ struct optspec {
           else if (argument == "optional")
             data->argument = item_type::optional;
           else
-            throw exception("Invalid argument type. Must be one of 'required', 'optional' or 'none'.");
+            throw exception("Invalid argument type. Must be one of 'required',"
+                            " 'optional' or 'none'.");
         }
       }
     }
@@ -120,10 +123,26 @@ struct optspec {
   void handle_short(std::string const &opt, std::size_t &pos) {
     for (std::size_t i = 0; i < opt.size(); ++i) {
       std::string name(1, opt[i]);
+      item_pointer data = options[name];
+      if (!data)
+        throw exception(("Unknown option " + name).c_str());
+
       if (!result.has_property(name))
         result.set_property(name, create_array());
       array arr(result.get_property_object(name));
-      arr.call("push", value());
+      
+      if (data->argument != item_type::none) {
+        if (i + 1 < opt.size())
+          arr.call("push", opt.substr(i + 1));
+        else if (pos + 1 < arguments.size())
+          arr.call("push", arguments.get_element(++pos));
+        else
+          throw exception(
+              ("No argument supplied for short option " + name).c_str());
+        break;
+      } else {
+        arr.call("push", value());
+      }
     }
   }
 };
@@ -141,9 +160,6 @@ object flusspferd::getopt(
   array const &arguments = arguments_.get();
 
   optspec spec(spec_, arguments);
-
-  for (optspec::map_type::iterator it = spec.options.begin(); it != spec.options.end(); ++it)
-    std::cout << it->first << ": " << &*it->second << std::endl;
 
   spec.result = create_object();
 
