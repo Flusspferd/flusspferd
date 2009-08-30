@@ -8,6 +8,6 @@ void do_nothing_useful() {
 
 FLUSSPFERD_LOADER_SIMPLE(exports) {
     flusspferd::create_native_function(exports, "doNothingUseful", &do_nothing_useful);
-    exports.set_property("variable", value(true));
+    exports.set_property("variable", true);
     std::cout << "Module loaded!" << std::endl;
 }
