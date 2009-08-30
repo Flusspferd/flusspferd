@@ -285,16 +285,22 @@ value object::apply(object const &fn, arguments const &arg_) {
 
   arguments arg(arg_);
 
+  JSContext *cx = Impl::current_context();
+
   JSBool status = JS_CallFunctionValue(
-      Impl::current_context(),
+      cx,
       get(),
       Impl::get_jsval(fnv),
       arg.size(),
       Impl::get_arguments(arg),
       Impl::get_jsvalp(result));
 
-  if (!status)
-    throw exception("Could not call function");
+  if (!status) {
+    if (JS_IsExceptionPending(cx))
+      throw exception("Could not call function");
+    else
+      throw js_quit();
+  }
 
   return result;
 }
@@ -307,16 +313,22 @@ value object::call(char const *fn, arguments const &arg_) {
 
   arguments arg(arg_);
 
+  JSContext *cx = Impl::current_context();
+
   JSBool status = JS_CallFunctionName(
-      Impl::current_context(),
+      cx,
       get(),
       fn,
       arg.size(),
       Impl::get_arguments(arg),
       Impl::get_jsvalp(result));
 
-  if (!status)
-    throw exception("Could not call function");
+  if (!status) {
+    if (JS_IsExceptionPending(cx))
+      throw exception("Could not call function");
+    else
+      throw js_quit();
+  }
 
   return result;
 }
