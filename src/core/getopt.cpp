@@ -113,11 +113,23 @@ struct optspec {
 
   void handle_option(std::string const &opt, std::size_t &pos) {
     std::size_t eq = opt.find('=');
+
     std::string name = opt.substr(0, eq);
+    item_pointer data = options[name];
+    if (!data)
+      throw exception(("Unknown option " + name).c_str());
+
     if (!result.has_property(name))
       result.set_property(name, create_array());
     array arr(result.get_property_object(name));
-    arr.call("push", value());
+
+    if (eq == std::string::npos)
+      arr.call("push", value());
+    else {
+      if (data->argument == item_type::none)
+        throw exception(("No argument allowed for option " + name).c_str());
+      arr.call("push", opt.substr(eq + 1));
+    }
   }
 
   void handle_short(std::string const &opt, std::size_t &pos) {
