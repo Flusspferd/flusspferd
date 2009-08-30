@@ -224,7 +224,8 @@ void print_help(char const *argv0) {
   std::cerr << "usage: " << argv0 <<
 " [option] ... [file | -] [arg] ...\n\n"
 "Options\n"
-"    -h                       Displays this message.\n"
+"    -h\n"
+"    --help                   Displays this message.\n"
 "\n"
 "    -v\n"
 "    --version                Print version and exit.\n"
@@ -249,7 +250,7 @@ void print_help(char const *argv0) {
 "    -M <module>\n            Load module."
 "\n"
 "    -m <module>\n"
-"    --main <module>\n         Load module as the main module."
+"    --main <module>\n        Load module as the main module."
 "\n"
 "    --no-global-history\n    Do not use a global history in interactive mode\n"
 "\n"
