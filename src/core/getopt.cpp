@@ -123,9 +123,11 @@ struct optspec {
       result.set_property(name, create_array());
     array arr(result.get_property_object(name));
 
-    if (eq == std::string::npos)
+    if (eq == std::string::npos) {
+      if (data->argument == item_type::required)
+        throw exception(("No argument supplied for long option "+name).c_str());
       arr.call("push", value());
-    else {
+    } else {
       if (data->argument == item_type::none)
         throw exception(("No argument allowed for option " + name).c_str());
       arr.call("push", opt.substr(eq + 1));
