@@ -111,7 +111,7 @@ struct optspec {
     }
   }
 
-  void handle_option(std::string const &opt, std::size_t &/*pos*/) {
+  void handle_option(std::string const &opt, std::size_t &pos) {
     std::size_t eq = opt.find('=');
 
     std::string name = opt.substr(0, eq);
@@ -124,11 +124,19 @@ struct optspec {
     array arr(result.get_property_object(name));
 
     if (eq == std::string::npos) {
-      if (data->argument == item_type::required)
-        throw exception(("No argument supplied for long option "+name).c_str());
-      arr.call("push", value());
-      if (!data->callback.is_null())
-        data->callback.call(result, name);
+      if (data->argument == item_type::required) {
+        if (++pos >= arguments.size())
+          throw exception(
+            ("No argument supplied for long option " + name).c_str());
+        std::string const &arg = arguments.get_element(pos).to_std_string();
+        arr.call("push", arg);
+        if (!data->callback.is_null())
+          data->callback.call(result, name, arg);
+      } else {
+        arr.call("push", value());
+        if (!data->callback.is_null())
+          data->callback.call(result, name);
+      }
     } else {
       if (data->argument == item_type::none)
         throw exception(("No argument allowed for option " + name).c_str());
