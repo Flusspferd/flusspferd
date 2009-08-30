@@ -328,6 +328,17 @@ FLUSSPFERD_CALLS(call, object const &)
   void set_property(value const &id, value const &v);
 
   /**
+   * Set a property.
+   *
+   * @param id The property's name / ID.
+   * @param v The new value.
+   */
+  template<typename T, typename U>
+  void set_property(T const &id, U const &v) {
+    return set_property(id, value(v));
+  }
+
+  /**
    * Get a property.
    *
    * @param name The property's name.
