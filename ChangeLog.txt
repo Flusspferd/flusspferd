@@ -6,13 +6,14 @@ Release 0.7
 
 2009-08-31:
 - Use new getopt API for parsing interpreter / shell arguments.
+- Add platform and xFlusspferdVersion constants to system module.
 
 2009-07-30:
 - Add (core) "getopt" plugin and C++ API.
 
 2009-07-19:
 - Remove environment plugin. Env variables are now only available via
-  require('system').env (CommonJS compatability)
+  require('system').env (CommonJS compatability).
 
 2009-07-04:
 - Emacs mode is installed (again) and byte compiled if emacs is found.
