@@ -73,6 +73,12 @@ add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
 message(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
 
+option(RELOCATABLE "Whether the binary should be relocatable")
+
+if(RELOCATABLE)
+    add_definitions("-DFLUSSPFERD_RELOCATABLE")
+endif()
+
 set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 add_definitions("-DFLUSSPFERD_MODULE_SUFFIX=\"${CMAKE_SHARED_MODULE_SUFFIX}\"")
 
