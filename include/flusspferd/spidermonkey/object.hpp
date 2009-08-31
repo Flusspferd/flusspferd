@@ -48,12 +48,14 @@ protected:
   JSObject *get_const() const { return obj; }
   void set(JSObject *o) { obj = o; }
 
+  object_impl() : obj(0) {}
   object_impl(JSObject *o) : obj(o) { }
 
   friend JSObject *get_object(object_impl const &o);
   friend object_impl wrap_object(JSObject *o);
 
 public:
+
   void *get_gcptr() {
     return &obj;
   }
