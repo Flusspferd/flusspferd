@@ -280,6 +280,9 @@ value object::apply(object const &fn, arguments const &arg_) {
   if (is_null())
     throw exception("Could not apply function (object is null)");
 
+  if (fn.is_null())
+    throw exception("Could not apply function (function is null)");
+
   value fnv(fn);
   root_value result((value()));
 
