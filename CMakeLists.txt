@@ -187,6 +187,27 @@ check_cxx_source_runs(
      }"
     FLUSSPFERD_HAVE_POSIX)
 
+## /proc/self/exe ###########################################################
+
+if(RELOCATABLE)
+    check_cxx_source_runs(
+    "#include <unistd.h>
+    #include <cstdlib>
+    int main() {
+      char buf[1024];
+      if (readlink(\"/proc/self/exe\", buf, 1024) > 0)
+        return EXIT_SUCCESS;
+      else
+        return EXIT_FAILURE;
+    }
+    "
+    FLUSSPFERD_HAVE_PROC_SELF_EXE)
+
+    if (FLUSSPFERD_HAVE_PROC_SELF_EXE)
+        add_definitions("-DFLUSSPFERD_HAVE_PROC_SELF_EXE")
+    endif()
+endif()
+
 ## libdl ####################################################################
 
 if(FLUSSPFERD_HAVE_POSIX)
