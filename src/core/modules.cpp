@@ -228,12 +228,16 @@ void require(call_context &x) {
           throw exception(ss.str().c_str());
         }
 
+        dlerror(); // clear error state
+
         void *symbol = dlsym(module, "flusspferd_load");
 
-        if (!symbol) {
+        char const *const error_string = dlerror();
+
+        if (error_string) {
           std::stringstream ss;
           ss << "Unable to load library '" << fullpath.c_str()
-             << "': " << dlerror();
+             << "': " << error_string;
           throw exception(ss.str().c_str());
         }
 #endif
