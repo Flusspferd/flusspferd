@@ -206,11 +206,15 @@ endif()
 
 set(Boost_FIND_REQUIRED TRUE)
 
+set(FLUSSPFERD_BOOST_LIBRARIES thread filesystem system)
+
+if(ENABLE_TESTS)
+    set(FLUSSPFERD_BOOST_LIBRARIES
+        unit_test_framework ${FLUSSPFERD_BOOST_LIBRARIES})
+endif()
+
 find_package(Boost 1.36.0 COMPONENTS
-    unit_test_framework
-    thread
-    filesystem
-    system)
+    ${FLUSSPFERD_BOOST_LIBRARIES})
 
 if(Boost_INCLUDE_DIR)
     include_directories(${Boost_INCLUDE_DIR})
