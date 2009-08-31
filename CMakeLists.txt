@@ -233,7 +233,11 @@ endif()
 set(Spidermonkey_REQUIRED TRUE)
 find_package(Spidermonkey)
 
-if(NOT SPIDERMONKEY_UTF8)
+if(NOT SPIDERMONKEY_FOUND)
+    message(FATAL_ERROR "Spidermonkey not found")
+endif()
+
+if(SPIDERMONKEY_FOUND AND NOT SPIDERMONKEY_UTF8)
     message(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
 endif()
 
