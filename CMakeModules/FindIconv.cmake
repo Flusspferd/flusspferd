@@ -44,8 +44,17 @@ else()
     set(ICONV_TEST "In glibc")
 endif()
 
+set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARY})
+check_cxx_source_compiles(
+    "#include <iconv.h>
+     int main() {
+        iconv(iconv_t(-1), 0, 0, 0, 0);
+     }"
+    ICONV_COMPILES)
+
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(ICONV DEFAULT_MSG ICONV_TEST ICONV_INCLUDE_DIR)
+find_package_handle_standard_args(ICONV DEFAULT_MSG ICONV_TEST ICONV_INCLUDE_DIR ICONV_COMPILES)
 
 if(ICONV_FOUND)
   set(ICONV_LIBRARIES ${ICONV_LIBRARY})
@@ -53,7 +62,7 @@ else(ICONV_FOUND)
   set(ICONV_LIBRARIES)
 endif(ICONV_FOUND)
 
-if(ICONV_FOUND)
+if(ICONV_FOUND)  
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
     check_cxx_source_compiles(
