@@ -34,7 +34,7 @@ find_path(ICONV_INCLUDE_DIR iconv.h)
 
 if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
-    check_function_exists(iconv ICONV_IN_GLIBC)
+    check_function_exists(iconv_open ICONV_IN_GLIBC)
 endif()
 
 if(NOT ICONV_IN_GLIBC)
