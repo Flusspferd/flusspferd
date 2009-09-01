@@ -19,6 +19,8 @@ do
 	cp $file $dir/
 done
 
+rm $PREFIX/pack.sh
+
 cd /tmp
 
 tar czf flusspferd-$VER.tar.gz flusspferd-$VER/

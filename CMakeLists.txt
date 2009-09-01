@@ -211,11 +211,15 @@ endif()
 
 set(Boost_FIND_REQUIRED TRUE)
 
+set(FLUSSPFERD_BOOST_LIBRARIES thread filesystem system)
+
+if(ENABLE_TESTS)
+    set(FLUSSPFERD_BOOST_LIBRARIES
+        unit_test_framework ${FLUSSPFERD_BOOST_LIBRARIES})
+endif()
+
 find_package(Boost 1.36.0 COMPONENTS
-    unit_test_framework
-    thread
-    filesystem
-    system)
+    ${FLUSSPFERD_BOOST_LIBRARIES})
 
 if(Boost_INCLUDE_DIR)
     include_directories(${Boost_INCLUDE_DIR})
@@ -238,7 +242,11 @@ endif()
 set(Spidermonkey_REQUIRED TRUE)
 find_package(Spidermonkey)
 
-if(NOT SPIDERMONKEY_UTF8)
+if(NOT SPIDERMONKEY_FOUND)
+    message(FATAL_ERROR "Spidermonkey not found")
+endif()
+
+if(SPIDERMONKEY_FOUND AND NOT SPIDERMONKEY_UTF8)
     message(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
 endif()
 

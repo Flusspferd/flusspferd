@@ -10,7 +10,7 @@ int main() {
     flusspferd::root_object x(flusspferd::create_object());
 
     // Set a property
-    x.set_property("property", flusspferd::value(1234));
+    x.set_property("property", 1234);
 
     // Add another - same value
     flusspferd::value tmp = x.get_property("property");

@@ -36,6 +36,35 @@ class array;
 
 void load_getopt_module(object container);
 
+/**
+ * Parse the options.
+ *
+ * Specification syntax:
+ *
+ * @code
+{
+  "name": {
+    "alias": ["abc", "d"],
+    "argument": "none", // or "optional" or "required"
+    "callback": myfunction // takes (option, argument)
+  },
+  "name2": {}
+}
+@endcode
+ *
+ * @return
+ * @code
+{
+  "name": ["arguments"],
+  ...,
+  "_": ["arguments"]
+}
+@endcode
+ *
+ * There are short options (-x) and long options (--xy). Short options cannot
+ * take optional arguments, they will always @b require arguments or not accept
+ * any at all.
+ */
 object getopt(
   object spec, boost::optional<array const &> const &arguments = boost::none);
 

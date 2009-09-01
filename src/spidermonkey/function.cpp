@@ -77,5 +77,9 @@ string function::name() const {
 }
 
 object Impl::function_impl::get_object() {
-  return Impl::wrap_object(JS_GetFunctionObject(get()));
+  JSFunction *fn = get();
+  if (!fn)
+    return object();
+  JSObject *o = JS_GetFunctionObject(fn);
+  return Impl::wrap_object(o);
 }
