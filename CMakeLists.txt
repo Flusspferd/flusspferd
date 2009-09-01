@@ -360,7 +360,8 @@ target_link_libraries(flusspferd ${flusspferd_LIBS})
 if(NOT WIN32)
     install(TARGETS
         flusspferd
-        RUNTIME DESTINATION ${INSTALL_LIBRARIES_PATH})
+        RUNTIME DESTINATION ${INSTALL_LIBRARIES_PATH}
+        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 else()
     # dll's need to live with the exe on windows.
     install(TARGETS
