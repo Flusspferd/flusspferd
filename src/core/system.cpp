@@ -35,7 +35,6 @@ THE SOFTWARE.
 #  include <crt_externs.h>
 #  define environ (*_NSGetEnviron())
 #elif defined(_MSC_VER)
-extern char** _environ;
 #  define environ _environ
 #elif defined(WIN32)
 // TODO: FixMe

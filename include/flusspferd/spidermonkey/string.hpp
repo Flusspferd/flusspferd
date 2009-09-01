@@ -55,7 +55,7 @@ protected:
 
   friend JSString *get_string(string_impl &s);
   friend string_impl wrap_string(JSString *s);
-
+  static string_impl do_wrap(JSString *s);
 public:
   void *get_gcptr() {
     return &str;
@@ -67,7 +67,7 @@ inline JSString *get_string(string_impl &s) {
 }
 
 inline string_impl wrap_string(JSString *s) {
-  return string_impl(s);
+    return string_impl::do_wrap(s);
 }
 
 }

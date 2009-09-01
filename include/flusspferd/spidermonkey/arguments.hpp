@@ -60,7 +60,7 @@ protected:
   void reset_argv();
 
   bool is_userprovided() const {
-    return values.size() == n; // TODO does this fix the problem?
+    return values.size() == n && !values.empty(); // TODO does this fix the problem?
   }
 
   arguments_impl &operator=(arguments_impl const &o);

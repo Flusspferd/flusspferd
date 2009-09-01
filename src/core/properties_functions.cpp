@@ -105,7 +105,7 @@ void ecma_define_own_property(object o, string p, object desc) {
   try {
     if (!v.is_undefined())
       getter_fn = v.to_object();
-  } catch (exception &e) {
+  } catch (exception &) {
     throw exception("getter must be a function", "TypeError");
   }
 
@@ -115,7 +115,7 @@ void ecma_define_own_property(object o, string p, object desc) {
       setter_fn = v.to_object();
       flags = flags &~ read_only_property;
     }
-  } catch (exception &e) {
+  } catch (exception &) {
     throw exception("setter must be a function", "TypeError");
   }
 

@@ -83,9 +83,7 @@ public:
   string(std::basic_string<char16_t> const &s);
 
 #ifndef IN_DOXYGEN
-  string(Impl::string_impl const &s)
-    : Impl::string_impl(s)
-  { }
+  string(Impl::string_impl const &s);
 #endif
 
   /// Destructor.
@@ -192,6 +190,23 @@ bool operator==(string const &lhs, string const &rhs);
  */
 bool operator<(string const &lhs, string const &rhs);
 
+char const * convert_helper_impl( value const & v, root_value & r, char const ** );
+string convert_helper_impl( value const & v, root_value & r, string *);
+std::string convert_helper_impl( value const & v, std::string *);
+std::basic_string<char16_t> convert_helper_impl( value const & v, std::basic_string<char16_t>*);
+
+template<typename ToType>
+ToType convert_helper( value const & v, root_value & r, ToType *x = 0)
+{
+    return convert_helper_impl(v, r, x);
+}
+
+template<typename ToType>
+ToType convert_helper( value const & v, ToType * x = 0)
+{
+    return convert_helper_impl(v, x);
+}
+
 template<>
 struct detail::convert<string> {
   typedef to_value_helper<string> to_value;
@@ -200,9 +215,7 @@ struct detail::convert<string> {
     root_value root;
 
     string perform(value const &v) {
-      string s = v.to_string();
-      root = s;
-      return s;
+        return convert_helper<string>(v, root);
     }
   };
 };
@@ -215,9 +228,7 @@ struct detail::convert<char const *> {
     root_value root;
 
     char const *perform(value const &v) {
-      string s = v.to_string();
-      root = s;
-      return s.c_str();
+        return convert_helper<char const *>(v, root);
     }
   };
 };
@@ -228,7 +239,7 @@ struct detail::convert<std::string> {
 
   struct from_value {
     std::string perform(value const &v) {
-      return v.to_string().to_string();
+        return convert_helper<std::string>(v);
     }
   };
 };
@@ -241,7 +252,7 @@ struct detail::convert<std::basic_string<char16_t> > {
 
   struct from_value {
     string_t perform(value const &v) {
-      return v.to_string().to_utf16_string();
+        return convert_helper<string_t>(v);
     }
   };
 };

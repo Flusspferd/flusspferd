@@ -66,6 +66,11 @@ Impl::string_impl::string_impl(value const &v)
     throw exception("Could not convert value to string");
 }
 
+Impl::string_impl Impl::string_impl::do_wrap(JSString *s)
+{
+    return string_impl(s);
+}
+
 namespace {
   JSString *get_string(string const &s) {
     return Impl::get_string(const_cast<string&>(s));
@@ -73,6 +78,11 @@ namespace {
 }
 
 string::string() { }
+
+string::string(Impl::string_impl const &s)
+: Impl::string_impl(s)
+{ }
+
 string::string(value const &v) : Impl::string_impl(v) { }
 string::string(char const *s, std::size_t n)
   : Impl::string_impl(s, n ? n : std::strlen(s)) { }
@@ -142,4 +152,28 @@ string string::concat(string const &a, string const &b) {
   if (!new_string)
     throw exception("Could not concatenate strings");
   return Impl::wrap_string(new_string);
+}
+
+char const * flusspferd::convert_helper_impl( value const & v, root_value & r, char const ** )
+{
+    string s = v.to_string();
+    r = s;
+    return s.c_str();
+}
+
+string flusspferd::convert_helper_impl( value const & v, root_value & r, string *)
+{
+    string s = v.to_string();
+    r = s;
+    return s;
+}
+
+std::string flusspferd::convert_helper_impl( value const & v, std::string *)
+{
+    return v.to_string().to_string();
+}
+
+std::basic_string<char16_t> flusspferd::convert_helper_impl( value const & v, std::basic_string<char16_t>*)
+{
+    return v.to_string().to_utf16_string();
 }

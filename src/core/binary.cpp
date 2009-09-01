@@ -394,7 +394,7 @@ array binary::split(value delim, object options) {
     // "count" option
     value count_ = options.get_property("count");
     if (!count_.is_undefined_or_null())
-      count = count_.to_number();
+      count = size_t(count_.to_number());
 
     // "includeDelimiter" option
     value include_delimiter_ = options.get_property("includeDelimiter");
@@ -647,10 +647,10 @@ int byte_array::erase(int begin, boost::optional<int> end) {
 }
 
 void byte_array::displace(call_context &x) {
-  int begin = x.arg[0].to_number();
+  int begin = int(x.arg[0].to_number());
   boost::optional<int> end;
   if (!x.arg[1].is_undefined_or_null())
-    end = x.arg[1].to_number();
+    end = int(x.arg[1].to_number());
   std::pair<std::size_t, std::size_t> r = range(begin, end);
   vector_type tmp(get_data().begin() + r.second, get_data().end());
   get_data().erase(get_data().begin() + r.first, get_data().end());
@@ -678,10 +678,10 @@ void byte_array::insert(call_context &x) {
 }
 
 void byte_array::splice(call_context &x) {
-  int begin = x.arg[0].to_number();
+  int begin = int(x.arg[0].to_number());
   boost::optional<int> length;
   if (!x.arg[1].is_undefined_or_null())
-    length = x.arg[1].to_number();
+    length = int(x.arg[1].to_number());
   std::pair<std::size_t, std::size_t> r = length_range(begin, length);
   root_object o(create(&get_data()[r.first], r.second - r.first));
   x.arg[0] = int(r.first);
