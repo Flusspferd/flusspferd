@@ -25,6 +25,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_PROPERTIES_FUNCTIONS_HPP
 #define FLUSSPFERD_PROPERTIES_FUNCTIONS_HPP
 
+#include "detail/api.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/init.hpp"
 
@@ -39,7 +40,7 @@ namespace flusspferd {
  *
  * @ingroup jsext
  */
-void load_properties_functions(object o = global());
+FLUSSPFERD_API void load_properties_functions(object o = global());
 
 }
 

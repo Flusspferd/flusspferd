@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 #include "flusspferd/property_attributes.hpp"
+#include "flusspferd/function.hpp"
 
 using namespace flusspferd;
 

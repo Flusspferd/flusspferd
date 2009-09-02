@@ -42,7 +42,7 @@ inline JSContext *current_context() {
   return get_context(flusspferd::current_context());
 }
 
-JSRuntime *get_runtime();
+FLUSSPFERD_API JSRuntime * get_runtime();
 
 }
 

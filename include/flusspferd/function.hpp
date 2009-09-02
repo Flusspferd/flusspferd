@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_FUNCTION_HPP
 #define FLUSSPFERD_FUNCTION_HPP
 
+#include "detail/api.hpp"
 #include "object.hpp"
 #include "convert.hpp"
 #include "spidermonkey/function.hpp"
@@ -40,7 +41,7 @@ class native_function_base;
  * @ingroup value_types
  * @ingroup functions
  */
-class function : 
+class FLUSSPFERD_API function : 
   public Impl::function_impl,
   public object
 {

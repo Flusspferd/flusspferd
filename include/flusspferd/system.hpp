@@ -26,11 +26,13 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_SYSTEM_HPP
 #define FLUSSPFERD_SYSTEM_HPP
 
+#include "detail/api.hpp"
+
 namespace flusspferd {
 
 class object;
 
-void load_system_module(object &context);
+FLUSSPFERD_API void load_system_module(object &context);
 
 }
 

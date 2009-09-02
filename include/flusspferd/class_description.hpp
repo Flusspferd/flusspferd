@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define FLUSSFPERD_CLASS_DESCRIPTION_HPP
 
 #ifndef PREPROC_DEBUG
+#include "detail/api.hpp"
 #include "class.hpp"
 #include "native_object_base.hpp"
 #endif
@@ -138,7 +139,7 @@ THE SOFTWARE.
   p_augment_prototype \
 ) \
   template<typename Class> \
-  class BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
+  class FLUSSPFERD_API BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
   public: \
     typedef BOOST_PP_CAT(p_cpp_name, _base) base_type; \
     struct class_info : ::flusspferd::class_info { \

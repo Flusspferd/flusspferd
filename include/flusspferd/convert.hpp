@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CONVERT_HPP
 #define FLUSSPFERD_CONVERT_HPP
 
+#include "detail/api.hpp"
 #include "value.hpp"
 #include "root.hpp"
 #include "exception.hpp"

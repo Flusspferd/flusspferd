@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_HPP
 
 #ifndef PREPROC_DEBUG
+#include "detail/api.hpp"
 #include "object.hpp"
 #include "function.hpp"
 #include "array.hpp"
@@ -48,8 +49,8 @@ class native_function_base;
 #ifndef IN_DOXYGEN
 namespace detail {
 
-object create_native_object(object const &proto);
-object create_native_enumerable_object(object const &proto);
+FLUSSPFERD_API object create_native_object(object const &proto);
+FLUSSPFERD_API object create_native_enumerable_object(object const &proto);
 
 }
 #endif
@@ -68,7 +69,7 @@ object create_native_enumerable_object(object const &proto);
  * @param proto The object to use as prototype.
  * @return The new object.
  */
-object create_object(object const &proto = object());
+FLUSSPFERD_API object create_object(object const &proto = object());
 
 /**
  * Create an array.
@@ -76,7 +77,7 @@ object create_object(object const &proto = object());
  * @param length The initial length of the new array.
  * @return The new array.
  */
-array create_array(unsigned int length = 0);
+FLUSSPFERD_API array create_array(unsigned int length = 0);
 
 #ifndef IN_DOXYGEN
 
@@ -146,7 +147,7 @@ T &create_native_object(object const &proto, ...);
  */
 //@{
 
-function create_function(
+function FLUSSPFERD_API create_function(
     std::string const &name,
     unsigned n_args,
     std::vector<std::string> argnames,
@@ -162,7 +163,7 @@ function create_function(
  * @param ptr The native function object.
  * @return The new function.
  */
-function create_native_function(native_function_base *ptr);
+FLUSSPFERD_API function create_native_function(native_function_base *ptr);
 
 /**
  * Create a new native function as method of an object.
@@ -173,7 +174,7 @@ function create_native_function(native_function_base *ptr);
  * @param ptr The native function object.
  * @return The new method.
  */
-function create_native_function(object const &o, native_function_base *ptr);
+FLUSSPFERD_API function create_native_function(object const &o, native_function_base *ptr);
 
 #ifndef IN_DOXYGEN
 

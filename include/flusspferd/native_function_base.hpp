@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_NATIVE_FUNCTION_BASE_HPP
 #define FLUSSPFERD_NATIVE_FUNCTION_BASE_HPP
 
+#include "detail/api.hpp"
 #include "init.hpp"
 #include "function.hpp"
 #include "convert.hpp"
@@ -42,7 +43,7 @@ struct call_context;
  *
  * @ingroup functions
  */
-class native_function_base : public function, private boost::noncopyable {
+class FLUSSPFERD_API native_function_base : public function, private boost::noncopyable {
 public:
   native_function_base(unsigned arity = 0);
   native_function_base(unsigned arity, std::string const &name);
@@ -56,7 +57,7 @@ protected:
 private:
   function create_function();
 
-  friend function create_native_function(native_function_base *);
+  friend FLUSSPFERD_API function create_native_function(native_function_base *);
 
 private:
   class impl;

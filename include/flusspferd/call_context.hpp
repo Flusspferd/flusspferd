@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 #ifndef FLUSSPFERD_CALL_CONTEXT_HPP
 #define FLUSSPFERD_CALL_CONTEXT_HPP
-
+#include "detail/api.hpp"
 #include "object.hpp"
 #include "arguments.hpp"
 #include "value.hpp"
@@ -39,7 +39,7 @@ class native_object_base;
  *
  * @ingroup functions
  */
-struct call_context {
+struct FLUSSPFERD_API call_context {
   /// Default constructor.
   call_context() : self_native(0) {}
 

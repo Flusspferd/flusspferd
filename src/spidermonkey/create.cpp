@@ -86,7 +86,7 @@ function flusspferd::create_function(
         0,
         name.c_str(),
         n_args,
-        &argnames_c[0],
+        (argnames_c.empty() ? 0 : &argnames_c[0]),
         body.data(),
         body.length(),
         file.c_str(),

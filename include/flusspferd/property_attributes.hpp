@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_PROPERTY_ATTRIBUTES
 #define FLUSSPFERD_PROPERTY_ATTRIBUTES
 
+#include "detail/api.hpp"
 #include <boost/optional.hpp>
 
 namespace flusspferd {
@@ -85,7 +86,7 @@ inline property_flag operator~(property_flag x) {
  *
  * @ingroup property_types
  */
-struct property_attributes {
+struct FLUSSPFERD_API property_attributes {
   /// The property's flags.
   property_flag flags;
 

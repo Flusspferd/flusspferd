@@ -37,7 +37,7 @@ class object;
 
 namespace Impl {
 
-class value_impl {
+class FLUSSPFERD_API value_impl {
   jsval val;
   jsval *ref;
 

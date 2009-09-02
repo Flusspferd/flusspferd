@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ARGUMENTS_HPP
 #define FLUSSPFERD_ARGUMENTS_HPP
 
+#include "detail/api.hpp"
 #include "spidermonkey/arguments.hpp"
 #include "root.hpp"
 #include "value.hpp"
@@ -39,7 +40,7 @@ namespace flusspferd {
  *
  * @ingroup functions
  */
-class arguments : public Impl::arguments_impl {
+class FLUSSPFERD_API arguments : public Impl::arguments_impl {
 private:
   std::vector<boost::shared_ptr<root_value> > roots;
 

@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_VALUE_HPP
 #define FLUSSPFERD_VALUE_HPP
 
+#include "detail/api.hpp"
 #include "spidermonkey/value.hpp"
 #include <string>
 #include <boost/type_traits/is_same.hpp>
@@ -46,7 +47,7 @@ template<typename T> class convert;
  *
  * @ingroup value_types
  */
-class value : public Impl::value_impl {
+class FLUSSPFERD_API value : public Impl::value_impl {
 public:
   /// Create a new value (Javascript: <code>undefined</code>).
   value();

@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_SECURITY_HPP
 #define FLUSSPFERD_SECURITY_HPP
 
+#include "detail/api.hpp"
 #include "native_object_base.hpp"
 #include "class.hpp"
 #include "class_description.hpp"
@@ -39,8 +40,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructible, false))
 {
 public:
-  static security &create(object container);
-  static security &get();
+  static FLUSSPFERD_API security &create(object container);
+  static FLUSSPFERD_API security &get();
 
   security(object const &);
   ~security();

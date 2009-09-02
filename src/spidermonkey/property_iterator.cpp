@@ -112,3 +112,9 @@ bool property_iterator::equal(property_iterator const &o) const {
 value const &property_iterator::dereference() const {
   return p->root_cache;
 }
+
+void property_iterator::advance(difference_type n){
+    for(difference_type i = 0; i < n; ++i){
+        increment();
+    }
+}

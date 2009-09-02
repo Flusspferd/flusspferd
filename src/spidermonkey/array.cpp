@@ -30,6 +30,12 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
+array::array()
+: object()
+{
+    check();
+}
+
 array::array(object const &o) : object(o) {
   check();
 }

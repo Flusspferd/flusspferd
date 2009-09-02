@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_TRACER_HPP
 #define FLUSSPFERD_TRACER_HPP
 
+#include "detail/api.hpp"
 #include "value.hpp"
 #include <boost/scoped_ptr.hpp>
 #include <string>
@@ -40,7 +41,7 @@ class value;
  *
  * @ingroup gc
  */
-class tracer {
+class FLUSSPFERD_API tracer {
 public:
   void trace_gcptr(char const *name, void *gcptr);
 

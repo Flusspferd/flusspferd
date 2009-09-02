@@ -36,7 +36,7 @@ class object;
 
 namespace Impl {
 
-class function_impl {
+class FLUSSPFERD_API function_impl {
   JSFunction *func;
 
 protected:

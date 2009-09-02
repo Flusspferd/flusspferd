@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_INIT_HPP
 #define FLUSSPFERD_INIT_HPP
 
+#include "detail/api.hpp"
 #include "flusspferd/context.hpp"
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -40,7 +41,7 @@ class object;
  *
  * @ingroup contexts
  */
-class init : boost::noncopyable {
+class FLUSSPFERD_API init : boost::noncopyable {
   init();
 
   class impl;

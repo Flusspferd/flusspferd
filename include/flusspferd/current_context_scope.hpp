@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
 #define FLUSSPFERD_CURRENT_CONTEXT_SCOPE_HPP
 
+#include "detail/api.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/context.hpp"
 
@@ -38,7 +39,7 @@ class context;
  *
  * @ingroup contexts
  */
-class current_context_scope {
+class FLUSSPFERD_API current_context_scope {
 private:
   context c;
   context old;

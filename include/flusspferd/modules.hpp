@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_IMPORTER_HPP
 #define FLUSSPFERD_IMPORTER_HPP
 
+#include "detail/api.hpp"
 #include "init.hpp"
 #include "object.hpp"
 
@@ -40,7 +41,7 @@ namespace flusspferd {
  *
  * @ingroup loadable_modules
  */
-void load_require_function(object container);
+FLUSSPFERD_API void load_require_function(object container);
 
 /**
  * The prototype for module loader functions.
@@ -78,7 +79,7 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
  * @ingroup loadable_modules
  */
 #define FLUSSPFERD_LOADER(exports, context) \
-  extern "C" \
+  extern "C" FLUSSPFERD_API \
   void flusspferd_load( \
     ::flusspferd::object &exports, \
     ::flusspferd::object &context)
@@ -91,7 +92,7 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
  * @ingroup loadable_modules
  */
 #define FLUSSPFERD_LOADER_SIMPLE(exports) \
-  extern "C" \
+  extern "C" FLUSSPFERD_API \
   void flusspferd_load( \
     ::flusspferd::object &exports, \
     ::flusspferd::object &)

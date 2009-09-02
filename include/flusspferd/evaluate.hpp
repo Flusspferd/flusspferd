@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_EVALUATE_HPP
 #define FLUSSPFERD_EVALUATE_HPP
 
+#include "detail/api.hpp"
 #include "object.hpp"
 
 namespace flusspferd {
@@ -48,7 +49,7 @@ class value;
  * @param file The file name to use.
  * @param line The initial line number.
  */
-value evaluate(char const *source, std::size_t n,
+value FLUSSPFERD_API evaluate(char const *source, std::size_t n,
                char const *file = 0x0, unsigned int line = 0);
 
 /**
@@ -60,7 +61,7 @@ value evaluate(char const *source, std::size_t n,
  * @param line The initial line number.
  * @param scope The scope 
  */
-value evaluate_in_scope(char const* source, std::size_t n,
+value FLUSSPFERD_API evaluate_in_scope(char const* source, std::size_t n,
                         char const* file, unsigned int line,
                         object const &scope);
 
@@ -73,7 +74,7 @@ value evaluate_in_scope(char const* source, std::size_t n,
  * @param file The file name to use.
  * @param line The initial line number.
  */
-value evaluate(char const *source, char const *file = 0x0,
+value FLUSSPFERD_API evaluate(char const *source, char const *file = 0x0,
                unsigned int line = 0);
 
 /**
@@ -85,7 +86,7 @@ value evaluate(char const *source, char const *file = 0x0,
  * @param file The file name to use.
  * @param line The initial line number.
  */
-value evaluate(std::string const &source, char const *file = 0x0,
+value FLUSSPFERD_API evaluate(std::string const &source, char const *file = 0x0,
                unsigned int line = 0);
 
 /**
@@ -94,7 +95,7 @@ value evaluate(std::string const &source, char const *file = 0x0,
  * @param file The path to the file.
  * @param scope The scope to use.
  */
-value execute(char const *file, object const &scope = object());
+value FLUSSPFERD_API execute(char const *file, object const &scope = object());
 
 //@}
 

@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_IO_STREAM_BASE_HPP
 #define FLUSSPFERD_IO_STREAM_BASE_HPP
 
+#include "../detail/api.hpp"
 #include "../native_object_base.hpp"
 #include "../class.hpp"
 #include "../class_description.hpp"

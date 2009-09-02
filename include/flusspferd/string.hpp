@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_STRING_HPP
 #define FLUSSPFERD_STRING_HPP
 
+#include "detail/api.hpp"
 #include "convert.hpp"
 #include "spidermonkey/string.hpp"
 #include <string>
@@ -39,7 +40,7 @@ class value;
  *
  * @ingroup value_types
  */
-class string : public Impl::string_impl {
+class FLUSSPFERD_API string : public Impl::string_impl {
 public:
   /// Construct an empty string.
   string();
@@ -190,10 +191,17 @@ bool operator==(string const &lhs, string const &rhs);
  */
 bool operator<(string const &lhs, string const &rhs);
 
-char const * convert_helper_impl( value const & v, root_value & r, char const ** );
-string convert_helper_impl( value const & v, root_value & r, string *);
-std::string convert_helper_impl( value const & v, std::string *);
-std::basic_string<char16_t> convert_helper_impl( value const & v, std::basic_string<char16_t>*);
+FLUSSPFERD_API char const * convert_helper_impl( 
+    value const & v, root_value & r, char const ** );
+
+FLUSSPFERD_API string convert_helper_impl( 
+    value const & v, root_value & r, string *);
+
+FLUSSPFERD_API std::string convert_helper_impl( 
+    value const & v, std::string *);
+
+FLUSSPFERD_API std::basic_string<char16_t> convert_helper_impl( 
+    value const & v, std::basic_string<char16_t>*);
 
 template<typename ToType>
 ToType convert_helper( value const & v, root_value & r, ToType *x = 0)

@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 #ifndef FLUSSPFERD_CLASS_HPP
 #define FLUSSPFERD_CLASS_HPP
-
+#include "detail/api.hpp"
 #include "native_function_base.hpp"
 #include "create.hpp"
 #include "init.hpp"
@@ -41,7 +41,7 @@ namespace flusspferd {
 
 namespace detail {
 
-struct unconstructible_class_constructor : native_function_base {
+struct FLUSSPFERD_API unconstructible_class_constructor : native_function_base {
   unconstructible_class_constructor(char const *name)
     : native_function_base(0, name)
   {}
@@ -111,7 +111,7 @@ void load_class(
  *
  * @ingroup classes
  */
-struct class_info {
+struct FLUSSPFERD_API class_info {
   /**
    * Whether the type is constructible.
    */

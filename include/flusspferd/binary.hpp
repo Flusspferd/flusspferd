@@ -24,14 +24,14 @@ THE SOFTWARE.
 */
 #ifndef FLUSSPFERD_BINARY_HPP
 #define FLUSSPFERD_BINARY_HPP
-
+#include "detail/api.hpp"
 #include "native_object_base.hpp"
 #include "class_description.hpp"
 #include <vector>
 
 namespace flusspferd {
 
-void load_binary_module(object container);
+void FLUSSPFERD_API load_binary_module(object container);
 
 class byte_string;
 

@@ -26,11 +26,12 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_VERSION_HPP
 #define FLUSSPFERD_VERSION_HPP
 
+#include "detail/api.hpp"
 #include <string>
 
 namespace flusspferd {
 
-std::string version();
+FLUSSPFERD_API std::string version();
 
 }
 

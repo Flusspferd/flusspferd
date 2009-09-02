@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_GETOPT_HPP
 #define FLUSSPFERD_GETOPT_HPP
 
+#include "detail/api.hpp"
 #include <boost/optional.hpp>
 #include <boost/none.hpp>
 
@@ -34,7 +35,7 @@ namespace flusspferd {
 class object;
 class array;
 
-void load_getopt_module(object container);
+FLUSSPFERD_API void load_getopt_module(object container);
 
 /**
  * Parse the options.
@@ -65,7 +66,7 @@ void load_getopt_module(object container);
  * take optional arguments, they will always @b require arguments or not accept
  * any at all.
  */
-object getopt(
+FLUSSPFERD_API object getopt(
   object spec, boost::optional<array const &> const &arguments = boost::none);
 
 }

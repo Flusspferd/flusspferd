@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CONTEXT_HPP
 #define FLUSSPFERD_CONTEXT_HPP
 
+#include "detail/api.hpp"
 #include "object.hpp"
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -41,7 +42,7 @@ class native_object_base;
  *
  * @ingroup contexts
  */
-class context {
+class FLUSSPFERD_API context {
   class impl;
   boost::shared_ptr<impl> p;
 

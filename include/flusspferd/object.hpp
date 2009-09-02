@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_OBJECT_HPP
 
 #ifndef PREPROC_DEBUG
+#include "detail/api.hpp"
 #include "spidermonkey/object.hpp"
 #include "property_attributes.hpp"
 #include "arguments.hpp"
@@ -58,7 +59,7 @@ template<typename> class convert;
  * @ingroup value_types
  * @ingroup property_types
  */
-class object : public Impl::object_impl {
+class FLUSSPFERD_API object : public Impl::object_impl {
 public:
 #ifndef PREPROC_DEBUG
 

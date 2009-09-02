@@ -26,11 +26,13 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_LOAD_CORE_HPP
 #define FLUSSPFERD_LOAD_CORE_HPP
 
+#include "detail/api.hpp"
+
 namespace flusspferd {
 
 class object;
 
-void load_core(object const &scope);
+void FLUSSPFERD_API load_core(object const &scope);
 
 }
 

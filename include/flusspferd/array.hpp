@@ -25,7 +25,7 @@ THE SOFTWARE.
 
 #ifndef FLUSSPFERD_ARRAY_HPP
 #define FLUSSPFERD_ARRAY_HPP
-
+#include "detail/api.hpp"
 #include "object.hpp"
 #include <boost/utility/in_place_factory.hpp>
 
@@ -39,8 +39,10 @@ namespace flusspferd {
  * @ingroup value_types
  * @ingroup property_types
  */
-class array : public object {
+class FLUSSPFERD_API array : public object {
 public:
+  array();
+
   /// Construct an #array from a Javascript Array object.
   array(object const &o);
 

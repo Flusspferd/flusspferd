@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_VALUE_IO_HPP
 #define FLUSSPFERD_VALUE_IO_HPP
 
+#include "detail/api.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/local_root_scope.hpp"

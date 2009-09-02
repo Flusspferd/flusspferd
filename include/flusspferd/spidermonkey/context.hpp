@@ -36,8 +36,8 @@ namespace flusspferd {
 
 namespace Impl {
 
-JSContext *get_context(context &co);
-context wrap_context(JSContext *c);
+FLUSSPFERD_API JSContext * get_context(context &co);
+FLUSSPFERD_API context wrap_context(JSContext *c);
 
 }
 

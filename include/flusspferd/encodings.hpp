@@ -25,6 +25,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ENCODINGS_HPP
 #define FLUSSPFERD_ENCODINGS_HPP
 
+#include "detail/api.hpp"
 #include "string.hpp"
 #include "binary.hpp"
 #include "class_description.hpp"
@@ -32,13 +33,13 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-void load_encodings_module(object container);
+FLUSSPFERD_API void load_encodings_module(object container);
 
 namespace encodings {
-  string convert_to_string(std::string const &enc, binary &source);
-  object convert_from_string(
+  FLUSSPFERD_API string convert_to_string(std::string const &enc, binary &source);
+  FLUSSPFERD_API object convert_from_string(
     std::string const &enc, flusspferd::string const &source);
-  object convert(
+  FLUSSPFERD_API object convert(
     std::string const &from_enc, std::string const &to_enc, binary &source);
 
   FLUSSPFERD_CLASS_DESCRIPTION(

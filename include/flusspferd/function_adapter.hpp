@@ -27,6 +27,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_FUNCTION_ADAPTER_HPP
 
 #ifndef PREPROC_DEBUG
+#include "detail/api.hpp"
 #include "convert.hpp"
 #include "call_context.hpp"
 #include <boost/type_traits/remove_reference.hpp>
@@ -76,7 +77,7 @@ struct ptr_to_native_object_type<
   }
 };
 
-native_object_base &get_native_object_parameter_ptr(call_context &x);
+FLUSSPFERD_API native_object_base & get_native_object_parameter_ptr(call_context &x);
 
 template<typename T>
 typename T::arg1_type

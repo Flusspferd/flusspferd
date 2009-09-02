@@ -37,7 +37,7 @@ class value;
 
 namespace Impl {
 
-class arguments_impl {
+class FLUSSPFERD_API arguments_impl {
   std::vector<jsval> values; // values from the user are added here
   std::size_t n;
   jsval *argv;

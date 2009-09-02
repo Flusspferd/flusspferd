@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_EXCEPTION_HPP
 #define FLUSSPFERD_EXCEPTION_HPP
 
+#include "detail/api.hpp"
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
@@ -38,7 +39,7 @@ class value;
  *
  * @ingroup exceptions
  */
-class exception : public std::runtime_error {
+class FLUSSPFERD_API exception : public std::runtime_error {
 public:
   /**
    * Constructor.
@@ -98,7 +99,7 @@ private:
  *
  * @ingroup exceptions
  */
-class js_quit {
+class FLUSSPFERD_API js_quit {
 public:
   /// Constructor.
   js_quit();

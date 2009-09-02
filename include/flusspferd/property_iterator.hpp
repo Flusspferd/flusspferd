@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_PROPERTY_ITERATOR_HPP
 #define FLUSSPFERD_PROPERTY_ITERATOR_HPP
 
+#include "detail/api.hpp"
 #include "object.hpp"
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -39,7 +40,7 @@ namespace flusspferd {
  *
  * @ingroup property_types
  */
-class property_iterator
+class FLUSSPFERD_API property_iterator
   : public boost::iterator_facade<
       property_iterator,
       value const,
@@ -87,6 +88,9 @@ private:
   bool equal(property_iterator const &other) const;
   value const &dereference() const;
 
+  void advance(difference_type);
+  
+  FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT
 private:
   class impl;
   boost::scoped_ptr<impl> p;

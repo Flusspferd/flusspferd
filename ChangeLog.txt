@@ -3,6 +3,12 @@ Flusspferd Change Log
 
 Release 0.7
 -----------
+2009-09-03:
+- Applied necessary changes to offer DLL build targets for 
+  Visual Studio 2008
+
+2009-09-02:
+- Visual Studio 2008 compiles with static libraries cleanly
 
 2009-08-31:
 - Use new getopt API for parsing interpreter / shell arguments.

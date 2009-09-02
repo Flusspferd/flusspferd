@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_LOCAL_ROOT_SCOPE_HPP
 #define FLUSSPFERD_LOCAL_ROOT_SCOPE_HPP
 
+#include "detail/api.hpp"
 #include "context.hpp"
 
 namespace flusspferd {
@@ -38,7 +39,7 @@ namespace flusspferd {
  *
  * @ingroup gc
  */
-class local_root_scope {
+class FLUSSPFERD_API local_root_scope {
 public:
   local_root_scope();
   ~local_root_scope();

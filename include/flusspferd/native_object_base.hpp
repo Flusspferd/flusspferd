@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_NATIVE_OBJECT_BASE_HPP
 #define FLUSSPFERD_NATIVE_OBJECT_BASE_HPP
 
+#include "detail/api.hpp"
 #include "object.hpp"
 #include "convert.hpp"
 #include "function_adapter.hpp"
@@ -45,8 +46,8 @@ struct call_context;
 class tracer;
 
 namespace detail {
-  object create_native_object(object const &proto);
-  object create_native_enumerable_object(object const &proto);
+FLUSSPFERD_API object create_native_object(object const &proto);
+FLUSSPFERD_API object create_native_enumerable_object(object const &proto);
 }
 #endif
 
@@ -55,7 +56,7 @@ namespace detail {
  *
  * @ingroup classes
  */
-class native_object_base : public object, private boost::noncopyable {
+class FLUSSPFERD_API native_object_base : public object, private boost::noncopyable {
 public:
   /// Destructor.
   virtual ~native_object_base() = 0;

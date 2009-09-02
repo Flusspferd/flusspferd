@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_NATIVE_FUNCTION_HPP
 #define FLUSSPFERD_NATIVE_FUNCTION_HPP
 
+#include "detail/api.hpp"
 #include "native_function_base.hpp"
 #include "function_adapter.hpp"
 #include <boost/function.hpp>

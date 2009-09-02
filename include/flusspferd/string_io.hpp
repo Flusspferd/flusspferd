@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_STRING_IO_HPP
 #define FLUSSPFERD_STRING_IO_HPP
 
+#include "detail/api.hpp"
 #include <flusspferd/string.hpp>
 #include <ostream>
 

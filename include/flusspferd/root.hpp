@@ -26,6 +26,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ROOT_VALUE_HPP
 #define FLUSSPFERD_ROOT_VALUE_HPP
 
+#include "detail/api.hpp"
 #include <boost/noncopyable.hpp>
 
 namespace flusspferd {
@@ -47,7 +48,7 @@ namespace detail {
  * @ingroup gc
  */
 template<class T>
-class root : public T, private boost::noncopyable {
+class FLUSSPFERD_API root : public T, private boost::noncopyable {
 public:
   /**
    * Construct the %root scope.
