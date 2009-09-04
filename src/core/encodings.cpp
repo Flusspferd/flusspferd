@@ -122,7 +122,7 @@ public:
   iconv_t conv;
 };
 
-void encodings::transcoder::trace(tracer &trc) {
+void encodings::transcoder::trace(tracer &) {
 }
 
 encodings::transcoder::transcoder(object const &obj, call_context &x)
