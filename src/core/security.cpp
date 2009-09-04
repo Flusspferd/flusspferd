@@ -71,12 +71,12 @@ security::security(object const &obj)
 security::~security()
 {}
 
-bool security::check_path(std::string const &pathname, unsigned mode) {
+bool security::check_path(std::string const &, unsigned) {
   // TODO
   return true;
 }
 
-bool security::check_url(std::string const &url, unsigned mode) {
+bool security::check_url(std::string const &, unsigned) {
   // TODO
   return true;
 }
