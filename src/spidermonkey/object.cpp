@@ -358,6 +358,8 @@ bool object::is_generator() const {
   if (is_null())
     return false;
 
+  JSContext *ctx = Impl::current_context();
+
   // There seems to be no way with the SM API to get the standard Generator
   // JSClass back. SO make a best effort guess
   JSClass *our_class = JS_GET_CLASS(ctx, get_const());
