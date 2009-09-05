@@ -499,6 +499,7 @@ int main(int argc, char **argv) {
     flusspferd_repl repl(argc, argv);
     return repl.run();
   } catch (flusspferd::js_quit&) {
+      return 0;
   } catch (std::exception &e) {
     std::cerr << "ERROR: " << e.what() << '\n';
     return 1;

@@ -37,7 +37,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   security,
   (full_name, "$security")
   (constructor_name, "")
-  (constructible, false))
+  (constructible, false)
+  (api, FLUSSPFERD_API))
 {
 public:
   static FLUSSPFERD_API security &create(object container);

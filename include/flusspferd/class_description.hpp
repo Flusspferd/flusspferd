@@ -80,7 +80,7 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PARAM_INITIAL \
-  (13, ( \
+  (14, ( \
     ~cpp_name~,                        /* name */ \
     ::flusspferd::native_object_base,  /* base class */ \
     ~constructor_name~,                /* constructor name */ \
@@ -93,7 +93,8 @@ THE SOFTWARE.
     (~, none, ~),                      /* constructor properties */ \
     false,                             /* custom enumerate */ \
     0,                                 /* augment constructor (custom func.)*/\
-    0                                  /* augment prototype (custom func.) */ \
+    0,                                 /* augment prototype (custom func.) */ \
+    FLUSSPFERD_PRIVATE_API
   )) \
   /* */
 
@@ -110,6 +111,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PARAM__custom_enumerate        10
 #define FLUSSPFERD_CD_PARAM__augment_constructor     11
 #define FLUSSPFERD_CD_PARAM__augment_prototype       12
+#define FLUSSPFERD_CD_PARAM__api                     13
 
 #define FLUSSPFERD_CD_PARAM(tuple_seq) \
   BOOST_PP_SEQ_FOLD_LEFT( \
@@ -136,10 +138,11 @@ THE SOFTWARE.
   p_constructor_properties, \
   p_custom_enumerate, \
   p_augment_constructor, \
-  p_augment_prototype \
+  p_augment_prototype, \
+  p_api \
 ) \
   template<typename Class> \
-  class FLUSSPFERD_API BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
+  class p_api BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
   public: \
     typedef BOOST_PP_CAT(p_cpp_name, _base) base_type; \
     struct class_info : ::flusspferd::class_info { \

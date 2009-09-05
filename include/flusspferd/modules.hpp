@@ -79,7 +79,7 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
  * @ingroup loadable_modules
  */
 #define FLUSSPFERD_LOADER(exports, context) \
-  extern "C" FLUSSPFERD_API \
+  extern "C" FLUSSPFERD_LOADER_API \
   void flusspferd_load( \
     ::flusspferd::object &exports, \
     ::flusspferd::object &context)
@@ -92,7 +92,7 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
  * @ingroup loadable_modules
  */
 #define FLUSSPFERD_LOADER_SIMPLE(exports) \
-  extern "C" FLUSSPFERD_API \
+  extern "C" FLUSSPFERD_LOADER_API \
   void flusspferd_load( \
     ::flusspferd::object &exports, \
     ::flusspferd::object &)

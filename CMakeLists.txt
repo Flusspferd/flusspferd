@@ -102,11 +102,6 @@ option(
     ${_ENABLE_TESTS_DEFAULT})
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-    # MinGW doesn't set this by default
-    if(WIN32)
-        add_definitions(-DWIN32)
-    endif()
-
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
     add_definitions("-pedantic-errors -Wall -Wextra"
@@ -137,8 +132,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         message(FATAL_ERROR "GCC Version too old! Get a newer GCC.")
     endif()
 elseif(MSVC)
-    add_definitions("/W3 /wd4512 /wd4355 /wd4800 /wd4996 /wd4251 /wd4275 /wd4714 /EHa")
-    set(WINLIBS projects/windows/lib32)
+    add_definitions("/W3 /wd4512 /wd4355 /wd4251 /wd4275 /wd4800 /wd4996 /wd4714 /EHa")
+    set(WINLIBS projectgit checkout CMakeLists.txts/windows/lib32)
     set(WININCLUDES ${CMAKE_SOURCE_DIR}/${WINLIBS})
 endif()
 
@@ -346,6 +341,12 @@ add_library(
     ${FLUSSPFERD_LIBRARY_TYPE}
     ${flusspferd_library_sources})
 
+# TODO: In future this must be conditional if we build build shared it is needed
+set_property(
+    TARGET flusspferd
+    PROPERTY COMPILE_DEFINITIONS
+    "FLUSSPFERD_BUILD_SHARED")
+
 set(
     flusspferd_LIBS
     ${DL_LIBRARIES}
@@ -360,13 +361,7 @@ target_link_libraries(flusspferd ${flusspferd_LIBS})
 if(NOT WIN32)
     install(TARGETS
         flusspferd
-        RUNTIME DESTINATION ${INSTALL_LIBRARIES_PATH}
         LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
-else()
-    # dll's need to live with the exe on windows.
-    install(TARGETS
-        flusspferd
-        RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 endif()
 
 ## Library - coverage variant ###############################################
@@ -423,9 +418,11 @@ else()
     ${READLINE_LIBRARIES})
 endif()
 
+if(NOT WIN32)
     install(TARGETS
         flusspferd-shell
         RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
+endif()
 
 ## Tests ###################################################################
 
@@ -485,7 +482,7 @@ endif()
 
 foreach(PLUGIN ${PLUGINS})
     message(STATUS "Plugin: ${PLUGIN} (will be built)")
-
+ 
     file(GLOB
         ${PLUGIN}_sources
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
@@ -502,16 +499,18 @@ foreach(PLUGIN ${PLUGINS})
         PROPERTY LIBRARY_OUTPUT_DIRECTORY
         ${Flusspferd_BINARY_DIR}/modules)
 
+# TODO: In future FLUSSPFERD_BUILD_SHARED must be conditional if we build build shared it is needed
     set_property(
-        TARGET ${PLUGIN}_PLUGIN
-        PROPERTY DEFINITIONS
-        ${${PLUGIN}_DEFINITIONS})
+        TARGET ${PLUGIN}_PLUGIN        
+        PROPERTY COMPILE_DEFINITIONS
+        "FLUSSPFERD_BUILD_SHARED ${${PLUGIN}_DEFINITIONS}")
 
     target_link_libraries(
         ${PLUGIN}_PLUGIN
         flusspferd
         ${${PLUGIN}_LIBRARIES})
 
+    if(NOT WIN32)
         install(TARGETS
             ${PLUGIN}_PLUGIN
             LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
@@ -525,9 +524,11 @@ foreach(PLUGIN ${PLUGINS})
                 ${${PLUGIN}_JS_FILES}
                 DESTINATION ${INSTALL_MODULES_PATH})
         endif()
+    endif()
 
 endforeach()
 
+if(NOT WIN32)
     set(JS_PLUGINS
         util util/array util/function util/range test test/equiv http/headers)
 
@@ -540,19 +541,24 @@ endforeach()
             DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
 
     endforeach()
+endif()
 
 ## Headers ##################################################################
 
+if(NOT WIN32)
     install(
         DIRECTORY include/
         DESTINATION ${INSTALL_HEADERS_PATH}
         FILES_MATCHING PATTERN "*.hpp")
+endif()
 
 ## Prelude ##################################################################
 
+if(NOT WIN32)
     install(
         FILES src/js/prelude.js
         DESTINATION ${INSTALL_LIBDATA_PATH})
+endif()
 
 ## Documentation ############################################################
 
@@ -570,6 +576,7 @@ endif()
 
 ## Configured files##########################################################
 
+if(NOT WIN32)
     configure_file(
         ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
         ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
@@ -578,7 +585,6 @@ endif()
         FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
         DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
 
-if(NOT WIN32)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
         "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
