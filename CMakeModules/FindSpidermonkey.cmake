@@ -40,25 +40,29 @@ set(
     SPIDERMONKEY_DEFINITIONS
     -D${SPIDERMONKEY_PLATFORM} -DJS_C_STRINGS_ARE_UTF8)
 
-find_path(
-    SPIDERMONKEY_INCLUDE_DIR
-    js/jsapi.h
-    PATHS "${SPIDERMONKEY_ROOT}/include"
-    NO_DEFAULT_PATH)
+if(SPIDERMONKEY_ROOT)
+    find_path(
+        SPIDERMONKEY_INCLUDE_DIR
+        js/jsapi.h
+        PATHS "${SPIDERMONKEY_ROOT}/include"
+        NO_DEFAULT_PATH)
+else()
+    find_path(
+        SPIDERMONKEY_INCLUDE_DIR
+        js/jsapi.h)
+endif()
 
-find_path(
-    SPIDERMONKEY_INCLUDE_DIR
-    js/jsapi.h)
-
-find_library(
-    SPIDERMONKEY_LIBRARY
-    NAMES mozjs js js32
-    PATHS "${SPIDERMONKEY_ROOT}/lib"
-    NO_DEFAULT_PATH)
-
-find_library(
-    SPIDERMONKEY_LIBRARY
-    NAMES mozjs js js32)
+if(SPIDERMONKEY_ROOT)
+    find_library(
+        SPIDERMONKEY_LIBRARY
+        NAMES mozjs js js32
+        PATHS "${SPIDERMONKEY_ROOT}/lib"
+        NO_DEFAULT_PATH)
+else()
+    find_library(
+        SPIDERMONKEY_LIBRARY
+        NAMES mozjs js js32)
+endif()
 
 set(SPIDERMONKEY_LIBRARIES ${SPIDERMONKEY_LIBRARY})
 
