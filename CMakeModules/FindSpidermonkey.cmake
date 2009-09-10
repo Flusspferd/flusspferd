@@ -88,10 +88,22 @@ find_package_handle_standard_args(
     SPIDERMONKEY_RUNS)
 
 if(SPIDERMONKEY_FOUND)
+    if(SPIDERMONKEY_ROOT)
+        find_path(
+            SPIDERMONKEY_JS_CONFIG_HEADER_PATH
+            "js/js-config.h"
+            PATHS "${SPIDERMONKEY_ROOT}/include"
+            NO_DEFAULT_PATH)
+    else()
+        find_path(
+            SPIDERMONKEY_JS_CONFIG_HEADER_PATH
+            "js/js-config.h")
+    endif()
+
     set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})
     set(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
     set(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
-    check_include_file_cxx("js/js-config.h" SPIDERMONKEY_JS_CONFIG_HEADER)
+    check_include_file_cxx("${SPIDERMONKEY_JS_CONFIG_HEADER_PATH}/js/js-config.h" SPIDERMONKEY_JS_CONFIG_HEADER)
 
     if(NOT SPIDERMONKEY_JS_CONFIG_HEADER)
         set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})
