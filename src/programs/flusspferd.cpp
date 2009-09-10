@@ -312,19 +312,23 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object help(flusspferd::create_object());
   spec.set_property("help", help);
   help.set_property("alias", "h");
+  help.set_property("doc", "Displays this message.");
   flusspferd::create_native_function(help, "callback",
     phoenix::bind(&flusspferd_repl::print_help, this, true));
 
   flusspferd::object version(flusspferd::create_object());
   spec.set_property("version", version);
   version.set_property("alias", "v");
+  version.set_property("doc", "Print version and exit.");
   flusspferd::create_native_function(version, "callback",
     phoenix::bind(&flusspferd_repl::print_version, this));
 
   flusspferd::object config(flusspferd::create_object());
   spec.set_property("config", config);
   config.set_property("alias", "c");
+  config.set_property("doc", "Load config from file.");
   config.set_property("argument", "required");
+  config.set_property("argument_type", "file");
   flusspferd::create_native_function(config, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::ref(config_file) = args::arg2
@@ -333,6 +337,7 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object interactive_(flusspferd::create_object());
   spec.set_property("interactive", interactive_);
   interactive_.set_property("alias", "i");
+  interactive_.set_property("doc", "Enter interactive mode (after files).");
   flusspferd::create_native_function(interactive_, "callback",
     boost::function<void ()>((
       phoenix::ref(interactive) = true,
@@ -342,6 +347,7 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object machine_mode_(flusspferd::create_object());
   spec.set_property("machine-mode", machine_mode_);
   machine_mode_.set_property("alias", "0");
+  machine_mode_.set_property("doc", "(Interactive) machine command mode (separator '\\0').");
   flusspferd::create_native_function(interactive_, "callback",
     boost::function<void ()>((
       phoenix::ref(machine_mode) = true,
@@ -352,7 +358,9 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object file(flusspferd::create_object());
   spec.set_property("file", file);
   file.set_property("alias", "f");
+  file.set_property("doc", "Run this file before standard script handling.");
   file.set_property("argument", "required");
+  file.set_property("argument_type", "file");
   flusspferd::create_native_function(file, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::bind(&flusspferd_repl::add_file, this,
@@ -362,7 +370,9 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object expression(flusspferd::create_object());
   spec.set_property("expression", expression);
   expression.set_property("alias", "e");
+  expression.set_property("doc", "Evaluate the expression.");
   expression.set_property("argument", "required");
+  expression.set_property("argument_type", "expr");
   flusspferd::create_native_function(expression, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::bind(&flusspferd_repl::add_file, this,
@@ -372,7 +382,9 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object include_path(flusspferd::create_object());
   spec.set_property("include-path", include_path);
   include_path.set_property("alias", "I");
+  include_path.set_property("doc", "Add include path.");
   include_path.set_property("argument", "required");
+  include_path.set_property("argument_type", "path");
   flusspferd::create_native_function(include_path, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::bind(&flusspferd_repl::add_file, this,
@@ -382,7 +394,9 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object module(flusspferd::create_object());
   spec.set_property("module", module);
   module.set_property("alias", "M");
+  module.set_property("doc", "Load module.");
   module.set_property("argument", "required");
+  module.set_property("argument_type", "module");
   flusspferd::create_native_function(module, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::bind(&flusspferd_repl::add_file, this,
@@ -392,7 +406,9 @@ flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::object main_module(flusspferd::create_object());
   spec.set_property("main", main_module);
   main_module.set_property("alias", "m");
+  main_module.set_property("doc", "Load module as the main module.");
   main_module.set_property("argument", "required");
+  main_module.set_property("argument_type", "module");
   flusspferd::create_native_function(main_module, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::bind(&flusspferd_repl::add_file, this,
@@ -401,6 +417,7 @@ flusspferd::object flusspferd_repl::option_spec() {
 
   flusspferd::object no_global_history(flusspferd::create_object());
   spec.set_property("no-global-history", no_global_history);
+  no_global_history.set_property("doc", "Do not use a global history in interactive mode.");
   flusspferd::create_native_function(no_global_history, "callback",
     boost::function<void()>(
       phoenix::ref(history_file) = std::string()
@@ -408,7 +425,9 @@ flusspferd::object flusspferd_repl::option_spec() {
 
   flusspferd::object history_file_(flusspferd::create_object());
   spec.set_property("history-file", history_file_);
+  history_file_.set_property("doc", "Sets history file (default: ~/.flusspferd-history)");
   history_file_.set_property("argument", "required");
+  history_file_.set_property("argument_type", "file");
   flusspferd::create_native_function(history_file_, "callback",
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::ref(history_file) = args::arg2
