@@ -31,6 +31,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+class string;
 class object;
 class array;
 
@@ -46,6 +47,9 @@ void load_getopt_module(object container);
   "name": {
     "alias": ["abc", "d"],
     "argument": "none", // or "optional" or "required"
+    "argument_type": "file", // or "dir" or "module" or ...
+    "argument_completion": "bash script", // completion script for unkown types
+    "doc": "documentation string"
     "callback": myfunction // takes (option, argument)
   },
   "name2": {}
@@ -68,6 +72,23 @@ void load_getopt_module(object container);
 object getopt(
   object spec, boost::optional<array const &> const &arguments = boost::none);
 
+/**
+ * Returns a help text to a corresponding getopt call
+ *
+ */
+string getopt_help(object spec);
+
+/**
+ * Returns a (nroff) manpage part to a corresponding getopt call
+ *
+ */
+string getopt_man(object spec);
+
+/**
+ * Returns a bash_completion script
+ *
+ */
+string getopt_bash(object spec);
 }
 
 #endif

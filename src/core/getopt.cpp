@@ -40,6 +40,9 @@ void flusspferd::load_getopt_module(object container) {
   object exports = container.get_property_object("exports");
 
   flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
+  flusspferd::create_native_function(exports, "getopt_help", &flusspferd::getopt_help);
+  flusspferd::create_native_function(exports, "getopt_man", &flusspferd::getopt_man);
+  flusspferd::create_native_function(exports, "getopt_bash", &flusspferd::getopt_bash);
 }
 
 namespace {
@@ -218,3 +221,86 @@ object flusspferd::getopt(
 
   return spec.result;
 }
+
+namespace {
+  std::string name_to_option(std::string const &name) {
+    if(name.size() > 1) {
+      return std::string("    --") + name;
+    }
+    else if(name.size() == 0) {
+      return "";
+    }
+    else {
+      return std::string("    -") + name;
+    }
+  }
+}
+
+string flusspferd::getopt_help(object spec) {
+  std::string ret;
+  for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+    std::string name = it->to_std_string();
+    object item = spec.get_property_object(name);
+
+    if (!item.is_null()) {
+      std::string argument;
+      if (item.has_property("argument_type")) {
+        argument = "<" + item.get_property("argument").to_std_string() + '>';
+      }
+      if(item.has_property("argument")) {
+        std::string arg = item.get_property("argument").to_std_string();
+        boost::algorithm::to_lower(arg);
+        if (arg == "required" && argument.empty()) {
+          argument = "<arg>";
+        }
+        else if (arg == "optional") {
+          if (argument.empty()) {
+            argument = "[<arg>]";
+          }
+          else {
+            argument = '[' + argument + ']';
+          }
+        }
+      }
+
+      std::string option = name_to_option(name) + ' ' + argument;
+
+      value aliases = item.get_property("alias");
+      if (aliases.is_undefined_or_null()) {
+        aliases = item.get_property("aliases");
+      }
+
+      if (!aliases.is_undefined_or_null()) {
+        if (!aliases.is_object() || !aliases.get_object().is_array()) {
+          option += '\n' + name_to_option(aliases.to_std_string()) + ' ' + argument;
+        }
+        else {
+          array aliases_a(aliases.get_object());
+          for (std::size_t i = 0; i < aliases_a.length(); ++i) {
+            option += '\n' + name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument;
+          }
+        }
+      }
+
+      if (item.has_property("doc")) {
+        option += '\t' + item.get_property("doc").to_std_string() + "\n\n";
+      }
+      else {
+        option += "\t...\n\n";
+      }
+      ret += option;
+    }
+  }
+  return ret;
+}
+
+string flusspferd::getopt_man(object spec) {
+  string ret = "TODO";
+  return ret;
+}
+
+string flusspferd::getopt_bash(object spec) {
+  string ret = "TODO";
+  return ret;
+}
+

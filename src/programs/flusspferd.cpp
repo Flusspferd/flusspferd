@@ -270,6 +270,9 @@ void flusspferd_repl::print_help(bool do_quit) {
 "\n"
 "    --                       Stop processing options.\n\n";
 
+  // auto generated
+  std::cerr << "auto generated\n\n" << flusspferd::getopt_help(option_spec());
+
   if (do_quit)
     throw flusspferd::js_quit();
 }
