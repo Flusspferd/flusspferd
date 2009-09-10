@@ -245,7 +245,7 @@ string flusspferd::getopt_help(object spec) {
     if (!item.is_null()) {
       std::string argument;
       if (item.has_property("argument_type")) {
-        argument = "<" + item.get_property("argument").to_std_string() + '>';
+        argument = "<" + item.get_property("argument_type").to_std_string() + '>';
       }
       if(item.has_property("argument")) {
         std::string arg = item.get_property("argument").to_std_string();
@@ -291,6 +291,7 @@ string flusspferd::getopt_help(object spec) {
       ret += option;
     }
   }
+  ret += "    --                       Stop processing options.\n\n";
   return ret;
 }
 
