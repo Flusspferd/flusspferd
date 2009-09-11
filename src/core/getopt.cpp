@@ -278,7 +278,7 @@ string flusspferd::getopt_help(object spec) {
     std::string name = it->to_std_string();
     object item = spec.get_property_object(name);
 
-    if (!item.is_null()) {
+    if (name[0] != '[' && !item.is_null()) {
       if (item.has_property("hidden") && item.get_property("hidden").to_boolean()) {
         continue;
       }
@@ -350,7 +350,7 @@ string flusspferd::getopt_man(object spec) {
     std::string name = it->to_std_string();
     object item = spec.get_property_object(name);
 
-    if (!item.is_null()) {
+    if (name[0] != '[' && !item.is_null()) {
       if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
         continue;
       }
@@ -445,7 +445,7 @@ string flusspferd::getopt_bash(object spec) {
     std::string name = it->to_std_string();
     object item = spec.get_property_object(name);
 
-    if (!item.is_null()) {
+    if (name[0] != '[' && !item.is_null()) {
       if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
         continue;
       }
