@@ -29,9 +29,15 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/root.hpp"
-#include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#ifdef HAVE_CPP0X
+#include <unordered_set>
+#else
+#include <tr1/unordered_set>
+#endif
 #include <algorithm>
 #include <map>
 
@@ -377,19 +383,21 @@ string flusspferd::getopt_man(object spec) {
 
 namespace {
   std::string arg_handler(std::string const &type) {
-    if(type == "file") {
-      return "COMPREPLY=( $(compgen -f ${cur}) )";
+#ifdef HAVE_CPP0X
+    using namespace std;
+#else
+    using namespace std::tr1;
+#endif
+    // this could be memory hungry. Better way?
+    static unordered_set<std::string> const options = boost::assign::list_of
+      ("alias")("arrayvar")("binding")("builtin")("command")("directory")
+      ("disabled")("enabled")("export")("file")("function")("group")
+      ("helptopic")("hostname")("job")("keyword")("running")("service")
+      ("setopt")("shopt")("signal")("stopped")("user")("variable")
+      .to_container(options);
+    if(options.find(type) != options.end()) {
+      return "COMPREPLY=( $(compgen -A " + type + " -- ${cur}) )";
     }
-    else if(type == "directory" || type == "path") {
-      return "COMPREPLY=( $(compgen -d ${cur}))";
-    }
-    else if(type == "alias") {
-      return "COMPREPLY=( $(compgen -a ${cur}))";
-    }
-    else if(type == "builtin") {
-      return "COMPREPLY=( $(compgen -b ${cur}))";
-    }
-    // ...
     else {
       return "";
     }
@@ -463,7 +471,7 @@ string flusspferd::getopt_bash(object spec) {
     "        case \"$prev\" in\n" +
     argument_handling +
     "            *)\n"
-    "                " + arg_handler("file") + "\n" // default case is file
+    "                COMPREPLY=( $(compgen -o default -- ${cur}) )\n"
     "                return 0\n"
     "                ;;\n"
     "        esac\n"
