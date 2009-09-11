@@ -87,6 +87,10 @@ string getopt_man(object spec);
 /**
  * Returns the content of a bash_completion function
  *
+ * Has completions for all argument types supported by compgen/complete -A.
+ * See http://www.gnu.org/software/bash/manual/bashref.html#Programmable-Completion-Builtins
+ * Use the "argument_bash" property for your own completion scripts.
+ *
  * @code
  cout << "_foo() {\n" + getopt_bash(spec) + "}\ncomplete -F _foo foo\n";
 @endcode
