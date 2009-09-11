@@ -118,7 +118,7 @@ public:
     parent_t::difference_type distance_to(iterator const &i) const {
       assert(a && a == i.a);
       typedef parent_t::difference_type diff_t;
-      return static_cast<diff_t>(pos) - static_cast<diff_t>(i.pos);
+      return static_cast<diff_t>(i.pos) - static_cast<diff_t>(pos);
     }
   };
 
