@@ -268,6 +268,10 @@ string flusspferd::getopt_help(object spec) {
     object item = spec.get_property_object(name);
 
     if (!item.is_null()) {
+      if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
+        continue;
+      }
+
       std::string argument_type;
       std::string argument;
       std::string required_argument;
@@ -336,6 +340,9 @@ string flusspferd::getopt_man(object spec) {
     object item = spec.get_property_object(name);
 
     if (!item.is_null()) {
+      if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
+        continue;
+      }
       ret += ".TP\n";
 
       value aliases = item.get_property("alias");
@@ -428,6 +435,9 @@ string flusspferd::getopt_bash(object spec) {
     object item = spec.get_property_object(name);
 
     if (!item.is_null()) {
+      if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
+        continue;
+      }
       std::string arg_handling = "            "; // tmp
 
       value aliases = item.get_property("alias");

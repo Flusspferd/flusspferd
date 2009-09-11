@@ -49,7 +49,8 @@ void load_getopt_module(object container);
     "argument": "none", // or "optional" or "required"
     "argument_type": "file", // or "dir" or "module" or ...
     "argument_bash": "bash script", // completion script for unkown types
-    "doc": "documentation string"
+    "doc": "documentation string",
+    "hidden": "true", // optional. if true no documentation is generated
     "callback": myfunction // takes (option, argument)
   },
   "name2": {}
