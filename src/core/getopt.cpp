@@ -375,8 +375,100 @@ string flusspferd::getopt_man(object spec) {
   return ret;
 }
 
+namespace {
+  std::string arg_handler(std::string const &type) {
+    if(type == "file") {
+      return "COMPREPLY=( $(compgen -f ${cur}) )";
+    }
+    else if(type == "directory" || type == "path") {
+      return "COMPREPLY=( $(compgen -d ${cur}))";
+    }
+    else if(type == "alias") {
+      return "COMPREPLY=( $(compgen -a ${cur}))";
+    }
+    else if(type == "builtin") {
+      return "COMPREPLY=( $(compgen -b ${cur}))";
+    }
+    // ...
+    else {
+      return "";
+    }
+  }
+}
+
 string flusspferd::getopt_bash(object spec) {
-  string ret = "TODO";
+  std::string ret =
+    "    local cur prev opts\n"
+    "    COMPREPLY=()\n"
+    "    cur=\"${COMP_WORDS[COMP_CWORD]}\"\n"
+    "    prev=\"${COMP_WORDS[COMP_CWORD-1]}\"\n";
+
+  std::string options;
+  std::string argument_handling;
+
+  for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+    std::string name = it->to_std_string();
+    object item = spec.get_property_object(name);
+
+    if (!item.is_null()) {
+      std::string arg_handling = "            "; // tmp
+
+      value aliases = item.get_property("alias");
+      if (aliases.is_undefined_or_null()) {
+        aliases = item.get_property("aliases");
+      }
+
+      if (!aliases.is_undefined_or_null()) {
+        if (!aliases.is_object() || !aliases.get_object().is_array()) {
+          std::string const option = name_to_option(aliases.to_std_string());
+          options += option + ' ';
+          arg_handling += option + '|';
+        }
+        else {
+          array aliases_a(aliases.get_object());
+          for (std::size_t i = 0; i < aliases_a.length(); ++i) {
+            std::string const option = aliases_a.get_element(i).to_std_string();
+            options += option + ' ';
+            arg_handling += option + '|';
+          }
+        }
+      }
+
+      std::string const option = name_to_option(name);
+      options += option + ' ';
+      arg_handling += option + ")\n";
+
+      if (item.has_property("argument_bash")) {
+        argument_handling += arg_handling +
+          "                " + item.get_property("argument_bash").to_std_string() +
+          "\n                return 0\n                ;;\n";
+      }
+      else if (item.has_property("argument_type")) {
+        std::string const handler = arg_handler(item.get_property("argument_type").to_std_string());
+        if (!handler.empty()) {
+          argument_handling += arg_handling +
+            "                " + handler +
+            "\n                return 0\n                ;;\n";
+        }
+      }
+    }
+  }
+
+  ret += 
+    "    opts=\"" + options + "\"\n\n" +
+    "    if [[ ${cur} == -* ]] ; then\n"
+    "        COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+    "        return 0\n"
+    "    else\n"
+    "        case \"$prev\" in\n" +
+    argument_handling +
+    "            *)\n"
+    "                " + arg_handler("file") + "\n" // default case is file
+    "                return 0\n"
+    "                ;;\n"
+    "        esac\n"
+    "    fi\n";
+
   return ret;
 }
 

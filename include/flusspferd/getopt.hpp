@@ -48,7 +48,7 @@ void load_getopt_module(object container);
     "alias": ["abc", "d"],
     "argument": "none", // or "optional" or "required"
     "argument_type": "file", // or "dir" or "module" or ...
-    "argument_completion": "bash script", // completion script for unkown types
+    "argument_bash": "bash script", // completion script for unkown types
     "doc": "documentation string"
     "callback": myfunction // takes (option, argument)
   },
