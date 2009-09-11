@@ -1,23 +1,23 @@
 // vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
 /**
- * @namespace IO related classes
- * @name IO
+ * @namespace io related classes
+ * @name io
  *
- * @see IO.Stream
- * @see IO.File
- * @see IO.BinaryStream
+ * @see io.Stream
+ * @see io.File
+ * @see io.BinaryStream
  */
 
-// IO.Stream {{{
+// io.Stream {{{
 /**
  * Not actually a class, but an interface
- * @name IO.Stream
+ * @name io.Stream
  * @class
- * Interface for all IO streams to follow
+ * Interface for all io streams to follow
  */
 
 // Stream instance methods {{{
-/**#@+ @methodOf IO.Stream# */
+/**#@+ @methodOf io.Stream# */
 
   /**
    * Read UTF-8 data. If the stream contains an invalid UTF-8 bye sequence, an
@@ -90,7 +90,7 @@
 /**#@- }}} */
 
 // Stream instance properties {{{
-/**#@+ @fieldOf IO.Stream# */
+/**#@+ @fieldOf io.Stream# */
 
   /**
    * Printed between every argument to [[#print]].

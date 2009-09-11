@@ -1,17 +1,17 @@
 // vim: ft=cpp:foldmethod=marker:foldmarker={{{,}}}
 /**
  *
- * @name IO.File
+ * @name io.File
  *
  * @class
- * File access from JavaScript. Files are instances of [[IO.Stream]]s.
+ * File access from JavaScript. Files are instances of [[io.Stream]]s.
  *
- * @extends IO.Stream
+ * @extends io.Stream
  */
 
 
-// IO.File instance methods {{{
-/**#@+ @methodOf IO.File# */
+// io.File instance methods {{{
+/**#@+ @methodOf io.File# */
 
   /**
    * Open a file.
@@ -23,13 +23,13 @@
   /**
    * Close the open file handle.
    *
-   * @name IO.File#close
+   * @name io.File#close
    */
 
 /**#@- }}} */
 
-// IO.File class methods {{{
-/**#@+ @methodOf IO.File */
+// io.File class methods {{{
+/**#@+ @methodOf io.File */
 
   /**
    * Create a file. No return value.
