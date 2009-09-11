@@ -226,13 +226,13 @@ object flusspferd::getopt(
 namespace {
   std::string name_to_option(std::string const &name) {
     if(name.size() > 1) {
-      return std::string("    --") + name;
+      return std::string("--") + name;
     }
     else if(name.size() == 0) {
       return "";
     }
     else {
-      return std::string("    -") + name;
+      return std::string("-") + name;
     }
   }
 }
@@ -272,7 +272,7 @@ string flusspferd::getopt_help(object spec) {
         }
       }
 
-      std::string name_arg = name_to_option(name) + ' ' + argument;
+      std::string name_arg = "    " + name_to_option(name) + ' ' + argument;
       longest_name = std::max(longest_name, name_arg.size());
 
       value aliases = item.get_property("alias");
@@ -283,12 +283,12 @@ string flusspferd::getopt_help(object spec) {
       std::string alias;
       if (!aliases.is_undefined_or_null()) {
         if (!aliases.is_object() || !aliases.get_object().is_array()) {
-          alias = name_to_option(aliases.to_std_string()) + ' ' + argument + '\n';
+          alias = "    " + name_to_option(aliases.to_std_string()) + ' ' + argument + '\n';
         }
         else {
           array aliases_a(aliases.get_object());
           for (std::size_t i = 0; i < aliases_a.length(); ++i) {
-            alias += name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument + '\n';
+            alias += "    " + name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument + '\n';
           }
         }
       }
@@ -314,7 +314,63 @@ string flusspferd::getopt_help(object spec) {
 }
 
 string flusspferd::getopt_man(object spec) {
-  string ret = "TODO";
+  std::string ret;
+  for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+    std::string name = it->to_std_string();
+    object item = spec.get_property_object(name);
+
+    if (!item.is_null()) {
+      ret += ".TP\n";
+
+      value aliases = item.get_property("alias");
+      if (aliases.is_undefined_or_null()) {
+        aliases = item.get_property("aliases");
+      }
+
+      if (!aliases.is_undefined_or_null()) {
+        if (!aliases.is_object() || !aliases.get_object().is_array()) {
+          ret += "\\fB" + name_to_option(aliases.to_std_string()) + "\\fR, ";
+        }
+        else {
+          array aliases_a(aliases.get_object());
+          for (std::size_t i = 0; i < aliases_a.length(); ++i) {
+            ret += "\\fB" + name_to_option(aliases_a.get_element(i).to_std_string()) + "\\fR, ";
+          }
+        }
+      }
+
+      ret += "\\fB" + name_to_option(name) + "\\fR";
+
+      std::string argument;
+      if (item.has_property("argument_type")) {
+        argument = "\\fI" + item.get_property("argument_type").to_std_string() + "\\fR";
+      }
+      if (item.has_property("argument")) {
+        std::string arg = item.get_property("argument").to_std_string();
+        boost::algorithm::to_lower(arg);
+        if (arg == "required" && argument.empty()) {
+          argument = "\\fIarg\\fR";
+        }
+        else if (arg == "optional") {
+          if (argument.empty()) {
+            argument = "[\\fIarg\\fR]";
+          }
+          else {
+            argument = '[' + argument + ']';
+          }
+        }
+      }
+      if (!argument.empty()) {
+        ret += ' ' + argument;
+      }
+
+      ret += '\n'; 
+      ret += item.has_property("doc") ?
+        item.get_property("doc").to_std_string() :
+        "...";
+      ret += '\n';
+    }
+  }
   return ret;
 }
 
