@@ -67,15 +67,24 @@ struct optspec {
   map_type options;
   array const &arguments;
   object result;
+  bool stop_early;
 
   optspec(object const &spec, array const &arguments)
-    : arguments(arguments)
+    : arguments(arguments), stop_early(false)
   {
     if (spec.is_null())
       throw exception("Getopt specification must be a valid object");
 
+    if (spec.has_property("[options]")) {
+      object options = spec.get_property_object("[options]");
+      stop_early = options.get_property("stop-early").to_boolean();
+    }
+
     for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
       std::string name = it->to_std_string();
+
+      if (name.empty() || name[0] == '[')
+        break;
 
       item_pointer data(new item_type);
 
@@ -223,6 +232,8 @@ object flusspferd::getopt(
         spec.handle_short(arg.substr(1), i);
     } else {
       result_arguments.call("push", arg);
+      if (spec.stop_early)
+        accept_options = false;
     }
   }
 
@@ -268,7 +279,7 @@ string flusspferd::getopt_help(object spec) {
     object item = spec.get_property_object(name);
 
     if (!item.is_null()) {
-      if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
+      if (item.has_property("hidden") && item.get_property("hidden").to_boolean()) {
         continue;
       }
 
