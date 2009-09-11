@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "flusspferd/value.hpp"
 #include "test_environment.hpp"
 
+BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::array::iterator) //FIXME?
+
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( array ) {
@@ -40,6 +42,24 @@ BOOST_AUTO_TEST_CASE( array ) {
   a.set_element(0, flusspferd::value(value0));
   BOOST_CHECK(a.get_element(0).is_int());
   BOOST_CHECK_EQUAL(a.get_element(0).get_int(), value0);
+}
+
+BOOST_AUTO_TEST_CASE( array_iterator ) {
+  std::size_t const array_size = 10;
+  flusspferd::array a = flusspferd::create_array(array_size);
+  for(std::size_t i = 0; i < array_size; ++i) {
+    a.set_element(i, flusspferd::value(static_cast<int>(i)));
+  }
+
+  flusspferd::array::iterator i = a.begin();
+  flusspferd::array::iterator const end = a.end();
+  BOOST_REQUIRE_NE(i, end);
+  BOOST_REQUIRE_EQUAL(end - i, array_size);
+  int j = 0;
+  for(; i != end; ++i, ++j) {
+    BOOST_REQUIRE(i->is_int());
+    BOOST_CHECK_EQUAL(i->get_int(), j);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
