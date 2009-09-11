@@ -31,7 +31,9 @@ THE SOFTWARE.
 #include "flusspferd/root.hpp"
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <iostream>
+#include <boost/tuple/tuple.hpp>
+#include <algorithm>
+//#include <iostream>
 #include <map>
 
 using namespace flusspferd;
@@ -237,7 +239,15 @@ namespace {
 }
 
 string flusspferd::getopt_help(object spec) {
-  std::string ret;
+  // 0 - list of aliases, 1 - name + arg, 2 - docstring
+  enum { ALIASES = 0, NAME = 1, DOC = 2 };
+  typedef boost::tuple<std::string, std::string, std::string> option_t;
+
+  typedef std::vector<option_t> options_t;
+  options_t options;
+
+  std::size_t longest_name = 0;
+
   for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
     std::string name = it->to_std_string();
     object item = spec.get_property_object(name);
@@ -263,35 +273,44 @@ string flusspferd::getopt_help(object spec) {
         }
       }
 
-      std::string option = name_to_option(name) + ' ' + argument;
+      std::string name_arg = name_to_option(name) + ' ' + argument;
+      longest_name = std::max(longest_name, name_arg.size());
 
       value aliases = item.get_property("alias");
       if (aliases.is_undefined_or_null()) {
         aliases = item.get_property("aliases");
       }
 
+      std::string alias;
       if (!aliases.is_undefined_or_null()) {
         if (!aliases.is_object() || !aliases.get_object().is_array()) {
-          option += '\n' + name_to_option(aliases.to_std_string()) + ' ' + argument;
+          alias = name_to_option(aliases.to_std_string()) + ' ' + argument + "\n";
         }
         else {
           array aliases_a(aliases.get_object());
           for (std::size_t i = 0; i < aliases_a.length(); ++i) {
-            option += '\n' + name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument;
+            alias += name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument + "\n";
           }
         }
       }
 
-      if (item.has_property("doc")) {
-        option += '\t' + item.get_property("doc").to_std_string() + "\n\n";
-      }
-      else {
-        option += "\t...\n\n";
-      }
-      ret += option;
+      options.push_back(boost::make_tuple(alias, name_arg,
+                                          item.has_property("doc") ?
+                                          item.get_property("doc").to_std_string() :
+                                          "..."));
     }
   }
-  ret += "    --                       Stop processing options.\n\n";
+  options.push_back(boost::make_tuple("", "    --", "Stop processing options."));
+
+  std::string ret;
+  typedef options_t::const_iterator iterator;
+  enum { space_between_doc = 2 };
+  for(iterator i = options.begin(); i != options.end(); ++i) {
+    ret += boost::get<ALIASES>(*i) + boost::get<NAME>(*i);
+    std::fill_n(std::back_inserter(ret), longest_name - boost::get<NAME>(*i).size() + space_between_doc, ' ');
+    ret += boost::get<DOC>(*i) + "\n\n";
+  }
+
   return ret;
 }
 
