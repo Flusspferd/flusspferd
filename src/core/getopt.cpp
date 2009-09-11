@@ -29,9 +29,16 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/root.hpp"
-#include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
-#include <iostream>
+#include <boost/assign/list_of.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <boost/shared_ptr.hpp>
+#ifdef HAVE_CPP0X
+#include <unordered_set>
+#else
+#include <tr1/unordered_set>
+#endif
+#include <algorithm>
 #include <map>
 
 using namespace flusspferd;
@@ -40,6 +47,9 @@ void flusspferd::load_getopt_module(object container) {
   object exports = container.get_property_object("exports");
 
   flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
+  flusspferd::create_native_function(exports, "getopt_help", &flusspferd::getopt_help);
+  flusspferd::create_native_function(exports, "getopt_man", &flusspferd::getopt_man);
+  flusspferd::create_native_function(exports, "getopt_bash", &flusspferd::getopt_bash);
 }
 
 namespace {
@@ -57,15 +67,24 @@ struct optspec {
   map_type options;
   array const &arguments;
   object result;
+  bool stop_early;
 
   optspec(object const &spec, array const &arguments)
-    : arguments(arguments)
+    : arguments(arguments), stop_early(false)
   {
     if (spec.is_null())
       throw exception("Getopt specification must be a valid object");
 
+    if (spec.has_property("[options]")) {
+      object options = spec.get_property_object("[options]");
+      stop_early = options.get_property("stop-early").to_boolean();
+    }
+
     for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
       std::string name = it->to_std_string();
+
+      if (name.empty() || name[0] == '[')
+        break;
 
       item_pointer data(new item_type);
 
@@ -213,8 +232,281 @@ object flusspferd::getopt(
         spec.handle_short(arg.substr(1), i);
     } else {
       result_arguments.call("push", arg);
+      if (spec.stop_early)
+        accept_options = false;
     }
   }
 
   return spec.result;
 }
+
+namespace {
+  std::string name_to_option(std::string const &name) {
+    if(name.size() > 1) {
+      return std::string("--") + name;
+    }
+    else if(name.size() == 0) {
+      return "";
+    }
+    else {
+      return std::string("-") + name;
+    }
+  }
+
+  std::string option_specification_text(std::string const &name, std::string const &argument, std::string const &required_argument) {
+    if (argument.empty())
+      return name_to_option(name);
+    else if (name.size() == 1)
+      return name_to_option(name) + required_argument;
+    else
+      return name_to_option(name) + '=' + argument;
+  }
+
+}
+
+string flusspferd::getopt_help(object spec) {
+  // 0 - list of aliases, 1 - name + arg, 2 - docstring
+  enum { ALIASES = 0, NAME = 1, DOC = 2 };
+  typedef boost::tuple<std::string, std::string, std::string> option_t;
+
+  typedef std::vector<option_t> options_t;
+  options_t options;
+
+  std::size_t longest_name = 0;
+
+  for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+    std::string name = it->to_std_string();
+    object item = spec.get_property_object(name);
+
+    if (!item.is_null()) {
+      if (item.has_property("hidden") && item.get_property("hidden").to_boolean()) {
+        continue;
+      }
+
+      std::string argument_type;
+      std::string argument;
+      std::string required_argument;
+      if (item.has_property("argument_type"))
+        argument_type = item.get_property("argument_type").to_std_string();
+      else
+        argument_type = "arg";
+      if (item.has_property("argument")) {
+        std::string arg = item.get_property("argument").to_std_string();
+        boost::algorithm::to_lower(arg);
+        if (arg != "none") {
+          required_argument = '<' + argument_type + '>';
+          if (arg == "required")
+            argument = required_argument;
+          else if (arg == "optional")
+            argument = '[' + argument_type + ']';
+        }
+      }
+
+      std::string name_arg = "    " + option_specification_text(name, argument, required_argument);
+      longest_name = std::max(longest_name, name_arg.size());
+
+      value aliases = item.get_property("alias");
+      if (aliases.is_undefined_or_null()) {
+        aliases = item.get_property("aliases");
+      }
+
+      std::string alias;
+      if (!aliases.is_undefined_or_null()) {
+        if (!aliases.is_object() || !aliases.get_object().is_array()) {
+          alias = "    " + option_specification_text(aliases.to_std_string(), argument, required_argument) + '\n';
+        }
+        else {
+          array aliases_a(aliases.get_object());
+          for (std::size_t i = 0; i < aliases_a.length(); ++i) {
+            alias += "    " + option_specification_text(aliases_a.get_element(i).to_std_string(), argument, required_argument) + '\n';
+          }
+        }
+      }
+
+      options.push_back(boost::make_tuple(alias, name_arg,
+                                          item.has_property("doc") ?
+                                          item.get_property("doc").to_std_string() :
+                                          "..."));
+    }
+  }
+  options.push_back(boost::make_tuple("", "    --", "Stop processing options."));
+
+  std::string ret;
+  typedef options_t::const_iterator iterator;
+  enum { space_between_doc = 2 };
+  for (iterator i = options.begin(); i != options.end(); ++i) {
+    ret += boost::get<ALIASES>(*i) + boost::get<NAME>(*i);
+    std::fill_n(std::back_inserter(ret), longest_name - boost::get<NAME>(*i).size() + space_between_doc, ' ');
+    ret += boost::get<DOC>(*i) + "\n\n";
+  }
+
+  return ret;
+}
+
+// TODO escape strings!
+string flusspferd::getopt_man(object spec) {
+  std::string ret;
+  for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+    std::string name = it->to_std_string();
+    object item = spec.get_property_object(name);
+
+    if (!item.is_null()) {
+      if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
+        continue;
+      }
+      ret += ".TP\n";
+
+      value aliases = item.get_property("alias");
+      if (aliases.is_undefined_or_null()) {
+        aliases = item.get_property("aliases");
+      }
+
+      if (!aliases.is_undefined_or_null()) {
+        if (!aliases.is_object() || !aliases.get_object().is_array()) {
+          ret += "\\fB" + name_to_option(aliases.to_std_string()) + "\\fR, ";
+        }
+        else {
+          array aliases_a(aliases.get_object());
+          for (std::size_t i = 0; i < aliases_a.length(); ++i) {
+            ret += "\\fB" + name_to_option(aliases_a.get_element(i).to_std_string()) + "\\fR, ";
+          }
+        }
+      }
+
+      ret += "\\fB" + name_to_option(name) + "\\fR";
+
+      std::string argument;
+      if (item.has_property("argument_type")) {
+        argument = "\\fI" + item.get_property("argument_type").to_std_string() + "\\fR";
+      }
+      if (item.has_property("argument")) {
+        std::string arg = item.get_property("argument").to_std_string();
+        boost::algorithm::to_lower(arg);
+        if (arg == "required" && argument.empty()) {
+          argument = "\\fIarg\\fR";
+        }
+        else if (arg == "optional") {
+          if (argument.empty()) {
+            argument = "[\\fIarg\\fR]";
+          }
+          else {
+            argument = '[' + argument + ']';
+          }
+        }
+      }
+      if (!argument.empty()) {
+        ret += ' ' + argument;
+      }
+
+      ret += '\n'; 
+      ret += item.has_property("doc") ?
+        item.get_property("doc").to_std_string() :
+        "...";
+      ret += '\n';
+    }
+  }
+  return ret;
+}
+
+namespace {
+  std::string arg_handler(std::string const &type) {
+#ifdef HAVE_CPP0X
+    using namespace std;
+#else
+    using namespace std::tr1;
+#endif
+    // this could be memory hungry. Better way?
+    static unordered_set<std::string> const options = boost::assign::list_of
+      ("alias")("arrayvar")("binding")("builtin")("command")("directory")
+      ("disabled")("enabled")("export")("file")("function")("group")
+      ("helptopic")("hostname")("job")("keyword")("running")("service")
+      ("setopt")("shopt")("signal")("stopped")("user")("variable")
+      .to_container(options);
+    if(options.find(type) != options.end()) {
+      return "COMPREPLY=( $(compgen -A " + type + " -- ${cur}) )";
+    }
+    else {
+      return "";
+    }
+  }
+}
+
+string flusspferd::getopt_bash(object spec) {
+  std::string ret =
+    "    local cur prev opts\n"
+    "    COMPREPLY=()\n"
+    "    cur=\"${COMP_WORDS[COMP_CWORD]}\"\n"
+    "    prev=\"${COMP_WORDS[COMP_CWORD-1]}\"\n";
+
+  std::string options;
+  std::string argument_handling;
+
+  for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
+    std::string name = it->to_std_string();
+    object item = spec.get_property_object(name);
+
+    if (!item.is_null()) {
+      if (item.has_property("hidden") && item.get_property("hidden").to_std_string() == "true") {
+        continue;
+      }
+      std::string arg_handling = "            "; // tmp
+
+      value aliases = item.get_property("alias");
+      if (aliases.is_undefined_or_null()) {
+        aliases = item.get_property("aliases");
+      }
+
+      if (!aliases.is_undefined_or_null()) {
+        if (!aliases.is_object() || !aliases.get_object().is_array()) {
+          std::string const option = name_to_option(aliases.to_std_string());
+          options += option + ' ';
+          arg_handling += option + '|';
+        }
+        else {
+          array aliases_a(aliases.get_object());
+          for (std::size_t i = 0; i < aliases_a.length(); ++i) {
+            std::string const option = aliases_a.get_element(i).to_std_string();
+            options += option + ' ';
+            arg_handling += option + '|';
+          }
+        }
+      }
+
+      std::string const option = name_to_option(name);
+      options += option + ' ';
+      arg_handling += option + ")\n";
+
+      if (item.has_property("argument_bash")) {
+        argument_handling += arg_handling +
+          "                " + item.get_property("argument_bash").to_std_string() +
+          "\n                return 0\n                ;;\n";
+      }
+      else if (item.has_property("argument_type")) {
+        std::string const handler = arg_handler(item.get_property("argument_type").to_std_string());
+        if (!handler.empty()) {
+          argument_handling += arg_handling +
+            "                " + handler +
+            "\n                return 0\n                ;;\n";
+        }
+      }
+    }
+  }
+
+  ret += 
+    "    opts=\"" + options + "\"\n\n" +
+    "    if [[ ${cur} == -* ]] ; then\n"
+    "        COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n"
+    "        return 0\n"
+    "    else\n"
+    "        case \"$prev\" in\n" +
+    argument_handling +
+    "            *)\n"
+    "                COMPREPLY=( $(compgen -o default -- ${cur}) )\n"
+    "                return 0\n"
+    "                ;;\n"
+    "        esac\n"
+    "    fi\n";
+
+  return ret;
+}
+
