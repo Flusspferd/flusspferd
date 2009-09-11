@@ -601,7 +601,7 @@ if(NOT WIN32)
     add_custom_command(
       OUTPUT flusspferd.1
       COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/misc/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
       DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
       DEPENDS flusspferd-shell
       COMMENT "Generating manpage")
