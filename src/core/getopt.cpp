@@ -313,6 +313,7 @@ string flusspferd::getopt_help(object spec) {
   return ret;
 }
 
+// TODO escape strings!
 string flusspferd::getopt_man(object spec) {
   std::string ret;
   for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
