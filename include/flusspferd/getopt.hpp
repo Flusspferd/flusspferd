@@ -44,13 +44,16 @@ void load_getopt_module(object container);
  *
  * @code
 {
+  "[options]": {
+    "stop-early": true //default: false
+  },
   "name": {
     "alias": ["abc", "d"],
     "argument": "none", // or "optional" or "required"
     "argument_type": "file", // or "dir" or "module" or ...
     "argument_bash": "bash script", // completion script for unkown types
     "doc": "documentation string",
-    "hidden": "true", // optional. if true no documentation is generated
+    "hidden": true, // optional. if true no documentation is generated
     "callback": myfunction // takes (option, argument)
   },
   "name2": {}

@@ -282,6 +282,10 @@ void flusspferd_repl::load_config() {
 flusspferd::object flusspferd_repl::option_spec() {
   flusspferd::root_object spec(flusspferd::create_object());
 
+  flusspferd::object options(flusspferd::create_object());
+  spec.set_property("[options]", options);
+  options.set_property("stop-early", true);
+
   flusspferd::object help(flusspferd::create_object());
   spec.set_property("help", help);
   help.set_property("alias", "h");
