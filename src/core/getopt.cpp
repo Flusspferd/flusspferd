@@ -241,6 +241,16 @@ namespace {
       return std::string("-") + name;
     }
   }
+
+  std::string option_specification_text(std::string const &name, std::string const &argument, std::string const &required_argument) {
+    if (argument.empty())
+      return name_to_option(name);
+    else if (name.size() == 1)
+      return name_to_option(name) + required_argument;
+    else
+      return name_to_option(name) + '=' + argument;
+  }
+
 }
 
 string flusspferd::getopt_help(object spec) {
@@ -258,27 +268,26 @@ string flusspferd::getopt_help(object spec) {
     object item = spec.get_property_object(name);
 
     if (!item.is_null()) {
+      std::string argument_type;
       std::string argument;
-      if (item.has_property("argument_type")) {
-        argument = "<" + item.get_property("argument_type").to_std_string() + '>';
-      }
+      std::string required_argument;
+      if (item.has_property("argument_type"))
+        argument_type = item.get_property("argument_type").to_std_string();
+      else
+        argument_type = "arg";
       if (item.has_property("argument")) {
         std::string arg = item.get_property("argument").to_std_string();
         boost::algorithm::to_lower(arg);
-        if (arg == "required" && argument.empty()) {
-          argument = "<arg>";
-        }
-        else if (arg == "optional") {
-          if (argument.empty()) {
-            argument = "[<arg>]";
-          }
-          else {
-            argument = '[' + argument + ']';
-          }
+        if (arg != "none") {
+          required_argument = '<' + argument_type + '>';
+          if (arg == "required")
+            argument = required_argument;
+          else if (arg == "optional")
+            argument = '[' + argument_type + ']';
         }
       }
 
-      std::string name_arg = "    " + name_to_option(name) + ' ' + argument;
+      std::string name_arg = "    " + option_specification_text(name, argument, required_argument);
       longest_name = std::max(longest_name, name_arg.size());
 
       value aliases = item.get_property("alias");
@@ -289,12 +298,12 @@ string flusspferd::getopt_help(object spec) {
       std::string alias;
       if (!aliases.is_undefined_or_null()) {
         if (!aliases.is_object() || !aliases.get_object().is_array()) {
-          alias = "    " + name_to_option(aliases.to_std_string()) + ' ' + argument + '\n';
+          alias = "    " + option_specification_text(aliases.to_std_string(), argument, required_argument) + '\n';
         }
         else {
           array aliases_a(aliases.get_object());
           for (std::size_t i = 0; i < aliases_a.length(); ++i) {
-            alias += "    " + name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument + '\n';
+            alias += "    " + option_specification_text(aliases_a.get_element(i).to_std_string(), argument, required_argument) + '\n';
           }
         }
       }
