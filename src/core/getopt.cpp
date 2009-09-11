@@ -343,7 +343,22 @@ string flusspferd::getopt_help(object spec) {
   return ret;
 }
 
-// TODO escape strings!
+namespace {
+  // replace \ with \\ .
+  std::string escape_string(std::string const &in) {
+    std::string ret;
+    for(std::string::const_iterator i = in.begin(); i != in.end(); ++i) {
+      if(*i != '\\') {
+        ret += *i;
+      }
+      else {
+        ret += "\\\\";
+      }
+    }
+    return ret;
+  }
+}
+
 string flusspferd::getopt_man(object spec) {
   std::string ret;
   for (property_iterator it = spec.begin(); it != spec.end(); ++it) {
@@ -363,12 +378,12 @@ string flusspferd::getopt_man(object spec) {
 
       if (!aliases.is_undefined_or_null()) {
         if (!aliases.is_object() || !aliases.get_object().is_array()) {
-          ret += "\\fB" + name_to_option(aliases.to_std_string()) + "\\fR, ";
+          ret += "\\fB" + escape_string(name_to_option(aliases.to_std_string())) + "\\fR, ";
         }
         else {
           array aliases_a(aliases.get_object());
           for (std::size_t i = 0; i < aliases_a.length(); ++i) {
-            ret += "\\fB" + name_to_option(aliases_a.get_element(i).to_std_string()) + "\\fR, ";
+            ret += "\\fB" + escape_string(name_to_option(aliases_a.get_element(i).to_std_string())) + "\\fR, ";
           }
         }
       }
@@ -377,7 +392,7 @@ string flusspferd::getopt_man(object spec) {
 
       std::string argument;
       if (item.has_property("argument_type")) {
-        argument = "\\fI" + item.get_property("argument_type").to_std_string() + "\\fR";
+        argument = "\\fI" + escape_string(item.get_property("argument_type").to_std_string()) + "\\fR";
       }
       if (item.has_property("argument")) {
         std::string arg = item.get_property("argument").to_std_string();
@@ -400,7 +415,7 @@ string flusspferd::getopt_man(object spec) {
 
       ret += '\n'; 
       ret += item.has_property("doc") ?
-        item.get_property("doc").to_std_string() :
+        escape_string(item.get_property("doc").to_std_string()) :
         "...";
       ret += '\n';
     }
