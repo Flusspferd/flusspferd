@@ -599,9 +599,16 @@ if(NOT WIN32)
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
     add_custom_command(
+      OUTPUT flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/misc/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
+      DEPENDS flusspferd-shell
+      COMMENT "Generating manpage")
+    add_custom_command(
       OUTPUT flusspferd.1.gz
-      COMMAND gzip -9 -c ${Flusspferd_SOURCE_DIR}/help/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
+      COMMAND gzip -9 -c ${Flusspferd_BINARY_DIR}/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
+      DEPENDS flusspferd.1
       COMMENT "Compressing manpage")
     add_custom_target(
       MANPAGE ALL
