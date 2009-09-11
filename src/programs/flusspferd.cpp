@@ -82,6 +82,8 @@ class flusspferd_repl {
   void parse_cmdline();
   void print_help(bool do_quit = false);
   void print_version();
+  void print_man();
+  void print_bash();
   void add_file(std::string const &path, Type type, bool del_interactive);
   void load_config();
 
@@ -236,6 +238,16 @@ void flusspferd_repl::print_help(bool do_quit) {
 
   if (do_quit)
     throw flusspferd::js_quit();
+}
+
+void flusspferd_repl::print_man() {
+  std::cout << flusspferd::getopt_man(option_spec());
+  throw flusspferd::js_quit();
+}
+
+void flusspferd_repl::print_bash() {
+  std::cout << flusspferd::getopt_bash(option_spec());
+  throw flusspferd::js_quit();
 }
 
 void flusspferd_repl::print_version() {
@@ -393,6 +405,19 @@ flusspferd::object flusspferd_repl::option_spec() {
     boost::function<void (flusspferd::value, std::string)>(
       phoenix::ref(history_file) = args::arg2
     ));
+
+  // Hidden Options for Generator Purpose
+  flusspferd::object man_gen_(flusspferd::create_object());
+  spec.set_property("hidden-man", man_gen_);
+  man_gen_.set_property("hidden", "true");
+  flusspferd::create_native_function(man_gen_, "callback",
+    phoenix::bind(&flusspferd_repl::print_man, this));
+
+  flusspferd::object bash_gen_(flusspferd::create_object());
+  spec.set_property("hidden-bash", bash_gen_);
+  bash_gen_.set_property("hidden", "true");
+  flusspferd::create_native_function(bash_gen_, "callback",
+    phoenix::bind(&flusspferd_repl::print_bash, this));
 
   return spec;
 }
