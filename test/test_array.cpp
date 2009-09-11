@@ -38,10 +38,31 @@ BOOST_AUTO_TEST_CASE( array ) {
   flusspferd::array a = flusspferd::create_array(array_size);
   BOOST_CHECK_EQUAL(a.length(), array_size);
   BOOST_CHECK_EQUAL(a.size(), a.length());
+
   int const value0 = 10;
   a.set_element(0, flusspferd::value(value0));
   BOOST_CHECK(a.get_element(0).is_int());
   BOOST_CHECK_EQUAL(a.get_element(0).get_int(), value0);
+
+  for(std::size_t i = 0; i < array_size; ++i) {
+    a.set_element(i, flusspferd::value(static_cast<int>(i)));
+  }
+  for(std::size_t i = 0; i < array_size; ++i) {
+    BOOST_CHECK(a.get_element(i).is_int());
+    BOOST_CHECK_EQUAL(a.get_element(i).get_int(), static_cast<int>(i));
+  }
+
+  {
+    std::size_t const new_array_size = 15;
+    a.set_length(new_array_size);
+    BOOST_CHECK_EQUAL(a.length(), new_array_size);
+  }
+
+  {
+    std::size_t const new_array_size = 5;
+    a.set_length(new_array_size);
+    BOOST_CHECK_EQUAL(a.length(), new_array_size);
+  }
 }
 
 BOOST_AUTO_TEST_CASE( array_iterator ) {
