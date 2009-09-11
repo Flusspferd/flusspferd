@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <algorithm>
-//#include <iostream>
 #include <map>
 
 using namespace flusspferd;
@@ -284,12 +283,12 @@ string flusspferd::getopt_help(object spec) {
       std::string alias;
       if (!aliases.is_undefined_or_null()) {
         if (!aliases.is_object() || !aliases.get_object().is_array()) {
-          alias = name_to_option(aliases.to_std_string()) + ' ' + argument + "\n";
+          alias = name_to_option(aliases.to_std_string()) + ' ' + argument + '\n';
         }
         else {
           array aliases_a(aliases.get_object());
           for (std::size_t i = 0; i < aliases_a.length(); ++i) {
-            alias += name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument + "\n";
+            alias += name_to_option(aliases_a.get_element(i).to_std_string()) + ' ' + argument + '\n';
           }
         }
       }
