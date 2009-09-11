@@ -79,14 +79,17 @@ object getopt(
 string getopt_help(object spec);
 
 /**
- * Returns a (nroff) manpage part to a corresponding getopt call
+ * Returns a (nroff formated) manpage part to a corresponding getopt call
  *
  */
 string getopt_man(object spec);
 
 /**
- * Returns a bash_completion script
+ * Returns the content of a bash_completion function
  *
+ * @code
+ cout << "_foo() {\n" + getopt_bash(spec) + "}\ncomplete -F _foo foo\n";
+@endcode
  */
 string getopt_bash(object spec);
 }
