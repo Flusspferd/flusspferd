@@ -614,6 +614,16 @@ if(NOT WIN32)
       MANPAGE ALL
       DEPENDS flusspferd.1.gz)
 
+    add_custom_command(
+      OUTPUT bash_completion.sh
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      DEPENDS flusspferd-shell
+      COMMENT "Generating Bash Completion Script")
+    add_custom_target(
+      BASH_COMPLETION ALL
+      DEPENDS bash_completion.sh)
+
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
         DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
