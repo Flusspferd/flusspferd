@@ -12,11 +12,12 @@
   "opensource javascript c++ cpp library bindings spidermonkey embedding embed" />
   <link rel="alternate" type="application/atom+xml" title="Flusspferd Mailing List" href=
   "http://groups.google.com/group/flusspferd/feed/atom_v1_0_msgs.xml" />
-  <link href="http://redmine.flusspferd.org/projects/flusspferd/news?format=atom&amp;key=ESNNYJwKrlFrftGoOOtJc4F7MQSkppMUqJ5MmNB6" rel="alternate" title="Flusspferd News" type="application/atom+xml" />
+  <link href=
+  "http://redmine.flusspferd.org/projects/flusspferd/news?format=atom&amp;key=ESNNYJwKrlFrftGoOOtJc4F7MQSkppMUqJ5MmNB6"
+  rel="alternate" title="Flusspferd News" type="application/atom+xml" />
   <link href="https://github.com/feeds/ruediger/commits/flusspferd/master" rel=
   "alternate" title="github: Recent Commits to flusspferd [master]" type=
   "application/atom+xml" />
-
   <link rel="stylesheet" type="text/css" media="screen" href="screen.css" />
 
   <title>Flusspferd - Javascript bindings for C++</title>
@@ -51,10 +52,9 @@
           <a href="http://gmplib.org/">GMP</a> and others. It is designed to support easy
           embedding of Javascript in C++ - and vice versa. It supports <a href=
           "https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> as its
-          backend, and possibly support for other engines will be
-          added later. Read the
-          <a href="http://redmine.flusspferd.org/projects/flusspferd/news">latest News</a>
-          on Flusspferd.</p>
+          backend, and possibly support for other engines will be added later. Read the
+          <a href="http://redmine.flusspferd.org/projects/flusspferd/news">latest
+          News</a> on Flusspferd.</p>
 
           <p>Flusspferd is licensed under the <a href=
           "http://redmine.flusspferd.org/wiki/flusspferd/MIT_License">MIT license</a>
@@ -130,6 +130,34 @@
           "https://sourceforge.net/project/showfiles.php?group_id=255938">Sourceforge</a>
           or you can retrieve them by checking out <span class=
           "tt">v<i>RELEASE</i></span> in our git repository.</p>
+
+          <h4 id="v0.7" class="heading"><a class="inthead" href="#v0.7">Major: 0.7
+          <small>(2009-09-11)</small></a></h4>
+
+          <p>Major features:</p>
+
+          <ul>
+            <li>Changed Flusspferd module system C++ API.</li>
+
+            <li>Dropped old proprietary 'blob' module in favor of 'binary' (conforming
+            with CommonJS Binary/B).</li>
+
+            <li>Add CommonJS 'system' module, moving some functionality from other
+            modules to it.</li>
+
+            <li>Replace option parsing with new 'getopt' module, which can also be used
+            from Javascript.</li>
+
+            <li>Add support for permanent history to the shell.</li>
+
+            <li>Add optional support for GNU readline.</li>
+          </ul>
+
+          <p>And other features and a lot of bug fixes.</p>
+
+          <p><small><a href=
+          "http://sourceforge.net/project/showfiles.php?group_id=255938">Download from
+          Sourceforge.</a></small></p>
 
           <h4 id="v0.6.1" class="heading"><a class="inthead" href="#v0.6.1">Minor: 0.6.1
           <small>(2009-06-18)</small></a></h4>
@@ -348,10 +376,10 @@
           <p>Alternatively, you can find us on IRC in <a href=
           "irc://irc.freenode.net/#flusspferd">#flusspferd</a> on <a href=
           "http://freenode.net/">freenode</a>. Use <a href=
-           "http://webchat.freenode.net/">Freenode's Webchat</a> or <a href=
+          "http://webchat.freenode.net/">Freenode's Webchat</a> or <a href=
           "http://java.freenode.net/index.php?nick=flusspferd-user&amp;channel=flusspferd">
-          Java client</a> to connect to the channel if you don't have an IRC
-          client on your computer.</p>
+          Java client</a> to connect to the channel if you don't have an IRC client on
+          your computer.</p>
         </div>
 
         <h3 id="bug" class="heading"><a class="inthead" href="#bug">Reporting
