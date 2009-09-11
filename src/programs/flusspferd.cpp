@@ -231,47 +231,8 @@ int flusspferd_repl::run() {
 }
 
 void flusspferd_repl::print_help(bool do_quit) {
-  std::cerr << "usage: " << argv[0] << " [option] ... [file | -] [arg] ...\n\n"
-"Options\n"
-"    -h\n"
-"    --help                   Displays this message.\n"
-"\n"
-"    -v\n"
-"    --version                Print version and exit.\n"
-"\n"
-"    -c <file>\n"
-"    --config <file>          Load config from file.\n"
-"\n"
-"    -i\n"
-"    --interactive            Enter interactive mode (after files).\n"
-"\n"
-"    -0\n"
-"    --machine-mode           (Interactive) machine command mode (separator\n"
-"                             '\\0').\n"
-"\n"
-"    -e <expr>\n"
-"    --expression <expr>      Evaluate the expression.\n"
-"\n"
-"    -f <file>\n"
-"    --file <file>            Run this file before standard script handling.\n"
-"\n"
-"    -I <path>\n"
-"    --include-path <path>    Add include path.\n"
-"\n"
-"    -M <module>\n"
-"    --module <module>        Load module.\n"
-"\n"
-"    -m <module>\n"
-"    --main <module>\n        Load module as the main module.\n"
-"\n"
-"    --no-global-history      Do not use a global history in interactive mode.\n"
-"\n"
-"    --history-file <file>    Sets history file (default: ~/.flusspferd-history)\n"
-"\n"
-"    --                       Stop processing options.\n\n";
-
-  // auto generated
-  std::cerr << "auto generated\n\n" << flusspferd::getopt_help(option_spec());
+  std::cerr << "usage: " << argv[0] << " [option] ... [file | -] [arg] ...\n\nOptions\n"
+            << flusspferd::getopt_help(option_spec());
 
   if (do_quit)
     throw flusspferd::js_quit();
