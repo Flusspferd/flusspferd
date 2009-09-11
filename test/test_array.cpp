@@ -83,22 +83,4 @@ BOOST_AUTO_TEST_CASE( array_iterator ) {
   }
 }
 
-BOOST_AUTO_TEST_CASE( array_iterator ) {
-  std::size_t const array_size = 10;
-  flusspferd::array a = flusspferd::create_array(array_size);
-  for(std::size_t i = 0; i < array_size; ++i) {
-    a.set_element(i, flusspferd::value(static_cast<int>(i)));
-  }
-
-  flusspferd::array::iterator i = a.begin();
-  flusspferd::array::iterator const end = a.end();
-  BOOST_REQUIRE_NE(i, end);
-  BOOST_REQUIRE_EQUAL(end - i, array_size);
-  int j = 0;
-  for(; i != end; ++i, ++j) {
-    BOOST_REQUIRE(i->is_int());
-    BOOST_CHECK_EQUAL(i->get_int(), j);
-  }
-}
-
 BOOST_AUTO_TEST_SUITE_END()
