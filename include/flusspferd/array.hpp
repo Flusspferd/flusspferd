@@ -1,8 +1,8 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,6 +65,7 @@ public:
   /// Set an array element.
   void set_element(std::size_t n, value const &x);
 
+  /// Const Array Iterator
   class iterator
     : public boost::iterator_facade<
     iterator, value, boost::random_access_traversal_tag, value
@@ -77,8 +78,10 @@ public:
     array const *a;
     std::size_t pos;
   public:
+#ifndef IN_DOXYGEN
     explicit
     iterator(array const &a, std::size_t pos = 0) : a(&a),   pos(pos)  { }
+#endif
     iterator(iterator const &i)                   : a(i.a), pos(i.pos) { }
     
     iterator &operator=(iterator const &o) {
@@ -120,7 +123,7 @@ public:
   };
 
   iterator begin() const { return iterator(*this); }
-  iterator end()   const { return iterator(*this, size()); }
+  iterator end()   const { return iterator(*this, length()); }
 private:
   void check();
 };
