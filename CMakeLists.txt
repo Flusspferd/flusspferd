@@ -626,6 +626,10 @@ if(NOT WIN32)
     add_custom_target(
       BASH_COMPLETION ALL
       DEPENDS bash_completion.sh)
+    install(
+      FILES ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d
+      RENAME flusspferd)
 
     find_program(EMACS NAMES emacs)
     if(NOT EMACS STREQUAL "EMACS-NOTFOUND")
