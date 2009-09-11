@@ -256,7 +256,7 @@ string flusspferd::getopt_help(object spec) {
       if (item.has_property("argument_type")) {
         argument = "<" + item.get_property("argument_type").to_std_string() + '>';
       }
-      if(item.has_property("argument")) {
+      if (item.has_property("argument")) {
         std::string arg = item.get_property("argument").to_std_string();
         boost::algorithm::to_lower(arg);
         if (arg == "required" && argument.empty()) {
@@ -304,7 +304,7 @@ string flusspferd::getopt_help(object spec) {
   std::string ret;
   typedef options_t::const_iterator iterator;
   enum { space_between_doc = 2 };
-  for(iterator i = options.begin(); i != options.end(); ++i) {
+  for (iterator i = options.begin(); i != options.end(); ++i) {
     ret += boost::get<ALIASES>(*i) + boost::get<NAME>(*i);
     std::fill_n(std::back_inserter(ret), longest_name - boost::get<NAME>(*i).size() + space_between_doc, ' ');
     ret += boost::get<DOC>(*i) + "\n\n";
