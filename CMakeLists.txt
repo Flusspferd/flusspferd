@@ -613,6 +613,9 @@ if(NOT WIN32)
     add_custom_target(
       MANPAGE ALL
       DEPENDS flusspferd.1.gz)
+    install(
+        FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
 
     add_custom_command(
       OUTPUT bash_completion.sh
@@ -623,10 +626,6 @@ if(NOT WIN32)
     add_custom_target(
       BASH_COMPLETION ALL
       DEPENDS bash_completion.sh)
-
-    install(
-        FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
 
     find_program(EMACS NAMES emacs)
     if(NOT EMACS STREQUAL "EMACS-NOTFOUND")
