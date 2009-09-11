@@ -10,6 +10,9 @@ Release 0.8
 Release 0.7
 -----------
 
+2009-09-10:
+- Added bash_completion script for flusspferd
+
 2009-08-31:
 - Use new getopt API for parsing interpreter / shell arguments.
 - Add platform and xFlusspferdVersion constants to system module.
