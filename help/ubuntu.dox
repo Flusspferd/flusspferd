@@ -123,6 +123,13 @@ $ sudo mv local.conf /etc/ld.so.conf.d/
 $ sudo ldconfig
 @endverbatim
  *
+ * Finally you should properly set up the bash completion script which allows
+ * intelligent tab completions in bash:
+ *
+ * @verbatim
+$ sudo cp /usr/local/etc/bash_completion.d/flusspferd /etc/bash_completion.d
+@endverbatim
+ *
  * @subsection sqlite Building Flusspferd with SQLite support
  *
  * Support for SQLite is autodetected during configuration. To compile with
