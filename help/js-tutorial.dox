@@ -103,7 +103,7 @@ print_args(system.args);
  */
 
 /**
- * @page js-tutorial-io Using IO
+ * @page js-tutorial-io Using io
  *
  * Previous: \ref js-tutorial-invoke
  *
