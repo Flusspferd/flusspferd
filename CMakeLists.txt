@@ -567,7 +567,7 @@ if(NOT WIN32)
       WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR})
     install(
       DIRECTORY ${Flusspferd_BINARY_DIR}/html/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/flusspferd/)
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/flusspferd/)
   endif()
 endif()
 
