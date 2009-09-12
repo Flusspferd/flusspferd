@@ -1,4 +1,4 @@
-#!/usr/local/bin/flusspferd --
+#!/usr/bin/env flusspferd
 
 var getopt = require('getopt');
 var io = require('io');
