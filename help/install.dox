@@ -1,8 +1,8 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// -*- mode: c++; coding: utf-8; -*- vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -117,9 +117,9 @@ Hello world!
  * Flusspferd. We have omitted several modules which you can choose to
  * activate if you have the necessary dependencies.
  *
- * @subsection ubu Install on Ubuntu 8.10
+ * @subsection ubu Install on Ubuntu 9.04
  *
- * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 8.10" and similar distributions.
+ * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 9.04" and similar distributions.
  *
  * @subsection ebuild Install on Gentoo
  *
