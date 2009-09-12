@@ -33,11 +33,7 @@ THE SOFTWARE.
 #include <boost/assign/list_of.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
-#ifdef HAVE_CPP0X
-#include <unordered_set>
-#else
-#include <tr1/unordered_set>
-#endif
+#include <boost/unordered_set.hpp>
 #include <algorithm>
 #include <map>
 
@@ -425,13 +421,8 @@ string flusspferd::getopt_man(object spec) {
 
 namespace {
   std::string arg_handler(std::string const &type) {
-#ifdef HAVE_CPP0X
-    using namespace std;
-#else
-    using namespace std::tr1;
-#endif
     // this could be memory hungry. Better way?
-    static unordered_set<std::string> const options = boost::assign::list_of
+    static boost::unordered_set<std::string> const options = boost::assign::list_of
       ("alias")("arrayvar")("binding")("builtin")("command")("directory")
       ("disabled")("enabled")("export")("file")("function")("group")
       ("helptopic")("hostname")("job")("keyword")("running")("service")
