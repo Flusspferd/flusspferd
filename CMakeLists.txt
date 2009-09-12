@@ -332,7 +332,9 @@ file(
     flusspferd_library_sources
     ${Flusspferd_SOURCE_DIR}/src/core/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
+    ${Flusspferd_SOURCE_DIR}/include/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp)
 
 if(WIN32)
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
@@ -421,6 +423,17 @@ if(NOT WIN32)
         flusspferd-shell
         RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 endif()
+
+## Headers ################################################################
+
+file(GLOB_RECURSE HEADERFILES
+  include/*.hpp)
+
+foreach(HEADER ${HEADERFILES})
+  set_source_files_properties(${HEADER}
+    PROPERTIES
+    HEADER_FILE_ONLY TRUE)
+endforeach()
 
 ## Tests ###################################################################
 
