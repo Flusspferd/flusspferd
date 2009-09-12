@@ -652,11 +652,6 @@ if(NOT WIN32)
     install(
       FILES ${Flusspferd_SOURCE_DIR}/misc/emacs/flusspferd.el
       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/emacs/site-lisp)
-
-#    install(
-#      FILES ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh
-#      RENAME flusspferd
-#      DESTINATION ) TODO!
 endif()
 
 message(STATUS "Configuration SUCCESSFUL. No fatal errors.")
