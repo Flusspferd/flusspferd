@@ -27,6 +27,8 @@ THE SOFTWARE.
 #include "flusspferd/init.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 
+#include <js/jsapi.h>
+
 #include <cstring>
 
 using namespace flusspferd;
@@ -133,4 +135,24 @@ value flusspferd::evaluate(
   return evaluate(source.data(), source.size(), file, line);
 }
 
+bool flusspferd::is_compilable(char const *source, std::size_t length,
+                                object const &scope_)
+{
+  assert(source);
+  JSContext *cx = Impl::current_context();
 
+  JSObject *scope = Impl::get_object(scope_);
+  if (!scope) {
+    scope = Impl::get_object(flusspferd::global());
+  }
+
+  return JS_BufferIsCompilableUnit(cx, scope, source, length);
+}
+
+bool flusspferd::is_compilable(char const *source, object const &scope) {
+  return is_compilable(source, std::strlen(source), scope);
+}
+
+bool flusspferd::is_compilable(std::string const &source, object const &scope) {
+  return is_compilable(source.data(), source.size(), scope);
+}
