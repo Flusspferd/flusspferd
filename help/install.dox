@@ -137,12 +137,18 @@ Hello world!
  *
  * @subsection macports Install on Mac OS X via Macports
  *
- * We have a Portfile for the <a href="http://www.macports.org">Macports
- * packaging system</a> in branch 'packages'. If your desired version is
- * available, you can also use the Macports repository.
+ * Flusspferd is included in the <a href="http://www.macports.org">Macports
+ * packaging system</a> since Macports 1.8. You can install Flusspferd with
  *
- * Otherwise, using the Portfile requires some additional steps.
- * See <a href="http://guide.macports.org/#development.local-repositories">
- * the Macport Guide on how to setup a local repository</a> to install
- * Flusspferd.
+ * @verbatim
+$ sudo port install flusspferd
+@endverbatim
+ *
+ * Different modules are available as variants. E.g. you can install the Flusspferd with the XML module by using
+ *
+ * @verbatim
+$ sudo port install flusspferd +xml
+@endverbatim
+ *
+ * See the <a href="http://guide.macports.org/">Macports Manual</a> for more information.
  */
