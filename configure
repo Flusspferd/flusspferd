@@ -27,6 +27,7 @@
 if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
     echo 'usage: ./configure -Dvariable=argument ...\n'
     echo 'Variables: '
+    echo '  CMAKE_BUILD_TYPE=Debug|Release        Sets build type (default Debug).'
     echo '  CMAKE_INSTALL_PREFIX=<path>           Sets installation Prefix (default /usr/local).'
     echo '  ENABLE_TESTS=ON|OFF                   Build tests (default ON).'
     echo '  ENABLE_DEBUG_WARNINGS=ON|OFF          Enable -Wpadded and -Weffc++ (default OFF).'
@@ -37,6 +38,7 @@ if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
     echo '  PLUGIN_XML=ON|OFF                     Build XML plugin if libxml2 is found (default ON).'
     echo '  LINE_EDITOR=none|libedit|readline     Select line editor (readline is better but GPL) (default libedit).'
     echo '  FORCE_LINE_EDITOR=ON|OFF              Fail configuration if the specified line editor is not available (default OFF).'
+    echo '  CREATE_DOCUMENATION=ON|OFF            Create and install documenation (default OFF).'
     echo '\nRun "ccmake build" after ./configure to get a curses based configuration editor and run "cmake --help" to get help with CMake.'
 
     exit 2
