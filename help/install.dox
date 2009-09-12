@@ -79,7 +79,8 @@ $ sudo make install
  * @p /opt/local) if you don't want to install Flusspferd in the default path
  * @p /usr/local.
  *
- * If you want to use GNU/readline, pass -DUSE_READLINE=0.
+ * If you want to use GNU/readline (e.g. for working UTF-8 support), pass
+ * @p -DLINE_EDITOR=readline but beware that GNU/readline is GPL licensed.
  *
  * If you have installed your dependencies in unusual paths, or your system
  * is unusual in another way, you might need to specify additional options.
