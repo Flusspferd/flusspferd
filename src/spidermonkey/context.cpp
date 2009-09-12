@@ -212,3 +212,13 @@ object context::constructor(std::string const &name) const {
 void context::gc() {
   JS_GC(p->context);
 }
+
+void context::set_thread() {
+  assert(JS_SetContextThread(p->context) == 0);
+}
+
+void context::clear_thread() {
+  //assert(
+  JS_ClearContextThread(p->context);
+  // == js_GetCurrentThread(p->context->runtime)->id);
+}
