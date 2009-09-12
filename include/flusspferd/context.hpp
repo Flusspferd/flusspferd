@@ -89,7 +89,7 @@ public:
    * Tie the context to the current thread. Must be called
    * before the context is used in a thread.
    * Newly created contexts are tied to the creating thread.
-   * User set_clear() before tieing the context to a new thread.
+   * Use clear_thread() before tieing the context to a new thread.
    */
   void set_thread();
 
