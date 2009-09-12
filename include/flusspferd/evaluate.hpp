@@ -96,6 +96,32 @@ value evaluate(std::string const &source, char const *file = 0x0,
  */
 value execute(char const *file, object const &scope = object());
 
+/**
+ * Check if the Code is Compileable
+ *
+ * @param source The code to check.
+ * @param length The length of the code.
+ * @param scope The scope to use.
+ */
+bool is_compilable(char const *source, std::size_t length,
+                    object const &scope = object());
+
+/**
+ * Check if the Code is Compileable
+ *
+ * @param source The source code to check
+ * @param scope The scope to use.
+ */
+bool is_compilable(char const *source, object const &scope = object());
+
+/**
+ * Check if the Code is Compileable
+ *
+ * @param source The source code to check
+ * @param scope The scope to use.
+ */
+bool is_compilable(std::string const &source, object const &scope = object());
+
 //@}
 
 }

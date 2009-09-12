@@ -1,8 +1,8 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// -*- mode:c++;coding:utf-8; -*- vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -196,15 +196,9 @@ int flusspferd_repl::run() {
     unsigned int startline = ++line;
 
     for (;;) {
-      JSBool compilable =
-          JS_BufferIsCompilableUnit(
-            flusspferd::Impl::current_context(),
-            flusspferd::Impl::get_object(flusspferd::global()),
-            source.data(),
-            source.size());
-
-      if (compilable)
+      if (flusspferd::is_compilable(source)) {
         break;
+      }
 
       std::string appendix;
       getline(appendix, "? ");
