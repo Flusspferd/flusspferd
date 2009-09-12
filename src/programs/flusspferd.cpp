@@ -473,7 +473,7 @@ namespace {
   }
 }
 
-bool flusspferd_repl::getline(std::string &source, const char* prompt) {
+bool flusspferd_repl::getline(std::string &source, char const *prompt) {
   if (machine_mode) {
     return std::getline(in, source, '\0');
   }
