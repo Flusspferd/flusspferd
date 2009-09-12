@@ -96,6 +96,20 @@ Hello world!
  *
  * Feel free to play around with the Javascript shell.
  *
+ * @section bash-completions Bash Completions
+ *
+ * Flusspferd provides a completion script for the bash shell. It is usually installed
+ * into @p PREFIX/etc/bash_completion.d/flusspferd since on most systems those files are
+ * not sourced you should either add the following line to your @p ~/.bashrc (replace @p PREFIX
+ * with the prefix where Flusspferd was installed)
+ *
+ * @verbatim
+. PREFIX/etc/bash_completion.d/flusspferd
+@endverbatim
+ *
+ * or copy the file into a path which is already sourced, like @p /etc/bash_completion.d/ on
+ * most modern Linux systems.
+ *
  * @section emacs-install-link Flusspferd's Emacs Mode
  *
  * Flusspferd comes with an
