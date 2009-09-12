@@ -123,13 +123,8 @@ Hello world!
  *
  * You might have noticed that Flusspferd doesn't use autotools or Makefiles
  * (although we provide a compatibility layer for those who can't live without).
- * Flusspferd uses <a href="http://code.google.com/p/waf">Waf</a> as its build
- * system. But as you have seen, you don't have to install it, it's entirely
- * self-contained in a single binary.
- *
- * For the purposes of this tutorial, we have not enabled all parts of
- * Flusspferd. We have omitted several modules which you can choose to
- * activate if you have the necessary dependencies.
+ * Flusspferd uses <a href="http://cmake.org/">CMake</a> as its build
+ * system.
  *
  * @subsection ubu Install on Ubuntu 9.04
  *
