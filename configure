@@ -37,7 +37,7 @@ if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
     echo '  PLUGIN_XML=ON|OFF                     Build XML plugin if libxml2 is found (default ON).'
     echo '  LINE_EDITOR=none|libedit|readline     Select line editor (readline is better but GPL) (default libedit).'
     echo '  FORCE_LINE_EDITOR=ON|OFF              Fail configuration if the specified line editor is not available (default OFF).'
-    echo '\nRun "ccmake ." to get a curses based configuration editor and run "cmake . --help" to get help with CMake.'
+    echo '\nRun "ccmake build" after ./configure to get a curses based configuration editor and run "cmake --help" to get help with CMake.'
 
     exit 2
 fi
