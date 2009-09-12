@@ -22,7 +22,7 @@
 # THE SOFTWARE.
 #
 
-.PHONY: all clean install
+.PHONY: all clean install uninstall
 
 all: build
 	$(MAKE) -C build
@@ -39,3 +39,11 @@ distclean:
 build:
 	@echo "Please run ./configure (with appropriate parameters)!"
 	@exit 1
+
+uninstall: build
+	@if [ -f build/install_manifest.txt ]; then \
+	echo 'Uninstalling' ;                       \
+	xargs rm < build/install_manifest.txt ;     \
+	else 					    \
+	echo 'Flusspferd does not seem to be installed.'; \
+	fi
