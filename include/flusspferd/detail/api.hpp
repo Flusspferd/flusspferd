@@ -38,7 +38,7 @@ THE SOFTWARE.
 #           define FLUSSPFERD_TEMPLATE_IMPORT
 #           define FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT
 #       elif defined(FLUSSPFERD_SHARED)
-#           define FLUSSPFERD_PUBLIC_API class __declspec(dllimport)
+#           define FLUSSPFERD_PUBLIC_API __declspec(dllimport)
 #           define FLUSSPFERD_PUBLIC_MODULE_API __declspec(dllimport)
 #           define FLUSSPFERD_TEMPLATE_IMPORT extern
 #           define FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT
