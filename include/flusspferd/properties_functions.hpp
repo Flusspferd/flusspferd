@@ -40,7 +40,7 @@ namespace flusspferd {
  *
  * @ingroup jsext
  */
-FLUSSPFERD_API void load_properties_functions(object o = global());
+FLUSSPFERD_PUBLIC_API void load_properties_functions(object o = global());
 
 }
 

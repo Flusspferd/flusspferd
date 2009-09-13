@@ -41,7 +41,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("close", bind, close))
   (constructor_methods,
     ("create", bind_static, create)
-    ("exists", bind_static, exists)))
+    ("exists", bind_static, exists))
+  (api, FLUSSPFERD_PUBLIC_API_CLASS))
 {
 public:
   file(object const &, call_context &);

@@ -26,14 +26,20 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CONFIG_HPP
 #define FLUSSPFERD_CONFIG_HPP
 
+#include <boost/preprocessor/control/if.hpp>
+
+#define FLUSSPFERD_PRIVATE_API
+
 #if defined(_MSC_VER) && (defined(WIN32) || defined(WIN64))
-#   ifndef FLUSSPFERD_API
+#   ifndef FLUSSPFERD_PUBLIC_API
 #       ifdef FLUSSPFERD_BUILD_SHARED
-#           define FLUSSPFERD_API    __declspec(dllexport)
+#           define FLUSSPFERD_PUBLIC_API __declspec(dllexport)
+#           define FLUSSPFERD_PUBLIC_MODULE_API __declspec(dllexport)
 #           define FLUSSPFERD_TEMPLATE_IMPORT
 #           define FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT
 #       elif defined(FLUSSPFERD_SHARED)
-#           define FLUSSPFERD_API    __declspec(dllimport)
+#           define FLUSSPFERD_PUBLIC_API class __declspec(dllimport)
+#           define FLUSSPFERD_PUBLIC_MODULE_API __declspec(dllimport)
 #           define FLUSSPFERD_TEMPLATE_IMPORT extern
 #           define FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT
 #       endif 
@@ -41,13 +47,30 @@ THE SOFTWARE.
 #   define FLUSSPFERD_LOADER_API __declspec(dllexport)
 #endif
 
-#ifndef FLUSSPFERD_API
-#   define FLUSSPFERD_API
+#ifndef FLUSSPFERD_PUBLIC_API
+#   define FLUSSPFERD_PUBLIC_API
 #endif 
 
-#ifndef FLUSSPFERD_LOADER_API
-#   define FLUSSPFERD_LOADER_API
+#ifndef FLUSSPFERD_PUBLIC_MODULE_API 
+#   define FLUSSPFERD_PUBLIC_MODULE_API 
 #endif
+
+#ifndef FLUSSPFERD_PRIVATE_MODULE_API 
+#   define FLUSSPFERD_PRIVATE_MODULE_API 
+#endif
+
+#ifndef FLUSSPFERD_LOADER_API
+#   define FLUSSPFERD_LOADER_API 
+#endif
+
+#define FLUSSPFERD_PUBLIC_API_CLASS  1
+#define FLUSSPFERD_PRIVATE_API_CLASS 0
+
+#define FLUSSPFERD_API_CLASS_PUBLIC_()  FLUSSPFERD_PUBLIC_MODULE_API
+#define FLUSSPFERD_API_CLASS_PRIVATE_() FLUSSPFERD_PRIVATE_MODULE_API
+
+#define FLUSSPFERD_API_CLASS( API_TYPE ) \
+    BOOST_PP_IF( API_TYPE , FLUSSPFERD_API_CLASS_PUBLIC_, FLUSSPFERD_API_CLASS_PRIVATE_)()
 
 #ifdef FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT
 #   undef FLUSSPFERD_PROPERTY_ITERATOR_NEEDS_DECREMENT

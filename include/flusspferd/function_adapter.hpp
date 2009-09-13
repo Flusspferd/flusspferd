@@ -77,7 +77,7 @@ struct ptr_to_native_object_type<
   }
 };
 
-FLUSSPFERD_API native_object_base & get_native_object_parameter_ptr(call_context &x);
+FLUSSPFERD_PUBLIC_API native_object_base & get_native_object_parameter_ptr(call_context &x);
 
 template<typename T>
 typename T::arg1_type

@@ -40,7 +40,7 @@ namespace flusspferd {
  *
  * @ingroup property_types
  */
-class FLUSSPFERD_API property_iterator
+class FLUSSPFERD_PUBLIC_API property_iterator
   : public boost::iterator_facade<
       property_iterator,
       value const,

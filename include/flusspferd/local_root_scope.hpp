@@ -39,7 +39,7 @@ namespace flusspferd {
  *
  * @ingroup gc
  */
-class FLUSSPFERD_API local_root_scope {
+class FLUSSPFERD_PUBLIC_API local_root_scope {
 public:
   local_root_scope();
   ~local_root_scope();

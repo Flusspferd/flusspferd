@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace io {
 
-object FLUSSPFERD_API load_io_module(object container);
+object FLUSSPFERD_PUBLIC_API load_io_module(object container);
 
 }}
 

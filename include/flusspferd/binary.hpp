@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-void FLUSSPFERD_API load_binary_module(object container);
+void FLUSSPFERD_PUBLIC_API load_binary_module(object container);
 
 class byte_string;
 
@@ -52,7 +52,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("slice", bind, slice)
     ("concat", bind, concat)
     ("split", bind, split)
-    ("decodeToString", bind, decode_to_string)))
+    ("decodeToString", bind, decode_to_string))
+    (api, FLUSSPFERD_PUBLIC_API_CLASS))
 {
 public:
   static void augment_prototype(object &);
@@ -130,7 +131,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (properties,
     ("length", getter, get_length))
   (constructor_methods,
-    ("join", bind_static, join)))
+    ("join", bind_static, join))
+    (api, FLUSSPFERD_PUBLIC_API_CLASS))
 {
 public:
   byte_string(object const &o, call_context &x);
@@ -181,7 +183,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("reduceRight", bind, reduce_right)
     ("toSource", bind, to_source))
   (properties,
-    ("length", getter_setter, (get_length, set_length))))
+    ("length", getter_setter, (get_length, set_length)))
+  (api, FLUSSPFERD_PUBLIC_API_CLASS))
 {
 public:
   byte_array(object const &o, call_context &x);

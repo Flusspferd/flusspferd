@@ -41,7 +41,7 @@ namespace flusspferd {
  *
  * @ingroup loadable_modules
  */
-FLUSSPFERD_API void load_require_function(object container);
+FLUSSPFERD_PUBLIC_API void load_require_function(object container);
 
 /**
  * The prototype for module loader functions.

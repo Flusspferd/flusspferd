@@ -39,7 +39,7 @@ class value;
  *
  * @ingroup exceptions
  */
-class FLUSSPFERD_API exception : public std::runtime_error {
+class FLUSSPFERD_PUBLIC_API exception : public std::runtime_error {
 public:
   /**
    * Constructor.
@@ -99,7 +99,7 @@ private:
  *
  * @ingroup exceptions
  */
-class FLUSSPFERD_API js_quit {
+class FLUSSPFERD_PUBLIC_API js_quit {
 public:
   /// Constructor.
   js_quit();

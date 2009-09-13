@@ -40,7 +40,7 @@ class value;
  *
  * @ingroup value_types
  */
-class FLUSSPFERD_API string : public Impl::string_impl {
+class FLUSSPFERD_PUBLIC_API string : public Impl::string_impl {
 public:
   /// Construct an empty string.
   string();
@@ -191,16 +191,16 @@ bool operator==(string const &lhs, string const &rhs);
  */
 bool operator<(string const &lhs, string const &rhs);
 
-FLUSSPFERD_API char const * convert_helper_impl( 
+FLUSSPFERD_PUBLIC_API char const * convert_helper_impl( 
     value const & v, root_value & r, char const ** );
 
-FLUSSPFERD_API string convert_helper_impl( 
+FLUSSPFERD_PUBLIC_API string convert_helper_impl( 
     value const & v, root_value & r, string *);
 
-FLUSSPFERD_API std::string convert_helper_impl( 
+FLUSSPFERD_PUBLIC_API std::string convert_helper_impl( 
     value const & v, std::string *);
 
-FLUSSPFERD_API std::basic_string<char16_t> convert_helper_impl( 
+FLUSSPFERD_PUBLIC_API std::basic_string<char16_t> convert_helper_impl( 
     value const & v, std::basic_string<char16_t>*);
 
 template<typename ToType>

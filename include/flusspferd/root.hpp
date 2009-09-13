@@ -48,7 +48,7 @@ namespace detail {
  * @ingroup gc
  */
 template<class T>
-class FLUSSPFERD_API root : public T, private boost::noncopyable {
+class FLUSSPFERD_PUBLIC_API root : public T, private boost::noncopyable {
 public:
   /**
    * Construct the %root scope.

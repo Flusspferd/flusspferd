@@ -41,7 +41,7 @@ class object;
  *
  * @ingroup contexts
  */
-class FLUSSPFERD_API init : boost::noncopyable {
+class FLUSSPFERD_PUBLIC_API init : boost::noncopyable {
   init();
 
   class impl;

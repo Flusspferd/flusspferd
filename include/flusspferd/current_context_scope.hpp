@@ -39,7 +39,7 @@ class context;
  *
  * @ingroup contexts
  */
-class FLUSSPFERD_API current_context_scope {
+class FLUSSPFERD_PUBLIC_API current_context_scope {
 private:
   context c;
   context old;

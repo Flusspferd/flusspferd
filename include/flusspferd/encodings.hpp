@@ -33,13 +33,13 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-FLUSSPFERD_API void load_encodings_module(object container);
+FLUSSPFERD_PUBLIC_API void load_encodings_module(object container);
 
 namespace encodings {
-  FLUSSPFERD_API string convert_to_string(std::string const &enc, binary &source);
-  FLUSSPFERD_API object convert_from_string(
+  FLUSSPFERD_PUBLIC_API string convert_to_string(std::string const &enc, binary &source);
+  FLUSSPFERD_PUBLIC_API object convert_from_string(
     std::string const &enc, flusspferd::string const &source);
-  FLUSSPFERD_API object convert(
+  FLUSSPFERD_PUBLIC_API object convert(
     std::string const &from_enc, std::string const &to_enc, binary &source);
 
   FLUSSPFERD_CLASS_DESCRIPTION(
@@ -50,7 +50,8 @@ namespace encodings {
     (methods,
       ("push", bind, push)
       ("close", bind, close)
-      ("pushAccumulate", bind, push_accumulate)))
+      ("pushAccumulate", bind, push_accumulate))
+    (api, FLUSSPFERD_PUBLIC_API_CLASS))
   {
   public:
     transcoder(object const &, std::string const &from, std::string const &to);

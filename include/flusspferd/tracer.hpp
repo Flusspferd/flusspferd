@@ -41,7 +41,7 @@ class value;
  *
  * @ingroup gc
  */
-class FLUSSPFERD_API tracer {
+class FLUSSPFERD_PUBLIC_API tracer {
 public:
   void trace_gcptr(char const *name, void *gcptr);
 

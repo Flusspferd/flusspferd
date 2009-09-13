@@ -43,7 +43,7 @@ struct call_context;
  *
  * @ingroup functions
  */
-class FLUSSPFERD_API native_function_base : public function, private boost::noncopyable {
+class FLUSSPFERD_PUBLIC_API native_function_base : public function, private boost::noncopyable {
 public:
   native_function_base(unsigned arity = 0);
   native_function_base(unsigned arity, std::string const &name);
@@ -57,7 +57,7 @@ protected:
 private:
   function create_function();
 
-  friend FLUSSPFERD_API function create_native_function(native_function_base *);
+  friend FLUSSPFERD_PUBLIC_API function create_native_function(native_function_base *);
 
 private:
   class impl;

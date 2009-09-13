@@ -94,7 +94,7 @@ THE SOFTWARE.
     false,                             /* custom enumerate */ \
     0,                                 /* augment constructor (custom func.)*/\
     0,                                 /* augment prototype (custom func.) */ \
-    FLUSSPFERD_PRIVATE_API
+    FLUSSPFERD_PRIVATE_API_CLASS \
   )) \
   /* */
 
@@ -142,7 +142,7 @@ THE SOFTWARE.
   p_api \
 ) \
   template<typename Class> \
-  class p_api BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
+  class FLUSSPFERD_API_CLASS(p_api) BOOST_PP_CAT(p_cpp_name, _base) : public p_base { \
   public: \
     typedef BOOST_PP_CAT(p_cpp_name, _base) base_type; \
     struct class_info : ::flusspferd::class_info { \
@@ -180,7 +180,7 @@ THE SOFTWARE.
       FLUSSPFERD_CD_CTOR_FWD, \
       (BOOST_PP_CAT(p_cpp_name, _base), p_base)) \
   }; \
-  class p_cpp_name \
+  class FLUSSPFERD_API_CLASS(p_api) p_cpp_name \
   : \
     public BOOST_PP_CAT(p_cpp_name, _base) < p_cpp_name > \
   /* */

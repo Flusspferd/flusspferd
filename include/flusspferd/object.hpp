@@ -59,7 +59,7 @@ template<typename> class convert;
  * @ingroup value_types
  * @ingroup property_types
  */
-class FLUSSPFERD_API object : public Impl::object_impl {
+class FLUSSPFERD_PUBLIC_API object : public Impl::object_impl {
 public:
 #ifndef PREPROC_DEBUG
 

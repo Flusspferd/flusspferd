@@ -35,7 +35,7 @@ namespace flusspferd {
 class object;
 class array;
 
-FLUSSPFERD_API void load_getopt_module(object container);
+FLUSSPFERD_PUBLIC_API void load_getopt_module(object container);
 
 /**
  * Parse the options.
@@ -66,7 +66,7 @@ FLUSSPFERD_API void load_getopt_module(object container);
  * take optional arguments, they will always @b require arguments or not accept
  * any at all.
  */
-FLUSSPFERD_API object getopt(
+FLUSSPFERD_PUBLIC_API object getopt(
   object spec, boost::optional<array const &> const &arguments = boost::none);
 
 }

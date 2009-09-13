@@ -32,7 +32,7 @@ namespace flusspferd {
 
 class object;
 
-void FLUSSPFERD_API load_core(object const &scope);
+void FLUSSPFERD_PUBLIC_API load_core(object const &scope);
 
 }
 

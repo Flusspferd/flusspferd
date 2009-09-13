@@ -86,7 +86,7 @@ inline property_flag operator~(property_flag x) {
  *
  * @ingroup property_types
  */
-struct FLUSSPFERD_API property_attributes {
+struct FLUSSPFERD_PUBLIC_API property_attributes {
   /// The property's flags.
   property_flag flags;
 

@@ -38,7 +38,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "BinaryStream")
   (constructor_arity, 1)
   (methods,
-    ("getBinary", bind, get_binary)))
+    ("getBinary", bind, get_binary))
+  (api, FLUSSPFERD_PUBLIC_API_CLASS))
 {
 public:
   binary_stream(object const &, call_context &);

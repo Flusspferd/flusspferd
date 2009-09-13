@@ -40,7 +40,7 @@ namespace flusspferd {
  *
  * @ingroup functions
  */
-class FLUSSPFERD_API arguments : public Impl::arguments_impl {
+class FLUSSPFERD_PUBLIC_API arguments : public Impl::arguments_impl {
 private:
   std::vector<boost::shared_ptr<root_value> > roots;
 

@@ -47,7 +47,7 @@ template<typename T> class convert;
  *
  * @ingroup value_types
  */
-class FLUSSPFERD_API value : public Impl::value_impl {
+class FLUSSPFERD_PUBLIC_API value : public Impl::value_impl {
 public:
   /// Create a new value (Javascript: <code>undefined</code>).
   value();

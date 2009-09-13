@@ -39,7 +39,7 @@ namespace flusspferd {
  * @ingroup value_types
  * @ingroup property_types
  */
-class FLUSSPFERD_API array : public object {
+class FLUSSPFERD_PUBLIC_API array : public object {
 public:
   array();
 

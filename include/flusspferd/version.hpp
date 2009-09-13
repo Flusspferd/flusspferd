@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-FLUSSPFERD_API std::string version();
+FLUSSPFERD_PUBLIC_API std::string version();
 
 }
 

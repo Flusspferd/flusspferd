@@ -39,7 +39,7 @@ class native_object_base;
  *
  * @ingroup functions
  */
-struct FLUSSPFERD_API call_context {
+struct FLUSSPFERD_PUBLIC_API call_context {
   /// Default constructor.
   call_context() : self_native(0) {}
 

@@ -53,7 +53,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (properties,
     ("fieldSeparator", variable, " ")
     ("recordSeparator", variable, "\n")
-    ("autoFlush", variable, false)))
+    ("autoFlush", variable, false))
+  (api, FLUSSPFERD_PUBLIC_API_CLASS))
 {
 public:
   stream(object const &o, std::streambuf *b);

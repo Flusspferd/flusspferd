@@ -49,8 +49,8 @@ class native_function_base;
 #ifndef IN_DOXYGEN
 namespace detail {
 
-FLUSSPFERD_API object create_native_object(object const &proto);
-FLUSSPFERD_API object create_native_enumerable_object(object const &proto);
+FLUSSPFERD_PUBLIC_API object create_native_object(object const &proto);
+FLUSSPFERD_PUBLIC_API object create_native_enumerable_object(object const &proto);
 
 }
 #endif
@@ -69,7 +69,7 @@ FLUSSPFERD_API object create_native_enumerable_object(object const &proto);
  * @param proto The object to use as prototype.
  * @return The new object.
  */
-FLUSSPFERD_API object create_object(object const &proto = object());
+FLUSSPFERD_PUBLIC_API object create_object(object const &proto = object());
 
 /**
  * Create an array.
@@ -77,7 +77,7 @@ FLUSSPFERD_API object create_object(object const &proto = object());
  * @param length The initial length of the new array.
  * @return The new array.
  */
-FLUSSPFERD_API array create_array(unsigned int length = 0);
+FLUSSPFERD_PUBLIC_API array create_array(unsigned int length = 0);
 
 #ifndef IN_DOXYGEN
 
@@ -147,7 +147,7 @@ T &create_native_object(object const &proto, ...);
  */
 //@{
 
-function FLUSSPFERD_API create_function(
+function FLUSSPFERD_PUBLIC_API create_function(
     std::string const &name,
     unsigned n_args,
     std::vector<std::string> argnames,
@@ -163,7 +163,7 @@ function FLUSSPFERD_API create_function(
  * @param ptr The native function object.
  * @return The new function.
  */
-FLUSSPFERD_API function create_native_function(native_function_base *ptr);
+FLUSSPFERD_PUBLIC_API function create_native_function(native_function_base *ptr);
 
 /**
  * Create a new native function as method of an object.
@@ -174,7 +174,7 @@ FLUSSPFERD_API function create_native_function(native_function_base *ptr);
  * @param ptr The native function object.
  * @return The new method.
  */
-FLUSSPFERD_API function create_native_function(object const &o, native_function_base *ptr);
+FLUSSPFERD_PUBLIC_API function create_native_function(object const &o, native_function_base *ptr);
 
 #ifndef IN_DOXYGEN
 

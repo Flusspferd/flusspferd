@@ -41,7 +41,7 @@ class native_function_base;
  * @ingroup value_types
  * @ingroup functions
  */
-class FLUSSPFERD_API function : 
+class FLUSSPFERD_PUBLIC_API function : 
   public Impl::function_impl,
   public object
 {

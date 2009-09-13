@@ -42,7 +42,7 @@ class native_object_base;
  *
  * @ingroup contexts
  */
-class FLUSSPFERD_API context {
+class FLUSSPFERD_PUBLIC_API context {
   class impl;
   boost::shared_ptr<impl> p;
 

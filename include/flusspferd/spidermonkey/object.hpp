@@ -40,7 +40,7 @@ class object;
 
 namespace Impl {
 
-class FLUSSPFERD_API object_impl {
+class FLUSSPFERD_PUBLIC_API object_impl {
   JSObject *obj;
 
 protected:

@@ -34,7 +34,7 @@ namespace flusspferd {
 
 namespace Impl {
 
-FLUSSPFERD_API JSRuntime * get_runtime();
+FLUSSPFERD_PUBLIC_API JSRuntime * get_runtime();
 
 }
 

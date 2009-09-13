@@ -39,7 +39,7 @@ typedef jschar char16_t;
 
 namespace Impl {
 
-class FLUSSPFERD_API string_impl {
+class FLUSSPFERD_PUBLIC_API string_impl {
   JSString *str;
 
 protected:

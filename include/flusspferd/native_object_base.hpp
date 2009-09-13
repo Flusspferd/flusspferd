@@ -46,8 +46,8 @@ struct call_context;
 class tracer;
 
 namespace detail {
-FLUSSPFERD_API object create_native_object(object const &proto);
-FLUSSPFERD_API object create_native_enumerable_object(object const &proto);
+FLUSSPFERD_PUBLIC_API object create_native_object(object const &proto);
+FLUSSPFERD_PUBLIC_API object create_native_enumerable_object(object const &proto);
 }
 #endif
 
@@ -56,7 +56,7 @@ FLUSSPFERD_API object create_native_enumerable_object(object const &proto);
  *
  * @ingroup classes
  */
-class FLUSSPFERD_API native_object_base : public object, private boost::noncopyable {
+class FLUSSPFERD_PUBLIC_API native_object_base : public object, private boost::noncopyable {
 public:
   /// Destructor.
   virtual ~native_object_base() = 0;
