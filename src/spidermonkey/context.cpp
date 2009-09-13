@@ -214,11 +214,15 @@ void context::gc() {
 }
 
 void context::set_thread() {
+#ifdef JS_THREADSAFE
   assert(JS_SetContextThread(p->context) == 0);
+#endif
 }
 
 void context::clear_thread() {
+#ifdef JS_THREADSAFE
   //assert(
   JS_ClearContextThread(p->context);
   // == js_GetCurrentThread(p->context->runtime)->id);
+#endif
 }
