@@ -334,7 +334,10 @@ file(
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
     ${Flusspferd_SOURCE_DIR}/include/*.hpp
-    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp)
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/io/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
 
 if(WIN32)
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
@@ -424,24 +427,15 @@ if(NOT WIN32)
         RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 endif()
 
-## Headers ################################################################
-
-file(GLOB_RECURSE HEADERFILES
-  include/*.hpp)
-
-foreach(HEADER ${HEADERFILES})
-  set_source_files_properties(${HEADER}
-    PROPERTIES
-    HEADER_FILE_ONLY TRUE)
-endforeach()
-
 ## Tests ###################################################################
 
 if(ENABLE_TESTS)
 
     file(GLOB
         TESTS
-        test/test_*.cpp)
+        test/test_*.cpp
+        #test/*.hpp
+        )
 
     foreach(TEST_SOURCE ${TESTS})
         string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
@@ -496,7 +490,8 @@ foreach(PLUGIN ${PLUGINS})
 
     file(GLOB
         ${PLUGIN}_sources
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
     add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
 
@@ -554,6 +549,14 @@ if(NOT WIN32)
 endif()
 
 ## Headers ##################################################################
+
+file(GLOB_RECURSE HEADERFILES *.hpp)
+
+foreach(HEADER ${HEADERFILES})
+  set_source_files_properties(${HEADER}
+    PROPERTIES
+    HEADER_FILE_ONLY TRUE)
+endforeach()
 
 if(NOT WIN32)
     install(
