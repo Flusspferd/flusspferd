@@ -58,6 +58,7 @@ struct context::context_private {
   boost::unordered_map<std::string, root_object_ptr> constructors;
 };
 
+/// impl provides the hidden implementation part
 class context::impl {
 public:
   impl()
@@ -130,6 +131,7 @@ public:
   bool destroy;
 };
 
+/// detail is used for copyconstructing/initialisation purpose
 struct context::detail {
   JSContext *c;
   detail(JSContext *ct) : c(ct) { }
