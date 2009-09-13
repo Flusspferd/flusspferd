@@ -58,6 +58,7 @@ struct context::context_private {
   boost::unordered_map<std::string, root_object_ptr> constructors;
 };
 
+/// impl provides the hidden implementation part
 class context::impl {
 public:
   impl()
@@ -130,6 +131,7 @@ public:
   bool destroy;
 };
 
+/// detail is used for copyconstructing/initialisation purpose
 struct context::detail {
   JSContext *c;
   detail(JSContext *ct) : c(ct) { }
@@ -211,4 +213,18 @@ object context::constructor(std::string const &name) const {
 
 void context::gc() {
   JS_GC(p->context);
+}
+
+void context::set_thread() {
+#ifdef JS_THREADSAFE
+  assert(JS_SetContextThread(p->context) == 0);
+#endif
+}
+
+void context::clear_thread() {
+#ifdef JS_THREADSAFE
+  //assert(
+  JS_ClearContextThread(p->context);
+  // == js_GetCurrentThread(p->context->runtime)->id);
+#endif
 }

@@ -40,25 +40,29 @@ set(
     SPIDERMONKEY_DEFINITIONS
     -D${SPIDERMONKEY_PLATFORM} -DJS_C_STRINGS_ARE_UTF8)
 
-find_path(
-    SPIDERMONKEY_INCLUDE_DIR
-    js/jsapi.h
-    PATHS "${SPIDERMONKEY_ROOT}/include"
-    NO_DEFAULT_PATH)
+if(SPIDERMONKEY_ROOT)
+    find_path(
+        SPIDERMONKEY_INCLUDE_DIR
+        js/jsapi.h
+        PATHS "${SPIDERMONKEY_ROOT}/include"
+        NO_DEFAULT_PATH)
+else()
+    find_path(
+        SPIDERMONKEY_INCLUDE_DIR
+        js/jsapi.h)
+endif()
 
-find_path(
-    SPIDERMONKEY_INCLUDE_DIR
-    js/jsapi.h)
-
-find_library(
-    SPIDERMONKEY_LIBRARY
-    NAMES mozjs js js32 js3250
-    PATHS "${SPIDERMONKEY_ROOT}/lib"
-    NO_DEFAULT_PATH)
-
-find_library(
-    SPIDERMONKEY_LIBRARY
-    NAMES mozjs js js32 js3250)
+if(SPIDERMONKEY_ROOT)
+    find_library(
+        SPIDERMONKEY_LIBRARY
+        NAMES mozjs js js32
+        PATHS "${SPIDERMONKEY_ROOT}/lib"
+        NO_DEFAULT_PATH)
+else()
+    find_library(
+        SPIDERMONKEY_LIBRARY
+        NAMES mozjs js js32)
+endif()
 
 set(SPIDERMONKEY_LIBRARIES ${SPIDERMONKEY_LIBRARY})
 
@@ -84,10 +88,22 @@ find_package_handle_standard_args(
     SPIDERMONKEY_RUNS)
 
 if(SPIDERMONKEY_FOUND)
+    if(SPIDERMONKEY_ROOT)
+        find_path(
+            SPIDERMONKEY_JS_CONFIG_HEADER_PATH
+            "js/js-config.h"
+            PATHS "${SPIDERMONKEY_ROOT}/include"
+            NO_DEFAULT_PATH)
+    else()
+        find_path(
+            SPIDERMONKEY_JS_CONFIG_HEADER_PATH
+            "js/js-config.h")
+    endif()
+
     set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})
     set(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
     set(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
-    check_include_file_cxx("js/js-config.h" SPIDERMONKEY_JS_CONFIG_HEADER)
+    check_include_file_cxx("${SPIDERMONKEY_JS_CONFIG_HEADER_PATH}/js/js-config.h" SPIDERMONKEY_JS_CONFIG_HEADER)
 
     if(NOT SPIDERMONKEY_JS_CONFIG_HEADER)
         set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})

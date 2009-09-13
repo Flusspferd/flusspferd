@@ -1,6 +1,25 @@
 Release Notes
 =============
 
+0.7 Series
+----------
+
+0.7: Major release (git: v0.7)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Major features:
+- Changed Flusspferd module system C++ API.
+- Dropped old proprietary 'blob' module in favor of 'binary' (conforming
+  with CommonJS Binary/B).
+- Add CommonJS 'system' module, moving some functionality from other modules
+  to it.
+- Replace option parsing with new 'getopt' module, which can also be used
+  from Javascript.
+- Add support for permanent history to the shell.
+- Add optional support for GNU readline.
+
+And other features and a lot of bug fixes.
+
 0.6 Series
 ----------
 

@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+class string;
 class object;
 class array;
 
@@ -44,9 +45,16 @@ FLUSSPFERD_PUBLIC_API void load_getopt_module(object container);
  *
  * @code
 {
+  "[options]": {
+    "stop-early": true //default: false
+  },
   "name": {
     "alias": ["abc", "d"],
     "argument": "none", // or "optional" or "required"
+    "argument_type": "file", // or "dir" or "module" or ...
+    "argument_bash": "bash script", // completion script for unkown types
+    "doc": "documentation string",
+    "hidden": true, // optional. if true no documentation is generated
     "callback": myfunction // takes (option, argument)
   },
   "name2": {}
@@ -69,6 +77,30 @@ FLUSSPFERD_PUBLIC_API void load_getopt_module(object container);
 FLUSSPFERD_PUBLIC_API object getopt(
   object spec, boost::optional<array const &> const &arguments = boost::none);
 
+/**
+ * Returns a help text to a corresponding getopt call
+ *
+ */
+string getopt_help(object spec);
+
+/**
+ * Returns a (nroff formated) manpage part to a corresponding getopt call
+ *
+ */
+string getopt_man(object spec);
+
+/**
+ * Returns the content of a bash_completion function
+ *
+ * Has completions for all argument types supported by compgen/complete -A.
+ * See http://www.gnu.org/software/bash/manual/bashref.html#Programmable-Completion-Builtins
+ * Use the "argument_bash" property for your own completion scripts.
+ *
+ * @code
+ cout << "_foo() {\n" + getopt_bash(spec) + "}\ncomplete -F _foo foo\n";
+@endcode
+ */
+string getopt_bash(object spec);
 }
 
 #endif

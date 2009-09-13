@@ -1,8 +1,8 @@
-// -*- mode: c++; coding: utf-8; -*- vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
+Copyright (c) 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,29 +23,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-/**
- * @page tutorials Tutorials
- *
- * It is always difficult to learn how to use a new library. Tutorials are
- * designed to cope with that problem.
- *
- * - @subpage install
- *   - @ref ubuntu
- *   - @ref emacs-install
- *
- * - @subpage cpp-tutorial
- *   - @ref cpp-tutorial-firstprogram
- *   - @ref cpp-tutorial-values_and_objects
- *   - @ref cpp-tutorial-gc
- *   - @ref cpp-tutorial-functions
- *   - @ref cpp-tutorial-classes
- *     - @ref cpp-tutorial-classes-without-macro
- *   - @ref cpp-tutorial-modules
- *
- * - @subpage js-tutorial
- *   - @ref js-tutorial-invoke
- *   - @ref js-tutorial-io
- *   - @ref js-tutorial-xml
- *   - @ref js-tutorial-getopt
- *   - @see @ref cpp-tutorial-modules
- */
+#include "flusspferd/evaluate.hpp"
+
+#include "flusspferd/value.hpp"
+#include "test_environment.hpp"
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+
+BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
+
+BOOST_AUTO_TEST_CASE( evaluate_file ) {
+  char const * const filename = "foo.js";
+
+  std::ofstream out(filename);
+  BOOST_REQUIRE(out.good());
+
+  int const value = 13;
+  out << value << ";\n";
+  out.close();
+
+  flusspferd::value v = flusspferd::execute(filename);
+  BOOST_REQUIRE(v.is_int());
+  BOOST_CHECK_EQUAL(v.get_int(), value);
+
+  std::remove(filename);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

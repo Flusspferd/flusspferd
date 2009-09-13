@@ -332,7 +332,9 @@ file(
     flusspferd_library_sources
     ${Flusspferd_SOURCE_DIR}/src/core/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
+    ${Flusspferd_SOURCE_DIR}/include/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp)
 
 set(FLUSSPFERD_LIBRARY_TYPE SHARED)
 
@@ -423,6 +425,17 @@ if(NOT WIN32)
         flusspferd-shell
         RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 endif()
+
+## Headers ################################################################
+
+file(GLOB_RECURSE HEADERFILES
+  include/*.hpp)
+
+foreach(HEADER ${HEADERFILES})
+  set_source_files_properties(${HEADER}
+    PROPERTIES
+    HEADER_FILE_ONLY TRUE)
+endforeach()
 
 ## Tests ###################################################################
 
@@ -570,7 +583,7 @@ if(NOT WIN32)
       WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR})
     install(
       DIRECTORY ${Flusspferd_BINARY_DIR}/html/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/flusspferd/)
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/flusspferd/)
   endif()
 endif()
 
@@ -602,17 +615,37 @@ if(NOT WIN32)
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
     add_custom_command(
+      OUTPUT flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
+      DEPENDS flusspferd-shell
+      COMMENT "Generating manpage")
+    add_custom_command(
       OUTPUT flusspferd.1.gz
-      COMMAND gzip -9 -c ${Flusspferd_SOURCE_DIR}/help/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
+      COMMAND gzip -9 -c ${Flusspferd_BINARY_DIR}/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
+      DEPENDS flusspferd.1
       COMMENT "Compressing manpage")
     add_custom_target(
       MANPAGE ALL
       DEPENDS flusspferd.1.gz)
-
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
+
+    add_custom_command(
+      OUTPUT bash_completion.sh
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      DEPENDS flusspferd-shell
+      COMMENT "Generating Bash Completion Script")
+    add_custom_target(
+      BASH_COMPLETION ALL
+      DEPENDS bash_completion.sh)
+    install(
+      FILES ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d
+      RENAME flusspferd)
 
     find_program(EMACS NAMES emacs)
     if(NOT EMACS STREQUAL "EMACS-NOTFOUND")

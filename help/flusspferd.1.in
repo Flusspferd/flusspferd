@@ -1,4 +1,4 @@
-.\" Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+.\" Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
 .\"
 .\" Permission is hereby granted, free of charge, to any person obtaining a copy
 .\" of this software and associated documentation files (the "Software"), to
@@ -28,45 +28,7 @@ flusspferd \- interactive Javascript shell/repl
 \fBflusspferd\fR is an interactive Javascript shell/repl based on the
 Flusspferd Javascript library. It can be used to run and test Javascript code.
 .SH OPTIONS
-.TP
-\fB-h\fR, \fB--help\fR
-Displays a help message.
-.TP
-\fB-v\fR, \fB--version\fR
-Print version and exit.
-.TP
-\fB-c\fR, \fB--config\fR \fIconfig-file\fR
-Load config from file \fIconfig-file\fR.
-.TP
-\fB-i\fR, \fB--interactive\fR
-Enter interactive mode (after all files are loaded).
-.TP
-\fB-0\fR, \fB--machine-mode\fR
-(Interactive) Machine command mode (separator '\\0').
-.TP
-\fB-e\fR, \fB--expression\fR \fIexpression\fR
-Evaluate the expression.
-.TP
-\fB-f\fR, \fB--file\fR \fIfile\fR
-Run this file before standard script handling.
-.TP
-\fB-I\fR, \fB--include-path\fR \fIpath\fR
-Add include path.
-.TP
-\fB-M\fR \fImodule\fR
-Load module.
-.TP
-\fB-m\fR, \fB--main\fR \fImodule\fR
-Load module as the main module.
-.TP
-\fB--no-global-history\fR
-Do not use a global history in interactive mode.
-.TP
-\fB--history-file\fR \fIfile\fR
-Sets history file (default: ~/.flusspferd-history).
-.TP
-\fB--\fR
-Stop processing options.
+@OPTIONS@
 .SH EXAMPLES
 .nf
   $ \fBflusspferd\fR

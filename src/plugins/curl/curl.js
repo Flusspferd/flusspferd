@@ -54,7 +54,7 @@ THE SOFTWARE.
 
     // If we have http/headers, define a default header callback that
     // creates 
-    var HTTPHeaders = require('http/headers').HTTP.Headers;
+    var HTTPHeaders = require('http/headers').Headers;
 
     /** 
      * Array of protocols by the linked version of libcurl.
