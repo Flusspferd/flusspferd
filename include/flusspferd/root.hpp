@@ -42,7 +42,32 @@ namespace detail {
 /**
  * Keeps a Javascript value, object or anything in a GC %root scope.
  *
- * @see root_value, root_object, root_string, root_function, root_array
+ * If the GC thing could not be rooted, an exception will be thrown.
+ *
+ * A root object can be used transparently as the type it roots. For example:
+ *
+ * @verbatim
+class root_example {
+private:
+  root_object root; // root_object is root<object>
+public:
+  object root_object(object to_root) {
+    // The object to_root will now be protected from GC as long as the
+    // root_example instance stays in scope. When it goes out, the root will
+    // be removed.
+    root = to_root;
+
+    // We can treat the root_object as a plain object
+    return root;
+  }
+}
+@endverbatim
+ *
+ * The above example would work just the same if to_root as a string, value,
+ * function or an array.
+ *
+ * @see root_value, root_object, root_string, root_function, root_array,
+ *      local_root_scope
  *
  * @ingroup gc
  */
