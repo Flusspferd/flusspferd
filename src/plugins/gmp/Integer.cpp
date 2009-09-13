@@ -72,7 +72,7 @@ namespace multi_precision {
 
   void Integer::cmp(flusspferd::call_context &x) /*const*/ {
     if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected one parameter!");
+      throw flusspferd::exception("Expected one parameter");
     flusspferd::value v = x.arg.front();
     if(v.is_int())
       x.result = ::cmp(mp, v.get_int());
@@ -91,7 +91,7 @@ namespace multi_precision {
 #define OPERATOR(name, op)                                              \
   void Integer:: name (flusspferd::call_context &x) /*const*/ {         \
     if(x.arg.empty() || x.arg.size() > 1)                               \
-      throw flusspferd::exception("Expected on parameter");             \
+      throw flusspferd::exception("Expected one parameter");            \
     flusspferd::value v = x.arg.front();                                \
     if(v.is_int())                                                      \
       x.result = create_integer(mp op v.get_int());                     \
