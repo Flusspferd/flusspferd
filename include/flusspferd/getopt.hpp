@@ -81,13 +81,13 @@ FLUSSPFERD_PUBLIC_API object getopt(
  * Returns a help text to a corresponding getopt call
  *
  */
-string getopt_help(object spec);
+FLUSSPFERD_PUBLIC_API string getopt_help(object spec);
 
 /**
  * Returns a (nroff formated) manpage part to a corresponding getopt call
  *
  */
-string getopt_man(object spec);
+FLUSSPFERD_PUBLIC_API string getopt_man(object spec);
 
 /**
  * Returns the content of a bash_completion function
@@ -100,7 +100,7 @@ string getopt_man(object spec);
  cout << "_foo() {\n" + getopt_bash(spec) + "}\ncomplete -F _foo foo\n";
 @endcode
  */
-string getopt_bash(object spec);
+FLUSSPFERD_PUBLIC_API string getopt_bash(object spec);
 }
 
 #endif

@@ -49,8 +49,10 @@ class value;
  * @param file The file name to use.
  * @param line The initial line number.
  */
-value FLUSSPFERD_PUBLIC_API evaluate(char const *source, std::size_t n,
-               char const *file = 0x0, unsigned int line = 0);
+FLUSSPFERD_PUBLIC_API value evaluate(char const *source, 
+                                     std::size_t n,
+                                     char const *file = 0x0, 
+                                     unsigned int line = 0);
 
 /**
  * Evaluate Javascript code in a scope.
@@ -61,9 +63,11 @@ value FLUSSPFERD_PUBLIC_API evaluate(char const *source, std::size_t n,
  * @param line The initial line number.
  * @param scope The scope 
  */
-value FLUSSPFERD_PUBLIC_API evaluate_in_scope(char const* source, std::size_t n,
-                        char const* file, unsigned int line,
-                        object const &scope);
+FLUSSPFERD_PUBLIC_API value evaluate_in_scope(char const* source, 
+                                              std::size_t n,
+                                              char const* file, 
+                                              unsigned int line,
+                                              object const &scope);
 
 /**
  * Evaluate Javascript code.
@@ -74,8 +78,9 @@ value FLUSSPFERD_PUBLIC_API evaluate_in_scope(char const* source, std::size_t n,
  * @param file The file name to use.
  * @param line The initial line number.
  */
-value FLUSSPFERD_PUBLIC_API evaluate(char const *source, char const *file = 0x0,
-               unsigned int line = 0);
+FLUSSPFERD_PUBLIC_API value evaluate(char const *source, 
+                                     char const *file = 0x0,
+                                     unsigned int line = 0);
 
 /**
  * Evaluate Javascript code.
@@ -86,8 +91,9 @@ value FLUSSPFERD_PUBLIC_API evaluate(char const *source, char const *file = 0x0,
  * @param file The file name to use.
  * @param line The initial line number.
  */
-value FLUSSPFERD_PUBLIC_API evaluate(std::string const &source, char const *file = 0x0,
-               unsigned int line = 0);
+FLUSSPFERD_PUBLIC_API value evaluate(std::string const &source, 
+                                     char const *file = 0x0, 
+                                     unsigned int line = 0);
 
 /**
  * Execute a Javascript file.
@@ -95,7 +101,8 @@ value FLUSSPFERD_PUBLIC_API evaluate(std::string const &source, char const *file
  * @param file The path to the file.
  * @param scope The scope to use.
  */
-value FLUSSPFERD_PUBLIC_API execute(char const *file, object const &scope = object());
+FLUSSPFERD_PUBLIC_API value execute(char const *file, 
+                                    object const &scope = object());
 
 /**
  * Check if the Code is Compileable
@@ -104,8 +111,9 @@ value FLUSSPFERD_PUBLIC_API execute(char const *file, object const &scope = obje
  * @param length The length of the code.
  * @param scope The scope to use.
  */
-bool is_compilable(char const *source, std::size_t length,
-                    object const &scope = object());
+FLUSSPFERD_PUBLIC_API bool is_compilable(char const *source, 
+                                         std::size_t length,
+                                         object const &scope = object());
 
 /**
  * Check if the Code is Compileable
@@ -113,7 +121,8 @@ bool is_compilable(char const *source, std::size_t length,
  * @param source The source code to check
  * @param scope The scope to use.
  */
-bool is_compilable(char const *source, object const &scope = object());
+FLUSSPFERD_PUBLIC_API bool is_compilable(char const *source, 
+                                         object const &scope = object());
 
 /**
  * Check if the Code is Compileable
@@ -121,7 +130,8 @@ bool is_compilable(char const *source, object const &scope = object());
  * @param source The source code to check
  * @param scope The scope to use.
  */
-bool is_compilable(std::string const &source, object const &scope = object());
+FLUSSPFERD_PUBLIC_API bool is_compilable(std::string const &source, 
+                                         object const &scope = object());
 
 //@}
 
