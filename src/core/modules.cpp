@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cerrno>
 #include <list>
 #ifdef WIN32
 #include <windows.h>
@@ -124,6 +125,34 @@ static std::string process_name(
   result += suffix;
 
   return result;
+}
+
+void require_js(object require, char const *filename, object exports) {
+  std::ifstream f(filename);
+  std::stringstream ss;
+  std::string l;
+  if (!f) {
+    unsigned int err = errno;
+    ss << "io.File: Could not open file '" << filename << "' - " << err;
+    throw exception(ss.str().c_str());
+  }
+
+  ss << "function(exports,require,module) { ";
+
+  while( getline(f, l) ) {
+    ss << l << '\n';
+  }
+  ss << ";}";
+
+  f.close();
+
+  std::string js = ss.str();
+  printf("%s\n", js.c_str());
+
+  object module = evaluate(js.c_str(), js.size(), filename, 1ul).to_object();
+
+  // TODO: Create a new require object so we have a different ID
+  module.call(module, exports, require);
 }
 
 void require(call_context &x) {
@@ -262,7 +291,8 @@ void require(call_context &x) {
       if (sec.check_path(fullpath, security::READ) &&
           boost::filesystem::exists(fullpath))
       {
-        value val = flusspferd::execute(fullpath.c_str(), ctx);
+        //value val = flusspferd::execute(fullpath.c_str(), ctx);
+        require_js(x.function, fullpath.c_str(), exports);
         found = true;
         break;
       }
