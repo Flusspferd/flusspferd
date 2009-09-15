@@ -3,6 +3,10 @@
 var getopt = require('getopt');
 var io = require('io');
 
+function print(x) {
+  require('system').stdout.print(x);
+}
+
 function file_content(filename) {
   var f = new io.File();
   f.open(filename);

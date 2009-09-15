@@ -616,8 +616,8 @@ if(NOT WIN32)
 
     add_custom_command(
       OUTPUT flusspferd.1
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
       DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
       DEPENDS flusspferd-shell
       COMMENT "Generating manpage")
@@ -635,8 +635,8 @@ if(NOT WIN32)
 
     add_custom_command(
       OUTPUT bash_completion.sh
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
       DEPENDS flusspferd-shell
       COMMENT "Generating Bash Completion Script")
     add_custom_target(
