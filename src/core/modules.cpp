@@ -128,6 +128,17 @@ static std::string process_name(
 }
 
 void require_js(object require, char const *filename, object exports) {
+  class StrictModeScopeGuard {
+      bool old_strict;
+    public:
+      StrictModeScopeGuard(bool v) : old_strict(v) {}
+
+      ~StrictModeScopeGuard() {
+        flusspferd::current_context().set_strict(old_strict);
+      }
+  };
+  StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
+
   std::ifstream f(filename);
   std::stringstream ss;
   std::string l;
