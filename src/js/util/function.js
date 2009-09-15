@@ -59,5 +59,5 @@ Function.bind = function bind(obj, name) {
   return fun.bind(obj);
 }
 
-Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
-Object.defineProperty(Function, 'bind', { enumerable: false, });
+Object.defineProperty(Function.prototype, 'bind', { enumerable: false });
+Object.defineProperty(Function, 'bind', { enumerable: false });
