@@ -178,6 +178,15 @@ public:
   object constructor() const {
     return constructor(T::class_info::full_name());
   }
+
+  /**
+   * Set the strict mode flag on or off.
+   *
+   * @param strict New setting for strict mode
+   *
+   * @return       The old value of the strict setting
+   */
+  bool set_strict(bool strict);
 };
 
 template<>

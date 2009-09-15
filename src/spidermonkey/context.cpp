@@ -246,3 +246,23 @@ void context::clear_thread() {
   JS_ClearContextThread(p->context);
   // == js_GetCurrentThread(p->context->runtime)->id);
 }
+
+bool context::set_strict(bool strict) {
+  uint32 options = JS_GetOptions(p->context);
+
+  bool old = (options & JSOPTION_STRICT) == JSOPTION_STRICT;
+
+  // No change.
+  if (old == strict)
+    return old;
+
+  if (strict) {
+    options |= JSOPTION_STRICT;
+  }
+  else {
+    options &= ~JSOPTION_STRICT;
+  }
+  JS_SetOptions(p->context, options);
+
+  return old;
+}
