@@ -192,6 +192,9 @@ int flusspferd_repl::run() {
 
   running = true;
 
+  // Disable strict mode for repl since its really annoying there.
+  co.set_strict(false);
+
   while (running && getline(source)) {
     unsigned int startline = ++line;
 
