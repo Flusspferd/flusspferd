@@ -71,6 +71,7 @@ public:
     uint32 options = JS_GetOptions(context);
 
     options |= JSOPTION_VAROBJFIX;
+    options |= JSOPTION_STRICT;
     options |= JSOPTION_DONT_REPORT_UNCAUGHT;
     options &= ~JSOPTION_XML;
 
