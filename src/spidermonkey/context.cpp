@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <boost/unordered_map.hpp>
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_STACKCHUNKSIZE
@@ -82,6 +83,8 @@ public:
     JS_BeginRequest(context);
 #endif
 
+    JS_SetErrorReporter(context, spidermonkey_error_reporter);
+
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
     if(!global_)
       throw exception("Could not create Global Object");
@@ -125,6 +128,26 @@ public:
 
   context_private *get_private() {
     return static_cast<context_private*>(JS_GetContextPrivate(context));
+  }
+
+  static void spidermonkey_error_reporter(JSContext *cx, char const *message, JSErrorReport *report) {
+
+    if (!report || JSREPORT_IS_EXCEPTION(report->flags)) {
+      return;
+    }
+
+    std::cerr << (JSREPORT_IS_STRICT(report->flags) ? "Strict warning: " : "Warning: ")
+              << message;
+
+    if (report->filename) {
+      std::cerr << " at " << report->filename;
+
+      if (report->lineno) {
+        std::cerr << ":" << report->lineno;
+      }
+    }
+    std::cerr << std::endl;
+
   }
 
   JSContext *context;
