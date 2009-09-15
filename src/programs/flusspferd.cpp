@@ -260,12 +260,17 @@ void flusspferd_repl::add_file(
 }
 
 void flusspferd_repl::load_config() {
+  // Define the prelude property so its not a strict warning to assign to it.
+  co.global().set_property("prelude", flusspferd::value());
+
   flusspferd::execute(config_file.c_str());
   config_loaded = true;
 
   // Get the prelude and execute it too
   flusspferd::value prelude = co.global().get_property("prelude");
-  
+  co.global().delete_property("prelude");
+
+
   if (!prelude.is_undefined_or_null()) {
     flusspferd::execute(
       prelude.to_string().c_str(),
