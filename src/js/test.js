@@ -45,7 +45,7 @@ const TAPProducer = function TAPProducer() {
         throw TypeError("paddDepth must be a number");
       depth = d;
       this.padding = this.getPadd();
-    },
+    }
   });
 
   this.paddDepth = 0;
@@ -149,7 +149,7 @@ const Suite = function Suite(cases) {
   }
 
   if (!cases) {
-    return this;
+    return;
   }
 
 
@@ -237,7 +237,7 @@ merge(Suite.prototype, {
         when: new Date(),
         errorDiag: diag,
         ok: !failed,
-        message: theCase.name,
+        message: theCase.name
       });
       return;
     }
@@ -246,7 +246,7 @@ merge(Suite.prototype, {
       type: 'case',
       when: new Date(),
       ok: !failed,
-      message: theCase.name,
+      message: theCase.name
     });
     delete this._state.currentCase;
 
@@ -298,7 +298,7 @@ Object.defineProperty( exports, "__currentSuite__", {
     throw new TypeError("__currentSuite__ must be an instanceof test.Suite");
   },
   configurable: false,
-  enumerable: false,
+  enumerable: false
 });
 
 
@@ -321,7 +321,7 @@ merge(Asserts.prototype, {
       when: new Date(),
       ok: ok,
       message: msg,
-      defaultMsg: "arguments are the same",
+      defaultMsg: "arguments are the same"
     };
 
     if (!ok) {
@@ -362,7 +362,7 @@ merge(Asserts.prototype, {
       type: 'ok',
       ok: !!test,
       when: new Date(),
-      message: msg,
+      message: msg
     } );
   },
 
