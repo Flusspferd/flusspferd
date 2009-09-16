@@ -110,7 +110,7 @@ $ make
 $ sudo make install
 @endverbatim
  *
- * You can pass -DUSE_READLINE=ON to ./configure if you want Flusspferd
+ * You can pass -DLINE_EDITOR=readline to ./configure if you want Flusspferd
  * to use GNU/readline, which we don't use by default because it has a GPL
  * license.
  *
