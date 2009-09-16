@@ -55,12 +55,12 @@ namespace {
 
 function::function(object const &o)
   : Impl::function_impl(get_function(o)),
-    object(Impl::function_impl::get_object())
+    object(o)
 { }
 
 function::function(Impl::object_impl const &o)
   : Impl::function_impl(get_function(o)),
-    object(Impl::function_impl::get_object())
+    object(o)
 { }
 
 std::size_t function::arity() const {
