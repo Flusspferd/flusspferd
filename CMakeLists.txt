@@ -332,7 +332,12 @@ file(
     flusspferd_library_sources
     ${Flusspferd_SOURCE_DIR}/src/core/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
+    ${Flusspferd_SOURCE_DIR}/include/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/io/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
 
 if(WIN32)
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
@@ -428,7 +433,9 @@ if(ENABLE_TESTS)
 
     file(GLOB
         TESTS
-        test/test_*.cpp)
+        test/test_*.cpp
+        #test/*.hpp
+        )
 
     foreach(TEST_SOURCE ${TESTS})
         string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
@@ -483,7 +490,8 @@ foreach(PLUGIN ${PLUGINS})
 
     file(GLOB
         ${PLUGIN}_sources
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
     add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
 
@@ -541,6 +549,14 @@ if(NOT WIN32)
 endif()
 
 ## Headers ##################################################################
+
+file(GLOB_RECURSE HEADERFILES *.hpp)
+
+foreach(HEADER ${HEADERFILES})
+  set_source_files_properties(${HEADER}
+    PROPERTIES
+    HEADER_FILE_ONLY TRUE)
+endforeach()
 
 if(NOT WIN32)
     install(
@@ -600,8 +616,8 @@ if(NOT WIN32)
 
     add_custom_command(
       OUTPUT flusspferd.1
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
       DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
       DEPENDS flusspferd-shell
       COMMENT "Generating manpage")
@@ -619,8 +635,8 @@ if(NOT WIN32)
 
     add_custom_command(
       OUTPUT bash_completion.sh
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
       DEPENDS flusspferd-shell
       COMMENT "Generating Bash Completion Script")
     add_custom_target(

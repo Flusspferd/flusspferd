@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE( array_iterator ) {
   flusspferd::array::iterator i = a.begin();
   flusspferd::array::iterator const end = a.end();
   BOOST_REQUIRE_NE(i, end);
-  BOOST_REQUIRE_EQUAL(end - i, array_size);
+  BOOST_REQUIRE_EQUAL(end - i, static_cast<ptrdiff_t>(array_size));
   int j = 0;
   for(; i != end; ++i, ++j) {
     BOOST_REQUIRE(i->is_int());

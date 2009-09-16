@@ -25,6 +25,7 @@ Optionally:
 - libxml2 2.6+ (for the XML plugin)
 - SQLite3 3.4+(for the SQLite3 plugin)
 - cURL (for the cURL plugin)
+- GMP (for the GMP plugin)
 
 Building & installing Flusspferd
 --------------------------------
@@ -38,7 +39,7 @@ as you probably are accustomed to. You might have to pass some parameters to
 
   -DBOOST_ROOT=/path/to/boost
   -DSPIDERMONKEY_ROOT=/path/to/spidermonkey
-  -DUSE_READLINE=ON (if you want to use GNU/readline instead of editline)
+  -DLINE_EDITOR=readline (if you want to use GNU/readline instead of editline)
 
 These parameters are passed directly to cmake, i.e. you can also pass other
 parameters that cmake understands.
