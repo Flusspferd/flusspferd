@@ -8,6 +8,7 @@ project "nspr"
     language "C"
     location "."
     targetname "nspr"
+    targetdir(solution().targetdir)
 
     nspr_cfg()
 
@@ -23,9 +24,15 @@ project "nspr_static"
     language "C"
     location "."
     targetname "libnspr"
+    targetdir(solution().targetdir)
     
     excludes {
         "src/md/windows/ntdllmn.c"
+    }
+
+    buildoptions {
+        "-UNSPR_API -DNSPR_API(x)=x",
+        "-UNSPR_DATA_API -DNSPR_DATA_API(x)=x"
     }
 
     nspr_cfg()

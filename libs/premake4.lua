@@ -3,5 +3,12 @@
 
 solution "hippoenv_libs"
     configurations { "Debug", "Release" }
+    platforms { "x32", "x64" } 
     
-    dofile("nspr/premake4.lua")
+    targetdir "bin"
+    location  "."
+
+dofile("nspr/premake4.lua")
+dofile("spidermonkey/premake4.lua")
+dofile("iconv/premake4.lua")
+
