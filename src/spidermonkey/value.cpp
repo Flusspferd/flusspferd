@@ -128,6 +128,14 @@ object value::to_object() const {
   return Impl::wrap_object(result);
 }
 
+string value::to_source() const {
+  JSString *source = JS_ValueToSource(Impl::current_context(), get());
+
+  if (!source)
+    throw exception("Could not convert value to source");
+  return Impl::wrap_string(source);
+}
+
 void value::bind(value o) {
   setval(JSVAL_VOID);
   setp(o.getp());
