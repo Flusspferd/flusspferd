@@ -1,2 +1,13 @@
 libs/boost/boost_*
-libs/
+libs/boost/build
+libs/bzip2/bzip*
+libs/openssl/openssl*
+libs/zlib/zlib-*
+libs/libxml2/libxml*
+libs/bin
+libs/lib
+*.ncb
+*.vcproj
+*.sln
+*.vcproj.*.user
+*~
