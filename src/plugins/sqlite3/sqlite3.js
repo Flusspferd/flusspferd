@@ -94,6 +94,14 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 
   /**
+   * Returns the row id of the last inserted column
+   * @name last_insert_id
+   * @function
+   *
+   * @returns a number
+   */
+
+  /**
    * Get a cursor to execute the given SQL statement. Bind parameters can be
    * passed in as parameters the SQL, or by using [[SQLite3.Cursor#bind]].
    * @name cursor

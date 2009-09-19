@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include "sqlite.hpp"
+#include <boost/lexical_cast.hpp>
 
 namespace sqlite3_plugin {
 
@@ -74,9 +75,7 @@ void sqlite3::close()
 ///////////////////////////
 void sqlite3::cursor(call_context &x) {    
     local_root_scope scope;
-    if (!db) {
-        throw exception("SQLite3.cursor called on closed dbh");
-    }
+    ensure_opened();
 
     if (x.arg.size() < 1) {
         throw exception ("cursor requires more than 0 arguments");
@@ -100,6 +99,20 @@ void sqlite3::cursor(call_context &x) {
     x.result = cursor;
 }
 
+///////////////////////////
+void sqlite3::last_insert_id(call_context & x) {
+    local_root_scope scope;
+    ensure_opened();
+        
+    x.result = boost::lexical_cast< std::string >( sqlite3_last_insert_rowid( db ) );
+}
 
+
+///////////////////////////
+void sqlite3::ensure_opened() {
+    if (!db) {
+        throw exception("SQLite3.cursor called on closed dbh");
+    }
+}
 }
 
