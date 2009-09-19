@@ -40,7 +40,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_name, "SQLite3")
     (methods,
         ("cursor", bind, cursor)
-        ("close", bind, close))
+        ("close", bind, close)
+        ("last_insert_id", bind, last_insert_id))
     (constructor_properties,
         ("version", constant, SQLITE_VERSION_NUMBER)
         ("versionStr", constant, SQLITE_VERSION)))
@@ -56,7 +57,10 @@ public: // JS methods
 
     void close();
     void cursor(flusspferd::call_context &x);
+    void last_insert_id(flusspferd::call_context &x);
 
+protected:
+    void ensure_opened();
 };
 
 }
