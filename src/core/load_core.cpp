@@ -43,6 +43,16 @@ void flusspferd::load_core(object const &scope_) {
 
   flusspferd::object require_fn = scope.get_property_object("require");
 
+  // Create the top level |module| and |exports| properties.
+  object module = create_object();
+  scope.define_property("module", module, dont_enumerate);
+
+  require_fn.define_property("main", module, read_only_property | permanent_property);
+
+
+  object exports = create_object();
+  scope.define_property("exports", exports, dont_enumerate);
+
   flusspferd::object preload = require_fn.get_property_object("preload");
 
   flusspferd::create_native_method(
