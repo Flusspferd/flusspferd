@@ -111,7 +111,7 @@ void sqlite3::last_insert_id(call_context & x) {
 ///////////////////////////
 void sqlite3::ensure_opened() {
     if (!db) {
-        throw exception("SQLite3.cursor called on closed dbh");
+        throw exception("SQLite3 method called on a closed database handle");
     }
 }
 }
