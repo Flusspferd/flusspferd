@@ -24,6 +24,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#if defined(HIPPOENV_ICONV_SHARED_BUILD)
+#   define ICONV_PUBLIC_API(x) __declspec(dllexport) x
+#elif defined(HIPPOENV_ICONV_SHARED)
+#   define ICONV_PUBLIC_API(x) __declspec(dllimport) x
+#else
+#   define ICONV_PUBLIC_API(x) x
+#endif
+
 #if 0
 # define MAKE_EXE
 # define MAKE_DLL
