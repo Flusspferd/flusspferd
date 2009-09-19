@@ -48,7 +48,6 @@ Util.Range = function Range(from,to, by) {
     }
   };
   r = new RangeInstance();
-  r.__iterator__ = function() { return r };
 
   return r;
 }
