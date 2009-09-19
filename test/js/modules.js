@@ -24,4 +24,4 @@ exports.test_varPolution = function() {
 }
 
 if (require.main == module)
-  print(test.runner(exports));
+  test.runner(exports);
