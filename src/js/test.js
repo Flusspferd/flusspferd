@@ -154,7 +154,7 @@ const Suite = function Suite(cases) {
 
 
   // TODO: setup and teardown methods
-  for ([k,t] in Iterator(cases)) {
+  for (let [k,t] in Iterator(cases)) {
 
     if (/^test_/.test(k) == false)
       continue;
@@ -182,7 +182,7 @@ merge(Suite.prototype, {
     var oldCurrent = exports.__currentSuite__;
     try {
       exports.__currentSuite__ = this;
-      for ([name,test] in Iterator(this._state.cases)) {
+      for (let [name,test] in Iterator(this._state.cases)) {
         this.runCase( test);
       }
     }
