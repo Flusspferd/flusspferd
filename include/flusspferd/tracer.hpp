@@ -36,7 +36,7 @@ class context;
 class value;
 
 /**
- * Garbage collection tracer.
+ * Garbage collection %tracer.
  *
  * @ingroup gc
  */
