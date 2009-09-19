@@ -22,23 +22,43 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#ifndef GUARD_FLUSSPFERD_PLUGINS_SQLITE3_SQLITE_HPP_INCLUDED
+#define GUARD_FLUSSPFERD_PLUGINS_SQLITE3_SQLITE_HPP_INCLUDED
 
 #include "flusspferd.hpp"
-#include <new>
-#include <sstream>
-
-#include "sqlite.hpp"
+#include <sqlite3.h>
 #include "sqlite_cursor.hpp"
 
-using namespace flusspferd;
+namespace sqlite3_plugin{
 
-// Put everything in an anon-namespace so typeid wont clash ever.
-namespace {
+void raise_sqlite_error(sqlite3* db);
 
-FLUSSPFERD_LOADER_SIMPLE(exports) {
-  object ctor = load_class<sqlite3_plugin::sqlite3>(exports);
-  load_class<sqlite3_plugin::sqlite3_cursor>(ctor);
+FLUSSPFERD_CLASS_DESCRIPTION(
+    sqlite3,
+    (full_name, "SQLite3")
+    (constructor_name, "SQLite3")
+    (methods,
+        ("cursor", bind, cursor)
+        ("close", bind, close))
+    (constructor_properties,
+        ("version", constant, SQLITE_VERSION_NUMBER)
+        ("versionStr", constant, SQLITE_VERSION)))
+{
+public:
+    sqlite3(flusspferd::object const &obj, 
+            flusspferd::call_context &x);
+
+    ~sqlite3();
+
+public: // JS methods
+    ::sqlite3 *db;
+
+    void close();
+    void cursor(flusspferd::call_context &x);
+
+};
+
 }
 
-}
+#endif //GUARD_FLUSSPFERD_PLUGINS_SQLITE3_SQLITE_HPP_INCLUDED
 
