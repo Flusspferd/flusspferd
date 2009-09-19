@@ -90,21 +90,12 @@ public:
     if(!global_)
       throw exception("Could not create Global Object");
 
-    // Set it so that it doesn't get GCd (play it safe)
     JS_SetGlobalObject(context, global_);
 
     if(!JS_InitStandardClasses(context, global_))
       throw exception("Could not initialize Global Object");
 
     JS_DeleteProperty(context, global_, "XML");
-
-    // Set the global object as an empty object which has its proto as the
-    // 'true' global object with the std classes on it
-    JSObject *pub_global = JS_NewObject(context, &global_class, global_, NULL);
-    if(!global_)
-      throw exception("Could not create Global Shim Object");
-
-    JS_SetGlobalObject(context, pub_global);
 
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
   }
