@@ -60,7 +60,9 @@ namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
 
 static void require(call_context &);
+static object new_require_function(object old_require, string const &id);
 
+// Create |require| function on container.
 void flusspferd::load_require_function(object container) {
   function imp = create_native_function(container, "require", &require, 1);
 
@@ -69,8 +71,16 @@ void flusspferd::load_require_function(object container) {
   imp.define_property("alias", create_object(), permanent_property);
   imp.define_property("module_cache", create_object(),
                       permanent_property);
-  imp.define_property("id", flusspferd::string(),
-                      permanent_property);
+}
+
+static object new_require_function(object old_require, string const &id) {
+  // new_req = create_object(old_require); doesn't end up creating a callable object
+  object new_req = create_native_function(object(), "require", &require, 1);
+  new_req.set_prototype(old_require);
+
+  new_req.define_property("id", id, permanent_property|read_only_property);
+
+  return new_req;
 }
 
 // Take 'foo/bar' as a flusspferd::string, check no path sep in it, and
@@ -127,7 +137,7 @@ static std::string process_name(
   return result;
 }
 
-void require_js(object require, char const *filename, object exports) {
+void require_js(object old_require, string id, std::string filename, object exports) {
   class StrictModeScopeGuard {
       bool old_strict;
     public:
@@ -139,7 +149,9 @@ void require_js(object require, char const *filename, object exports) {
   };
   StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
 
-  std::ifstream f(filename);
+  local_root_scope root_scope;
+
+  std::ifstream f(filename.c_str());
   std::stringstream ss;
   std::string l;
   if (!f) {
@@ -158,12 +170,17 @@ void require_js(object require, char const *filename, object exports) {
   f.close();
 
   std::string js = ss.str();
-  printf("%s\n", js.c_str());
 
-  object module = evaluate(js.c_str(), js.size(), filename, 1ul).to_object();
+  object fn = evaluate(js.c_str(), js.size(), filename.c_str(), 1ul).to_object();
+
+  object module = create_object();
+  module.set_property("uri", "fille://" + filename);
+  module.set_property("id", id);
+
+  object require = new_require_function(old_require, id);
 
   // TODO: Create a new require object so we have a different ID
-  module.call(module, exports, require);
+  fn.call(fn, exports, require, module);
 }
 
 void require(call_context &x) {
@@ -178,17 +195,15 @@ void require(call_context &x) {
 
   bool found = false;
 
-  std::string name = flusspferd::string(x.arg[0]).to_string();
+  flusspferd::string id = x.arg[0];
+  std::string name = id.to_string();
+  std::string curr_id = x.function.get_property("id").to_string().to_string();
 
-  std::string module =
-      x.function.get_property("id").to_std_string();
-
-  std::string key = process_name(name, module, "", "", '/');
+  std::string key = process_name(name, curr_id, "", "", '/');
 
   object module_cache;
 
   try {
-    x.function.set_property("id", flusspferd::string(key));
 
     value alias_v = x.function.get_property("alias");
 
@@ -209,7 +224,7 @@ void require(call_context &x) {
       return;
     }
 
-    object classes_object = flusspferd::global().prototype();
+    object classes_object = flusspferd::global();
     object ctx = flusspferd::create_object(classes_object);
     ctx.set_parent(classes_object);
 
@@ -303,7 +318,7 @@ void require(call_context &x) {
           boost::filesystem::exists(fullpath))
       {
         //value val = flusspferd::execute(fullpath.c_str(), ctx);
-        require_js(x.function, fullpath.c_str(), exports);
+        require_js(x.function, id, fullpath, exports);
         found = true;
         break;
       }
@@ -318,10 +333,8 @@ void require(call_context &x) {
     if (!module_cache.is_null())
       module_cache.delete_property(key);
 
-    x.function.set_property("id", flusspferd::string(module));
     throw;
   }
 
-  x.function.set_property("id", flusspferd::string(module));
 }
 
