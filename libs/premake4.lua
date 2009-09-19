@@ -11,4 +11,4 @@ solution "hippoenv_libs"
 dofile("nspr/premake4.lua")
 dofile("spidermonkey/premake4.lua")
 dofile("iconv/premake4.lua")
-
+dofile("zlib/premake4.lua")
