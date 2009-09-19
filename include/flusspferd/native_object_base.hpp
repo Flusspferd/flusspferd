@@ -281,6 +281,7 @@ bool is_derived(native_object_base &o) {
  *
  * @param o object to check
  * @see get_native
+ * @ingroup classes
  */
 template<typename T>
 bool is_native(object const &o) {
