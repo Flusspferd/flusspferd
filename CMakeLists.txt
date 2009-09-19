@@ -145,7 +145,6 @@ option(
     FORCE_PLUGINS
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
-option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 set(
     LINE_EDITOR
@@ -276,16 +275,6 @@ if(LINE_EDITOR STREQUAL "readline")
   if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
         message(SEND_ERROR "readline required but it was not found")
   endif()
-endif()
-
-## libcurl ##################################################################
-
-if(PLUGIN_CURL)
-    find_package(CURL)
-
-    if(FORCE_PLUGINS AND NOT CURL_FOUND)
-        message(SEND_ERROR "CURL plugin required but cURL not found")
-    endif()
 endif()
 
 ## GMP ######################################################################
@@ -430,12 +419,6 @@ if(ENABLE_TESTS)
 endif()
 
 ## Plugins #################################################################
-
-if(PLUGIN_CURL AND CURL_FOUND)
-    set(PLUGINS ${PLUGINS} curl)
-    set(curl_LIBRARIES ${CURL_LIBRARIES})
-    include_directories(${CURL_INCLUDE_DIR})
-endif()
 
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
