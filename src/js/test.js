@@ -308,36 +308,25 @@ const Asserts = function() {
 }
 
 merge(Asserts.prototype, {
-  same: function() {
-    var args = Array.slice(arguments),
-        msg;
+  same: function(got, expected, message) {
 
-    if (args.length > 2)
-      msg = args.pop();
-    var ok = !!equiv.apply(equiv, args);
+    var ok = !!equiv(got, expected);
 
     var a = {
       type: 'same',
       when: new Date(),
       ok: ok,
-      message: msg,
+      message: message,
       defaultMsg: "arguments are the same"
     };
 
     if (!ok) {
-      a.wanted = args[0];
-      a.got = args.slice(1);
-      a.diag = "Wanted: " + (args[0] === undefined
+      a.diag = "   Got: " + (got === undefined
                              ? "undefined"
-                             : args[0].toSource())
-
-                          + args.slice(1).map(function(i) {
-                              return "\n   Got: "
-                                   + (i === undefined
-                                          ? "undefined"
-                                          : i.toSource()
-                                     )
-                            });
+                             : uneval(got))
+             + "\nWanted: " + (expected === undefined
+                             ? "undefined"
+                             : uneval(expected));
     }
     return exports.__currentSuite__.do_assert(a);
   },
