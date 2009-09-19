@@ -115,7 +115,19 @@ protected:
    * Default implementation: stub.
    *
    * For each value that is an otherwise unreachable member of the object and
-   * that should be protected from garbage collection, call @c trc(x).
+   * that should be protected from garbage collection, call @c trc("x", x).
+   * The string "x" does not need to be unique, it's used for debugging
+   * purposes only.
+   *
+   * @code
+flusspferd::value v;
+
+...
+
+void trace(flusspferd::tracer &trc) {
+    trc("v", v);
+}
+   @endcode
    *
    * @param trc The tracer to be used.
    *
