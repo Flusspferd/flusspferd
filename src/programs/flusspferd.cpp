@@ -143,13 +143,20 @@ int flusspferd_repl::run() {
 
   flusspferd::object require_obj =
       flusspferd::global()
-        .prototype()
         .get_property_object("require");
+
+  flusspferd::object module_obj = require_obj.get_property_object("main");
 
   typedef std::list<std::pair<std::string, Type> >::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     switch (i->second) {
     case File:
+      // TODO: Move this logic into modules.cpp and make it set the right values
+      if (!module_obj.has_own_property("id")) {
+        module_obj.set_property("uri", "fille://" + i->first);
+        module_obj.set_property("id", i->first);
+        require_obj.set_property("id", i->first);
+      }
       flusspferd::execute(i->first.c_str());
       break;
     case Expression:
@@ -275,9 +282,7 @@ void flusspferd_repl::load_config() {
 
 
   if (!prelude.is_undefined_or_null()) {
-    flusspferd::execute(
-      prelude.to_string().c_str(),
-      flusspferd::global().prototype());
+    flusspferd::execute( prelude.to_string().c_str() );
   }
 }
 
