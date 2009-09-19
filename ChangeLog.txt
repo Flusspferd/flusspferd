@@ -7,17 +7,22 @@ Release 0.8
 2009-09-19:
 - Immature plugins have been removed (and moved into feature branch).
 
+2009-09-13:
+- Added MULTIPROCESSOR flag to CMake for significantly improving build
+  time when building on Windows with MSVC
+
 2009-09-10:
 - Added bash_completion script for flusspferd.
 
-Release 0.7
------------
 2009-09-03:
 - Applied necessary changes to offer DLL build targets for 
   Visual Studio 2008
 
 2009-09-02:
 - Visual Studio 2008 compiles with static libraries cleanly
+
+Release 0.7
+-----------
 
 2009-08-31:
 - Use new getopt API for parsing interpreter / shell arguments.
