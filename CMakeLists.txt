@@ -148,7 +148,6 @@ option(
 option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
-option(PLUGIN_XML "Build XML plugin" ON)
 set(
     LINE_EDITOR
     "libedit"
@@ -278,16 +277,6 @@ if(LINE_EDITOR STREQUAL "readline")
   if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
         message(SEND_ERROR "readline required but it was not found")
   endif()
-endif()
-
-## libxml2 ##################################################################
-
-if(PLUGIN_XML)
-    find_package(LibXml2)
-
-    if(FORCE_PLUGINS AND NOT LIBXML2_FOUND)
-        message(SEND_ERROR "XML plugin required but libxml2 not found")
-    endif()
 endif()
 
 ## sqlite3 ##################################################################
@@ -471,12 +460,6 @@ if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
     include_directories(${GMP_INCLUDE_DIR})
-endif()
-
-if(PLUGIN_XML AND LIBXML2_FOUND)
-    set(PLUGINS ${PLUGINS} xml)
-    set(xml_LIBRARIES ${LIBXML2_LIBRARIES})
-    include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
 foreach(PLUGIN ${PLUGINS})
