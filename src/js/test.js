@@ -59,7 +59,7 @@ merge(TAPProducer.prototype, {
   colourize: true,
 
   green: function green() {
-    var a = Array.slice.apply(arguments);
+    var a = Array.slice(arguments);
     if (a.length == 0 && a[0] instanceof Array)
       a = a[0];
 
@@ -70,7 +70,7 @@ merge(TAPProducer.prototype, {
   },
 
   red: function red() {
-    var a = Array.slice.apply(arguments);
+    var a = Array.slice(arguments);
     if (a.length == 1 && a[0] instanceof Array)
       a = a[0];
 
