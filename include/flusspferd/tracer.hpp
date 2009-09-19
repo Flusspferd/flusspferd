@@ -38,15 +38,19 @@ class value;
 /**
  * Garbage collection tracer.
  *
+ * @see native_object_base::trace
+ *
  * @ingroup gc
  */
 class tracer {
 public:
+#ifndef IN_DOXYGEN
   void trace_gcptr(char const *name, void *gcptr);
 
   void trace_gctr(std::string const &name, void *gcptr) {
     trace_gcptr(name.c_str(), gcptr);
   }
+#endif
 
   void operator()(char const *name, value val) {
     trace_gcptr(name, val.get_gcptr());
