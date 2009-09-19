@@ -56,21 +56,45 @@ file::file(object const &obj, call_context &x)
 {
   set_streambuf(p->stream.rdbuf());
   if (!x.arg.empty()) {
-    string name = x.arg[0].to_string();
-    open(name.c_str());
+    call("open", x.arg);
   }
 }
 
 file::~file()
 {}
 
-void file::open(char const *name) {
+void file::open(char const *name, value options) {
   security &sec = security::get();
 
   if (!sec.check_path(name, security::READ_WRITE))
     throw exception("Could not open file (security)");
 
-  p->stream.open(name);
+  std::ios::openmode open_mode = std::ios::openmode();
+
+  // TODO: Support more open modes, check defaults
+  if (options.is_string()) {
+    std::string mode = options.to_std_string();
+    if (mode == "r")
+      open_mode = std::ios::in;
+    else if (mode == "r+")
+      open_mode = std::ios::in | std::ios::out;
+    else if (mode == "w")
+      open_mode = std::ios::out;
+    else
+      throw exception("Open mode not supported (yet?)");
+  }else if (options.is_object()) {
+    object obj = options.get_object();
+    if (obj.get_property("read").to_boolean())
+      open_mode |= std::ios::in;
+    if (obj.get_property("write").to_boolean())
+      open_mode |= std::ios::out;
+  }else if (options.is_undefined_or_null()) {
+    open_mode = std::ios::in | std::ios::out;
+  }else {
+    throw exception("Invalid options for File.open");
+  }
+
+  p->stream.open(name, open_mode);
 
   define_property("fileName", string(name), 
                   permanent_property | read_only_property );

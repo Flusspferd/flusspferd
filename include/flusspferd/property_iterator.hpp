@@ -38,6 +38,17 @@ namespace flusspferd {
  *
  * Uses boost::iterator_facade to support basic iterator operations.
  *
+ * Example:
+ *
+ * @verbatim
+for (property_iterator it = obj.begin(); it != obj.end(); ++it) {
+  value const val = *it;
+
+  // or more commonly, you'll want a string directly
+  std::string name = it->to_std_string();
+}
+@endverbatim
+ *
  * @ingroup property_types
  */
 class FLUSSPFERD_PUBLIC_API property_iterator

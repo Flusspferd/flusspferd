@@ -99,7 +99,7 @@ public:
    * small chance this cant return true erroneously, but only if someone has
    * gone out of their way to make it happen.
    *
-   * @return Wether the object is a generator.
+   * @return Whether the object is a generator.
    */
   bool is_generator() const;
 

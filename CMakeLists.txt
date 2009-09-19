@@ -149,10 +149,7 @@ option(
     FORCE_PLUGINS
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
-option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
-option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
-option(PLUGIN_XML "Build XML plugin" ON)
 set(
     LINE_EDITOR
     "libedit"
@@ -284,38 +281,6 @@ if(LINE_EDITOR STREQUAL "readline")
   endif()
 endif()
 
-## libxml2 ##################################################################
-
-if(PLUGIN_XML)
-    find_package(LibXml2)
-
-    if(FORCE_PLUGINS AND NOT LIBXML2_FOUND)
-        message(SEND_ERROR "XML plugin required but libxml2 not found")
-    endif()
-endif()
-
-## sqlite3 ##################################################################
-
-if(PLUGIN_SQLITE3)
-    pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
-    include_directories(${SQLITE3_INCLUDE_DIRS})
-    link_directories(${SQLITE3_LIBRARY_DIRS})
-
-    if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
-        message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
-    endif()
-endif()
-
-## libcurl ##################################################################
-
-if(PLUGIN_CURL)
-    find_package(CURL)
-
-    if(FORCE_PLUGINS AND NOT CURL_FOUND)
-        message(SEND_ERROR "CURL plugin required but cURL not found")
-    endif()
-endif()
-
 ## GMP ######################################################################
 
 if(PLUGIN_GMP)
@@ -338,7 +303,10 @@ file(
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
     ${Flusspferd_SOURCE_DIR}/include/*.hpp
-    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp)
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/io/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
 
 set(FLUSSPFERD_LIBRARY_TYPE SHARED)
 
@@ -430,24 +398,15 @@ if(NOT WIN32)
         RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 endif()
 
-## Headers ################################################################
-
-file(GLOB_RECURSE HEADERFILES
-  include/*.hpp)
-
-foreach(HEADER ${HEADERFILES})
-  set_source_files_properties(${HEADER}
-    PROPERTIES
-    HEADER_FILE_ONLY TRUE)
-endforeach()
-
 ## Tests ###################################################################
 
 if(ENABLE_TESTS)
 
     file(GLOB
         TESTS
-        test/test_*.cpp)
+        test/test_*.cpp
+        #test/*.hpp
+        )
 
     foreach(TEST_SOURCE ${TESTS})
         string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
@@ -467,34 +426,10 @@ endif()
 
 ## Plugins #################################################################
 
-set(PLUGINS os)
-
-if(FLUSSPFERD_HAVE_POSIX)
-    set(PLUGINS ${PLUGINS} posix)
-endif()
-
-if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
-    set(PLUGINS ${PLUGINS} sqlite3)
-    set(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
-    set(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
-endif()
-
-if(PLUGIN_CURL AND CURL_FOUND)
-    set(PLUGINS ${PLUGINS} curl)
-    set(curl_LIBRARIES ${CURL_LIBRARIES})
-    include_directories(${CURL_INCLUDE_DIR})
-endif()
-
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
     include_directories(${GMP_INCLUDE_DIR})
-endif()
-
-if(PLUGIN_XML AND LIBXML2_FOUND)
-    set(PLUGINS ${PLUGINS} xml)
-    set(xml_LIBRARIES ${LIBXML2_LIBRARIES})
-    include_directories(${LIBXML2_INCLUDE_DIR})
 endif()
 
 foreach(PLUGIN ${PLUGINS})
@@ -502,7 +437,8 @@ foreach(PLUGIN ${PLUGINS})
  
     file(GLOB
         ${PLUGIN}_sources
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
     add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
 
@@ -562,6 +498,14 @@ endif()
 
 ## Headers ##################################################################
 
+file(GLOB_RECURSE HEADERFILES *.hpp)
+
+foreach(HEADER ${HEADERFILES})
+  set_source_files_properties(${HEADER}
+    PROPERTIES
+    HEADER_FILE_ONLY TRUE)
+endforeach()
+
 if(NOT WIN32)
     install(
         DIRECTORY include/
@@ -620,8 +564,8 @@ if(NOT WIN32)
 
     add_custom_command(
       OUTPUT flusspferd.1
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
       DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
       DEPENDS flusspferd-shell
       COMMENT "Generating manpage")
@@ -639,8 +583,8 @@ if(NOT WIN32)
 
     add_custom_command(
       OUTPUT bash_completion.sh
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
       DEPENDS flusspferd-shell
       COMMENT "Generating Bash Completion Script")
     add_custom_target(
