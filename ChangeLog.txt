@@ -4,8 +4,11 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-09-19:
+- Immature plugins have been removed (and moved into feature branch).
+
 2009-09-10:
-- Added bash_completion script for flusspferd
+- Added bash_completion script for flusspferd.
 
 Release 0.7
 -----------
