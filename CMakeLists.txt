@@ -455,8 +455,6 @@ endif()
 
 ## Plugins #################################################################
 
-set(PLUGINS os)
-
 if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
     set(PLUGINS ${PLUGINS} sqlite3)
     set(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
