@@ -20,7 +20,7 @@ project "iconv"
     targetname "iconv"
 
     files { "src/win_iconv.c" }
-    defines {"HIPPOENV_SHARED_BUILD"}
+    defines {"HIPPOENV_ICONV_SHARED_BUILD"}
     flags { "Symbols" }
 
     configuration "Release"
