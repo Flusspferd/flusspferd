@@ -122,9 +122,9 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   // g.prototype() is available everywhere
 
-  flusspferd::security::create(g.prototype());
+  flusspferd::security::create(g);
 
-  flusspferd::load_core(g.prototype());
+  flusspferd::load_core(g);
 
   flusspferd::create_native_function<void (int)>(
     g, "quit",
