@@ -41,7 +41,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (methods,
         ("cursor", bind, cursor)
         ("close", bind, close)
-        ("last_insert_id", bind, last_insert_id))
+        ("lastInsertID", bind, last_insert_id))
     (constructor_properties,
         ("version", constant, SQLITE_VERSION_NUMBER)
         ("versionStr", constant, SQLITE_VERSION)))

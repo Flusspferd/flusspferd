@@ -95,7 +95,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
 
   /**
    * Returns the row id of the last inserted column
-   * @name last_insert_id
+   * @name lastInsertID
    * @function
    *
    * @returns a number
