@@ -48,7 +48,7 @@ public:
   ~file();
 
 public: // javascript methods
-  void open(char const *name);
+  void open(char const *name, value options);
   void close();
 
 public: // constructor methods
