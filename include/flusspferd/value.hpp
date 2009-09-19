@@ -265,6 +265,9 @@ public:
 
   /// Convert the value to an object.
   object to_object() const;
+
+  /// Return a debugging representation, similar to calling v.toSource() in javascript.
+  string to_source() const;
 };
 
 }
