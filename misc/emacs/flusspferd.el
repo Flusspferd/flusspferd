@@ -1,8 +1,9 @@
 ;;; flusspferd.el --- Interactive interface to the Flusspferd REPL
-;; Copyright (C) 2009
-;;   Rüdiger Sonderfeld, Aristid Breitkreuz, Moritz Ulrich
+;; Copyright (C) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+;;                                     http://flusspferd.org/contributors.txt)
 ;;
-;; Author: Rüdiger Sonderfeld <ruediger at c-plusplus dot de>
+;; Author: Flusspferd contributors (see "CONTRIBUTORS" or
+;;                                  http://flusspferd.org/contributors.txt)
 ;; Homepage: http://flusspferd.org
 ;;
 ;; This file is NOT part of GNU Emacs.
