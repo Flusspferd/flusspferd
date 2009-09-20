@@ -12,6 +12,7 @@ Release 0.8
 
 2009-09-19:
 - Immature plugins have been removed (and moved into feature branch).
+- Added lastInsertID to SQLite3
 
 2009-09-10:
 - Added bash_completion script for flusspferd.
