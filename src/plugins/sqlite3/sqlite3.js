@@ -102,6 +102,16 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 
   /**
+   * Execute the given SQL statement(s).
+   * @name exec
+   * @function
+   *
+   * @param sql SQL to prepare.
+   *
+   * @returns number of executed statements
+   */
+
+  /**
    * Get a cursor to execute the given SQL statement. Bind parameters can be
    * passed in as parameters the SQL, or by using [[SQLite3.Cursor#bind]].
    * @name cursor
