@@ -54,6 +54,18 @@ public:
   exception(char const *what, std::string const &type = "Error");
 
   /**
+   * Constructor.
+   *
+   * If available, this constructor will create an exception containing the last
+   * Javascript engine error. Otherwise, it will create an exception of type
+   * @p type.
+   *
+   * @param what The error message.
+   * @param type The error type (if applicable).
+   */
+  exception(std::string const &what, std::string const &type = "Error");
+
+  /**
    * Value constructor.
    *
    * Will create an exception containing @p val. The error message will be the
