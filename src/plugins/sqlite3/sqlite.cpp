@@ -90,13 +90,23 @@ void sqlite3::cursor(call_context &x) {
     {
         raise_sqlite_error(db);
     }
-    
-    object cursor = create_native_object<sqlite3_cursor>(object(), sth);
 
-    // TODO: remove tail and set it seperately
-    cursor.define_property("sql", sql);
+    object cursor = create_native_object<sqlite3_cursor>(object(), sth);
+    
+    string tail_str;
+    if (tail) {
+        tail_str = string(tail);
+    }
+    cursor.define_property("tail", tail_str);        
+    cursor.define_property("sql", sql.substr(0, sql.size() - tail_str.size()));
+    
 
     x.result = cursor;
+}
+
+///////////////////////////
+void sqlite3::exec(call_context & x){
+
 }
 
 ///////////////////////////

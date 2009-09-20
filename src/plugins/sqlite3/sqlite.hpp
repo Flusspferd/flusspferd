@@ -57,6 +57,7 @@ public: // JS methods
 
     void close();
     void cursor(flusspferd::call_context &x);
+    void exec(flusspferd::call_context & x);
     void last_insert_id(flusspferd::call_context &x);
 
 protected:
