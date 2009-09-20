@@ -43,7 +43,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
         ("query", bind, query)
         ("exec", bind, exec)
         ("close", bind, close)
-        ("lastInsertID", bind, last_insert_id))
+        ("lastInsertID", bind, last_insert_id)
+        ("begin", bind, begin)
+        ("commit", bind, commit)
+        ("rollback", bind, rollback))
     (constructor_properties,
         ("version", constant, SQLITE_VERSION_NUMBER)
         ("versionStr", constant, SQLITE_VERSION)))
@@ -70,15 +73,6 @@ protected:
     unsigned exec_internal( flusspferd::array arr );
     flusspferd::object compile(flusspferd::string sql, flusspferd::value bind);
     void ensure_opened();
-
-    struct rollback_guard {
-        rollback_guard( sqlite3 & db );
-        ~rollback_guard();
-        void commit();
-    protected:
-        sqlite3 & db_;
-        bool commited_;
-    };
 };
 
 }

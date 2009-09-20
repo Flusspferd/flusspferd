@@ -102,13 +102,61 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 
   /**
-   * Execute the given SQL statement(s).
+   * Execute the given SQL statement. A bind parameter can be passed and should 
+   * be a value, array or object. The object can be used for named placeholders.
+   * {{{ 
+   * db.exec('INSERT INTO foobar VALUES(?,?,?)',[1,2,3])
+   * db.exec('INSERT INTO foobar VALUES(:first, :second, :third)',{ first: 4, second: 5, third: 6 })
+   * }}}
    * @name exec
    * @function
    *
    * @param sql SQL to prepare.
+   * @param bind_arg bind parameters passed to [[SQLite3.Cursor#bind]].
    *
    * @returns number of executed statements
+   */
+
+  /**
+   * Accepts an array of objects with sql and optional bind properties. The bind property should
+   * contain a value, an array or an object. The object can be used for named placeholders
+   *
+   * {{{ 
+   * db.exec([{ 
+   *        sql: 'CREATE TABLE foobar (a,b,c)'
+   *    }, {
+   *        sql: 'INSERT INTO foobar VALUES(?,?,?)',
+   *        bind: [1,2,3]
+   *    }, {
+   *        sql: 'INSERT INTO foobar VALUES(:first, :second, :third)',
+   *        bind: { first: 4, second: 5, third: 6 }
+   *    }])
+   * }}}
+   * 
+   * @name exec
+   * @function
+   *
+   * @param array of objects with sql and optional bind parameter passed to [[SQLite3.Cursor#bind]].
+   *
+   * @returns number of executed statements
+   */
+
+  /**
+   * Begin a transaction
+   * @name begin
+   * @function
+   */
+
+  /**
+   * Commit a transaction
+   * @name commit
+   * @function
+   */   
+
+  /**
+   * Rollback a transaction
+   * @name rollback
+   * @function
    */
 
   /**
@@ -126,7 +174,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
 /**#@- }}} */
 // }}}
 
-// SQLite3.Cursor {{{
+// SQLite3.Cursor {{{ 
 /**
  * You cannot construct a cursor object directly, use [[SQLite3#cursor]] to
  * create one.
@@ -135,7 +183,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
  * @name SQLite3.Cursor
  */
 
-// Instance methods {{{
+// Instance methods  {{{
 /**#@+ @methodOf SQLite3.Cursor# */
 
   /**
@@ -178,13 +226,13 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 /**#@- }}} */
 
-// Instance properties {{{
+// Instance prop erties {{{
 /**#@+ @fieldOf SQLite3.Cursor# */
 
   /**
    * Iterator support.  A generator function that enables you to write
    *
-   * {{{
+   * {{{ 
    * for (row in myCursor) { ... }
    * }}}
    *

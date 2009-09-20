@@ -13,6 +13,7 @@ Release 0.8
 2009-09-21
 - Renamed cursor to query
 - Supporting bind parameters on exec and query
+- Added begin(),commit() and rollback() to the interface to support transactions
 2009-09-20
 - Added lastInsertID to SQLite3
 - Added tail to SQLite3.Cursor

@@ -119,10 +119,6 @@ void sqlite3::exec(call_context & x) {
 unsigned sqlite3::exec_internal( array arr ) {
     local_root_scope scope;
 
-    begin();
-
-    rollback_guard rollback(*this);
-
     size_t count = 0; 
     for ( size_t idx = 0; idx < arr.size(); ++idx ) {
         value const & v = arr.get_element(idx);
@@ -149,8 +145,6 @@ unsigned sqlite3::exec_internal( array arr ) {
         ++count;
     }
     
-    rollback.commit();
-
     return count;
 }
 
@@ -222,28 +216,11 @@ void sqlite3::commit() {
 
 ///////////////////////////
 void sqlite3::rollback() {    
-    if ( db && sqlite3_exec(db, "ROLLBACK TRANSACTION", 0, 0, 0) != SQLITE_OK ) {
-        // ROLLBACK SHALL NEVER THROW!
+    ensure_opened();
+
+    if ( sqlite3_exec(db, "ROLLBACK TRANSACTION", 0, 0, 0) != SQLITE_OK ) {
+        raise_sqlite_error(db);
     }
-}
-
-///////////////////////////
-sqlite3::rollback_guard::rollback_guard( sqlite3 & db )
-: db_(db)
-, commited_(false)
-{}
-
-///////////////////////////
-sqlite3::rollback_guard::~rollback_guard() {
-    if ( !commited_ ) {
-        db_.rollback();
-    }
-}
-
-///////////////////////////
-void sqlite3::rollback_guard::commit() {
-    db_.commit();
-    commited_ = true;
 }
 
 }
