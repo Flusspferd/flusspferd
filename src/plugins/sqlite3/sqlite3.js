@@ -162,7 +162,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
   /**
    * Get a cursor to execute the given SQL statement. Bind parameters can be
    * passed in as parameters the SQL, or by using [[SQLite3.Cursor#bind]].
-   * @name cursor
+   * @name query
    * @function
    *
    * @param sql SQL to prepare.
