@@ -98,6 +98,10 @@ void sqlite3::cursor(call_context &x) {
 void sqlite3::exec(call_context & x) {
     local_root_scope scope;
 
+    if (x.arg.size() == 1) {
+        throw exception ("SQLite3.exec() requires 1 argument");
+    }
+
     compile_result_t result;
     string sql = x.arg[0].to_string();
     size_t count = 0; 
