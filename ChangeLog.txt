@@ -15,6 +15,7 @@ Release 0.8
 - Added lastInsertID to SQLite3
 - Added tail to SQLite3.Cursor
 - Removed the tail part from the sql property of SQLite3.Cursor
+- Added exec to SQLite3 (supports multiple statements)
 
 2009-09-10:
 - Added bash_completion script for flusspferd.

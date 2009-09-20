@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "flusspferd.hpp"
 #include <sqlite3.h>
+#include <boost/tuple/tuple.hpp>
 #include "sqlite_cursor.hpp"
 
 namespace sqlite3_plugin{
@@ -40,6 +41,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_name, "SQLite3")
     (methods,
         ("cursor", bind, cursor)
+        ("exec", bind, exec)
         ("close", bind, close)
         ("lastInsertID", bind, last_insert_id))
     (constructor_properties,
@@ -61,6 +63,13 @@ public: // JS methods
     void last_insert_id(flusspferd::call_context &x);
 
 protected:
+    typedef boost::tuple<
+        sqlite3_stmt*,
+        flusspferd::string, 
+        flusspferd::string
+    > compile_result_t;
+
+    compile_result_t compile(flusspferd::string sql);
     void ensure_opened();
 };
 
