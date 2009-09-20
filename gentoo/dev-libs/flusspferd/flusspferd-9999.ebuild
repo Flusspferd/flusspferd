@@ -14,20 +14,15 @@ EAPI="2"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="curl doc gmp libedit readline sqlite tests xml"
+IUSE="doc gmp libedit readline tests"
 
 RDEPEND="
 	>=dev-lang/spidermonkey-1.7[unicode]
 	>=dev-libs/boost-1.36
 	virtual/libiconv
-	curl? ( net-misc/curl )
 	gmp? ( dev-libs/gmp[-nocxx] )
-	|| (
-		libedit? ( >=dev-libs/libedit-20090610.3.0 )
-		readline? ( sys-libs/readline )
-	)
-	sqlite? ( >=dev-db/sqlite-3 )
-	xml? ( dev-libs/libxml2 )"
+	libedit? ( >=dev-libs/libedit-20090610.3.0 )
+	readline? ( sys-libs/readline )"
 DEPEND="${RDEPEND}
 	>=dev-util/cmake-2.6"
 
@@ -38,14 +33,11 @@ src_configure() {
 		die "libedit and readline enabled. Please choose just one of them"
 	
 	use libedit || use readline || options="${options} -D LINE_EDITOR:=none"
-	use curl || options="${options} -D PLUGIN_CURL:=OFF"
 	use doc && options="${options} -D CREATE_DOCUMENTATION:=ON"
 	use gmp || options="${options} -D PLUGIN_GMP:=OFF"
 	use libedit && options="${options} -D LINE_EDITOR:=libedit"
 	use readline && options="${options} -D LINE_EDITOR:=readline"
-	use sqlite || options="${options} -D PLUGIN_SQLITE3:=OFF"
 	use tests || options="${options} -D ENABLE_TESTS:=OFF"
-	use xml || options="${options} -D PLUGIN_XML:=OFF"
 
 	mkdir build || die
 	cd build || die
