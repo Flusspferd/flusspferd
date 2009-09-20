@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -115,7 +116,19 @@ protected:
    * Default implementation: stub.
    *
    * For each value that is an otherwise unreachable member of the object and
-   * that should be protected from garbage collection, call @c trc(x).
+   * that should be protected from garbage collection, call @c trc("x", x).
+   * The string "x" does not need to be unique, it's used for debugging
+   * purposes only.
+   *
+   * @code
+flusspferd::value v;
+
+...
+
+void trace(flusspferd::tracer &trc) {
+    trc("v", v);
+}
+   @endcode
    *
    * @param trc The tracer to be used.
    *
@@ -281,6 +294,7 @@ bool is_derived(native_object_base &o) {
  *
  * @param o object to check
  * @see get_native
+ * @ingroup classes
  */
 template<typename T>
 bool is_native(object const &o) {
