@@ -81,32 +81,60 @@ void sqlite3::cursor(call_context &x) {
         throw exception ("cursor requires more than 0 arguments");
     }
 
-    string sql = x.arg[0].to_string();
-    size_t n_bytes = sql.length() * 2;
-    sqlite3_stmt *sth = 0;
-    char16_t *tail = 0; // uncompiled part of the sql (when multiple stmts)
-    
-    if (sqlite3_prepare16_v2(db, sql.data(), n_bytes, &sth, (const void**)&tail) != SQLITE_OK)
-    {
-        raise_sqlite_error(db);
-    }
+    compile_result_t result = compile( x.arg[0].to_string() );
+        
+    object cursor = create_native_object<sqlite3_cursor>(
+                        object(), 
+                        boost::get<0>(result)
+                    );
 
-    object cursor = create_native_object<sqlite3_cursor>(object(), sth);
+    cursor.define_property("sql", boost::get<1>(result));
+    cursor.define_property("tail", boost::get<2>(result));        
     
-    string tail_str;
-    if (tail) {
-        tail_str = string(tail);
-    }
-    cursor.define_property("tail", tail_str);        
-    cursor.define_property("sql", sql.substr(0, sql.size() - tail_str.size()));
-    
-
     x.result = cursor;
 }
 
 ///////////////////////////
-void sqlite3::exec(call_context & x){
+void sqlite3::exec(call_context & x) {
+    local_root_scope scope;
 
+    compile_result_t result;
+    string sql = x.arg[0].to_string();
+    size_t count = 0; 
+    do { 
+        result = compile( sql );
+    
+        if ( sqlite3_step( boost::get<0>( result ) ) != SQLITE_DONE ) {
+            raise_sqlite_error(db); 
+        }    
+        ++count;
+        sql = boost::get<2>( result );
+    } while ( !boost::get<2>( result ).empty() );
+
+    x.result = count;
+}
+
+///////////////////////////
+sqlite3::compile_result_t sqlite3::compile(flusspferd::string sql_in) {
+    local_root_scope scope;
+
+    size_t n_bytes = sql_in.length() * 2;
+    sqlite3_stmt * sth = 0;
+    char16_t * tail = 0; // uncompiled part of the sql (when multiple stmts)
+    
+    if (sqlite3_prepare16_v2(db, sql_in.data(), n_bytes, &sth, (const void**)&tail) != SQLITE_OK)
+    {
+        raise_sqlite_error(db);
+    }
+
+    string tail_str;
+    if (tail) {
+        tail_str = string(tail);
+    }
+    
+    string sql = sql_in.substr( 0, sql_in.size() - tail_str.size() );
+    
+    return boost::make_tuple( sth, sql, tail_str );
 }
 
 ///////////////////////////
