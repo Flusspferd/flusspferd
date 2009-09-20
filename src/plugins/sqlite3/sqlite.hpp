@@ -40,7 +40,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (full_name, "SQLite3")
     (constructor_name, "SQLite3")
     (methods,
-        ("cursor", bind, cursor)
+        ("query", bind, query)
         ("exec", bind, exec)
         ("close", bind, close)
         ("lastInsertID", bind, last_insert_id))
@@ -58,19 +58,27 @@ public: // JS methods
     ::sqlite3 *db;
 
     void close();
-    void cursor(flusspferd::call_context &x);
+    void query(flusspferd::call_context &x);
     void exec(flusspferd::call_context & x);
     void last_insert_id(flusspferd::call_context &x);
 
-protected:
-    typedef boost::tuple<
-        sqlite3_stmt*,
-        flusspferd::string, 
-        flusspferd::string
-    > compile_result_t;
+    void begin();
+    void commit();
+    void rollback();
 
-    compile_result_t compile(flusspferd::string sql);
+protected:
+    unsigned exec_internal( flusspferd::array arr );
+    flusspferd::object compile(flusspferd::string sql, flusspferd::value bind);
     void ensure_opened();
+
+    struct rollback_guard {
+        rollback_guard( sqlite3 & db );
+        ~rollback_guard();
+        void commit();
+    protected:
+        sqlite3 & db_;
+        bool commited_;
+    };
 };
 
 }

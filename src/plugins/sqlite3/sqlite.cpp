@@ -73,53 +73,89 @@ void sqlite3::close()
 }
 
 ///////////////////////////
-void sqlite3::cursor(call_context &x) {    
+void sqlite3::query(call_context &x) {    
     local_root_scope scope;
     ensure_opened();
 
     if (x.arg.size() < 1) {
-        throw exception ("cursor requires more than 0 arguments");
+        throw exception ("SQLite3.query() at least 1 argument");
     }
 
-    compile_result_t result = compile( x.arg[0].to_string() );
-        
-    object cursor = create_native_object<sqlite3_cursor>(
-                        object(), 
-                        boost::get<0>(result)
-                    );
+    value bind;
+    if ( x.arg.size() > 1 ) {
+        bind = x.arg[1];
+    }
 
-    cursor.define_property("sql", boost::get<1>(result));
-    cursor.define_property("tail", boost::get<2>(result));        
-    
-    x.result = cursor;
+    x.result = compile( x.arg[0].to_string(), bind);
 }
 
 ///////////////////////////
 void sqlite3::exec(call_context & x) {
     local_root_scope scope;
 
-    if (x.arg.size() != 1) {
-        throw exception ("SQLite3.exec() requires 1 argument");
+    if (x.arg.size() < 1) {
+        throw exception ("SQLite3.exec() requires at least 1 argument");
     }
 
-    compile_result_t result;
-    string sql = x.arg[0].to_string();
-    size_t count = 0; 
-    do { 
-        result = compile( sql );
-    
-        if ( sqlite3_step( boost::get<0>( result ) ) != SQLITE_DONE ) {
-            raise_sqlite_error(db); 
-        }    
-        ++count;
-        sql = boost::get<2>( result );
-    } while ( !boost::get<2>( result ).empty() );
+    if ( x.arg.size() == 1 && x.arg[0].is_object() && x.arg[0].get_object().is_array() ) {
+        x.result = exec_internal( x.arg[0].to_object() );
+    }
+    else if ( x.arg[0].is_string() ) {
 
-    x.result = count;
+        object data = create_object();
+        data.set_property("sql", x.arg[0].get_string() );        
+
+        if ( x.arg.size() > 1 ) {
+            data.set_property( "bind", x.arg[1].to_object() );
+        }
+
+        array arr = create_array( 1 );
+        arr.set_element(0, data);
+        x.result = exec_internal( arr );
+    }    
 }
 
 ///////////////////////////
-sqlite3::compile_result_t sqlite3::compile(flusspferd::string sql_in) {
+unsigned sqlite3::exec_internal( array arr ) {
+    local_root_scope scope;
+
+    begin();
+
+    rollback_guard rollback(*this);
+
+    size_t count = 0; 
+    for ( size_t idx = 0; idx < arr.size(); ++idx ) {
+        value const & v = arr.get_element(idx);
+        
+        if ( !v.is_object() ) {
+            throw exception("exec expects an object");
+        }
+
+        object obj = v.get_object();
+
+        if ( !obj.has_property("sql") ) {
+            throw exception("no sql statement found");
+        }
+        
+        value bind;
+        if ( obj.has_property("bind") ){
+            bind = obj.get_property("bind");
+        }
+
+        object result = compile( obj.get_property("sql").to_string(), bind); 
+        
+        result.call("next");
+
+        ++count;
+    }
+    
+    rollback.commit();
+
+    return count;
+}
+
+///////////////////////////
+object sqlite3::compile(flusspferd::string sql_in, value bind ) {
     local_root_scope scope;
 
     size_t n_bytes = sql_in.length() * 2;
@@ -131,14 +167,23 @@ sqlite3::compile_result_t sqlite3::compile(flusspferd::string sql_in) {
         raise_sqlite_error(db);
     }
 
+    object cursor = create_native_object<sqlite3_cursor>(object(), sth);
+
     string tail_str;
     if (tail) {
         tail_str = string(tail);
     }
     
     string sql = sql_in.substr( 0, sql_in.size() - tail_str.size() );
+
+    cursor.define_property("sql", sql);
+    cursor.define_property("tail", tail_str);        
+
+    if ( !bind.is_undefined_or_null() ) {
+        cursor.call("bind", bind );
+    }
     
-    return boost::make_tuple( sth, sql, tail_str );
+    return cursor;
 }
 
 ///////////////////////////
@@ -156,5 +201,50 @@ void sqlite3::ensure_opened() {
         throw exception("SQLite3 method called on a closed database handle");
     }
 }
+
+///////////////////////////
+void sqlite3::begin() {
+    ensure_opened();
+
+    if ( sqlite3_exec(db, "BEGIN TRANSACTION", 0, 0, 0) != SQLITE_OK ) {
+         raise_sqlite_error(db);
+    }
+}
+
+///////////////////////////
+void sqlite3::commit() {
+    ensure_opened();
+
+    if ( sqlite3_exec(db, "COMMIT TRANSACTION", 0, 0, 0) != SQLITE_OK ) {
+         raise_sqlite_error(db);
+    }
+}
+
+///////////////////////////
+void sqlite3::rollback() {    
+    if ( db && sqlite3_exec(db, "ROLLBACK TRANSACTION", 0, 0, 0) != SQLITE_OK ) {
+        // ROLLBACK SHALL NEVER THROW!
+    }
+}
+
+///////////////////////////
+sqlite3::rollback_guard::rollback_guard( sqlite3 & db )
+: db_(db)
+, commited_(false)
+{}
+
+///////////////////////////
+sqlite3::rollback_guard::~rollback_guard() {
+    if ( !commited_ ) {
+        db_.rollback();
+    }
+}
+
+///////////////////////////
+void sqlite3::rollback_guard::commit() {
+    db_.commit();
+    commited_ = true;
+}
+
 }
 
