@@ -14,11 +14,14 @@ Release 0.8
 - Renamed cursor to query
 - Supporting bind parameters on exec and query
 - Added begin(),commit() and rollback() to the interface to support transactions
+- Added execMany to support multiple statements to be executed by a single call
+
 2009-09-20
 - Added lastInsertID to SQLite3
 - Added tail to SQLite3.Cursor
 - Removed the tail part from the sql property of SQLite3.Cursor
 - Added exec to SQLite3 (supports multiple statements)
+
 2009-09-19:
 - Immature plugins have been removed (and moved into feature branch).
 

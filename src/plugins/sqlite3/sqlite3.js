@@ -101,26 +101,54 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 
   /**
+   * Executes a given SQL statement and optionally, bind parameters 
+   * can be passed to fill the placeholders in the SQL statement 
+   *
+   * ** Note: **
+   *
+   * If the execution throws an exception and the execution is aborted 
+   * it will not automatically rollback the applied changes. If this is wanted
+   * the user of this function has to explicitly take care about it by using
+   * [[SQLite3#begin]],[[SQLite3#commit]] and [[SQLite3#rollback]]
+   * 
+   * ==Example usage:==
+   *
+   * {{{ 
+   * db.exec('CREATE TABLE foobar (a,b,c)');
+   *
+   * db.exec('INSERT INTO foobar VALUES(?,?,?)',[1,2,3]);
+   *
+   * db.exec('INSERT INTO foobar VALUES(:first, :second, :third)',
+   *         { first: 4, second: 5, third: 6 });
+   * }}}
+   * 
+   * @name exec
+   * @function
+   *
+   * @param sql SQL to execute which might contain placeholders
+   * @param optional_bind_args bind parameters passed to [[SQLite3.Cursor#bind]].
+   *
+   * @returns number of executed statements
+   * 
+   */
+
+  /**
    * Executes given SQL statement(s). Bind parameters can be passed to fill
    * placeholders used in the corresponding SQL statement.
    * 
-   * If parameter sql_or_array is an array it is expected to be an array of 
+   * The parameter is expected to be an array of 
    * objects with sql and optional bind properties. The bind property should
-   * contain a value, an array or an object. The object can be used for named placeholders
-   * In this case the parameter bind_arg is ignored!
+   * contain a value, an array or an object. The object can be used for
+   * named placeholders
    *
-   * If parameter sql_or_array is a string it will be executed and the content of the 
-   * optional parameter bind_arg will be used to fill placeholders.
-   * 
-   * ==Examples with a single statement:==
+   * ** Note: **
    *
-   * {{{ 
-   * db.exec('INSERT INTO foobar VALUES(?,?,?)',[1,2,3])
-   * db.exec('INSERT INTO foobar VALUES(:first, :second, :third)',
-   *         { ':first': 4, ':second': 5, ':third': 6 })
-   * }}}
+   * If the execution throws an exception and the execution is aborted 
+   * it will not automatically rollback the applied changes. If this is wanted
+   * the user of this function has to explicitly take care about it by using
+   * [[SQLite3#begin]],[[SQLite3#commit]] and [[SQLite3#rollback]]
    * 
-   * ==An example with multiple statements:==
+   * ==Example:==
    *
    * {{{ 
    * db.exec([{ 
@@ -130,16 +158,15 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    *        bind: [1,2,3]
    *    }, {
    *        sql: 'INSERT INTO foobar VALUES(:first, :second, :third)',
-   *        bind: { ':first': 4, ':second': 5, ':third': 6 }
+   *        bind: { first: 4, second: 5, third: 6 }
    *    }])
    * }}}
    *
    *
-   * @name exec
+   * @name execMany
    * @function
    *
-   * @param sql_or_array SQL to prepare or an array of objects with sql and optional bind properties
-   * @param bind_arg bind parameters passed to [[SQLite3.Cursor#bind]] (Optional).
+   * @param sql SQL statment to execute which can contain placeholders
    *
    * @returns number of executed statements
    * 
