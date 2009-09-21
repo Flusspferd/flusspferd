@@ -32,8 +32,9 @@ THE SOFTWARE.
 namespace flusspferd {
 
 /**
- * Load the properties function Object.defineProperty modelled after
- * [[DefineOwnProperty]] from the ES3.1 specification.
+ * Load the properties function Object.defineProperty and
+ * Object.defineProperties modelled after [[DefineOwnProperty]] from the ES6
+ * specification.
  *
  * @param o The container (must contain an Object property) to load the
  *          functions into.

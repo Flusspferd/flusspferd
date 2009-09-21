@@ -126,7 +126,7 @@ bool flusspferd::operator<(string const &lhs, string const &rhs) {
   return JS_CompareStrings(get_string(lhs), get_string(rhs)) < 0;
 }
 
-string string::substr(size_t start, size_t length) {
+string string::substr(size_t start, size_t length) const {
   JSContext *ctx = Impl::current_context();
   JSString *new_string =
     JS_NewDependentString(ctx, get_string(*this), start, length);
