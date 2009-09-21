@@ -121,12 +121,12 @@ object sqlite3_cursor::next() {
                 break;
             case SQLITE_BLOB:
             {
-                unsigned char * bytes = sqlite3_column_binary(sth, i);
+                unsigned char const * bytes = reinterpret_cast<unsigned char const*>(sqlite3_column_blob(sth, i));
                 if (!bytes) {
                     raise_sqlite_error();
                 }
 
-                size_t length = sqlite3_column_bytes(sth);
+                size_t length = sqlite3_column_bytes(sth, i);
                 col = byte_string(object(), bytes, length);
             }
             break;
