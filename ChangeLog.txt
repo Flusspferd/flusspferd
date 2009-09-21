@@ -17,6 +17,7 @@ Release 0.8
 - Added execMany to support multiple statements to be executed by a single call
 - exec and execMany now return the number of rows affected rather the count of 
   SQL statements executed
+- Implemented support for blob data types - fixes issue #104
 
 2009-09-20
 - Added lastInsertID to SQLite3
