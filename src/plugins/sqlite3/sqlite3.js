@@ -1,5 +1,4 @@
 // vim:ts=2:sw=2:expandtab:autoindent:
-// vim: foldmethod=marker:foldmarker={{{,}}}
 /*
 The MIT License
 
@@ -102,24 +101,26 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 
   /**
-   * Execute the given SQL statement. A bind parameter can be passed and should 
-   * be a value, array or object. The object can be used for named placeholders.
+   * Executes given SQL statement(s). Bind parameters can be passed to fill
+   * placeholders used in the corresponding SQL statement.
+   * 
+   * If parameter sql_or_array is an array it is expected to be an array of 
+   * objects with sql and optional bind properties. The bind property should
+   * contain a value, an array or an object. The object can be used for named placeholders
+   * In this case the parameter bind_arg is ignored!
+   *
+   * If parameter sql_or_array is a string it will be executed and the content of the 
+   * optional parameter bind_arg will be used to fill placeholders.
+   * 
+   * ==Examples with a single statement:==
+   *
    * {{{ 
    * db.exec('INSERT INTO foobar VALUES(?,?,?)',[1,2,3])
-   * db.exec('INSERT INTO foobar VALUES(:first, :second, :third)',{ first: 4, second: 5, third: 6 })
+   * db.exec('INSERT INTO foobar VALUES(:first, :second, :third)',
+   *         { ':first': 4, ':second': 5, ':third': 6 })
    * }}}
-   * @name exec
-   * @function
-   *
-   * @param sql SQL to prepare.
-   * @param bind_arg bind parameters passed to [[SQLite3.Cursor#bind]].
-   *
-   * @returns number of executed statements
-   */
-
-  /**
-   * Accepts an array of objects with sql and optional bind properties. The bind property should
-   * contain a value, an array or an object. The object can be used for named placeholders
+   * 
+   * ==An example with multiple statements:==
    *
    * {{{ 
    * db.exec([{ 
@@ -129,16 +130,19 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    *        bind: [1,2,3]
    *    }, {
    *        sql: 'INSERT INTO foobar VALUES(:first, :second, :third)',
-   *        bind: { first: 4, second: 5, third: 6 }
+   *        bind: { ':first': 4, ':second': 5, ':third': 6 }
    *    }])
    * }}}
-   * 
+   *
+   *
    * @name exec
    * @function
    *
-   * @param array of objects with sql and optional bind parameter passed to [[SQLite3.Cursor#bind]].
+   * @param sql_or_array SQL to prepare or an array of objects with sql and optional bind properties
+   * @param bind_arg bind parameters passed to [[SQLite3.Cursor#bind]] (Optional).
    *
    * @returns number of executed statements
+   * 
    */
 
   /**
@@ -226,7 +230,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 /**#@- }}} */
 
-// Instance prop erties {{{
+// Instance properties {{{
 /**#@+ @fieldOf SQLite3.Cursor# */
 
   /**
