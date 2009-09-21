@@ -160,7 +160,7 @@ int sqlite3::exec_internal( array arr ) {
         
         result.call("next");
 
-        count += sqlite3_total_changes(db);
+        count += sqlite3_changes(db);
     }
     
     return count;
