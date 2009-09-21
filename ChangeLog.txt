@@ -15,6 +15,8 @@ Release 0.8
 - Supporting bind parameters on exec and query
 - Added begin(),commit() and rollback() to the interface to support transactions
 - Added execMany to support multiple statements to be executed by a single call
+- exec and execMany now return the number of rows affected rather the count of 
+  SQL statements executed
 
 2009-09-20
 - Added lastInsertID to SQLite3
