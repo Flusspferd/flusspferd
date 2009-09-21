@@ -127,7 +127,7 @@ object sqlite3_cursor::next() {
                 }
 
                 size_t length = sqlite3_column_bytes(sth, i);
-                col = byte_string(object(), bytes, length);
+                col = create_native_object<byte_string>(object(), bytes, length);
             }
             break;
             case SQLITE_TEXT:
