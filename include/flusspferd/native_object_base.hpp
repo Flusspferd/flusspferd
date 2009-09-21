@@ -77,6 +77,13 @@ public:
    */
   static native_object_base &get_native(object const &o);
 
+  /**
+   * Test if the Javascript object is associated with a native object
+   *
+   * @return true if the give object is native
+   */
+  static bool is_object_native(object const &o);
+
 public:
   /**
    * Associate with an object if there is no association yet.
@@ -313,7 +320,10 @@ if (flusspferd::is_native<flusspferd::binary>(o) {
  */
 template<typename T>
 bool is_native(object const &o) {
-  return is_derived<T>(native_object_base::get_native(o));
+  if ( native_object_base::is_object_native(o) ) {
+    return is_derived<T>(native_object_base::get_native(o));
+  }
+  return false;
 }
 
 template<typename T>
