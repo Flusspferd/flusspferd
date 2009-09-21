@@ -144,4 +144,11 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
 #undef X
 }
 
+BOOST_AUTO_TEST_CASE( recursive_loop_on_set_property ) {
+  flusspferd::object object = flusspferd::create_object();
+
+  object.set_property( flusspferd::string(), flusspferd::string() );
+  
+}
+
 BOOST_AUTO_TEST_SUITE_END()
