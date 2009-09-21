@@ -97,7 +97,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    * @name lastInsertID
    * @function
    *
-   * @returns a number
+   * @returns the last inserted row id as a number
    */
 
   /**
@@ -128,7 +128,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    * @param sql SQL to execute which might contain placeholders
    * @param optional_bind_args bind parameters passed to [[SQLite3.Cursor#bind]].
    *
-   * @returns number of executed statements
+   * @returns number of rows affected by the statement
    * 
    */
 
@@ -168,7 +168,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    *
    * @param sql SQL statment to execute which can contain placeholders
    *
-   * @returns number of executed statements
+   * @returns total number of rows affected by the given statements
    * 
    */
 

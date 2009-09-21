@@ -134,10 +134,10 @@ void sqlite3::execMany(call_context & x) {
 }
 
 ///////////////////////////
-unsigned sqlite3::exec_internal( array arr ) {
+int sqlite3::exec_internal( array arr ) {
     local_root_scope scope;
 
-    size_t count = 0; 
+    int count = 0; 
     for ( size_t idx = 0; idx < arr.size(); ++idx ) {
         value const & v = arr.get_element(idx);
         
@@ -160,7 +160,7 @@ unsigned sqlite3::exec_internal( array arr ) {
         
         result.call("next");
 
-        ++count;
+        count += sqlite3_total_changes(db);
     }
     
     return count;

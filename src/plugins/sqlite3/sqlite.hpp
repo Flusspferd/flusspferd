@@ -72,7 +72,7 @@ public: // JS methods
     void rollback();
 
 protected:
-    unsigned exec_internal( flusspferd::array arr );
+    int exec_internal( flusspferd::array arr );
     flusspferd::object compile(flusspferd::string sql, flusspferd::value bind);
     void ensure_opened();
 };
