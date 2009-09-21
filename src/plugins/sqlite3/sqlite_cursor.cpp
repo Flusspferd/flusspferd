@@ -174,6 +174,9 @@ void sqlite3_cursor::bind(call_context &x) {
             array a = o;
             bind_array(a, num_binds);
         }
+        else if ( is_native<binary>(o) ) {
+            do_bind_param(1, x.arg[0]);
+        }
         else {
             bind_dict(o, num_binds);
         }
@@ -233,7 +236,11 @@ void sqlite3_cursor::do_bind_param(int n, value v) {
     } else if (v.is_double()) {
         ok = sqlite3_bind_double(sth, n, v.get_double());
     } else if (v.is_null()) {
-        ok = sqlite3_bind_null(sth, n);
+        ok = sqlite3_bind_null(sth, n);                
+    } else if ( v.is_object() && is_native<binary>(v.get_object()) ) {
+        binary & b = flusspferd::get_native<binary>(v.get_object());        
+        binary::vector_type const & vec = b.get_const_data();
+        ok = sqlite3_bind_blob( sth, n, (vec.empty() ? 0 : &vec[0]), vec.size(), SQLITE_TRANSIENT );
     } else {
         // Default, stringify the object
         string bind = v.to_string();
