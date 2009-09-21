@@ -121,9 +121,15 @@ object sqlite3_cursor::next() {
                 break;
             case SQLITE_BLOB:
             {
-                // TODO: Implement blog - issue #104
-                throw exception("Blob data type not supported yet");
+                unsigned char * bytes = sqlite3_column_binary(sth, i);
+                if (!bytes) {
+                    raise_sqlite_error();
+                }
+
+                size_t length = sqlite3_column_bytes(sth);
+                col = byte_string(object(), bytes, length);
             }
+            break;
             case SQLITE_TEXT:
             {
                 char16_t *text  = (char16_t*)sqlite3_column_text16(sth, i);
