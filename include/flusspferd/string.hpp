@@ -165,7 +165,7 @@ public:
    * @param length The number of characters.
    * @return The substring.
    */
-  string substr(size_t start, size_t length);
+  string substr(size_t start, size_t length) const;
 
   /**
    * Concatenate two strings.
