@@ -42,6 +42,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (methods,
         ("query", bind, query)
         ("exec", bind, exec)
+        ("execMany", bind, execMany)
         ("close", bind, close)
         ("lastInsertID", bind, last_insert_id)
         ("begin", bind, begin)
@@ -63,6 +64,7 @@ public: // JS methods
     void close();
     void query(flusspferd::call_context &x);
     void exec(flusspferd::call_context & x);
+    void execMany(flusspferd::call_context & x);
     void last_insert_id(flusspferd::call_context &x);
 
     void begin();

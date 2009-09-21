@@ -93,15 +93,11 @@ void sqlite3::query(call_context &x) {
 void sqlite3::exec(call_context & x) {
     local_root_scope scope;
 
-    if (x.arg.size() < 1) {
+    if (x.arg.size() != 1 && x.arg.size() != 2) {
         throw exception ("SQLite3.exec() requires at least 1 argument");
     }
-
-    if ( x.arg.size() == 1 && x.arg[0].is_object() && x.arg[0].get_object().is_array() ) {
-        x.result = exec_internal( x.arg[0].to_object() );
-    }
-    else if ( x.arg[0].is_string() ) {
-
+    
+    if ( x.arg[0].is_string() ) {
         object data = create_object();
         data.set_property("sql", x.arg[0].get_string() );        
 
@@ -113,6 +109,28 @@ void sqlite3::exec(call_context & x) {
         arr.set_element(0, data);
         x.result = exec_internal( arr );
     }    
+    else {
+        throw exception("The first parameter of SQLite3.exec() requires to be"
+                        " a string containing an SQL statement");
+    }
+}
+
+///////////////////////////
+void sqlite3::execMany(call_context & x) {
+    local_root_scope scope;
+
+    if (x.arg.size() != 1) {
+        throw exception ("SQLite3.execMany() requires 1 argument");
+    }
+
+    if ( x.arg[0].is_object() && x.arg[0].get_object().is_array() ) {
+        x.result = exec_internal( x.arg[0].to_object() );
+    }
+    else {
+        throw exception("SQLite3.execMany() expected an array of"
+                        " objects as argument");
+    }
+
 }
 
 ///////////////////////////
