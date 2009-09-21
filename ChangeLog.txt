@@ -20,6 +20,8 @@ Release 0.8
 - Implemented support for blob data types - fixes issue #104
 - Added bool native_object_base::is_object_native() 
 - bool flusspferd::is_native<T>() no longer throws if an object is not native
+- SQLite3.Cursor.next() now returns a row as an object or an array 
+  (if passed true as parameter it will return an object)
 
 2009-09-20
 - Added lastInsertID to SQLite3

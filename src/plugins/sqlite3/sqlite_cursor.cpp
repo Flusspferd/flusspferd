@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "sqlite.hpp"
 #include <sstream>
 #include <new>
+#include <iostream>
 
 namespace sqlite3_plugin {
 
@@ -64,7 +65,7 @@ void sqlite3_cursor::reset() {
 }
 
 ///////////////////////////
-object sqlite3_cursor::next() {
+void sqlite3_cursor::next(call_context & x) {
     local_root_scope scope;
 
     if (!sth){
@@ -75,7 +76,8 @@ object sqlite3_cursor::next() {
         case CursorState_Finished:
             // We've seen the last row, remember it and return the 
             // EOF indicator
-            return object();
+            x.result = object();
+            return;
         case CursorState_Errored:
             throw exception("SQLite3.Cursor: This cursor has seen an error and"
                             " needs to be reset");
@@ -87,7 +89,8 @@ object sqlite3_cursor::next() {
 
     if (code == SQLITE_DONE) {
         state = CursorState_Finished;
-        return object();
+        x.result = object();
+        return;
     } else if (code != SQLITE_ROW) {
         if (sqlite3_errcode( sqlite3_db_handle(sth) ) != SQLITE_OK) {
             state = CursorState_Errored;
@@ -100,60 +103,95 @@ object sqlite3_cursor::next() {
 
     state = CursorState_InProgress;
 
-    // Build up the row object.
-    array row = create_array();
-    int cols = sqlite3_column_count(sth);
+    if ( x.arg.size() == 1 && x.arg[0].is_boolean() && x.arg[0].get_boolean() ) {
+        x.result = create_result_object();
+    }
+    else {
+        x.result = create_result_array();
+    }
+}
 
+///////////////////////////
+object sqlite3_cursor::create_result_array() {
+    local_root_scope scope;
+    // Build up the row object.
+    int cols = sqlite3_column_count(sth);
+    array row = create_array();
     for (int i=0; i < cols; i++)
     {
-        int type = sqlite3_column_type(sth, i);
-        value col;
-    
-        switch (type) {
-            case SQLITE_INTEGER:
-                col = value(sqlite3_column_int(sth, i));
-                break;
-            case SQLITE_FLOAT:
-                col = value(sqlite3_column_double(sth, i));
-                break;
-            case SQLITE_NULL:
-                col = object();
-                break;
-            case SQLITE_BLOB:
-            {
-                unsigned char const * bytes = reinterpret_cast<unsigned char const*>(sqlite3_column_blob(sth, i));
-                if (!bytes) {
-                    raise_sqlite_error();
-                }
-
-                size_t length = sqlite3_column_bytes(sth, i);
-                col = create_native_object<byte_string>(object(), bytes, length);
-            }
-            break;
-            case SQLITE_TEXT:
-            {
-                char16_t *text  = (char16_t*)sqlite3_column_text16(sth, i);
-                
-                if (!text) {
-                    // Checking if it was an allocation error if so we throw
-                    raise_sqlite_error();
-                }
-                // Its actually num of *bytes* not chars
-                size_t length = sqlite3_column_bytes16(sth, i) / 2;
-                col = string(text, length);
-            }
-            break;
-            default:
-            {
-                std::stringstream ss;
-                ss << "SQLite3.Cursor.next: Unknown column type " << type;
-                throw exception(ss.str().c_str());
-            }
-            break;
-        }
-        row.set_element(i, col);
+        row.set_element(i, get_column(i) );
     }
-    return row;
+    return row;    
+}
+
+///////////////////////////
+object sqlite3_cursor::create_result_object() {
+    local_root_scope scope;
+    // Build up the row object.
+    int cols = sqlite3_column_count(sth);
+    object row = create_object();
+    for (int i=0; i < cols; i++)
+    {
+        char16_t const * name_str = reinterpret_cast<char16_t const *>( sqlite3_column_name16(sth, i) );
+        if ( !name_str ) {
+            throw exception("Couldn't retrieve column name for column");
+        }
+        string name = std::basic_string<char16_t>(name_str);
+        row.set_property( name, get_column(i) );
+    }
+    return row;    
+}
+
+///////////////////////////
+value sqlite3_cursor::get_column(int i) {
+    local_root_scope scope;
+    
+    int type = sqlite3_column_type(sth, i);
+    value col;
+    
+    switch (type) {
+        case SQLITE_INTEGER:
+            col = value(sqlite3_column_int(sth, i));
+            break;
+        case SQLITE_FLOAT:
+            col = value(sqlite3_column_double(sth, i));
+            break;
+        case SQLITE_NULL:
+            col = object();
+            break;
+        case SQLITE_BLOB:
+        {
+            unsigned char const * bytes = reinterpret_cast<unsigned char const*>(sqlite3_column_blob(sth, i));
+            if (!bytes) {
+                raise_sqlite_error();
+            }
+
+            size_t length = sqlite3_column_bytes(sth, i);
+            col = create_native_object<byte_string>(object(), bytes, length);
+        }
+        break;
+        case SQLITE_TEXT:
+        {
+            char16_t *text  = (char16_t*)sqlite3_column_text16(sth, i);
+            
+            if (!text) {
+                // Checking if it was an allocation error if so we throw
+                raise_sqlite_error();
+            }
+            // Its actually num of *bytes* not chars
+            size_t length = sqlite3_column_bytes16(sth, i) / 2;
+            col = string(text, length);
+        }
+        break;
+        default:
+        {
+            std::stringstream ss;
+            ss << "SQLite3.Cursor.next: Unknown column type " << type;
+            throw exception(ss.str().c_str());
+        }
+        break;
+    }
+    return col;
 }
 
 ///////////////////////////
