@@ -51,7 +51,11 @@ public:
    * @param what The error message.
    * @param type The error type (if applicable).
    */
-  exception(char const *what, std::string const &type = "Error");
+  exception(char const *what, std::string const &type = "Error")
+  : std::runtime_error(exception_message(what))
+  {
+    init(what, type);
+  }
 
   /**
    * Constructor.
@@ -63,7 +67,11 @@ public:
    * @param what The error message.
    * @param type The error type (if applicable).
    */
-  exception(std::string const &what, std::string const &type = "Error");
+  exception(std::string const &what, std::string const &type = "Error")
+  : std::runtime_error(exception_message(what.c_str()))
+  {
+    init(what.c_str(), type);
+  }
 
   /**
    * Value constructor.
@@ -97,6 +105,10 @@ public:
 #ifndef IN_DOXYGEN
   void throw_js_INTERNAL();
 #endif
+
+private:
+  void init(char const *what, std::string const &type);
+  static std::string exception_message(char const *what);
 
 private:
   class impl;
