@@ -10,24 +10,7 @@ Release ?.?
 Release 0.8
 -----------
 
-2009-09-21
-- Renamed cursor to query
-- Supporting bind parameters on exec and query
-- Added begin(),commit() and rollback() to the interface to support transactions
-- Added execMany to support multiple statements to be executed by a single call
-- exec and execMany now return the number of rows affected rather the count of 
-  SQL statements executed
-- Implemented support for blob data types - fixes issue #104
-- Added bool native_object_base::is_object_native() 
-- bool flusspferd::is_native<T>() no longer throws if an object is not native
-- SQLite3.Cursor.next() now returns a row as an object or an array 
-  (if passed true as parameter it will return an object)
-
-2009-09-20
-- Added lastInsertID to SQLite3
-- Added tail to SQLite3.Cursor
-- Removed the tail part from the sql property of SQLite3.Cursor
-- Added exec to SQLite3 (supports multiple statements)
+2009-09-20:
 - json2.js (http://www.json.org/json2.js) is now loaded to provide an ES5 compatible JSON object for older spidermonkey
 
 2009-09-19:
