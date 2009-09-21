@@ -310,7 +310,7 @@ bool is_derived(native_object_base &o) {
  * @code
 flusspferd::object o = v.get_object();
 if (flusspferd::is_native<flusspferd::binary>(o) {
-  flusspferd::binary b = flusspferd::get_native<flusspferd::binary>(o);
+  flusspferd::binary &b = flusspferd::get_native<flusspferd::binary>(o);
 }
 @endcode
  *
