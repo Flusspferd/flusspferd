@@ -39,27 +39,6 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-namespace {
-  std::string exception_message(std::string const &what) {
-    std::string ret = what;
-    jsval v;
-    JSContext *const cx = Impl::current_context();
-
-    if (JS_GetPendingException(cx, &v)) {
-      value val = Impl::wrap_jsval(v);
-      ret += ": exception `" + val.to_std_string() + '\'';
-      if (val.is_object()) {
-        object o = val.to_object();
-        if(o.has_property("fileName"))
-          ret += " at " + o.get_property("fileName").to_std_string()
-              +  ":" + o.get_property("lineNumber").to_std_string();
-      }
-      return ret;
-    }
-
-    return ret;
-  }
-}
 
 class exception::impl {
 public:
@@ -72,8 +51,7 @@ public:
   bool empty;
 };
 
-exception::exception(char const *what, std::string const &type)
-  : std::runtime_error(exception_message(what))
+void exception::init(char const *what, std::string const &type)
 {
   boost::shared_ptr<impl> p(new impl);
 
@@ -96,28 +74,23 @@ exception::exception(char const *what, std::string const &type)
   this->p = p;
 }
 
-exception::exception(std::string const &what, std::string const &type)
-  : std::runtime_error(exception_message(what))
-{
-  boost::shared_ptr<impl> p(new impl);
+std::string exception::exception_message(char const *what) {
+  std::string ret(what);
+  jsval v;
+  JSContext *const cx = Impl::current_context();
 
-  p->exception_value.reset(new root_value);
-  p->ctx = current_context();
-
-  JSContext *ctx = Impl::get_context(p->ctx);
-
-  value &v = *p->exception_value;
-
-  if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
-    p->empty = false;
-    JS_ClearPendingException(ctx);
-  } else {
-    try {
-      v = global().call(type, what);
-    } catch (...) { }
+  if (JS_GetPendingException(cx, &v)) {
+    value val = Impl::wrap_jsval(v);
+    ret += ": exception `" + val.to_std_string() + '\'';
+    if (val.is_object()) {
+      object o = val.to_object();
+      if(o.has_property("fileName"))
+        ret += " at " + o.get_property("fileName").to_std_string()
+            +  ":" + o.get_property("lineNumber").to_std_string();
+    }
   }
 
-  this->p = p;
+  return ret;
 }
 
 exception::exception(value const &val)

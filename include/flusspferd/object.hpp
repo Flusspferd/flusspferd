@@ -39,6 +39,8 @@ THE SOFTWARE.
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace flusspferd {
 
@@ -335,7 +337,11 @@ FLUSSPFERD_CALLS(call, object const &)
    * @param v The new value.
    */
   template<typename T, typename U>
-  void set_property(T const &id, U const &v) {
+  void set_property(T const &id, U const &v
+#ifndef IN_DOXYGEN
+  , typename boost::disable_if<boost::is_same<U, value> >::type * = 0
+#endif
+  ) {
     return set_property(id, value(v));
   }
 
