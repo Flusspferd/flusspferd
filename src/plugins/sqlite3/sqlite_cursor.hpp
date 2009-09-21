@@ -62,10 +62,13 @@ private:
     void bind_dict(flusspferd::object &o, size_t num_binds);
     void do_bind_param(int n, flusspferd::value v);
     void raise_sqlite_error();
+    flusspferd::value get_column(int i);
+    object create_result_array();
+    object create_result_object();
 public: // JS methods
     void close();
     void reset();
-    object next();
+    void next(flusspferd::call_context & x);
     void bind(flusspferd::call_context &x);    
 };
 
