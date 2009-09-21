@@ -231,8 +231,13 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    * Get next row from this cursor. This is the alternative way of getting at
    * the results if you don't like the iterator style (or if the JS engine
    * doesn't support it).
+   * If you pass as optional parameter true next will return an Object with 
+   * the column names as id. For no parameter or anything else it will return an 
+   * array.
+   * 
+   * @param optional_param_true
    *
-   * @returns Next row as an array, or null when end of results reached.
+   * @returns Next row as an array, or object, or null when end of results reached.
    *
    * @name SQLite3.Cursor.prototype.next
    */
