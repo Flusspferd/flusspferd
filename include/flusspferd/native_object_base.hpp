@@ -290,7 +290,14 @@ bool is_derived(native_object_base &o) {
 }
 
 /**
- * Checks if @p o is a @p T.
+ * Checks if @p o is a native object of class @p T.
+ *
+ * @code
+flusspferd::object o = v.get_object();
+if (flusspferd::is_native<flusspferd::binary>(o) {
+  flusspferd::binary b = flusspferd::get_native<flusspferd::binary>(o);
+}
+@endcode
  *
  * @param o object to check
  * @see get_native
