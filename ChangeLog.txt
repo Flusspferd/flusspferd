@@ -1,6 +1,12 @@
 Flusspferd Change Log
 =====================
 
+Release ?.?
+-----------
+
+2009-09-19:
+- Overhauled SQLite3 module.
+
 Release 0.8
 -----------
 
