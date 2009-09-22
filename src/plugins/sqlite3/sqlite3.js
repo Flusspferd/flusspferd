@@ -36,6 +36,11 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
   }
 };
 
+SQLite3.prototype.cursor = function() {
+  require('system').stderr.print('SQLite3.cursor() has been deprecated. use SQLite3.query() instead');
+  return this.query.apply(this, arguments);
+}
+
 // SQLite3 {{{
 /**
  * Opens a handle to the database dsn Will usually be
