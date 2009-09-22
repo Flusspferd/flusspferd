@@ -145,6 +145,7 @@ option(
     FORCE_PLUGINS
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
+option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 set(
     LINE_EDITOR
@@ -275,6 +276,18 @@ if(LINE_EDITOR STREQUAL "readline")
   if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
         message(SEND_ERROR "readline required but it was not found")
   endif()
+endif()
+
+## sqlite3 ##################################################################
+
+if(PLUGIN_SQLITE3)
+    pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
+    include_directories(${SQLITE3_INCLUDE_DIRS})
+    link_directories(${SQLITE3_LIBRARY_DIRS})
+
+    if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
+        message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
+    endif()
 endif()
 
 ## GMP ######################################################################
@@ -419,6 +432,12 @@ if(ENABLE_TESTS)
 endif()
 
 ## Plugins #################################################################
+
+if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
+    set(PLUGINS ${PLUGINS} sqlite3)
+    set(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
+    set(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
+endif()
 
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
