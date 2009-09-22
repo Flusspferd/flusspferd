@@ -66,6 +66,30 @@ value evaluate_in_scope(char const* source, std::size_t n,
                         object const &scope);
 
 /**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope 
+ */
+value evaluate_in_scope(std::string const &source,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope 
+ */
+value evaluate_in_scope(char const *source,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
  * Evaluate Javascript code.
  *
  * Uses the global object as context.
