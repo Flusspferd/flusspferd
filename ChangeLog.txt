@@ -5,7 +5,7 @@ Release 0.8
 -----------
 
 2009-09-19:
-- Overhauled SQLite3 module.
+- Overhauled SQLite3 module (issue #103).
 
 2009-09-20:
 - json2.js (http://www.json.org/json2.js) is now loaded to provide an ES5 compatible JSON object for older spidermonkey
