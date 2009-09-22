@@ -63,6 +63,20 @@ value flusspferd::evaluate_in_scope(
   return Impl::wrap_jsval(rval);
 }
 
+value evaluate_in_scope(std::string const &source,
+                        char const* file, unsigned int line,
+                        object const &scope)
+{
+  return evaluate_in_scope(source.data(), source.size(), file, line, scope);
+}
+
+value evaluate_in_scope(char const *source,
+                        char const* file, unsigned int line,
+                        object const &scope)
+{
+  return evaluate_in_scope(source, std::strlen(source), file, line, scope);
+}
+
 value flusspferd::execute(char const *filename, object const &scope_) {
   JSContext *cx = Impl::current_context();
 
