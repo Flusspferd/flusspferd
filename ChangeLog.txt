@@ -1,14 +1,11 @@
 Flusspferd Change Log
 =====================
 
-Release ?.?
+Release 0.8
 -----------
 
 2009-09-19:
 - Overhauled SQLite3 module.
-
-Release 0.8
------------
 
 2009-09-20:
 - json2.js (http://www.json.org/json2.js) is now loaded to provide an ES5 compatible JSON object for older spidermonkey
