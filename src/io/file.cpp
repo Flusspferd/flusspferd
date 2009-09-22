@@ -67,6 +67,8 @@ namespace {
       LocalFree(message);
       return ret;
     }
+#else
+    return what;
 #endif
   }
 }
