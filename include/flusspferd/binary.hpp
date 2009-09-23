@@ -109,7 +109,7 @@ public:
   object slice(int begin, boost::optional<int> end);
   void concat(call_context &x);
   array split(value delim, object options);
-  string decode_to_string(std::string const &enc);
+  string decode_to_string(boost::optional<std::string> const &enc);
 
 private:
   vector_type v_data;
