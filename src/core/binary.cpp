@@ -463,8 +463,8 @@ void binary::debug_rep(std::ostream &stream) {
     stream << "...";
 }
 
-string binary::decode_to_string(std::string const &enc) {
-  return encodings::convert_to_string(enc, *this);
+string binary::decode_to_string(boost::optional<std::string> const &enc) {
+  return encodings::convert_to_string(enc ? enc.get() : DEFAULT_ENCODING, *this);
 }
 
 // -- byte_string -----------------------------------------------------------
