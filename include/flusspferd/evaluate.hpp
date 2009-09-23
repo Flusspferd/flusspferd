@@ -60,6 +60,8 @@ value evaluate(char const *source, std::size_t n,
  * @param file The file name to use.
  * @param line The initial line number.
  * @param scope The scope 
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
  */
 value evaluate_in_scope(char const* source, std::size_t n,
                         char const* file, unsigned int line,
@@ -71,7 +73,9 @@ value evaluate_in_scope(char const* source, std::size_t n,
  * @param source The source code.
  * @param file The file name to use.
  * @param line The initial line number.
- * @param scope The scope 
+ * @param scope The scope
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
  */
 value evaluate_in_scope(std::string const &source,
                         char const* file, unsigned int line,
@@ -84,6 +88,8 @@ value evaluate_in_scope(std::string const &source,
  * @param file The file name to use.
  * @param line The initial line number.
  * @param scope The scope 
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
  */
 value evaluate_in_scope(char const *source,
                         char const* file, unsigned int line,
