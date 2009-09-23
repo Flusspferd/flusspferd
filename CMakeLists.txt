@@ -349,30 +349,34 @@ endif()
 
 if(ENABLE_TESTS)
 
+# The coverage library has been removed for now. It only makes it less likely
+# for people to run the tests, which is a bigger problem than getting coverage
+# numbers, which don't work for JS anyways.
+
 #    file(
 #        GLOB
 #        flusspferd_coverage_extra_sources
 #        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
 #        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
-
-    add_library(
-        flusspferd-coverage
-        SHARED
-        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
-
-    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
-
-    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
-
-    set_property(
-        TARGET flusspferd-coverage
-        PROPERTY COMPILE_FLAGS
-        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
-
-    set_property(
-        TARGET flusspferd-coverage
-        PROPERTY LINK_FLAGS
-        ${COV_FLAGS})
+#
+#    add_library(
+#        flusspferd-coverage
+#        SHARED
+#        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
+#
+#    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
+#
+#    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
+#
+#    set_property(
+#        TARGET flusspferd-coverage
+#        PROPERTY COMPILE_FLAGS
+#        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
+#
+#    set_property(
+#        TARGET flusspferd-coverage
+#        PROPERTY LINK_FLAGS
+#        ${COV_FLAGS})
 
 endif()
 
@@ -426,7 +430,7 @@ if(ENABLE_TESTS)
         target_link_libraries(
             ${TEST_OUTPUT}
             ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-            flusspferd-coverage)
+            flusspferd)
     endforeach()
 
 endif()
