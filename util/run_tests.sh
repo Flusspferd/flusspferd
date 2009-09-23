@@ -31,9 +31,9 @@ then
   exit 2
 fi
 
-echo "PROGRESS: Clearing test coverage counters" 1>&2
-
-LCOV_MODE=-z ./util/lcov.sh
+#echo "PROGRESS: Clearing test coverage counters" 1>&2
+#
+#LCOV_MODE=-z ./util/lcov.sh
 
 echo "PROGRESS: Running tests" 1>&2
 
@@ -46,12 +46,12 @@ do
   fi
 done
 
-echo "PROGRESS: Analyzing test coverage" 1>&2
+#echo "PROGRESS: Analyzing test coverage" 1>&2
+#
+#./util/lcov.sh
+#
+#lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
 
-./util/lcov.sh
-
-lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
-
-echo "PROGRESS: Visualizing test coverage" 1>&2
-
-./util/genhtml.sh
+#echo "PROGRESS: Visualizing test coverage" 1>&2
+#
+#./util/genhtml.sh
