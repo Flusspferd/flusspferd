@@ -14,7 +14,7 @@ EAPI="2"
 LICENSE="MIT"
 SLOT="0"
 KEYWORDS="~amd64 ~x86"
-IUSE="doc gmp libedit readline tests"
+IUSE="doc gmp libedit readline sqlite3 tests"
 
 RDEPEND="
 	>=dev-lang/spidermonkey-1.7[unicode]
@@ -22,7 +22,8 @@ RDEPEND="
 	virtual/libiconv
 	gmp? ( dev-libs/gmp[-nocxx] )
 	libedit? ( >=dev-libs/libedit-20090610.3.0 )
-	readline? ( sys-libs/readline )"
+	readline? ( sys-libs/readline )
+	sqlite3? ( >=dev-db/sqlite-3 )"
 DEPEND="${RDEPEND}
 	>=dev-util/cmake-2.6"
 
@@ -37,6 +38,7 @@ src_configure() {
 	use gmp || options="${options} -D PLUGIN_GMP:=OFF"
 	use libedit && options="${options} -D LINE_EDITOR:=libedit"
 	use readline && options="${options} -D LINE_EDITOR:=readline"
+	use sqlite3 || options="${options} -D PLUGIN_SQLITE3:=OFF"
 	use tests || options="${options} -D ENABLE_TESTS:=OFF"
 
 	mkdir build || die
