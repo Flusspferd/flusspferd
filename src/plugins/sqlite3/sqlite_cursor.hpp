@@ -56,6 +56,7 @@ private:
         CursorState_Finished = 2,
         CursorState_Errored = 3
     } state;
+    std::vector<bool> param_bound;
 
     // Methods that help wiht binding
     void bind_array(flusspferd::array &a, size_t num_binds);
@@ -70,6 +71,8 @@ public: // JS methods
     void reset();
     void next(flusspferd::call_context & x);
     void bind(flusspferd::call_context &x);    
+    bool all_params_bound() const;
+    void ensure_all_params_bound() const;
 };
 
 }
