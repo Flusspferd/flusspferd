@@ -82,7 +82,7 @@ this.sqlite_test_helper.get_test_statements = function(){
             bind: { 
                 first:   data[5][0], 
                 second:  data[5][1],  
-                third:   data[5][3], 
+                third:   data[5][2], 
         }},{
             sql: 'INSERT INTO test_table VALUES(:first,$second,@third)', 
             data: data[6],
@@ -127,7 +127,7 @@ exports.test_sqlite3_placeholder_query_row_array = function() {
         asserts.same(row[2].toArray(), data[index].data[2].toArray())
         ++index
     }
-    asserts(index == data.length)    
+    asserts.same(index, data.length)    
 }
 
 exports.test_sqlite3_placeholder_query_row_object = function() {
