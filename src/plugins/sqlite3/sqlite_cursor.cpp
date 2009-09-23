@@ -28,7 +28,8 @@ THE SOFTWARE.
 #include "sqlite.hpp"
 #include <sstream>
 #include <new>
-#include <iostream>
+#include <boost/lexical_cast.hpp>
+
 
 namespace sqlite3_plugin {
 
@@ -40,7 +41,8 @@ sqlite3_cursor::sqlite3_cursor(object const &obj, sqlite3_stmt *_sth)
 : base_type(obj)
 , sth(_sth)
 , state(CursorState_Init)
-{
+, param_bound( sqlite3_bind_parameter_count(_sth), false )
+{        
 }
 
 
@@ -84,6 +86,8 @@ void sqlite3_cursor::next(call_context & x) {
         default:
             break;    
     }
+
+    ensure_all_params_bound();
 
     int code = sqlite3_step(sth);
 
@@ -234,10 +238,7 @@ void sqlite3_cursor::bind_array(array &a, size_t num_binds) {
     // Pull bind param 1 (the first) from array index 0 (also the first)
     for (size_t n = 1; n <= num_binds; n++) {
         value bind = a.get_element(n-1);
-
-        if (!bind.is_undefined()) {
-            do_bind_param(n, bind);
-        }
+        do_bind_param(n, bind);
     }
 }
 
@@ -246,20 +247,44 @@ void sqlite3_cursor::bind_array(array &a, size_t num_binds) {
 void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
 
     for (size_t n = 1; n <= num_binds; n++) {
-        const char* name = sqlite3_bind_parameter_name(sth, n);
-
+        const char * name = sqlite3_bind_parameter_name(sth, n);
+        bool found = false;
         value bind;
 
         if (!name) {
             // Possibly a '?' unnnamed param
             // TODO: This will break when n is > 2^31.
-            bind = o.get_property( value(n) );
+            if( o.has_property( value(n) ) ) {
+                found = true;
+                bind = o.get_property( value(n) );
+            }
         } else {
             // Named param
-            bind = o.get_property(name);
+            if( o.has_property(name) ) {
+                found = true;
+                bind = o.get_property(name);
+            }
+            // If not found the property we did not find any suitable parameter with this name
+            // So we'll try if we find a property which has the name without the first character
+            // and only if the name starts with '@',':' or '$' 
+            else {
+                switch(name[0])
+                {
+                case '@':
+                case '$':
+                case ':':
+                    if( o.has_property(++name) ) {
+                        found = true;
+                        bind = o.get_property(name);    
+                    }
+                }                
+            }            
         }
-
-        if (!bind.is_undefined()) {
+        
+        // if found now is false there was no suitable bind parameter specified 
+        // so we do not call do_bind_param because the user might want to bind
+        // later
+        if (found) {
             do_bind_param(n, bind);
         }
   }
@@ -269,7 +294,14 @@ void sqlite3_cursor::bind_dict(object &o, size_t num_binds) {
 // Bind the actual para
 void sqlite3_cursor::do_bind_param(int n, value v) {
     int ok;
-    if (v.is_int()) {
+
+    if (v.is_undefined()){
+        char const * name = sqlite3_bind_parameter_name(sth, n);
+        throw exception("SQLite3.Cursor.bind() attempt to bind undefined value to placeholder " +
+                            boost::lexical_cast<std::string>(n) + 
+                            (name ? " '" + std::string(name) + "'" : std::string()) );
+    }
+    else if (v.is_int()) {
         ok = sqlite3_bind_int(sth, n, v.get_int());
     } else if (v.is_double()) {
         ok = sqlite3_bind_double(sth, n, v.get_double());
@@ -283,11 +315,33 @@ void sqlite3_cursor::do_bind_param(int n, value v) {
         // Default, stringify the object
         string bind = v.to_string();
         ok = sqlite3_bind_text16(sth, n, bind.data(), bind.length()*2, SQLITE_TRANSIENT);
-    }
+    }    
 
     if (ok != SQLITE_OK) {
         raise_sqlite_error(); 
     }
+
+    if(n > 0 && size_t(n) <= param_bound.size())
+    {
+        param_bound[ size_t(n - 1) ] = true;
+    }
+}
+
+bool sqlite3_cursor::all_params_bound() const {
+    for(size_t i = 0; i < param_bound.size(); ++i){
+        if(!param_bound[i]){
+            return false;
+        }
+    }
+    return true;
+}
+
+void sqlite3_cursor::ensure_all_params_bound() const {
+    for(size_t i = 0; i < param_bound.size(); ++i){
+        if(!param_bound[i]){
+            throw exception("SQLite3() not all placeholders bound on executed statement!");
+        }
+    }    
 }
 
 void sqlite3_cursor::raise_sqlite_error() {
