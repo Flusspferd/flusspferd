@@ -51,3 +51,34 @@
  * If configurable is false, then any further attempts to call
  * [[#defineProperty]] on that property will result in an exception.  
  */
+
+/**
+ * Define multiple properties on an object.
+ *
+ * @name defineProperties
+ * @methodOf Object
+ *
+ * This the same as to calling `Object.defineProperty` multiple times. For
+ * example:
+ *
+ * {{{
+ * Object.defineProperties(obj, {
+ *   prop1: { value: 1, enumerable: true, configurable: true },
+ *   prop2: { value: 2, enumerable: true, configurable: true },
+ * })
+ * }}}
+ *
+ * behaves the same as just doing
+
+ * {{{
+ * Object.defineProperty(obj, "prop1",
+ *   { value: 1, enumerable: true, configurable: true }
+ * );
+ * Object.defineProperty(obj, "prop2",
+ *   { value: 2, enumerable: true, configurable: true },
+ * )
+ * }}}
+ *
+ * @param obj Object on which to define the property
+ * @param dict dictionary of properties to add to the object
+ */

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 #include "flusspferd/properties_functions.hpp"
+#include "flusspferd/property_iterator.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
@@ -30,6 +32,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 // An implementation like [[DefineOwnProperty]] from ES5 spec 8.12.10
+void ecma_define_own_properties(object o, object desc);
 void ecma_define_own_property(object o, string p, object desc);
 
 void flusspferd::load_properties_functions(object container) {
@@ -43,8 +46,19 @@ void flusspferd::load_properties_functions(object container) {
       obj_ctor,
       "defineProperty",
       ecma_define_own_property);
+
+  create_native_function(
+      obj_ctor,
+      "defineProperties",
+      ecma_define_own_properties);
 }
 
+void ecma_define_own_properties(object o, object desc) {
+
+  for (flusspferd::property_iterator it = desc.begin(); it != desc.end(); ++it) {
+    ecma_define_own_property(o, *it, desc.get_property_object(*it));
+  }
+}
 
 // This doesn't quite match the exact behaviour of the spec, but it hopefully
 // captures the intent.

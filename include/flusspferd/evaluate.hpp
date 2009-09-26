@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,8 +60,38 @@ value evaluate(char const *source, std::size_t n,
  * @param file The file name to use.
  * @param line The initial line number.
  * @param scope The scope 
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
  */
 value evaluate_in_scope(char const* source, std::size_t n,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
+ */
+value evaluate_in_scope(std::string const &source,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope 
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
+ */
+value evaluate_in_scope(char const *source,
                         char const* file, unsigned int line,
                         object const &scope);
 
