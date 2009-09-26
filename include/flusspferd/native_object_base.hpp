@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -76,6 +77,13 @@ public:
    */
   static native_object_base &get_native(object const &o);
 
+  /**
+   * Test if the Javascript object is associated with a native object
+   *
+   * @return true if the give object is native
+   */
+  static bool is_object_native(object const &o);
+
 public:
   /**
    * Associate with an object if there is no association yet.
@@ -115,7 +123,19 @@ protected:
    * Default implementation: stub.
    *
    * For each value that is an otherwise unreachable member of the object and
-   * that should be protected from garbage collection, call @c trc(x).
+   * that should be protected from garbage collection, call @c trc("x", x).
+   * The string "x" does not need to be unique, it's used for debugging
+   * purposes only.
+   *
+   * @code
+flusspferd::value v;
+
+...
+
+void trace(flusspferd::tracer &trc) {
+    trc("v", v);
+}
+   @endcode
    *
    * @param trc The tracer to be used.
    *
@@ -266,6 +286,14 @@ T &cast_to_derived(native_object_base &o) {
   return *ptr;
 }
 
+/**
+ * Gets @p o as native object of class @p T. If @p o is not an object, not
+ * native or not of class @p T then an exception will be thrown.
+ *
+ * @param o object to check
+ * @see is_native
+ * @ingroup classes
+ */
 template<typename T>
 T &get_native(object const &o) {
   return cast_to_derived<T>(native_object_base::get_native(o));
@@ -277,14 +305,25 @@ bool is_derived(native_object_base &o) {
 }
 
 /**
- * Checks if @p o is a @p T.
+ * Checks if @p o is a native object of class @p T.
+ *
+ * @code
+flusspferd::object o = v.get_object();
+if (flusspferd::is_native<flusspferd::binary>(o) {
+  flusspferd::binary &b = flusspferd::get_native<flusspferd::binary>(o);
+}
+@endcode
  *
  * @param o object to check
  * @see get_native
+ * @ingroup classes
  */
 template<typename T>
 bool is_native(object const &o) {
-  return is_derived<T>(native_object_base::get_native(o));
+  if ( native_object_base::is_object_native(o) ) {
+    return is_derived<T>(native_object_base::get_native(o));
+  }
+  return false;
 }
 
 template<typename T>

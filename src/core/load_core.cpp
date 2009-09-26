@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +26,7 @@ THE SOFTWARE.
 
 #include "flusspferd/load_core.hpp"
 #include "flusspferd/modules.hpp"
+#include "flusspferd/evaluate.hpp"
 #include "flusspferd/properties_functions.hpp"
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
@@ -34,6 +36,10 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 
 using namespace flusspferd;
+
+namespace flusspferd { namespace detail {
+  extern char const * const json2;
+}}
 
 void flusspferd::load_core(object const &scope_) {
   object scope = scope_;
@@ -74,4 +80,6 @@ void flusspferd::load_core(object const &scope_) {
   flusspferd::create_native_method(
     preload, "getopt",
     &flusspferd::load_getopt_module);
+
+  flusspferd::evaluate_in_scope(detail::json2, std::strlen(detail::json2), 0x0, 0, scope_);
 }

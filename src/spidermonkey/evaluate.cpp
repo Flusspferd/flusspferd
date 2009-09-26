@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,6 +61,20 @@ value flusspferd::evaluate_in_scope(
       throw e;
   }
   return Impl::wrap_jsval(rval);
+}
+
+value flusspferd::evaluate_in_scope(std::string const &source,
+                                    char const* file, unsigned int line,
+                                    object const &scope)
+{
+  return evaluate_in_scope(source.data(), source.size(), file, line, scope);
+}
+
+value flusspferd::evaluate_in_scope(char const *source,
+                                    char const* file, unsigned int line,
+                                    object const &scope)
+{
+  return evaluate_in_scope(source, std::strlen(source), file, line, scope);
 }
 
 value flusspferd::execute(char const *filename, object const &scope_) {

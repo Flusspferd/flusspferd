@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +33,6 @@ function merge(ctor, obj) {
 }
 
 const TAPProducer = function TAPProducer() {
-  // TODO: ServerJS compliance
   this.outputStream = require('system').stdout;
 
   var depth;
@@ -141,12 +141,11 @@ const Suite = function Suite(cases) {
   this.__proto__.__proto__.constructor.call(this);
   this._state = {
     cases: [],
-    casesFailed: 0,
     assertsFailed: [],
     numAsserts: 0,
-    run: 0,
     currentCase: undefined
   }
+  this.nested = false;
 
   if (!cases) {
     return;
@@ -158,13 +157,23 @@ const Suite = function Suite(cases) {
 
     if (/^test_/.test(k) == false)
       continue;
-    this._state.cases.push({
-      func: t,
+
+    let testCase = {
       name: k.replace(/^test_(.*)/, "$1"),
       index: this._state.cases.length,
       numAsserts: 0,
       assertsFailed: []
-    });
+    };
+
+    // Not a function - must be a sub-test
+    if (typeof t != "function") {
+      let s = testCase.suite = new Suite(t);
+      s.nested = true;
+      s.name = k;
+    }
+    else testCase.func = t;
+
+    this._state.cases.push(testCase);
   }
 
   this._state.plan = this._state.cases.length;
@@ -187,12 +196,9 @@ merge(Suite.prototype, {
       }
     }
     finally {
-      currentSuite = oldCurrent;
+      exports.__currentSuite__ = oldCurrent;
     }
     this.finalize();
-  },
-
-  addSubSuite: function addSubSuite(s) {
   },
 
   runCase: function runCase(theCase) {
@@ -200,17 +206,24 @@ merge(Suite.prototype, {
         depth = this.paddDepth,
         error;
 
-    this.printPlan(this._state);
-
     try {
       this.diag(theCase.name + "...");
       this.paddDepth = depth + 1;
       try {
         this._state.currentCase = theCase;
-        theCase.func.call(asserts, this);
-        this.printPlan(theCase);
+        if (theCase.suite) {
+          var nested = theCase.suite;
+          nested.paddDepth = this.paddDepth;
+
+          nested.run();
+          theCase = nested._state;
+        }
+        else {
+          theCase.func.call(asserts, this);
+        }
       }
       finally {
+        this.printPlan(theCase);
         this.paddDepth = depth;
       }
     }
@@ -264,7 +277,12 @@ merge(Suite.prototype, {
   },
 
   finalize: function finalize() {
-    //this.diag(this._state.toSource());
+    if (this.nested)
+      return;
+    if (this._state.assertsFailed.length)
+      this.print("Failed", this._state.assertsFailed.length, "tests");
+    else
+      this.print("All tests successful");
   }
 })
 
@@ -293,7 +311,7 @@ var currentSuite;
 Object.defineProperty( exports, "__currentSuite__", {
   getter: function() { return currentSuite },
   setter: function(x) {
-    if (x instanceof Suite)
+    if (x === undefined || x instanceof Suite)
       return currentSuite = x;
     throw new TypeError("__currentSuite__ must be an instanceof test.Suite");
   },
@@ -353,10 +371,6 @@ merge(Asserts.prototype, {
       when: new Date(),
       message: msg
     } );
-  },
-
-  expects: function expects(count) {
-    return exports.__currentSuite__.expects(count);
   },
 
   diag: function diag() {

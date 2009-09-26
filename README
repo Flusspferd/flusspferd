@@ -56,10 +56,11 @@ Using Flusspferd
 We have tutorials at http://flusspferd.org/docs/tutorials.html. Just a quick
 peek:
 
-$ flusspferd
-> "Hello!"
-Hello!
-> require('posix').sleep(5)
+> const GMP = require('gmp');
+> f = GMP.Float(2);
+2.0
+> print(f.sqrt())
+1.41421356237309504876
 >
 
 (The text after ">" in each line is input.)

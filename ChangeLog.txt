@@ -4,8 +4,17 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-09-19:
+- Overhauled SQLite3 module (issue #103).
+
+2009-09-20:
+- json2.js (http://www.json.org/json2.js) is now loaded to provide an ES5 compatible JSON object for older spidermonkey
+
+2009-09-19:
+- Immature plugins have been removed (and moved into feature branch).
+
 2009-09-10:
-- Added bash_completion script for flusspferd
+- Added bash_completion script for flusspferd.
 
 Release 0.7
 -----------
