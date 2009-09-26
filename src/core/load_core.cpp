@@ -81,5 +81,12 @@ void flusspferd::load_core(object const &scope_) {
     preload, "getopt",
     &flusspferd::load_getopt_module);
 
-  flusspferd::evaluate_in_scope(detail::json2, std::strlen(detail::json2), 0x0, 0, scope_);
+  if (!scope_.has_own_property("JSON")) {
+    flusspferd::evaluate_in_scope(
+      detail::json2,
+      std::strlen(detail::json2),
+      0x0, // Filename
+      0,   // Linenumber
+      scope_);
+  }
 }
