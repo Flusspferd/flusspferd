@@ -347,6 +347,9 @@ if (!this.JSON) {
             gap = mind;
             return v;
         }
+
+        // Added by ash
+        return "null";
     }
 
 // If the JSON object does not yet have a stringify method, give it one.
