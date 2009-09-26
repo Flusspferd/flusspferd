@@ -61,7 +61,7 @@ THE SOFTWARE.
   // Constructor, take headers (as any case) and assign to proper cassed values
   var hdrs = function HTTP$Headers(hdr_dict) {
     if (hdr_dict === undefined)
-      return this;
+      return;
 
     for (let [h,v] in Iterator(hdr_dict)) {
       h = h.replace('_', '-'); // CGI environs do this
@@ -149,12 +149,12 @@ THE SOFTWARE.
   // Create setters and getters for other headers, such as contentType sets 
   // Content-Type header
   for each (let h in header_order) {
-    h$ = h.split(/-/);
+    let h$ = h.split(/-/);
     h$[0] = h$[0].toLowerCase();
     h$ = h$.join("");
     if (h != h$) {
       let k = h;
-      hdrs.prototype.__defineGetter__(h$, function() { return this[k] } );
+      hdrs.prototype.__defineGetter__(h$, function() { return this[k] || undefined } );
       hdrs.prototype.__defineSetter__(h$, function(v) { return this[k] = v } );
     }
   }
