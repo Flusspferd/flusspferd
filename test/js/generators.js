@@ -7,7 +7,7 @@ require.paths.unshift('test/js/lib');
 if (!this.exports) this.exports = {};
 
 exports.test_generatorsInMoudles = function() {
-  var a = require('./generator_test').run();
+  var a = require('generator_test').run();
 
   var it = (k for (k in [1,2,3]) );
   asserts.same(a.toString(), "[object Generator]", "got a generator");
@@ -15,7 +15,7 @@ exports.test_generatorsInMoudles = function() {
 }
 
 exports.test_utilRange = function() {
-  var r = Util.Range(1,10,2);
+  var r = require('util').Range(1,10,2);
   var a1 = [];
 
   for (let i in r) { a1.push(i) };
