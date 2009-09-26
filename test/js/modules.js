@@ -6,7 +6,7 @@ let test = require('test'),
 
 exports.test_RequireId = function () {
   // Not sure what require.id should be. it ceratinly shouldn't be 'system'
-  asserts.same(require.id, "modules");
+  asserts.same(require.id, "test/js/modules.js");
 }
 
 exports.test_InstanceOf = function () {
