@@ -220,8 +220,9 @@ int flusspferd_repl::run() {
 
     try {
       flusspferd::value v = flusspferd::evaluate(source, "[typein]", startline);
-      if (!v.is_undefined())
-        std::cout << v << '\n';
+      if (!v.is_undefined()) {
+        std::cout << v.to_source() << '\n';
+      }
     }
     catch(std::exception &e) {
       std::cerr << "ERROR: " << e.what() << '\n';

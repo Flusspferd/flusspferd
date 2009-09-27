@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-09-27:
+- repl now prints v.to_source to give better output for objects.
+
 2009-09-26:
 - Chane how (pure JS) modules are loaded to preserve JIT and isolate scopes
   better
