@@ -44,7 +44,7 @@ THE SOFTWARE.
 #define creat _creat
 
 namespace {
-  std::string compose_error_message(std::string const &what) {
+  std::string compose_error_message(std::string const &what, char const *filename = 0x0) {
 #if 0
     /* yuck Windoze API.
        Is TCHAR the way to go, since we only want char? (no wchar_t stuff?)
@@ -68,7 +68,7 @@ namespace {
       return ret;
     }
 #else
-    return what;
+    return what + filename;
 #endif
   }
 }
@@ -76,8 +76,11 @@ namespace {
 #include <errno.h>
 #include <cstring>
 namespace {
-  std::string compose_error_message(std::string const &what) {
-    std::string error = what + ": '" + std::strerror(errno) + "'";
+  std::string compose_error_message(char const *what, char const *filename = 0x0) {
+    std::string error = std::string(what) + ": '" + std::strerror(errno) + "'";
+    if (filename) {
+      error += std::string(" (") + filename + ')';
+    }
     return error;
   }
 }
@@ -140,7 +143,7 @@ void file::open(char const *name, value options) {
                   permanent_property | read_only_property );
 
   if (!p->stream)
-    throw exception(compose_error_message("Could not open file"));
+    throw exception(compose_error_message("Could not open file", name));
 }
 
 void file::close() {
@@ -155,7 +158,7 @@ void file::create(char const *name, boost::optional<int> mode) {
     throw exception("Could not create file (security)");
 
   if (creat(name, mode.get_value_or(0666)) < 0)
-    throw exception(compose_error_message("Could not create file"));
+    throw exception(compose_error_message("Could not create file", name));
 }
 
 bool file::exists(char const *name) {
