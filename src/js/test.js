@@ -137,7 +137,7 @@ merge(TAPProducer.prototype, {
 });
 
 
-const Suite = function Suite(cases) {
+const Suite = exports.Suite = function Suite(cases) {
   this.__proto__.__proto__.constructor.call(this);
   this._state = {
     cases: [],
@@ -280,13 +280,12 @@ merge(Suite.prototype, {
     if (this.nested)
       return;
     if (this._state.assertsFailed.length)
-      this.print("Failed", this._state.assertsFailed.length, "tests");
+      this.print(this.red("Failed", this._state.assertsFailed.length, "tests"));
     else
-      this.print("All tests successful");
+      this.print(this.green("All tests successful"));
   }
 })
 
-exports.Suite = Suite;
 exports.runner = function runner() {
   var suite;
   var args = Array.slice(arguments);
@@ -306,6 +305,71 @@ exports.runner = function runner() {
 
   return suite.run();
 };
+
+// The general test runner for 'run this dir of tests'
+exports.prove = function prove() {
+  const fs = require('filesystem-base');
+
+  var i = 0;
+  var options = {};
+
+  if (typeof arguments[0] == "object") {
+    i++;
+    options = arguments[0];
+  }
+
+  var test_files = [];
+
+  for (; i < arguments.length; ++i) {
+    var x = arguments[i];
+    if (!fs.exists(x))
+      throw new TypeError("Cannot determine test source for " + uneval(x));
+
+    if (fs.isDirectory(x))
+      findTests(fs.list(x));
+    else
+      findTests([x]);
+  }
+
+  var test = loadTests(test_files);
+  var suite = new Suite(test);
+  suite.run();
+
+  var failed = suite._state.assertsFailed.length;
+  quit( failed <= 255 ? failed : 255 );
+
+  function findTests(files) {
+    for ([,x] in Iterator(files) ) {
+      if (x.match(/^\.(?!\/)/))
+        continue;
+
+      if (fs.isDirectory(x)) {
+        print(x, "is dir");
+        if (options.recurse)
+          findTests(fs.list(x));
+        continue;
+      }
+
+      if (x.match(/\.t\.js$/))
+        test_files.push(x);
+    }
+  }
+
+  function loadTests(files) {
+    var filename;
+    var testObject = {};
+    print(files);
+    for ([,filename] in Iterator(files) ) {
+      var id  = fs.canonical(filename);
+      print(id);
+
+      var test = require('file://' + id);
+      testObject['test_' + id] = test;
+    }
+
+    return testObject;
+  }
+}
 
 var currentSuite;
 Object.defineProperty( exports, "__currentSuite__", {
