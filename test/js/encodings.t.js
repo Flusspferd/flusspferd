@@ -116,5 +116,5 @@ exports.test_katakanaTranscoder_Chunks = function() {
   );
 }
 
-// if (module.isMain)
+if (require.main === module)
   require('test').runner(exports);

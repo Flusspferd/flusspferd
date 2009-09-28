@@ -5,7 +5,8 @@ if (!this.exports) this.exports = {};
 
 exports.test_decodeToString = function() {
 	b = binary.ByteString([65, 66]);
-	asserts.same(b.decodeToString(), "AB");	
+	asserts.same(b.decodeToString(), "AB");
 }
 
-require('test').runner(exports);
+if (require.main === module)
+  require('test').runner(exports);

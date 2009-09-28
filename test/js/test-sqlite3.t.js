@@ -28,16 +28,15 @@ const asserts = require('test').asserts,
       sqlite3 = require('sqlite3'),
       sqlite3_testblob = require('binary').ByteString("0123456789");
 
-if(!this.exports) this.exports = {};
-if(!this.sqlite_test_helper) this.sqlite_test_helper = {}
+var sqlite_test_helper = {}
 
-this.sqlite_test_helper.get_db = function(){
+sqlite_test_helper.get_db = function(){
     db = sqlite3.SQLite3(':memory:')
     db.exec('CREATE TABLE test_table(int_val INTEGER, str_val TEXT, bin_val BLOB)')    
     return db
 }
 
-this.sqlite_test_helper.get_test_statements = function(){
+sqlite_test_helper.get_test_statements = function(){
     data = [[ 1, "one",     sqlite3_testblob ],
             [ 2, "two",     sqlite3_testblob ],
             [ 3, "three",   sqlite3_testblob ],
@@ -146,5 +145,6 @@ exports.test_sqlite3_placeholder_query_row_object = function() {
     asserts.same(index, data.length)    
 }
 
-require('test').runner(exports);
+if (require.main === module)
+  require('test').runner(exports);
 

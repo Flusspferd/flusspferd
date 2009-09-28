@@ -6,7 +6,7 @@ let test = require('test'),
 
 exports.test_RequireId = function () {
   // Not sure what require.id should be. it ceratinly shouldn't be 'system'
-  asserts.same(require.id, "test/js/modules.js");
+  asserts.same(require.id, "test/js/modules.t.js");
 }
 
 exports.test_InstanceOf = function () {
@@ -23,5 +23,5 @@ exports.test_varPolution = function() {
   asserts.same("a2" in global, false, "no a2 variable");
 }
 
-if (require.main == module)
+if (require.main === module)
   test.runner(exports);
