@@ -48,4 +48,5 @@ exports.test_multiline = function() {
   );
 }
 
-require('test').runner(exports);
+if (require.main === module)
+  require('test').runner(exports);

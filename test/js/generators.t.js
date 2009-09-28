@@ -23,4 +23,5 @@ exports.test_utilRange = function() {
   asserts.same(a1, [1,3,5,7,9], "Util.Range works");
 }
 
-require('test').runner(exports);
+if (require.main === module)
+  require('test').runner(exports);
