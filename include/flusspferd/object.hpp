@@ -311,33 +311,37 @@ FLUSSPFERD_CALLS(call, object const &)
    *
    * @param name The property's name.
    * @param v The new value.
+   * @return @p v
    */
-  void set_property(char const *name, value const &v);
+  value set_property(char const *name, value const &v);
 
   /**
    * Set a property.
    *
    * @param name The property's name.
    * @param v The new value.
+   * @return @p v
    */
-  void set_property(std::string const &name, value const &v);
+  value set_property(std::string const &name, value const &v);
 
   /**
    * Set a property.
    *
    * @param id The property's name / ID.
    * @param v The new value.
+   * @return @p v
    */
-  void set_property(value const &id, value const &v);
+  value set_property(value const &id, value const &v);
 
   /**
    * Set a property.
    *
    * @param id The property's name / ID.
    * @param v The new value.
+   * @returnv @p v
    */
   template<typename T, typename U>
-  void set_property(T const &id, U const &v
+  value set_property(T const &id, U const &v
 #ifndef IN_DOXYGEN
   , typename boost::disable_if<boost::is_same<U, value> >::type * = 0
 #endif
