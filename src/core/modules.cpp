@@ -175,7 +175,7 @@ void require_js(object old_require, string id, std::string filename, object expo
   object fn = evaluate(js.c_str(), js.size(), filename.c_str(), 1ul).to_object();
 
   object module = create_object();
-  module.set_property("uri", "fille://" + filename);
+  module.set_property("uri", "file://" + filename);
   module.set_property("id", id);
 
   object require = new_require_function(old_require, id);
