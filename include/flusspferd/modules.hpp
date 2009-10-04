@@ -29,6 +29,9 @@ THE SOFTWARE.
 
 #include "init.hpp"
 #include "object.hpp"
+#include "array.hpp"
+#include "native_function_base.hpp"
+#include <boost/filesystem.hpp>
 
 namespace flusspferd { 
 
@@ -96,6 +99,55 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
   void flusspferd_load( \
     ::flusspferd::object &exports, \
     ::flusspferd::object &)
-}
+
+/// Functor object that backs the require('foo') in JavaScript
+class require : public flusspferd::native_function_base {
+public:
+  require();
+  require(require const &rhs);
+  ~require();
+
+  /// The different types of IDs understood by require
+  enum id_classification {
+    relative, // "./foo" or "../foo"
+    top_level, // "foo/bar"
+    fully_qualified // "file://path/to/foo.js"
+  };
+
+  void call(flusspferd::call_context &x);
+
+  /// Create the initial %require function.
+  /**
+   * Needed because native_function_base doesn't have a nice way to create
+   * properties on the function object itself
+   */
+  static object create_require();
+
+  /// Create a sub-%require object for the given module id
+  object new_require_function(string const &id);
+
+protected:
+  object module_cache;
+  array paths;
+  object alias;
+  object preload;
+
+
+  std::string current_id();
+
+  object load_top_level_module(std::string &id);
+  object load_absolute_js_file(boost::filesystem::path path, std::string &id);
+
+  boost::filesystem::path resolve_relative_id(std::string const &id);
+
+  void require_js(boost::filesystem::path filename,
+                  std::string const &id,
+                  object exports);
+
+  static id_classification classify_id(std::string const &id);
+
+};
+
+} // namespace flusspferd
 
 #endif
