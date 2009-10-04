@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/arguments.hpp"
+#include "flusspferd/tracer.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/context.hpp"
 #include "flusspferd/spidermonkey/function.hpp"
@@ -47,6 +48,12 @@ public:
   static JSBool call_helper(
     JSContext *ctx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
   static void finalize(JSContext *, JSObject *);
+
+#if JS_VERSION >= 180
+  static void trace_op(JSTracer *trc, JSObject *obj);
+#else
+  static uint32 mark_op(JSContext *, JSObject *, void *);
+#endif
 
   unsigned arity;
   std::string name;
@@ -67,14 +74,34 @@ native_function_base::native_function_base(
 
 native_function_base::~native_function_base() { }
 
+
+#if JS_VERSION >= 180
+#define MARK_TRACE_OP ((JSMarkOp) &native_function_base::impl::trace_op)
+#else
+#define MARK_TRACE_OP (&native_function_base::impl::mark_op)
+#endif
+
 JSClass native_function_base::impl::function_priv_class = {
   "FunctionParent",
-  JSCLASS_HAS_PRIVATE,
+  JSCLASS_HAS_PRIVATE
+#if JS_VERSION >= 180
+  | JSCLASS_MARK_IS_TRACE
+#endif
+  ,
   JS_PropertyStub, JS_PropertyStub, JS_PropertyStub, JS_PropertyStub,
   JS_EnumerateStub, JS_ResolveStub, JS_ConvertStub,
   &native_function_base::impl::finalize,
-  JSCLASS_NO_OPTIONAL_MEMBERS
+  0,
+  0,
+  0,
+  0,
+  0,
+  0,
+  MARK_TRACE_OP,
+  0
 };
+
+#undef MARK_TRACE_OP
 
 function native_function_base::create_function() {
   JSContext *ctx = Impl::current_context();
@@ -139,6 +166,35 @@ JSBool native_function_base::impl::call_helper(
   } FLUSSPFERD_CALLBACK_END;
 }
 
+
+#if JS_VERSION >= 180
+void native_function_base::impl::trace_op(
+    JSTracer *trc, JSObject *obj)
+{
+  current_context_scope scope(Impl::wrap_context(trc->context));
+
+  native_function_base *self =
+    native_function_base::get_native(Impl::wrap_object(obj));
+
+  tracer tracer_(trc);
+  self->trace(tracer_);
+}
+#else
+uint32 native_function_base::impl::mark_op(
+    JSContext *ctx, JSObject *obj, void *thing)
+{
+  current_context_scope scope(Impl::wrap_context(ctx));
+
+  native_function_base *self =
+    native_function_base::get_native(Impl::wrap_object(obj));
+
+  tracer trc(thing);
+  self->trace(trc);
+
+  return 0;
+}
+#endif
+
 void native_function_base::impl::finalize(JSContext *ctx, JSObject *priv) {
   current_context_scope scope(Impl::wrap_context(ctx));
 
@@ -184,3 +240,5 @@ native_function_base *native_function_base::get_native(object const &o_) {
 
   return self;
 }
+
+void native_function_base::trace(tracer&) {}

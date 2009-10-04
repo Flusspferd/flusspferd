@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-10-04:
+- native_function_base object now has a trace() method
+
 2009-09-27:
 - repl now prints v.to_source to give better output for objects.
 
