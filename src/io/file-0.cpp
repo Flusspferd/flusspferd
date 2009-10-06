@@ -41,6 +41,7 @@ void flusspferd::load_file_0_module(object container) {
   create_native_function(exports, "canonical", &file0::canonical);
   create_native_function(exports, "lastModified", &file0::last_modified);
   create_native_function(exports, "touch", &file0::touch);
+  create_native_function(exports, "size", &file0::size);
 }
 
 fs::path canonicalize(fs::path in);
@@ -125,4 +126,12 @@ void file0::touch(string str, object mtime_o) {
   }
 
   fs::last_write_time(p, mtime);
+}
+
+// JS has no concept of unit, and double has a 53 bit mantissa, which means we
+// can store up to 9*10^E15 (2^53, 8192TB ) without loosing precisions. Much
+// better than only 30bits == 1gb! eek
+double file0::size(string file) {
+  uintmax_t fsize = fs::file_size(file.to_string());
+  return fsize;
 }
