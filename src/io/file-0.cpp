@@ -29,7 +29,12 @@ THE SOFTWARE.
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <iostream>
+
+#ifdef WIN32
+#include <stdio.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace flusspferd;
 namespace file0 =  flusspferd::io::file0;
@@ -42,9 +47,15 @@ void flusspferd::load_file_0_module(object container) {
   create_native_function(exports, "lastModified", &file0::last_modified);
   create_native_function(exports, "touch", &file0::touch);
   create_native_function(exports, "size", &file0::size);
-}
 
-fs::path canonicalize(fs::path in);
+
+  create_native_function(exports, "exists", &file0::exists);
+  create_native_function(exports, "isFile", &file0::is_file);
+  create_native_function(exports, "isDirectory", &file0::is_directory);
+  create_native_function(exports, "isLink", &file0::is_link);
+  create_native_function(exports, "isReadable", &file0::is_readable);
+  create_native_function(exports, "isWriteable", &file0::is_writeable);
+}
 
 string file0::canonical(string path) {
   return canonicalize(path.to_string()).string();
@@ -134,4 +145,40 @@ void file0::touch(string str, object mtime_o) {
 double file0::size(string file) {
   uintmax_t fsize = fs::file_size(file.to_string());
   return fsize;
+}
+
+bool file0::exists(string p) {
+  return fs::exists(p.to_string());
+}
+
+bool file0::is_file(string p) {
+  return fs::is_regular_file(p.to_string());
+}
+
+bool file0::is_directory(string p) {
+  return fs::is_directory(p.to_string());
+}
+
+bool file0::is_link(string p) {
+  return fs::is_symlink(p.to_string());
+}
+
+bool file0::is_readable(string p) {
+  return access(p.to_string().c_str(), R_OK) != -1;
+}
+
+bool file0::is_writeable(string str) {
+  fs::path p(str.to_string());
+
+  if (access(p.string().c_str(), W_OK) != -1)
+    return true;
+
+  // Might be false because it doesn't exist, in which case check we can write
+  // to the dir its in
+  if (!fs::exists(p)) {
+    p.remove_filename();
+    p = canonicalize(p);
+    return access(p.string().c_str(), W_OK) != -1;
+  }
+  return false;
 }
