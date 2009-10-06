@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/io/file-0.hpp"
 #include "flusspferd.hpp"
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace flusspferd;
 namespace file0 =  flusspferd::io::file0;
@@ -36,6 +37,7 @@ void flusspferd::load_file_0_module(object container) {
   object exports = container.get_property_object("exports");
 
   create_native_function(exports, "canonical", &file0::canonical);
+  create_native_function(exports, "lastModified", &file0::last_modified);
 }
 
 fs::path canonicalize(fs::path in);
@@ -92,4 +94,10 @@ fs::path file0::canonicalize(fs::path in) {
   return accum;
 }
 
+value file0::last_modified(string path) {
+  std::time_t last_mod = fs::last_write_time(path.to_string());
 
+  // TODO: Is there any way that isn't so truely horrible?
+  std::string js = "new Date(";
+  return evaluate(js + boost::lexical_cast<std::string>(last_mod*1000.0) + ")");
+}
