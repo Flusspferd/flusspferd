@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include "flusspferd.hpp"
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem/fstream.hpp>
+#include <iostream>
 
 using namespace flusspferd;
 namespace file0 =  flusspferd::io::file0;
@@ -38,6 +40,7 @@ void flusspferd::load_file_0_module(object container) {
 
   create_native_function(exports, "canonical", &file0::canonical);
   create_native_function(exports, "lastModified", &file0::last_modified);
+  create_native_function(exports, "touch", &file0::touch);
 }
 
 fs::path canonicalize(fs::path in);
@@ -100,4 +103,26 @@ value file0::last_modified(string path) {
   // TODO: Is there any way that isn't so truely horrible?
   std::string js = "new Date(";
   return evaluate(js + boost::lexical_cast<std::string>(last_mod*1000.0) + ")");
+}
+
+void file0::touch(string str, object mtime_o) {
+  object date = global().get_property_object("Date");
+  value ctor;
+  if (mtime_o.is_null() ||
+     !(ctor = mtime_o.get_property("constructor")).is_object() ||
+     ctor.get_object() != date)
+  {
+    throw exception("touch expects a Date as it's second argument", "TypeError");
+  }
+
+  double msecs = mtime_o.call("valueOf").to_number();
+  std::time_t mtime = msecs/1000;
+
+  fs::path p(str.to_string());
+  if (!fs::exists(p)) {
+    // File doesn't exist, create
+    fs::ofstream f(p);
+  }
+
+  fs::last_write_time(p, mtime);
 }
