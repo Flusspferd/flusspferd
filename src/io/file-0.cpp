@@ -55,6 +55,11 @@ void flusspferd::load_file_0_module(object container) {
   create_native_function(exports, "isLink", &file0::is_link);
   create_native_function(exports, "isReadable", &file0::is_readable);
   create_native_function(exports, "isWriteable", &file0::is_writeable);
+
+
+  create_native_function(exports, "link", &file0::link);
+  create_native_function(exports, "hardLink", &file0::hard_link);
+  create_native_function(exports, "readLink", &file0::read_link);
 }
 
 string file0::canonical(string path) {
@@ -181,4 +186,36 @@ bool file0::is_writeable(string str) {
     return access(p.string().c_str(), W_OK) != -1;
   }
   return false;
+}
+
+void file0::link(string source, string target) {
+  if (symlink(source.to_string().c_str(), target.to_string().c_str()) == 0)
+    return;
+
+  // TODO: paths and system error message!
+  throw exception("Error creating symbolic link");
+}
+
+void file0::hard_link(string source, string target) {
+  if (::link(source.to_string().c_str(), target.to_string().c_str()) == 0)
+    return;
+
+  // TODO: paths and system error message!
+  throw exception("Error creating hard link");
+}
+
+string file0::read_link(string link) {
+  std::string s = link.to_string();
+  if (!fs::is_symlink(s)) {
+    throw exception("Cannot readLink: " + s + " is not a link");
+  }
+
+  char buff[PATH_MAX];
+
+  ssize_t len = readlink(s.c_str(), buff, PATH_MAX);
+  if (len == -1) {
+    //TODO: How do i use boost to get a nicer errmessage? Also should actually use errno
+    throw std::string("Path too long");
+  }
+  return string(buff, len);
 }
