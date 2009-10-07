@@ -125,15 +125,22 @@ value file0::last_modified(string path) {
 void file0::touch(string str, object mtime_o) {
   object date = global().get_property_object("Date");
   value ctor;
-  if (mtime_o.is_null() ||
-     !(ctor = mtime_o.get_property("constructor")).is_object() ||
-     ctor.get_object() != date)
-  {
-    throw exception("touch expects a Date as it's second argument", "TypeError");
-  }
+  std::size_t mtime;
 
-  double msecs = mtime_o.call("valueOf").to_number();
-  std::time_t mtime = msecs/1000;
+  if (!mtime_o.is_null()) {
+    if (!(ctor = mtime_o.get_property("constructor")).is_object() ||
+        ctor.get_object() != date)
+    {
+      throw exception("touch expects a Date as it's second argument if present",
+                      "TypeError");
+    }
+
+    double msecs = mtime_o.call("valueOf").to_number();
+    mtime = msecs/1000;
+  }
+  else {
+    mtime = time(NULL);
+  }
 
   fs::path p(str.to_string());
   if (!fs::exists(p)) {
