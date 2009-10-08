@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/io/file-0.hpp"
 #include "flusspferd.hpp"
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/fstream.hpp>
 
@@ -37,8 +38,14 @@ THE SOFTWARE.
 #endif
 
 using namespace flusspferd;
+using boost::format;
 namespace file0 =  flusspferd::io::file0;
 namespace fs = boost::filesystem;
+
+// owner: No such file or directory "foo/bar"
+const format error_fmt("%1%: %2% \"%3%\"");
+// symlink: No such file or directory "foo/bar", "baz"
+const format error_fmt2("%1%: %2% \"%3%\", \"%4%\"");
 
 void flusspferd::load_file_0_module(object container) {
   object exports = container.get_property_object("exports");
@@ -92,8 +99,10 @@ fs::path file0::canonicalize(fs::path in) {
     if (fs::is_symlink(accum)) {
       ssize_t len = readlink(accum.string().c_str(), buff, PATH_MAX);
       if (len == -1) {
-        //TODO: How do i use boost to get a nicer errmessage? Also should actually use errno
-        throw std::string("Path too long");
+        format fmt = format(error_fmt) % "canonical"
+                                       % std::strerror(errno)
+                                       % accum;
+        throw exception(fmt.str());
       }
       fs::path link_path = std::string(buff, len);
 
@@ -131,7 +140,7 @@ void file0::touch(string str, object mtime_o) {
     if (!(ctor = mtime_o.get_property("constructor")).is_object() ||
         ctor.get_object() != date)
     {
-      throw exception("touch expects a Date as it's second argument if present",
+      throw exception("touch: expects a Date as it's second argument if present",
                       "TypeError");
     }
 
@@ -200,7 +209,12 @@ void file0::link(string source, string target) {
     return;
 
   // TODO: paths and system error message!
-  throw exception("Error creating symbolic link");
+  format e = format(error_fmt2)
+           % "link"
+           % std::strerror(errno)
+           % source.to_string()
+           % target.to_string();
+  throw exception(e.str());
 }
 
 void file0::hard_link(string source, string target) {
@@ -208,21 +222,26 @@ void file0::hard_link(string source, string target) {
     return;
 
   // TODO: paths and system error message!
-  throw exception("Error creating hard link");
+  format e = format(error_fmt2)
+           % "hardLink"
+           % std::strerror(errno)
+           % source.to_string()
+           % target.to_string();
+  throw exception(e.str());
 }
 
 string file0::read_link(string link) {
   std::string s = link.to_string();
-  if (!fs::is_symlink(s)) {
-    throw exception("Cannot readLink: " + s + " is not a link");
-  }
 
   char buff[PATH_MAX];
 
   ssize_t len = readlink(s.c_str(), buff, PATH_MAX);
   if (len == -1) {
-    //TODO: How do i use boost to get a nicer errmessage? Also should actually use errno
-    throw std::string("Path too long");
+    format e = format(error_fmt)
+             % "readLink"
+             % std::strerror(errno)
+             % s;
+    throw exception(e.str());
   }
   return string(buff, len);
 }
