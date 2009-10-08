@@ -51,7 +51,7 @@ namespace file0 {
   string read_link(string link);
 
   string working_directory();
-  string change_workingDirectory(string path);
+  void change_working_directory(string path);
 
   string owner(string path);
   void change_owner(string path, string owner);

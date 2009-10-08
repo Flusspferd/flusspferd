@@ -62,11 +62,30 @@ void flusspferd::load_file_0_module(object container) {
   create_native_function(exports, "isLink", &file0::is_link);
   create_native_function(exports, "isReadable", &file0::is_readable);
   create_native_function(exports, "isWriteable", &file0::is_writeable);
+  create_native_function(exports, "same", &file0::same);
 
 
   create_native_function(exports, "link", &file0::link);
   create_native_function(exports, "hardLink", &file0::hard_link);
   create_native_function(exports, "readLink", &file0::read_link);
+
+
+  create_native_function(exports, "makeDirectory", &file0::make_directory);
+  create_native_function(exports, "removeDirectory", &file0::remove_directory);
+
+
+
+  create_native_function(exports, "move", &file0::move);
+  create_native_function(exports, "remove", &file0::remove);
+
+
+
+  create_native_function(exports, "workingDirectory", &file0::working_directory);
+  create_native_function(exports, "changeWorkingDirectory", &file0::change_working_directory);
+
+
+
+  create_native_function(exports, "list", &file0::list);
 }
 
 string file0::canonical(string path) {
@@ -204,6 +223,11 @@ bool file0::is_writeable(string str) {
   return false;
 }
 
+bool file0::same(string source, string target) {\
+  // TODO: test if this behaves right w.r.t. symlinks
+  return fs::equivalent(source.to_string(), target.to_string());
+}
+
 void file0::link(string source, string target) {
   if (symlink(source.to_string().c_str(), target.to_string().c_str()) == 0)
     return;
@@ -244,4 +268,57 @@ string file0::read_link(string link) {
     throw exception(e.str());
   }
   return string(buff, len);
+}
+
+
+void file0::make_directory(string dir) {
+  fs::create_directory(dir.to_string());
+}
+
+void file0::remove_directory(string dir) {
+  fs::path p(dir.to_string());
+
+  if (!fs::exists(p))
+    throw exception("removeDirectory: " + p.string() + " doesn't exist");
+  if (!fs::is_directory(p))
+    throw exception("removeDirectory: " + p.string() + " isn't a directory");
+
+  fs::remove(p);
+}
+
+void file0::move(string source, string target) {
+  fs::rename(source.to_string(), target.to_string());
+}
+
+void file0::remove(string path) {
+  fs::path p(path.to_string());
+
+  if (!fs::exists(p))
+    throw exception("remove: " + p.string() + " doesn't exist");
+  // Remove doesn't operate on dirs, just (plain,symlink,special) files
+  if (fs::is_directory(p))
+    throw exception("remove: " + p.string() + " isn't a file");
+  fs::remove(p);
+}
+
+string file0::working_directory() {
+  //return fs::current_path().string();
+  return fs::current_path<fs::path>().string();
+}
+
+void file0::change_working_directory(string str) {
+  fs::current_path(str.to_string());
+}
+
+array file0::list(string dir) {
+
+  root_array ret(create_array());
+
+  fs::basic_directory_iterator<fs::path> it(dir.to_string());
+
+  for (;  it != fs::directory_iterator(); ++it) {
+    ret.call("push", it->path().string());
+  }
+
+  return ret;
 }
