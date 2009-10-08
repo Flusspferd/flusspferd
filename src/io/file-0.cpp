@@ -86,6 +86,10 @@ void flusspferd::load_file_0_module(object container) {
 
 
   create_native_function(exports, "list", &file0::list);
+
+#ifdef FLUSSPFERD_HAVE_POSIX
+  create_native_function(exports, "owner", &file0::owner);
+#endif
 }
 
 string file0::canonical(string path) {
@@ -322,3 +326,34 @@ array file0::list(string dir) {
 
   return ret;
 }
+
+#ifdef FLUSSPFERD_HAVE_POSIX
+#include <sys/stat.h>
+#include <errno.h>
+#include <cstring>
+#include <pwd.h>
+
+// stat a file, and throw a nicer error message on failure
+static void _get_stat(std::string const &path, struct stat *buf,
+    char const *fn_name)
+{
+  int ret = ::stat(path.c_str(), buf);
+  if (ret != 0) {
+    format fmt = format(error_fmt) % fn_name % std::strerror(errno) % path;
+    throw exception(fmt.str());
+  }
+}
+
+string file0::owner(string path) {
+  struct stat buf;
+  _get_stat(path.to_string(), &buf, "owner");
+
+  struct passwd *p = getpwuid(buf.st_uid);
+
+  if (p)
+    return p->pw_name;
+  else
+    return boost::lexical_cast<std::string>(buf.st_uid);
+}
+
+#endif
