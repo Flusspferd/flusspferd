@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/io/file-0.hpp"
+#include "flusspferd/io/file.hpp"
 #include "flusspferd.hpp"
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
@@ -49,6 +50,8 @@ const format error_fmt2("%1%: %2% \"%3%\", \"%4%\"");
 
 void flusspferd::load_file_0_module(object container) {
   object exports = container.get_property_object("exports");
+
+  create_native_function(exports, "rawOpen", &file0::raw_open);
 
   create_native_function(exports, "canonical", &file0::canonical);
   create_native_function(exports, "lastModified", &file0::last_modified);
@@ -90,6 +93,14 @@ void flusspferd::load_file_0_module(object container) {
 #ifdef FLUSSPFERD_HAVE_POSIX
   create_native_function(exports, "owner", &file0::owner);
 #endif
+}
+
+object file0::raw_open(char const* name, value mode, value perms) {
+  // TODO: Deal with permissions somewhere :)
+  if (!perms.is_undefined_or_null())
+    throw exception("rawOpen: permissions not yet supported");
+
+  return create_native_object<io::file>(object(), name, mode);
 }
 
 string file0::canonical(string path) {

@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_IO_FILE_CLASS_HPP
-#define FLUSSPFERD_IO_FILE_CLASS_HPP
+#ifndef FLUSSPFERD_IO_FILE0_HPP
+#define FLUSSPFERD_IO_FILE0_HPP
 
 #include "../string.hpp"
 #include "../object.hpp"
@@ -37,6 +37,8 @@ void load_file_0_module(object container);
 namespace io {
 
 namespace file0 {
+
+  object raw_open(char const* name, value mode, value permissions);
 
   string canonical(string path);
   boost::filesystem::path canonicalize(boost::filesystem::path in);
