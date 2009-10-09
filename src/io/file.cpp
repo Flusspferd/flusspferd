@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include <boost/scoped_array.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <fstream>
 #include <iostream>
 #include <sys/types.h>
@@ -88,6 +89,7 @@ namespace {
 
 using namespace flusspferd;
 using namespace flusspferd::io;
+using namespace boost;
 
 class file::impl {
 public:
@@ -114,6 +116,8 @@ void file::open(char const *name, value options) {
 
   std::ios::openmode open_mode = std::ios::openmode();
 
+  bool exclusive_create = false;
+
   // TODO: Support more open modes, check defaults
   if (options.is_string()) {
     std::string mode = options.to_std_string();
@@ -121,25 +125,64 @@ void file::open(char const *name, value options) {
       open_mode = std::ios::in;
     else if (mode == "r+")
       open_mode = std::ios::in | std::ios::out;
+    else if (mode == "r+x") {
+      open_mode = std::ios::in | std::ios::out;
+      exclusive_create = true;
+    }
     else if (mode == "w")
       open_mode = std::ios::out;
-    else
-      throw exception("Open mode not supported (yet?)");
+    else if (mode == "wx") {
+      open_mode = std::ios::out;
+      exclusive_create = true;
+    }
+    else if (mode == "w+x") {
+      open_mode = std::ios::out | std::ios::in | std::ios::trunc;
+      exclusive_create = true;
+    }
+    else {
+      throw exception(str(format("File.open: mode '%s' not supported (yet?)") % mode));
+    }
   }else if (options.is_object()) {
     object obj = options.get_object();
+
     if (obj.get_property("read").to_boolean())
       open_mode |= std::ios::in;
     if (obj.get_property("write").to_boolean())
       open_mode |= std::ios::out;
+    if (obj.get_property("truncate").to_boolean())
+      open_mode |= std::ios::trunc;
+    if (obj.get_property("append").to_boolean()) {
+      if (!(open_mode & std::ios::out)) {
+        throw exception("File.open: append mode can only be used with write");
+      }
+      open_mode |= std::ios::app | std::ios::out;
+    }
+    if (obj.get_property("exclusive").to_boolean()) {
+      bool create = obj.get_property("create").to_boolean();
+      if (!create)
+        throw exception("File.open: exclusive mode can only be used with create");
+      exclusive_create = true;
+    }
+    // TODO: Work out how to handle create: false
   }else if (options.is_undefined_or_null()) {
     open_mode = std::ios::in | std::ios::out;
   }else {
-    throw exception("Invalid options for File.open");
+    throw exception("File.open: Invalid options argument", "TypeError");
+  }
+
+  if (exclusive_create) {
+    // C++ streams don't support O_EXCL|O_CREAT mode. Fall back to open
+    int fd = ::open(name, O_CREAT|O_EXCL);
+    if (fd == -1)
+      throw exception(compose_error_message("File.open: couldn't create exclusive file", name));
+
+    // Done  - got the file exclusively created.
+    ::close(fd);
   }
 
   p->stream.open(name, open_mode);
 
-  define_property("fileName", string(name), 
+  define_property("fileName", string(name),
                   permanent_property | read_only_property );
 
   if (!p->stream)
