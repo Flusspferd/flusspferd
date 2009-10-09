@@ -46,6 +46,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 public:
   file(object const &, call_context &);
+  file(object const &, char const* name, value mode);
   ~file();
 
 public: // javascript methods
