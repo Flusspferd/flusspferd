@@ -119,15 +119,14 @@ file::~file()
 void file::open(char const *name, value options) {
   security &sec = security::get();
 
-  if (!sec.check_path(name, security::READ_WRITE))
-    throw exception("Could not open file (security)");
-
   std::ios::openmode open_mode = std::ios::openmode();
 
-  bool exclusive_create = false;
+  bool exclusive = false, create = false;
 
-  // TODO: Support more open modes, check defaults
   if (options.is_string()) {
+    // String modes always set create
+    create = true;
+
     std::string mode = options.to_std_string();
     if (mode == "r")
       open_mode = std::ios::in;
@@ -135,23 +134,25 @@ void file::open(char const *name, value options) {
       open_mode = std::ios::in | std::ios::out;
     else if (mode == "r+x") {
       open_mode = std::ios::in | std::ios::out;
-      exclusive_create = true;
+      exclusive = create = true;
     }
     else if (mode == "w")
       open_mode = std::ios::out;
     else if (mode == "wx") {
       open_mode = std::ios::out;
-      exclusive_create = true;
+      exclusive = create = true;
     }
     else if (mode == "w+x") {
       open_mode = std::ios::out | std::ios::in | std::ios::trunc;
-      exclusive_create = true;
+      exclusive = create = true;
     }
     else {
       throw exception(str(format("File.open: mode '%s' not supported (yet?)") % mode));
     }
   }else if (options.is_object()) {
     object obj = options.get_object();
+
+    create = obj.get_property("create").to_boolean();
 
     if (obj.get_property("read").to_boolean())
       open_mode |= std::ios::in;
@@ -166,25 +167,39 @@ void file::open(char const *name, value options) {
       open_mode |= std::ios::app | std::ios::out;
     }
     if (obj.get_property("exclusive").to_boolean()) {
-      bool create = obj.get_property("create").to_boolean();
       if (!create)
         throw exception("File.open: exclusive mode can only be used with create");
-      exclusive_create = true;
+      exclusive = create = true;
     }
-    // TODO: Work out how to handle create: false
+
   }else if (options.is_undefined_or_null()) {
     open_mode = std::ios::in | std::ios::out;
   }else {
     throw exception("File.open: Invalid options argument", "TypeError");
   }
 
-  if (exclusive_create) {
-    // C++ streams don't support O_EXCL|O_CREAT mode. Fall back to open
-    int fd = ::open(name, O_CREAT|O_EXCL);
-    if (fd == -1)
-      throw exception(compose_error_message("File.open: couldn't create exclusive file", name));
+  unsigned sec_mode = 0;
 
-    // Done  - got the file exclusively created.
+  if (open_mode & std::ios::in)  sec_mode |= security::READ;
+  if (open_mode & std::ios::out) sec_mode |= security::WRITE;
+  if (create)                    sec_mode |= security::CREATE;
+
+  if (!sec.check_path(name, sec_mode)) {
+    throw exception(str(
+      format("File.open: could not open file: 'defined by security' (%s)") % name
+    ));
+  }
+
+  if (create) {
+    // C++ streams don't support O_EXCL|O_CREAT modes. Fall back to open
+    unsigned o_mode = exclusive
+                    ? O_CREAT|O_EXCL
+                    : O_CREAT;
+    int fd = ::open(name, o_mode);
+    if (fd == -1)
+      throw exception(compose_error_message("File.open: couldn't create file", name));
+
+    // Done  - got the file (exclusively) created.
     ::close(fd);
   }
 
