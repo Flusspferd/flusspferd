@@ -105,6 +105,14 @@ file::file(object const &obj, call_context &x)
   }
 }
 
+
+file::file(object const &obj, char const* name, value mode)
+  : base_type(obj, (std::streambuf*)0), p(new impl)
+{
+  set_streambuf(p->stream.rdbuf());
+  open(name, mode);
+}
+
 file::~file()
 {}
 
