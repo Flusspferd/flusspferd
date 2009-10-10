@@ -29,7 +29,10 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
+#include "flusspferd/binary.hpp"
+#include "flusspferd/encodings.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -140,6 +143,40 @@ void require::call(call_context &x) {
   x.result = load_absolute_js_file(module_path, id);
 }
 
+#include <iostream>
+
+string transcode_js_file(fs::path filename) {
+  io::file &f = create_native_object<io::file>(
+    object(),
+    filename.string().c_str(),
+    value("r")
+  );
+
+  // buffer blob
+  byte_array &blob = create_native_object<byte_array>(
+    object(),
+    static_cast<binary::element_type*>(0),
+    0
+  );
+  binary::vector_type &buf = blob.get_data();
+
+  // Look for a shebang line
+  f.read_binary(2, blob);
+
+  if (buf[0] == '#' && buf[1] == '!') {
+    // Shebang line - skip the line, but insert an empty one in there to keep
+    // source line numbers right
+    buf.clear();
+    buf.push_back('\n');
+    f.read_line(value("\n"));
+  }
+  f.read_whole_binary(blob);
+
+  // TODO: Some way of supporting other encodings is probably useful
+  return encodings::convert_to_string("UTF-8", blob);
+
+}
+
 /// Load the given @c filename as a module
 void require::require_js(fs::path filename, std::string const &id, object exports) {
   class StrictModeScopeGuard {
@@ -156,27 +193,17 @@ void require::require_js(fs::path filename, std::string const &id, object export
 
   local_root_scope root_scope;
 
-  fs::ifstream f(filename);
-  std::stringstream ss;
-  std::string l;
-  if (!f) {
-    unsigned int err = errno;
-    ss << "io.File: Could not open file '" << filename << "' - " << err;
-    throw exception(ss.str().c_str());
-  }
+  string module_text = transcode_js_file(filename);
 
-  ss << "function(exports,require,module) { ";
+  std::vector<std::string> argnames;
+  argnames.push_back("exports");
+  argnames.push_back("require");
+  argnames.push_back("module");
 
-  while( getline(f, l) ) {
-    ss << l << '\n';
-  }
-  ss << ";}";
-
-  f.close();
-
-  std::string js = ss.str();
-
-  object fn = evaluate(js.c_str(), js.size(), filename.string().c_str(), 1ul).to_object();
+  std::string fname = filename.string();
+  function fn = ::flusspferd::create_function(
+      fname, argnames.size(), argnames,
+      module_text, fname.c_str(), 1ul);
 
   object module = create_object();
   module.set_property("uri", id);
