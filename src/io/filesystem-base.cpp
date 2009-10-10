@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/io/file-0.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd.hpp"
 #include <boost/foreach.hpp>
@@ -40,7 +40,7 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 using boost::format;
-namespace file0 =  flusspferd::io::file0;
+namespace fs_base =  flusspferd::io::fs_base;
 namespace fs = boost::filesystem;
 
 // owner: No such file or directory "foo/bar"
@@ -50,54 +50,54 @@ const format error_fmt2("%1%: %2% \"%3%\", \"%4%\"");
 // lastModified: access to "foo/bar" deined by security
 const format error_sec("%1%: security deined operation on \"%2%\"");
 
-void flusspferd::load_file_0_module(object container) {
+void flusspferd::load_filesystem_base_module(object container) {
   object exports = container.get_property_object("exports");
 
-  create_native_function(exports, "rawOpen", &file0::raw_open);
+  create_native_function(exports, "rawOpen", &fs_base::raw_open);
 
-  create_native_function(exports, "canonical", &file0::canonical);
-  create_native_function(exports, "lastModified", &file0::last_modified);
-  create_native_function(exports, "touch", &file0::touch);
-  create_native_function(exports, "size", &file0::size);
-
-
-  create_native_function(exports, "exists", &file0::exists);
-  create_native_function(exports, "isFile", &file0::is_file);
-  create_native_function(exports, "isDirectory", &file0::is_directory);
-  create_native_function(exports, "isLink", &file0::is_link);
-  create_native_function(exports, "isReadable", &file0::is_readable);
-  create_native_function(exports, "isWriteable", &file0::is_writeable);
-  create_native_function(exports, "same", &file0::same);
+  create_native_function(exports, "canonical", &fs_base::canonical);
+  create_native_function(exports, "lastModified", &fs_base::last_modified);
+  create_native_function(exports, "touch", &fs_base::touch);
+  create_native_function(exports, "size", &fs_base::size);
 
 
-  create_native_function(exports, "link", &file0::link);
-  create_native_function(exports, "hardLink", &file0::hard_link);
-  create_native_function(exports, "readLink", &file0::read_link);
+  create_native_function(exports, "exists", &fs_base::exists);
+  create_native_function(exports, "isFile", &fs_base::is_file);
+  create_native_function(exports, "isDirectory", &fs_base::is_directory);
+  create_native_function(exports, "isLink", &fs_base::is_link);
+  create_native_function(exports, "isReadable", &fs_base::is_readable);
+  create_native_function(exports, "isWriteable", &fs_base::is_writeable);
+  create_native_function(exports, "same", &fs_base::same);
 
 
-  create_native_function(exports, "makeDirectory", &file0::make_directory);
-  create_native_function(exports, "removeDirectory", &file0::remove_directory);
+  create_native_function(exports, "link", &fs_base::link);
+  create_native_function(exports, "hardLink", &fs_base::hard_link);
+  create_native_function(exports, "readLink", &fs_base::read_link);
 
 
-
-  create_native_function(exports, "move", &file0::move);
-  create_native_function(exports, "remove", &file0::remove);
+  create_native_function(exports, "makeDirectory", &fs_base::make_directory);
+  create_native_function(exports, "removeDirectory", &fs_base::remove_directory);
 
 
 
-  create_native_function(exports, "workingDirectory", &file0::working_directory);
-  create_native_function(exports, "changeWorkingDirectory", &file0::change_working_directory);
+  create_native_function(exports, "move", &fs_base::move);
+  create_native_function(exports, "remove", &fs_base::remove);
 
 
 
-  create_native_function(exports, "list", &file0::list);
+  create_native_function(exports, "workingDirectory", &fs_base::working_directory);
+  create_native_function(exports, "changeWorkingDirectory", &fs_base::change_working_directory);
+
+
+
+  create_native_function(exports, "list", &fs_base::list);
 
 #ifdef FLUSSPFERD_HAVE_POSIX
-  create_native_function(exports, "owner", &file0::owner);
+  create_native_function(exports, "owner", &fs_base::owner);
 #endif
 }
 
-object file0::raw_open(char const* name, value mode, value perms) {
+object fs_base::raw_open(char const* name, value mode, value perms) {
   // TODO: Deal with permissions somewhere :)
   if (!perms.is_undefined_or_null())
     throw exception("rawOpen: permissions not yet supported");
@@ -105,7 +105,7 @@ object file0::raw_open(char const* name, value mode, value perms) {
   return create_native_object<io::file>(object(), name, mode);
 }
 
-string file0::canonical(std::string const &path) {
+string fs_base::canonical(std::string const &path) {
   if (!security::get().check_path(path, security::ACCESS)) {
     throw exception(str(format(error_sec) % "canonical" % path));
   }
@@ -114,7 +114,7 @@ string file0::canonical(std::string const &path) {
 }
 
 // Resolve symlinks
-fs::path file0::canonicalize(fs::path in) {
+fs::path fs_base::canonicalize(fs::path in) {
   fs::path accum;
   char buff[PATH_MAX];
 
@@ -163,7 +163,7 @@ fs::path file0::canonicalize(fs::path in) {
   return accum;
 }
 
-value file0::last_modified(std::string const &path) {
+value fs_base::last_modified(std::string const &path) {
   if (!security::get().check_path(path, security::ACCESS)) {
     throw exception(str(format(error_sec) % "lastModified" % path));
   }
@@ -175,7 +175,7 @@ value file0::last_modified(std::string const &path) {
   return evaluate(js + boost::lexical_cast<std::string>(last_mod*1000.0) + ")");
 }
 
-void file0::touch(std::string const &str, object mtime_o) {
+void fs_base::touch(std::string const &str, object mtime_o) {
   object date = global().get_property_object("Date");
   value ctor;
   std::size_t mtime;
@@ -212,7 +212,7 @@ void file0::touch(std::string const &str, object mtime_o) {
 // JS has no concept of unit, and double has a 53 bit mantissa, which means we
 // can store up to 9*10^E15 (2^53, 8192TB ) without loosing precisions. Much
 // better than only 30bits == 1gb! eek
-double file0::size(std::string const &file) {
+double fs_base::size(std::string const &file) {
   if (!security::get().check_path(file, security::ACCESS)) {
     throw exception(str(format(error_sec) % "size" % file));
   }
@@ -220,35 +220,35 @@ double file0::size(std::string const &file) {
   return fsize;
 }
 
-bool file0::exists(std::string const &p) {
+bool fs_base::exists(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
     throw exception(str(format(error_sec) % "exists" % p));
   }
   return fs::exists(p);
 }
 
-bool file0::is_file(std::string const &p) {
+bool fs_base::is_file(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
     throw exception(str(format(error_sec) % "isFile" % p));
   }
   return fs::is_regular_file(p);
 }
 
-bool file0::is_directory(std::string const &p) {
+bool fs_base::is_directory(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
     throw exception(str(format(error_sec) % "isDirectory" % p));
   }
   return fs::is_directory(p);
 }
 
-bool file0::is_link(std::string const &p) {
+bool fs_base::is_link(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
     throw exception(str(format(error_sec) % "isLink" % p));
   }
   return fs::is_symlink(p);
 }
 
-bool file0::is_readable(std::string const &p) {
+bool fs_base::is_readable(std::string const &p) {
   security &sec = security::get();
   if (!sec.check_path(p, security::ACCESS)) {
     throw exception(str(format(error_sec) % "isReadable" % p));
@@ -258,7 +258,7 @@ bool file0::is_readable(std::string const &p) {
          access(p.c_str(), R_OK) != -1;
 }
 
-bool file0::is_writeable(std::string const &str) {
+bool fs_base::is_writeable(std::string const &str) {
   fs::path p(str);
   security &sec = security::get();
   if (!sec.check_path(str, security::ACCESS)) {
@@ -283,7 +283,7 @@ bool file0::is_writeable(std::string const &str) {
   return false;
 }
 
-bool file0::same(std::string const &source, std::string const &target) {\
+bool fs_base::same(std::string const &source, std::string const &target) {\
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
     throw exception(boost::str(format(error_sec) % "same" % source));
@@ -295,7 +295,7 @@ bool file0::same(std::string const &source, std::string const &target) {\
   return fs::equivalent(source, target);
 }
 
-void file0::link(std::string const &source, std::string const &target) {
+void fs_base::link(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
     throw exception(boost::str(format(error_sec) % "link" % source));
@@ -316,7 +316,7 @@ void file0::link(std::string const &source, std::string const &target) {
   throw exception(e.str());
 }
 
-void file0::hard_link(std::string const &source, std::string const &target) {
+void fs_base::hard_link(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
     throw exception(boost::str(format(error_sec) % "hardLink" % source));
@@ -337,7 +337,7 @@ void file0::hard_link(std::string const &source, std::string const &target) {
   throw exception(e.str());
 }
 
-string file0::read_link(std::string const &link) {
+string fs_base::read_link(std::string const &link) {
   if (!security::get().check_path(link, security::READ)) {
     throw exception(boost::str(format(error_sec) % "readLink" % link));
   }
@@ -356,7 +356,7 @@ string file0::read_link(std::string const &link) {
 }
 
 
-void file0::make_directory(std::string const &dir) {
+void fs_base::make_directory(std::string const &dir) {
   if (!security::get().check_path(dir, security::CREATE)) {
     throw exception(boost::str(format(error_sec) % "makeDirectory" % dir));
   }
@@ -364,7 +364,7 @@ void file0::make_directory(std::string const &dir) {
   fs::create_directory(dir);
 }
 
-void file0::remove_directory(std::string const &dir) {
+void fs_base::remove_directory(std::string const &dir) {
   fs::path p(dir);
 
   if (!fs::exists(p))
@@ -379,7 +379,7 @@ void file0::remove_directory(std::string const &dir) {
   fs::remove(p);
 }
 
-void file0::move(std::string const &source, std::string const &target) {
+void fs_base::move(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::READ)) {
     throw exception(boost::str(format(error_sec) % "move" % source));
@@ -391,7 +391,7 @@ void file0::move(std::string const &source, std::string const &target) {
   fs::rename(source, target);
 }
 
-void file0::remove(std::string const &path) {
+void fs_base::remove(std::string const &path) {
   if (!security::get().check_path(path, security::WRITE)) {
     throw exception(boost::str(format(error_sec) % "remove" % path));
   }
@@ -406,12 +406,12 @@ void file0::remove(std::string const &path) {
   fs::remove(p);
 }
 
-string file0::working_directory() {
+string fs_base::working_directory() {
   //return fs::current_path().string();
   return fs::current_path<fs::path>().string();
 }
 
-void file0::change_working_directory(std::string const &str) {
+void fs_base::change_working_directory(std::string const &str) {
   if (!security::get().check_path(str, security::ACCESS)) {
     throw exception(boost::str(format(error_sec) % "changeWorkingDirectory" % str));
   }
@@ -419,7 +419,7 @@ void file0::change_working_directory(std::string const &str) {
   fs::current_path(str);
 }
 
-array file0::list(std::string const &dir) {
+array fs_base::list(std::string const &dir) {
   if (!security::get().check_path(dir, security::ACCESS)) {
     throw exception(boost::str(format(error_sec) % "list" % dir));
   }
@@ -453,7 +453,7 @@ static void _get_stat(std::string const &path, struct stat *buf,
   }
 }
 
-string file0::owner(std::string const &path) {
+string fs_base::owner(std::string const &path) {
   if (!security::get().check_path(path, security::ACCESS)) {
     throw exception(boost::str(format(error_sec) % "owner" % path));
   }
