@@ -183,6 +183,7 @@ check_cxx_source_runs(
 
 if(FLUSSPFERD_HAVE_POSIX)
     find_package(DL REQUIRED)
+    add_definitions(-DFLUSSPFERD_HAVE_POSIX)
     include_directories(${DL_INCLUDE_DIR})
 endif()
 

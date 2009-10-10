@@ -4,6 +4,11 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-10-10:
+- A largely complete implementation of CommonJS 'filesystem-base' module
+  (http://wiki.commonjs.org/wiki/Filesystem/A/0). This is only a proposal, so
+  might change.
+
 2009-10-04:
 - native_function_base object now has a trace() method
 
@@ -11,7 +16,7 @@ Release 0.8
 - repl now prints v.to_source to give better output for objects.
 
 2009-09-26:
-- Chane how (pure JS) modules are loaded to preserve JIT and isolate scopes
+- Change how (pure JS) modules are loaded to preserve JIT and isolate scopes
   better
 - Enable spidermonkey's strict mode warnings for all modules
 
