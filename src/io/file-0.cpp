@@ -47,6 +47,8 @@ namespace fs = boost::filesystem;
 const format error_fmt("%1%: %2% \"%3%\"");
 // symlink: No such file or directory "foo/bar", "baz"
 const format error_fmt2("%1%: %2% \"%3%\", \"%4%\"");
+// lastModified: access to "foo/bar" deined by security
+const format error_sec("%1%: security deined operation on \"%2%\"");
 
 void flusspferd::load_file_0_module(object container) {
   object exports = container.get_property_object("exports");
@@ -103,8 +105,12 @@ object file0::raw_open(char const* name, value mode, value perms) {
   return create_native_object<io::file>(object(), name, mode);
 }
 
-string file0::canonical(string path) {
-  return canonicalize(path.to_string()).string();
+string file0::canonical(std::string const &path) {
+  if (!security::get().check_path(path, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "canonical" % path));
+  }
+
+  return canonicalize(path).string();
 }
 
 // Resolve symlinks
@@ -157,15 +163,19 @@ fs::path file0::canonicalize(fs::path in) {
   return accum;
 }
 
-value file0::last_modified(string path) {
-  std::time_t last_mod = fs::last_write_time(path.to_string());
+value file0::last_modified(std::string const &path) {
+  if (!security::get().check_path(path, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "lastModified" % path));
+  }
+
+  std::time_t last_mod = fs::last_write_time(path);
 
   // TODO: Is there any way that isn't so truely horrible?
   std::string js = "new Date(";
   return evaluate(js + boost::lexical_cast<std::string>(last_mod*1000.0) + ")");
 }
 
-void file0::touch(string str, object mtime_o) {
+void file0::touch(std::string const &str, object mtime_o) {
   object date = global().get_property_object("Date");
   value ctor;
   std::size_t mtime;
@@ -185,47 +195,82 @@ void file0::touch(string str, object mtime_o) {
     mtime = time(NULL);
   }
 
-  fs::path p(str.to_string());
+  security &sec = security::get();
+  fs::path p(str);
   if (!fs::exists(p)) {
+    if (!sec.check_path(str, security::CREATE))
+      throw exception(boost::str(format(error_sec) % "touch" % str));
     // File doesn't exist, create
     fs::ofstream f(p);
   }
 
+  if (!sec.check_path(str, security::WRITE))
+    throw exception(boost::str(format(error_sec) % "touch" % str));
   fs::last_write_time(p, mtime);
 }
 
 // JS has no concept of unit, and double has a 53 bit mantissa, which means we
 // can store up to 9*10^E15 (2^53, 8192TB ) without loosing precisions. Much
 // better than only 30bits == 1gb! eek
-double file0::size(string file) {
-  uintmax_t fsize = fs::file_size(file.to_string());
+double file0::size(std::string const &file) {
+  if (!security::get().check_path(file, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "size" % file));
+  }
+  uintmax_t fsize = fs::file_size(file);
   return fsize;
 }
 
-bool file0::exists(string p) {
-  return fs::exists(p.to_string());
+bool file0::exists(std::string const &p) {
+  if (!security::get().check_path(p, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "exists" % p));
+  }
+  return fs::exists(p);
 }
 
-bool file0::is_file(string p) {
-  return fs::is_regular_file(p.to_string());
+bool file0::is_file(std::string const &p) {
+  if (!security::get().check_path(p, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "isFile" % p));
+  }
+  return fs::is_regular_file(p);
 }
 
-bool file0::is_directory(string p) {
-  return fs::is_directory(p.to_string());
+bool file0::is_directory(std::string const &p) {
+  if (!security::get().check_path(p, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "isDirectory" % p));
+  }
+  return fs::is_directory(p);
 }
 
-bool file0::is_link(string p) {
-  return fs::is_symlink(p.to_string());
+bool file0::is_link(std::string const &p) {
+  if (!security::get().check_path(p, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "isLink" % p));
+  }
+  return fs::is_symlink(p);
 }
 
-bool file0::is_readable(string p) {
-  return access(p.to_string().c_str(), R_OK) != -1;
+bool file0::is_readable(std::string const &p) {
+  security &sec = security::get();
+  if (!sec.check_path(p, security::ACCESS)) {
+    throw exception(str(format(error_sec) % "isReadable" % p));
+  }
+
+  return (!security::get().check_path(p, security::READ)) &&
+         access(p.c_str(), R_OK) != -1;
 }
 
-bool file0::is_writeable(string str) {
-  fs::path p(str.to_string());
+bool file0::is_writeable(std::string const &str) {
+  fs::path p(str);
+  security &sec = security::get();
+  if (!sec.check_path(str, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "isWriteable" % str));
+  }
 
-  if (access(p.string().c_str(), W_OK) != -1)
+  if (!sec.check_path(str, security::WRITE)) {
+    // Denied by security - never writable
+    return false;
+  }
+
+  if (access(str.c_str(), W_OK) != -1)
     return true;
 
   // Might be false because it doesn't exist, in which case check we can write
@@ -238,75 +283,120 @@ bool file0::is_writeable(string str) {
   return false;
 }
 
-bool file0::same(string source, string target) {\
+bool file0::same(std::string const &source, std::string const &target) {\
+  security &sec = security::get();
+  if (!sec.check_path(source, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "same" % source));
+  }
+  if (!sec.check_path(target, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "same" % target));
+  }
   // TODO: test if this behaves right w.r.t. symlinks
-  return fs::equivalent(source.to_string(), target.to_string());
+  return fs::equivalent(source, target);
 }
 
-void file0::link(string source, string target) {
-  if (symlink(source.to_string().c_str(), target.to_string().c_str()) == 0)
+void file0::link(std::string const &source, std::string const &target) {
+  security &sec = security::get();
+  if (!sec.check_path(source, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "link" % source));
+  }
+  if (!sec.check_path(target, security::WRITE|security::CREATE)) {
+    throw exception(boost::str(format(error_sec) % "link" % target));
+  }
+
+  if (symlink(source.c_str(), target.c_str()) == 0)
     return;
 
   // TODO: paths and system error message!
   format e = format(error_fmt2)
            % "link"
            % std::strerror(errno)
-           % source.to_string()
-           % target.to_string();
+           % source
+           % target;
   throw exception(e.str());
 }
 
-void file0::hard_link(string source, string target) {
-  if (::link(source.to_string().c_str(), target.to_string().c_str()) == 0)
+void file0::hard_link(std::string const &source, std::string const &target) {
+  security &sec = security::get();
+  if (!sec.check_path(source, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "hardLink" % source));
+  }
+  if (!sec.check_path(target, security::WRITE|security::CREATE)) {
+    throw exception(boost::str(format(error_sec) % "hardLink" % target));
+  }
+
+  if (::link(source.c_str(), target.c_str()) == 0)
     return;
 
   // TODO: paths and system error message!
   format e = format(error_fmt2)
            % "hardLink"
            % std::strerror(errno)
-           % source.to_string()
-           % target.to_string();
+           % source
+           % target;
   throw exception(e.str());
 }
 
-string file0::read_link(string link) {
-  std::string s = link.to_string();
+string file0::read_link(std::string const &link) {
+  if (!security::get().check_path(link, security::READ)) {
+    throw exception(boost::str(format(error_sec) % "readLink" % link));
+  }
 
   char buff[PATH_MAX];
 
-  ssize_t len = readlink(s.c_str(), buff, PATH_MAX);
+  ssize_t len = readlink(link.c_str(), buff, PATH_MAX);
   if (len == -1) {
     format e = format(error_fmt)
              % "readLink"
              % std::strerror(errno)
-             % s;
+             % link;
     throw exception(e.str());
   }
   return string(buff, len);
 }
 
 
-void file0::make_directory(string dir) {
-  fs::create_directory(dir.to_string());
+void file0::make_directory(std::string const &dir) {
+  if (!security::get().check_path(dir, security::CREATE)) {
+    throw exception(boost::str(format(error_sec) % "makeDirectory" % dir));
+  }
+
+  fs::create_directory(dir);
 }
 
-void file0::remove_directory(string dir) {
-  fs::path p(dir.to_string());
+void file0::remove_directory(std::string const &dir) {
+  fs::path p(dir);
 
   if (!fs::exists(p))
     throw exception("removeDirectory: " + p.string() + " doesn't exist");
   if (!fs::is_directory(p))
     throw exception("removeDirectory: " + p.string() + " isn't a directory");
 
+  if (!security::get().check_path(dir, security::ACCESS|security::WRITE)) {
+    throw exception(boost::str(format(error_sec) % "removeDirectory" % dir));
+  }
+
   fs::remove(p);
 }
 
-void file0::move(string source, string target) {
-  fs::rename(source.to_string(), target.to_string());
+void file0::move(std::string const &source, std::string const &target) {
+  security &sec = security::get();
+  if (!sec.check_path(source, security::READ)) {
+    throw exception(boost::str(format(error_sec) % "move" % source));
+  }
+  if (!sec.check_path(target, security::WRITE|security::CREATE)) {
+    throw exception(boost::str(format(error_sec) % "move" % target));
+  }
+
+  fs::rename(source, target);
 }
 
-void file0::remove(string path) {
-  fs::path p(path.to_string());
+void file0::remove(std::string const &path) {
+  if (!security::get().check_path(path, security::WRITE)) {
+    throw exception(boost::str(format(error_sec) % "remove" % path));
+  }
+
+  fs::path p(path);
 
   if (!fs::exists(p))
     throw exception("remove: " + p.string() + " doesn't exist");
@@ -321,15 +411,23 @@ string file0::working_directory() {
   return fs::current_path<fs::path>().string();
 }
 
-void file0::change_working_directory(string str) {
-  fs::current_path(str.to_string());
+void file0::change_working_directory(std::string const &str) {
+  if (!security::get().check_path(str, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "changeWorkingDirectory" % str));
+  }
+
+  fs::current_path(str);
 }
 
-array file0::list(string dir) {
+array file0::list(std::string const &dir) {
+  if (!security::get().check_path(dir, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "list" % dir));
+  }
+
 
   root_array ret(create_array());
 
-  fs::basic_directory_iterator<fs::path> it(dir.to_string());
+  fs::basic_directory_iterator<fs::path> it(dir);
 
   for (;  it != fs::directory_iterator(); ++it) {
     ret.call("push", it->path().string());
@@ -355,9 +453,13 @@ static void _get_stat(std::string const &path, struct stat *buf,
   }
 }
 
-string file0::owner(string path) {
+string file0::owner(std::string const &path) {
+  if (!security::get().check_path(path, security::ACCESS)) {
+    throw exception(boost::str(format(error_sec) % "owner" % path));
+  }
+
   struct stat buf;
-  _get_stat(path.to_string(), &buf, "owner");
+  _get_stat(path, &buf, "owner");
 
   struct passwd *p = getpwuid(buf.st_uid);
 
