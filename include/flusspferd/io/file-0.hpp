@@ -40,44 +40,41 @@ namespace file0 {
 
   object raw_open(char const* name, value mode, value permissions);
 
-  string canonical(string path);
+  string canonical(std::string const &path);
   boost::filesystem::path canonicalize(boost::filesystem::path in);
 
-  void move(string source, string target);
-  void remove(string target);
-  void touch(string path, object mtime);
+  void move(std::string const &source, std::string const &target);
+  void remove(std::string const &target);
+  void touch(std::string const &path, object mtime);
 
-  void make_directory(string target);
-  void remove_directory(string target);
+  void make_directory(std::string const &target);
+  void remove_directory(std::string const &target);
 
-  string read_link(string link);
+  string read_link(std::string const &link);
 
   string working_directory();
-  void change_working_directory(string path);
+  void change_working_directory(std::string const &path);
 
-  string owner(string path);
-  void change_owner(string path, string owner);
+  string owner(std::string const &path);
+  void change_owner(std::string const &path, std::string owner);
 
-  int permissions(string path);
-  void change_ermissions(string path, int newPerms);
+  void link(std::string const &source, std::string const &target);
+  void hard_link(std::string const &source, std::string const &target);
 
-  void link(string source, string target);
-  void hard_link(string source, string target);
-
-  bool exists(string path);
-  bool is_file(string path);
-  bool is_directory(string path);
-  bool is_link(string path);
-  bool is_readable(string path);
-  bool is_writeable(string path);
+  bool exists(std::string const &path);
+  bool is_file(std::string const &path);
+  bool is_directory(std::string const &path);
+  bool is_link(std::string const &path);
+  bool is_readable(std::string const &path);
+  bool is_writeable(std::string const &path);
 
   // Return a double since 1gb file limit on size would suck
-  double size(string file);
-  value last_modified(string path);
-  bool same(string source, string target);
+  double size(std::string const &file);
+  value last_modified(std::string const &path);
+  bool same(std::string const &source, std::string const &target);
 
-  array list(string path);
-  object iterate(string path);
+  array list(std::string const &path);
+  object iterate(std::string const &path);
 }
 
 }}
