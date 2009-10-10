@@ -157,8 +157,10 @@ fs::path fs_base::canonicalize(fs::path in) {
   }
 
   // This trickery forces a trailing / onto the dir
-  accum /= ".";
-  accum.remove_filename();
+  if (fs::is_directory(accum)) {
+    accum /= ".";
+    accum.remove_filename();
+  }
 
   return accum;
 }
