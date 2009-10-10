@@ -64,10 +64,10 @@ public:
 
 public: // javascript methods
   string read_whole();
-  string read(unsigned max_size);
+  string read(boost::optional<unsigned> max_size);
 
   object read_whole_binary(boost::optional<byte_array&> output);
-  object read_binary(unsigned max_size, boost::optional<byte_array&> output);
+  object read_binary(boost::optional<unsigned> max_size, boost::optional<byte_array&> output);
 
   void write(value const &);
 
