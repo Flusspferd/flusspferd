@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
 #include <boost/filesystem.hpp>
+#include "flusspferd/io/filesystem-base.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
@@ -64,7 +65,6 @@ namespace args = phoenix::arg_names;
 namespace fs = boost::filesystem;
 
 
-fs::path canonicalize(fs::path in);
 static fs::path make_dsoname(std::string const &id);
 
 // Create |require| function on container.
@@ -118,7 +118,7 @@ object require::new_require_function(string const &id) {
   return new_req;
 }
 
-// The implementation of the |require()| function that us available to JS
+// The implementation of the |require()| function that is available to JS
 void require::call(call_context &x) {
   std::string id = x.arg[0].to_std_string();
 
@@ -142,7 +142,7 @@ void require::call(call_context &x) {
   }
   else if (type == fully_qualified) {
     id = id.substr(strlen("file://"));
-    module_path = canonicalize( id );
+    module_path = io::fs_base::canonicalize( id );
   }
   id = "file://" + id;
 
@@ -224,7 +224,7 @@ fs::path require::resolve_relative_id(std::string const &id) {
   fs::path module(current_id().substr(strlen("file://")));
   module.remove_filename();
 
-  return canonicalize( module / id ).replace_extension(".js");
+  return io::fs_base::canonicalize( module / id ).replace_extension(".js");
 }
 
 
@@ -248,60 +248,6 @@ class ExportsScopeGuard {
       module_cache = object();
     }
 };
-
-// Resolve symlinks
-fs::path canonicalize(fs::path in) {
-  fs::path dir = in, accum, file;
-  char buff[PATH_MAX];
-
-  if (!fs::is_directory(dir)) {
-    file = dir.filename();
-    dir.remove_filename();
-  }
-
-  if (!dir.has_root_path()) {
-    // dir is relative!
-    accum = fs::system_complete(".");
-    if (*--accum.end() == ".")
-      accum.remove_filename();
-  }
-
-  BOOST_FOREACH(fs::path seg, dir) {
-    if (seg == ".")
-      continue;
-
-    // We've already canon'd the path's parent, so just remove the last dir
-    if (seg == "..") {
-      accum = accum.remove_filename();
-      continue;
-    }
-
-    accum /= seg;
-    if (fs::is_symlink(accum)) {
-      ssize_t len = readlink(accum.string().c_str(), buff, PATH_MAX);
-      if (len == -1) {
-        //TODO: How do i use boost to get a nicer errmessage? Also should actually use errno
-        throw std::string("Path too long");
-      }
-      fs::path link_path = std::string(buff, len);
-
-      // An absolute link
-      if (link_path.has_root_path())
-        accum = canonicalize(link_path);
-      else {
-        accum.remove_filename();
-        accum = canonicalize(accum / link_path);
-      }
-    }
-  }
-
-  // This trickery forces a trailing / onto the dir
-  accum /= ".";
-  accum.remove_filename();
-
-  // Add the filename back on if there was one
-  return accum / file;
-}
 
 
 
@@ -394,7 +340,7 @@ object require::load_top_level_module(std::string &id) {
   fs::path dso_name = make_dsoname(id);
 
   for (size_t i = 0; i < len; i++) {
-    fs::path path = canonicalize(paths.get_element(i).to_std_string());
+    fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
     fs::path native_path = path / dso_name;
     if (sec.check_path(native_path.string(), security::READ) &&
         fs::exists(native_path) )
@@ -408,7 +354,7 @@ object require::load_top_level_module(std::string &id) {
   fs::path js_name = fs::path(id).replace_extension(".js");
 
   for (size_t i = 0; i < len; i++) {
-    fs::path path = canonicalize(paths.get_element(i).to_std_string());
+    fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
 
     fs::path js_path = path / js_name;
 
