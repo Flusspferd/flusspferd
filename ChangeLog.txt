@@ -8,6 +8,7 @@ Release 0.8
 - A largely complete implementation of CommonJS 'filesystem-base' module
   (http://wiki.commonjs.org/wiki/Filesystem/A/0). This is only a proposal, so
   might change.
+- Treat JS files as UTF-8
 
 2009-10-04:
 - native_function_base object now has a trace() method
