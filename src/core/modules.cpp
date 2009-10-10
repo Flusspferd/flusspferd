@@ -26,42 +26,26 @@ THE SOFTWARE.
 
 #include "flusspferd/modules.hpp"
 #include "flusspferd/create.hpp"
-#include "flusspferd/string.hpp"
-#include "flusspferd/tracer.hpp"
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
-#include <boost/filesystem.hpp>
 #include "flusspferd/io/filesystem-base.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/spirit/home/phoenix/core.hpp>
-#include <boost/spirit/home/phoenix/operator.hpp>
-#include <boost/utility.hpp>
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <sstream>
-#include <cerrno>
-#include <list>
+
 #ifdef WIN32
 #include <windows.h>
 #else
+#define SHLIBPREFIX "lib"
 #include <dlfcn.h>
 #endif
 
-#define DIRSEP1 '/'
-#define DIRSEP2 '\0'
-#define SHLIBPREFIX "lib"
 
 using namespace flusspferd;
 
 namespace algo = boost::algorithm;
-namespace phoenix = boost::phoenix;
-namespace args = phoenix::arg_names;
 namespace fs = boost::filesystem;
 
 
