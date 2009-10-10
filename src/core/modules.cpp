@@ -362,7 +362,7 @@ object require::load_top_level_module(std::string &id) {
     }
   }
 
-  fs::path js_name = fs::path(id).replace_extension(".js");
+  fs::path js_name = fs::path(id + ".js");
 
   for (size_t i = 0; i < len; i++) {
     fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
