@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/system.hpp"
 #include "flusspferd/getopt.hpp"
 #include "flusspferd/io/io.hpp"
-#include "flusspferd/io/file-0.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/create.hpp"
 
 using namespace flusspferd;
@@ -83,8 +83,8 @@ void flusspferd::load_core(object const &scope_) {
     &flusspferd::load_getopt_module);
 
   flusspferd::create_native_method(
-    preload, "file-0",
-    &flusspferd::load_file_0_module);
+    preload, "filesystem-base",
+    &flusspferd::load_filesystem_base_module);
 
   if (!scope_.has_own_property("JSON")) {
     flusspferd::evaluate_in_scope(

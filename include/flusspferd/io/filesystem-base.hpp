@@ -24,8 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_IO_FILE0_HPP
-#define FLUSSPFERD_IO_FILE0_HPP
+#ifndef FLUSSPFERD_IO_FILESYSTEM_BASE_HPP
+#define FLUSSPFERD_IO_FILESYSTEM_BASE_HPP
 
 #include "../string.hpp"
 #include "../object.hpp"
@@ -33,10 +33,11 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-void load_file_0_module(object container);
+void load_filesystem_base_module(object container);
+
 namespace io {
 
-namespace file0 {
+namespace fs_base {
 
   object raw_open(char const* name, value mode, value permissions);
 
