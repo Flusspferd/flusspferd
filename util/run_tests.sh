@@ -46,6 +46,10 @@ do
   fi
 done
 
+# TODO: This probably wont update the coverage for what C++ parts that the JS
+# hits. It should do.
+./util/jsrepl.sh -e 'require("test").prove("./test/js")'
+
 #echo "PROGRESS: Analyzing test coverage" 1>&2
 #
 #./util/lcov.sh
