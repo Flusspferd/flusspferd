@@ -344,7 +344,6 @@ exports.prove = function prove() {
         continue;
 
       if (fs.isDirectory(x)) {
-        print(x, "is dir");
         if (options.recurse)
           findTests(fs.list(x));
         continue;
@@ -358,10 +357,8 @@ exports.prove = function prove() {
   function loadTests(files) {
     var filename;
     var testObject = {};
-    print(files);
     for ([,filename] in Iterator(files) ) {
       var id  = fs.canonical(filename);
-      print(id);
 
       var test = require('file://' + id);
       testObject['test_' + id] = test;
