@@ -2,8 +2,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld,
-#                          Philipp Reh
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -152,9 +152,7 @@ option(
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
 option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
-option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
-option(PLUGIN_XML "Build XML plugin" ON)
 set(
     LINE_EDITOR
     "libedit"
@@ -212,6 +210,7 @@ endif()
 
 if(FLUSSPFERD_HAVE_POSIX)
     find_package(DL REQUIRED)
+    add_definitions(-DFLUSSPFERD_HAVE_POSIX)
     include_directories(${DL_INCLUDE_DIR})
 endif()
 
@@ -233,11 +232,15 @@ endif()
 
 set(Boost_FIND_REQUIRED TRUE)
 
+set(FLUSSPFERD_BOOST_LIBRARIES thread filesystem system)
+
+if(ENABLE_TESTS)
+    set(FLUSSPFERD_BOOST_LIBRARIES
+        unit_test_framework ${FLUSSPFERD_BOOST_LIBRARIES})
+endif()
+
 find_package(Boost 1.36.0 COMPONENTS
-    unit_test_framework
-    thread
-    filesystem
-    system)
+    ${FLUSSPFERD_BOOST_LIBRARIES})
 
 if(Boost_INCLUDE_DIR)
     include_directories(${Boost_INCLUDE_DIR})
@@ -260,7 +263,11 @@ endif()
 set(Spidermonkey_REQUIRED TRUE)
 find_package(Spidermonkey)
 
-if(NOT SPIDERMONKEY_UTF8)
+if(NOT SPIDERMONKEY_FOUND)
+    message(FATAL_ERROR "Spidermonkey not found")
+endif()
+
+if(SPIDERMONKEY_FOUND AND NOT SPIDERMONKEY_UTF8)
     message(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
 endif()
 
@@ -299,16 +306,6 @@ if(LINE_EDITOR STREQUAL "readline")
   endif()
 endif()
 
-## libxml2 ##################################################################
-
-if(PLUGIN_XML)
-    find_package(LibXml2)
-
-    if(FORCE_PLUGINS AND NOT LIBXML2_FOUND)
-        message(SEND_ERROR "XML plugin required but libxml2 not found")
-    endif()
-endif()
-
 ## sqlite3 ##################################################################
 
 if(PLUGIN_SQLITE3)
@@ -318,16 +315,6 @@ if(PLUGIN_SQLITE3)
 
     if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
         message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
-    endif()
-endif()
-
-## libcurl ##################################################################
-
-if(PLUGIN_CURL)
-    find_package(CURL)
-
-    if(FORCE_PLUGINS AND NOT CURL_FOUND)
-        message(SEND_ERROR "CURL plugin required but cURL not found")
     endif()
 endif()
 
@@ -351,7 +338,12 @@ file(
     flusspferd_library_sources
     ${Flusspferd_SOURCE_DIR}/src/core/*.cpp
     ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp)
+    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
+    ${Flusspferd_SOURCE_DIR}/include/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/io/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
+    ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
 
 if(WIN32)
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
@@ -385,30 +377,34 @@ endif()
 
 if(ENABLE_TESTS)
 
+# The coverage library has been removed for now. It only makes it less likely
+# for people to run the tests, which is a bigger problem than getting coverage
+# numbers, which don't work for JS anyways.
+
 #    file(
 #        GLOB
 #        flusspferd_coverage_extra_sources
 #        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
 #        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
-
-    add_library(
-        flusspferd-coverage
-        SHARED
-        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
-
-    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
-
-    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
-
-    set_property(
-        TARGET flusspferd-coverage
-        PROPERTY COMPILE_FLAGS
-        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
-
-    set_property(
-        TARGET flusspferd-coverage
-        PROPERTY LINK_FLAGS
-        ${COV_FLAGS})
+#
+#    add_library(
+#        flusspferd-coverage
+#        SHARED
+#        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
+#
+#    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
+#
+#    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
+#
+#    set_property(
+#        TARGET flusspferd-coverage
+#        PROPERTY COMPILE_FLAGS
+#        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
+#
+#    set_property(
+#        TARGET flusspferd-coverage
+#        PROPERTY LINK_FLAGS
+#        ${COV_FLAGS})
 
 endif()
 
@@ -447,7 +443,9 @@ if(ENABLE_TESTS)
 
     file(GLOB
         TESTS
-        test/test_*.cpp)
+        test/test_*.cpp
+        #test/*.hpp
+        )
 
     foreach(TEST_SOURCE ${TESTS})
         string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
@@ -460,29 +458,17 @@ if(ENABLE_TESTS)
         target_link_libraries(
             ${TEST_OUTPUT}
             ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-            flusspferd-coverage)
+            flusspferd)
     endforeach()
 
 endif()
 
 ## Plugins #################################################################
 
-set(PLUGINS os)
-
-if(FLUSSPFERD_HAVE_POSIX)
-    set(PLUGINS ${PLUGINS} posix)
-endif()
-
 if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
     set(PLUGINS ${PLUGINS} sqlite3)
     set(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
     set(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
-endif()
-
-if(PLUGIN_CURL AND CURL_FOUND)
-    set(PLUGINS ${PLUGINS} curl)
-    set(curl_LIBRARIES ${CURL_LIBRARIES})
-    include_directories(${CURL_INCLUDE_DIR})
 endif()
 
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
@@ -491,18 +477,13 @@ if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     include_directories(${GMP_INCLUDE_DIR})
 endif()
 
-if(PLUGIN_XML AND LIBXML2_FOUND)
-    set(PLUGINS ${PLUGINS} xml)
-    set(xml_LIBRARIES ${LIBXML2_LIBRARIES})
-    include_directories(${LIBXML2_INCLUDE_DIR})
-endif()
-
 foreach(PLUGIN ${PLUGINS})
     message(STATUS "Plugin: ${PLUGIN} (will be built)")
 
     file(GLOB
         ${PLUGIN}_sources
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp)
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
     add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
 
@@ -561,6 +542,14 @@ endif()
 
 ## Headers ##################################################################
 
+file(GLOB_RECURSE HEADERFILES *.hpp)
+
+foreach(HEADER ${HEADERFILES})
+  set_source_files_properties(${HEADER}
+    PROPERTIES
+    HEADER_FILE_ONLY TRUE)
+endforeach()
+
 if(NOT WIN32)
     install(
         DIRECTORY include/
@@ -586,7 +575,7 @@ if(NOT WIN32)
       WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR})
     install(
       DIRECTORY ${Flusspferd_BINARY_DIR}/html/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/doc/flusspferd/)
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/flusspferd/)
   endif()
 endif()
 
@@ -618,17 +607,37 @@ if(NOT WIN32)
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 
     add_custom_command(
+      OUTPUT flusspferd.1
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var OPTIONS=${Flusspferd_BINARY_DIR}/flusspferd.1.options ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in > ${Flusspferd_BINARY_DIR}/flusspferd.1
+      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
+      DEPENDS flusspferd-shell
+      COMMENT "Generating manpage")
+    add_custom_command(
       OUTPUT flusspferd.1.gz
-      COMMAND gzip -9 -c ${Flusspferd_SOURCE_DIR}/help/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-      DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1
+      COMMAND gzip -9 -c ${Flusspferd_BINARY_DIR}/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
+      DEPENDS flusspferd.1
       COMMENT "Compressing manpage")
     add_custom_target(
       MANPAGE ALL
       DEPENDS flusspferd.1.gz)
-
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/man/man1)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
+
+    add_custom_command(
+      OUTPUT bash_completion.sh
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      DEPENDS flusspferd-shell
+      COMMENT "Generating Bash Completion Script")
+    add_custom_target(
+      BASH_COMPLETION ALL
+      DEPENDS bash_completion.sh)
+    install(
+      FILES ${Flusspferd_BINARY_DIR}/bash_completion.sh
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d
+      RENAME flusspferd)
 
     find_program(EMACS NAMES emacs)
     if(NOT EMACS STREQUAL "EMACS-NOTFOUND")

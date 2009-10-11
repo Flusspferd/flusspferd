@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,26 +34,31 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 Impl::arguments_impl::arguments_impl(std::vector<value> const &vals)
-  : n(vals.size())
+  : n(vals.size()), argv(0)
 {
   values.reserve(n);
-  BOOST_FOREACH(value const &v, vals) {
-    values.push_back(get_jsval(v));
+  if (n > 0) {
+    BOOST_FOREACH(value const &v, vals) {
+      values.push_back(get_jsval(v));
+    }
+    argv = &values[0];
   }
-  argv = &values[0];
 }
 
 Impl::arguments_impl::arguments_impl(Impl::arguments_impl const &o)
   : values(o.values), n(o.n),
-    argv(o.is_userprovided() ? &values[0] : o.argv)
-{ }
+    argv(o.is_userprovided() ? 0 : o.argv)
+{
+  if (!argv)
+    reset_argv();
+}
 
 Impl::arguments_impl &Impl::arguments_impl::operator=(arguments_impl const &o) {
   if(&o != this) {
     n = o.n;
     if(o.is_userprovided()) {
       values = o.values;
-      argv = &values[0];
+      reset_argv();
     }
     else {
       values.clear();
@@ -65,7 +71,7 @@ Impl::arguments_impl &Impl::arguments_impl::operator=(arguments_impl const &o) {
 void Impl::arguments_impl::reset_argv() {
   //assert(is_userprovided());
   n = values.size();
-  argv = &values[0];
+  argv = n >  0 ? &values[0] : 0;
 }
 
 arguments::arguments(std::vector<value> const &v)

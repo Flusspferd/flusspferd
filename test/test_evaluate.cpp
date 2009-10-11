@@ -1,8 +1,9 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,29 +24,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
-#define FLUSSPFERD_XML_PROCESSING_INSTRUCTION_HPP
+#include "flusspferd/evaluate.hpp"
 
-#include "node.hpp"
-#include "flusspferd/class_description.hpp"
-#include <boost/noncopyable.hpp>
-#include <libxml/tree.h>
+#include "flusspferd/value.hpp"
+#include "test_environment.hpp"
+#include <iostream>
+#include <fstream>
+#include <cstdio>
 
-namespace flusspferd { namespace xml {
+BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
-FLUSSPFERD_CLASS_DESCRIPTION(
-  processing_instruction,
-  (base, node)
-  (full_name, "XML.ProcessingInstruction")
-  (constructor_name, "ProcessingInstruction")
-  (constructor_arity, 3))
-{
-public:
-  processing_instruction(object const &, call_context &);
-  processing_instruction(object const &, xmlNodePtr pi);
-  ~processing_instruction();
-};
+BOOST_AUTO_TEST_CASE( evaluate_file ) {
+  char const * const filename = "foo.js";
 
-}}
+  std::ofstream out(filename);
+  BOOST_REQUIRE(out.good());
 
-#endif
+  int const value = 13;
+  out << value << ";\n";
+  out.close();
+
+  flusspferd::value v = flusspferd::execute(filename);
+  BOOST_REQUIRE(v.is_int());
+  BOOST_CHECK_EQUAL(v.get_int(), value);
+
+  std::remove(filename);
+}
+
+BOOST_AUTO_TEST_SUITE_END()

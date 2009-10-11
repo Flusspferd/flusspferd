@@ -3,3 +3,9 @@ FLUSSPFERD-VERSION-FILE
 build/*
 *.swp
 *~
+premake4.lua
+*.vcproj
+*.sln
+*.suo
+*.ncb
+*.vcproj.*.user

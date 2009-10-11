@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +36,7 @@ THE SOFTWARE.
 #include <boost/unordered_map.hpp>
 #include <cstring>
 #include <cstdio>
+#include <iostream>
 #include <js/jsapi.h>
 
 #ifndef FLUSSPFERD_STACKCHUNKSIZE
@@ -58,6 +60,7 @@ struct context::context_private {
   boost::unordered_map<std::string, root_object_ptr> constructors;
 };
 
+/// impl provides the hidden implementation part
 class context::impl {
 public:
   impl()
@@ -71,6 +74,7 @@ public:
     uint32 options = JS_GetOptions(context);
 
     options |= JSOPTION_VAROBJFIX;
+    options |= JSOPTION_STRICT;
     options |= JSOPTION_DONT_REPORT_UNCAUGHT;
     options &= ~JSOPTION_XML;
 
@@ -81,25 +85,18 @@ public:
     JS_BeginRequest(context);
 #endif
 
+    JS_SetErrorReporter(context, spidermonkey_error_reporter);
+
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
     if(!global_)
       throw exception("Could not create Global Object");
 
-    // Set it so that it doesn't get GCd (play it safe)
     JS_SetGlobalObject(context, global_);
 
     if(!JS_InitStandardClasses(context, global_))
       throw exception("Could not initialize Global Object");
 
     JS_DeleteProperty(context, global_, "XML");
-
-    // Set the global object as an empty object which has its proto as the
-    // 'true' global object with the std classes on it
-    JSObject *pub_global = JS_NewObject(context, &global_class, global_, NULL);
-    if(!global_)
-      throw exception("Could not create Global Shim Object");
-
-    JS_SetGlobalObject(context, pub_global);
 
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
   }
@@ -126,10 +123,31 @@ public:
     return static_cast<context_private*>(JS_GetContextPrivate(context));
   }
 
+  static void spidermonkey_error_reporter(JSContext *cx, char const *message, JSErrorReport *report) {
+
+    if (!report || JSREPORT_IS_EXCEPTION(report->flags)) {
+      return;
+    }
+
+    std::cerr << (JSREPORT_IS_STRICT(report->flags) ? "Strict warning: " : "Warning: ")
+              << message;
+
+    if (report->filename) {
+      std::cerr << " at " << report->filename;
+
+      if (report->lineno) {
+        std::cerr << ":" << report->lineno;
+      }
+    }
+    std::cerr << std::endl;
+
+  }
+
   JSContext *context;
   bool destroy;
 };
 
+/// detail is used for copyconstructing/initialisation purpose
 struct context::detail {
   JSContext *c;
   detail(JSContext *ct) : c(ct) { }
@@ -211,4 +229,38 @@ object context::constructor(std::string const &name) const {
 
 void context::gc() {
   JS_GC(p->context);
+}
+
+void context::set_thread() {
+#ifdef JS_THREADSAFE
+  assert(JS_SetContextThread(p->context) == 0);
+#endif
+}
+
+void context::clear_thread() {
+#ifdef JS_THREADSAFE
+  //assert(
+  JS_ClearContextThread(p->context);
+  // == js_GetCurrentThread(p->context->runtime)->id);
+#endif
+}
+
+bool context::set_strict(bool strict) {
+  uint32 options = JS_GetOptions(p->context);
+
+  bool old = (options & JSOPTION_STRICT) == JSOPTION_STRICT;
+
+  // No change.
+  if (old == strict)
+    return old;
+
+  if (strict) {
+    options |= JSOPTION_STRICT;
+  }
+  else {
+    options &= ~JSOPTION_STRICT;
+  }
+  JS_SetOptions(p->context, options);
+
+  return old;
 }

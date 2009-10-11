@@ -1,7 +1,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +23,7 @@
 # THE SOFTWARE.
 #
 
-.PHONY: all clean install
+.PHONY: all clean install uninstall
 
 all: build
 	$(MAKE) -C build
@@ -39,3 +40,11 @@ distclean:
 build:
 	@echo "Please run ./configure (with appropriate parameters)!"
 	@exit 1
+
+uninstall: build
+	@if [ -f build/install_manifest.txt ]; then \
+	echo 'Uninstalling' ;                       \
+	xargs rm < build/install_manifest.txt ;     \
+	else 					    \
+	echo 'Flusspferd does not seem to be installed.'; \
+	fi

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,258 +26,414 @@ THE SOFTWARE.
 
 #include "flusspferd/modules.hpp"
 #include "flusspferd/create.hpp"
-#include "flusspferd/string.hpp"
-#include "flusspferd/tracer.hpp"
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
-#include <boost/filesystem.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/algorithm/string/split.hpp>
+#include "flusspferd/io/file.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
+#include "flusspferd/binary.hpp"
+#include "flusspferd/encodings.hpp"
+#include <boost/filesystem/fstream.hpp>
+#include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/spirit/home/phoenix/core.hpp>
-#include <boost/spirit/home/phoenix/operator.hpp>
-#include <boost/utility.hpp>
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <sstream>
-#include <list>
+
 #ifdef WIN32
 #include <windows.h>
 #else
+#define SHLIBPREFIX "lib"
 #include <dlfcn.h>
 #endif
 
-#define DIRSEP1 '/'
-#define DIRSEP2 '\0'
-#define SHLIBPREFIX "lib"
 
 using namespace flusspferd;
 
 namespace algo = boost::algorithm;
-namespace phoenix = boost::phoenix;
-namespace args = phoenix::arg_names;
+namespace fs = boost::filesystem;
 
-static void require(call_context &);
 
+static fs::path make_dsoname(std::string const &id);
+
+// Create |require| function on container.
 void flusspferd::load_require_function(object container) {
-  function imp = create_native_function(container, "require", &require, 1);
-
-  imp.define_property("preload", create_object(), permanent_property);
-  imp.define_property("paths", create_array(), permanent_property);
-  imp.define_property("alias", create_object(), permanent_property);
-  imp.define_property("module_cache", create_object(),
-                      permanent_property);
-  imp.define_property("id", flusspferd::string(),
-                      permanent_property);
+  container.set_property("require", require::create_require());
 }
 
-// Take 'foo/bar' as a flusspferd::string, check no path sep in it, and
-// return '/foo/bar.js' or '/foo/libbar.so', etc. as a std::string
-static std::string process_name(
-    std::string name,
-    std::string module,
-    std::string const &prefix,
-    std::string const &suffix,
-    char out_dirsep)
-{
-  if ((DIRSEP1 != '/' && name.find(DIRSEP1) != std::string::npos) &&
-      (DIRSEP2 != '/' && DIRSEP2 && name.find(DIRSEP2) != std::string::npos))
-  {
-    throw exception("Invalid module name");
-  }
 
-  typedef std::list<std::string> container;
+require::require()
+  : native_function_base(1, "require"),
+    module_cache(create_object()),
+    paths(create_array()),
+    alias(create_object()),
+    preload(create_object())
+{ }
 
-  module.erase(
-    std::find(module.rbegin(), module.rend(), '/').base(),
-    module.end());;
+// Copy constructor. Keep the same JS objects for the state variables
+require::require(require const &rhs)
+  : native_function_base(1, "require"),
+    module_cache(rhs.module_cache),
+    paths(rhs.paths),
+    alias(rhs.alias),
+    preload(rhs.preload)
+{ }
 
-  if (algo::starts_with(name, "./") || algo::starts_with(name, "../"))
-    name = module + "/" + name;
+require::~require() {}
 
-  container elements;
-  algo::split(elements, name, args::arg1 == '/', algo::token_compress_on);
+// Static helper method to actually create |require| function objects
+object require::create_require() {
+  object fn = create_native_functor_function<require>(object());
+  require* r = static_cast<require*>(native_function_base::get_native(fn));
 
-  if (elements.empty())
-    throw exception("Invalid module name");
+  const property_flag perm_ro = permanent_property | read_only_property;
 
-  elements.remove(".");
-
-  for (container::iterator it = ++elements.begin(); it != elements.end();) {
-    if (*it == ".." && it != elements.begin())
-      it = elements.erase(boost::prior(it), boost::next(it));
-    else
-      ++it;
-  }
-  std::string result;
-
-  container::iterator last = boost::prior(elements.end());
-
-  for (container::iterator it = elements.begin(); it != last; ++it) {
-    result.append(*it);
-    result += out_dirsep;
-  }
-
-  result += prefix;
-  result += *last;
-  result += suffix;
-
-  return result;
+  fn.define_property("module_cache", r->module_cache, perm_ro);
+  fn.define_property("paths", r->paths, perm_ro);
+  fn.define_property("alias", r->alias, perm_ro);
+  fn.define_property("preload", r->preload, perm_ro);
+  return fn;
 }
 
-void require(call_context &x) {
-  security &sec = security::get();
+// Each module wants a different |require| object, so that it can have a
+// different require.id property
+object require::new_require_function(string const &id) {
+  // Use the copy ctor form to share the JS state variables.
+  object new_req = create_native_functor_function<require>(object(), *this);
+  new_req.set_prototype(*this);
 
-  value paths_v = x.function.get_property_object("paths");
-  if (!paths_v.is_object() || paths_v.is_null())
-    throw exception("Unable to get search paths or it is not an object");
+  new_req.define_property("id", id, permanent_property|read_only_property);
 
-  array paths = paths_v.get_object();
-  size_t len = paths.length();
+  return new_req;
+}
 
-  bool found = false;
+// The implementation of the |require()| function that is available to JS
+void require::call(call_context &x) {
+  std::string id = x.arg[0].to_std_string();
 
-  std::string name = flusspferd::string(x.arg[0]).to_string();
+  // If what ever they require is already loaded, give it to them
+  if (module_cache.has_own_property(id)) {
+    x.result = module_cache.get_property(id);
+    return;
+  }
 
-  std::string module =
-      x.function.get_property("id").to_std_string();
+  id_classification type = classify_id(id);
 
-  std::string key = process_name(name, module, "", "", '/');
+  if (type == top_level) {
+    x.result = load_top_level_module(id);
+    return;
+  }
 
-  object module_cache;
+  fs::path module_path;
+  if (type == relative) {
+    module_path = resolve_relative_id( id );
+    id = module_path.string();
+  }
+  else if (type == fully_qualified) {
+    id = id.substr(strlen("file://"));
+    module_path = io::fs_base::canonicalize( id );
+  }
+  id = "file://" + id;
 
-  try {
-    x.function.set_property("id", flusspferd::string(key));
 
-    value alias_v = x.function.get_property("alias");
+  // If what ever the file resolves to is already loaded, give it to them
+  if (module_cache.has_own_property(id)) {
+    x.result = module_cache.get_property(id);
+    return;
+  }
 
-    if (alias_v.is_object() && !alias_v.is_null()) {
-      object alias = alias_v.get_object();
-      if (alias.has_own_property(key)) {
-        name = alias.get_property(key).to_std_string();
-        key = process_name(name, "", "", "", '/');
+  x.result = load_absolute_js_file(module_path, id);
+}
+
+#include <iostream>
+
+string require::load_module_text(fs::path filename) {
+  io::file &f = create_native_object<io::file>(
+    object(),
+    filename.string().c_str(),
+    value("r")
+  );
+
+  // buffer blob
+  byte_array &blob = create_native_object<byte_array>(
+    object(),
+    static_cast<binary::element_type*>(0),
+    0
+  );
+  binary::vector_type &buf = blob.get_data();
+
+  // Look for a shebang line
+  f.read_binary(2, blob);
+
+  if (buf[0] == '#' && buf[1] == '!') {
+    // Shebang line - skip the line, but insert an empty one in there to keep
+    // source line numbers right
+    buf.clear();
+    buf.push_back('\n');
+    f.read_line(value("\n"));
+  }
+  f.read_whole_binary(blob);
+
+  // TODO: Some way of supporting other encodings is probably useful
+  return encodings::convert_to_string("UTF-8", blob);
+
+}
+
+/// Load the given @c filename as a module
+void require::require_js(fs::path filename, std::string const &id, object exports) {
+  class StrictModeScopeGuard {
+      bool old_strict;
+    public:
+      StrictModeScopeGuard(bool v) : old_strict(v) {}
+
+      ~StrictModeScopeGuard() {
+        flusspferd::current_context().set_strict(old_strict);
       }
+  };
+  // Reset the strict mode when we leave (the REPL might have it off)
+  StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
+
+  local_root_scope root_scope;
+
+  string module_text = load_module_text(filename);
+
+  std::vector<std::string> argnames;
+  argnames.push_back("exports");
+  argnames.push_back("require");
+  argnames.push_back("module");
+
+  std::string fname = filename.string();
+  function fn = ::flusspferd::create_function(
+      fname, argnames.size(), argnames,
+      module_text, fname.c_str(), 1ul);
+
+  object module = create_object();
+  module.set_property("uri", id);
+  module.set_property("id", id);
+
+  object require = new_require_function(id);
+
+  fn.call(fn, exports, require, module);
+}
+
+/// What type of require id is @c id
+require::id_classification require::classify_id(std::string const &id) {
+  if (algo::starts_with(id, "./") || algo::starts_with(id, "../"))
+    return relative;
+  if (algo::starts_with(id, "file://"))
+    return fully_qualified;
+  return top_level;
+}
+
+/**
+ * Resolve a realtive ID (as passed to require) using the current module id
+ * returning a canonical filename
+ *
+ * @param id The require id to resolve into an absolute path
+ * @return boost::filesystem::path object
+ */
+fs::path require::resolve_relative_id(std::string const &id) {
+
+  fs::path module(current_id().substr(strlen("file://")));
+  module.remove_filename();
+
+  return io::fs_base::canonicalize( module / id ).replace_extension(".js");
+}
+
+
+// Utility class to remove |module_cache[id]| in case of an exception
+class ExportsScopeGuard {
+    object module_cache;
+    std::string id;
+  public:
+    ExportsScopeGuard(object _cache, std::string _id)
+      : module_cache(_cache),
+        id(_id)
+    {}
+
+    ~ExportsScopeGuard() {
+      if (!module_cache.is_null())
+        module_cache.delete_property(id);
     }
 
-    module_cache = x.function.get_property_object("module_cache");
-    if (module_cache.is_null())
-      throw exception("No valid module cache");
-
-    if (module_cache.has_own_property(key)) {
-      x.result = module_cache.get_property(key);
-      return;
+    void exit_cleanly() {
+      // Replace object with null
+      module_cache = object();
     }
+};
 
-    object classes_object = flusspferd::global().prototype();
-    object ctx = flusspferd::create_object(classes_object);
-    ctx.set_parent(classes_object);
 
-    object exports = flusspferd::create_object();
-    ctx.define_property(
-      "exports",
-      exports,
-      read_only_property | permanent_property);
 
-    module_cache.set_property(key, exports);
-    x.result = exports;
-
-    value preload = x.function.get_property("preload");
-
-    if (preload.is_object() && !preload.is_null()) {
-      value loader = preload.get_object().get_property(key);
-      if (loader.is_object()) {
-        if (!loader.is_null()) {
-          local_root_scope scope;
-          object o = loader.get_object();
-          o.call(ctx);
-        }
-        return;
-      }
-    }
-
-    std::string so_name, js_name;
-    so_name = "/" + process_name(key, "", SHLIBPREFIX, FLUSSPFERD_MODULE_SUFFIX, DIRSEP1);
-    js_name = "/" + process_name(key, "", "", ".js", DIRSEP1);
-
-    for (size_t i = 0; i < len; i++) {
-      std::string path = paths.get_element(i).to_std_string();
-      std::string fullpath = path + so_name;
-
-      if (sec.check_path(fullpath, security::READ) &&
-          boost::filesystem::exists(fullpath))
-      {
+object load_native_module(fs::path const &dso_name, object exports) {
+  std::string const &fullpath = dso_name.string();
 #ifdef WIN32
-        HMODULE module = LoadLibrary(fullpath.c_str());
+  HMODULE module = LoadLibrary(fullpath.c_str());
 
-        if (!module)
-          throw exception(("Unable to load library '" +fullpath+"'").c_str());
+  // TODO: Imrpove error message
+  if (!module)
+    throw exception(("Unable to load library '" +fullpath+"'"));
 
-        FARPROC symbol = GetProcAddress(module, "flusspferd_load");
+  FARPROC symbol = GetProcAddress(module, "flusspferd_load");
 
-        if (!symbol)
-          throw exception(("Unable to load library '" + fullpath + "': symbol "
-                          "not found").c_str());
+  if (!symbol)
+    throw exception(("Unable to load library '" + fullpath + "': symbol "
+                    "not found"));
 #else
-        // Load the .so
-        void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
-        if (!module) {
-          std::stringstream ss;
-          ss << "Unable to load library '" << fullpath.c_str()
-             << "': " << dlerror();
-          throw exception(ss.str().c_str());
-        }
+  // Load the .so
+  void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
+  if (!module) {
+    std::stringstream ss;
+    ss << "Unable to load library '" << fullpath
+       << "': " << dlerror();
+    throw exception(ss.str());
+  }
 
-        void *symbol = dlsym(module, "flusspferd_load");
+  dlerror(); // clear error state
 
-        if (!symbol) {
-          std::stringstream ss;
-          ss << "Unable to load library '" << fullpath.c_str()
-             << "': " << dlerror();
-          throw exception(ss.str().c_str());
-        }
+  void *symbol = dlsym(module, "flusspferd_load");
+
+  char const *const error_string = dlerror();
+
+    if (error_string) {
+      std::stringstream ss;
+      ss << "Unable to load library '" << fullpath
+         << "': " << error_string;
+      throw exception(ss.str());
+    }
 #endif
 
-        flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
+  flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-        func(exports, ctx);
+  object context = global();
+  func(exports, context);
 
-        // The exports reference might have been changed.
-        module_cache.set_property(key, exports);
-        x.result = exports;
+  return exports;
+}
 
-        found = true;
-        break;
-      }
+std::string require::current_id() {
+  return get_property("id").to_std_string();
+}
+
+
+// Loading of top-level IDs is more complex then relative or abs uris
+// We need to check alias and prelaod, and also search the require paths for
+// .js files and DSOs
+object require::load_top_level_module(std::string &id) {
+  security &sec = security::get();
+
+  object classes_object = flusspferd::global();
+  object ctx = flusspferd::create_object(classes_object);
+  ctx.set_parent(classes_object);
+
+  root_object exports(create_object());
+
+  ctx.define_property(
+    "exports",
+    exports,
+    read_only_property | permanent_property);
+
+  ExportsScopeGuard scope_guard(module_cache, id);
+  module_cache.set_property(id, exports);
+
+  if (!preload.is_null()) {
+    // Check for 'preloaded' module
+    value loader = preload.get_property(id);
+    if (loader.is_object() && !loader.is_null()) {
+      object o = loader.get_object();
+      o.call(ctx);
+      scope_guard.exit_cleanly();
+
+      return exports;
     }
-
-    for (size_t i = 0; i < len; i++) {
-      std::string path = paths.get_element(i).to_std_string();
-      std::string fullpath = path + js_name;
-
-      if (sec.check_path(fullpath, security::READ) &&
-          boost::filesystem::exists(fullpath))
-      {
-        value val = flusspferd::execute(fullpath.c_str(), ctx);
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) {
-      std::stringstream ss;
-      ss << "Unable to find library '" << key << "' in [" << paths_v << "]";
-      throw exception(ss.str().c_str());
-    }
-  } catch (...) {
-    if (!module_cache.is_null())
-      module_cache.delete_property(key);
-
-    x.function.set_property("id", flusspferd::string(module));
-    throw;
   }
 
-  x.function.set_property("id", flusspferd::string(module));
+  size_t len = paths.length();
+  bool found = false;
+
+  fs::path dso_name = make_dsoname(id);
+
+  for (size_t i = 0; i < len; i++) {
+    fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
+    fs::path native_path = path / dso_name;
+    if (sec.check_path(native_path.string(), security::READ) &&
+        fs::exists(native_path) )
+    {
+      found = true;
+      load_native_module(native_path, exports);
+      break;
+    }
+  }
+
+  fs::path js_name = fs::path(id + ".js");
+
+  for (size_t i = 0; i < len; i++) {
+    fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
+
+    fs::path js_path = path / js_name;
+
+    // Check if we loaded something by this name previously, even if the file
+    // doesn't exist anymore
+    std::string new_id = "file://" + js_path.string();
+    if (module_cache.has_own_property(new_id)) {
+      exports = module_cache.get_property_object(new_id);
+      found = true;
+      break;
+    }
+
+    if ( !fs::exists(js_path) )
+      continue;
+
+    found = true;
+
+    // Cache it under the top-level and fully-qualified ids
+    ExportsScopeGuard scope_guard2(module_cache, new_id);
+    module_cache.set_property(new_id, exports);
+
+    require_js(js_path, new_id, exports);
+    scope_guard2.exit_cleanly();
+    break;
+  }
+
+  if (found)
+    scope_guard.exit_cleanly();
+  else {
+    std::stringstream ss;
+    ss << "Unable to find library '" << id << "' in [" << paths << "]";
+    throw exception(ss.str());
+  }
+
+  return exports;
+}
+
+
+object require::load_absolute_js_file(fs::path path, std::string &id) {
+  security &sec = security::get();
+
+  ExportsScopeGuard scope_guard(module_cache, id);
+  if (sec.check_path(path.string(), security::READ) &&
+      fs::exists(path))
+  {
+    root_object exports(create_object());
+
+    module_cache.set_property(id, exports);
+    require_js(path, id, exports);
+    scope_guard.exit_cleanly();
+    return exports;
+  }
+
+  std::stringstream ss;
+  ss << "Unable to load library '" << id;
+  throw exception(ss.str());
+}
+
+
+static fs::path make_dsoname(std::string const &id) {
+  fs::path p(id);
+
+  p.replace_extension(FLUSSPFERD_MODULE_SUFFIX);
+#ifdef SHLIBPREFIX
+  std::string file = SHLIBPREFIX + p.filename();
+  p = p.remove_filename() / file;
+#endif
+
+  return p;
 }
 

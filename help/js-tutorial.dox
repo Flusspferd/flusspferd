@@ -1,8 +1,9 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// -*- mode: c++; coding: utf-8; -*- vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +35,7 @@ THE SOFTWARE.
  * - @subpage js-tutorial-invoke
  * - @subpage js-tutorial-io
  * - @subpage js-tutorial-xml
+ * - @subpage js-tutorial-getopt
  *
  * @see
  *   - @ref cpp-tutorial-modules
@@ -102,7 +104,7 @@ print_args(system.args);
  */
 
 /**
- * @page js-tutorial-io Using IO
+ * @page js-tutorial-io Using io
  *
  * Previous: \ref js-tutorial-invoke
  *
@@ -209,5 +211,220 @@ www.bayes.co.uk/xml Chris Bayes' XML Portal
 @endverbatim
  *
  * @note Reference documentation has not been written yet.
+ *
+ * Next: \ref js-tutorial-getopt
+ *
+ */
+
+/**
+ * @page js-tutorial-getopt Using Getopt
+ *
+ * Previous: \ref js-tutorial-xml
+ *
+ * Flusspferd provides with getopt a module to parse command line parameters.
+ * The module has a C++ and a Javascript API and is also used by the
+ * Flusspferd Shell. See flusspferd::getopt for the reference.
+ *
+ * Getopt is similar to alternatives known from other languages, like
+ * <a href="http://man.cx/getopt(3)">getopt(3)</a>. The getopt function
+ * takes a specification which options are supported and returns a list of
+ * parsed options. If no second parameter containing an Array of command line
+ * input is passed it is read from the environment.
+ *
+ * The parameter specification is an object consisting of parameter names as properties.
+ * Those properties contain objects defining different aspects of the parameter. So the
+ * specification is basically a JSON structure. A very simple specification thus might look
+ * like this:
+ *
+ * @verbatim
+var spec = {
+  "help" : { },
+  "version" : { },
+  "foo" : { },
+  "bar" : { }
+};
+@endverbatim
+ * 
+ * getopt uses the following syntax for command line parameters:
+ *
+ * Short option (one character long): @p -S
+ * 
+ * Long option: @p --longoption
+ *
+ * If an option is short or long is determined by the length of the name. In our example all options
+ * are long options. It is recommended to always provide a descriptive long option and provide a short
+ * alias for common options. This brings us to the next point: Providing aliases. You can define several
+ * aliases for each option by adding an @p "alias" option to the subobjects:
+ *
+ * @verbatim
+var spec = {
+  "help" : {
+     "alias" : "h"
+  },
+  "version" : {
+     "alias" : "v"
+  },
+  "foo" : {
+     "alias" : ["f", "F"]
+  },
+  "bar" : {
+     "alias" : ["baz", "b" ]
+  }
+};
+@endverbatim
+ *
+ * getopt also supports arguments to those options. The following syntaxes are supported:
+ *
+ * Short option with argument: @p -Sargument or @p -S @p argument
+ *
+ * Long option with argument: @p --longoption=argument or @p --longoption @p argument
+ *
+ * You can specify that an option requires an argument with an @p "argument"
+ * parameter which should be either @p "none", @p "optional" or @p "required"
+ * and you can define an argument type with @p "argument_type".
+ * The @p "argument_type" is currently useful to improve the help output and
+ * for a bash completion script. We get back to this later.
+ *
+ * @verbatim
+var spec = {
+  "help" : {
+     "alias" : "h"
+  },
+  "version" : {
+     "alias" : "v"
+  },
+  "foo" : {
+     "alias" : ["f", "F"],
+     "argument" : "required",
+     "argument_type" : "file"
+  },
+  "bar" : {
+     "alias" : ["baz", "b" ],
+     "argument" : "optional"
+     // an argument_type does not need to be set
+  }
+};
+@endverbatim
+ *
+ * Now we can parse the command line parameters with getopt:
+ *
+ * @verbatim
+var getopt = require('getopt');
+var result = getopt.getopt(spec);
+@endverbatim
+ *
+ * @p result now is an object containing the parsed options as property names
+ * which contain a list of arguments:
+ *
+ * @verbatim
+{
+  "option0" : [ "arg0", "arg1" ],
+  "option1" : [ "arg0" ],
+  "_" : [ "rest" ]
+};
+@endverbatim
+ *
+ * The property @p "_" is a special case containing the unparsed arguments.
+ *
+ * Now you could process result. But getopt provides an even easier way by using
+ * callbacks. You can define callbacks inside the specifications:
+ *
+ * @verbatim
+var spec = {
+  "help" : {
+    "alias" : "h",
+    "callback" : function() {
+      print("help");
+      quit();
+    }
+  },
+  "version" : {
+    "alias" : "v",
+    "callback" : function() {
+      print("Version 1.0");
+      quit();
+    }
+  },
+  "foo" : {
+     "alias" : ["f", "F"],
+     "argument" : "required",
+     "argument_type" : "file",
+     "callback" : function(name, argument) {
+       print("option '" + name + "' argument '" + argument + "'");
+     }
+  },
+  "bar" : {
+     "alias" : ["baz", "b" ],
+     "argument" : "optional",
+     "callback" : function(name, argument) {
+       if(argument) {
+         print("option '" + name + "' called with argument '" + argument + "'");
+       }
+       else {
+         print("option '" + name + "' called without argument");
+       }
+     }
+  }
+};
+@endverbatim
+ *
+ * @p "help" is a common option and every program using command line options
+ * should provide it to list the supported options. getopt can even help
+ * with this option since getopt already know the supported options. There is
+ * a getopt_help function taking the parameter specification and generating a
+ * corresponding output. To improve the output you should add a @p "doc"
+ * property to all options.
+ *
+ * @verbatim
+var spec = {
+  "help" : {
+    "alias" : "h",
+    "doc" : "Displays this message.",
+    "callback" : function() {
+      print("usage: getopt-example.js [OPTIONS] ...");
+      print(getopt.getopt_help(spec));
+      quit();
+    }
+  },
+  "version" : {
+    "alias" : "v",
+    "doc" : "Show version number.",
+    "callback" : function() {
+      print("Version 1.0");
+      quit();
+    }
+  },
+  "foo" : {
+     "alias" : ["f", "F"],
+     "argument" : "required",
+     "argument_type" : "file",
+     "doc" : "Foo!",
+     "callback" : function(name, argument) {
+       print("option '" + name + "' argument '" + argument + "'");
+     }
+  },
+  "bar" : {
+     "alias" : ["baz", "b" ],
+     "argument" : "optional",
+     "doc" : "Bar is the way to go.",
+     "callback" : function(name, argument) {
+       if(argument) {
+         print("option '" + name + "' called with argument '" + argument + "'");
+       }
+       else {
+         print("option '" + name + "' called without argument");
+       }
+     }
+  }
+};
+@endverbatim
+ *
+ * getopt even provides functions to auto generate parts of a manpage
+ * (flusspferd::getopt_man) and bash completion script
+ * (flusspferd::getopt_bash).
+ *
+ * See @p help/getopt-example.js or @p misc/replace-var.js for examples on
+ * the usage of getopt with Javascript or take a look at
+ * @p src/programs/flusspferd.cpp for the getopt usage with C++.
  *
  */

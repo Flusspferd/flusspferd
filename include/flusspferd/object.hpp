@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +39,8 @@ THE SOFTWARE.
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/utility/enable_if.hpp>
 
 namespace flusspferd {
 
@@ -98,7 +101,7 @@ public:
    * small chance this cant return true erroneously, but only if someone has
    * gone out of their way to make it happen.
    *
-   * @return Wether the object is a generator.
+   * @return Whether the object is a generator.
    */
   bool is_generator() const;
 
@@ -308,33 +311,41 @@ FLUSSPFERD_CALLS(call, object const &)
    *
    * @param name The property's name.
    * @param v The new value.
+   * @return @p v
    */
-  void set_property(char const *name, value const &v);
+  value set_property(char const *name, value const &v);
 
   /**
    * Set a property.
    *
    * @param name The property's name.
    * @param v The new value.
+   * @return @p v
    */
-  void set_property(std::string const &name, value const &v);
+  value set_property(std::string const &name, value const &v);
 
   /**
    * Set a property.
    *
    * @param id The property's name / ID.
    * @param v The new value.
+   * @return @p v
    */
-  void set_property(value const &id, value const &v);
+  value set_property(value const &id, value const &v);
 
   /**
    * Set a property.
    *
    * @param id The property's name / ID.
    * @param v The new value.
+   * @returnv @p v
    */
   template<typename T, typename U>
-  void set_property(T const &id, U const &v) {
+  value set_property(T const &id, U const &v
+#ifndef IN_DOXYGEN
+  , typename boost::disable_if<boost::is_same<U, value> >::type * = 0
+#endif
+  ) {
     return set_property(id, value(v));
   }
 

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,27 +39,6 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-namespace {
-  std::string exception_message(std::string const &what) {
-    std::string ret = what;
-    jsval v;
-    JSContext *const cx = Impl::current_context();
-
-    if (JS_GetPendingException(cx, &v)) {
-      value val = Impl::wrap_jsval(v);
-      ret += ": exception `" + val.to_std_string() + '\'';
-      if (val.is_object()) {
-        object o = val.to_object();
-        if(o.has_property("fileName"))
-          ret += " at " + o.get_property("fileName").to_std_string()
-              +  ":" + o.get_property("lineNumber").to_std_string();
-      }
-      return ret;
-    }
-
-    return ret;
-  }
-}
 
 class exception::impl {
 public:
@@ -71,8 +51,7 @@ public:
   bool empty;
 };
 
-exception::exception(char const *what, std::string const &type)
-  : std::runtime_error(exception_message(what))
+void exception::init(char const *what, std::string const &type)
 {
   boost::shared_ptr<impl> p(new impl);
 
@@ -93,6 +72,25 @@ exception::exception(char const *what, std::string const &type)
   }
 
   this->p = p;
+}
+
+std::string exception::exception_message(char const *what) {
+  std::string ret(what);
+  jsval v;
+  JSContext *const cx = Impl::current_context();
+
+  if (JS_GetPendingException(cx, &v)) {
+    value val = Impl::wrap_jsval(v);
+    ret += ": exception `" + val.to_std_string() + '\'';
+    if (val.is_object()) {
+      object o = val.to_object();
+      if(o.has_property("fileName"))
+        ret += " at " + o.get_property("fileName").to_std_string()
+            +  ":" + o.get_property("lineNumber").to_std_string();
+    }
+  }
+
+  return ret;
 }
 
 exception::exception(value const &val)

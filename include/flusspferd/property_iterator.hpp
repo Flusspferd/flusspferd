@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +37,17 @@ namespace flusspferd {
  * Property iterator.
  *
  * Uses boost::iterator_facade to support basic iterator operations.
+ *
+ * Example:
+ *
+ * @verbatim
+for (property_iterator it = obj.begin(); it != obj.end(); ++it) {
+  value const val = *it;
+
+  // or more commonly, you'll want a string directly
+  std::string name = it->to_std_string();
+}
+@endverbatim
  *
  * @ingroup property_types
  */
