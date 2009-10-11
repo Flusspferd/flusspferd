@@ -1,9 +1,9 @@
 // vim:ts=2:sw=2:expandtab:autoindent:
-// vim: foldmethod=marker:foldmarker={{{,}}}
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,11 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
     yield row;
   }
 };
+
+SQLite3.prototype.cursor = function() {
+  require('system').stderr.print('SQLite3.cursor() has been deprecated. use SQLite3.query() instead');
+  return this.query.apply(this, arguments);
+}
 
 // SQLite3 {{{
 /**
@@ -93,9 +98,107 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    */
 
   /**
+   * Returns the row id of the last inserted column
+   * @name lastInsertID
+   * @function
+   *
+   * @returns the last inserted row id as a number
+   */
+
+  /**
+   * Executes a given SQL statement and optionally, bind parameters 
+   * can be passed to fill the placeholders in the SQL statement 
+   *
+   * ** Note: **
+   *
+   * If the execution throws an exception and the execution is aborted 
+   * it will not automatically rollback the applied changes. If this is wanted
+   * the user of this function has to explicitly take care about it by using
+   * [[SQLite3#begin]],[[SQLite3#commit]] and [[SQLite3#rollback]]
+   * 
+   * ==Example usage:==
+   *
+   * {{{ 
+   * db.exec('CREATE TABLE foobar (a,b,c)');
+   *
+   * db.exec('INSERT INTO foobar VALUES(?,?,?)',[1,2,3]);
+   *
+   * db.exec('INSERT INTO foobar VALUES(:first, :second, :third)',
+   *         { first: 4, second: 5, third: 6 });
+   * }}}
+   * 
+   * @name exec
+   * @function
+   *
+   * @param sql SQL to execute which might contain placeholders
+   * @param optional_bind_args bind parameters passed to [[SQLite3.Cursor#bind]].
+   *
+   * @returns number of rows affected by the statement
+   * 
+   */
+
+  /**
+   * Executes given SQL statement(s). Bind parameters can be passed to fill
+   * placeholders used in the corresponding SQL statement.
+   * 
+   * The parameter is expected to be an array of 
+   * objects with sql and optional bind properties. The bind property should
+   * contain a value, an array or an object. The object can be used for
+   * named placeholders
+   *
+   * ** Note: **
+   *
+   * If the execution throws an exception and the execution is aborted 
+   * it will not automatically rollback the applied changes. If this is wanted
+   * the user of this function has to explicitly take care about it by using
+   * [[SQLite3#begin]],[[SQLite3#commit]] and [[SQLite3#rollback]]
+   * 
+   * ==Example:==
+   *
+   * {{{ 
+   * db.exec([{ 
+   *        sql: 'CREATE TABLE foobar (a,b,c)'
+   *    }, {
+   *        sql: 'INSERT INTO foobar VALUES(?,?,?)',
+   *        bind: [1,2,3]
+   *    }, {
+   *        sql: 'INSERT INTO foobar VALUES(:first, :second, :third)',
+   *        bind: { first: 4, second: 5, third: 6 }
+   *    }])
+   * }}}
+   *
+   *
+   * @name execMany
+   * @function
+   *
+   * @param sql SQL statment to execute which can contain placeholders
+   *
+   * @returns total number of rows affected by the given statements
+   * 
+   */
+
+  /**
+   * Begin a transaction
+   * @name begin
+   * @function
+   */
+
+  /**
+   * Commit a transaction
+   * @name commit
+   * @function
+   */   
+
+  /**
+   * Rollback a transaction
+   * @name rollback
+   * @function
+   */
+
+  /**
    * Get a cursor to execute the given SQL statement. Bind parameters can be
    * passed in as parameters the SQL, or by using [[SQLite3.Cursor#bind]].
-   * @name cursor
+   * @name query
    * @function
    *
    * @param sql SQL to prepare.
@@ -107,7 +210,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
 /**#@- }}} */
 // }}}
 
-// SQLite3.Cursor {{{
+// SQLite3.Cursor {{{ 
 /**
  * You cannot construct a cursor object directly, use [[SQLite3#cursor]] to
  * create one.
@@ -116,7 +219,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
  * @name SQLite3.Cursor
  */
 
-// Instance methods {{{
+// Instance methods  {{{
 /**#@+ @methodOf SQLite3.Cursor# */
 
   /**
@@ -133,8 +236,13 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
    * Get next row from this cursor. This is the alternative way of getting at
    * the results if you don't like the iterator style (or if the JS engine
    * doesn't support it).
+   * If you pass as optional parameter true next will return an Object with 
+   * the column names as id. For no parameter or anything else it will return an 
+   * array.
+   * 
+   * @param optional_param_true
    *
-   * @returns Next row as an array, or null when end of results reached.
+   * @returns Next row as an array, or object, or null when end of results reached.
    *
    * @name SQLite3.Cursor.prototype.next
    */
@@ -165,7 +273,7 @@ SQLite3.Cursor.prototype.__iterator__ = function() {
   /**
    * Iterator support.  A generator function that enables you to write
    *
-   * {{{
+   * {{{ 
    * for (row in myCursor) { ... }
    * }}}
    *

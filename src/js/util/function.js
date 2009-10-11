@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,5 +60,5 @@ Function.bind = function bind(obj, name) {
   return fun.bind(obj);
 }
 
-Object.defineProperty(Function.prototype, 'bind', {enumerable: false});
-Object.defineProperty(Function, 'bind', { enumerable: false, });
+Object.defineProperty(Function.prototype, 'bind', { enumerable: false });
+Object.defineProperty(Function, 'bind', { enumerable: false });

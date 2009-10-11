@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +32,9 @@ THE SOFTWARE.
 namespace flusspferd {
 
 /**
- * Load the properties function Object.defineProperty modelled after
- * [[DefineOwnProperty]] from the ES3.1 specification.
+ * Load the properties function Object.defineProperty and
+ * Object.defineProperties modelled after [[DefineOwnProperty]] from the ES6
+ * specification.
  *
  * @param o The container (must contain an Object property) to load the
  *          functions into.

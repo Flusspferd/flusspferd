@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,15 +26,21 @@ THE SOFTWARE.
 
 #include "flusspferd/load_core.hpp"
 #include "flusspferd/modules.hpp"
+#include "flusspferd/evaluate.hpp"
 #include "flusspferd/properties_functions.hpp"
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
 #include "flusspferd/system.hpp"
 #include "flusspferd/getopt.hpp"
 #include "flusspferd/io/io.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/create.hpp"
 
 using namespace flusspferd;
+
+namespace flusspferd { namespace detail {
+  extern char const * const json2;
+}}
 
 void flusspferd::load_core(object const &scope_) {
   object scope = scope_;
@@ -42,6 +49,16 @@ void flusspferd::load_core(object const &scope_) {
   flusspferd::load_properties_functions(scope);
 
   flusspferd::object require_fn = scope.get_property_object("require");
+
+  // Create the top level |module| and |exports| properties.
+  object module = create_object();
+  scope.define_property("module", module, dont_enumerate);
+
+  require_fn.define_property("main", module, read_only_property | permanent_property);
+
+
+  object exports = create_object();
+  scope.define_property("exports", exports, dont_enumerate);
 
   flusspferd::object preload = require_fn.get_property_object("preload");
 
@@ -64,4 +81,17 @@ void flusspferd::load_core(object const &scope_) {
   flusspferd::create_native_method(
     preload, "getopt",
     &flusspferd::load_getopt_module);
+
+  flusspferd::create_native_method(
+    preload, "filesystem-base",
+    &flusspferd::load_filesystem_base_module);
+
+  if (!scope_.has_own_property("JSON")) {
+    flusspferd::evaluate_in_scope(
+      detail::json2,
+      std::strlen(detail::json2),
+      0x0, // Filename
+      0,   // Linenumber
+      scope_);
+  }
 }

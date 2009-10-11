@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -141,6 +142,13 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
 
   //TODO
 #undef X
+}
+
+BOOST_AUTO_TEST_CASE( recursive_loop_on_set_property ) {
+  flusspferd::object object = flusspferd::create_object();
+
+  object.set_property( flusspferd::string(), flusspferd::string() );
+  
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include <boost/scoped_array.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <fstream>
 #include <iostream>
 #include <sys/types.h>
@@ -41,10 +43,53 @@ THE SOFTWARE.
 #include <io.h>
 
 #define creat _creat
+
+namespace {
+  std::string compose_error_message(std::string const &what, char const *filename = 0x0) {
+#if 0
+    /* yuck Windoze API.
+       Is TCHAR the way to go, since we only want char? (no wchar_t stuff?)
+     */
+    TCHAR *message;
+    DWORD const error = GetLastError();
+
+    if(FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+        FORMAT_MESSAGE_FROM_SYSTEM |
+        FORMAT_MESSAGE_IGNORE_INSERTS,
+        0x0, error, 0, message,
+        0, 0x0) == 0)
+    {
+      return what;
+    }
+    else
+    {
+      std::string ret = what + ": '" + message + "'";
+      LocalFree(message);
+      return ret;
+    }
+#else
+    return what + filename;
+#endif
+  }
+}
+#else
+#include <errno.h>
+#include <cstring>
+namespace {
+  std::string compose_error_message(char const *what, char const *filename = 0x0) {
+    std::string error = std::string(what) + ": '" + std::strerror(errno) + "'";
+    if (filename) {
+      error += std::string(" (") + filename + ')';
+    }
+    return error;
+  }
+}
 #endif
 
 using namespace flusspferd;
 using namespace flusspferd::io;
+using namespace boost;
 
 class file::impl {
 public:
@@ -56,28 +101,115 @@ file::file(object const &obj, call_context &x)
 {
   set_streambuf(p->stream.rdbuf());
   if (!x.arg.empty()) {
-    string name = x.arg[0].to_string();
-    open(name.c_str());
+    call("open", x.arg);
   }
+}
+
+
+file::file(object const &obj, char const* name, value mode)
+  : base_type(obj, (std::streambuf*)0), p(new impl)
+{
+  set_streambuf(p->stream.rdbuf());
+  open(name, mode);
 }
 
 file::~file()
 {}
 
-void file::open(char const *name) {
+void file::open(char const *name, value options) {
   security &sec = security::get();
 
-  if (!sec.check_path(name, security::READ_WRITE))
-    throw exception("Could not open file (security)");
+  std::ios::openmode open_mode = std::ios::openmode();
 
-  p->stream.open(name);
+  bool exclusive = false, create = false;
 
-  define_property("fileName", string(name), 
+  if (options.is_string()) {
+    // String modes always set create
+    create = true;
+
+    std::string mode = options.to_std_string();
+    if (mode == "r")
+      open_mode = std::ios::in;
+    else if (mode == "r+")
+      open_mode = std::ios::in | std::ios::out;
+    else if (mode == "r+x") {
+      open_mode = std::ios::in | std::ios::out;
+      exclusive = create = true;
+    }
+    else if (mode == "w")
+      open_mode = std::ios::out;
+    else if (mode == "wx") {
+      open_mode = std::ios::out;
+      exclusive = create = true;
+    }
+    else if (mode == "w+x") {
+      open_mode = std::ios::out | std::ios::in | std::ios::trunc;
+      exclusive = create = true;
+    }
+    else {
+      throw exception(str(format("File.open: mode '%s' not supported (yet?)") % mode));
+    }
+  }else if (options.is_object()) {
+    object obj = options.get_object();
+
+    create = obj.get_property("create").to_boolean();
+
+    if (obj.get_property("read").to_boolean())
+      open_mode |= std::ios::in;
+    if (obj.get_property("write").to_boolean())
+      open_mode |= std::ios::out;
+    if (obj.get_property("truncate").to_boolean())
+      open_mode |= std::ios::trunc;
+    if (obj.get_property("append").to_boolean()) {
+      if (!(open_mode & std::ios::out)) {
+        throw exception("File.open: append mode can only be used with write");
+      }
+      open_mode |= std::ios::app | std::ios::out;
+    }
+    if (obj.get_property("exclusive").to_boolean()) {
+      if (!create)
+        throw exception("File.open: exclusive mode can only be used with create");
+      exclusive = create = true;
+    }
+
+  }else if (options.is_undefined_or_null()) {
+    open_mode = std::ios::in | std::ios::out;
+  }else {
+    throw exception("File.open: Invalid options argument", "TypeError");
+  }
+
+  unsigned sec_mode = 0;
+
+  if (open_mode & std::ios::in)  sec_mode |= security::READ;
+  if (open_mode & std::ios::out) sec_mode |= security::WRITE;
+  if (create)                    sec_mode |= security::CREATE;
+
+  if (!sec.check_path(name, sec_mode)) {
+    throw exception(str(
+      format("File.open: could not open file: 'defined by security' (%s)") % name
+    ));
+  }
+
+  if (create) {
+    // C++ streams don't support O_EXCL|O_CREAT modes. Fall back to open
+    unsigned o_mode = exclusive
+                    ? O_CREAT|O_EXCL
+                    : O_CREAT;
+    int fd = ::open(name, o_mode);
+    if (fd == -1)
+      throw exception(compose_error_message("File.open: couldn't create file", name));
+
+    // Done  - got the file (exclusively) created.
+    ::close(fd);
+  }
+
+  p->stream.open(name, open_mode);
+
+  define_property("fileName", string(name),
                   permanent_property | read_only_property );
 
   if (!p->stream)
-    // TODO: Include some sort of system error message here
-    throw exception("Could not open file");
+    throw exception(compose_error_message("Could not open file", name));
 }
 
 void file::close() {
@@ -92,7 +224,7 @@ void file::create(char const *name, boost::optional<int> mode) {
     throw exception("Could not create file (security)");
 
   if (creat(name, mode.get_value_or(0666)) < 0)
-    throw exception("Could not create file");
+    throw exception(compose_error_message("Could not create file", name));
 }
 
 bool file::exists(char const *name) {

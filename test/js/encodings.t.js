@@ -13,9 +13,26 @@ const e_accute_utf8 = binary.ByteString([0xC3,0xA9]),
 
       ligature_oe_iso8859_15 = binary.ByteString([0xBD]),
 
-      katakana_shift_jis = binary.ByteString([0x83,0x65,0x83,0x58,0x83,0x67]),
-      katakana_iso2022 = binary.ByteString([0x1b,0x24,0x42,0x25,0x46,0x25,0x39,0x25,0x48,0x1b,0x28,0x42]),
-      katakana_string = "\u30c6\u30b9\u30c8";
+      // Te Su To - thanks to miwagawa
+      katakana_string = "\u30c6\u30b9\u30c8",
+      katakana_shift_jis = binary.ByteString([
+        0x83,0x65,
+        0x83,0x58,
+        0x83,0x67
+      ]),
+
+      // Shift to JIS X 0208-1983
+      iso2022_FROM_ascii = [ 0x1b,0x24,0x42 ],
+      // Shift to ASCII
+      iso2022_TO_ascii   = [ 0x1b,0x28,0x42 ],
+
+      katakana_iso2022 = binary.ByteString(
+        iso2022_FROM_ascii.concat([
+          0x25,0x46,
+          0x25,0x39,
+          0x25,0x48,
+        ], iso2022_TO_ascii)
+      );
 
 if (!this.exports) this.exports = {};
 
@@ -34,6 +51,16 @@ exports.test_convertToString = function() {
   asserts.same(str, "\xE9")
 }
 
+exports.test_convertFromString = function() {
+  var blob = encodings.convertFromString("utf-8", "\xE9");
+  asserts.same(blob.toArray(), [0xC3,0xA9], "FromString(utf-8) (escaped source)" )
+
+  blob = encodings.convertFromString("utf-8", "é");
+  asserts.same(blob.toArray(), [0xC3,0xA9], "FromString(utf-8) (literal in source)" )
+
+  blob = encodings.convertFromString("utf-16", "é");
+  asserts.same(blob.toArray(), [0xFE, 0xFF, 0x00, 0xE9], "FromString(utf-16) correct (literal in source)" )
+}
 
 exports.test_convertToStringUTF16 = function() {
   var str = encodings.convertToString("utf-16", e_accute_utf16);
@@ -87,7 +114,7 @@ exports.test_katakanaTranscoder_Chunks = function() {
 
   const iso2022 = katakana_iso2022.toArray();
 
-  asserts.instanceOf(c, encodings.Transcoder);
+  asserts.instanceOf(c, encodings.Transcoder, "Transcoder created");
 
   // Each 2 bytes of the Shift_JIS (when non-ascii) = 1 unicode character.
 
@@ -107,14 +134,23 @@ exports.test_katakanaTranscoder_Chunks = function() {
   // Rest of the data
   c.push(katakana_shift_jis.slice(2), a);
 
+  // Test that the chars have been output, but not the final shift back to ascii
+  asserts.same(
+    a.toArray(),
+    katakana_iso2022.substr(
+      0, katakana_iso2022.length - iso2022_TO_ascii.length
+    ).toArray(),
+    "ISO-2022-JP->ascii not yet sent"
+  );
+
   c.close(a);
 
   asserts.same(
     a.toArray(),
-    [0x1b,0x24,0x42,0x25,0x46,100,100],
-    "ISO-2022-JP->ascii not yet sent"
+    katakana_iso2022.toArray(),
+    "ISO-2022-JP->ascii added only after close"
   );
 }
 
-// if (module.isMain)
+if (require.main === module)
   require('test').runner(exports);

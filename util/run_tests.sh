@@ -3,7 +3,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +31,9 @@ then
   exit 2
 fi
 
-echo "PROGRESS: Clearing test coverage counters" 1>&2
-
-LCOV_MODE=-z ./util/lcov.sh
+#echo "PROGRESS: Clearing test coverage counters" 1>&2
+#
+#LCOV_MODE=-z ./util/lcov.sh
 
 echo "PROGRESS: Running tests" 1>&2
 
@@ -45,12 +46,16 @@ do
   fi
 done
 
-echo "PROGRESS: Analyzing test coverage" 1>&2
+# TODO: This probably wont update the coverage for what C++ parts that the JS
+# hits. It should do.
+./util/jsrepl.sh -e 'require("test").prove("./test/js")'
 
-./util/lcov.sh
+#echo "PROGRESS: Analyzing test coverage" 1>&2
+#
+#./util/lcov.sh
+#
+#lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
 
-lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
-
-echo "PROGRESS: Visualizing test coverage" 1>&2
-
-./util/genhtml.sh
+#echo "PROGRESS: Visualizing test coverage" 1>&2
+#
+#./util/genhtml.sh

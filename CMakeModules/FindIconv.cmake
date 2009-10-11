@@ -2,7 +2,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +35,7 @@ find_path(ICONV_INCLUDE_DIR iconv.h)
 
 if(NOT ICONV_INCLUDE_DIR STREQUAL "ICONV_INCLUDE_DIR-NOTFOUND")
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
-    check_function_exists(iconv ICONV_IN_GLIBC)
+    check_function_exists(iconv_open ICONV_IN_GLIBC)
 endif()
 
 if(NOT ICONV_IN_GLIBC)
@@ -44,8 +45,17 @@ else()
     set(ICONV_TEST "In glibc")
 endif()
 
+set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
+set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARY})
+check_cxx_source_compiles(
+    "#include <iconv.h>
+     int main() {
+        iconv(iconv_t(-1), 0, 0, 0, 0);
+     }"
+    ICONV_COMPILES)
+
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(ICONV DEFAULT_MSG ICONV_TEST ICONV_INCLUDE_DIR)
+find_package_handle_standard_args(ICONV DEFAULT_MSG ICONV_TEST ICONV_INCLUDE_DIR ICONV_COMPILES)
 
 if(ICONV_FOUND)
   set(ICONV_LIBRARIES ${ICONV_LIBRARY})
@@ -53,7 +63,7 @@ else(ICONV_FOUND)
   set(ICONV_LIBRARIES)
 endif(ICONV_FOUND)
 
-if(ICONV_FOUND)
+if(ICONV_FOUND)  
     set(CMAKE_REQUIRED_INCLUDES ${ICONV_INCLUDE_DIR})
     set(CMAKE_REQUIRED_LIBRARIES ${ICONV_LIBRARIES})
     check_cxx_source_compiles(

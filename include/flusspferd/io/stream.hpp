@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,10 +64,10 @@ public:
 
 public: // javascript methods
   string read_whole();
-  string read(unsigned max_size);
+  string read(boost::optional<unsigned> max_size);
 
   object read_whole_binary(boost::optional<byte_array&> output);
-  object read_binary(unsigned max_size, boost::optional<byte_array&> output);
+  object read_binary(boost::optional<unsigned> max_size, boost::optional<byte_array&> output);
 
   void write(value const &);
 

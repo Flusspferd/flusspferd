@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -55,12 +56,12 @@ namespace {
 
 function::function(object const &o)
   : Impl::function_impl(get_function(o)),
-    object(Impl::function_impl::get_object())
+    object(o)
 { }
 
 function::function(Impl::object_impl const &o)
   : Impl::function_impl(get_function(o)),
-    object(Impl::function_impl::get_object())
+    object(o)
 { }
 
 std::size_t function::arity() const {
@@ -77,5 +78,9 @@ string function::name() const {
 }
 
 object Impl::function_impl::get_object() {
-  return Impl::wrap_object(JS_GetFunctionObject(get()));
+  JSFunction *fn = get();
+  if (!fn)
+    return object();
+  JSObject *o = JS_GetFunctionObject(fn);
+  return Impl::wrap_object(o);
 }

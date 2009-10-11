@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -86,6 +87,20 @@ public:
   void gc();
 
   /**
+   * Tie the context to the current thread. Must be called
+   * before the context is used in a thread.
+   * Newly created contexts are tied to the creating thread.
+   * Use clear_thread() before tieing the context to a new thread.
+   */
+  void set_thread();
+
+  /**
+   * Untie the context from the current thread. Must be called
+   * before tieing the context to another thread with set_thread().
+   */
+  void clear_thread();
+
+  /**
    * Add a prototype to the context's prototype registry.
    *
    * @param name The name and ID of the prototype.
@@ -164,6 +179,15 @@ public:
   object constructor() const {
     return constructor(T::class_info::full_name());
   }
+
+  /**
+   * Set the strict mode flag on or off.
+   *
+   * @param strict New setting for strict mode
+   *
+   * @return       The old value of the strict setting
+   */
+  bool set_strict(bool strict);
 };
 
 template<>

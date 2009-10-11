@@ -1,8 +1,9 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// -*- mode: c++; coding: utf-8; -*- vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +80,8 @@ $ sudo make install
  * @p /opt/local) if you don't want to install Flusspferd in the default path
  * @p /usr/local.
  *
- * If you want to use GNU/readline, pass -DUSE_READLINE=0.
+ * If you want to use GNU/readline (e.g. for working UTF-8 support), pass
+ * @p -DLINE_EDITOR=readline but beware that GNU/readline is GPL licensed.
  *
  * If you have installed your dependencies in unusual paths, or your system
  * is unusual in another way, you might need to specify additional options.
@@ -96,6 +98,20 @@ Hello world!
  *
  * Feel free to play around with the Javascript shell.
  *
+ * @section bash-completions Bash Completions
+ *
+ * Flusspferd provides a completion script for the bash shell. It is usually installed
+ * into @p PREFIX/etc/bash_completion.d/flusspferd since on most systems those files are
+ * not sourced you should either add the following line to your @p ~/.bashrc (replace @p PREFIX
+ * with the prefix where Flusspferd was installed)
+ *
+ * @verbatim
+. PREFIX/etc/bash_completion.d/flusspferd
+@endverbatim
+ *
+ * or copy the file into a path which is already sourced, like @p /etc/bash_completion.d/ on
+ * most modern Linux systems.
+ *
  * @section emacs-install-link Flusspferd's Emacs Mode
  *
  * Flusspferd comes with an
@@ -109,17 +125,12 @@ Hello world!
  *
  * You might have noticed that Flusspferd doesn't use autotools or Makefiles
  * (although we provide a compatibility layer for those who can't live without).
- * Flusspferd uses <a href="http://code.google.com/p/waf">Waf</a> as its build
- * system. But as you have seen, you don't have to install it, it's entirely
- * self-contained in a single binary.
+ * Flusspferd uses <a href="http://cmake.org/">CMake</a> as its build
+ * system.
  *
- * For the purposes of this tutorial, we have not enabled all parts of
- * Flusspferd. We have omitted several modules which you can choose to
- * activate if you have the necessary dependencies.
+ * @subsection ubu Install on Ubuntu 9.04
  *
- * @subsection ubu Install on Ubuntu 8.10
- *
- * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 8.10" and similar distributions.
+ * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 9.04" and similar distributions.
  *
  * @subsection ebuild Install on Gentoo
  *
@@ -128,12 +139,18 @@ Hello world!
  *
  * @subsection macports Install on Mac OS X via Macports
  *
- * We have a Portfile for the <a href="http://www.macports.org">Macports
- * packaging system</a> in branch 'packages'. If your desired version is
- * available, you can also use the Macports repository.
+ * Flusspferd is included in the <a href="http://www.macports.org">Macports
+ * packaging system</a> since Macports 1.8. You can install Flusspferd with
  *
- * Otherwise, using the Portfile requires some additional steps.
- * See <a href="http://guide.macports.org/#development.local-repositories">
- * the Macport Guide on how to setup a local repository</a> to install
- * Flusspferd.
+ * @verbatim
+$ sudo port install flusspferd
+@endverbatim
+ *
+ * Different modules are available as variants. E.g. you can install the Flusspferd with the XML module by using
+ *
+ * @verbatim
+$ sudo port install flusspferd +xml
+@endverbatim
+ *
+ * See the <a href="http://guide.macports.org/">Macports Manual</a> for more information.
  */

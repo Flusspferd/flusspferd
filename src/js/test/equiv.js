@@ -54,6 +54,7 @@ function hoozit(o) {
     } else if (o instanceof Function) {
         return "function";
     }
+    return "unknown";
 }
 
 // Call the o related callback with the given arguments.
@@ -66,6 +67,7 @@ function bindCallbacks(o, callbacks, args) {
             return callbacks[prop]; // or undefined
         }
     }
+    return undefined;
 }
 
 var equiv = function () {

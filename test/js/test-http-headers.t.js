@@ -1,8 +1,9 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +24,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_PARSE_HPP
-#define FLUSSPFERD_XML_PARSE_HPP
+const asserts = require('test').asserts,
+      HTTP = require('http/headers');
 
-#include "flusspferd/object.hpp"
-#include "flusspferd/binary.hpp"
+if (!this.exports) this.exports = {};
 
-namespace flusspferd { namespace xml {
+exports.test_simple = function() {
+  const hdr_str = "Content-type: text/html; charset=utf8\r\n";
+  asserts.same(
+    HTTP.Headers.parse(hdr_str),
+    new HTTP.Headers({"Content-Type": "text/html; charset=utf8"})
+  );
+}
 
-object parse_binary(binary &b, object options);
-object parse_file(string filename, object options);
-object html_parse_binary(binary &b, object options);
-object html_parse_file(string filename, object options);
+exports.test_multiline = function() {
+  const hdr_str = "Set-Cookie: value=foo\r\n   bar;path=/\r\n";
 
-}}
+  var got = HTTP.Headers.parse(hdr_str);
+  asserts.same(
+    got,
+    new HTTP.Headers({"Set-Cookie": "value=foo bar;path=/"}),
+    "multi-line header parsed okay"
+  );
+}
 
-#endif
+if (require.main === module)
+  require('test').runner(exports);

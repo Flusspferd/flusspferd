@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -59,8 +60,38 @@ value evaluate(char const *source, std::size_t n,
  * @param file The file name to use.
  * @param line The initial line number.
  * @param scope The scope 
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
  */
 value evaluate_in_scope(char const* source, std::size_t n,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
+ */
+value evaluate_in_scope(std::string const &source,
+                        char const* file, unsigned int line,
+                        object const &scope);
+
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope 
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
+ */
+value evaluate_in_scope(char const *source,
                         char const* file, unsigned int line,
                         object const &scope);
 
@@ -95,6 +126,32 @@ value evaluate(std::string const &source, char const *file = 0x0,
  * @param scope The scope to use.
  */
 value execute(char const *file, object const &scope = object());
+
+/**
+ * Check if the Code is Compileable
+ *
+ * @param source The code to check.
+ * @param length The length of the code.
+ * @param scope The scope to use.
+ */
+bool is_compilable(char const *source, std::size_t length,
+                    object const &scope = object());
+
+/**
+ * Check if the Code is Compileable
+ *
+ * @param source The source code to check
+ * @param scope The scope to use.
+ */
+bool is_compilable(char const *source, object const &scope = object());
+
+/**
+ * Check if the Code is Compileable
+ *
+ * @param source The source code to check
+ * @param scope The scope to use.
+ */
+bool is_compilable(std::string const &source, object const &scope = object());
 
 //@}
 
