@@ -77,6 +77,13 @@ option(RELOCATABLE "Whether the binary should be relocatable" ON)
 
 if(RELOCATABLE)
     add_definitions("-DFLUSSPFERD_RELOCATABLE")
+    # TODO: should should probably use some relative_to funciton to be smarter
+    # That or being settable from a cmake option
+    add_definitions("-DFLUSSPFERD_ETC_PATH=\"../etc/flusspferd\"")
+    set(INSTALL_RELATIVE_MODULES_PATH "../lib/flusspferd/modules")
+    set(INSTALL_RELATIVE_LIBDATA_PATH "../lib/flusspferd")
+else()
+    add_definitions("-DFLUSSPFERD_ETC_PATH=\"${INSTALL_ETC_PATH}\"")
 endif()
 
 set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})

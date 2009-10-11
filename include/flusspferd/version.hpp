@@ -32,6 +32,7 @@ THE SOFTWARE.
 namespace flusspferd {
 
 std::string version();
+bool is_relocatable();
 
 }
 
