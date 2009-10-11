@@ -56,14 +56,20 @@ void flusspferd::load_encodings_module(object container) {
   load_class<encodings::transcoder>(exports);
 }
 
-// HELPER METHODS
+// the UTF-16 bom is codepoint U+feff
+static char16_t const bom_le = *(char16_t*)"\xff\xfe";
+static char16_t const bom_native = 0xfeff;
+
+static char const * const native_charset = bom_le == bom_native
+                                         ? "utf-16le" : "utf-16be";
+
 
 // JAVASCRIPT METHODS
 
 flusspferd::string
 encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
   transcoder &trans =
-    create_native_object<transcoder>(object(), enc_, "utf-8");
+    create_native_object<transcoder>(object(), enc_, native_charset);
   root_object root_obj(trans);
 
   trans.push_accumulate(source_binary);
@@ -71,20 +77,20 @@ encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
   binary &out = trans.close(boost::none);
 
   return flusspferd::string(
-    reinterpret_cast<char const *>(&out.get_data()[0]),
-    out.get_length());
+    reinterpret_cast<char16_t const *>(&out.get_data()[0]),
+    out.get_length() / sizeof(char16_t));
 }
 
 object encodings::convert_from_string(std::string const &enc, string const &str)
 {
   transcoder &trans =
-    create_native_object<transcoder>(object(), "utf-8", enc);
+    create_native_object<transcoder>(object(), native_charset, enc);
   root_object root_obj(trans);
 
   binary &source_binary = create_native_object<byte_string>(
     object(),
-    reinterpret_cast<binary::element_type const *>(str.c_str()),
-    std::strlen(str.c_str()));
+    reinterpret_cast<binary::element_type const *>(str.data()),
+    str.size() * sizeof(char16_t));
   root_object root_obj2(source_binary);
 
   trans.push_accumulate(source_binary);
