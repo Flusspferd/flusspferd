@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/modules.hpp"
 
 #include <js/jsapi.h>
 
@@ -82,36 +83,20 @@ value flusspferd::execute(char const *filename, object const &scope_) {
 
   local_root_scope root_scope;
 
-  FILE *file = fopen(filename, "r");
-  if (!file) {
-    throw exception((std::string("Could not open '") + filename + "'").c_str());
-  }
- 
-  /*
-   * It's not interactive - just execute it.
-   *
-   * Support the UNIX #! shell hack; gobble the first line if it starts
-   * with '#'. TODO - this isn't quite compatible with sharp variables,
-   * as a legal js program (using sharp variables) might start with '#'.
-   * But that would require multi-character lookahead.
-   */
-  int ch = fgetc(file);
-  if (ch == '#') {
-      while((ch = fgetc(file)) != EOF) {
-          if (ch == '\n' || ch == '\r')
-              break;
-      }
-  }
-  ungetc(ch, file);
+  string module_text = require::load_module_text(filename);
 
   JSObject *scope = Impl::get_object(scope_);
 
   if (!scope)
     scope = Impl::get_object(flusspferd::global());
- 
+
   int oldopts = JS_GetOptions(cx);
   JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
-  JSScript *script = JS_CompileFileHandle(cx, scope, filename, file);
+  JSScript *script = JS_CompileUCScript(
+    cx, scope,
+    module_text.data(), module_text.length(),
+    filename, 1ul
+  );
 
   if (!script) {
     exception e("Could not compile script");
@@ -122,9 +107,9 @@ value flusspferd::execute(char const *filename, object const &scope_) {
   JS_SetOptions(cx, oldopts);
 
   value result;
- 
+
   JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
- 
+
   if (!ok) {
     exception e("Script execution failed");
     if (!e.empty()) {
