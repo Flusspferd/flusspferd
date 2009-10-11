@@ -28,14 +28,20 @@ THE SOFTWARE.
 #include "flusspferd/load_core.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
+#include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
 #include <boost/optional.hpp>
+#include <vector>
+#include <stdlib.h>
 
 using boost::optional;
 static optional<std::string> get_exe_name();
+static std::string get_exe_name_from_argv(std::string const &argv0);
 
 using namespace flusspferd;
+namespace fs = boost::filesystem;
 
-void flusspferd::load_flusspferd_module(object container) {
+void flusspferd::load_flusspferd_module(object container, std::string const &argv0) {
   object exports = container.get_property_object("exports");
 
   exports.define_property(
@@ -70,10 +76,66 @@ void flusspferd::load_flusspferd_module(object container) {
       value(io::fs_base::canonicalize(*exe).string()),
       read_only_property | permanent_property);
   }
+  else {
+    // Fall back to processing argv[0]
+    exports.define_property(
+      "executableName",
+      value(get_exe_name_from_argv(argv0)),
+      read_only_property | permanent_property);
+  }
 }
 
 std::string flusspferd::version() {
   return FLUSSPFERD_VERSION;
+}
+
+// The fallback mechanism if platform specific method doesn't exist or failed
+// 1. see if the file exists - if so canonicalize it
+// 2. failing that, search in the path for binary named argv0
+// 3. set it to argv0. Probably not usable, but oh well
+std::string get_exe_name_from_argv(std::string const &argv0) {
+  fs::path name(argv0);
+
+  // 1. See if the file exists
+  // Relative path. Complete using the initial value of cwd
+  if(!name.has_root_path()) {
+    name = fs::initial_path<fs::path>() / name;
+  }
+
+  fs::file_status s = fs::status(name);
+  if (fs::exists(s) && !fs::is_directory(s)) {
+    return io::fs_base::canonicalize(name).string();
+  }
+
+  // 2. search on the path
+  char* path = getenv("PATH");
+
+  if (!path)
+    return argv0;
+
+  // Reset it incase we prepended the cwd to it
+  name = argv0;
+  #ifdef WIN32
+    name.replace_extension(".exe");
+
+    char const *path_delim = ";";
+  #else
+    char const *path_delim = ":";
+  #endif
+
+  std::vector<std::string>path_dirs;
+  boost::split(path_dirs, path, boost::is_any_of(path_delim));
+
+  BOOST_FOREACH(std::string &d, path_dirs) {
+    fs::path candidate = fs::path(d) / name;
+    fs::file_status s = fs::status(candidate);
+    if (fs::exists(s) && !fs::is_directory(s)) {
+      return io::fs_base::canonicalize(candidate).string();
+    }
+  }
+
+  // 3. Failure case is return whatever is in argv[0]
+  return argv0;
 }
 
 // Various platform specific ways to get the path to the flusspferd interpreter
@@ -158,7 +220,6 @@ std::string flusspferd::version() {
 #elif defined(FLUSSPFERD_SELF_EXE_getexecname)
   // Solaris version
 
-  #include <stdlib.h>
   optional<std::string> get_exe_name() {
     char const * name = getexecname();
     return name ? name : boost::none;

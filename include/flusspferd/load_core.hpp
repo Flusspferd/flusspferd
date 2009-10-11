@@ -27,12 +27,14 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_LOAD_CORE_HPP
 #define FLUSSPFERD_LOAD_CORE_HPP
 
+#include <string>
+
 namespace flusspferd {
 
 class object;
 
-void load_core(object const &scope);
-void load_flusspferd_module(object container);
+void load_core(object const &scope, std::string const &argv0);
+void load_flusspferd_module(object container, std::string const &argv0);
 }
 
 #endif
