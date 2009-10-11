@@ -145,7 +145,7 @@ void require::call(call_context &x) {
 
 #include <iostream>
 
-string transcode_js_file(fs::path filename) {
+string require::load_module_text(fs::path filename) {
   io::file &f = create_native_object<io::file>(
     object(),
     filename.string().c_str(),
@@ -193,7 +193,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
 
   local_root_scope root_scope;
 
-  string module_text = transcode_js_file(filename);
+  string module_text = load_module_text(filename);
 
   std::vector<std::string> argnames;
   argnames.push_back("exports");

@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "native_function_base.hpp"
 #include <boost/filesystem.hpp>
 
-namespace flusspferd { 
+namespace flusspferd {
 
 /**
  * Load the 'require()' function into @p container.
@@ -122,6 +122,8 @@ public:
    * properties on the function object itself
    */
   static object create_require();
+
+  static string load_module_text(boost::filesystem::path filename);
 
   /// Create a sub-%require object for the given module id
   object new_require_function(string const &id);
