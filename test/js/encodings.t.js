@@ -51,6 +51,13 @@ exports.test_convertToString = function() {
   asserts.same(str, "\xE9")
 }
 
+exports.test_convertFromString = function() {
+  var blob = encodings.convertFromString("utf-8", "\xE9");
+  asserts.same(blob.toArray(), [0xC3,0xA9], "FromString(utf-8) correct (escaped source)" )
+
+  blob = encodings.convertFromString("utf-8", "é");
+  asserts.same(blob.toArray(), [0xC3,0xA9], "FromString(utf-8) correct (literal in source)" )
+}
 
 exports.test_convertToStringUTF16 = function() {
   var str = encodings.convertToString("utf-16", e_accute_utf16);
