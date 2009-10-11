@@ -49,18 +49,12 @@ void flusspferd::load_flusspferd_module(object container, std::string const &arg
     value(flusspferd::version()),
     read_only_property | permanent_property);
 
-#ifdef FLUSSPFERD_RELOCATABLE
   exports.define_property(
     "relocatable",
-    value(true),
+    value(is_relocatable()),
     read_only_property | permanent_property);
 
-#else
-  exports.define_property(
-    "relocatable",
-    value(false),
-    read_only_property | permanent_property);
-
+#ifndef FLUSSPFERD_RELOCATABLE
   exports.define_property(
     "installPrefix",
     value(INSTALL_PREFIX),
@@ -83,6 +77,14 @@ void flusspferd::load_flusspferd_module(object container, std::string const &arg
       value(get_exe_name_from_argv(argv0)),
       read_only_property | permanent_property);
   }
+}
+
+bool flusspferd::is_relocatable() {
+#ifdef FLUSSPFERD_RELOCATABLE
+  return true;
+#else
+  return false;
+#endif
 }
 
 std::string flusspferd::version() {

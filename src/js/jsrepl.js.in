@@ -24,6 +24,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require.paths.push('.', '@INSTALL_MODULES_PATH@');
+if (require('flusspferd').relocatable) {
+  var binDir = require('flusspferd').executableName
+                                    .replace(/flusspferd(?:\.exe)?/, '');
 
-prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+  require.paths.push('.', binDir + '@INSTALL_RELATIVE_MODULES_PATH@');
+
+  prelude = binDir + '@INSTALL_RELATIVE_LIBDATA_PATH@prelude.js';
+} else {
+  require.paths.push('.', '@INSTALL_MODULES_PATH@');
+
+  prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
+}
