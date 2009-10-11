@@ -25,7 +25,41 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/version.hpp"
+#include "flusspferd/load_core.hpp"
+#include "flusspferd/create.hpp"
+
+using namespace flusspferd;
+
+void flusspferd::load_flusspferd_module(object container) {
+  object exports = container.get_property_object("exports");
+
+  exports.define_property(
+    "version",
+    value(flusspferd::version()),
+    read_only_property | permanent_property);
+
+#ifdef FLUSSPFERD_RELOCATABLE
+  exports.define_property(
+    "relocatable",
+    value(true),
+    read_only_property | permanent_property);
+
+#else
+  exports.define_property(
+    "relocatable",
+    value(false),
+    read_only_property | permanent_property);
+
+  exports.define_property(
+    "installPrefix",
+    value(INSTALL_PREFIX),
+    read_only_property | permanent_property);
+
+#endif
+
+}
 
 std::string flusspferd::version() {
   return FLUSSPFERD_VERSION;
-} 
+}
+

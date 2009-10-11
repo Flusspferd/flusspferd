@@ -108,27 +108,12 @@ void flusspferd::load_system_module(object &context) {
     value("flusspferd"),
     read_only_property | permanent_property);
 
+  // TODO: Remove this in a future version - its no on the flusspferd module:
+  //  require('flusspferd').version
   exports.define_property(
     "xFlusspferdVersion",
     value(flusspferd::version()),
     read_only_property | permanent_property);
-
-#ifndef XX_FLUSSPFERD_RELOCATABLE
-  exports.define_property(
-    "xFlusspferdRelocatable",
-    value(false),
-    read_only_property | permanent_property);
-
-  exports.define_property(
-    "xFlusspferdPrefix",
-    value(INSTALL_PREFIX),
-    read_only_property | permanent_property);
-#else
-  exports.define_property(
-    "xFlusspferdRelocatable",
-    value(true),
-    read_only_property | permanent_property);
-#endif
 }
 
 
