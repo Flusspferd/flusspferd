@@ -27,6 +27,11 @@ THE SOFTWARE.
 #include "flusspferd/version.hpp"
 #include "flusspferd/load_core.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
+#include <boost/optional.hpp>
+
+using boost::optional;
+static optional<std::string> get_exe_name();
 
 using namespace flusspferd;
 
@@ -57,9 +62,112 @@ void flusspferd::load_flusspferd_module(object container) {
 
 #endif
 
+  optional<std::string> exe = get_exe_name();
+
+  if (exe) {
+    exports.define_property(
+      "executableName",
+      value(io::fs_base::canonicalize(*exe).string()),
+      read_only_property | permanent_property);
+  }
 }
 
 std::string flusspferd::version() {
   return FLUSSPFERD_VERSION;
 }
 
+// Various platform specific ways to get the path to the flusspferd interpreter
+// Only Linux and OSX have been tested. Others are roughly correct
+
+#if defined(FLUSSPFERD_SELF_EXE__NSGetExecutablePath)
+  // OSX Version
+
+  #include <vector>
+  #include <mach-o/dyld.h>
+
+  optional<std::string> get_exe_name() {
+    std::vector<char> buf;
+    buf.resize(1024);
+    unsigned size = buf.size();
+
+    int ret = _NSGetExecutablePath(&buf[0], &size);
+    if (ret == -1) {
+      // Buffer wasn't large enough. size now contains the size needed
+      buf.resize(size+1);
+      ret = _NSGetExecutablePath(&buf[0], &size);
+    }
+
+    if (ret == 0)
+      return std::string(buf.begin(), buf.begin() + size);
+    else
+      return boost::none;
+  }
+
+#elif defined(FLUSSPFERD_SELF_EXE_proc_self_exe) || \
+      defined(FLUSSPFERD_SELF_EXE_proc_curproc_file)
+  // BSD and Linux Versions are similar - just different symlink to read
+
+  optional<std::string> get_exe_name() {
+  #ifdef FLUSSPFERD_SELF_EXE_proc_self_exe
+    char const *link_name = "/proc/self/exe";
+  #else
+    char const *link_name = "/proc/curproc/file";
+  #endif
+
+    // The procfs might not be mounted.
+    if (boost::filesystem::is_symlink(link_name))
+      // This will be canonicalized outside.
+      return link_name;
+    else
+      return boost::none;
+  }
+
+#elif defined(FLUSSPFERD_SELF_EXE_sysctl_PROC_PPATHNAME)
+  // FreeBSD version
+
+  #include <sys/types.h>
+  #include <sys/sysctl.h>
+  #include <unistd.h>
+
+  optional<std::string> get_exe_name() {
+    int mib[4];
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PATHNAME;
+    mib[3] = -1;
+    char buf[MAX_PATH];
+    size_t cb = sizeof(buf);
+    if (sysctl(mib, 4, &cb, NULL, 0) == 0)
+      return std::string(buf);
+    else
+      return boost::none;
+  }
+
+#elif defined(FLUSSPFERD_SELF_EXE_GetModuleFilename)
+  // Windows version
+
+  #include <windows.h>
+  optional<std::string> get_exe_name() {
+    char buf[MAX_PATH];
+    if (GetModuleFileName( NULL, buf, MAX_PATH))
+      return buf;
+    else
+      return boost::none;
+  }
+
+#elif defined(FLUSSPFERD_SELF_EXE_getexecname)
+  // Solaris version
+
+  #include <stdlib.h>
+  optional<std::string> get_exe_name() {
+    char const * name = getexecname();
+    return name ? name : boost::none;
+  }
+
+#else
+
+  optional<std::string> get_exe_name() {
+    return boost::none;
+  }
+
+#endif
