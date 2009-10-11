@@ -36,14 +36,24 @@ THE SOFTWARE.
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/create.hpp"
 
+#include <boost/filesystem.hpp>
+#include <boost/spirit/home/phoenix/core.hpp>
+#include <boost/spirit/home/phoenix/bind.hpp>
+#include <boost/spirit/home/phoenix/operator.hpp>
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
+
 using namespace flusspferd;
 
 namespace flusspferd { namespace detail {
   extern char const * const json2;
 }}
 
-void flusspferd::load_core(object const &scope_) {
+void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   object scope = scope_;
+
+  // Initalize boost's copy of cwd as early as possible
+  boost::filesystem::initial_path<boost::filesystem::path>();
 
   flusspferd::load_require_function(scope);
   flusspferd::load_properties_functions(scope);
@@ -86,9 +96,12 @@ void flusspferd::load_core(object const &scope_) {
     preload, "filesystem-base",
     &flusspferd::load_filesystem_base_module);
 
+  // Curry argv[0] into the preload function
   flusspferd::create_native_method(
     preload, "flusspferd",
-    &flusspferd::load_flusspferd_module);
+    boost::function<void (object)>((
+      phoenix::bind(&flusspferd::load_flusspferd_module, args::arg1, argv0)
+    )));
 
   if (!scope_.has_own_property("JSON")) {
     flusspferd::evaluate_in_scope(

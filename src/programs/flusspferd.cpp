@@ -125,7 +125,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::security::create(g);
 
-  flusspferd::load_core(g);
+  flusspferd::load_core(g, argv[0]);
 
   flusspferd::create_native_function<void (int)>(
     g, "quit",
