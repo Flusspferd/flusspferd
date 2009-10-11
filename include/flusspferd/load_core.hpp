@@ -32,7 +32,7 @@ namespace flusspferd {
 class object;
 
 void load_core(object const &scope);
-
+void load_flusspferd_module(object container);
 }
 
 #endif

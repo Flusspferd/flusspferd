@@ -188,6 +188,7 @@ check_cxx_source_runs(
 ## /proc/self/exe ###########################################################
 
 if(RELOCATABLE)
+    add_definitions(-DFLUSSPFERD_RELOCATABLE)
     include(FindSelfExe)
 endif()
 

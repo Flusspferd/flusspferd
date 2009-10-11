@@ -86,6 +86,10 @@ void flusspferd::load_core(object const &scope_) {
     preload, "filesystem-base",
     &flusspferd::load_filesystem_base_module);
 
+  flusspferd::create_native_method(
+    preload, "flusspferd",
+    &flusspferd::load_flusspferd_module);
+
   if (!scope_.has_own_property("JSON")) {
     flusspferd::evaluate_in_scope(
       detail::json2,
