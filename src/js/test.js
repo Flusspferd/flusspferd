@@ -382,11 +382,7 @@ Object.defineProperty( exports, "__currentSuite__", {
 
 
 
-
-const Asserts = function() {
-}
-
-merge(Asserts.prototype, {
+exports.asserts = {
   same: function(got, expected, message) {
 
     var ok = !!equiv(got, expected);
@@ -434,14 +430,36 @@ merge(Asserts.prototype, {
     } );
   },
 
+  matches: function matches(value, re, msg) {
+    if (re instanceof RegExp == false) {
+      re = new RegExp(re);
+    }
+    var ok = !!re(value);
+
+    var a = {
+      type: 'matches',
+      ok: ok,
+      when: new Date(),
+      message: msg,
+      defaultMsg: "matches " + re,
+    };
+
+    if (!ok) {
+      a.diag = (value === undefined
+                ? "undefined"
+                : uneval(value))
+             + "\nDidn't Match: " + re
+    }
+
+    return exports.__currentSuite__.do_assert(a);
+  },
+
   diag: function diag() {
     var suite = exports.__currentSuite__;
     suite.diag.apply(suite, arguments);
   }
 
-});
-
-exports.asserts = new Asserts();
+};
 
 
 /*

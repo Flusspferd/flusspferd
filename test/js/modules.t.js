@@ -5,8 +5,7 @@ let test = require('test'),
 
 
 exports.test_RequireId = function () {
-  // Not sure what require.id should be. it ceratinly shouldn't be 'system'
-  asserts.same(require.id, "test/js/modules.t.js");
+  asserts.matches(require.id, "test/js/modules.t.js$");
 }
 
 exports.test_InstanceOf = function () {
