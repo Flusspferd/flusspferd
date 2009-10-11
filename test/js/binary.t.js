@@ -4,7 +4,7 @@ const asserts = require('test').asserts;
 if (!this.exports) this.exports = {};
 
 exports.test_decodeToString = function() {
-	b = binary.ByteString([65, 66]);
+	var b = binary.ByteString([65, 66]);
 	asserts.same(b.decodeToString(), "AB");
 }
 

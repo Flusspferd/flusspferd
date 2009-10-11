@@ -31,12 +31,13 @@ const asserts = require('test').asserts,
 var sqlite_test_helper = {}
 
 sqlite_test_helper.get_db = function(){
-    db = sqlite3.SQLite3(':memory:')
-    db.exec('CREATE TABLE test_table(int_val INTEGER, str_val TEXT, bin_val BLOB)')    
+    var db = sqlite3.SQLite3(':memory:')
+    db.exec('CREATE TABLE test_table(int_val INTEGER, str_val TEXT, bin_val BLOB)')
     return db
 }
 
 sqlite_test_helper.get_test_statements = function(){
+    var data;
     data = [[ 1, "one",     sqlite3_testblob ],
             [ 2, "two",     sqlite3_testblob ],
             [ 3, "three",   sqlite3_testblob ],
@@ -45,104 +46,108 @@ sqlite_test_helper.get_test_statements = function(){
             [ 6, "six",     sqlite3_testblob ],
             [ 7, "seven",   sqlite3_testblob ],
             [ 8, "eight",   sqlite3_testblob ]]
-    
+
     return [{
-            sql: 'INSERT INTO test_table VALUES(?,?,?)', 
+            sql: 'INSERT INTO test_table VALUES(?,?,?)',
             data: data[0],
             bind: data[0]
         },{
-            sql: 'INSERT INTO test_table VALUES(:first,:second,:third)', 
+            sql: 'INSERT INTO test_table VALUES(:first,:second,:third)',
             data: data[1],
-            bind: { 
-                first:  data[1][0], 
-                second: data[1][1], 
+            bind: {
+                first:  data[1][0],
+                second: data[1][1],
                 third:  data[1][2]
         }},{
-            sql: 'INSERT INTO test_table VALUES(?1,?2,?3)', 
+            sql: 'INSERT INTO test_table VALUES(?1,?2,?3)',
             data: data[2],
             bind: data[2]
         },{
-            sql: 'INSERT INTO test_table VALUES($first,$second,$third)', 
+            sql: 'INSERT INTO test_table VALUES($first,$second,$third)',
             data: data[3],
             bind: {
-                first:  data[3][0], 
-                second: data[3][1], 
+                first:  data[3][0],
+                second: data[3][1],
                 third:  data[3][2]
         }},{
-            sql: 'INSERT INTO test_table VALUES(@first,@second,@third)', 
+            sql: 'INSERT INTO test_table VALUES(@first,@second,@third)',
             data: data[4],
-            bind: { 
-                first:  data[4][0], 
-                second: data[4][1], 
-                third:  data[4][2], 
+            bind: {
+                first:  data[4][0],
+                second: data[4][1],
+                third:  data[4][2],
         }},{
-            sql: 'INSERT INTO test_table VALUES(:first,$second,@third)', 
-            data: data[5], 
-            bind: { 
-                first:   data[5][0], 
-                second:  data[5][1],  
-                third:   data[5][2], 
+            sql: 'INSERT INTO test_table VALUES(:first,$second,@third)',
+            data: data[5],
+            bind: {
+                first:   data[5][0],
+                second:  data[5][1],
+                third:   data[5][2],
         }},{
-            sql: 'INSERT INTO test_table VALUES(:first,$second,@third)', 
+            sql: 'INSERT INTO test_table VALUES(:first,$second,@third)',
             data: data[6],
-            bind: { 
+            bind: {
                 ":first":   data[6][0],
                 "$second":  data[6][1],
                 "@third":   data[6][2],
         }},{
-            sql: 'INSERT INTO test_table VALUES(?1,?2,?3)', 
+            sql: 'INSERT INTO test_table VALUES(?1,?2,?3)',
             data: data[7],
             bind: data[7]
-        }]
+        }];
 }
 
 exports.sqlite_test_sqlite3_usage = function() {
-    db = sqlite_test_helper.get_db()
+    var db = sqlite_test_helper.get_db();
 }
 
 exports.test_sqlite3_placeholder_exec = function() {
-    db = sqlite_test_helper.get_db()
-    data = sqlite_test_helper.get_test_statements()
-    for(idx in data){
-        db.exec(data[idx].sql, data[idx].bind)
+    var db = sqlite_test_helper.get_db();
+    var data = sqlite_test_helper.get_test_statements();
+    for(idx in data) {
+        db.exec(data[idx].sql, data[idx].bind);
     }
 }
 
-exports.test_sqlite3_placeholder_execMany = function(db) {
-    db = sqlite_test_helper.get_db()
-    db.execMany(sqlite_test_helper.get_test_statements())
+exports.test_sqlite3_placeholder_execMany = function() {
+    var db = sqlite_test_helper.get_db();
+    db.execMany(sqlite_test_helper.get_test_statements());
 }
 
 exports.test_sqlite3_placeholder_query_row_array = function() {
-    db = sqlite_test_helper.get_db()
-    data = sqlite_test_helper.get_test_statements()
-    
-    db.execMany(data)
-    cur = db.query("SELECT * from test_table")
-    index = 0
+    var db = sqlite_test_helper.get_db();
+    var data = sqlite_test_helper.get_test_statements();
+
+    db.execMany(data);
+    var cur = db.query("SELECT * from test_table"),
+        index = 0,
+        row;
+
     while((row = cur.next()) != null){
-        asserts.same(row[0], data[index].data[0])
-        asserts.same(row[1], data[index].data[1])
-        asserts.same(row[2].toArray(), data[index].data[2].toArray())
-        ++index
+        asserts.same(row[0], data[index].data[0]);
+        asserts.same(row[1], data[index].data[1]);
+        asserts.same(row[2].toArray(), data[index].data[2].toArray());
+        ++index;
     }
-    asserts.same(index, data.length)    
+    asserts.same(index, data.length);
 }
 
 exports.test_sqlite3_placeholder_query_row_object = function() {
-    db = sqlite_test_helper.get_db()
-    data = sqlite_test_helper.get_test_statements()
-    
-    db.execMany(data)
-    cur = db.query("SELECT * from test_table")
-    index = 0
+    var db = sqlite_test_helper.get_db();
+    var data = sqlite_test_helper.get_test_statements();
+
+    db.execMany(data);
+    var cur = db.query("SELECT * from test_table"),
+        index = 0,
+        row;
+
     while((row = cur.next(true)) != null){
-        asserts.same(row.int_val, data[index].data[0])
-        asserts.same(row.str_val, data[index].data[1])
-        asserts.same(row.bin_val.toArray(), data[index].data[2].toArray())
-        ++index
+        asserts.same(row.int_val, data[index].data[0]);
+        asserts.same(row.str_val, data[index].data[1]);
+        asserts.same(row.bin_val.toArray(), data[index].data[2].toArray());
+        ++index;
     }
-    asserts.same(index, data.length)    
+    asserts.same(index, data.length);
 }
 
 if (require.main === module)
