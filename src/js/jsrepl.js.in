@@ -30,7 +30,7 @@ if (require('flusspferd').relocatable) {
 
   require.paths.push('.', binDir + '@INSTALL_RELATIVE_MODULES_PATH@');
 
-  prelude = binDir + '@INSTALL_RELATIVE_LIBDATA_PATH@prelude.js';
+  prelude = binDir + '@INSTALL_RELATIVE_LIBDATA_PATH@/prelude.js';
 } else {
   require.paths.push('.', '@INSTALL_MODULES_PATH@');
 
