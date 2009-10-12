@@ -181,7 +181,7 @@ std::string get_exe_name_from_argv(std::string const &argv0) {
     // The procfs might not be mounted.
     if (boost::filesystem::is_symlink(link_name))
       // This will be canonicalized outside.
-      return link_name;
+      return std::string(link_name);
     else
       return boost::none;
   }
