@@ -141,7 +141,6 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
   p /=  boost::filesystem::path(FLUSSPFERD_ETC_PATH)
     /   std::string("jsrepl.js");
   config_file = p.string();
-  std::cout << "new config: " << config_file << "\n";
 #endif
 
   flusspferd::create_native_function<void (int)>(
