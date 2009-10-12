@@ -125,7 +125,6 @@ void file::open(char const *name, value options) {
 
   if (options.is_string()) {
     // String modes always set create
-    create = true;
 
     std::string mode = options.to_std_string();
     if (mode == "r")
@@ -136,8 +135,10 @@ void file::open(char const *name, value options) {
       open_mode = std::ios::in | std::ios::out;
       exclusive = create = true;
     }
-    else if (mode == "w")
+    else if (mode == "w") {
       open_mode = std::ios::out;
+      create = true;
+    }
     else if (mode == "wx") {
       open_mode = std::ios::out;
       exclusive = create = true;
@@ -195,7 +196,7 @@ void file::open(char const *name, value options) {
     unsigned o_mode = exclusive
                     ? O_CREAT|O_EXCL
                     : O_CREAT;
-    int fd = ::open(name, o_mode);
+    int fd = ::open(name, o_mode, 0666);
     if (fd == -1)
       throw exception(compose_error_message("File.open: couldn't create file", name));
 
