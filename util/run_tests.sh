@@ -56,6 +56,13 @@ done
 ./util/jsrepl.sh -e 'require("test").prove("./test/js")'
 status=$(($status + $?))
 
+
+# This test behaves differently/tests different things based on if its the main
+# module or not. Until we have a nice way of shelling out and starting new
+# processes in tests, test it this way too
+./util/jsrepl.sh ./test/js/modules.t.js
+status=$(($status + $?))
+
 #echo "PROGRESS: Analyzing test coverage" 1>&2
 #
 #./util/lcov.sh
