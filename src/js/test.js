@@ -340,7 +340,8 @@ exports.prove = function prove() {
 
   function findTests(files) {
     for ([,x] in Iterator(files) ) {
-      if (x.match(/^\.(?!\/)/))
+      // Ingore "." dot-files
+      if (x.match(/(?:^|[\/\\])\.[^\/]*$/))
         continue;
 
       if (fs.isDirectory(x)) {
