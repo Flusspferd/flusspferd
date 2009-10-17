@@ -122,7 +122,7 @@ fs::path fs_base::canonicalize(fs::path in) {
     // dir is relative!
     accum = fs::system_complete(".");
     if (*--accum.end() == ".")
-      accum.remove_filename();
+      accum = accum.parent_path();
   }
 
   BOOST_FOREACH(fs::path seg, in) {
@@ -131,7 +131,7 @@ fs::path fs_base::canonicalize(fs::path in) {
 
     // We've already canon'd the path's parent, so just remove the last dir
     if (seg == "..") {
-      accum = accum.remove_filename();
+      accum = accum.parent_path();
       continue;
     }
 
