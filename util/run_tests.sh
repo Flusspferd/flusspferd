@@ -37,18 +37,24 @@ fi
 
 echo "PROGRESS: Running tests" 1>&2
 
+status=0
 for prog in ./build/bin/test_*
 do
   if [ -x $prog ]
   then
     echo "Testing '$prog'" 1>&2
     $prog 2>&1
+    last_status=$?
+    echo status: $last_status
+    echo
+    status=$(($status + $last_status))
   fi
 done
 
 # TODO: This probably wont update the coverage for what C++ parts that the JS
 # hits. It should do.
 ./util/jsrepl.sh -e 'require("test").prove("./test/js")'
+status=$(($status + $?))
 
 #echo "PROGRESS: Analyzing test coverage" 1>&2
 #
@@ -59,3 +65,8 @@ done
 #echo "PROGRESS: Visualizing test coverage" 1>&2
 #
 #./util/genhtml.sh
+
+echo ""
+/bin/echo -n "Test Suite Status: "
+[  $status -ne 0 ] && echo 'failed' || echo 'success'
+echo
