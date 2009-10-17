@@ -82,7 +82,7 @@ class flusspferd_repl {
   std::list<std::pair<std::string, Type> > files;
 
   flusspferd::object option_spec();
-  
+
   // Returns list of files / expressions to execute
   void parse_cmdline();
   void print_help(bool do_quit = false);
@@ -100,6 +100,8 @@ class flusspferd_repl {
     throw flusspferd::js_quit();
   }
 
+  void run_cmdline();
+  void repl_loop();
 public:
   flusspferd_repl(int argc, char** argv);
 
@@ -153,6 +155,24 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 }
 
 int flusspferd_repl::run() {
+  try {
+    run_cmdline();
+  } catch (flusspferd::js_quit&) {
+    if (!interactive)
+      throw;
+  } catch (std::exception &e) {
+    if (interactive)
+      std::cerr << "ERROR: " << e.what() << '\n';
+    else
+      throw;
+  }
+
+  if (interactive)
+    repl_loop();
+  return exit_code;
+}
+
+void flusspferd_repl::run_cmdline() {
   parse_cmdline();
 
   if (!config_loaded)
@@ -191,9 +211,9 @@ int flusspferd_repl::run() {
       break;
     }
   }
-  
-  if (!interactive)
-    return exit_code;
+}
+
+void flusspferd_repl::repl_loop() {
 
 #ifdef HAVE_EDITLINE
   if (!machine_mode && !history_file.empty()) {
@@ -250,29 +270,35 @@ int flusspferd_repl::run() {
   if (!machine_mode && !history_file.empty())
     write_history(history_file.c_str());
 #endif
-
-  return exit_code;
 }
 
 void flusspferd_repl::print_help(bool do_quit) {
   std::cerr << "usage: " << argv[0] << " [option] ... [file | -] [arg] ...\n\nOptions\n"
             << flusspferd::getopt_help(option_spec());
 
-  if (do_quit)
+  if (do_quit) {
+    interactive = false;
     throw flusspferd::js_quit();
+  }
 }
 
 void flusspferd_repl::print_man() {
+  if (!interactive_set)
+    interactive = false;
   std::cout << flusspferd::getopt_man(option_spec());
   throw flusspferd::js_quit();
 }
 
 void flusspferd_repl::print_bash() {
+  if (!interactive_set)
+    interactive = false;
   std::cout << flusspferd::getopt_bash(option_spec());
   throw flusspferd::js_quit();
 }
 
 void flusspferd_repl::print_version() {
+  if (!interactive_set)
+    interactive = false;
   std::cout << "flusspferd shell version: " << FLUSSPFERD_VERSION << '\n';
   std::cout << "flusspferd library version: " << flusspferd::version() << '\n';
   std::cout.flush();
