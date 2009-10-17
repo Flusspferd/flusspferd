@@ -1,3 +1,5 @@
+const test_const_var = 'A const var at the top level of module a2';
+
 var a2 = require.id;
 a2_novar = "a2_novar";
 
