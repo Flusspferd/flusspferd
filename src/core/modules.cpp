@@ -65,7 +65,8 @@ require::require()
     module_cache(create_object()),
     paths(create_array()),
     alias(create_object()),
-    preload(create_object())
+    preload(create_object()),
+    main(create_object())
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
@@ -74,7 +75,8 @@ require::require(require const &rhs)
     module_cache(rhs.module_cache),
     paths(rhs.paths),
     alias(rhs.alias),
-    preload(rhs.preload)
+    preload(rhs.preload),
+    main(rhs.main)
 { }
 
 require::~require() {}
@@ -90,6 +92,7 @@ object require::create_require() {
   fn.define_property("paths", r->paths, perm_ro);
   fn.define_property("alias", r->alias, perm_ro);
   fn.define_property("preload", r->preload, perm_ro);
+  fn.define_property("main", r->main, perm_ro);
   return fn;
 }
 
@@ -103,6 +106,25 @@ object require::new_require_function(string const &id) {
   new_req.define_property("id", id, permanent_property|read_only_property);
 
   return new_req;
+}
+
+void require::set_main_module(std::string const &id_) {
+  id_classification type = classify_id(id_);
+
+  if (type == relative)
+    throw exception("require.main cannot be set using a relative id", "TypeError");
+
+  fs::path mod;
+  if (type == top_level) {
+    mod = find_top_level_js_module(id_, true).get_value_or("ARGH");
+  }
+  else {
+    mod = io::fs_base::canonicalize( id_.substr(strlen("file://")) );
+  }
+
+  std::string id = "file://" + mod.string();
+  main.set_property("id", id);
+  main.set_property("uri", id);
 }
 
 // The implementation of the |require()| function that is available to JS
@@ -143,7 +165,6 @@ void require::call(call_context &x) {
   x.result = load_absolute_js_file(module_path, id);
 }
 
-#include <iostream>
 
 string require::load_module_text(fs::path filename) {
   io::file &f = create_native_object<io::file>(
@@ -205,9 +226,17 @@ void require::require_js(fs::path filename, std::string const &id, object export
       fname, argnames.size(), argnames,
       module_text, fname.c_str(), 1ul);
 
-  object module = create_object();
-  module.set_property("uri", id);
-  module.set_property("id", id);
+  object module;
+
+  // Are we requring the main module?
+  if (main.get_property("id")== id) {
+    module = main;
+  }
+  else {
+    module = create_object();
+    module.set_property("uri", id);
+    module.set_property("id", id);
+  }
 
   object require = new_require_function(id);
 
@@ -233,9 +262,9 @@ require::id_classification require::classify_id(std::string const &id) {
 fs::path require::resolve_relative_id(std::string const &id) {
 
   fs::path module(current_id().substr(strlen("file://")));
-  module.remove_filename();
+  module = module.parent_path();
 
-  return io::fs_base::canonicalize( module / id ).replace_extension(".js");
+  return io::fs_base::canonicalize( module / (id +".js") );
 }
 
 
@@ -362,7 +391,36 @@ object require::load_top_level_module(std::string &id) {
     }
   }
 
+  boost::optional<fs::path> js_name = find_top_level_js_module(id, !found);
+
+  if (js_name) {
+    found = true;
+    std::string new_id = "file://" + js_name->string();
+    // Check if we loaded something by this name previously, even if the file
+    // doesn't exist anymore
+    if (module_cache.has_own_property(new_id)) {
+      exports = module_cache.get_property_object(new_id);
+    }
+    else {
+      // Cache it under the top-level and fully-qualified ids
+      ExportsScopeGuard scope_guard2(module_cache, new_id);
+      module_cache.set_property(new_id, exports);
+
+      require_js(js_name.get(), new_id, exports);
+      scope_guard2.exit_cleanly();
+    }
+  }
+
+  scope_guard.exit_cleanly();
+
+  return exports;
+}
+
+boost::optional<fs::path>
+require::find_top_level_js_module(std::string const &id, bool fatal) {
   fs::path js_name = fs::path(id + ".js");
+
+  size_t len = paths.length();
 
   for (size_t i = 0; i < len; i++) {
     fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
@@ -373,36 +431,20 @@ object require::load_top_level_module(std::string &id) {
     // doesn't exist anymore
     std::string new_id = "file://" + js_path.string();
     if (module_cache.has_own_property(new_id)) {
-      exports = module_cache.get_property_object(new_id);
-      found = true;
-      break;
+      return js_path;
     }
 
-    if ( !fs::exists(js_path) )
-      continue;
-
-    found = true;
-
-    // Cache it under the top-level and fully-qualified ids
-    ExportsScopeGuard scope_guard2(module_cache, new_id);
-    module_cache.set_property(new_id, exports);
-
-    require_js(js_path, new_id, exports);
-    scope_guard2.exit_cleanly();
-    break;
+    if ( fs::exists(js_path) )
+      return js_path;
   }
 
-  if (found)
-    scope_guard.exit_cleanly();
-  else {
+  if (fatal) {
     std::stringstream ss;
     ss << "Unable to find library '" << id << "' in [" << paths << "]";
     throw exception(ss.str());
   }
-
-  return exports;
+  return boost::none;
 }
-
 
 object require::load_absolute_js_file(fs::path path, std::string &id) {
   security &sec = security::get();

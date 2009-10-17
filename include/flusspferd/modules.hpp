@@ -128,11 +128,14 @@ public:
   /// Create a sub-%require object for the given module id
   object new_require_function(string const &id);
 
+  /// Populate values in require.main for @c id
+  void set_main_module(std::string const &id);
 protected:
   object module_cache;
   array paths;
   object alias;
   object preload;
+  object main;
 
 
   std::string current_id();
@@ -147,6 +150,9 @@ protected:
                   object exports);
 
   static id_classification classify_id(std::string const &id);
+
+  boost::optional<boost::filesystem::path>
+  find_top_level_js_module(std::string const & id, bool not_found_is_fatal);
 
 };
 

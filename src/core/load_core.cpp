@@ -61,11 +61,7 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   flusspferd::object require_fn = scope.get_property_object("require");
 
   // Create the top level |module| and |exports| properties.
-  object module = create_object();
-  scope.define_property("module", module, dont_enumerate);
-
-  require_fn.define_property("main", module, read_only_property | permanent_property);
-
+  scope.define_property("module", require_fn.get_property("main"), dont_enumerate);
 
   object exports = create_object();
   scope.define_property("exports", exports, dont_enumerate);
