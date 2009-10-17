@@ -197,6 +197,13 @@ check_cxx_source_runs(
 if(RELOCATABLE)
     add_definitions(-DFLUSSPFERD_RELOCATABLE)
     include(FindSelfExe)
+    IF(APPLE)
+      SET(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS
+          "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -Wl,-x -flat_namespace")
+      SET(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
+          "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -Wl,-x -flat_namespace")
+    ENDIF(APPLE)
+
 endif()
 
 ## libdl ####################################################################
@@ -478,7 +485,8 @@ foreach(PLUGIN ${PLUGINS})
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
-    add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
+    # This might want to be MODULE on linux. OSX doesn't work properly with this as MODULE
+    add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
 
     set_property(
         TARGET ${PLUGIN}_PLUGIN
