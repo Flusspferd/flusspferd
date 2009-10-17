@@ -1,3 +1,5 @@
+const test_const_var = 'A const var at the top level of module a1';
+
 exports.id = require.id;
 exports.id_now = function() { return require.id };
 
