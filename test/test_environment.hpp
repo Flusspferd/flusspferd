@@ -28,11 +28,15 @@ THE SOFTWARE.
 #define FLUSSPFERD_TEST_ENVIRONMENT_HPP
 
 #include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/load_core.hpp"
+#include "flusspferd/security.hpp"
 #include <boost/test/unit_test.hpp>
 
 class context_fixture {
 public:
   context_fixture() : scope(flusspferd::context::create()) {
+    flusspferd::security::create(flusspferd::current_context().global());
+    flusspferd::load_core(flusspferd::current_context().global(), "exeName");
   }
 
   ~context_fixture() {

@@ -34,9 +34,9 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 
-#ifdef FLUSSPFERD_HAVE_IO
 
 BOOST_FIXTURE_TEST_SUITE( io, context_fixture )
+#ifdef FLUSSPFERD_HAVE_IO
 
 BOOST_AUTO_TEST_CASE( IO_no_security ) {
   flusspferd::object IO = flusspferd::create_object();
@@ -69,7 +69,12 @@ BOOST_AUTO_TEST_CASE( test_file_read ) {
   flusspferd::gc();
 }
 
+#else
+
+BOOST_AUTO_TEST_CASE( test_stub ) {
+  BOOST_REQUIRE(true);
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif
