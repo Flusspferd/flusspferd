@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
@@ -179,8 +180,13 @@ void flusspferd_repl::run_cmdline() {
     load_config();
 
   flusspferd::object require_obj =
-      flusspferd::global()
-        .get_property_object("require");
+    flusspferd::global()
+      .get_property_object("require");
+
+  flusspferd::require require =
+      dynamic_cast<flusspferd::require&>(
+        *flusspferd::native_function_base::get_native(require_obj)
+      );
 
   flusspferd::object module_obj = require_obj.get_property_object("main");
 
@@ -190,9 +196,10 @@ void flusspferd_repl::run_cmdline() {
     case File:
       // TODO: Move this logic into modules.cpp and make it set the right values
       if (!module_obj.has_own_property("id")) {
-        module_obj.set_property("uri", "fille://" + i->first);
-        module_obj.set_property("id", i->first);
-        require_obj.set_property("id", i->first);
+        std::string id = "file://"
+                       + flusspferd::io::fs_base::canonicalize(i->first).string();
+        require.set_main_module(id);
+        require_obj.set_property("id", id);
       }
       flusspferd::execute(i->first.c_str());
       break;
@@ -207,6 +214,9 @@ void flusspferd_repl::run_cmdline() {
       break;
     case MainModule:
       // TODO: make the module aware that it is the main module
+      std::cout << "Setting require.main.id\n";
+      require.set_main_module(i->first);
+      std::cout << "Running main module\n";
       require_obj.call(flusspferd::global(), i->first);
       break;
     }

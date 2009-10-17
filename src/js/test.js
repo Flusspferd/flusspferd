@@ -321,7 +321,8 @@ exports.prove = function prove() {
   var test_files = [];
 
   for (; i < arguments.length; ++i) {
-    var x = arguments[i];
+    var x = arguments[i].replace(/^file:\/\//, '');
+
     if (!fs.exists(x))
       throw new TypeError("Cannot determine test source for " + uneval(x));
 
