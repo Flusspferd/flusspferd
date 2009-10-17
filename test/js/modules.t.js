@@ -21,4 +21,4 @@ exports.test_varPolution = function() {
 }
 
 if (require.main === module)
-  test.runner(exports);
+  test.prove(module.id);
