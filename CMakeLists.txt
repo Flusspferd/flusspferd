@@ -373,6 +373,10 @@ set(
 
 target_link_libraries(flusspferd ${flusspferd_LIBS})
 
+# Libraries linking against the flusspferd DSO dont need to link to all the above.
+set_property(TARGET flusspferd PROPERTY LINK_INTERFACE_LIBRARIES "")
+
+
 if(NOT WIN32)
     install(TARGETS
         flusspferd
@@ -425,17 +429,17 @@ set_property(
     PROPERTY OUTPUT_NAME
     flusspferd)
 
+set(flusspferd_shell_LIBS flusspferd ${Boost_SYSTEM_LIBRARY})
+
 if(NOT LINE_EDITOR STREQUAL "readline")
-  target_link_libraries(
-    flusspferd-shell
-    flusspferd
-    ${LIBEDIT_LIBRARIES})
+  list(APPEND flusspferd_shell_LIBS ${LIBEDIT_LIBRARIES})
 else()
-  target_link_libraries(
-    flusspferd-shell
-    flusspferd
-    ${READLINE_LIBRARIES})
+  list(APPEND flusspferd_shell_LIBS ${READLINE_LIBRARIES})
 endif()
+
+target_link_libraries(
+    flusspferd-shell
+    ${flusspferd_shell_LIBS})
 
 if(NOT WIN32)
     install(TARGETS
