@@ -58,12 +58,12 @@ exports.test_convertFromString = function() {
   blob = encodings.convertFromString("utf-8", "é");
   asserts.same(blob.toArray(), [0xC3,0xA9], "FromString(utf-8) (literal in source)" )
 
-  blob = encodings.convertFromString("utf-16", "é");
-  asserts.same(blob.toArray(), [0xFE, 0xFF, 0x00, 0xE9], "FromString(utf-16) correct (literal in source)" )
+  blob = encodings.convertFromString("utf-16be", "é");
+  asserts.same(blob.toArray(), [0x00, 0xE9], "FromString(utf-16) correct (literal in source)" )
 }
 
 exports.test_convertToStringUTF16 = function() {
-  var str = encodings.convertToString("utf-16", e_accute_utf16);
+  var str = encodings.convertToString("utf-16be", e_accute_utf16);
 
   asserts.same(str, "\xE9") // é
 }
@@ -75,10 +75,10 @@ exports.test_convertToStringISO8859_15 = function() {
 }
 
 exports.test_convert = function() {
-  var blob = encodings.convert("utf-8", "UTF-16", e_accute_utf8);
+  var blob = encodings.convert("utf-8", "UTF-16be", e_accute_utf8);
 
   asserts.instanceOf(blob, binary.Binary);
-  asserts.same(blob.toArray(), [254,255,0,233]);
+  asserts.same(blob.toArray(), [0,233]);
 }
 
 exports.test_katakanaTranscoder_OneShot = function() {
