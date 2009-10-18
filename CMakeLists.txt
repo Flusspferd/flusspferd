@@ -316,6 +316,12 @@ if(PLUGIN_SQLITE3)
     if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
         message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
     endif()
+
+    if (SQLITE3_STATIC)
+        add_library(sqlite3_static STATIC IMPORTED)
+        set_property(TARGET sqlite3_static PROPERTY IMPORTED_LOCATION SQLITE3_STATIC)
+        set(SQLITE3_LIBRARIES ${SQLITE3_STATIC})
+    endif()
 endif()
 
 ## GMP ######################################################################
