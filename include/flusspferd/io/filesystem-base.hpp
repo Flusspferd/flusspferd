@@ -51,7 +51,6 @@ namespace fs_base {
   void make_directory(std::string const &target);
   void remove_directory(std::string const &target);
 
-  string read_link(std::string const &link);
 
   string working_directory();
   void change_working_directory(std::string const &path);
@@ -59,8 +58,11 @@ namespace fs_base {
   string owner(std::string const &path);
   void change_owner(std::string const &path, std::string owner);
 
+#ifndef WIN32
+  string read_link(std::string const &link);
   void link(std::string const &source, std::string const &target);
   void hard_link(std::string const &source, std::string const &target);
+#endif
 
   bool exists(std::string const &path);
   bool is_file(std::string const &path);

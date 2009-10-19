@@ -56,7 +56,7 @@ endif()
 if(SPIDERMONKEY_ROOT)
     find_library(
         SPIDERMONKEY_LIBRARY
-        NAMES mozjs js js32
+        NAMES mozjs js js32 js3250
         PATHS "${SPIDERMONKEY_ROOT}/lib"
         NO_DEFAULT_PATH)
 else()

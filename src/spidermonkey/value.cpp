@@ -34,7 +34,8 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 #include <cassert>
 #include <cmath>
-#ifdef WIN32
+
+#ifdef _MSC_VER
 #include <float.h>
 #endif
 
@@ -95,7 +96,7 @@ double value::to_number() const {
 
 double value::to_integral_number(int bits, bool signedness) const {
   long double value = to_number();
-#ifdef WIN32
+#ifdef _MSC_VER
   if (!_finite(value))
     return 0;
 #else

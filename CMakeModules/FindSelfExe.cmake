@@ -39,6 +39,29 @@ if (APPLE)
     endif()
 endif()
 
+if(WIN32 AND NOT FLUSSPFERD_HAVE_SELF_EXE)
+    # This might need an explicit link against kernel32.lib. Probably not
+    list(APPEND CMAKE_REQUIRED_LIBRARIES "kernel32")
+    check_cxx_source_runs(
+        "#include <windows.h>
+        int main() {
+          char buf[1024];
+          if (GetModuleFileName(NULL, buf, 1024) > 0)
+            return EXIT_SUCCESS;
+          else
+            return EXIT_FAILURE;
+        }
+        "
+    FLUSSPFERD_SELF_EXE_GetModuleFilename)
+    list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES "kernel32")
+
+    if(FLUSSPFERD_SELF_EXE_GetModuleFilename)
+      add_definitions("-DFLUSSPFERD_SELF_EXE_GetModuleFilename")
+      set(FLUSSPFERD_HAVE_SELF_EXE ON)
+    endif()
+endif()
+
+
 if(NOT FLUSSPFERD_HAVE_SELF_EXE)
     # Linux-ism. /proc/self/exe is a symlink to the actual binary
     check_cxx_source_runs(
@@ -117,14 +140,3 @@ if(NOT FLUSSPFERD_HAVE_SELF_EXE)
       set(FLUSSPFERD_HAVE_SELF_EXE ON)
     endif()
 endif()
-
-if(WIN32 AND NOT FLUSSPFERD_HAVE_SELF_EXE)
-    # This might need an explicit link against kernel32.lib. Probably not
-    check_function_exists(GetModuleFileName SELF_EXE_GetModuleFilename)
-
-    if(SELF_EXE_GetModuleFilename)
-      add_definitions("-DFLUSSPFERD_SELF_EXE_GetModuleFilename")
-      set(FLUSSPFERD_HAVE_SELF_EXE ON)
-    endif()
-endif()
-
