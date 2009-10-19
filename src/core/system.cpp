@@ -36,9 +36,8 @@ THE SOFTWARE.
 #if defined(__APPLE__)
 #  include <crt_externs.h>
 #  define environ (*_NSGetEnviron())
-#elif defined(XP_WIN)
-extern char** _environ;
-#  define environ _environ
+#elif defined(WIN32)
+#include <windows.h>
 #else
 extern char** environ;
 # endif
@@ -138,10 +137,31 @@ bool environment::property_resolve(value const &id, unsigned)
 
 boost::any environment::enumerate_start(int &n) {
   n = 0; // We dont know how many
+#ifdef WIN32
+  return boost::any(GetEnvironmentStrings());
+#else
   return boost::any(environ);
+#endif
 }
 
 value environment::enumerate_next(boost::any &iter) {
+#ifdef WIN32
+  // GetEnvironmentStrings returns "Var1=Value1\0Var2=Value2\0\0"
+  char *env = boost::any_cast<char*>(iter);
+
+  if (*env == 0) {
+    FreeEnvironmentStrings(env);
+    return value();
+  }
+
+  char* eq_c = strchr(env, '=');
+  string s = string(env, eq_c - env);
+
+  // Skip over the value, leaving env[0] at the \0 byte.
+  while(*env) { ++env; }
+  // Iter is now first byte of next var (or the second \0 of end)
+  iter = ++env;
+#else
   char **env = boost::any_cast<char**>(iter);
 
   if (*env == 0)
@@ -151,6 +171,7 @@ value environment::enumerate_next(boost::any &iter) {
   string s = string(*env, eq_c - *env);
 
   iter = ++env;
+#endif
 
   return s;
 }
