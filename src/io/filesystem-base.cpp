@@ -132,6 +132,12 @@ fs::path fs_base::canonicalize(fs::path in) {
     if (*--accum.end() == ".")
       accum = accum.parent_path();
   }
+#ifdef WIN32
+  // No C:/ in the path
+  else if (!in.has_root_name()) {
+    accum = fs::system_complete(".").root_name() / accum;
+  }
+#endif
 
   BOOST_FOREACH(fs::path seg, in) {
     if (seg == ".")
