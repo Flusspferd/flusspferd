@@ -213,8 +213,9 @@ std::string get_exe_name_from_argv(std::string const &argv0) {
   #include <windows.h>
   optional<std::string> get_exe_name() {
     char buf[MAX_PATH];
-    if (GetModuleFileName( NULL, buf, MAX_PATH))
-      return buf;
+    DWORD len = GetModuleFileName( NULL, buf, MAX_PATH);
+    if (len > 0)
+      return std::string(buf, len);
     else
       return boost::none;
   }

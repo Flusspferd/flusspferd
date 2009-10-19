@@ -34,6 +34,13 @@ THE SOFTWARE.
 
 #ifdef WIN32
 #include <stdio.h>
+#include <io.h>
+
+#define access _access
+
+//int const R_OK = 04;
+//int const W_OK = 02;
+
 #else
 #include <unistd.h>
 #endif
@@ -70,9 +77,11 @@ void flusspferd::load_filesystem_base_module(object container) {
   create_native_function(exports, "same", &fs_base::same);
 
 
+#ifndef WIN32
   create_native_function(exports, "link", &fs_base::link);
   create_native_function(exports, "hardLink", &fs_base::hard_link);
   create_native_function(exports, "readLink", &fs_base::read_link);
+#endif
 
 
   create_native_function(exports, "makeDirectory", &fs_base::make_directory);
@@ -116,7 +125,6 @@ string fs_base::canonical(std::string const &path) {
 // Resolve symlinks
 fs::path fs_base::canonicalize(fs::path in) {
   fs::path accum;
-  char buff[PATH_MAX];
 
   if (!in.has_root_path()) {
     // dir is relative!
@@ -136,7 +144,9 @@ fs::path fs_base::canonicalize(fs::path in) {
     }
 
     accum /= seg;
+#ifndef WIN32
     if (fs::is_symlink(accum)) {
+      char buff[PATH_MAX];
       ssize_t len = readlink(accum.string().c_str(), buff, PATH_MAX);
       if (len == -1) {
         format fmt = format(error_fmt) % "canonical"
@@ -154,6 +164,7 @@ fs::path fs_base::canonicalize(fs::path in) {
         accum = canonicalize(accum / link_path);
       }
     }
+#endif
   }
 
   // This trickery forces a trailing / onto the dir
@@ -297,6 +308,7 @@ bool fs_base::same(std::string const &source, std::string const &target) {\
   return fs::equivalent(source, target);
 }
 
+#ifndef WIN32
 void fs_base::link(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
@@ -356,7 +368,7 @@ string fs_base::read_link(std::string const &link) {
   }
   return string(buff, len);
 }
-
+#endif
 
 void fs_base::make_directory(std::string const &dir) {
   if (!security::get().check_path(dir, security::CREATE)) {

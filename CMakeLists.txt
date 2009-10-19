@@ -115,11 +115,21 @@ option(
     ${_ENABLE_TESTS_DEFAULT})
 
 if(CMAKE_COMPILER_IS_GNUCXX)
+    # MinGW doesn't set this by default
+    if(WIN32)
+        add_definitions(-DWIN32)
+    endif()
+
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
     add_definitions("-pedantic-errors -Wall -Wextra"
-    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo"
-    "-Wstrict-aliasing=1")
+    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo")
+
+    if (NOT WIN32)
+        # Boost 1.39 on mingw seems to produce a lot of these - they are very
+        # noisy
+        add_definitions("-Wstrict-aliasing=1")
+    endif()
 
     if(ENABLE_DEBUG_WARNINGS)
         add_definitions("-Wpadded -Weffc++")
