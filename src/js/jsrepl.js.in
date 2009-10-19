@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 if (require('flusspferd').relocatable) {
   var binDir = require('flusspferd').executableName
-                                    .replace(/flusspferd(?:\.exe)?/, '');
+                                    .replace(/flusspferd(?:\.exe)?$/, '');
 
   require.paths.push('.', binDir + '@INSTALL_RELATIVE_MODULES_PATH@');
 
