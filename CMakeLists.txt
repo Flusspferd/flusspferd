@@ -58,14 +58,16 @@ set(INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
 set(INSTALL_HEADERS_PATH ${CMAKE_INSTALL_PREFIX}/include)
 set(INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc)
 
-execute_process(
-    COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
-    WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
-    OUTPUT_VARIABLE FLUSSPFERD_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(WIN32 AND NOT FLUSSPFERD_VERSION)
+    execute_process(
+        COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
+        WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
+        OUTPUT_VARIABLE FLUSSPFERD_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(NOT FLUSSPFERD_VERSION)
-    set(FLUSSPFERD_VERSION unknown)
+    if(NOT FLUSSPFERD_VERSION)
+        set(FLUSSPFERD_VERSION unknown)
+    endif()
 endif()
 
 add_definitions("-DFLUSSPFERD_VERSION=\"${FLUSSPFERD_VERSION}\"")
@@ -189,19 +191,6 @@ if(NOT LINE_EDITOR STREQUAL "none" AND
  message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
 endif()
 
-## POSIX ####################################################################
-
-check_cxx_source_runs(
-    "#include <unistd.h>
-     #include <cstdlib>
-     int main()
-     {
-       return _POSIX_VERSION >= 199506
-              ? EXIT_SUCCESS
-          : EXIT_FAILURE;
-     }"
-    FLUSSPFERD_HAVE_POSIX)
-
 ## /proc/self/exe ###########################################################
 
 if(RELOCATABLE)
@@ -215,6 +204,20 @@ if(RELOCATABLE)
     ENDIF(APPLE)
 
 endif()
+
+## POSIX ####################################################################
+
+check_cxx_source_runs(
+    "#include <unistd.h>
+     #include <cstdlib>
+     int main()
+     {
+       return _POSIX_VERSION >= 199506
+              ? EXIT_SUCCESS
+          : EXIT_FAILURE;
+     }"
+    FLUSSPFERD_HAVE_POSIX)
+
 
 ## libdl ####################################################################
 
@@ -361,7 +364,8 @@ file(
     ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
     ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
 
-if(WIN32)
+if(MSVC)
+    # Build static lib for MSVC
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
 else()
     set(FLUSSPFERD_LIBRARY_TYPE SHARED)
@@ -387,10 +391,13 @@ target_link_libraries(flusspferd ${flusspferd_LIBS})
 set_property(TARGET flusspferd PROPERTY LINK_INTERFACE_LIBRARIES "")
 
 
-if(NOT WIN32)
-    install(TARGETS
-        flusspferd
-        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+if(WIN32)
+    # .dll goes in bin/
+    install(TARGETS flusspferd RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
+    # .lib goes in lib/
+    install(TARGETS flusspferd ARCHIVE DESTINATION ${INSTALL_LIBRARIES_PATH})
+else()
+    install(TARGETS flusspferd LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 endif()
 
 ## Library - coverage variant ###############################################
@@ -451,11 +458,9 @@ target_link_libraries(
     flusspferd-shell
     ${flusspferd_shell_LIBS})
 
-if(NOT WIN32)
-    install(TARGETS
-        flusspferd-shell
-        RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
-endif()
+install(TARGETS
+    flusspferd-shell
+    RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 
 ## Tests ###################################################################
 
@@ -528,38 +533,34 @@ foreach(PLUGIN ${PLUGINS})
         flusspferd
         ${${PLUGIN}_LIBRARIES})
 
-    if(NOT WIN32)
-        install(TARGETS
-            ${PLUGIN}_PLUGIN
-            LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+    install(TARGETS
+        ${PLUGIN}_PLUGIN
+        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
-        file(GLOB
-            ${PLUGIN}_JS_FILES
-            ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
+    file(GLOB
+        ${PLUGIN}_JS_FILES
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
 
-        if(${PLUGIN}_JS_FILES)
-            install(FILES
-                ${${PLUGIN}_JS_FILES}
-                DESTINATION ${INSTALL_MODULES_PATH})
-        endif()
+    if(${PLUGIN}_JS_FILES)
+        install(FILES
+            ${${PLUGIN}_JS_FILES}
+            DESTINATION ${INSTALL_MODULES_PATH})
     endif()
 
 endforeach()
 
-if(NOT WIN32)
-    set(JS_PLUGINS
-        util util/array util/function util/range test test/equiv http/headers)
+set(JS_PLUGINS
+    util util/array util/function util/range test test/equiv http/headers)
 
-    foreach(JS_PLUGIN ${JS_PLUGINS})
+foreach(JS_PLUGIN ${JS_PLUGINS})
 
-        string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
+    string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
 
-        install(FILES
-            src/js/${JS_PLUGIN}.js
-            DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
+    install(FILES
+        src/js/${JS_PLUGIN}.js
+        DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
 
-    endforeach()
-endif()
+endforeach()
 
 ## Headers ##################################################################
 
@@ -571,20 +572,16 @@ foreach(HEADER ${HEADERFILES})
     HEADER_FILE_ONLY TRUE)
 endforeach()
 
-if(NOT WIN32)
-    install(
-        DIRECTORY include/
-        DESTINATION ${INSTALL_HEADERS_PATH}
-        FILES_MATCHING PATTERN "*.hpp")
-endif()
+install(
+    DIRECTORY include/
+    DESTINATION ${INSTALL_HEADERS_PATH}
+    FILES_MATCHING PATTERN "*.hpp")
 
 ## Prelude ##################################################################
 
-if(NOT WIN32)
-    install(
-        FILES src/js/prelude.js
-        DESTINATION ${INSTALL_LIBDATA_PATH})
-endif()
+install(
+    FILES src/js/prelude.js
+    DESTINATION ${INSTALL_LIBDATA_PATH})
 
 ## Documentation ############################################################
 
@@ -602,15 +599,15 @@ endif()
 
 ## Configured files##########################################################
 
-if(NOT WIN32)
-    configure_file(
-        ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
-        ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
+configure_file(
+    ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
+    ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
 
-    install(
-        FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
-        DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
+install(
+    FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
+    DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
 
+if(NOT MSVC)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
         "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
@@ -626,7 +623,9 @@ if(NOT WIN32)
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+endif()
 
+if (NOT WIN32)
     add_custom_command(
       OUTPUT flusspferd.1
       COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options
