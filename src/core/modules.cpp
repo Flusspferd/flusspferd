@@ -346,6 +346,22 @@ std::string require::current_id() {
 // We need to check alias and prelaod, and also search the require paths for
 // .js files and DSOs
 object require::load_top_level_module(std::string &id) {
+
+  if (alias.has_own_property(id)) {
+    std::string new_id = alias.get_property(id).to_std_string();
+
+    // Sanity check - aliased ID should be toplevel too
+    if (classify_id(new_id) != top_level) {
+      throw exception("'" + id + "' must be aliased to a top-level id - not '" +
+                      new_id);
+    }
+
+    object e = load_top_level_module(new_id);
+    // Cache the aliased version under both ids
+    module_cache.set_property(id, e);
+    return e;
+  }
+
   security &sec = security::get();
 
   object classes_object = flusspferd::global();
