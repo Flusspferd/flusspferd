@@ -39,7 +39,6 @@ will run flusspferd in an interactive repl/shell mode.
 .nf
   $ \fBflusspferd flusspferd.js\fR
 .fi
-.PP
 will execute the file \fIflusspferd.js\fR and then quit.
 .PP
 .nf
