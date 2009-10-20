@@ -91,6 +91,8 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   flusspferd::create_native_method(
     preload, "filesystem-base",
     &flusspferd::load_filesystem_base_module);
+  // alias fs-base -> filesystem-base
+  require_fn.get_property_object("alias").set_property("fs-base", "filesystem-base");
 
   // Curry argv[0] into the preload function
   flusspferd::create_native_method(
