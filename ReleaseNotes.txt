@@ -1,6 +1,25 @@
 Release Notes
 =============
 
+0.8 Series
+----------
+
+0.8: Major release (git: v0.8)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Major features:
+- Refactor of require() handling - this means mdoules are now JITable
+- Implement most of the  CommonJS `fs-base' (Filesystem/A/0) module.
+- Treat source files as UTF-8 -- this means you can have unicode literals in
+  .js source files now
+- REPL now prints debug/uneval representation, rather than .toString()
+
+- Enable Spidermonkey strict warnings for all modules.
+- SQLite3 plugin got an overhaul
+- Immature plugins are no longer part of the main tree. This means no cURL,
+  or XML plugins for now. If you want them, help us finsih (designing) the API.
+- JSON top-level-object now always available
+
 0.7 Series
 ----------
 
