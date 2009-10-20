@@ -119,6 +119,12 @@ file::~file()
 void file::open(char const *name, value options) {
   security &sec = security::get();
 
+  if (boost::filesystem::is_directory(std::string(name))) {
+    throw exception(
+      std::string("Could not open file: it is a directory (")+ name + ")"
+    );
+  }
+
   std::ios::openmode open_mode = std::ios::openmode();
 
   bool exclusive = false, create = false;
@@ -187,7 +193,7 @@ void file::open(char const *name, value options) {
 
   if (!sec.check_path(name, sec_mode)) {
     throw exception(str(
-      format("File.open: could not open file: 'defined by security' (%s)") % name
+      format("File.open: could not open file: 'denied by security' (%s)") % name
     ));
   }
 
