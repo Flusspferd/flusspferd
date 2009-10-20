@@ -54,13 +54,11 @@ void flusspferd::load_flusspferd_module(object container, std::string const &arg
     value(is_relocatable()),
     read_only_property | permanent_property);
 
-#ifndef FLUSSPFERD_RELOCATABLE
+  // Warning: This might not be right if the binary has been relocated!
   exports.define_property(
     "installPrefix",
     value(INSTALL_PREFIX),
     read_only_property | permanent_property);
-
-#endif
 
   optional<std::string> exe = get_exe_name();
 
