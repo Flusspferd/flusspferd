@@ -39,38 +39,37 @@ THE SOFTWARE.
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+
 #ifdef WIN32
 #include <io.h>
+#include <windows.h>
 
 #define creat _creat
 
 namespace {
-  std::string compose_error_message(std::string const &what, char const *filename = 0x0) {
-#if 0
-    /* yuck Windoze API.
-       Is TCHAR the way to go, since we only want char? (no wchar_t stuff?)
-     */
-    TCHAR *message;
+  std::string compose_error_message(char const *what, char const *filename = 0x0) {
+    char *message;
     DWORD const error = GetLastError();
 
-    if(FormatMessage(
+    std::string ret = what;
+    DWORD len = FormatMessage(
         FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
-        0x0, error, 0, message,
-        0, 0x0) == 0)
-    {
-      return what;
-    }
-    else
-    {
-      std::string ret = what + ": '" + message + "'";
+        0x0, error, 0, (char*)&message,
+        0, 0x0);
+
+    if (len) {
+      // Strip trailing new lines
+      while (message[len-1] == '\n' || message[len-1] == '\r') len--;
+      ret += ": '" + std::string(message,len) + "'";
       LocalFree(message);
-      return ret;
     }
-#else
-    return what + filename;
-#endif
+    if (filename) {
+      ret += std::string(" (") + filename + ')';
+    }
+    return ret;
   }
 }
 #else
@@ -212,11 +211,11 @@ void file::open(char const *name, value options) {
 
   p->stream.open(name, open_mode);
 
-  define_property("fileName", string(name),
-                  permanent_property | read_only_property );
-
   if (!p->stream)
     throw exception(compose_error_message("Could not open file", name));
+
+  define_property("fileName", string(name),
+                  permanent_property | read_only_property );
 }
 
 void file::close() {
