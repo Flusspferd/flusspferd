@@ -3,7 +3,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,27 +31,49 @@ then
   exit 2
 fi
 
-echo "PROGRESS: Clearing test coverage counters" 1>&2
-
-LCOV_MODE=-z ./util/lcov.sh
+#echo "PROGRESS: Clearing test coverage counters" 1>&2
+#
+#LCOV_MODE=-z ./util/lcov.sh
 
 echo "PROGRESS: Running tests" 1>&2
 
+status=0
 for prog in ./build/bin/test_*
 do
   if [ -x $prog ]
   then
     echo "Testing '$prog'" 1>&2
     $prog 2>&1
+    last_status=$?
+    echo status: $last_status
+    echo
+    status=$(($status + $last_status))
   fi
 done
 
-echo "PROGRESS: Analyzing test coverage" 1>&2
+# TODO: This probably wont update the coverage for what C++ parts that the JS
+# hits. It should do.
+./util/jsrepl.sh -e 'require("test").prove("./test/js")'
+status=$(($status + $?))
 
-./util/lcov.sh
 
-lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
+# This test behaves differently/tests different things based on if its the main
+# module or not. Until we have a nice way of shelling out and starting new
+# processes in tests, test it this way too
+./util/jsrepl.sh ./test/js/modules.t.js
+status=$(($status + $?))
 
-echo "PROGRESS: Visualizing test coverage" 1>&2
+#echo "PROGRESS: Analyzing test coverage" 1>&2
+#
+#./util/lcov.sh
+#
+#lcov -q -r ./build/coverage.info '/usr*' 'test/*' -o ./build/coverage.info
 
-./util/genhtml.sh
+#echo "PROGRESS: Visualizing test coverage" 1>&2
+#
+#./util/genhtml.sh
+
+echo ""
+/bin/echo -n "Test Suite Status: "
+[  $status -ne 0 ] && echo 'failed' || echo 'success'
+echo

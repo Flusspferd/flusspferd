@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -80,20 +81,21 @@ void object::set_prototype(object const &o) {
     throw exception("Could not set object prototype");
 }
 
-void object::set_property(char const *name, value const &v_) {
+value object::set_property(char const *name, value const &v_) {
   if (is_null())
     throw exception("Could not set property (object is null)");
   value v = v_;
   if (!JS_SetProperty(Impl::current_context(), get(), name,
                       Impl::get_jsvalp(v)))
     throw exception("Could not set property");
+  return v;
 }
 
-void object::set_property(std::string const &name, value const &v) {
-  set_property(name.c_str(), v);
+value object::set_property(std::string const &name, value const &v) {
+  return set_property(name.c_str(), v);
 }
 
-void object::set_property(value const &id, value const &v_) {
+value object::set_property(value const &id, value const &v_) {
   if (is_null())
     throw exception("Could not set property (object is null)");
   local_root_scope scope;
@@ -103,6 +105,7 @@ void object::set_property(value const &id, value const &v_) {
                         name.data(), name.length(),
                         Impl::get_jsvalp(v)))
     throw exception("Could not set property");
+  return v;
 }
 
 value object::get_property(char const *name) const {

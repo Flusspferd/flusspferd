@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +34,8 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 #include <cassert>
 #include <cmath>
-#ifdef WIN32
+
+#ifdef _MSC_VER
 #include <float.h>
 #endif
 
@@ -94,7 +96,7 @@ double value::to_number() const {
 
 double value::to_integral_number(int bits, bool signedness) const {
   long double value = to_number();
-#ifdef WIN32
+#ifdef _MSC_VER
   if (!_finite(value))
     return 0;
 #else
@@ -126,6 +128,20 @@ object value::to_object() const {
   if (!JS_ValueToObject(Impl::current_context(), get(), &result))
     throw exception("Could not convert value to object");
   return Impl::wrap_object(result);
+}
+
+string value::to_source() const {
+#ifdef JS_ValueToSource
+  JSString *source = JS_ValueToSource(Impl::current_context(), get());
+
+  if (!source)
+    throw exception("Could not convert value to source");
+  return Impl::wrap_string(source);
+#else
+  // This is potentially dangerous. Not sure there's much other choice if we
+  // want to support older spidermonkey versions though
+  return current_context().global().call("uneval", *this);
+#endif
 }
 
 void value::bind(value o) {

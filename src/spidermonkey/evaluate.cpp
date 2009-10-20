@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/modules.hpp"
 
 #include <js/jsapi.h>
 
@@ -62,41 +64,39 @@ value flusspferd::evaluate_in_scope(
   return Impl::wrap_jsval(rval);
 }
 
+value flusspferd::evaluate_in_scope(std::string const &source,
+                                    char const* file, unsigned int line,
+                                    object const &scope)
+{
+  return evaluate_in_scope(source.data(), source.size(), file, line, scope);
+}
+
+value flusspferd::evaluate_in_scope(char const *source,
+                                    char const* file, unsigned int line,
+                                    object const &scope)
+{
+  return evaluate_in_scope(source, std::strlen(source), file, line, scope);
+}
+
 value flusspferd::execute(char const *filename, object const &scope_) {
   JSContext *cx = Impl::current_context();
 
   local_root_scope root_scope;
 
-  FILE *file = fopen(filename, "r");
-  if (!file) {
-    throw exception((std::string("Could not open '") + filename + "'").c_str());
-  }
- 
-  /*
-   * It's not interactive - just execute it.
-   *
-   * Support the UNIX #! shell hack; gobble the first line if it starts
-   * with '#'. TODO - this isn't quite compatible with sharp variables,
-   * as a legal js program (using sharp variables) might start with '#'.
-   * But that would require multi-character lookahead.
-   */
-  int ch = fgetc(file);
-  if (ch == '#') {
-      while((ch = fgetc(file)) != EOF) {
-          if (ch == '\n' || ch == '\r')
-              break;
-      }
-  }
-  ungetc(ch, file);
+  string module_text = require::load_module_text(filename);
 
   JSObject *scope = Impl::get_object(scope_);
 
   if (!scope)
     scope = Impl::get_object(flusspferd::global());
- 
+
   int oldopts = JS_GetOptions(cx);
   JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
-  JSScript *script = JS_CompileFileHandle(cx, scope, filename, file);
+  JSScript *script = JS_CompileUCScript(
+    cx, scope,
+    module_text.data(), module_text.length(),
+    filename, 1ul
+  );
 
   if (!script) {
     exception e("Could not compile script");
@@ -107,9 +107,9 @@ value flusspferd::execute(char const *filename, object const &scope_) {
   JS_SetOptions(cx, oldopts);
 
   value result;
- 
+
   JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
- 
+
   if (!ok) {
     exception e("Script execution failed");
     if (!e.empty()) {

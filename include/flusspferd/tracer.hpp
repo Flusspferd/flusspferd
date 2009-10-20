@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,17 +37,21 @@ class context;
 class value;
 
 /**
- * Garbage collection tracer.
+ * Garbage collection %tracer.
+ *
+ * @see native_object_base::trace
  *
  * @ingroup gc
  */
 class tracer {
 public:
+#ifndef IN_DOXYGEN
   void trace_gcptr(char const *name, void *gcptr);
 
   void trace_gctr(std::string const &name, void *gcptr) {
     trace_gcptr(name.c_str(), gcptr);
   }
+#endif
 
   void operator()(char const *name, value val) {
     trace_gcptr(name, val.get_gcptr());

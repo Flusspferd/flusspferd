@@ -1,7 +1,8 @@
 # -*- coding: utf-8; mode: sh; indent-tabs-mode: nil; -*-
 # The MIT License
 #
-# Copyright (C) 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
+# Copyright (C) 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal

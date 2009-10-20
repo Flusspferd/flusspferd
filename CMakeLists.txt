@@ -2,8 +2,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld,
-#                          Philipp Reh
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -58,11 +58,13 @@ set(INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
 set(INSTALL_HEADERS_PATH ${CMAKE_INSTALL_PREFIX}/include)
 set(INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc)
 
-execute_process(
-    COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
-    WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
-    OUTPUT_VARIABLE FLUSSPFERD_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT WIN32 AND NOT FLUSSPFERD_VERSION)
+    execute_process(
+        COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
+        WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
+        OUTPUT_VARIABLE FLUSSPFERD_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 
 if(NOT FLUSSPFERD_VERSION)
     set(FLUSSPFERD_VERSION unknown)
@@ -72,6 +74,19 @@ add_definitions("-DFLUSSPFERD_VERSION=\"${FLUSSPFERD_VERSION}\"")
 add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
 message(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
+
+option(RELOCATABLE "Whether the binary should be relocatable" ON)
+
+if(RELOCATABLE)
+    add_definitions("-DFLUSSPFERD_RELOCATABLE")
+    # TODO: should should probably use some relative_to funciton to be smarter
+    # That or being settable from a cmake option
+    add_definitions("-DFLUSSPFERD_ETC_PATH=\"../etc/flusspferd\"")
+    set(INSTALL_RELATIVE_MODULES_PATH "../lib/flusspferd/modules")
+    set(INSTALL_RELATIVE_LIBDATA_PATH "../lib/flusspferd")
+else()
+    add_definitions("-DFLUSSPFERD_ETC_PATH=\"${INSTALL_ETC_PATH}\"")
+endif()
 
 set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 add_definitions("-DFLUSSPFERD_MODULE_SUFFIX=\"${CMAKE_SHARED_MODULE_SUFFIX}\"")
@@ -102,11 +117,21 @@ option(
     ${_ENABLE_TESTS_DEFAULT})
 
 if(CMAKE_COMPILER_IS_GNUCXX)
+    # MinGW doesn't set this by default
+    if(WIN32)
+        add_definitions(-DWIN32)
+    endif()
+
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
     add_definitions("-pedantic-errors -Wall -Wextra"
-    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo"
-    "-Wstrict-aliasing=1")
+    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo")
+
+    if (NOT WIN32)
+        # Boost 1.39 on mingw seems to produce a lot of these - they are very
+        # noisy
+        add_definitions("-Wstrict-aliasing=1")
+    endif()
 
     if(ENABLE_DEBUG_WARNINGS)
         add_definitions("-Wpadded -Weffc++")
@@ -146,6 +171,7 @@ option(
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
 option(PLUGIN_CURL "Build cURL plugin" ON)
+option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 set(
     LINE_EDITOR
@@ -166,6 +192,20 @@ if(NOT LINE_EDITOR STREQUAL "none" AND
  message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
 endif()
 
+## /proc/self/exe ###########################################################
+
+if(RELOCATABLE)
+    add_definitions(-DFLUSSPFERD_RELOCATABLE)
+    include(FindSelfExe)
+    IF(APPLE)
+      SET(CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS
+          "${CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS} -Wl,-x -flat_namespace")
+      SET(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
+          "${CMAKE_SHARED_MODULE_CREATE_C_FLAGS} -Wl,-x -flat_namespace")
+    ENDIF(APPLE)
+
+endif()
+
 ## POSIX ####################################################################
 
 check_cxx_source_runs(
@@ -179,10 +219,12 @@ check_cxx_source_runs(
      }"
     FLUSSPFERD_HAVE_POSIX)
 
+
 ## libdl ####################################################################
 
 if(FLUSSPFERD_HAVE_POSIX)
     find_package(DL REQUIRED)
+    add_definitions(-DFLUSSPFERD_HAVE_POSIX)
     include_directories(${DL_INCLUDE_DIR})
 endif()
 
@@ -288,6 +330,24 @@ if(PLUGIN_CURL)
     endif()
 endif()
 
+## sqlite3 ##################################################################
+
+if(PLUGIN_SQLITE3)
+    pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
+    include_directories(${SQLITE3_INCLUDE_DIRS})
+    link_directories(${SQLITE3_LIBRARY_DIRS})
+
+    if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
+        message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
+    endif()
+
+    if (SQLITE3_STATIC)
+        add_library(sqlite3_static STATIC IMPORTED)
+        set_property(TARGET sqlite3_static PROPERTY IMPORTED_LOCATION SQLITE3_STATIC)
+        set(SQLITE3_LIBRARIES ${SQLITE3_STATIC})
+    endif()
+endif()
+
 ## GMP ######################################################################
 
 if(PLUGIN_GMP)
@@ -315,7 +375,8 @@ file(
     ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
     ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
 
-if(WIN32)
+if(MSVC)
+    # Build static lib for MSVC
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
 else()
     set(FLUSSPFERD_LIBRARY_TYPE SHARED)
@@ -337,40 +398,51 @@ set(
 
 target_link_libraries(flusspferd ${flusspferd_LIBS})
 
-if(NOT WIN32)
-    install(TARGETS
-        flusspferd
-        LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+# Libraries linking against the flusspferd DSO dont need to link to all the above.
+set_property(TARGET flusspferd PROPERTY LINK_INTERFACE_LIBRARIES "")
+
+
+if(WIN32)
+    # .dll goes in bin/
+    install(TARGETS flusspferd RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
+    # .lib goes in lib/
+    install(TARGETS flusspferd ARCHIVE DESTINATION ${INSTALL_LIBRARIES_PATH})
+else()
+    install(TARGETS flusspferd LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 endif()
 
 ## Library - coverage variant ###############################################
 
 if(ENABLE_TESTS)
 
+# The coverage library has been removed for now. It only makes it less likely
+# for people to run the tests, which is a bigger problem than getting coverage
+# numbers, which don't work for JS anyways.
+
 #    file(
 #        GLOB
 #        flusspferd_coverage_extra_sources
 #        ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
 #        ${Flusspferd_SOURCE_DIR}/src/xml/*.cpp)
-
-    add_library(
-        flusspferd-coverage
-        SHARED
-        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
-
-    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
-
-    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
-
-    set_property(
-        TARGET flusspferd-coverage
-        PROPERTY COMPILE_FLAGS
-        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
-
-    set_property(
-        TARGET flusspferd-coverage
-        PROPERTY LINK_FLAGS
-        ${COV_FLAGS})
+#
+#    add_library(
+#        flusspferd-coverage
+#        SHARED
+#        ${flusspferd_library_sources} ${flusspferd_coverage_extra_sources})
+#
+#    target_link_libraries(flusspferd-coverage ${flusspferd_LIBS})
+#
+#    set(COV_FLAGS "-fprofile-arcs -ftest-coverage")
+#
+#    set_property(
+#        TARGET flusspferd-coverage
+#        PROPERTY COMPILE_FLAGS
+#        "${COV_FLAGS} -DFLUSSPFERD_COVERAGE")
+#
+#    set_property(
+#        TARGET flusspferd-coverage
+#        PROPERTY LINK_FLAGS
+#        ${COV_FLAGS})
 
 endif()
 
@@ -385,23 +457,21 @@ set_property(
     PROPERTY OUTPUT_NAME
     flusspferd)
 
+set(flusspferd_shell_LIBS flusspferd ${Boost_SYSTEM_LIBRARY})
+
 if(NOT LINE_EDITOR STREQUAL "readline")
-  target_link_libraries(
-    flusspferd-shell
-    flusspferd
-    ${LIBEDIT_LIBRARIES})
+  list(APPEND flusspferd_shell_LIBS ${LIBEDIT_LIBRARIES})
 else()
-  target_link_libraries(
-    flusspferd-shell
-    flusspferd
-    ${READLINE_LIBRARIES})
+  list(APPEND flusspferd_shell_LIBS ${READLINE_LIBRARIES})
 endif()
 
-if(NOT WIN32)
-    install(TARGETS
-        flusspferd-shell
-        RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
-endif()
+target_link_libraries(
+    flusspferd-shell
+    ${flusspferd_shell_LIBS})
+
+install(TARGETS
+    flusspferd-shell
+    RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
 
 ## Tests ###################################################################
 
@@ -424,7 +494,7 @@ if(ENABLE_TESTS)
         target_link_libraries(
             ${TEST_OUTPUT}
             ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-            flusspferd-coverage)
+            flusspferd)
     endforeach()
 
 endif()
@@ -435,6 +505,12 @@ if(PLUGIN_CURL AND CURL_FOUND)
     set(PLUGINS ${PLUGINS} curl)
     set(curl_LIBRARIES ${CURL_LIBRARIES})
     include_directories(${CURL_INCLUDE_DIR})
+endif()
+
+if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
+    set(PLUGINS ${PLUGINS} sqlite3)
+    set(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
+    set(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
 endif()
 
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
@@ -451,7 +527,8 @@ foreach(PLUGIN ${PLUGINS})
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
-    add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
+    # This might want to be MODULE on linux. OSX doesn't work properly with this as MODULE
+    add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
 
     set_property(
         TARGET ${PLUGIN}_PLUGIN
@@ -473,38 +550,34 @@ foreach(PLUGIN ${PLUGINS})
         flusspferd
         ${${PLUGIN}_LIBRARIES})
 
-    if(NOT WIN32)
-        install(TARGETS
-            ${PLUGIN}_PLUGIN
-            LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
+    install(TARGETS
+        ${PLUGIN}_PLUGIN
+        LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
-        file(GLOB
-            ${PLUGIN}_JS_FILES
-            ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
+    file(GLOB
+        ${PLUGIN}_JS_FILES
+        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
 
-        if(${PLUGIN}_JS_FILES)
-            install(FILES
-                ${${PLUGIN}_JS_FILES}
-                DESTINATION ${INSTALL_MODULES_PATH})
-        endif()
+    if(${PLUGIN}_JS_FILES)
+        install(FILES
+            ${${PLUGIN}_JS_FILES}
+            DESTINATION ${INSTALL_MODULES_PATH})
     endif()
 
 endforeach()
 
-if(NOT WIN32)
-    set(JS_PLUGINS
-        util util/array util/function util/range test test/equiv http/headers)
+set(JS_PLUGINS
+    util util/array util/function util/range test test/equiv http/headers)
 
-    foreach(JS_PLUGIN ${JS_PLUGINS})
+foreach(JS_PLUGIN ${JS_PLUGINS})
 
-        string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
+    string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
 
-        install(FILES
-            src/js/${JS_PLUGIN}.js
-            DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
+    install(FILES
+        src/js/${JS_PLUGIN}.js
+        DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
 
-    endforeach()
-endif()
+endforeach()
 
 ## Headers ##################################################################
 
@@ -516,20 +589,16 @@ foreach(HEADER ${HEADERFILES})
     HEADER_FILE_ONLY TRUE)
 endforeach()
 
-if(NOT WIN32)
-    install(
-        DIRECTORY include/
-        DESTINATION ${INSTALL_HEADERS_PATH}
-        FILES_MATCHING PATTERN "*.hpp")
-endif()
+install(
+    DIRECTORY include/
+    DESTINATION ${INSTALL_HEADERS_PATH}
+    FILES_MATCHING PATTERN "*.hpp")
 
 ## Prelude ##################################################################
 
-if(NOT WIN32)
-    install(
-        FILES src/js/prelude.js
-        DESTINATION ${INSTALL_LIBDATA_PATH})
-endif()
+install(
+    FILES src/js/prelude.js
+    DESTINATION ${INSTALL_LIBDATA_PATH})
 
 ## Documentation ############################################################
 
@@ -547,15 +616,15 @@ endif()
 
 ## Configured files##########################################################
 
-if(NOT WIN32)
-    configure_file(
-        ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
-        ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
+configure_file(
+    ${Flusspferd_SOURCE_DIR}/src/js/jsrepl.js.in
+    ${Flusspferd_BINARY_DIR}/js/jsrepl.js)
 
-    install(
-        FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
-        DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
+install(
+    FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
+    DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
 
+if(NOT MSVC)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
         "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
@@ -571,7 +640,9 @@ if(NOT WIN32)
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+endif()
 
+if (NOT WIN32)
     add_custom_command(
       OUTPUT flusspferd.1
       COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-man > ${Flusspferd_BINARY_DIR}/flusspferd.1.options

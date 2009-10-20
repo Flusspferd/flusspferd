@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +33,6 @@ function merge(ctor, obj) {
 }
 
 const TAPProducer = function TAPProducer() {
-  // TODO: ServerJS compliance
   this.outputStream = require('system').stdout;
 
   var depth;
@@ -45,7 +45,7 @@ const TAPProducer = function TAPProducer() {
         throw TypeError("paddDepth must be a number");
       depth = d;
       this.padding = this.getPadd();
-    },
+    }
   });
 
   this.paddDepth = 0;
@@ -59,7 +59,7 @@ merge(TAPProducer.prototype, {
   colourize: true,
 
   green: function green() {
-    var a = Array.slice.apply(arguments);
+    var a = Array.slice(arguments);
     if (a.length == 0 && a[0] instanceof Array)
       a = a[0];
 
@@ -70,7 +70,7 @@ merge(TAPProducer.prototype, {
   },
 
   red: function red() {
-    var a = Array.slice.apply(arguments);
+    var a = Array.slice(arguments);
     if (a.length == 1 && a[0] instanceof Array)
       a = a[0];
 
@@ -137,34 +137,43 @@ merge(TAPProducer.prototype, {
 });
 
 
-const Suite = function Suite(cases) {
+const Suite = exports.Suite = function Suite(cases) {
   this.__proto__.__proto__.constructor.call(this);
   this._state = {
     cases: [],
-    casesFailed: 0,
     assertsFailed: [],
     numAsserts: 0,
-    run: 0,
     currentCase: undefined
   }
+  this.nested = false;
 
   if (!cases) {
-    return this;
+    return;
   }
 
 
   // TODO: setup and teardown methods
-  for ([k,t] in Iterator(cases)) {
+  for (let [k,t] in Iterator(cases)) {
 
     if (/^test_/.test(k) == false)
       continue;
-    this._state.cases.push({
-      func: t,
+
+    let testCase = {
       name: k.replace(/^test_(.*)/, "$1"),
       index: this._state.cases.length,
       numAsserts: 0,
       assertsFailed: []
-    });
+    };
+
+    // Not a function - must be a sub-test
+    if (typeof t != "function") {
+      let s = testCase.suite = new Suite(t);
+      s.nested = true;
+      s.name = k;
+    }
+    else testCase.func = t;
+
+    this._state.cases.push(testCase);
   }
 
   this._state.plan = this._state.cases.length;
@@ -182,17 +191,14 @@ merge(Suite.prototype, {
     var oldCurrent = exports.__currentSuite__;
     try {
       exports.__currentSuite__ = this;
-      for ([name,test] in Iterator(this._state.cases)) {
+      for (let [name,test] in Iterator(this._state.cases)) {
         this.runCase( test);
       }
     }
     finally {
-      currentSuite = oldCurrent;
+      exports.__currentSuite__ = oldCurrent;
     }
     this.finalize();
-  },
-
-  addSubSuite: function addSubSuite(s) {
   },
 
   runCase: function runCase(theCase) {
@@ -200,17 +206,24 @@ merge(Suite.prototype, {
         depth = this.paddDepth,
         error;
 
-    this.printPlan(this._state);
-
     try {
       this.diag(theCase.name + "...");
       this.paddDepth = depth + 1;
       try {
         this._state.currentCase = theCase;
-        theCase.func.call(asserts, this);
-        this.printPlan(theCase);
+        if (theCase.suite) {
+          var nested = theCase.suite;
+          nested.paddDepth = this.paddDepth;
+
+          nested.run();
+          theCase = nested._state;
+        }
+        else {
+          theCase.func.call(asserts, this);
+        }
       }
       finally {
+        this.printPlan(theCase);
         this.paddDepth = depth;
       }
     }
@@ -237,7 +250,7 @@ merge(Suite.prototype, {
         when: new Date(),
         errorDiag: diag,
         ok: !failed,
-        message: theCase.name,
+        message: theCase.name
       });
       return;
     }
@@ -246,7 +259,7 @@ merge(Suite.prototype, {
       type: 'case',
       when: new Date(),
       ok: !failed,
-      message: theCase.name,
+      message: theCase.name
     });
     delete this._state.currentCase;
 
@@ -264,11 +277,15 @@ merge(Suite.prototype, {
   },
 
   finalize: function finalize() {
-    //this.diag(this._state.toSource());
+    if (this.nested)
+      return;
+    if (this._state.assertsFailed.length)
+      this.print(this.red("Failed", this._state.assertsFailed.length, "tests"));
+    else
+      this.print(this.green("All tests successful"));
   }
 })
 
-exports.Suite = Suite;
 exports.runner = function runner() {
   var suite;
   var args = Array.slice(arguments);
@@ -289,55 +306,104 @@ exports.runner = function runner() {
   return suite.run();
 };
 
+// The general test runner for 'run this dir of tests'
+exports.prove = function prove() {
+  const fs = require('filesystem-base');
+
+  var i = 0;
+  var options = {};
+
+  if (typeof arguments[0] == "object") {
+    i++;
+    options = arguments[0];
+  }
+
+  var test_files = [];
+
+  for (; i < arguments.length; ++i) {
+    var x = arguments[i].replace(/^file:\/\//, '');
+
+    if (!fs.exists(x))
+      throw new TypeError("Cannot determine test source for " + uneval(x));
+
+    if (fs.isDirectory(x))
+      findTests(fs.list(x));
+    else
+      findTests([x]);
+  }
+
+  var test = loadTests(test_files);
+  var suite = new Suite(test);
+  suite.run();
+
+  var failed = suite._state.assertsFailed.length;
+  quit( failed <= 255 ? failed : 255 );
+
+  function findTests(files) {
+    for ([,x] in Iterator(files) ) {
+      // Ingore "." dot-files
+      if (x.match(/(?:^|[\/\\])\.[^\/]*$/))
+        continue;
+
+      if (fs.isDirectory(x)) {
+        if (options.recurse)
+          findTests(fs.list(x));
+        continue;
+      }
+
+      if (x.match(/\.t\.js$/))
+        test_files.push(x);
+    }
+  }
+
+  function loadTests(files) {
+    var filename;
+    var testObject = {};
+    for ([,filename] in Iterator(files) ) {
+      var id  = fs.canonical(filename);
+
+      var test = require('file://' + id);
+      testObject['test_' + id] = test;
+    }
+
+    return testObject;
+  }
+}
+
 var currentSuite;
 Object.defineProperty( exports, "__currentSuite__", {
   getter: function() { return currentSuite },
   setter: function(x) {
-    if (x instanceof Suite)
+    if (x === undefined || x instanceof Suite)
       return currentSuite = x;
     throw new TypeError("__currentSuite__ must be an instanceof test.Suite");
   },
   configurable: false,
-  enumerable: false,
+  enumerable: false
 });
 
 
 
+exports.asserts = {
+  same: function(got, expected, message) {
 
-const Asserts = function() {
-}
-
-merge(Asserts.prototype, {
-  same: function() {
-    var args = Array.slice(arguments),
-        msg;
-
-    if (args.length > 2)
-      msg = args.pop();
-    var ok = !!equiv.apply(equiv, args);
+    var ok = !!equiv(got, expected);
 
     var a = {
       type: 'same',
       when: new Date(),
       ok: ok,
-      message: msg,
-      defaultMsg: "arguments are the same",
+      message: message,
+      defaultMsg: "arguments are the same"
     };
 
     if (!ok) {
-      a.wanted = args[0];
-      a.got = args.slice(1);
-      a.diag = "Wanted: " + (args[0] === undefined
+      a.diag = "   Got: " + (got === undefined
                              ? "undefined"
-                             : args[0].toSource())
-
-                          + args.slice(1).map(function(i) {
-                              return "\n   Got: "
-                                   + (i === undefined
-                                          ? "undefined"
-                                          : i.toSource()
-                                     )
-                            });
+                             : uneval(got))
+             + "\nWanted: " + (expected === undefined
+                             ? "undefined"
+                             : uneval(expected));
     }
     return exports.__currentSuite__.do_assert(a);
   },
@@ -362,12 +428,32 @@ merge(Asserts.prototype, {
       type: 'ok',
       ok: !!test,
       when: new Date(),
-      message: msg,
+      message: msg
     } );
   },
 
-  expects: function expects(count) {
-    return exports.__currentSuite__.expects(count);
+  matches: function matches(value, re, msg) {
+    if (re instanceof RegExp == false) {
+      re = new RegExp(re);
+    }
+    var ok = !!re(value);
+
+    var a = {
+      type: 'matches',
+      ok: ok,
+      when: new Date(),
+      message: msg,
+      defaultMsg: "matches " + re,
+    };
+
+    if (!ok) {
+      a.diag = (value === undefined
+                ? "undefined"
+                : uneval(value))
+             + "\nDidn't Match: " + re
+    }
+
+    return exports.__currentSuite__.do_assert(a);
   },
 
   diag: function diag() {
@@ -375,9 +461,7 @@ merge(Asserts.prototype, {
     suite.diag.apply(suite, arguments);
   }
 
-});
-
-exports.asserts = new Asserts();
+};
 
 
 /*
