@@ -4,8 +4,11 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-10-20:
+- Alias 'fs-base' to 'filesystem-base' module
+
 2009-10-17:
-- '--interactive' flag to the REPL will now enter interactive mode evan after
+- '--interactive' flag to the REPL will now enter interactive mode even after
   call to quit() or an exception is thrown
 
 2009-10-10:
