@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,12 +27,14 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_LOAD_CORE_HPP
 #define FLUSSPFERD_LOAD_CORE_HPP
 
+#include <string>
+
 namespace flusspferd {
 
 class object;
 
-void load_core(object const &scope);
-
+void load_core(object const &scope, std::string const &argv0);
+void load_flusspferd_module(object container, std::string const &argv0);
 }
 
 #endif

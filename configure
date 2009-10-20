@@ -3,7 +3,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +33,10 @@ if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
     echo '  ENABLE_TESTS=ON|OFF                   Build tests (default ON).'
     echo '  ENABLE_DEBUG_WARNINGS=ON|OFF          Enable -Wpadded and -Weffc++ (default OFF).'
     echo '  FORCE_PLUGINS=ON|OFF                  Fail configuration if some enabled plugins could not be configured (default ON).'
-    echo '  PLUGIN_SQLITE3=ON|OFF                 Build SQLite3 plugin if SQLite3 is found (default ON).'
-    echo '  PLUGIN_CURL=ON|OFF                    Build cURL plugin if cURL is found (default ON).'
+#    echo '  PLUGIN_SQLITE3=ON|OFF                 Build SQLite3 plugin if SQLite3 is found (default ON).'
+#    echo '  PLUGIN_CURL=ON|OFF                    Build cURL plugin if cURL is found (default ON).'
     echo '  PLUGIN_GMP=ON|OFF                     Build GMP plugin if GMP is found (default ON).'
-    echo '  PLUGIN_XML=ON|OFF                     Build XML plugin if libxml2 is found (default ON).'
+#    echo '  PLUGIN_XML=ON|OFF                     Build XML plugin if libxml2 is found (default ON).'
     echo '  LINE_EDITOR=none|libedit|readline     Select line editor (readline is better but GPL) (default libedit).'
     echo '  FORCE_LINE_EDITOR=ON|OFF              Fail configuration if the specified line editor is not available (default OFF).'
     echo '  CREATE_DOCUMENATION=ON|OFF            Create and install documenation (default OFF).'

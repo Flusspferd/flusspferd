@@ -2,7 +2,8 @@
 #
 # The MIT License
 #
-# Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+# Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+#                                      http://flusspferd.org/contributors.txt)
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -55,20 +56,20 @@ endif()
 if(SPIDERMONKEY_ROOT)
     find_library(
         SPIDERMONKEY_LIBRARY
-        NAMES mozjs js js32
+        NAMES mozjs js js32 js3250
         PATHS "${SPIDERMONKEY_ROOT}/lib"
         NO_DEFAULT_PATH)
 else()
     find_library(
         SPIDERMONKEY_LIBRARY
-        NAMES mozjs js js32)
+        NAMES mozjs js js32 js3250)
 endif()
 
 set(SPIDERMONKEY_LIBRARIES ${SPIDERMONKEY_LIBRARY})
 
 set(CMAKE_REQUIRED_INCLUDES ${SPIDERMONKEY_INCLUDE_DIR})
 set(CMAKE_REQUIRED_DEFINITIONS ${SPIDERMONKEY_DEFINITIONS})
-set(CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
+list(APPEND CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
 check_cxx_source_runs(
     "#include <js/jsapi.h>
      int main() {
@@ -140,6 +141,13 @@ if(SPIDERMONKEY_FOUND)
          }"
         SPIDERMONKEY_UTF8)
 
+    get_filename_component(
+      SPIDERMONKEY_LIBDIR
+      ${SPIDERMONKEY_LIBRARY}
+      PATH)
+    link_directories(${SPIDERMONKEY_LIBDIR})
 endif()
 
+list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
+list(REMOVE_DUPLICATES CMAKE_REQUIRED_LIBRARIES)
 mark_as_advanced(SPIDERMONKEY_INCLUDE_DIR SPIDERMONKEY_LIBRARY)

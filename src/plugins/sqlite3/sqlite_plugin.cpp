@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +24,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/version.hpp"
+#include "flusspferd.hpp"
+#include <new>
+#include <sstream>
 
-std::string flusspferd::version() {
-  return FLUSSPFERD_VERSION;
-} 
+#include "sqlite.hpp"
+#include "sqlite_cursor.hpp"
+
+using namespace flusspferd;
+
+// Put everything in an anon-namespace so typeid wont clash ever.
+namespace {
+
+FLUSSPFERD_LOADER_SIMPLE(exports) {
+  object ctor = load_class<sqlite3_plugin::sqlite3>(exports);
+  load_class<sqlite3_plugin::sqlite3_cursor>(ctor);
+}
+
+}
+

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -138,6 +139,26 @@ void native_object_base::load_into(object const &o) {
     if (!JS_SetPrivate(Impl::current_context(), Impl::get_object(o), this))
       throw exception("Could not create native object (private data)");
   }
+}
+
+bool native_object_base::is_object_native(object const &o_) {
+  object o = o_;
+
+  if (o.is_null())
+    return false;
+
+  JSContext *ctx = Impl::current_context();
+  JSObject *jso = Impl::get_object(o);
+  JSClass *classp = JS_GET_CLASS(ctx, jso);
+
+  if (!classp || classp->finalize != &native_object_base::impl::finalize)
+    return false;
+
+  void *priv = JS_GetPrivate(ctx, jso);
+  if (!priv)
+    return false;
+
+  return true;
 }
 
 native_object_base &native_object_base::get_native(object const &o_) {

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,9 +34,9 @@ THE SOFTWARE.
 #include <iostream>
 #include <string>
 
-#ifdef FLUSSPFERD_HAVE_IO
 
 BOOST_FIXTURE_TEST_SUITE( io, context_fixture )
+#ifdef FLUSSPFERD_HAVE_IO
 
 BOOST_AUTO_TEST_CASE( IO_no_security ) {
   flusspferd::object IO = flusspferd::create_object();
@@ -68,7 +69,12 @@ BOOST_AUTO_TEST_CASE( test_file_read ) {
   flusspferd::gc();
 }
 
+#else
+
+BOOST_AUTO_TEST_CASE( test_stub ) {
+  BOOST_REQUIRE(true);
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
 
-#endif

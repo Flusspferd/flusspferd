@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +37,9 @@ THE SOFTWARE.
 namespace flusspferd {
 
 struct call_context;
+#ifndef IN_DOXYGEN
+class tracer;
+#endif
 
 /**
  * Native function base.
@@ -50,6 +54,15 @@ public:
 
   static native_function_base *get_native(object const &o);
 
+  /**
+   * Virtual method invoked whenever the object has to be traced.
+   *
+   * Default implementation: stub.
+   *
+   * @see native_object_base::trace
+   * @see @ref gc
+   */
+  virtual void trace(tracer &trc);
 protected:
   virtual void call(call_context &) = 0;
 

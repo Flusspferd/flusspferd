@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,11 +28,15 @@ THE SOFTWARE.
 #define FLUSSPFERD_TEST_ENVIRONMENT_HPP
 
 #include "flusspferd/current_context_scope.hpp"
+#include "flusspferd/load_core.hpp"
+#include "flusspferd/security.hpp"
 #include <boost/test/unit_test.hpp>
 
 class context_fixture {
 public:
   context_fixture() : scope(flusspferd::context::create()) {
+    flusspferd::security::create(flusspferd::current_context().global());
+    flusspferd::load_core(flusspferd::current_context().global(), "exeName");
   }
 
   ~context_fixture() {

@@ -4,6 +4,37 @@ Flusspferd Change Log
 Release 0.8
 -----------
 
+2009-10-20:
+- Alias 'fs-base' to 'filesystem-base' module
+
+2009-10-17:
+- '--interactive' flag to the REPL will now enter interactive mode even after
+  call to quit() or an exception is thrown
+
+2009-10-10:
+- A largely complete implementation of CommonJS 'filesystem-base' module
+  (http://wiki.commonjs.org/wiki/Filesystem/A/0). This is only a proposal, so
+  might change.
+- Treat JS files as UTF-8
+
+2009-10-04:
+- native_function_base object now has a trace() method
+
+2009-09-27:
+- repl now prints v.to_source to give better output for objects.
+
+2009-09-26:
+- Change how (pure JS) modules are loaded to preserve JIT and isolate scopes
+  better
+- Enable spidermonkey's strict mode warnings for all modules
+
+2009-09-19:
+- Overhauled SQLite3 module (issue #103).
+
+2009-09-20:
+- json2.js (http://www.json.org/json2.js) is now loaded to provide an ES5
+  compatible JSON object for older spidermonkey
+
 2009-09-19:
 - Immature plugins have been removed (and moved into feature branch).
 

@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Ruediger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -98,9 +99,8 @@ object stream::read_whole_binary(boost::optional<byte_array&> output_) {
   return output;
 }
 
-string stream::read(unsigned size) {
-  if (!size)
-    size = 4096;
+string stream::read(boost::optional<unsigned> size_opt) {
+  unsigned size = size_opt.get_value_or(4096);
 
   boost::scoped_array<char> buf(new char[size + 1]);
 
@@ -112,10 +112,9 @@ string stream::read(unsigned size) {
   return string(buf.get());
 }
 
-object stream::read_binary(unsigned size, boost::optional<byte_array&> output_)
+object stream::read_binary(boost::optional<unsigned> size_opt, boost::optional<byte_array&> output_)
 {
-  if (!size)
-    size = 4096;
+  unsigned size = size_opt.get_value_or(4096);
 
   binary &output =
     output_

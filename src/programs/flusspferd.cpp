@@ -2,7 +2,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Aristid Breitkreuz, Ash Berlin, Rüdiger Sonderfeld
+Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+                                       http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd.hpp"
+#include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
@@ -47,6 +49,10 @@ THE SOFTWARE.
 
 #ifndef HISTORY_FILE_DEFAULT
 #define HISTORY_FILE_DEFAULT "~/.flusspferd-history"
+#endif
+
+#ifdef FLUSSPFERD_RELOCATABLE
+#include <boost/filesystem.hpp>
 #endif
 
 namespace phoenix = boost::phoenix;
@@ -77,7 +83,7 @@ class flusspferd_repl {
   std::list<std::pair<std::string, Type> > files;
 
   flusspferd::object option_spec();
-  
+
   // Returns list of files / expressions to execute
   void parse_cmdline();
   void print_help(bool do_quit = false);
@@ -95,6 +101,8 @@ class flusspferd_repl {
     throw flusspferd::js_quit();
   }
 
+  void run_cmdline();
+  void repl_loop();
 public:
   flusspferd_repl(int argc, char** argv);
 
@@ -122,9 +130,21 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   // g.prototype() is available everywhere
 
-  flusspferd::security::create(g.prototype());
+  flusspferd::security::create(g);
 
-  flusspferd::load_core(g.prototype());
+  flusspferd::load_core(g, argv[0]);
+
+#ifdef FLUSSPFERD_RELOCATABLE
+  // Change the config to use the relative version
+  boost::filesystem::path p = g.call("require", "flusspferd")
+                               .to_object()
+                               .get_property("executableName")
+                               .to_std_string();
+  p.remove_filename();
+  p /=  boost::filesystem::path(FLUSSPFERD_ETC_PATH)
+    /   std::string("jsrepl.js");
+  config_file = p.string();
+#endif
 
   flusspferd::create_native_function<void (int)>(
     g, "quit",
@@ -136,20 +156,51 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 }
 
 int flusspferd_repl::run() {
+  try {
+    run_cmdline();
+  } catch (flusspferd::js_quit&) {
+    if (!interactive)
+      throw;
+  } catch (std::exception &e) {
+    if (interactive)
+      std::cerr << "ERROR: " << e.what() << '\n';
+    else
+      throw;
+  }
+
+  if (interactive)
+    repl_loop();
+  return exit_code;
+}
+
+void flusspferd_repl::run_cmdline() {
   parse_cmdline();
 
   if (!config_loaded)
     load_config();
 
   flusspferd::object require_obj =
-      flusspferd::global()
-        .prototype()
-        .get_property_object("require");
+    flusspferd::global()
+      .get_property_object("require");
+
+  flusspferd::require require =
+      dynamic_cast<flusspferd::require&>(
+        *flusspferd::native_function_base::get_native(require_obj)
+      );
+
+  flusspferd::object module_obj = require_obj.get_property_object("main");
 
   typedef std::list<std::pair<std::string, Type> >::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     switch (i->second) {
     case File:
+      // TODO: Move this logic into modules.cpp and make it set the right values
+      if (!module_obj.has_own_property("id")) {
+        std::string id = "file://"
+                       + flusspferd::io::fs_base::canonicalize(i->first).string();
+        require.set_main_module(id);
+        require_obj.set_property("id", id);
+      }
       flusspferd::execute(i->first.c_str());
       break;
     case Expression:
@@ -163,13 +214,16 @@ int flusspferd_repl::run() {
       break;
     case MainModule:
       // TODO: make the module aware that it is the main module
+      std::cout << "Setting require.main.id\n";
+      require.set_main_module(i->first);
+      std::cout << "Running main module\n";
       require_obj.call(flusspferd::global(), i->first);
       break;
     }
   }
-  
-  if (!interactive)
-    return exit_code;
+}
+
+void flusspferd_repl::repl_loop() {
 
 #ifdef HAVE_EDITLINE
   if (!machine_mode && !history_file.empty()) {
@@ -192,6 +246,9 @@ int flusspferd_repl::run() {
 
   running = true;
 
+  // Disable strict mode for repl since its really annoying there.
+  co.set_strict(false);
+
   while (running && getline(source)) {
     unsigned int startline = ++line;
 
@@ -209,8 +266,9 @@ int flusspferd_repl::run() {
 
     try {
       flusspferd::value v = flusspferd::evaluate(source, "[typein]", startline);
-      if (!v.is_undefined())
-        std::cout << v << '\n';
+      if (!v.is_undefined()) {
+        std::cout << v.to_source() << '\n';
+      }
     }
     catch(std::exception &e) {
       std::cerr << "ERROR: " << e.what() << '\n';
@@ -222,29 +280,35 @@ int flusspferd_repl::run() {
   if (!machine_mode && !history_file.empty())
     write_history(history_file.c_str());
 #endif
-
-  return exit_code;
 }
 
 void flusspferd_repl::print_help(bool do_quit) {
   std::cerr << "usage: " << argv[0] << " [option] ... [file | -] [arg] ...\n\nOptions\n"
             << flusspferd::getopt_help(option_spec());
 
-  if (do_quit)
+  if (do_quit) {
+    interactive = false;
     throw flusspferd::js_quit();
+  }
 }
 
 void flusspferd_repl::print_man() {
+  if (!interactive_set)
+    interactive = false;
   std::cout << flusspferd::getopt_man(option_spec());
   throw flusspferd::js_quit();
 }
 
 void flusspferd_repl::print_bash() {
+  if (!interactive_set)
+    interactive = false;
   std::cout << flusspferd::getopt_bash(option_spec());
   throw flusspferd::js_quit();
 }
 
 void flusspferd_repl::print_version() {
+  if (!interactive_set)
+    interactive = false;
   std::cout << "flusspferd shell version: " << FLUSSPFERD_VERSION << '\n';
   std::cout << "flusspferd library version: " << flusspferd::version() << '\n';
   std::cout.flush();
@@ -260,16 +324,19 @@ void flusspferd_repl::add_file(
 }
 
 void flusspferd_repl::load_config() {
+  // Define the prelude property so its not a strict warning to assign to it.
+  co.global().set_property("prelude", flusspferd::value());
+
   flusspferd::execute(config_file.c_str());
   config_loaded = true;
 
   // Get the prelude and execute it too
   flusspferd::value prelude = co.global().get_property("prelude");
-  
+  co.global().delete_property("prelude");
+
+
   if (!prelude.is_undefined_or_null()) {
-    flusspferd::execute(
-      prelude.to_string().c_str(),
-      flusspferd::global().prototype());
+    flusspferd::execute( prelude.to_string().c_str() );
   }
 }
 
