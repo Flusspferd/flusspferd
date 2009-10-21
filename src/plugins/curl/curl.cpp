@@ -113,8 +113,12 @@ namespace {
     }
     ~Easy() { cleanup(); }
 
-    int perform() {
-      return curl_easy_perform(get());
+    void perform() {
+			CURLcode res = curl_easy_perform(get());
+			if(res != 0) {
+				throw flusspferd::exception(std::string("curl_easy_setopt: ") +
+																		curl_easy_strerror(res));
+			}
     }
 
     void reset() {
