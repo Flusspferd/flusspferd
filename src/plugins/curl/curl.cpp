@@ -25,9 +25,11 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/create.hpp"
+#include "flusspferd/binary.hpp"
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/modules.hpp"
 #include "flusspferd/security.hpp"
+#include "flusspferd/arguments.hpp"
 #include "flusspferd/class_description.hpp"
 
 #include <sstream>
@@ -65,9 +67,14 @@ namespace {
 		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
 			assert(stream);
 			Easy &self = *reinterpret_cast<Easy*>(stream);
-			//			self.writecallback.call();
-			// TODO ...
-			return size * nmemb;
+			byte_array data(object(),
+											reinterpret_cast<byte_array::element_type*>(ptr),
+											size*nmemb);
+			arguments arg;
+			arg.push_back(value(data));
+			arg.push_back(value(size));
+			value v = self.writecallback.call(arg);
+			return v.to_number();
 		}
 	protected:
 		void trace(flusspferd::tracer &trc) {
@@ -116,7 +123,7 @@ namespace {
 
     std::string unescape(char const *input) {
       int len;
-      char *uesc = curl_easy_unescape(get(), input, 0, &len);
+      char *const uesc = curl_easy_unescape(get(), input, 0, &len);
       if(!uesc) {
         throw flusspferd::exception("curl_easy_escape");
       }
@@ -126,7 +133,7 @@ namespace {
     }
 
     std::string escape(char const *input) {
-      char *esc = curl_easy_escape(get(), input, 0);
+      char *const esc = curl_easy_escape(get(), input, 0);
       if(!esc) {
         throw flusspferd::exception("curl_easy_escape");
       }
@@ -146,7 +153,7 @@ namespace {
       break
 
 #define OPT_FUNCTION(What, Data, Callback, Func)												\
-		case What : {																											\
+		case What : {																												\
 			if(x.arg.size() != 2) {																						\
 				throw flusspferd::exception("curl_easy_setopt: Expected two arguments"); \
 			}																																	\
@@ -166,7 +173,7 @@ namespace {
 		}																																		\
 		break
 
-#define OPT_DATAFUNCTION(What, Prefix)					\
+#define OPT_DATAFUNCTION(What, Prefix)																	\
 		OPT_FUNCTION( What ## FUNCTION, What ## DATA, Prefix ## callback, Prefix ## function )
 
 	private:
