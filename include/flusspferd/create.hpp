@@ -86,12 +86,12 @@ array create_array(unsigned int length = 0);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  T &create_native_object( \
+  typename boost::enable_if< boost::mpl::not_<  \
+    typename T::class_info::custom_enumerate >, \
+  T& >::type                                    \
+  create_native_object(      \
     object proto \
-    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
-    typename boost::enable_if< boost::mpl::not_<\
-      typename T::class_info::custom_enumerate > \
-    >::type * = 0 \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
     if (proto.is_null()) \
       proto = current_context().prototype<T>(); \
@@ -104,11 +104,12 @@ array create_array(unsigned int length = 0);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  T &create_native_object( \
-    object proto \
-    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
-    typename boost::enable_if< \
-      typename T::class_info::custom_enumerate >::type * = 0 \
+  typename boost::enable_if<                          \
+    typename T::class_info::custom_enumerate,         \
+  T& >::type                                          \
+  create_native_object(                               \
+    object proto                                      \
+    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
     if (proto.is_null()) \
       proto = current_context().prototype<T>(); \
