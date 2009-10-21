@@ -36,8 +36,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 namespace {
-  long global_init(long flags) {
-    return curl_global_init(flags);
+  void global_init(long flags) {
+    CURLcode ret = curl_global_init(flags);
+		if(ret != 0) {
+			throw flusspferd::exception(std::string("curl_global_init: ") +
+																	curl_easy_strerror(ret));
+		}
   }
 
   FLUSSPFERD_CLASS_DESCRIPTION
