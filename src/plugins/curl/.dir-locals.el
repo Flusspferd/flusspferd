@@ -1,0 +1,5 @@
+((nil . ((indent-tabs-mode . t)
+         (tab-width . 2)
+         (coding . "utf-8")))
+ (c++ . ((compile-command . "cd ../../.. && make")
+         (c-basic-offset . 2))))

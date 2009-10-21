@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/class_description.hpp"
 
-
 #include <curl/curl.h>
 
 using namespace flusspferd;
@@ -41,21 +40,37 @@ namespace {
 
   FLUSSPFERD_CLASS_DESCRIPTION
   (
-   Curl,
-   (constructor_name, "CURL")
-   (constructible, false)
-   (full_name, "cURL.CURL")
-   )
+   Easy,
+   (constructor_name, "Easy")
+   (full_name, "cURL.Easy")
+   (methods,
+    ("cleanup",  bind, cleanup)
+    ("perform",  bind, perform)
+    ("reset",    bind, reset)
+    ("escape",   bind, escape)
+    ("unescape", bind, unescape)
+    ("valid",    bind, valid)))
   {
     CURL *handle;
   public:
     CURL *data() { return handle; }
+    bool valid() { return handle; }
     CURL *get() {
-      assert(handle);
+      if(!handle) {
+        throw flusspferd::exception("CURL handle not valid!");
+      }
       return handle;
     }
 
-    Curl(flusspferd::object const &self, CURL *hnd)
+    Easy(flusspferd::object const &self, flusspferd::call_context&)
+      : base_type(self), handle(curl_easy_init())
+    {
+      if(!handle) {
+        throw flusspferd::exception("curl_easy_init");
+      }
+    }
+
+    Easy(flusspferd::object const &self, CURL *hnd)
       : base_type(self), handle(hnd)
     {
       assert(handle);
@@ -67,83 +82,64 @@ namespace {
         handle = 0x0;
       }
     }
-    ~Curl() { cleanup(); }
+    ~Easy() { cleanup(); }
 
-    static Curl &create(CURL *hnd) {
-      return flusspferd::create_native_object<Curl>(object(), hnd);
+    int perform() {
+      return curl_easy_perform(get());
+    }
+
+    void reset() {
+      curl_easy_reset(get());
+    }
+
+    std::string unescape(char const *input) {
+      int len;
+      char *uesc = curl_easy_unescape(get(), input, 0, &len);
+      if(!uesc) {
+        throw flusspferd::exception("curl_easy_escape");
+      }
+      std::string ret(uesc, len);
+      curl_free(uesc);
+      return ret;
+    }
+
+    std::string escape(char const *input) {
+      char *esc = curl_easy_escape(get(), input, 0);
+      if(!esc) {
+        throw flusspferd::exception("curl_easy_escape");
+      }
+      std::string ret(esc);
+      curl_free(esc);
+      return ret;
+    }
+
+    static Easy &create(CURL *hnd) {
+      return flusspferd::create_native_object<Easy>(object(), hnd);
     }
   };
 
-  Curl &wrap(CURL *hnd) {
-    return Curl::create(hnd);
+  Easy &wrap(CURL *hnd) {
+    return Easy::create(hnd);
   }
-  CURL *unwrap(Curl &c) {
+  CURL *unwrap(Easy &c) {
     return c.data();
-  }
-
-  Curl &easy_init() {
-    CURL *hnd = curl_easy_init();
-    if(!hnd) {
-      throw flusspferd::exception("curl_easy_init");
-    }
-    return wrap(hnd);
-  }
-
-  void easy_cleanup(Curl &c) {
-    c.cleanup();
-  }
-
-  void easy_reset(Curl &c) {
-    curl_easy_reset(c.get());
-  }
-
-  std::string easy_escape(Curl &c, char const *input) {
-    char *esc = curl_easy_escape(c.get(), input, 0);
-    if(!esc) {
-      throw flusspferd::exception("curl_easy_escape");
-    }
-    std::string ret(esc);
-    curl_free(esc);
-    return ret;
-  }
-
-  std::string easy_unescape(Curl &c, char const *input) {
-    int len;
-    char *uesc = curl_easy_unescape(c.get(), input, 0, &len);
-    if(!uesc) {
-      throw flusspferd::exception("curl_easy_escape");
-    }
-    std::string ret(uesc, len);
-    curl_free(uesc);
-    return ret;
-  }
-
-  int easy_perform(Curl &c) {
-    return curl_easy_perform(c.get());
-  }
-
-  void easy_setopt(flusspferd::call_context &x) {
   }
 
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
     local_root_scope scope;
 
-    cURL.define_property("GLOBAL_ALL", value(CURL_GLOBAL_ALL));
-    cURL.define_property("GLOBAL_SSL", value(CURL_GLOBAL_SSL));
-    cURL.define_property("GLOBAL_WIN32", value(CURL_GLOBAL_WIN32));
-    cURL.define_property("GLOBAL_NOTHING", value(CURL_GLOBAL_NOTHING));
+    cURL.define_property("GLOBAL_ALL", value(CURL_GLOBAL_ALL),
+                         read_only_property | permanent_property);
+    cURL.define_property("GLOBAL_SSL", value(CURL_GLOBAL_SSL),
+                         read_only_property | permanent_property);
+    cURL.define_property("GLOBAL_WIN32", value(CURL_GLOBAL_WIN32),
+                         read_only_property | permanent_property);
+    cURL.define_property("GLOBAL_NOTHING", value(CURL_GLOBAL_NOTHING),
+                         read_only_property | permanent_property);
     create_native_function(cURL, "globalInit", &global_init);
-    create_native_function(cURL, "version", &curl_version);
+    cURL.define_property("version", value(curl_version()),
+                         read_only_property | permanent_property);
 
-    load_class<Curl>(cURL);
-    create_native_function(cURL, "easyInit", &easy_init);
-    create_native_function(cURL, "easyCleanup", &easy_cleanup);
-    create_native_function(cURL, "easyReset", &easy_reset);
-    create_native_function(cURL, "easyEscape", &easy_escape);
-    create_native_function(cURL, "easyUnescape", &easy_unescape);
-    create_native_function(cURL, "easyPerform", &easy_perform);
-    //create_native_function(cURL, "easySetopt", &easy_setopt);
-    //create_native_function(cURL, "easyGetinfo", &easy_getinfo);
-    //...
+    load_class<Easy>(cURL);
   }
 }
