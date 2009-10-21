@@ -255,7 +255,7 @@ public:
   /// Convert the value to a C++ standard library string (std::string)
   std::string to_std_string() const;
 
-  /// Convert the number to a number.
+  /// Convert the value to a number.
   double to_number() const;
 
   /// Convert the value to an integral number.
