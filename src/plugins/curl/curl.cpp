@@ -25,10 +25,12 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/create.hpp"
+#include "flusspferd/tracer.hpp"
 #include "flusspferd/modules.hpp"
 #include "flusspferd/security.hpp"
 #include "flusspferd/class_description.hpp"
 
+#include <sstream>
 #include <curl/curl.h>
 
 using namespace flusspferd;
@@ -49,9 +51,25 @@ namespace {
     ("reset",    bind, reset)
     ("escape",   bind, escape)
     ("unescape", bind, unescape)
-    ("valid",    bind, valid)))
+    ("setopt",   bind, setopt)
+    ("valid",    bind, valid))
+   )
   {
     CURL *handle;
+
+		object writecallback;
+		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
+			assert(stream);
+			Easy &self = *reinterpret_cast<Easy*>(stream);
+			//			self.writecallback.call();
+			// TODO ...
+			return size * nmemb;
+		}
+	protected:
+		void trace(flusspferd::tracer &trc) {
+			trc("writecallback", writecallback);
+		}
+
   public:
     CURL *data() { return handle; }
     bool valid() { return handle; }
@@ -113,6 +131,55 @@ namespace {
       return ret;
     }
 
+#define OPT_NUMBER(what)                                                \
+    case what :                                                         \
+      if(x.arg.size() != 2) {                                           \
+        std::stringstream ss;                                           \
+        ss << "curl_easy_setopt: Expected two arguments. Got (" << x.arg.size() << ')'; \
+        throw flusspferd::exception(ss.str());                          \
+      }                                                                 \
+      int res = curl_easy_setopt(get(), what , x.arg[1].to_number());		\
+			if(res != 0) {																										\
+				throw flusspferd::exception(std::string("curl_easy_setopt: ") +	\
+																		curl_easy_strerror(res));						\
+			}																																	\
+      break;                                                            \
+      /**/
+
+#define OPT_FUNCTION(what, data, callback, func)
+
+    void setopt(flusspferd::call_context &x) {
+      int what = x.arg.front().to_number();
+      switch(what) {
+        //OPT_NUMBER(CURLOPT_HEADER)
+      case CURLOPT_WRITEFUNCTION: {
+				// TODO reset to default function (0x0 parameter!)
+				if(!x.arg[1].is_object()) {
+					throw flusspferd::exception("curl_easy_setopt: expected a function as second parameter!");
+				}
+				writecallback = x.arg[1].to_object();
+        int res = curl_easy_setopt(get(), CURLOPT_WRITEDATA, this);
+        if(res != 0) {
+          throw flusspferd::exception(std::string("curl_easy_setopt: ") +
+																			curl_easy_strerror((CURLcode)res));
+        }
+				res = curl_easy_setopt(get(), CURLOPT_WRITEFUNCTION, writefunction);
+				if(res != 0) {
+					throw flusspferd::exception(std::string("curl_easy_setopt: ") +
+																			curl_easy_strerror((CURLcode)res));
+				}
+			}
+      default: {
+        std::stringstream ss;
+        ss << "curl_easy_setopt unkown or unsupported option (" << what << ')';
+        throw flusspferd::exception(ss.str());
+      }
+      };
+    }
+
+#undef OPT_FUNCTION
+#undef OPT_NUMBER
+
     static Easy &create(CURL *hnd) {
       return flusspferd::create_native_object<Easy>(object(), hnd);
     }
@@ -141,5 +208,9 @@ namespace {
                          read_only_property | permanent_property);
 
     load_class<Easy>(cURL);
+    cURL.define_property("OPT_HEADER", value((int)CURLOPT_HEADER),
+                         read_only_property | permanent_property);
+		cURL.define_property("OPT_WRITEFUNCTION", value((int)CURLOPT_WRITEFUNCTION),
+                         read_only_property | permanent_property);
   }
 }
