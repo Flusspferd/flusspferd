@@ -322,9 +322,21 @@ endif()
 ## sqlite3 ##################################################################
 
 if(PLUGIN_SQLITE3)
-    pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
-    include_directories(${SQLITE3_INCLUDE_DIRS})
-    link_directories(${SQLITE3_LIBRARY_DIRS})
+    if (WIN32)
+        find_library(
+            SQLITE3_LIBRARIES
+            NAMES sqlite3
+            PATHS "${SQLITE3_LIBRARY_DIRS}")
+        IF(SQLITE3_LIBRARIES)
+            set(SQLITE3_FOUND ON)
+            link_directories(${SQLITE3_LIBRARY_DIRS})
+            include_directories(${SQLITE3_INCLUDE_DIRS})
+        ENDIF()
+    else()
+        pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
+        include_directories(${SQLITE3_INCLUDE_DIRS})
+        link_directories(${SQLITE3_LIBRARY_DIRS})
+    endif()
 
     if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
         message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
