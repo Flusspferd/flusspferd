@@ -286,7 +286,7 @@ if(SPIDERMONKEY_FOUND)
     endif()
 
     if (NOT SPIDERMONKEY_JS_CONFIG_HEADER_PATH)
-        message(FATAL_ERROR "Spidermonkey with config.h required but not found")
+        message(FATAL_ERROR "Spidermonkey with config.h required but not found (Version 1.8.1+ required)")
     endif()
 endif()
 
