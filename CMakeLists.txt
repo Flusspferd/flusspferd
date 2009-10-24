@@ -522,8 +522,12 @@ foreach(PLUGIN ${PLUGINS})
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
-    # This might want to be MODULE on linux. OSX doesn't work properly with this as MODULE
-    add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
+    # OSX doesn't work properly with this as MODULE (something about --flat-namespace)
+    if (APPLE)
+        add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
+    else()
+        add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
+    endif()
 
     set_property(
         TARGET ${PLUGIN}_PLUGIN
@@ -539,6 +543,13 @@ foreach(PLUGIN ${PLUGINS})
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY DEFINITIONS
         ${${PLUGIN}_DEFINITIONS})
+
+    IF (WIN32)
+        # Remove the 'lib' prefix from plugin modules on win32
+        set_property(
+            TARGET ${PLUGIN}_PLUGIN
+            PROPERTY PREFIX "")
+    ENDIF()
 
     target_link_libraries(
         ${PLUGIN}_PLUGIN
