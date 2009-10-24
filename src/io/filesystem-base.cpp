@@ -200,10 +200,10 @@ void fs_base::touch(std::string const &str, object mtime_o) {
   std::size_t mtime;
 
   if (!mtime_o.is_null()) {
-    if (!(ctor = mtime_o.get_property("constructor")).is_object() ||
-        ctor.get_object() != date)
+    ctor = mtime_o.get_property("constructor");
+    if (ctor.to_object() != date)
     {
-      throw exception("touch: expects a Date as it's second argument if present",
+      throw exception("touch: expects a Date as its second argument if present",
                       "TypeError");
     }
 
