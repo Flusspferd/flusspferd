@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
-#include <cassert>
 #include <js/jsapi.h>
 
 using namespace flusspferd;
