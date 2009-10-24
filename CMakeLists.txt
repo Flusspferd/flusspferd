@@ -328,9 +328,21 @@ endif()
 ## sqlite3 ##################################################################
 
 if(PLUGIN_SQLITE3)
-    pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
-    include_directories(${SQLITE3_INCLUDE_DIRS})
-    link_directories(${SQLITE3_LIBRARY_DIRS})
+    if (WIN32)
+        find_library(
+            SQLITE3_LIBRARIES
+            NAMES sqlite3
+            PATHS "${SQLITE3_LIBRARY_DIRS}")
+        IF(SQLITE3_LIBRARIES)
+            set(SQLITE3_FOUND ON)
+            link_directories(${SQLITE3_LIBRARY_DIRS})
+            include_directories(${SQLITE3_INCLUDE_DIRS})
+        ENDIF()
+    else()
+        pkg_check_modules(SQLITE3 sqlite3>=3.4.0)
+        include_directories(${SQLITE3_INCLUDE_DIRS})
+        link_directories(${SQLITE3_LIBRARY_DIRS})
+    endif()
 
     if(FORCE_PLUGINS AND NOT SQLITE3_FOUND)
         message(SEND_ERROR "SQLite3 plugin required but SQLite3 not found")
@@ -516,8 +528,12 @@ foreach(PLUGIN ${PLUGINS})
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
         ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
 
-    # This might want to be MODULE on linux. OSX doesn't work properly with this as MODULE
-    add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
+    # OSX doesn't work properly with this as MODULE (something about --flat-namespace)
+    if (APPLE)
+        add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
+    else()
+        add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
+    endif()
 
     set_property(
         TARGET ${PLUGIN}_PLUGIN
@@ -533,6 +549,13 @@ foreach(PLUGIN ${PLUGINS})
         TARGET ${PLUGIN}_PLUGIN
         PROPERTY DEFINITIONS
         ${${PLUGIN}_DEFINITIONS})
+
+    IF (WIN32)
+        # Remove the 'lib' prefix from plugin modules on win32
+        set_property(
+            TARGET ${PLUGIN}_PLUGIN
+            PROPERTY PREFIX "")
+    ENDIF()
 
     target_link_libraries(
         ${PLUGIN}_PLUGIN
