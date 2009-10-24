@@ -35,9 +35,19 @@ THE SOFTWARE.
 #include <sstream>
 #include <curl/curl.h>
 
+#include <boost/exception/all.hpp>
+
 using namespace flusspferd;
 
 namespace {
+	typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
+
+	struct exception
+		: virtual flusspferd::exception, virtual boost::exception
+	{
+		char const *what() {
+	};
+
   void global_init(long flags) {
     CURLcode ret = curl_global_init(flags);
 		if(ret != 0) {
