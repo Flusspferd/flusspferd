@@ -280,8 +280,14 @@ if(NOT SPIDERMONKEY_FOUND)
     message(FATAL_ERROR "Spidermonkey not found")
 endif()
 
-if(SPIDERMONKEY_FOUND AND NOT SPIDERMONKEY_UTF8)
-    message(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
+if(SPIDERMONKEY_FOUND)
+    if (NOT SPIDERMONKEY_UTF8)
+        message(FATAL_ERROR "Spidermonkey UTF8 support required but not found")
+    endif()
+
+    if (NOT SPIDERMONKEY_JS_CONFIG_HEADER_PATH)
+        message(FATAL_ERROR "Spidermonkey with config.h required but not found")
+    endif()
 endif()
 
 include_directories(${SPIDERMONKEY_INCLUDE_DIR})

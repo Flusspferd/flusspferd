@@ -24,6 +24,10 @@
 # THE SOFTWARE.
 #
 
+##
+## TODO: Simplify this!
+##
+
 include(CheckCXXSourceRuns)
 include(CheckIncludeFileCXX)
 
