@@ -80,7 +80,7 @@ public:
    *
    * @param x The initial value.
    */
-  root(T const &x = T());
+  explicit root(T const &x = T());
 
   /// Destructor.
   ~root();

@@ -6,6 +6,7 @@ Release 0.9
 
 2009-10-24:
 - Remove support for old Spidermonkey versions.
+- Constructor of root_* now explicit (#124).
 
 Release 0.8
 -----------
