@@ -37,7 +37,7 @@ THE SOFTWARE.
  * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
  *     1.7 or higher 
  *     (<a href="http://ftp.mozilla.org/pub/mozilla.org/js/">download here</a>).
- *
+ * @li Depending on your platform, you need to install iconv.
  *
  * Recommended, but optional:
  *
