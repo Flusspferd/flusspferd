@@ -188,6 +188,15 @@ public:
    * @return       The old value of the strict setting
    */
   bool set_strict(bool strict);
+
+  /**
+   * Set the JIT flag on or off.
+   *
+   * @param strict New setting for JIT mode
+   *
+   * @return       The old value of the JIT setting
+   */
+  bool set_jit(bool jit);
 };
 
 template<>

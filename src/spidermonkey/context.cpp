@@ -264,3 +264,24 @@ bool context::set_strict(bool strict) {
 
   return old;
 }
+
+bool context::set_jit(bool jit) {
+  uint32 options = JS_GetOptions(p->context);
+
+  bool old = (options & JSOPTION_JIT) == JSOPTION_JIT;
+
+  // No change.
+  if (old == jit)
+    return old;
+
+  if (jit) {
+    options |= JSOPTION_JIT;
+  }
+  else {
+    options &= ~JSOPTION_JIT;
+  }
+  JS_SetOptions(p->context, options);
+
+  return old;
+}
+
