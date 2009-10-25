@@ -40,10 +40,9 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 
-class exception::impl {
-public:
-  impl() : empty(true) {}
-
+struct exception::impl {
+  impl(std::string const &what, std::string const &type);
+  impl(value const &v);
   ~impl();
 
   context ctx;
@@ -51,27 +50,36 @@ public:
   bool empty;
 };
 
-void exception::init(char const *what, std::string const &type)
+exception::impl::impl(value const &v)
+  : ctx(current_context()),
+    exception_value(new root_value(v)),
+    empty(true)
+{ }
+
+exception::impl::impl(std::string const &what, std::string const &type)
+  : ctx(current_context()),
+    exception_value(new root_value),
+    empty(true)
 {
-  boost::shared_ptr<impl> p(new impl);
+  JSContext *c = Impl::get_context(ctx);
 
-  p->exception_value.reset(new root_value);
-  p->ctx = current_context();
+  value &v = *exception_value;
 
-  JSContext *ctx = Impl::get_context(p->ctx);
-
-  value &v = *p->exception_value;
-
-  if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
-    p->empty = false;
-    JS_ClearPendingException(ctx);
+  if (JS_GetPendingException(c, Impl::get_jsvalp(v))) {
+    empty = false;
+    JS_ClearPendingException(c);
   } else {
     try {
       v = global().call(type, what);
     } catch (...) { }
   }
+}
 
-  this->p = p;
+exception::impl::~impl() {
+  if (exception_value) {
+    current_context_scope scope(ctx);
+    exception_value.reset();
+  }
 }
 
 namespace {
@@ -95,34 +103,22 @@ std::string exception_message(std::string what) {
 }
 
 exception::exception(char const *what, std::string const &type)
-  : std::runtime_error(exception_message(what))
-{
-  init(what, type);
-}
+  : std::runtime_error(exception_message(what)),
+    p(new impl(what, type))
+{ }
 
 exception::exception(std::string const &what, std::string const &type)
-  : std::runtime_error(exception_message(what.c_str()))
-{
-  init(what.c_str(), type);
-}
+  : std::runtime_error(exception_message(what.c_str())),
+    p(new impl(what, type))
+{ }
 
 exception::exception(value const &val)
-  : std::runtime_error(val.to_std_string()), p(new impl)
-{
-  p->exception_value.reset(new root_value(val));
-  p->ctx = current_context();
-}
+  : std::runtime_error(val.to_std_string()),
+    p(new impl(val))
+{ }
 
 exception::~exception() throw()
-{
-}
-
-exception::impl::~impl() {
-  if (exception_value) {
-    current_context_scope scope(ctx);
-    exception_value.reset();
-  }
-}
+{ }
 
 void exception::throw_js_INTERNAL() {
   JS_SetPendingException(

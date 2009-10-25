@@ -97,9 +97,6 @@ public:
 #endif
 
 private:
-  void init(char const *what, std::string const &type);
-
-private:
   class impl;
   boost::shared_ptr<impl> p;
 };
