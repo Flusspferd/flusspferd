@@ -374,6 +374,19 @@ function create_native_method(
 
 //@}
 
+
+
+namespace detail {
+
+  template<typename Class>
+  struct create_traits;
+
+}
+
+template<typename Class>
+typename detail::create_traits<Class>::result_type create() {
+}
+
 }
 
 #endif
