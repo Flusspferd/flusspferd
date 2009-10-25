@@ -61,16 +61,14 @@ exception::impl::impl(std::string const &what, std::string const &type)
     exception_value(new root_value),
     is_js_exception(true)
 {
-  JSContext *c = Impl::get_context(ctx);
+  JSContext *const cx = Impl::get_context(ctx);
 
-  value &v = *exception_value;
-
-  if (JS_GetPendingException(c, Impl::get_jsvalp(v))) {
+  if (JS_GetPendingException(cx, Impl::get_jsvalp(*exception_value))) {
     is_js_exception = false;
-    JS_ClearPendingException(c);
+    JS_ClearPendingException(cx);
   } else {
     try {
-      v = global().call(type, what);
+      *exception_value = global().call(type, what);
     } catch (...) { }
   }
 }
@@ -94,7 +92,7 @@ std::string exception_message(std::string what) {
       object o = val.to_object();
       if(o.has_property("fileName"))
         what += " at " + o.get_property("fileName").to_std_string()
-             +  ":" + o.get_property("lineNumber").to_std_string();
+             +  ':' + o.get_property("lineNumber").to_std_string();
     }
   }
 
