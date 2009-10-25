@@ -199,11 +199,6 @@ public:
   bool set_jit(bool jit);
 };
 
-template<>
-inline object context::prototype<native_object_base>() const {
-  return object();
-}
-
 /**
  * Compare two context%s for inequality.
  *
