@@ -75,23 +75,22 @@ void exception::init(char const *what, std::string const &type)
 }
 
 namespace {
-std::string exception_message(char const *what) {
-  std::string ret(what);
+std::string exception_message(std::string what) {
   jsval v;
   JSContext *const cx = Impl::current_context();
 
   if (JS_GetPendingException(cx, &v)) {
     value val = Impl::wrap_jsval(v);
-    ret += ": exception `" + val.to_std_string() + '\'';
+    what += ": exception `" + val.to_std_string() + '\'';
     if (val.is_object()) {
       object o = val.to_object();
       if(o.has_property("fileName"))
-        ret += " at " + o.get_property("fileName").to_std_string()
-            +  ":" + o.get_property("lineNumber").to_std_string();
+        what += " at " + o.get_property("fileName").to_std_string()
+             +  ":" + o.get_property("lineNumber").to_std_string();
     }
   }
 
-  return ret;
+  return what;
 }
 }
 
