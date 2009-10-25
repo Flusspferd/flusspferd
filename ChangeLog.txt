@@ -11,6 +11,8 @@ Release 0.9
 - Add push for flusspferd::array (#144).
 - Adapt array::set_element to object::set_property interface (#146).
 - Renamed exception::empty to excepion::is_js_exception.
+- create_array no longer accepts a length parameter.
+- create_array accepts an input range for creation (#145).
 
 2009-10-24:
 - Remove support for old Spidermonkey versions.

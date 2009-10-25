@@ -105,7 +105,7 @@ void sqlite3::exec(call_context & x) {
             data.set_property( "bind", x.arg[1].to_object() );
         }
 
-        array arr = create_array( 1 );
+        array arr = create_array();
         arr.set_element(0, data);
         x.result = exec_internal( arr );
     }    
