@@ -27,10 +27,14 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_ARRAY_HPP
 #define FLUSSPFERD_ARRAY_HPP
 
+#ifndef PREPROC_DEBUG
 #include "object.hpp"
 #include <boost/utility/in_place_factory.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <cassert>
+#endif
+#include "detail/limit.hpp"
+#include <boost/preprocessor.hpp>
 
 namespace flusspferd {
 
@@ -65,6 +69,35 @@ public:
 
   /// Set an array element.
   void set_element(std::size_t n, value const &x);
+
+#ifndef IN_DOXYGEN
+
+#define FLUSSPFERD_ARRAY_PUSH(z, n, d) \
+  template< \
+    BOOST_PP_ENUM_PARAMS(n, typename T) \
+  > \
+  void push(BOOST_PP_ENUM_BINARY_PARAMS(n, T, const &x)) { \
+    call("push", BOOST_PP_ENUM_PARAMS(n, x)); \
+  } \
+  /**/
+
+  BOOST_PP_REPEAT_FROM_TO(
+    1,
+    BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
+    FLUSSPFERD_ARRAY_PUSH,
+    ~)
+
+#undef FLUSSPFERD_ARRAY_PUSH
+
+#else
+
+  /**
+   * Push elements onto the array. Equivalent to call("push", ...).
+   */
+  template<typename T0, ...>
+  void push(T0 const &x0, ...);
+
+#endif
 
   /// Const Array Iterator
   class iterator

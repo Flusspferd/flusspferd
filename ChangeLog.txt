@@ -8,6 +8,7 @@ Release 0.9
 - Better toString and toSource for native objects (#139).
 - Allow enabling the Tracemonkey JIT mode from C++ (#140).
 - Add == for flusspferd::value (#141).
+- Add push for flusspferd::array (#144).
 
 2009-10-24:
 - Remove support for old Spidermonkey versions.
