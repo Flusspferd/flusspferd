@@ -271,8 +271,18 @@ public:
   string to_source() const;
 };
 
+/**
+ * Compare two values for strict equality, like === in Javascript.
+ *
+ * @relates value
+ */
 bool operator==(value const &a, value const &b);
 
+/**
+ * Compare two values for strict inequality, like !== in Javascript.
+ *
+ * @relates value
+ */
 inline bool operator!=(value const &a, value const &b) {
   return !(a == b);
 }
