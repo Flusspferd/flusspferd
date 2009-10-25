@@ -47,8 +47,8 @@ object flusspferd::create_object(object const &proto) {
   return Impl::wrap_object(o);
 }
 
-array flusspferd::create_array(unsigned length) {
-  JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
+array flusspferd::create_array() {
+  JSObject *o = JS_NewArrayObject(Impl::current_context(), 0, 0);
   if (!o)
     throw exception("Could not create array");
 
