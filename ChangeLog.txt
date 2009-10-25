@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-10-25:
+- Add == for flusspferd::value (#141).
+
 2009-10-24:
 - Remove support for old Spidermonkey versions.
 - Constructor of root_* now explicit (#124).
