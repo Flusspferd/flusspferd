@@ -444,13 +444,12 @@ array fs_base::list(std::string const &dir) {
     throw exception(boost::str(format(error_sec) % "list" % dir));
   }
 
-
   root_array ret(create_array());
 
   fs::basic_directory_iterator<fs::path> it(dir);
 
   for (;  it != fs::directory_iterator(); ++it) {
-    ret.call("push", it->path().string());
+    ret.push(it->path().string());
   }
 
   return ret;

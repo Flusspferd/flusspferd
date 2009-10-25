@@ -493,7 +493,7 @@ void flusspferd_repl::parse_cmdline() {
   flusspferd::array arguments(flusspferd::create_array());
 
   for (int i = 1; i < argc; ++i)
-    arguments.call("push", std::string(argv[i]));
+    arguments.push(std::string(argv[i]));
 
   flusspferd::root_object results(flusspferd::getopt(spec, arguments));
 
