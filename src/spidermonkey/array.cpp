@@ -69,9 +69,10 @@ value array::get_element(std::size_t index) const {
   return result;
 }
 
-void array::set_element(std::size_t index, value const &v_) {
+value array::set_element(std::size_t index, value const &v_) {
   value v(v_);
   if (!JS_SetElement(Impl::current_context(),
                      get(), index, Impl::get_jsvalp(v)))
     throw exception("Could not set array element");
+  return v;
 }
