@@ -121,7 +121,7 @@ value exception::val() const {
   return p->exception_value ? *p->exception_value : value();
 }
 
-bool exception::empty() const {
+bool exception::is_js_exception() const {
   return p->empty;
 }
 

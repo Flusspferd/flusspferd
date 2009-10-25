@@ -58,7 +58,7 @@ value flusspferd::evaluate_in_scope(
                                 source, n, file, line, &rval);
   if(!ok) {
     exception e("Could not evaluate script");
-    if (!e.empty())
+    if (!e.is_js_exception())
       throw e;
   }
   return Impl::wrap_jsval(rval);
@@ -112,7 +112,7 @@ value flusspferd::execute(char const *filename, object const &scope_) {
 
   if (!ok) {
     exception e("Script execution failed");
-    if (!e.empty()) {
+    if (!e.is_js_exception()) {
       JS_DestroyScript(cx, script);
       throw e;
     }

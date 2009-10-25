@@ -92,14 +92,12 @@ struct exception : virtual std::runtime_error, virtual boost::exception {
   value val() const;
 
   /**
-   * "Emptiness".
-   *
-   * Will return only if the exception contains an exception fetched from the
+   * Will return true only if the exception contains an exception fetched from the
    * underlying Javascript engine.
    *
-   * @return Whether this exception is "empty".
+   * @return Whether this exception is a JavaScript exception.
    */
-  bool empty() const;
+  bool is_js_exception() const;
 
 public:
 #ifndef IN_DOXYGEN
