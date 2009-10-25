@@ -58,6 +58,10 @@ namespace detail {
  */
 class native_object_base : public object, private boost::noncopyable {
 public:
+  struct class_info {
+    static char const *full_name() { return ""; }
+  };
+
   /// Destructor.
   virtual ~native_object_base() = 0;
 
