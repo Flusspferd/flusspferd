@@ -27,6 +27,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_EXCEPTION_HPP
 #define FLUSSPFERD_EXCEPTION_HPP
 
+#include <boost/exception/exception.hpp>
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
@@ -39,8 +40,7 @@ class value;
  *
  * @ingroup exceptions
  */
-class exception : public std::runtime_error {
-public:
+struct exception : virtual std::runtime_error, virtual boost::exception {
   /**
    * Constructor.
    *
