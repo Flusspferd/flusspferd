@@ -47,26 +47,26 @@ struct exception::impl {
 
   context ctx;
   boost::scoped_ptr<root_value> exception_value;
-  bool empty;
+  bool is_js_exception;
 };
 
 exception::impl::impl(value const &v)
   : ctx(current_context()),
     exception_value(new root_value(v)),
-    empty(true)
+    is_js_exception(true)
 { }
 
 exception::impl::impl(std::string const &what, std::string const &type)
   : ctx(current_context()),
     exception_value(new root_value),
-    empty(true)
+    is_js_exception(true)
 {
   JSContext *c = Impl::get_context(ctx);
 
   value &v = *exception_value;
 
   if (JS_GetPendingException(c, Impl::get_jsvalp(v))) {
-    empty = false;
+    is_js_exception = false;
     JS_ClearPendingException(c);
   } else {
     try {
@@ -131,7 +131,7 @@ value exception::val() const {
 }
 
 bool exception::is_js_exception() const {
-  return p->empty;
+  return p->is_js_exception;
 }
 
 
