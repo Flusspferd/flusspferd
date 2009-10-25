@@ -154,6 +154,13 @@ void value::unbind() {
   setp(getvalp());
 }
 
+bool flusspferd::operator==(value const &a, value const &b) {
+  return JS_StrictlyEqual(
+    Impl::current_context(),
+    Impl::get_jsval(a),
+    Impl::get_jsval(b));
+}
+
 Impl::value_impl Impl::value_impl::from_double(double num) {
   value_impl result;
   if (!JS_NewNumberValue(

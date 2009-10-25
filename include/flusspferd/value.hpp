@@ -271,6 +271,12 @@ public:
   string to_source() const;
 };
 
+bool operator==(value const &a, value const &b);
+
+inline bool operator!=(value const &a, value const &b) {
+  return !(a == b);
+}
+
 }
 
 #include "convert.hpp"
