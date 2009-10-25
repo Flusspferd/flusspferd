@@ -74,7 +74,8 @@ void exception::init(char const *what, std::string const &type)
   this->p = p;
 }
 
-std::string exception::exception_message(char const *what) {
+namespace {
+std::string exception_message(char const *what) {
   std::string ret(what);
   jsval v;
   JSContext *const cx = Impl::current_context();
@@ -91,6 +92,19 @@ std::string exception::exception_message(char const *what) {
   }
 
   return ret;
+}
+}
+
+exception::exception(char const *what, std::string const &type)
+  : std::runtime_error(exception_message(what))
+{
+  init(what, type);
+}
+
+exception::exception(std::string const &what, std::string const &type)
+  : std::runtime_error(exception_message(what.c_str()))
+{
+  init(what.c_str(), type);
 }
 
 exception::exception(value const &val)
