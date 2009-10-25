@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "flusspferd/create.hpp"
 #include "flusspferd/value.hpp"
+#include "flusspferd/value_io.hpp"
 #include "test_environment.hpp"
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::array::iterator) //FIXME?
@@ -64,6 +65,14 @@ BOOST_AUTO_TEST_CASE( array ) {
     a.set_length(new_array_size);
     BOOST_CHECK_EQUAL(a.length(), new_array_size);
   }
+}
+
+BOOST_AUTO_TEST_CASE( push) {
+  flusspferd::array a = flusspferd::create_array();
+  a.push(0, 1, 2);
+  BOOST_CHECK_EQUAL(a.length(), 3);
+  for (int i = 0; i < 3; ++i)
+    BOOST_CHECK_EQUAL(a.get_element(i), flusspferd::value(i));
 }
 
 BOOST_AUTO_TEST_CASE( array_iterator ) {
