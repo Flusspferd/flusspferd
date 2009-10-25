@@ -68,7 +68,18 @@ public:
   value get_element(std::size_t n) const;
 
   /// Set an array element.
-  void set_element(std::size_t n, value const &x);
+  value set_element(std::size_t n, value const &x);
+
+  /// Set an array element.
+  template<typename T>
+  value set_element(std::size_t n, T const &v
+#ifndef IN_DOXYGEN
+  , typename boost::disable_if<boost::is_same<T, value> >::type * = 0
+#endif
+  ) {
+    return set_element(n, value(v));
+  }
+
 
 #ifndef IN_DOXYGEN
 

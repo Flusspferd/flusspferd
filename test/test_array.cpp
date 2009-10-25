@@ -47,11 +47,10 @@ BOOST_AUTO_TEST_CASE( array ) {
   BOOST_CHECK_EQUAL(a.get_element(0).get_int(), value0);
 
   for(std::size_t i = 0; i < array_size; ++i) {
-    a.set_element(i, flusspferd::value(static_cast<int>(i)));
+    a.set_element(i, static_cast<int>(i));
   }
   for(std::size_t i = 0; i < array_size; ++i) {
-    BOOST_CHECK(a.get_element(i).is_int());
-    BOOST_CHECK_EQUAL(a.get_element(i).get_int(), static_cast<int>(i));
+    BOOST_CHECK_EQUAL(a.get_element(i),flusspferd::value(static_cast<int>(i)));
   }
 
   {
