@@ -26,6 +26,7 @@ THE SOFTWARE.
 
 #include "flusspferd/create.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/init.hpp"
 #include "test_environment.hpp"
 #include <boost/assign/list_of.hpp>
 
@@ -34,7 +35,43 @@ using namespace boost::assign;
 
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
+BOOST_AUTO_TEST_CASE( object ) {
+  flusspferd::local_root_scope scope;
+
+  flusspferd::object o1(flusspferd::create<flusspferd::object>());
+  BOOST_CHECK(!o1.is_null());
+  BOOST_CHECK_EQUAL(
+    o1.prototype(), flusspferd::current_context().prototype(""));
+
+  flusspferd::object o2(
+    flusspferd::create<flusspferd::object>(_prototype = o1));
+  BOOST_CHECK(!o2.is_null());
+  BOOST_CHECK_EQUAL(o2.prototype(), o1);
+
+  o2 = flusspferd::create<flusspferd::object>(o1);
+  BOOST_CHECK(!o2.is_null());
+  BOOST_CHECK_EQUAL(o2.prototype(), o1);
+
+  flusspferd::object o3(
+    flusspferd::create<flusspferd::object>(_parent = o2));
+  BOOST_CHECK(!o3.is_null());
+  BOOST_CHECK_EQUAL(o3.parent(), o2);
+
+  flusspferd::object o4(
+    flusspferd::create<flusspferd::object>(o1, o2));
+  BOOST_CHECK(!o4.is_null());
+  BOOST_CHECK_EQUAL(o4.prototype(), o1);
+  BOOST_CHECK_EQUAL(o4.parent(), o2);
+
+  o4 = flusspferd::create<flusspferd::object>(_parent = o2, _prototype = o1);
+  BOOST_CHECK(!o4.is_null());
+  BOOST_CHECK_EQUAL(o4.prototype(), o1);
+  BOOST_CHECK_EQUAL(o4.parent(), o2);
+}
+
 BOOST_AUTO_TEST_CASE( array ) {
+  flusspferd::local_root_scope scope;
+
   flusspferd::array a(flusspferd::create<flusspferd::array>());
   BOOST_CHECK_EQUAL(a.length(), 0);
 

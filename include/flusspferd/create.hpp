@@ -354,13 +354,37 @@ function create_native_method(
 namespace param {
   BOOST_PARAMETER_NAME(length)
   BOOST_PARAMETER_NAME(contents)
+  BOOST_PARAMETER_NAME(prototype)
+  BOOST_PARAMETER_NAME(parent)
 }
 
 namespace detail {
-  flusspferd::array create_length_array(std::size_t length);
+  object create_object(object const &prototype, object const &parent);
+  array create_length_array(std::size_t length);
 
   template<typename Class>
   struct create_traits;
+
+  template<>
+  struct create_traits<flusspferd::object> {
+    typedef flusspferd::object result_type;
+
+    typedef boost::parameter::parameters<
+        param::tag::prototype,
+        param::tag::parent
+      > parameters;
+
+    static result_type create() {
+      return create_object(object(), object());
+    }
+
+    template<typename ArgPack>
+    static result_type create(ArgPack const &arg) {
+      return create_object(
+        arg[param::_prototype | object()],
+        arg[param::_parent | object()]);
+    }
+  };
 
   template<>
   struct create_traits<flusspferd::array> {
