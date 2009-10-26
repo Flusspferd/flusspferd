@@ -362,11 +362,6 @@ namespace detail {
   template<typename Class>
   struct create_traits;
 
-  template<typename T, typename C = void>
-  struct is_boost_range_impl {
-    typedef boost::mpl::false_ type;
-  };
-
   template<>
   struct create_traits<flusspferd::array> {
     typedef flusspferd::array result_type;
