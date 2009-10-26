@@ -37,6 +37,10 @@ THE SOFTWARE.
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/range.hpp>
+#include <boost/parameter/parameters.hpp>
+#include <boost/parameter/keyword.hpp>
+#include <boost/parameter/name.hpp>
+#include <boost/parameter/binding.hpp>
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
@@ -374,17 +378,97 @@ function create_native_method(
 
 //@}
 
-
+namespace param {
+  BOOST_PARAMETER_NAME(length)
+  BOOST_PARAMETER_NAME(contents)
+}
 
 namespace detail {
+  flusspferd::array create_length_array(std::size_t length);
 
   template<typename Class>
   struct create_traits;
 
+  template<typename T, typename C = void>
+  struct is_boost_range_impl {
+    typedef boost::mpl::false_ type;
+  };
+
+  template<>
+  struct create_traits<flusspferd::array> {
+    typedef flusspferd::array result_type;
+
+    typedef boost::parameter::parameters<
+        boost::parameter::optional<
+          boost::parameter::deduced<param::tag::length>,
+          boost::is_integral<boost::mpl::_>
+        >,
+        boost::parameter::optional<
+          boost::parameter::deduced<param::tag::contents>,
+          boost::mpl::not_<boost::is_integral<boost::mpl::_> >
+        >
+      >
+      parameters;
+
+    static flusspferd::array create() {
+      return create_length_array(0);
+    }
+
+    template<typename ArgPack>
+    static 
+    typename boost::enable_if<
+      boost::is_same<
+        typename boost::parameter::binding<
+          ArgPack,
+          param::tag::contents,
+          void
+        >::type,
+        void
+      >,
+      flusspferd::array
+    >::type
+    create(ArgPack const &arg) {
+      return create_length_array(arg[param::_length | 0]);
+    }
+
+    template<typename ArgPack>
+    static
+    typename boost::disable_if<
+      boost::is_same<
+        typename boost::parameter::binding<
+          ArgPack,
+          param::tag::contents,
+          void
+        >::type,
+        void
+      >,
+      flusspferd::array
+    >::type
+    create(ArgPack const &arg) {
+      return flusspferd::create_array(arg[param::_contents]);
+    }
+  };
+
 }
 
 template<typename Class>
-typename detail::create_traits<Class>::result_type create() {
+typename detail::create_traits<Class>::result_type
+create()
+{
+  typedef detail::create_traits<Class> traits;
+
+  return traits::create();
+}
+
+template<typename Class, typename T0>
+typename detail::create_traits<Class>::result_type
+create(
+  T0 const &x0,
+  typename detail::create_traits<Class>::parameters::template match<T0>::type kw = typename detail::create_traits<Class>::parameters())
+{
+  typedef detail::create_traits<Class> traits;
+
+  return traits::create(kw(x0));
 }
 
 }

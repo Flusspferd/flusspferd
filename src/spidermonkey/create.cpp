@@ -55,6 +55,14 @@ array flusspferd::create_array() {
   return object(Impl::wrap_object(o));
 }
 
+array flusspferd::detail::create_length_array(std::size_t length) {
+  JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
+  if (!o)
+    throw exception("Could not create array");
+
+  return object(Impl::wrap_object(o));
+}
+
 object flusspferd::detail::create_native_object(object const &proto) {
   return native_object_base::do_create_object(proto);
 }
