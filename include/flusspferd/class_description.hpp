@@ -152,7 +152,7 @@ THE SOFTWARE.
         return (p_full_name); \
       } \
       static ::flusspferd::object create_prototype() { \
-        ::flusspferd::object obj = ::flusspferd::create_object( \
+        ::flusspferd::object obj = ::flusspferd::create<flusspferd::object>( \
             ::flusspferd::prototype< p_base >() \
           ); \
         FLUSSPFERD_CD_METHODS(p_methods) \

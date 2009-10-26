@@ -341,27 +341,27 @@ void flusspferd_repl::load_config() {
 }
 
 flusspferd::object flusspferd_repl::option_spec() {
-  flusspferd::root_object spec(flusspferd::create_object());
+  flusspferd::root_object spec(flusspferd::create<flusspferd::object>());
 
-  flusspferd::object options(flusspferd::create_object());
+  flusspferd::object options(flusspferd::create<flusspferd::object>());
   spec.set_property("[options]", options);
   options.set_property("stop-early", true);
 
-  flusspferd::object help(flusspferd::create_object());
+  flusspferd::object help(flusspferd::create<flusspferd::object>());
   spec.set_property("help", help);
   help.set_property("alias", "h");
   help.set_property("doc", "Displays this message.");
   flusspferd::create_native_function(help, "callback",
     phoenix::bind(&flusspferd_repl::print_help, this, true));
 
-  flusspferd::object version(flusspferd::create_object());
+  flusspferd::object version(flusspferd::create<flusspferd::object>());
   spec.set_property("version", version);
   version.set_property("alias", "v");
   version.set_property("doc", "Print version and exit.");
   flusspferd::create_native_function(version, "callback",
     phoenix::bind(&flusspferd_repl::print_version, this));
 
-  flusspferd::object config(flusspferd::create_object());
+  flusspferd::object config(flusspferd::create<flusspferd::object>());
   spec.set_property("config", config);
   config.set_property("alias", "c");
   config.set_property("doc", "Load config from file.");
@@ -372,7 +372,7 @@ flusspferd::object flusspferd_repl::option_spec() {
       phoenix::ref(config_file) = args::arg2
     ));
 
-  flusspferd::object interactive_(flusspferd::create_object());
+  flusspferd::object interactive_(flusspferd::create<flusspferd::object>());
   spec.set_property("interactive", interactive_);
   interactive_.set_property("alias", "i");
   interactive_.set_property("doc", "Enter interactive mode (after files).");
@@ -382,7 +382,7 @@ flusspferd::object flusspferd_repl::option_spec() {
       phoenix::ref(interactive_set) = true
     )));
 
-  flusspferd::object machine_mode_(flusspferd::create_object());
+  flusspferd::object machine_mode_(flusspferd::create<flusspferd::object>());
   spec.set_property("machine-mode", machine_mode_);
   machine_mode_.set_property("alias", "0");
   machine_mode_.set_property("doc", "(Interactive) machine command mode (separator '\\0').");
@@ -393,7 +393,7 @@ flusspferd::object flusspferd_repl::option_spec() {
       phoenix::ref(interactive_set) = true
     )));
 
-  flusspferd::object file(flusspferd::create_object());
+  flusspferd::object file(flusspferd::create<flusspferd::object>());
   spec.set_property("file", file);
   file.set_property("alias", "f");
   file.set_property("doc", "Run this file before standard script handling.");
@@ -405,7 +405,7 @@ flusspferd::object flusspferd_repl::option_spec() {
                     args::arg2, File, true)
     ));
 
-  flusspferd::object expression(flusspferd::create_object());
+  flusspferd::object expression(flusspferd::create<flusspferd::object>());
   spec.set_property("expression", expression);
   expression.set_property("alias", "e");
   expression.set_property("doc", "Evaluate the expression.");
@@ -417,7 +417,7 @@ flusspferd::object flusspferd_repl::option_spec() {
                     args::arg2, Expression, true)
     ));
 
-  flusspferd::object include_path(flusspferd::create_object());
+  flusspferd::object include_path(flusspferd::create<flusspferd::object>());
   spec.set_property("include-path", include_path);
   include_path.set_property("alias", "I");
   include_path.set_property("doc", "Add include path.");
@@ -429,7 +429,7 @@ flusspferd::object flusspferd_repl::option_spec() {
                     args::arg2, IncludePath, false)
     ));
 
-  flusspferd::object module(flusspferd::create_object());
+  flusspferd::object module(flusspferd::create<flusspferd::object>());
   spec.set_property("module", module);
   module.set_property("alias", "M");
   module.set_property("doc", "Load module.");
@@ -441,7 +441,7 @@ flusspferd::object flusspferd_repl::option_spec() {
                     args::arg2, Module, false)
     ));
 
-  flusspferd::object main_module(flusspferd::create_object());
+  flusspferd::object main_module(flusspferd::create<flusspferd::object>());
   spec.set_property("main", main_module);
   main_module.set_property("alias", "m");
   main_module.set_property("doc", "Load module as the main module.");
@@ -453,7 +453,7 @@ flusspferd::object flusspferd_repl::option_spec() {
                     args::arg2, MainModule, true)
     ));
 
-  flusspferd::object no_global_history(flusspferd::create_object());
+  flusspferd::object no_global_history(flusspferd::create<flusspferd::object>());
   spec.set_property("no-global-history", no_global_history);
   no_global_history.set_property("doc", "Do not use a global history in interactive mode.");
   flusspferd::create_native_function(no_global_history, "callback",
@@ -461,7 +461,7 @@ flusspferd::object flusspferd_repl::option_spec() {
       phoenix::ref(history_file) = std::string()
     ));
 
-  flusspferd::object history_file_(flusspferd::create_object());
+  flusspferd::object history_file_(flusspferd::create<flusspferd::object>());
   spec.set_property("history-file", history_file_);
   history_file_.set_property("doc", "Sets history file (default: ~/.flusspferd-history)");
   history_file_.set_property("argument", "required");
@@ -472,13 +472,13 @@ flusspferd::object flusspferd_repl::option_spec() {
     ));
 
   // Hidden Options for Generator Purpose
-  flusspferd::object man_gen_(flusspferd::create_object());
+  flusspferd::object man_gen_(flusspferd::create<flusspferd::object>());
   spec.set_property("hidden-man", man_gen_);
   man_gen_.set_property("hidden", "true");
   flusspferd::create_native_function(man_gen_, "callback",
     phoenix::bind(&flusspferd_repl::print_man, this));
 
-  flusspferd::object bash_gen_(flusspferd::create_object());
+  flusspferd::object bash_gen_(flusspferd::create<flusspferd::object>());
   spec.set_property("hidden-bash", bash_gen_);
   bash_gen_.set_property("hidden", "true");
   flusspferd::create_native_function(bash_gen_, "callback",

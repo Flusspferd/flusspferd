@@ -210,7 +210,7 @@ object flusspferd::getopt(
 
   optspec spec(spec_, arguments);
 
-  spec.result = create_object();
+  spec.result = create<object>();
 
   array result_arguments = flusspferd::create<array>();
   spec.result.set_property("_", result_arguments);

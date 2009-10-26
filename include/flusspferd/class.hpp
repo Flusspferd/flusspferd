@@ -189,7 +189,7 @@ struct class_info {
    * @return Return the newly created prototype object.
    */
   static object create_prototype() {
-    return create_object();
+    return create<object>();
   }
 };
 

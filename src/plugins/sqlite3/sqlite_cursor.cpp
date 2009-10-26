@@ -133,7 +133,7 @@ object sqlite3_cursor::create_result_object() {
     local_root_scope scope;
     // Build up the row object.
     int cols = sqlite3_column_count(sth);
-    object row = create_object();
+    object row = create<object>();
     for (int i=0; i < cols; i++)
     {
         char16_t const * name_str = reinterpret_cast<char16_t const *>( sqlite3_column_name16(sth, i) );

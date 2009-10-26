@@ -37,16 +37,6 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-object flusspferd::create_object(object const &proto) {
-  JSObject *o = JS_NewObject(
-      Impl::current_context(), 0, Impl::get_object(proto), 0);
-
-  if (!o)
-    throw exception("Could not create object");
-
-  return Impl::wrap_object(o);
-}
-
 object flusspferd::detail::create_object(
   object const &proto, object const &parent)
 {
