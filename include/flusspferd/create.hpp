@@ -44,6 +44,7 @@ THE SOFTWARE.
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
+#include <boost/parameter/config.hpp>
 
 namespace flusspferd {
 
@@ -447,21 +448,31 @@ template<typename Class>
 typename detail::create_traits<Class>::result_type
 create()
 {
-  typedef detail::create_traits<Class> traits;
-
-  return traits::create();
+  return detail::create_traits<Class>::create();
 }
 
-template<typename Class, typename T0>
-typename detail::create_traits<Class>::result_type
-create(
-  T0 const &x0,
-  typename detail::create_traits<Class>::parameters::template match<T0>::type kw = typename detail::create_traits<Class>::parameters())
-{
-  typedef detail::create_traits<Class> traits;
+#define FLUSSPFERD_CREATE(z, n, d) \
+  template< \
+    typename Class, \
+    BOOST_PP_ENUM_PARAMS(n, typename T) \
+  > \
+  typename detail::create_traits<Class>::result_type \
+  create( \
+    BOOST_PP_ENUM_BINARY_PARAMS(n, T, const &x), \
+    typename detail::create_traits<Class>::parameters::template match<T0>::type kw = typename detail::create_traits<Class>::parameters()) \
+  { \
+    typedef detail::create_traits<Class> traits; \
+    return traits::create(kw(BOOST_PP_ENUM_PARAMS(n, x))); \
+  } \
+  /* */
 
-  return traits::create(kw(x0));
-}
+BOOST_PP_REPEAT_FROM_TO(
+  1,
+  BOOST_PP_INC(BOOST_PARAMETER_MAX_ARITY),
+  FLUSSPFERD_CREATE,
+  ~)
+
+#undef FLUSSPFERD_CREATE
 
 }
 
