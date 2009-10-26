@@ -99,7 +99,7 @@ void flusspferd::load_system_module(object &context) {
 
   exports.define_property(
     "args",
-    create_array(),
+    flusspferd::create<array>(),
     read_only_property | permanent_property);
 
   exports.define_property(

@@ -40,9 +40,7 @@ BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( array ) {
   std::size_t const array_size = 10;
-  flusspferd::array a = flusspferd::create_array();
-  BOOST_CHECK_EQUAL(a.length(), 0);
-  a.set_length(array_size);
+  flusspferd::array a = flusspferd::create<flusspferd::array>(array_size);
   BOOST_CHECK_EQUAL(a.length(), array_size);
   BOOST_CHECK_EQUAL(a.size(), a.length());
 
@@ -72,7 +70,7 @@ BOOST_AUTO_TEST_CASE( array ) {
 }
 
 BOOST_AUTO_TEST_CASE( push) {
-  flusspferd::array a = flusspferd::create_array();
+  flusspferd::array a = flusspferd::create<flusspferd::array>();
   a.push(0, 1, 2);
   BOOST_CHECK_EQUAL(a.length(), 3);
   for (int i = 0; i < 3; ++i)
@@ -80,7 +78,7 @@ BOOST_AUTO_TEST_CASE( push) {
 }
 
 BOOST_AUTO_TEST_CASE( create_range ) {
-  flusspferd::array a = flusspferd::create_array(
+  flusspferd::array a = flusspferd::create<flusspferd::array>(
     boost::assign::list_of
     (1)
     (2)
@@ -92,7 +90,7 @@ BOOST_AUTO_TEST_CASE( create_range ) {
 
 BOOST_AUTO_TEST_CASE( array_iterator ) {
   std::size_t const array_size = 10;
-  flusspferd::array a = flusspferd::create_array();
+  flusspferd::array a = flusspferd::create<flusspferd::array>();
 
   BOOST_CHECK_EQUAL(a.length(), 0);
 

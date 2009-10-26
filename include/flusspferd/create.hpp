@@ -76,34 +76,6 @@ object create_native_enumerable_object(object const &proto);
  */
 object create_object(object const &proto = object());
 
-/**
- * Create an array.
- *
- * @return The new array.
- */
-array create_array();
-
-/**
- * Create an array with the given contents.
- */
-template<typename Range>
-array create_array(Range const &r)
-{
-  typedef typename boost::range_iterator<Range>::type iterator;
-
-  local_root_scope scope;
-
-  array arr = flusspferd::create_array();
-
-  iterator first = boost::begin(r);
-  iterator last = boost::end(r);
-
-  for (iterator it = first; it != last; ++it)
-     arr.push(*it);
-
-  return arr;
-}
-
 #ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
@@ -445,7 +417,27 @@ namespace detail {
       flusspferd::array
     >::type
     create(ArgPack const &arg) {
-      return flusspferd::create_array(arg[param::_contents]);
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::contents
+        >::type
+        Range;
+
+      typedef typename boost::range_iterator<Range>::type iterator;
+
+      Range const &r = arg[param::_contents];
+
+      local_root_scope scope;
+
+      array arr = create_length_array(0);
+
+      iterator first = boost::begin(r);
+      iterator last = boost::end(r);
+
+      for (iterator it = first; it != last; ++it)
+        arr.push(*it);
+
+      return arr;
     }
   };
 
