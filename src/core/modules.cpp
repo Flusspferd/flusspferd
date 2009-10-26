@@ -63,7 +63,7 @@ void flusspferd::load_require_function(object container) {
 require::require()
   : native_function_base(1, "require"),
     module_cache(create_object()),
-    paths(create_array()),
+    paths(flusspferd::create<array>()),
     alias(create_object()),
     preload(create_object()),
     main(create_object())

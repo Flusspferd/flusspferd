@@ -408,7 +408,7 @@ array binary::split(value delim, object options) {
   typedef vector_type::iterator iterator;
   iterator pos = v_data.begin();
 
-  array results = create_array();
+  array results = flusspferd::create<array>();
 
   // Loop only through the first count-1 elements
   for (std::size_t n = 1; n < count; ++n) {

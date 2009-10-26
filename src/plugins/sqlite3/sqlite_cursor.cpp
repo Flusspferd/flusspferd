@@ -120,7 +120,7 @@ object sqlite3_cursor::create_result_array() {
     local_root_scope scope;
     // Build up the row object.
     int cols = sqlite3_column_count(sth);
-    array row = create_array();
+    array row = create<array>();
     for (int i=0; i < cols; i++)
     {
         row.set_element(i, get_column(i) );

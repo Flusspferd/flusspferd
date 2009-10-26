@@ -136,7 +136,7 @@ struct optspec {
       throw exception(("Unknown option " + name).c_str());
 
     if (!result.has_property(name))
-      result.set_property(name, create_array());
+      result.set_property(name, flusspferd::create<array>());
     array arr(result.get_property_object(name));
 
     if (eq == std::string::npos) {
@@ -171,7 +171,7 @@ struct optspec {
         throw exception(("Unknown option " + name).c_str());
 
       if (!result.has_property(name))
-        result.set_property(name, create_array());
+        result.set_property(name, flusspferd::create<array>());
       array arr(result.get_property_object(name));
       
       if (data->argument != item_type::none) {
@@ -212,7 +212,7 @@ object flusspferd::getopt(
 
   spec.result = create_object();
 
-  array result_arguments = create_array();
+  array result_arguments = flusspferd::create<array>();
   spec.result.set_property("_", result_arguments);
 
   bool accept_options = true;
