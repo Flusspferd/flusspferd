@@ -62,11 +62,11 @@ void flusspferd::load_require_function(object container) {
 
 require::require()
   : native_function_base(1, "require"),
-    module_cache(create_object()),
+    module_cache(flusspferd::create<object>()),
     paths(flusspferd::create<array>()),
-    alias(create_object()),
-    preload(create_object()),
-    main(create_object())
+    alias(flusspferd::create<object>()),
+    preload(flusspferd::create<object>()),
+    main(flusspferd::create<object>())
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
@@ -83,6 +83,8 @@ require::~require() {}
 
 // Static helper method to actually create |require| function objects
 object require::create_require() {
+  local_root_scope scope;
+
   object fn = create_native_functor_function<require>(object());
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
@@ -233,7 +235,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
     module = main;
   }
   else {
-    module = create_object();
+    module = create<object>();
     module.set_property("uri", id);
     module.set_property("id", id);
   }
@@ -365,10 +367,10 @@ object require::load_top_level_module(std::string &id) {
   security &sec = security::get();
 
   object classes_object = flusspferd::global();
-  object ctx = flusspferd::create_object(classes_object);
+  object ctx = flusspferd::create<object>(classes_object);
   ctx.set_parent(classes_object);
 
-  root_object exports(create_object());
+  root_object exports(flusspferd::create<object>());
 
   ctx.define_property(
     "exports",
@@ -469,7 +471,7 @@ object require::load_absolute_js_file(fs::path path, std::string &id) {
   if (sec.check_path(path.string(), security::READ) &&
       fs::exists(path))
   {
-    root_object exports(create_object());
+    root_object exports(flusspferd::create<object>());
 
     module_cache.set_property(id, exports);
     require_js(path, id, exports);

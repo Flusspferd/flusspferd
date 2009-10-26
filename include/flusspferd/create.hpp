@@ -61,22 +61,6 @@ object create_native_enumerable_object(object const &proto);
 }
 #endif
 
-/**
- * @name Creating values
- * @addtogroup create
- */
-//@{
-/**
- * Create a simple object.
- *
- * Creates a new object with prototype @p proto. If proto is @c null,
- * @c Object.prototype will be used.
- *
- * @param proto The object to use as prototype.
- * @return The new object.
- */
-object create_object(object const &proto = object());
-
 #ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \

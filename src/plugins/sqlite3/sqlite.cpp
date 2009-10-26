@@ -100,7 +100,7 @@ void sqlite3::exec(call_context & x) {
     }
     
     if ( x.arg[0].is_string() ) {
-        object data = create_object();
+        object data = create<object>();
         data.set_property("sql", x.arg[0].get_string() );        
 
         if ( x.arg.size() > 1 ) {

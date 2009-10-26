@@ -183,7 +183,7 @@ context context::create() {
   current_context_scope scope(c);
 
   // add standard prototype (for e.g. native_object_base)
-  object std_proto = create_object().prototype();
+  object std_proto = flusspferd::create<object>().prototype();
   c.add_prototype("", std_proto);
 
   return c;

@@ -63,7 +63,7 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   // Create the top level |module| and |exports| properties.
   scope.define_property("module", require_fn.get_property("main"), dont_enumerate);
 
-  object exports = create_object();
+  object exports = create<object>();
   scope.define_property("exports", exports, dont_enumerate);
 
   flusspferd::object preload = require_fn.get_property_object("preload");

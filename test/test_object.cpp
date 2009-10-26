@@ -48,7 +48,8 @@ BOOST_AUTO_TEST_CASE( null_object ) {
 }
 
 BOOST_AUTO_TEST_CASE( plain_object ) {
-  flusspferd::object const &plain_object = flusspferd::create_object();
+  flusspferd::object const &plain_object =
+    flusspferd::create<flusspferd::object>();
   BOOST_CHECK(!plain_object.is_null());
 
   BOOST_CHECK_EQUAL(plain_object, plain_object);
@@ -59,12 +60,13 @@ BOOST_AUTO_TEST_CASE( plain_object ) {
 
   BOOST_CHECK_EQUAL(plain_object, object_copy);
 
-  flusspferd::object const &plain_object2 = flusspferd::create_object();
+  flusspferd::object const &plain_object2 =
+    flusspferd::create<flusspferd::object>();
   BOOST_CHECK_NE(plain_object, plain_object2);
 }
 
 BOOST_AUTO_TEST_CASE( object_property ) {
-  flusspferd::object obj = flusspferd::create_object();
+  flusspferd::object obj = flusspferd::create<flusspferd::object>();
   std::string const name = "foobar";
   flusspferd::value const v(409);
   obj.set_property(name, v);
@@ -77,7 +79,7 @@ BOOST_AUTO_TEST_CASE( object_property ) {
 }
 
 BOOST_AUTO_TEST_CASE( object_property_value ) {
-  flusspferd::object obj = flusspferd::create_object();
+  flusspferd::object obj = flusspferd::create<flusspferd::object>();
   flusspferd::value const name = flusspferd::string("foobar");
   flusspferd::value const v(409);
   obj.set_property(name, v);
@@ -145,7 +147,7 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
 }
 
 BOOST_AUTO_TEST_CASE( recursive_loop_on_set_property ) {
-  flusspferd::object object = flusspferd::create_object();
+  flusspferd::object object = flusspferd::create<flusspferd::object>();
 
   object.set_property( flusspferd::string(), flusspferd::string() );
   

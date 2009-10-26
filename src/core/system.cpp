@@ -88,7 +88,7 @@ void flusspferd::load_system_module(object &context) {
     read_only_property | permanent_property);
 
 
-  load_class<environment>(create_object());
+  load_class<environment>(create<object>());
   call_context x;
 
   exports.define_property(
