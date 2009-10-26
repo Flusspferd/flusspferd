@@ -490,7 +490,7 @@ flusspferd::object flusspferd_repl::option_spec() {
 void flusspferd_repl::parse_cmdline() {
   flusspferd::root_object spec(option_spec());
 
-  flusspferd::array arguments(flusspferd::create_array());
+  flusspferd::root_array arguments(flusspferd::create_array());
 
   for (int i = 1; i < argc; ++i)
     arguments.push(std::string(argv[i]));
