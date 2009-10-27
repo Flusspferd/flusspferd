@@ -47,10 +47,10 @@ THE SOFTWARE.
 
 
 using namespace flusspferd;
+using namespace flusspferd::param;
 
 namespace algo = boost::algorithm;
 namespace fs = boost::filesystem;
-
 
 static fs::path make_dsoname(std::string const &id);
 
@@ -224,9 +224,12 @@ void require::require_js(fs::path filename, std::string const &id, object export
   argnames.push_back("module");
 
   std::string fname = filename.string();
-  function fn = ::flusspferd::create_function(
-      fname, argnames.size(), argnames,
-      module_text, fname.c_str(), 1ul);
+  function fn = flusspferd::create<flusspferd::function>(
+      _name = fname,
+      _argument_names = argnames,
+      _source = module_text,
+      _file = fname.c_str(),
+      _line = 1ul);
 
   object module;
 
