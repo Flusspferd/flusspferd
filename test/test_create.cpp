@@ -120,4 +120,30 @@ BOOST_AUTO_TEST_CASE( container ) {
   BOOST_CHECK_EQUAL(attr.flags, flusspferd::no_property_flag);
 }
 
+BOOST_AUTO_TEST_CASE( function ) {
+  flusspferd::local_root_scope scope;
+
+  flusspferd::function f = flusspferd::create<flusspferd::function>();
+  flusspferd::value v;
+  BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
+  BOOST_CHECK_EQUAL(v, flusspferd::value());
+
+  f = flusspferd::create<flusspferd::function>(
+    _argument_names = list_of("a"),
+    _source = "return a * 2");
+  BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 4));
+  BOOST_CHECK_EQUAL(v, flusspferd::value(8));
+
+  f = flusspferd::create<flusspferd::function>(
+    "name",
+    "return x + y",
+    list_of("x")("y"),
+    "file",
+    666);    
+  BOOST_CHECK_EQUAL(f.name(), "name");
+  BOOST_CHECK_EQUAL(f.arity(), 2);
+  BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 1, 2));
+  BOOST_CHECK_EQUAL(v, flusspferd::value(3));
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -344,11 +344,23 @@ namespace param {
   BOOST_PARAMETER_NAME(contents)
   BOOST_PARAMETER_NAME(prototype)
   BOOST_PARAMETER_NAME(parent)
+
+  BOOST_PARAMETER_NAME(argument_names)
+  BOOST_PARAMETER_NAME(source)
+  BOOST_PARAMETER_NAME(file)
+  BOOST_PARAMETER_NAME(line)
 }
 
 namespace detail {
   object create_object(object const &prototype, object const &parent);
   array create_length_array(std::size_t length);
+  function create_source_function(
+    flusspferd::string const &name,
+    std::vector<flusspferd::string> const &argnames,
+    flusspferd::string const &body,
+    flusspferd::string const &file,
+    unsigned line);
+
 
   template<typename Class>
   struct create_traits;
@@ -456,6 +468,48 @@ namespace detail {
         arr.push(*it);
 
       return arr;
+    }
+  };
+
+  template<>
+  struct create_traits<function> {
+    typedef function result_type;
+
+    typedef boost::parameter::parameters<
+        param::tag::name,
+        param::tag::source,
+        param::tag::argument_names,
+        param::tag::file,
+        param::tag::line
+      > parameters;
+
+    static result_type create() {
+      flusspferd::root_string empty((flusspferd::string()));
+      return create_source_function(
+        empty,
+        std::vector<flusspferd::string>(),
+        empty,
+        empty,
+        0);
+    }
+
+    template<typename ArgPack>
+    static result_type create(ArgPack const &arg) {
+      local_root_scope scope;
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::argument_names,
+          std::vector<flusspferd::string>
+        >::type Range;
+      Range const &r = arg[param::_argument_names | std::vector<flusspferd::string>()];
+      std::vector<flusspferd::string> arg_names(boost::begin(r), boost::end(r));
+     
+      return create_source_function(
+        flusspferd::string(arg[param::_name | flusspferd::string()]),
+        arg_names,
+        arg[param::_source],
+        arg[param::_file | flusspferd::string()],
+        arg[param::_line | 0]);
     }
   };
 
