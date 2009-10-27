@@ -68,10 +68,11 @@ object create_native_enumerable_object(object const &proto);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  typename boost::enable_if< boost::mpl::not_<  \
-    typename T::class_info::custom_enumerate >, \
-  T& >::type                                    \
-  create_native_object(      \
+  typename boost::disable_if< \
+    typename T::class_info::custom_enumerate, \
+    T& \
+  >::type \
+  create_native_object( \
     object proto \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
@@ -86,11 +87,12 @@ object create_native_enumerable_object(object const &proto);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  typename boost::enable_if<                          \
-    typename T::class_info::custom_enumerate,         \
-  T& >::type                                          \
-  create_native_object(                               \
-    object proto                                      \
+  typename boost::enable_if< \
+    typename T::class_info::custom_enumerate, \
+    T& \
+  >::type \
+  create_native_object( \
+    object proto \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
     if (proto.is_null()) \
