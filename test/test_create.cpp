@@ -91,4 +91,33 @@ BOOST_AUTO_TEST_CASE( array ) {
   BOOST_CHECK_EQUAL(a.get_element(0), flusspferd::value(9));
 }
 
+BOOST_AUTO_TEST_CASE( container ) {
+  flusspferd::local_root_scope scope;
+  flusspferd::property_attributes attr;
+
+  flusspferd::object cont = flusspferd::create<flusspferd::object>();
+  BOOST_CHECK(!cont.is_null());
+
+  flusspferd::object o =
+    flusspferd::create<flusspferd::object>(
+      _container = cont,
+      _name = "o"
+    );
+  BOOST_CHECK(!o.is_null());
+  BOOST_CHECK_EQUAL(cont.get_property_object("o"), o);
+  BOOST_CHECK(cont.get_property_attributes("o", attr));
+  BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);
+
+  flusspferd::array a =
+    flusspferd::create<flusspferd::array>(
+      _name = "a",
+      5,
+      _container = cont,
+      _attributes = flusspferd::no_property_flag);
+  BOOST_CHECK_EQUAL(a.length(), 5);
+  BOOST_CHECK_EQUAL(cont.get_property_object("a"), a);
+  BOOST_CHECK(cont.get_property_attributes("a", attr));
+  BOOST_CHECK_EQUAL(attr.flags, flusspferd::no_property_flag);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -336,6 +336,10 @@ function create_native_method(
 //@}
 
 namespace param {
+  BOOST_PARAMETER_NAME(container)
+  BOOST_PARAMETER_NAME(name)
+  BOOST_PARAMETER_NAME(attributes)
+
   BOOST_PARAMETER_NAME(length)
   BOOST_PARAMETER_NAME(contents)
   BOOST_PARAMETER_NAME(prototype)
@@ -349,13 +353,20 @@ namespace detail {
   template<typename Class>
   struct create_traits;
 
+  typedef param::tag::container container_spec;
+  typedef param::tag::name name_spec;
+  typedef param::tag::attributes attributes_spec;
+
   template<>
   struct create_traits<flusspferd::object> {
     typedef flusspferd::object result_type;
 
     typedef boost::parameter::parameters<
         param::tag::prototype,
-        param::tag::parent
+        param::tag::parent,
+        container_spec,
+        name_spec,
+        attributes_spec
       > parameters;
 
     static result_type create() {
@@ -382,7 +393,10 @@ namespace detail {
         boost::parameter::optional<
           boost::parameter::deduced<param::tag::contents>,
           boost::mpl::not_<boost::is_integral<boost::mpl::_> >
-        >
+        >,
+        container_spec,
+        name_spec,
+        attributes_spec
       >
       parameters;
 
@@ -445,6 +459,48 @@ namespace detail {
     }
   };
 
+  template<typename Class, typename ArgPack>
+  typename boost::enable_if<
+    boost::is_same<
+      typename boost::parameter::binding<
+        ArgPack,
+        param::tag::container,
+        void
+      >::type,
+      void
+    >,
+    typename create_traits<Class>::result_type
+  >::type
+  create_helper(ArgPack const &arg) {
+    return create_traits<Class>::create(arg);
+  }
+
+  template<typename Class, typename ArgPack>
+  typename boost::disable_if<
+    boost::is_same<
+      typename boost::parameter::binding<
+        ArgPack,
+        param::tag::container,
+        void
+      >::type,
+      void
+    >,
+    typename create_traits<Class>::result_type
+  >::type
+  create_helper(ArgPack const &arg) {
+    typedef create_traits<Class> traits;
+    local_root_scope scope;
+
+    typename traits::result_type result = traits::create(arg);
+
+    object container(arg[param::_container]);
+    container.define_property(
+      arg[param::_name],
+      result,
+      arg[param::_attributes | dont_enumerate]);
+
+    return result;
+  }
 }
 
 template<typename Class>
@@ -465,7 +521,7 @@ create()
     typename detail::create_traits<Class>::parameters::template match<T0>::type kw = typename detail::create_traits<Class>::parameters()) \
   { \
     typedef detail::create_traits<Class> traits; \
-    return traits::create(kw(BOOST_PP_ENUM_PARAMS(n, x))); \
+    return detail::create_helper<Class>(kw(BOOST_PP_ENUM_PARAMS(n, x))); \
   } \
   /* */
 
