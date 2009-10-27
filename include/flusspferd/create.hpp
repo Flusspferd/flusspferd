@@ -130,14 +130,6 @@ T &create_native_object(object const &proto, ...);
  */
 //@{
 
-function create_function(
-    std::string const &name,
-    unsigned n_args,
-    std::vector<std::string> argnames,
-    flusspferd::string const &body,
-    std::string const &file,
-    unsigned line);
-
 /**
  * Create a new native function.
  *

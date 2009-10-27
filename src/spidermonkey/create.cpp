@@ -68,42 +68,6 @@ object flusspferd::detail::create_native_enumerable_object(object const &proto) 
   return native_object_base::do_create_enumerable_object(proto);
 }
 
-function flusspferd::create_function(
-    std::string const &name,
-    unsigned n_args,
-    std::vector<std::string> argnames,
-    flusspferd::string const &body,
-    std::string const &file,
-    unsigned line)
-{
-  JSContext *cx = Impl::current_context();
-
-  std::vector<char const *> argnames_c;
-  argnames_c.reserve(argnames.size());
-
-  for (std::vector<std::string>::const_iterator it = argnames.begin();
-      it != argnames.end();
-      ++it)
-    argnames_c.push_back(it->c_str());
-
-  JSFunction *fun =
-      JS_CompileUCFunction(
-        cx,
-        0,
-        name.c_str(),
-        n_args,
-        &argnames_c[0],
-        body.data(),
-        body.length(),
-        file.c_str(),
-        line);
-
-  if (!fun)
-    throw exception("Could not compile function");
-
-  return Impl::wrap_function(fun);
-}
-
 function flusspferd::detail::create_source_function(
     flusspferd::string const &name,
     std::vector<flusspferd::string> const &argnames,

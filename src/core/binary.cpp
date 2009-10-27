@@ -134,13 +134,11 @@ void binary::augment_prototype(object &proto) {
     "}"
     ;
   function values_fn =
-    create_function(
-      "values",
-      0,
-      std::vector<std::string>(),
-      string(js_val_iter),
-      __FILE__,
-      __LINE__);
+    flusspferd::create<function>(
+      param::_name = "values",
+      param::_source = string(js_val_iter),
+      param::_file = __FILE__,
+      param::_line = __LINE__);
 
   proto.define_property("values", value(),
       property_attributes(dont_enumerate, values_fn));
