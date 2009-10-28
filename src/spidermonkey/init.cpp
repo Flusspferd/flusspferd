@@ -42,18 +42,14 @@ using namespace flusspferd;
 
 static boost::thread_specific_ptr<init> p_instance;
 
-#if JS_VERSION >= 180
 static boost::once_flag runtime_created = BOOST_ONCE_INIT;
-#endif
 
 class init::impl {
 public:
   // we use a single JS_Runtime for each process!
   impl()
   {
-#if JS_VERSION >= 180
     boost::call_once(runtime_created, JS_SetCStringsAreUTF8);
-#endif
 
     if (!JS_CStringsAreUTF8())
       throw std::runtime_error("UTF8 support in Spidermonkey required");

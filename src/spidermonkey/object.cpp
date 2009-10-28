@@ -36,12 +36,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
-#include <cassert>
 #include <js/jsapi.h>
-
-#if JS_VERSION < 180
-#include <js/jsobj.h>
-#endif
 
 using namespace flusspferd;
 
@@ -179,20 +174,9 @@ bool object::has_own_property(value const &id) const {
     throw exception("Could not check property (object is null)");
 
   JSBool has;
-#if JS_VERSION >= 180
   string name = id.to_string();
   if (!JS_AlreadyHasOwnUCProperty(Impl::current_context(), get_const(),
                                   name.data(), name.length(), &has))
-#else
-  JSObject *obj = get_const();
-  jsval argv[] = { Impl::get_jsval(id) };
-  jsval vp;
-  JSBool ret = js_HasOwnPropertyHelper(Impl::current_context(), obj,
-                                       obj->map->ops->lookupProperty, 1, argv, 
-                                       &vp);
-  has = JSVAL_TO_BOOLEAN(vp);
-  if (!ret)
-#endif
   {
     throw exception("Unable to check for own property");
   }

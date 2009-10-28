@@ -58,7 +58,7 @@ public:
         flusspferd::array result = flusspferd::create_array();
 
         for (iterator it = data.begin(); it != data.end(); ++it) {
-            result.call("push", *it);
+            result.push(*it);
         }
 
         return result;

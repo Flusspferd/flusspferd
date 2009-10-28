@@ -40,68 +40,37 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 
-class exception::impl {
-public:
-  impl() : empty(true) {}
-
+struct exception::impl {
+  impl(std::string const &what, std::string const &type);
+  impl(value const &v);
   ~impl();
 
   context ctx;
   boost::scoped_ptr<root_value> exception_value;
-  bool empty;
+  bool is_js_exception;
 };
 
-void exception::init(char const *what, std::string const &type)
+exception::impl::impl(value const &v)
+  : ctx(current_context()),
+    exception_value(new root_value(v)),
+    is_js_exception(true)
+{ }
+
+exception::impl::impl(std::string const &what, std::string const &type)
+  : ctx(current_context()),
+    exception_value(new root_value),
+    is_js_exception(true)
 {
-  boost::shared_ptr<impl> p(new impl);
+  JSContext *const cx = Impl::get_context(ctx);
 
-  p->exception_value.reset(new root_value);
-  p->ctx = current_context();
-
-  JSContext *ctx = Impl::get_context(p->ctx);
-
-  value &v = *p->exception_value;
-
-  if (JS_GetPendingException(ctx, Impl::get_jsvalp(v))) {
-    p->empty = false;
-    JS_ClearPendingException(ctx);
+  if (JS_GetPendingException(cx, Impl::get_jsvalp(*exception_value))) {
+    is_js_exception = false;
+    JS_ClearPendingException(cx);
   } else {
     try {
-      v = global().call(type, what);
+      *exception_value = global().call(type, what);
     } catch (...) { }
   }
-
-  this->p = p;
-}
-
-std::string exception::exception_message(char const *what) {
-  std::string ret(what);
-  jsval v;
-  JSContext *const cx = Impl::current_context();
-
-  if (JS_GetPendingException(cx, &v)) {
-    value val = Impl::wrap_jsval(v);
-    ret += ": exception `" + val.to_std_string() + '\'';
-    if (val.is_object()) {
-      object o = val.to_object();
-      if(o.has_property("fileName"))
-        ret += " at " + o.get_property("fileName").to_std_string()
-            +  ":" + o.get_property("lineNumber").to_std_string();
-    }
-  }
-
-  return ret;
-}
-
-exception::exception(value const &val)
-  : std::runtime_error(val.to_std_string()), p(new impl)
-{
-  p->exception_value.reset(new root_value(val));
-  p->ctx = current_context();
-}
-
-exception::~exception() throw()
-{
 }
 
 exception::impl::~impl() {
@@ -110,6 +79,44 @@ exception::impl::~impl() {
     exception_value.reset();
   }
 }
+
+namespace {
+std::string exception_message(std::string what) {
+  jsval v;
+  JSContext *const cx = Impl::current_context();
+
+  if (JS_GetPendingException(cx, &v)) {
+    value val = Impl::wrap_jsval(v);
+    what += ": exception `" + val.to_std_string() + '\'';
+    if (val.is_object()) {
+      object o = val.to_object();
+      if(o.has_property("fileName"))
+        what += " at " + o.get_property("fileName").to_std_string()
+             +  ':' + o.get_property("lineNumber").to_std_string();
+    }
+  }
+
+  return what;
+}
+}
+
+exception::exception(char const *what, std::string const &type)
+  : std::runtime_error(exception_message(what)),
+    p(new impl(what, type))
+{ }
+
+exception::exception(std::string const &what, std::string const &type)
+  : std::runtime_error(exception_message(what.c_str())),
+    p(new impl(what, type))
+{ }
+
+exception::exception(value const &val)
+  : std::runtime_error(val.to_std_string()),
+    p(new impl(val))
+{ }
+
+exception::~exception() throw()
+{ }
 
 void exception::throw_js_INTERNAL() {
   JS_SetPendingException(
@@ -121,8 +128,8 @@ value exception::val() const {
   return p->exception_value ? *p->exception_value : value();
 }
 
-bool exception::empty() const {
-  return p->empty;
+bool exception::is_js_exception() const {
+  return p->is_js_exception;
 }
 
 

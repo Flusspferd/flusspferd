@@ -145,11 +145,11 @@ struct optspec {
           throw exception(
             ("No argument supplied for long option " + name).c_str());
         std::string const &arg = arguments.get_element(pos).to_std_string();
-        arr.call("push", arg);
+        arr.push(arg);
         if (!data->callback.is_null())
           data->callback.call(result, name, arg);
       } else {
-        arr.call("push", value());
+        arr.push(value());
         if (!data->callback.is_null())
           data->callback.call(result, name);
       }
@@ -157,7 +157,7 @@ struct optspec {
       if (data->argument == item_type::none)
         throw exception(("No argument allowed for option " + name).c_str());
       std::string const &arg = opt.substr(eq + 1);
-      arr.call("push", arg);
+      arr.push(arg);
       if (!data->callback.is_null())
         data->callback.call(result, name, arg);
     }
@@ -183,12 +183,12 @@ struct optspec {
         else
           throw exception(
               ("No argument supplied for short option " + name).c_str());
-        arr.call("push", arg);
+        arr.push(arg);
         if (!data->callback.is_null())
           data->callback.call(result, name, arg);
         break;
       } else {
-        arr.call("push", value());
+        arr.push(value());
         if (!data->callback.is_null())
           data->callback.call(result, name);
       }
@@ -228,7 +228,7 @@ object flusspferd::getopt(
       else
         spec.handle_short(arg.substr(1), i);
     } else {
-      result_arguments.call("push", arg);
+      result_arguments.push(arg);
       if (spec.stop_early)
         accept_options = false;
     }

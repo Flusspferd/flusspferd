@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <boost/type_traits/is_function.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/range.hpp>
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
@@ -74,10 +75,30 @@ object create_object(object const &proto = object());
 /**
  * Create an array.
  *
- * @param length The initial length of the new array.
  * @return The new array.
  */
-array create_array(unsigned int length = 0);
+array create_array();
+
+/**
+ * Create an array with the given contents.
+ */
+template<typename Range>
+array create_array(Range const &r)
+{
+  typedef typename boost::range_iterator<Range>::type iterator;
+
+  local_root_scope scope;
+
+  array arr = flusspferd::create_array();
+
+  iterator first = boost::begin(r);
+  iterator last = boost::end(r);
+
+  for (iterator it = first; it != last; ++it)
+     arr.push(*it);
+
+  return arr;
+}
 
 #ifndef IN_DOXYGEN
 

@@ -60,31 +60,12 @@ $ sudo apt-get install git-core   # optional
 @endverbatim
  *
  * @section spidermonkey Building Spidermonkey
- * The Spidermonkey packages that come with Ubuntu are broken and Flusspferd
- * won't work with them. This might not be the fault of the Ubuntu maintainers
- * since building Spidermonkey is a bit messy due to the lack of a proper build
- * system. The situation is improving with Spidermonkey 1.8.1 but since 1.8.1 is
- * not finally released at the time and because, due to major changes
- * (Tracemonkey), it is not that stable at the moment we will stick with
- * Spidermonkey 1.8rc1 (which isn't as similar to 1.8.1 as you might think).
- * If you really need speed or want the newest stuff, just check out
- * Spidermonkey 1.8.1.
  *
- * Flusspferd should work with all versions of Spidermonkey from 1.7 upwards.
+ * Build Spidermonkey tip (from the HG repository mozilla-central), or
+ * 1.8.1 if available.
  *
- * @verbatim
-$ wget http://ftp.mozilla.org/pub/mozilla.org/js/js-1.8.0-rc1.tar.gz
-$ tar xzf js-1.8.0-rc1.tar.gz
-$ cd js/src/
-$ make -f Makefile.ref
-$ sudo mkdir /usr/local/include/js
-$ sudo cp *.h *.tbl Linux_All_DBG.OBJ/*.h /usr/local/include/js/
-$ sudo cp Linux_All_DBG.OBJ/libjs.* /usr/local/lib/
-$ cd ../..
-@endverbatim
- *
- * <a href="https://developer.mozilla.org/En/SpiderMonkey/Build_Documentation">
- * There is more detailed build documentation over at the Mozilla Developer
+ * <a href="https://developer.mozilla.org/en/SpiderMonkey/Build_Documentation">
+ * There is a detailed build documentation over at the Mozilla Developer
  * Center Wiki</a>.
  *
  * @section flusspferd Building Flusspferd
@@ -92,7 +73,7 @@ $ cd ../..
  * If you have downloaded a <a href="https://sourceforge.net/projects/flusspferd/files/">
  * release file</a>, you should unpack it.
  *
- * Alternatively, you can use git to check out the newest (but probably
+ * Alternatively, you can use git to check out the newest (but possibly
  * unstable) version of flusspferd:
  *
  * @verbatim

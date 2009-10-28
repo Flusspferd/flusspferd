@@ -35,9 +35,8 @@ THE SOFTWARE.
  * @li <a href="http://www.cmake.org/">cmake</a> 2.6 or higher,
  * @li <a href="http://www.boost.org/">Boost</a> 1.36 or higher,
  * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
- *     1.7 or higher 
- *     (<a href="http://ftp.mozilla.org/pub/mozilla.org/js/">download here</a>).
- *
+ *     1.8.1 or higher (NOT 1.8.0)
+ * @li Depending on your platform, you need to install iconv.
  *
  * Recommended, but optional:
  *
