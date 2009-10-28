@@ -99,6 +99,10 @@ struct exception : virtual std::runtime_error, virtual boost::exception {
    */
   bool empty() const { return is_js_exception(); }
 
+  /**
+   * This function returns the error message.
+   */
+  virtual char const *what() const throw();
 public:
 #ifndef IN_DOXYGEN
   void throw_js_INTERNAL();
