@@ -50,7 +50,7 @@ namespace {
 		{ }
 
 		char const *what() throw() {
-			if(CURLcode const *code = ::boost::get_error_info<tag_curlcode>(*this)) {
+			if(CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
 				std::string what_ = flusspferd::exception::what();
 				what_ += ": ";
 				what_ += curl_easy_strerror(*code);
