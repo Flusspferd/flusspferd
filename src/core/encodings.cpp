@@ -164,8 +164,13 @@ void encodings::transcoder::init(std::string const &from, std::string const &to)
 
   p->conv = iconv_open(to.c_str(), from.c_str());
 
-  if (p->conv == iconv_t(-1))
-    throw exception("Could not create Transcoder with iconv");
+  if (p->conv == iconv_t(-1)) {
+    std::ostringstream message;
+    message << "Could not create Transcoder (iconv) "
+            << "from charset \"" << from << "\" "
+            << "to charset \"" << to << "\"";
+    throw exception(message.str());
+  }
 
   this->p.swap(p);
 }

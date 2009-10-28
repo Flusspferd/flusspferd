@@ -200,10 +200,10 @@ void fs_base::touch(std::string const &str, object mtime_o) {
   std::size_t mtime;
 
   if (!mtime_o.is_null()) {
-    if (!(ctor = mtime_o.get_property("constructor")).is_object() ||
-        ctor.get_object() != date)
+    ctor = mtime_o.get_property("constructor");
+    if (ctor.to_object() != date)
     {
-      throw exception("touch: expects a Date as it's second argument if present",
+      throw exception("touch: expects a Date as its second argument if present",
                       "TypeError");
     }
 
@@ -444,13 +444,12 @@ array fs_base::list(std::string const &dir) {
     throw exception(boost::str(format(error_sec) % "list" % dir));
   }
 
-
   root_array ret(create_array());
 
   fs::basic_directory_iterator<fs::path> it(dir);
 
   for (;  it != fs::directory_iterator(); ++it) {
-    ret.call("push", it->path().string());
+    ret.push(it->path().string());
   }
 
   return ret;

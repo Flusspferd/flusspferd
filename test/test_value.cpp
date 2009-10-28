@@ -48,6 +48,8 @@ BOOST_AUTO_TEST_CASE( void_value ) {
   BOOST_CHECK(!void_value.is_object());
 
   BOOST_CHECK_NE(void_value.to_number(), void_value.to_number());
+
+  BOOST_CHECK_EQUAL(void_value, void_value);
 }
 
 BOOST_AUTO_TEST_CASE( null_value ) {
@@ -65,6 +67,8 @@ BOOST_AUTO_TEST_CASE( null_value ) {
   BOOST_CHECK(!null_value.is_double());
 
   BOOST_CHECK_EQUAL(null_value.to_number(), 0);
+
+  BOOST_CHECK_EQUAL(null_value, null_value);
 }
 
 BOOST_AUTO_TEST_CASE( boolean_value ) {
@@ -82,11 +86,15 @@ BOOST_AUTO_TEST_CASE( boolean_value ) {
 
   BOOST_CHECK_EQUAL(boolean_value.to_number(), 0);
 
-  boolean_value = true;
-  BOOST_CHECK(boolean_value.is_boolean());
-  BOOST_CHECK(boolean_value.get_boolean());
+  BOOST_CHECK_EQUAL(boolean_value, boolean_value);
 
-  BOOST_CHECK_EQUAL(boolean_value.to_number(), 1);
+  flusspferd::value boolean_value2(true);
+  BOOST_CHECK(boolean_value2.is_boolean());
+  BOOST_CHECK(boolean_value2.get_boolean());
+
+  BOOST_CHECK_EQUAL(boolean_value2.to_number(), 1);
+
+  BOOST_CHECK_NE(boolean_value, boolean_value2);
 }
 
 BOOST_AUTO_TEST_CASE( value_to_boolean ) {
@@ -130,6 +138,8 @@ BOOST_AUTO_TEST_CASE( double_value ) {
 
   BOOST_CHECK_EQUAL(double_value.get_double(), X);
   BOOST_CHECK_EQUAL(double_value.to_number(), X);
+
+  BOOST_CHECK_EQUAL(double_value, double_value);
 }
 
 BOOST_AUTO_TEST_CASE( string_value ) {
@@ -152,6 +162,8 @@ BOOST_AUTO_TEST_CASE( string_value ) {
   std::stringstream ss2;
   ss2 << s;
   BOOST_CHECK_EQUAL(ss1.str(), ss2.str());
+
+  BOOST_CHECK_EQUAL(v, v);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

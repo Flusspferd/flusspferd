@@ -28,15 +28,21 @@ THE SOFTWARE.
 
 #include "flusspferd/create.hpp"
 #include "flusspferd/value.hpp"
+#include "flusspferd/value_io.hpp"
 #include "test_environment.hpp"
+#include <boost/assign/list_of.hpp>
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::array::iterator) //FIXME?
+#include <iostream>//FIXME
+
+BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::array::iterator)
 
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( array ) {
   std::size_t const array_size = 10;
-  flusspferd::array a = flusspferd::create_array(array_size);
+  flusspferd::array a = flusspferd::create_array();
+  BOOST_CHECK_EQUAL(a.length(), 0);
+  a.set_length(array_size);
   BOOST_CHECK_EQUAL(a.length(), array_size);
   BOOST_CHECK_EQUAL(a.size(), a.length());
 
@@ -46,11 +52,10 @@ BOOST_AUTO_TEST_CASE( array ) {
   BOOST_CHECK_EQUAL(a.get_element(0).get_int(), value0);
 
   for(std::size_t i = 0; i < array_size; ++i) {
-    a.set_element(i, flusspferd::value(static_cast<int>(i)));
+    a.set_element(i, static_cast<int>(i));
   }
   for(std::size_t i = 0; i < array_size; ++i) {
-    BOOST_CHECK(a.get_element(i).is_int());
-    BOOST_CHECK_EQUAL(a.get_element(i).get_int(), static_cast<int>(i));
+    BOOST_CHECK_EQUAL(a.get_element(i),flusspferd::value(static_cast<int>(i)));
   }
 
   {
@@ -66,12 +71,36 @@ BOOST_AUTO_TEST_CASE( array ) {
   }
 }
 
+BOOST_AUTO_TEST_CASE( push) {
+  flusspferd::array a = flusspferd::create_array();
+  a.push(0, 1, 2);
+  BOOST_CHECK_EQUAL(a.length(), 3);
+  for (int i = 0; i < 3; ++i)
+    BOOST_CHECK_EQUAL(a.get_element(i), flusspferd::value(i));
+}
+
+BOOST_AUTO_TEST_CASE( create_range ) {
+  flusspferd::array a = flusspferd::create_array(
+    boost::assign::list_of
+    (1)
+    (2)
+    (3));
+  BOOST_CHECK_EQUAL(a.length(), 3);
+  for (int i = 0; i < 3; ++i)
+    BOOST_CHECK_EQUAL(a.get_element(i), flusspferd::value(i + 1));
+}
+
 BOOST_AUTO_TEST_CASE( array_iterator ) {
   std::size_t const array_size = 10;
-  flusspferd::array a = flusspferd::create_array(array_size);
+  flusspferd::array a = flusspferd::create_array();
+
+  BOOST_CHECK_EQUAL(a.length(), 0);
+
   for(std::size_t i = 0; i < array_size; ++i) {
     a.set_element(i, flusspferd::value(static_cast<int>(i)));
   }
+
+  BOOST_CHECK_EQUAL(a.length(), array_size);
 
   flusspferd::array::iterator i = a.begin();
   flusspferd::array::iterator const end = a.end();

@@ -41,7 +41,7 @@ The license is <a href="http://www.opensource.org/licenses/mit-license.php">MIT 
 
 @ref tutorials - find a list of Flusspferd's tutorials.
 
-See <a href="docs/index.html">JS docs</a> for documentation of the Javascript interface and there is an overview of all core classes in the documentation for namespace #flusspferd. Read the <a href="flusspferd.1.html">flusspferd(1)</a> manpage for more information on the Flusspferd repl/shell.
+See <a href="js/index.html">JS docs</a> for documentation of the Javascript interface and there is an overview of all core classes in the documentation for namespace #flusspferd. Read the <a href="flusspferd.1.html">flusspferd(1)</a> manpage for more information on the Flusspferd repl/shell.
 
 @section other Other
 

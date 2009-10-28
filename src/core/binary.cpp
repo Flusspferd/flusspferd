@@ -433,18 +433,18 @@ array binary::split(value delim, object options) {
     binary &elem = create_range(pos, first_found);
 
     // Add element
-    results.call("push", elem);
+    results.push(elem);
 
     // Possible add delimiter
     if (include_delimiter)
-      results.call("push", *delims[delim_id]);
+      results.push(*delims[delim_id]);
 
     // Advance position _after_ the delimiter.
     pos = first_found + delims[delim_id]->get_length();
   }
 
   // Add last element, possibly containing delimiters
-  results.call("push", create_range(pos, v_data.end()));
+  results.push(create_range(pos, v_data.end()));
 
   return results;
 }

@@ -188,12 +188,16 @@ public:
    * @return       The old value of the strict setting
    */
   bool set_strict(bool strict);
-};
 
-template<>
-inline object context::prototype<native_object_base>() const {
-  return object();
-}
+  /**
+   * Set the JIT flag on or off.
+   *
+   * @param strict New setting for JIT mode
+   *
+   * @return       The old value of the JIT setting
+   */
+  bool set_jit(bool jit);
+};
 
 /**
  * Compare two context%s for inequality.

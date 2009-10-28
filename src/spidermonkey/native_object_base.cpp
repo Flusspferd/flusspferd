@@ -44,11 +44,7 @@ public:
   static void finalize(JSContext *ctx, JSObject *obj);
   static JSBool call_helper(JSContext *, JSObject *, uintN, jsval *, jsval *);
 
-#if JS_VERSION >= 180
   static void trace_op(JSTracer *trc, JSObject *obj);
-#else
-  static uint32 mark_op(JSContext *, JSObject *, void *);
-#endif
 
   template<property_mode>
   static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
@@ -66,16 +62,10 @@ public:
 static const unsigned int basic_flags =
   JSCLASS_HAS_PRIVATE
   | JSCLASS_NEW_RESOLVE
-#if JS_VERSION >= 180
   | JSCLASS_MARK_IS_TRACE
-#endif
   ;
 
-#if JS_VERSION >= 180
 #define MARK_TRACE_OP ((JSMarkOp) &native_object_base::impl::trace_op)
-#else
-#define MARK_TRACE_OP (&native_object_base::impl::mark_op)
-#endif
 
 JSClass native_object_base::impl::native_object_class = {
   "NativeObject",
@@ -338,7 +328,6 @@ JSBool native_object_base::impl::new_enumerate(
   } FLUSSPFERD_CALLBACK_END;
 }
 
-#if JS_VERSION >= 180
 void native_object_base::impl::trace_op(
     JSTracer *trc, JSObject *obj)
 {
@@ -350,21 +339,6 @@ void native_object_base::impl::trace_op(
   tracer tracer_(trc);
   self.trace(tracer_);
 }
-#else
-uint32 native_object_base::impl::mark_op(
-    JSContext *ctx, JSObject *obj, void *thing)
-{
-  current_context_scope scope(Impl::wrap_context(ctx));
-
-  native_object_base &self =
-    native_object_base::get_native(Impl::wrap_object(obj));
-
-  tracer trc(thing);
-  self.trace(trc);
-
-  return 0;
-}
-#endif
 
 void native_object_base::property_op(
     property_mode, value const &, value &)

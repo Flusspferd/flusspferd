@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/ref.hpp>
+#include <sstream>
 
 namespace flusspferd {
 
@@ -64,9 +65,25 @@ struct class_constructor : native_function_base {
 };
 
 template<typename T>
+std::string default_to_string() {
+  std::ostringstream str;
+  str << "[object " << T::class_info::full_name() << "]";
+  return str.str();
+}
+
+template<typename T>
+std::string default_to_source() {
+  std::ostringstream str;
+  str << "(new " << T::class_info::full_name() << "(...))";
+  return str.str();
+}
+
+template<typename T>
 void load_class(
     context &ctx, object &constructor) 
 {
+  local_root_scope scope;
+
   object prototype = T::class_info::create_prototype();
   ctx.add_prototype<T>(prototype);
 
@@ -74,6 +91,24 @@ void load_class(
     "constructor",
     constructor,
     permanent_property | read_only_property | dont_enumerate);
+
+  value old_to_string = prototype.get_property("toString");
+  if (old_to_string == ctx.prototype("").get_property("toString")
+      || old_to_string.to_object().get_property("auto").to_boolean())
+  {
+    object fn =
+      create_native_function(prototype, "toString", &default_to_string<T>);
+    fn.set_property("auto", true);
+  }
+
+  value old_to_source = prototype.get_property("toSource");
+  if (old_to_source == ctx.prototype("").get_property("toSource")
+      || old_to_source.to_object().get_property("auto").to_boolean())
+  {
+    object fn =
+      create_native_function(prototype, "toSource", &default_to_source<T>);
+    fn.set_property("auto", true);
+  }
 
   constructor.define_property(
     "prototype",
