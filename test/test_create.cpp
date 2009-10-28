@@ -33,6 +33,25 @@ THE SOFTWARE.
 using namespace flusspferd::param;
 using namespace boost::assign;
 
+FLUSSPFERD_CLASS_DESCRIPTION(
+  my_class,
+  (constructor_name, "MyClass")
+  (full_name, "test_create.MyClass")
+)
+{
+public:
+  enum constructor_choice_t {
+    obj_only
+  };
+
+  constructor_choice_t constructor_choice;
+
+  my_class(object const &obj)
+    : base_type(obj),
+      constructor_choice(obj_only)
+  {}
+};
+
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( object ) {
@@ -144,6 +163,16 @@ BOOST_AUTO_TEST_CASE( function ) {
   BOOST_CHECK_EQUAL(f.arity(), 2);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 1, 2));
   BOOST_CHECK_EQUAL(v, flusspferd::value(3));
+}
+
+BOOST_AUTO_TEST_CASE( MyClass ) {
+  flusspferd::local_root_scope scope;
+
+  my_class &obj = flusspferd::create<my_class>();
+  BOOST_CHECK(!obj.is_null());
+  BOOST_CHECK_EQUAL(
+    &obj,
+    &flusspferd::get_native<my_class>(flusspferd::object(obj)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
