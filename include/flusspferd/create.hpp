@@ -58,6 +58,30 @@ namespace detail {
 object create_native_object(object const &proto);
 object create_native_enumerable_object(object const &proto);
 
+template<typename T>
+object generic_create_native_object(
+  object proto,
+  typename boost::disable_if<
+    typename T::class_info::custom_enumerate
+  >::type * = 0)
+{
+  if (proto.is_null())
+    proto = current_context().prototype<T>();
+  return detail::create_native_object(proto);
+}
+
+template<typename T>
+object generic_create_native_object(
+  object proto,
+  typename boost::enable_if<
+    typename T::class_info::custom_enumerate
+  >::type * = 0)
+{
+  if (proto.is_null())
+    proto = current_context().prototype<T>();
+  return detail::create_native_enumerable_object(proto);
+}
+
 }
 #endif
 
@@ -68,37 +92,13 @@ object create_native_enumerable_object(object const &proto);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  typename boost::disable_if< \
-    typename T::class_info::custom_enumerate, \
-    T& \
-  >::type \
+  T& \
   create_native_object( \
     object proto \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
   ) { \
-    if (proto.is_null()) \
-      proto = current_context().prototype<T>(); \
     local_root_scope scope; \
-    object obj = detail::create_native_object(proto); \
-    return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
-  } \
-  \
-  template< \
-    typename T \
-    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
-  > \
-  typename boost::enable_if< \
-    typename T::class_info::custom_enumerate, \
-    T& \
-  >::type \
-  create_native_object( \
-    object proto \
-    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
-  ) { \
-    if (proto.is_null()) \
-      proto = current_context().prototype<T>(); \
-    local_root_scope scope; \
-    object obj = detail::create_native_enumerable_object(proto); \
+    object obj = detail::generic_create_native_object<T>(proto); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
   } \
   /* */
@@ -356,7 +356,7 @@ namespace detail {
     unsigned line);
 
 
-  template<typename Class>
+  template<typename Class, typename Cond = void>
   struct create_traits;
 
   typedef param::tag::container container_spec;
@@ -364,7 +364,7 @@ namespace detail {
   typedef param::tag::attributes attributes_spec;
 
   template<>
-  struct create_traits<flusspferd::object> {
+  struct create_traits<flusspferd::object, void> {
     typedef flusspferd::object result_type;
 
     typedef boost::parameter::parameters<
@@ -388,7 +388,7 @@ namespace detail {
   };
 
   template<>
-  struct create_traits<flusspferd::array> {
+  struct create_traits<flusspferd::array, void> {
     typedef flusspferd::array result_type;
 
     typedef boost::parameter::parameters<
@@ -466,7 +466,7 @@ namespace detail {
   };
 
   template<>
-  struct create_traits<function> {
+  struct create_traits<function, void> {
     typedef function result_type;
 
     typedef boost::parameter::parameters<
@@ -504,6 +504,23 @@ namespace detail {
         arg[param::_source],
         arg[param::_file | flusspferd::string()],
         arg[param::_line | 0]);
+    }
+  };
+
+  template<typename Class>
+  struct create_traits<
+    Class,
+    typename boost::enable_if<
+      boost::is_base_of<native_object_base, Class>
+    >::type
+  >
+  {
+    typedef Class &result_type;
+
+    static result_type create() {
+      local_root_scope scope;
+      object obj = detail::generic_create_native_object<Class>(object());
+      return *new Class(obj);
     }
   };
 
