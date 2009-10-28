@@ -49,7 +49,7 @@ namespace {
 			: std::runtime_error(what), flusspferd::exception(what)
 		{ }
 
-		char const *what() throw() {
+		char const *what() const throw() {
 			if(CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
 				std::string what_ = flusspferd::exception::what();
 				what_ += ": ";
