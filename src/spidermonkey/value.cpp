@@ -131,17 +131,11 @@ object value::to_object() const {
 }
 
 string value::to_source() const {
-#ifdef JS_ValueToSource
   JSString *source = JS_ValueToSource(Impl::current_context(), get());
 
   if (!source)
     throw exception("Could not convert value to source");
   return Impl::wrap_string(source);
-#else
-  // This is potentially dangerous. Not sure there's much other choice if we
-  // want to support older spidermonkey versions though
-  return current_context().global().call("uneval", *this);
-#endif
 }
 
 void value::bind(value o) {
