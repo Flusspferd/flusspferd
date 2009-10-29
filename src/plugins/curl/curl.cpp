@@ -65,8 +65,8 @@ namespace {
   void global_init(long flags) {
     CURLcode ret = curl_global_init(flags);
 		if(ret != 0) {
-			throw flusspferd::exception(std::string("curl_global_init: ") +
-																	curl_easy_strerror(ret));
+			throw flusspferd::exception("curl_global_init: ") <<
+				curlcode_info(ret);
 		}
   }
 
