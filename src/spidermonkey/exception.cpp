@@ -135,9 +135,9 @@ bool exception::is_js_exception() const {
 
 char const *exception::what() const throw() {
 #ifdef DEBUG
-  char const *const *file;
-  int const *line;
-  char const *const *func;
+  boost::shared_ptr<char const * const> file;
+  boost::shared_ptr<int const> line;
+  boost::shared_ptr<char const * const> func;
   if( (file = boost::get_error_info<boost::throw_file>(*this)) &&
       (line = boost::get_error_info<boost::throw_line>(*this)) &&
       (func = boost::get_error_info<boost::throw_function>(*this)))
@@ -146,9 +146,9 @@ char const *exception::what() const throw() {
     sstr << '(' << *func << ':' << *file << '@' << *line << ") " << std::runtime_error::what();
     return sstr.str().c_str();
   }
-  else
 #endif
-    return std::runtime_error::what();
+
+  return std::runtime_error::what();
 }
 
 js_quit::js_quit() {}
