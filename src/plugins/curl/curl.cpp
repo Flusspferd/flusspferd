@@ -83,13 +83,8 @@ namespace {
 	public:
 		EasyOpt(flusspferd::object const &self, Easy &parent) : base_type(self), parent(parent) { }
 
-		// workarround
-		EasyOpt(flusspferd::object const &self, Easy const &parent)
-			: base_type(self), parent(const_cast<Easy&>(parent))
-		{ }
-
 		static EasyOpt &create(Easy &p) {
-			return flusspferd::create_native_object<EasyOpt>(object(), p);
+			return flusspferd::create_native_object<EasyOpt>(object(), boost::ref(p));
 		}
 	protected:
 		bool property_resolve(value const &id, unsigned access);
