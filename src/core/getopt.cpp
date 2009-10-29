@@ -32,9 +32,11 @@ THE SOFTWARE.
 #include "flusspferd/root.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
+#include <boost/fusion/include/at_c.hpp>
 #include <algorithm>
 #include <map>
 
@@ -264,7 +266,7 @@ namespace {
 string flusspferd::getopt_help(object spec) {
   // 0 - list of aliases, 1 - name + arg, 2 - docstring
   enum { ALIASES = 0, NAME = 1, DOC = 2 };
-  typedef boost::tuple<std::string, std::string, std::string> option_t;
+  typedef boost::fusion::vector<std::string, std::string, std::string> option_t;
 
   typedef std::vector<option_t> options_t;
   options_t options;
@@ -320,21 +322,24 @@ string flusspferd::getopt_help(object spec) {
         }
       }
 
-      options.push_back(boost::make_tuple(alias, name_arg,
-                                          item.has_property("doc") ?
-                                          item.get_property("doc").to_std_string() :
-                                          "..."));
+      options.push_back(
+        boost::fusion::make_vector(
+          alias,
+          name_arg,
+          item.has_property("doc") ?
+            item.get_property("doc").to_std_string() :
+            "..."));
     }
   }
-  options.push_back(boost::make_tuple("", "    --", "Stop processing options."));
+  options.push_back(boost::fusion::make_vector("", "    --", "Stop processing options."));
 
   std::string ret;
   typedef options_t::const_iterator iterator;
   enum { space_between_doc = 2 };
   for (iterator i = options.begin(); i != options.end(); ++i) {
-    ret += boost::get<ALIASES>(*i) + boost::get<NAME>(*i);
-    std::fill_n(std::back_inserter(ret), longest_name - boost::get<NAME>(*i).size() + space_between_doc, ' ');
-    ret += boost::get<DOC>(*i) + "\n\n";
+    ret += boost::fusion::at_c<ALIASES>(*i) + boost::fusion::at_c<NAME>(*i);
+    std::fill_n(std::back_inserter(ret), longest_name - boost::fusion::at_c<NAME>(*i).size() + space_between_doc, ' ');
+    ret += boost::fusion::at_c<DOC>(*i) + "\n\n";
   }
 
   return ret;

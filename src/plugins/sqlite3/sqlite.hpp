@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 #include "flusspferd.hpp"
 #include <sqlite3.h>
-#include <boost/tuple/tuple.hpp>
 #include "sqlite_cursor.hpp"
 
 namespace sqlite3_plugin{
