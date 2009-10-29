@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
+#include <boost/version.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/exception/get_error_info.hpp>
