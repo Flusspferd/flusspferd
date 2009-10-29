@@ -135,7 +135,7 @@ bool exception::is_js_exception() const {
 
 char const *exception::what() const throw() {
 #ifdef DEBUG
-#if BOOST_VERSION < 13900
+#if BOOST_VERSION < 103900
   boost::shared_ptr<char const * const> file;
   boost::shared_ptr<int const> line;
   boost::shared_ptr<char const * const> func;
