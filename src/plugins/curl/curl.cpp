@@ -83,6 +83,14 @@ namespace {
 	public:
 		EasyOpt(flusspferd::object const &self, Easy &parent) : base_type(self), parent(parent) { }
 
+		// workarround
+		EasyOpt(flusspferd::object const &self, Easy const &parent)
+			: base_type(self), parent(const_cast<Easy&>(parent))
+		{ }
+
+		static EasyOpt &create(Easy &p) {
+			return flusspferd::create_native_object<EasyOpt>(object(), p);
+		}
 	protected:
 		bool property_resolve(value const &id, unsigned access);
 	};
@@ -105,7 +113,7 @@ namespace {
    )
   {
     CURL *handle;
-		EasyOpt opt;
+		EasyOpt &opt;
 
 		object writecallback;
 		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
@@ -137,7 +145,7 @@ namespace {
 		EasyOpt &get_opt() { return opt; }
 
     Easy(flusspferd::object const &self, flusspferd::call_context&)
-      : base_type(self), handle(curl_easy_init()), opt(object(), *this)
+      : base_type(self), handle(curl_easy_init()), opt(EasyOpt::create(*this))
     {
       if(!handle) {
         throw flusspferd::exception("curl_easy_init");
@@ -145,7 +153,7 @@ namespace {
     }
 
     Easy(flusspferd::object const &self, CURL *hnd)
-      : base_type(self), handle(hnd), opt(object(), *this)
+      : base_type(self), handle(hnd), opt(EasyOpt::create(*this))
     {
       assert(handle);
     }
@@ -277,7 +285,6 @@ namespace {
 
 	bool EasyOpt::property_resolve(value const &id, unsigned) {
 		(void)id;
-		// TODO ...
 		return false;
 	}
 
@@ -295,7 +302,7 @@ namespace {
     create_native_function(cURL, "globalInit", &global_init);
     cURL.define_property("version", value(curl_version()),
                          read_only_property | permanent_property);
-
+		load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
 		// Behaviour Options
 		cURL.define_property("OPT_VERBOSE", value((int)CURLOPT_VERBOSE),
