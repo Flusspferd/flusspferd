@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <curl/curl.h>
 
 #include <boost/exception/get_error_info.hpp>
+#include <boost/version.hpp>
 
 using namespace flusspferd;
 
@@ -50,7 +51,12 @@ namespace {
 		{ }
 
 		char const *what() const throw() {
-			if(CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
+#if BOOST_VERSION < 103900
+			boost::shared_ptr<CURLcode const*> code;
+#else
+			CURLcode const *code;
+#endif
+			if(code = ::boost::get_error_info<curlcode_info>(*this)) {
 				std::string what_ = flusspferd::exception::what();
 				what_ += ": ";
 				what_ += curl_easy_strerror(*code);
