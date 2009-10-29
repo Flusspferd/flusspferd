@@ -81,7 +81,9 @@ namespace {
 	{
 		Easy &parent;
 	public:
-		EasyOpt(flusspferd::object const &self, Easy &parent) : base_type(self), parent(parent) { }
+		EasyOpt(flusspferd::object const &self, Easy &parent)
+			: base_type(self), parent(parent)
+		{	}
 
 		static EasyOpt &create(Easy &p) {
 			return flusspferd::create_native_object<EasyOpt>(object(), boost::ref(p));
@@ -126,6 +128,7 @@ namespace {
 	protected:
 		void trace(flusspferd::tracer &trc) {
 			trc("writecallback", writecallback);
+			trc("options", opt);
 		}
 
   public:
@@ -137,7 +140,9 @@ namespace {
       }
       return handle;
     }
-		EasyOpt &get_opt() { return opt; }
+		EasyOpt &get_opt() {
+			return opt;
+		}
 
     Easy(flusspferd::object const &self, flusspferd::call_context&)
       : base_type(self), handle(curl_easy_init()), opt(EasyOpt::create(*this))
@@ -279,7 +284,6 @@ namespace {
   }
 
 	bool EasyOpt::property_resolve(value const &id, unsigned) {
-		(void)id;
 		return false;
 	}
 
