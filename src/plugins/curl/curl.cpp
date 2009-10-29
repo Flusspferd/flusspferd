@@ -65,10 +65,27 @@ namespace {
   void global_init(long flags) {
     CURLcode ret = curl_global_init(flags);
 		if(ret != 0) {
-			throw flusspferd::exception("curl_global_init: ") <<
-				curlcode_info(ret);
+			throw flusspferd::exception(std::string("curl_global_init: ") + curl_easy_strerror(ret));
 		}
   }
+
+	class Easy;
+
+	FLUSSPFERD_CLASS_DESCRIPTION
+	(
+	 EasyOpt,
+	 (constructor_name, "EasyOpt")
+	 (full_name, "cURL.Easy.EasyOpt")
+	 (constructible, false)
+	 )
+	{
+		Easy &parent;
+	public:
+		EasyOpt(flusspferd::object const &self, Easy &parent) : base_type(self), parent(parent) { }
+
+	protected:
+		bool property_resolve(value const &id, unsigned access);
+	};
 
   FLUSSPFERD_CLASS_DESCRIPTION
   (
@@ -83,9 +100,12 @@ namespace {
     ("unescape", bind, unescape)
     ("setopt",   bind, setopt)
     ("valid",    bind, valid))
+	 (properties,
+		("options", getter, get_opt))
    )
   {
     CURL *handle;
+		EasyOpt opt;
 
 		object writecallback;
 		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
@@ -114,9 +134,10 @@ namespace {
       }
       return handle;
     }
+		EasyOpt &get_opt() { return opt; }
 
     Easy(flusspferd::object const &self, flusspferd::call_context&)
-      : base_type(self), handle(curl_easy_init())
+      : base_type(self), handle(curl_easy_init()), opt(object(), *this)
     {
       if(!handle) {
         throw flusspferd::exception("curl_easy_init");
@@ -124,7 +145,7 @@ namespace {
     }
 
     Easy(flusspferd::object const &self, CURL *hnd)
-      : base_type(self), handle(hnd)
+      : base_type(self), handle(hnd), opt(object(), *this)
     {
       assert(handle);
     }
@@ -253,6 +274,12 @@ namespace {
   CURL *unwrap(Easy &c) {
     return c.data();
   }
+
+	bool EasyOpt::property_resolve(value const &id, unsigned) {
+		(void)id;
+		// TODO ...
+		return false;
+	}
 
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
     local_root_scope scope;
