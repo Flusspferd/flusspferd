@@ -200,7 +200,7 @@ void object::delete_property(value const &id) {
   local_root_scope scope;
   string name = id.to_string();
   jsval dummy;
-  if (!JS_DeletePropertybyId2(Impl::current_context(), get(),
+  if (!JS_DeletePropertyById2(Impl::current_context(), get(),
                               Impl::get_jsid(id), &dummy))
     throw exception("Could not delete property");
 }
