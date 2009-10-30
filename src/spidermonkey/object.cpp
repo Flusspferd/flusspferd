@@ -217,6 +217,59 @@ property_iterator object::end() const {
   return property_iterator();
 }
 
+namespace {
+  /// common function of define_property
+  void extract_attributes(
+    property_attributes const &attrs,
+    JSObject *&getter_o,
+    JSObject *&setter_o,
+    unsigned &sm_flags)
+  {
+    function getter;
+    if (attrs.getter) getter = attrs.getter.get();
+    function setter;
+    if (attrs.setter) setter = attrs.setter.get();
+
+    getter_o = Impl::get_object(getter);
+    setter_o = Impl::get_object(setter);
+
+    unsigned const flags = attrs.flags;
+    if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
+    if (flags & read_only_property) sm_flags |= JSPROP_READONLY;
+    if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
+    if (flags & shared_property) sm_flags |= JSPROP_SHARED;
+
+    if (getter_o) sm_flags |= JSPROP_GETTER;
+    if (setter_o) sm_flags |= JSPROP_SETTER;
+  }
+}
+
+void object::define_property(
+  value const &id,
+  value const &init_value, 
+  property_attributes const &attrs)
+{
+  if (is_null())
+    throw exception("Could not define property (object is null)");
+
+  root_value id_r(id);
+  root_value v(init_value);
+
+  JSObject *getter_o = 0x0;
+  JSObject *setter_o = 0x0;
+  unsigned sm_flags = 0;
+  extract_attributes(attrs, getter_o, setter_o, sm_flags);
+
+  if (!JS_DefinePropertyById(Impl::current_context(),
+                             get_const(),
+                             Impl::get_jsid(id),
+                             Impl::get_jsval(v),
+                             *(JSPropertyOp*) &getter_o,
+                             *(JSPropertyOp*) &setter_o,
+                             sm_flags))
+    throw exception("Could not define property");
+}
+
 void object::define_property(
   string const &name,
   value const &init_value, 
@@ -226,28 +279,12 @@ void object::define_property(
     throw exception("Could not define property (object is null)");
 
   root_string name_r(name);
+  root_value v(init_value);
 
-  unsigned flags = attrs.flags;
-  root_value v;
-  v = init_value;
-
-  function getter;
-  if (attrs.getter) getter = attrs.getter.get();
-  function setter;
-  if (attrs.setter) setter = attrs.setter.get();
-
-  JSObject *getter_o = Impl::get_object(getter);
-  JSObject *setter_o = Impl::get_object(setter);
-   
+  JSObject *getter_o = 0x0;
+  JSObject *setter_o = 0x0;
   unsigned sm_flags = 0;
-
-  if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
-  if (flags & read_only_property) sm_flags |= JSPROP_READONLY;
-  if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
-  if (flags & shared_property) sm_flags |= JSPROP_SHARED;
-
-  if (getter_o) sm_flags |= JSPROP_GETTER;
-  if (setter_o) sm_flags |= JSPROP_SETTER;
+  extract_attributes(attrs, getter_o, setter_o, sm_flags);
 
   if (!JS_DefineUCProperty(Impl::current_context(),
                            get_const(),
