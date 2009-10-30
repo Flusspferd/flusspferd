@@ -31,12 +31,17 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/arguments.hpp"
 #include "flusspferd/class_description.hpp"
+#include "flusspferd/property_iterator.hpp"
 
 #include <sstream>
 #include <curl/curl.h>
 
+#include <boost/ptr_container/ptr_unordered_map.hpp>
 #include <boost/exception/get_error_info.hpp>
+#include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/version.hpp>
+
+#include <iostream>
 
 using namespace flusspferd;
 
@@ -56,7 +61,7 @@ namespace {
 #else
 			CURLcode const *code;
 #endif
-			if(code = ::boost::get_error_info<curlcode_info>(*this)) {
+			if( (code = ::boost::get_error_info<curlcode_info>(*this)) ) {
 				std::string what_ = flusspferd::exception::what();
 				what_ += ": ";
 				what_ += curl_easy_strerror(*code);
@@ -76,6 +81,18 @@ namespace {
   }
 
 	class Easy;
+
+	namespace {
+		struct handle_option {
+			virtual ~handle_option() =0;
+			virtual value default_value() const { return value(); }
+			virtual void handle(Easy &e, value const &v) const =0;
+		};
+		handle_option::~handle_option() { }
+
+		typedef boost::ptr_unordered_map<std::string, handle_option> options_map_t;
+		options_map_t const &get_options();
+	}
 
 	FLUSSPFERD_CLASS_DESCRIPTION
 	(
@@ -117,7 +134,6 @@ namespace {
     CURL *handle;
 		EasyOpt &opt;
 
-		object writecallback;
 		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
 			assert(stream);
 			Easy &self = *reinterpret_cast<Easy*>(stream);
@@ -127,12 +143,13 @@ namespace {
 			arguments arg;
 			arg.push_back(value(data));
 			arg.push_back(value(size));
-			value v = self.writecallback.call(arg);
+			object callback = self.opt.get_property("writefunction").to_object();
+			value v = callback.call(arg);
 			return v.to_number();
 		}
+
 	protected:
 		void trace(flusspferd::tracer &trc) {
-			trc("writecallback", writecallback);
 			trc("options", opt);
 			trc("defaultFunction", default_function);
 		}
@@ -172,10 +189,35 @@ namespace {
     }
     ~Easy() { cleanup(); }
 
+		/**
+		 * Applies all options set in EasyOpt.
+		 * This is called automatically.
+		 * Shouldn't be necessary to call it manually!
+		 *
+		 * Not exported.
+		 *
+		 * Maybe this should be called by unwrap and private ...
+		 */
+		void apply_options() {
+			std::cout << "apply_options()\n";
+			options_map_t const &options = get_options();
+			for(property_iterator i = opt.begin();
+					i != opt.end();
+					++i)
+			{
+				std::cout << "\t" << i->to_std_string() << "\n";
+				options_map_t::const_iterator option = options.find(i->to_std_string());
+				if(option != options.end()) {
+					option->second->handle(*this, opt.get_property(*i));
+				}
+			}
+		}
+
     void perform() {
+			apply_options();
 			CURLcode res = curl_easy_perform(get());
 			if(res != 0) {
-				throw flusspferd::exception(std::string("curl_easy_setopt: ") +
+				throw flusspferd::exception(std::string("curl_easy_perform: ") +
 																		curl_easy_strerror(res));
 			}
     }
@@ -210,6 +252,28 @@ namespace {
     }
 
 		static object default_function;
+
+		//private:
+		template<typename T>
+		void do_setopt(CURLoption what, T data) {
+			std::cout << "setopt (" << (unsigned)what << ' ' << data << '\n'; // DEBUG
+			CURLcode res = curl_easy_setopt(get(), what, data);
+			if(res != 0) {
+				throw flusspferd::exception(std::string("curl_easy_setopt: ") +
+																		curl_easy_strerror(res));
+			}
+		}
+
+		void do_setopt_function(CURLoption what, bool default_) {
+			switch(what) {
+			case CURLOPT_WRITEFUNCTION:
+				do_setopt(CURLOPT_WRITEFUNCTION, default_ ? 0x0 : &writefunction);
+				do_setopt(CURLOPT_WRITEDATA, this);
+				break;
+			default:
+				throw flusspferd::exception("unkown function option");
+			};
+		}
   };
 	object Easy::default_function;
 
@@ -220,8 +284,64 @@ namespace {
     return c.data();
   }
 
+	namespace {
+		struct integer_option : handle_option {
+			integer_option(CURLoption what) : what(what) { }
+			value default_value() const { return value(0); }
+			void handle(Easy &e, value const &v) const {
+				e.do_setopt(what, v.to_number());
+			}
+  	private:
+			CURLoption what;
+		};
+
+		struct string_option : handle_option {
+			string_option(CURLoption what) : what(what) { }
+			value default_value() const { return value(""); }
+			void handle(Easy &e, value const &v) const {
+				e.do_setopt(what, v.to_std_string().c_str());
+			}
+		private:
+			CURLoption what;
+		};
+
+		struct function_option : handle_option {
+			function_option(CURLoption what) : what(what) { }
+			value default_value() const { return value(Easy::default_function); }
+			void handle(Easy &e, value const &v) const {
+				e.do_setopt_function(what, v == default_value());
+			}
+		private:
+			CURLoption what;
+		};
+
+		options_map_t const &get_options() {
+			static options_map_t map;
+			if(map.empty()) {
+				boost::assign::ptr_map_insert<integer_option>(map)
+					("verbose", CURLOPT_VERBOSE)
+					("header", CURLOPT_HEADER)
+					("noprogress", CURLOPT_NOPROGRESS)
+					("nosignal", CURLOPT_NOSIGNAL);
+				boost::assign::ptr_map_insert<function_option>(map)
+					("writefunction", CURLOPT_WRITEFUNCTION);
+				boost::assign::ptr_map_insert<string_option>(map)
+					("url", CURLOPT_URL);
+			}
+			return map;
+		}
+	}
+
 	bool EasyOpt::property_resolve(value const &id, unsigned) {
-		return false;
+		std::string name = id.to_std_string();
+		options_map_t::const_iterator i;
+		if( (i = get_options().find(name)) != get_options().end() ) {
+			define_property(id.get_string(), i->second->default_value());
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
