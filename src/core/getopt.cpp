@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/root.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
