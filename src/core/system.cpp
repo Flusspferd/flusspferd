@@ -106,13 +106,6 @@ void flusspferd::load_system_module(object &context) {
     "platform",
     value("flusspferd"),
     read_only_property | permanent_property);
-
-  // TODO: Remove this in a future version - its no on the flusspferd module:
-  //  require('flusspferd').version
-  exports.define_property(
-    "xFlusspferdVersion",
-    value(flusspferd::version()),
-    read_only_property | permanent_property);
 }
 
 
