@@ -76,7 +76,8 @@ namespace {
   void global_init(long flags) {
     CURLcode ret = curl_global_init(flags);
 		if(ret != 0) {
-			throw flusspferd::exception(std::string("curl_global_init: ") + curl_easy_strerror(ret));
+			throw flusspferd::exception(std::string("curl_global_init: ")
+																	+ curl_easy_strerror(ret));
 		}
   }
 
@@ -146,7 +147,7 @@ namespace {
 			arguments arg;
 			arg.push_back(value(data));
 			arg.push_back(value(size));
-			object callback = self.opt.get_property("writefunction").to_object();
+			object callback = self.opt.get_property("writeFunction").to_object();
 			value v = callback.call(arg);
 			return v.to_number();
 		}
@@ -323,8 +324,8 @@ namespace {
 				boost::assign::ptr_map_insert<integer_option>(map)
 					("verbose", CURLOPT_VERBOSE)
 					("header", CURLOPT_HEADER)
-					("noprogress", CURLOPT_NOPROGRESS)
-					("nosignal", CURLOPT_NOSIGNAL);
+					("noProgress", CURLOPT_NOPROGRESS)
+					("noSignal", CURLOPT_NOSIGNAL);
 				boost::assign::ptr_map_insert<function_option>(map)
 					("writeFunction", CURLOPT_WRITEFUNCTION);
 				boost::assign::ptr_map_insert<string_option>(map)
@@ -338,7 +339,8 @@ namespace {
 		std::string const name = id.to_std_string();
 		options_map_t::const_iterator const i = get_options().find(name);
 		if(i != get_options().end()) {
-			define_property(id.get_string(), i->second->default_value());
+			define_property(id.get_string(), i->second->default_value(),
+											i->second->default_attributes());
 			return true;
 		}
 		else {
