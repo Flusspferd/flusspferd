@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <boost/spirit/home/phoenix/core.hpp>
 #include <boost/spirit/home/phoenix/bind.hpp>
 #include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/spirit/home/phoenix/statement/sequence.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -386,7 +387,7 @@ flusspferd::object flusspferd_repl::option_spec() {
   spec.set_property("machine-mode", machine_mode_);
   machine_mode_.set_property("alias", "0");
   machine_mode_.set_property("doc", "(Interactive) machine command mode (separator '\\0').");
-  flusspferd::create_native_function(interactive_, "callback",
+  flusspferd::create_native_function(machine_mode_, "callback",
     boost::function<void ()>((
       phoenix::ref(machine_mode) = true,
       phoenix::ref(interactive) = true,

@@ -33,8 +33,10 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
+#include <boost/version.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/exception/get_error_info.hpp>
 #include <js/jsapi.h>
 
 using namespace flusspferd;
@@ -132,7 +134,30 @@ bool exception::is_js_exception() const {
   return p->is_js_exception;
 }
 
+char const *exception::what() const throw() {
+#ifdef DEBUG
+#if BOOST_VERSION < 103900
+  boost::shared_ptr<char const * const> file;
+  boost::shared_ptr<int const> line;
+  boost::shared_ptr<char const * const> func;
+#else
+  char const * const *file;
+  int const *line;
+  char const * const *func;
+#endif
 
+  if( (file = boost::get_error_info<boost::throw_file>(*this)) &&
+      (line = boost::get_error_info<boost::throw_line>(*this)) &&
+      (func = boost::get_error_info<boost::throw_function>(*this)))
+  {
+    std::stringstream sstr;
+    sstr << '(' << *func << ':' << *file << '@' << *line << ") " << std::runtime_error::what();
+    return sstr.str().c_str();
+  }
+#endif
+
+  return std::runtime_error::what();
+}
 
 js_quit::js_quit() {}
 
