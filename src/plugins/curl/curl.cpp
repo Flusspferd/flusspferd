@@ -86,6 +86,9 @@ namespace {
 		struct handle_option {
 			virtual ~handle_option() =0;
 			virtual value default_value() const { return value(); }
+			virtual property_attributes default_attributes() const {
+				return property_attributes();
+			}
 			virtual void handle(Easy &e, value const &v) const =0;
 		};
 		handle_option::~handle_option() { }
@@ -151,7 +154,6 @@ namespace {
 	protected:
 		void trace(flusspferd::tracer &trc) {
 			trc("options", opt);
-			trc("defaultFunction", default_function);
 		}
 
   public:
@@ -196,7 +198,7 @@ namespace {
 		 *
 		 * Not exported.
 		 *
-		 * Maybe this should be called by unwrap and private ...
+		 * Maybe this should be called by unwrap and be private ...
 		 */
 		void apply_options() {
 			std::cout << "apply_options()\n";
@@ -230,7 +232,7 @@ namespace {
       int len;
       char *const uesc = curl_easy_unescape(get(), input, 0, &len);
       if(!uesc) {
-        throw flusspferd::exception("curl_easy_escape");
+        throw flusspferd::exception("curl_easy_unescape");
       }
       std::string ret(uesc, len);
       curl_free(uesc);
@@ -251,8 +253,6 @@ namespace {
       return flusspferd::create_native_object<Easy>(object(), hnd);
     }
 
-		static object default_function;
-
 		//private:
 		template<typename T>
 		void do_setopt(CURLoption what, T data) {
@@ -265,18 +265,21 @@ namespace {
 		}
 
 		void do_setopt_function(CURLoption what, bool default_) {
-			switch(what) {
-			case CURLOPT_WRITEFUNCTION:
-				do_setopt(CURLOPT_WRITEFUNCTION, default_ ? 0x0 : &writefunction);
-				do_setopt(CURLOPT_WRITEDATA, this);
-				break;
-			default:
-				throw flusspferd::exception("unkown function option");
-			};
+			if(default_) {
+				do_setopt(what, 0x0);
+			}
+			else {
+				switch(what) {
+				case CURLOPT_WRITEFUNCTION:
+					do_setopt(CURLOPT_WRITEFUNCTION, &writefunction);
+					do_setopt(CURLOPT_WRITEDATA, this);
+					break;
+				default:
+					throw flusspferd::exception("unkown function option");
+				};
+			}
 		}
   };
-	object Easy::default_function;
-
   Easy &wrap(CURL *hnd) {
     return Easy::create(hnd);
   }
@@ -299,7 +302,7 @@ namespace {
 			string_option(CURLoption what) : what(what) { }
 			value default_value() const { return value(""); }
 			void handle(Easy &e, value const &v) const {
-				e.do_setopt(what, v.to_std_string().c_str());
+				e.do_setopt(what, v.to_std_string().c_str()); // TODO this won't work! string needs to be stored.
 			}
 		private:
 			CURLoption what;
@@ -307,9 +310,8 @@ namespace {
 
 		struct function_option : handle_option {
 			function_option(CURLoption what) : what(what) { }
-			value default_value() const { return value(Easy::default_function); }
 			void handle(Easy &e, value const &v) const {
-				e.do_setopt_function(what, v == default_value());
+				e.do_setopt_function(what, v.is_undefined_or_null());
 			}
 		private:
 			CURLoption what;
@@ -324,7 +326,7 @@ namespace {
 					("noprogress", CURLOPT_NOPROGRESS)
 					("nosignal", CURLOPT_NOSIGNAL);
 				boost::assign::ptr_map_insert<function_option>(map)
-					("writefunction", CURLOPT_WRITEFUNCTION);
+					("writeFunction", CURLOPT_WRITEFUNCTION);
 				boost::assign::ptr_map_insert<string_option>(map)
 					("url", CURLOPT_URL);
 			}
@@ -333,9 +335,9 @@ namespace {
 	}
 
 	bool EasyOpt::property_resolve(value const &id, unsigned) {
-		std::string name = id.to_std_string();
-		options_map_t::const_iterator i;
-		if( (i = get_options().find(name)) != get_options().end() ) {
+		std::string const name = id.to_std_string();
+		options_map_t::const_iterator const i = get_options().find(name);
+		if(i != get_options().end()) {
 			define_property(id.get_string(), i->second->default_value());
 			return true;
 		}
@@ -360,7 +362,5 @@ namespace {
                          read_only_property | permanent_property);
 		load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
-		cURL.define_property("defaultFunction", value(Easy::default_function),
-												 read_only_property | permanent_property);
   }
 }
