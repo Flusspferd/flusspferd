@@ -280,7 +280,7 @@ FLUSSPFERD_CALLS(call, object const &)
   void define_property(
     string const &name,
     value const &init_value = value(),
-    property_attributes const attrs = property_attributes());
+    property_attributes const &attrs = property_attributes());
 
   /**
    * Define a property.
@@ -292,7 +292,7 @@ FLUSSPFERD_CALLS(call, object const &)
    */
   void define_property(
     string const &name,
-    property_attributes const attrs)
+    property_attributes const &attrs)
   {
     return define_property(name, value(), attrs);
   }

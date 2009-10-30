@@ -220,7 +220,7 @@ property_iterator object::end() const {
 void object::define_property(
   string const &name,
   value const &init_value, 
-  property_attributes const attrs)
+  property_attributes const &attrs)
 {
   if (is_null())
     throw exception("Could not define property (object is null)");
