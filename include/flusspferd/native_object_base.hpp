@@ -46,8 +46,10 @@ struct call_context;
 class tracer;
 
 namespace detail {
-  object create_native_object(object const &proto);
-  object create_native_enumerable_object(object const &proto);
+  object create_native_object(
+    object const &proto, object const &parent);
+  object create_native_enumerable_object(
+    object const &proto, object const &parent);
 }
 #endif
 
@@ -268,11 +270,15 @@ protected:
 
 private:
 #ifndef IN_DOXYGEN
-  static object do_create_object(object const &proto);
-  static object do_create_enumerable_object(object const &proto);
+  static object do_create_object(
+    object const &proto, object const &parent);
+  static object do_create_enumerable_object(
+    object const &proto, object const &parent);
 
-  friend object detail::create_native_object(object const &proto);
-  friend object detail::create_native_enumerable_object(object const &proto);
+  friend object detail::create_native_object(
+    object const &proto, object const &parent);
+  friend object detail::create_native_enumerable_object(
+    object const &proto, object const &parent);
 
 private:
   class impl;
