@@ -49,7 +49,7 @@ $ sudo apt-get install libedit-dev   # optional but recommended
  * If you want to run Flusspferd's unit test system you also need the
  * Boost.Test Library and to messure test coverage you need lcov
  * @verbatim
-$ sudo apt-get install libboost-test1.40-dev lcov   # optional
+$ sudo apt-get install libboost-test1.40-dev   # optional
 @endverbatim
  *
  * If you want to use the most current (but probably unstable) version of
@@ -71,17 +71,11 @@ $ sudo apt-get install git-core   # optional
  * There is a detailed build documentation over at the Mozilla Developer
  * Center Wiki</a>.
  *
- * You need autoconf2.13 to compile Spidermonkey 1.8.1.
- * @verbatim
-$ sudo apt-get install autoconf2.13
-@endverbatim
- *
  * A quick installation guide.
  * @verbatim
 $ wget http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2
 $ tar xjf http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2
 $ cd js/src
-$ autoconf2.13
 $ ./configure
 $ make
 $ sudo make install
