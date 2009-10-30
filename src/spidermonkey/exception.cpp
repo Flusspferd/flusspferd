@@ -136,16 +136,9 @@ bool exception::is_js_exception() const {
 
 char const *exception::what() const throw() {
 #ifdef DEBUG
-#if BOOST_VERSION < 103900
-  boost::shared_ptr<char const * const> file;
-  boost::shared_ptr<int const> line;
-  boost::shared_ptr<char const * const> func;
-#else
   char const * const *file;
   int const *line;
   char const * const *func;
-#endif
-
   if( (file = boost::get_error_info<boost::throw_file>(*this)) &&
       (line = boost::get_error_info<boost::throw_line>(*this)) &&
       (func = boost::get_error_info<boost::throw_function>(*this)))
