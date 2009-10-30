@@ -42,8 +42,7 @@ THE SOFTWARE.
 #include <boost/parameter/name.hpp>
 #include <boost/parameter/binding.hpp>
 #include <boost/fusion/functional/invocation/invoke.hpp>
-#include <boost/fusion/algorithm/transformation/push_front.hpp>
-#include <boost/fusion/algorithm/transformation/transform.hpp>
+#include <boost/fusion/view/joint_view.hpp>
 #include <boost/fusion/container/vector/vector10.hpp>
 #include <boost/type_traits.hpp>
 #endif
@@ -382,7 +381,7 @@ namespace detail {
       BOOST_PP_ENUM_PARAMS(n, typename T) \
     > \
     Class &operator()( \
-      BOOST_PP_ENUM_BINARY_PARAMS(n, T, const &x) \
+      BOOST_PP_ENUM_BINARY_PARAMS(n, T, &x) \
     ) \
     { \
       return *new Class(BOOST_PP_ENUM_PARAMS(n, x)); \
@@ -595,18 +594,17 @@ namespace detail {
           boost::fusion::vector0
         >::type input_arguments_type;
 
-      input_arguments_type const &input_arguments(
+      input_arguments_type input_arguments(
         args[param::_arguments | boost::fusion::vector0()]);
 
-      typedef typename boost::fusion::result_of::push_front<
-          input_arguments_type const,
-          object
-        >::type full_arguments_type;
+      boost::fusion::vector1<object> obj_seq(obj);
 
-      full_arguments_type full_arguments(
-        boost::fusion::push_front(
-          input_arguments,
-          object(obj)));
+      typedef boost::fusion::joint_view<
+          boost::fusion::vector1<object>,
+          input_arguments_type
+        > full_arguments_type;
+
+      full_arguments_type full_arguments(obj_seq, input_arguments);
 
       return boost::fusion::invoke(new_functor<Class>(), full_arguments);
     }
