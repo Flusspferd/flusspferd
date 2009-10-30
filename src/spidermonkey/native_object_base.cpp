@@ -171,7 +171,9 @@ native_object_base &native_object_base::get_native(object const &o_) {
   return *static_cast<native_object_base*>(priv);
 }
 
-object native_object_base::do_create_object(object const &prototype_) {
+object native_object_base::do_create_object(
+  object const &prototype_, object const &parent)
+{
   JSContext *ctx = Impl::current_context();
 
   object prototype = prototype_;
@@ -180,7 +182,7 @@ object native_object_base::do_create_object(object const &prototype_) {
       ctx,
       &impl::native_object_class,
       Impl::get_object(prototype),
-      0);
+      Impl::get_object(parent));
 
   if (!o)
     throw exception("Could not create native object");
@@ -188,7 +190,9 @@ object native_object_base::do_create_object(object const &prototype_) {
   return Impl::wrap_object(o);
 }
 
-object native_object_base::do_create_enumerable_object(object const &prototype_) {
+object native_object_base::do_create_enumerable_object(
+  object const &prototype_, object const &parent)
+{
   JSContext *ctx = Impl::current_context();
 
   object prototype = prototype_;
@@ -197,7 +201,7 @@ object native_object_base::do_create_enumerable_object(object const &prototype_)
       ctx,
       &impl::native_enumerable_object_class,
       Impl::get_object(prototype),
-      0);
+      Impl::get_object(parent));
 
   if (!o)
     throw exception("Could not create native object");

@@ -60,12 +60,16 @@ array flusspferd::detail::create_length_array(std::size_t length) {
   return object(Impl::wrap_object(o));
 }
 
-object flusspferd::detail::create_native_object(object const &proto) {
-  return native_object_base::do_create_object(proto);
+object flusspferd::detail::create_native_object(
+  object const &proto, object const &parent)
+{
+  return native_object_base::do_create_object(proto, parent);
 }
 
-object flusspferd::detail::create_native_enumerable_object(object const &proto) {
-  return native_object_base::do_create_enumerable_object(proto);
+object flusspferd::detail::create_native_enumerable_object(
+  object const &proto, object const &parent)
+{
+  return native_object_base::do_create_enumerable_object(proto, parent);
 }
 
 function flusspferd::detail::create_source_function(
