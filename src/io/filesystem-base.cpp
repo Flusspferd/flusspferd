@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 #ifdef WIN32
 #include <stdio.h>
@@ -49,6 +50,7 @@ using namespace flusspferd;
 using boost::format;
 namespace fs_base =  flusspferd::io::fs_base;
 namespace fs = boost::filesystem;
+namespace fusion = boost::fusion;
 
 // owner: No such file or directory "foo/bar"
 const format error_fmt("%1%: %2% \"%3%\"");
@@ -111,7 +113,7 @@ object fs_base::raw_open(char const* name, value mode, value perms) {
   if (!perms.is_undefined_or_null())
     throw exception("rawOpen: permissions not yet supported");
 
-  return create_native_object<io::file>(object(), name, mode);
+  return create<io::file>(fusion::make_vector(name, mode));
 }
 
 string fs_base::canonical(std::string const &path) {

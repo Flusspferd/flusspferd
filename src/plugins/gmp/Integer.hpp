@@ -68,7 +68,7 @@ public:
 
   template<typename T>
   static Integer &create_integer(T mp) {
-    return flusspferd::create_native_object<Integer>(object(), mpz_class(mp));
+    return flusspferd::create<Integer>(boost::fusion::vector1<mpz_class>(mp));
   }
 
   // this should be external but js doesn't support overloading!

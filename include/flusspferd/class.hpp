@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/ref.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 #include <sstream>
 
 namespace flusspferd {
@@ -58,9 +59,9 @@ struct class_constructor : native_function_base {
   {}
 
   void call(call_context &x) {
-    x.result = flusspferd::create_native_object<T>(
-        x.function.get_property_object("prototype"),
-        boost::ref(x));
+    x.result = flusspferd::create<T>(
+        boost::fusion::make_vector(boost::ref(x)),
+        x.function.get_property_object("prototype"));
   }
 };
 

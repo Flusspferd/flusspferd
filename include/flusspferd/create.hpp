@@ -93,47 +93,6 @@ object generic_create_native_object(
 }
 #endif
 
-#ifndef IN_DOXYGEN
-
-#define FLUSSPFERD_FN_CREATE_NATIVE_OBJECT(z, n_args, d) \
-  template< \
-    typename T \
-    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
-  > \
-  T& \
-  create_native_object( \
-    object proto \
-    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param) \
-  ) { \
-    local_root_scope scope; \
-    object obj = detail::generic_create_native_object<T>(proto, object()); \
-    return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
-  } \
-  /* */
-
-BOOST_PP_REPEAT(
-  BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
-  FLUSSPFERD_FN_CREATE_NATIVE_OBJECT,
-  ~
-)
-
-#else
-
-/**
- * Create a new native object of type @p T.
- *
- * @param T The type of the object's class.
- * @param proto The prototype to be used. If @p null, the class' default
- *          prototype will be used.
- * @param ... The parameters to the constructor of @p T.
- * @return The new object.
- */
-template<typename T>
-T &create_native_object(object const &proto, ...);
-
-#endif
-//@}
-
 /**
  * @name Creating functions
  * @addtogroup create_function
