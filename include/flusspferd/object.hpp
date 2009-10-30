@@ -317,7 +317,16 @@ FLUSSPFERD_CALLS(call, object const &)
    * @return Whether the property exists.
    */
   bool get_property_attributes(string const &id, property_attributes &attrs);
-    
+
+  /**
+   * Get a property's attributes.
+   *
+   * @param id The property's ID.
+   * @param[out] attrs The property's attributes.
+   * @return Whether the property exists.
+   */
+  bool get_property_attributes(value const &id, property_attributes &attrs);
+
   /**
    * Set a property.
    *
