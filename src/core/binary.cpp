@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/encodings.hpp"
 #include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
 #include <sstream>
 #include <algorithm>
 #include <boost/ref.hpp>
