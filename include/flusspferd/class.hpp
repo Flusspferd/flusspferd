@@ -28,7 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CLASS_HPP
 
 #include "native_function_base.hpp"
-#include "create.hpp"
+#include "create/object.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
 #include <boost/mpl/size_t.hpp>

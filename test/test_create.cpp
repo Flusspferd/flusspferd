@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/native_function_base.hpp"

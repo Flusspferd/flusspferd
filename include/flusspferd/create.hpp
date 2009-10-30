@@ -364,30 +364,6 @@ namespace detail {
   typedef param::tag::attributes attributes_spec;
 
   template<>
-  struct create_traits<flusspferd::object, void> {
-    typedef flusspferd::object result_type;
-
-    typedef boost::parameter::parameters<
-        param::tag::prototype,
-        param::tag::parent,
-        container_spec,
-        name_spec,
-        attributes_spec
-      > parameters;
-
-    static result_type create() {
-      return create_object(object(), object());
-    }
-
-    template<typename ArgPack>
-    static result_type create(ArgPack const &arg) {
-      return create_object(
-        arg[param::_prototype | object()],
-        arg[param::_parent | object()]);
-    }
-  };
-
-  template<>
   struct create_traits<flusspferd::array, void> {
     typedef flusspferd::array result_type;
 
