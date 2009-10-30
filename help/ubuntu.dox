@@ -47,7 +47,7 @@ $ sudo apt-get install libedit-dev   # optional but recommended
 @endverbatim
  *
  * If you want to run Flusspferd's unit test system you also need the
- * Boost.Test Library and to messure test coverage you need lcov
+ * Boost.Test Library
  * @verbatim
 $ sudo apt-get install libboost-test1.40-dev   # optional
 @endverbatim
