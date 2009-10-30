@@ -569,6 +569,45 @@ namespace detail {
     }
   };
 
+  template<typename Class>
+  struct create_traits<
+    Class,
+    typename boost::enable_if<
+      boost::is_base_of<native_function_base, Class>
+    >::type
+  >
+  {
+    typedef object result_type;
+
+    typedef boost::parameter::parameters<
+      param::tag::arguments,
+      param::tag::prototype,
+      name_spec,
+      container_spec,
+      attributes_spec
+    > parameters;
+
+    static result_type create() {
+      return create_native_function(object(), new Class);
+    }
+
+    template<typename ArgPack>
+    static result_type create(ArgPack const &args) {
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::arguments,
+          boost::fusion::vector0
+        >::type input_arguments_type;
+
+      input_arguments_type input_arguments(
+        args[param::_arguments | boost::fusion::vector0()]);
+
+      Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
+
+      return create_native_function(args[param::_prototype | object()], &self);
+    }
+  };
+
   template<typename Class, typename ArgPack>
   typename boost::enable_if<
     boost::is_same<
