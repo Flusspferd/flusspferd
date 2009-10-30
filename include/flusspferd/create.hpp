@@ -366,23 +366,6 @@ namespace detail {
     flusspferd::string const &file,
     unsigned line);
 
-  struct cref_functor {
-    template<typename>
-    struct result;
-
-    template<typename Self, typename A>
-    struct result<Self (A)> {
-      typedef typename boost::add_reference<
-          typename boost::add_const<A>::type
-        >::type type;
-    };
-
-    template<typename A>
-    A const &operator()(A const &x) const {
-      return x;
-    }
-  };
-
   template<typename Class>
   struct new_functor {
     template<typename>
@@ -611,27 +594,18 @@ namespace detail {
           param::tag::arguments,
           boost::fusion::vector0
         >::type input_arguments_type;
+
       input_arguments_type const &input_arguments(
         args[param::_arguments | boost::fusion::vector0()]);
 
-      typedef typename boost::fusion::result_of::transform<
-          input_arguments_type const,
-          cref_functor
-        >::type ref_input_arguments_type;
-
-      ref_input_arguments_type const &ref_input_arguments(
-        boost::fusion::transform(
-          input_arguments,
-          cref_functor()));
-
       typedef typename boost::fusion::result_of::push_front<
-          ref_input_arguments_type const,
+          input_arguments_type const,
           object
         >::type full_arguments_type;
 
       full_arguments_type full_arguments(
         boost::fusion::push_front(
-          ref_input_arguments,
+          input_arguments,
           object(obj)));
 
       return boost::fusion::invoke(new_functor<Class>(), full_arguments);
