@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/binary.hpp"

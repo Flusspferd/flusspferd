@@ -25,8 +25,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/array.hpp"
-
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/array.hpp"
 #include "flusspferd/value.hpp"
 #include "flusspferd/value_io.hpp"
 #include "test_environment.hpp"
