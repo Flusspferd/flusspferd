@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/init.hpp"
+#include "flusspferd/native_function_base.hpp"
 #include "test_environment.hpp"
 #include <boost/assign/list_of.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
@@ -61,6 +62,17 @@ public:
       a(a),
       b(b)
   {}
+};
+
+struct my_functor : flusspferd::native_function_base {
+  bool x;
+
+  my_functor() : x(true) {}
+  my_functor(int) : x(false) {}
+
+  void call(flusspferd::call_context &) {
+    set_property("called", x);
+  }
 };
 
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
@@ -163,6 +175,24 @@ BOOST_AUTO_TEST_CASE( MyClass ) {
   BOOST_CHECK_EQUAL(obj2.constructor_choice, my_class::ab);
   BOOST_CHECK_EQUAL(obj2.a, 5);
   BOOST_CHECK_EQUAL(obj2.b, "hey");
+}
+
+BOOST_AUTO_TEST_CASE( MyFunctor ) {
+  flusspferd::local_root_scope scope;
+
+  flusspferd::object f;
+  BOOST_CHECK_NO_THROW(f = flusspferd::create<my_functor>());
+  BOOST_CHECK(!f.is_null());
+  BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value());
+  BOOST_CHECK_NO_THROW(f.call(flusspferd::global()));
+  BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value(true));
+
+  BOOST_CHECK_NO_THROW(
+    f = flusspferd::create<my_functor>(boost::fusion::make_vector(0)));
+  BOOST_CHECK(!f.is_null());
+  BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value());
+  BOOST_CHECK_NO_THROW(f.call(flusspferd::global()));
+  BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value(false));
 }
 
 BOOST_AUTO_TEST_CASE( container ) {
