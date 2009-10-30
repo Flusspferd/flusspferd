@@ -393,6 +393,39 @@ bool object::is_generator() const {
       && get_property("next").is_function();
 }
 
+namespace {
+  void set_property_attributes(
+    property_attributes &attrs,
+    uintN sm_flags, void *getter_op, void *setter_op)
+  {
+    attrs = property_attributes();
+    if (~sm_flags & JSPROP_ENUMERATE)
+      attrs.flags = attrs.flags | dont_enumerate;
+    if (sm_flags & JSPROP_PERMANENT)
+      attrs.flags = attrs.flags | permanent_property;
+    if (sm_flags & JSPROP_READONLY)
+      attrs.flags = attrs.flags | read_only_property;
+    if (sm_flags & JSPROP_SHARED)
+      attrs.flags = attrs.flags | shared_property;
+
+    if (getter_op) {
+      if (sm_flags & JSPROP_GETTER) {
+        attrs.getter = Impl::wrap_object((JSObject*)getter_op);
+      } else {
+        // What do i set attrs.getter to here....?
+      }
+    }
+  
+    if (setter_op) {
+      if (sm_flags & JSPROP_SETTER) {
+        attrs.setter = Impl::wrap_object((JSObject*)setter_op);
+      } else {
+        // What do i set attrs.setter to here....?
+      }
+    }
+  }
+}
+
 bool object::get_property_attributes(
     string const &name, property_attributes &attrs)
 {
@@ -405,9 +438,6 @@ bool object::get_property_attributes(
   void *getter_op, *setter_op;
   uintN sm_flags;
 
-  attrs.flags = no_property_flag;
-  attrs.getter = boost::none;
-  attrs.setter = boost::none;
   JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
           Impl::current_context(), get_const(), name.data(), name.length(),
           &sm_flags, &found,
@@ -419,29 +449,34 @@ bool object::get_property_attributes(
   if (!found)
     return false;
 
-  if (~sm_flags & JSPROP_ENUMERATE)
-    attrs.flags = attrs.flags | dont_enumerate;
-  if (sm_flags & JSPROP_PERMANENT)
-    attrs.flags = attrs.flags | permanent_property;
-  if (sm_flags & JSPROP_READONLY)
-    attrs.flags = attrs.flags | read_only_property;
-  if (sm_flags & JSPROP_SHARED)
-    attrs.flags = attrs.flags | shared_property;
+  set_property_attributes(attrs, sm_flags, getter_op, setter_op);
 
-  if (getter_op) {
-    if (sm_flags & JSPROP_GETTER) {
-      attrs.getter = Impl::wrap_object((JSObject*)getter_op);
-    } else {
-      // What do i set attrs.getter to here....?
-    }
-  }
-  
-  if (setter_op) {
-    if (sm_flags & JSPROP_SETTER) {
-      attrs.setter = Impl::wrap_object((JSObject*)setter_op);
-    } else {
-      // What do i set attrs.setter to here....?
-    }
-  }
+  return true;
+}
+
+bool object::get_property_attributes(
+    value const &id, property_attributes &attrs)
+{
+  if (is_null())
+    throw exception("Could not get property attributes (object is null)");
+
+  flusspferd::root_value id_r(id);
+
+  JSBool found;
+  void *getter_op, *setter_op;
+  uintN sm_flags;
+  JSBool success = JS_GetPropertyAttrsGetterAndSetterById(
+          Impl::current_context(), get_const(), Impl::get_jsid(id),
+          &sm_flags, &found,
+          (JSPropertyOp*)&getter_op, (JSPropertyOp*)&setter_op);
+
+  if (!success)
+    throw exception("Could not query property attributes");
+
+  if (!found)
+    return false;
+
+  set_property_attributes(attrs, sm_flags, getter_op, setter_op);
+
   return true;
 }
