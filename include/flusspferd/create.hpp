@@ -474,7 +474,9 @@ namespace detail {
         param::tag::source,
         param::tag::argument_names,
         param::tag::file,
-        param::tag::line
+        param::tag::line,
+        container_spec,
+        attributes_spec
       > parameters;
 
     static result_type create() {
