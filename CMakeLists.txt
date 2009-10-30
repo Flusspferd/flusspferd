@@ -253,7 +253,7 @@ if(ENABLE_TESTS)
         unit_test_framework ${FLUSSPFERD_BOOST_LIBRARIES})
 endif()
 
-find_package(Boost 1.36.0 COMPONENTS
+find_package(Boost 1.40.0 COMPONENTS
     ${FLUSSPFERD_BOOST_LIBRARIES})
 
 if(Boost_INCLUDE_DIR)

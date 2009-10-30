@@ -176,3 +176,19 @@ Impl::value_impl Impl::value_impl::from_string(string const &s) {
 Impl::value_impl Impl::value_impl::from_object(object const &o) {
   return wrap_jsval(OBJECT_TO_JSVAL(Impl::get_object(const_cast<object&>(o))));
 }
+
+jsid Impl::get_jsid(Impl::value_impl const &v) {
+  jsid id;
+  if(!JS_ValueToId(Impl::current_context(), Impl::get_jsval(v), &id)) {
+    throw exception("Could not convert value to id");
+  }
+  return id;
+}
+
+Impl::value_impl Impl::wrap_jsid(jsid id) {
+  jsval value;
+  if(!JS_IdToValue(Impl::current_context(), id, &value)) {
+    throw exception("Could not convert id to value");
+  }
+  return Impl::wrap_jsval(value);
+}
