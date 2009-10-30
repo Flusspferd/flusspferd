@@ -96,9 +96,9 @@ value object::set_property(value const &id, value const &v_) {
   local_root_scope scope;
   value v = v_;
   string name = id.to_string();
-  if (!JS_SetUCProperty(Impl::current_context(), get(),
-                        name.data(), name.length(),
-                        Impl::get_jsvalp(v)))
+  if (!JS_SetPropertyById(Impl::current_context(), get(),
+                          Impl::get_jsid(id),
+                          Impl::get_jsvalp(v)))
     throw exception("Could not set property");
   return v;
 }
@@ -123,9 +123,9 @@ value object::get_property(value const &id) const {
   value result;
   local_root_scope scope;
   string name = id.to_string();
-  if (!JS_GetUCProperty(Impl::current_context(), get_const(),
-                        name.data(), name.length(),
-                        Impl::get_jsvalp(result)))
+  if (!JS_GetPropertyById(Impl::current_context(), get_const(),
+                          Impl::get_jsid(id),
+                          Impl::get_jsvalp(result)))
     throw exception("Could not get property");
   return result;
 }
@@ -150,9 +150,9 @@ bool object::has_property(value const &id) const {
   local_root_scope scope;
   string name = id.to_string();
   JSBool foundp;
-  if (!JS_HasUCProperty(Impl::current_context(), get_const(),
-                        name.data(), name.length(),
-                        &foundp))
+  if (!JS_HasPropertyById(Impl::current_context(), get_const(),
+                          Impl::get_jsid(id),
+                          &foundp))
     throw exception("Could not check property");
   return foundp;
 }
@@ -175,8 +175,8 @@ bool object::has_own_property(value const &id) const {
 
   JSBool has;
   string name = id.to_string();
-  if (!JS_AlreadyHasOwnUCProperty(Impl::current_context(), get_const(),
-                                  name.data(), name.length(), &has))
+  if (!JS_AlreadyHasOwnPropertyById(Impl::current_context(), get_const(),
+                                    Impl::get_jsid(id), &has))
   {
     throw exception("Unable to check for own property");
   }
@@ -200,8 +200,8 @@ void object::delete_property(value const &id) {
   local_root_scope scope;
   string name = id.to_string();
   jsval dummy;
-  if (!JS_DeleteUCProperty2(Impl::current_context(), get(),
-                            name.data(), name.length(), &dummy))
+  if (!JS_DeletePropertybyId2(Impl::current_context(), get(),
+                              Impl::get_jsid(id), &dummy))
     throw exception("Could not delete property");
 }
 
