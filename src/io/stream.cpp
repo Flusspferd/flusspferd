@@ -32,10 +32,12 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
 #include <boost/scoped_array.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 #include <cstdlib>
 
 using namespace flusspferd;
 using namespace flusspferd::io;
+namespace fusion = boost::fusion;
 
 stream::stream(object const &o, std::streambuf *p)
   : base_type(o), streambuf_(p)
@@ -74,10 +76,8 @@ object stream::read_whole_binary(boost::optional<byte_array&> output_) {
     output_
     ? static_cast<binary&>(output_.get())
     : static_cast<binary&>(
-        create_native_object<byte_string>(
-          object(),
-          static_cast<binary::element_type*>(0),
-          0));
+        create<byte_string>(
+          fusion::vector2<binary::element_type*, std::size_t>(0, 0)));
   root_object root_obj(output);
 
   unsigned const N = 4096;
@@ -120,10 +120,8 @@ object stream::read_binary(boost::optional<unsigned> size_opt, boost::optional<b
     output_
     ? static_cast<binary&>(output_.get())
     : static_cast<binary&>(
-        create_native_object<byte_string>(
-          object(),
-          static_cast<binary::element_type*>(0),
-          0));
+        create<byte_string>(
+          fusion::vector2<binary::element_type*, std::size_t>(0, 0)));
   root_object root_obj(output);
 
   binary::vector_type &data = output.get_data();

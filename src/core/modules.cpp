@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 #include <sstream>
 
 #ifdef WIN32
@@ -51,6 +52,7 @@ using namespace flusspferd::param;
 
 namespace algo = boost::algorithm;
 namespace fs = boost::filesystem;
+namespace fusion = boost::fusion;
 
 static fs::path make_dsoname(std::string const &id);
 
@@ -169,18 +171,12 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
-  io::file &f = create_native_object<io::file>(
-    object(),
-    filename.string().c_str(),
-    value("r")
-  );
+  io::file &f = create<io::file>(
+    fusion::make_vector(filename.string().c_str(), value("r")));
 
   // buffer blob
-  byte_array &blob = create_native_object<byte_array>(
-    object(),
-    static_cast<binary::element_type*>(0),
-    0
-  );
+  byte_array &blob = create<byte_array>(
+    fusion::vector2<binary::element_type*, std::size_t>(0, 0));
   binary::vector_type &buf = blob.get_data();
 
   // Look for a shebang line

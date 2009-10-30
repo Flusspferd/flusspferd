@@ -28,10 +28,13 @@ THE SOFTWARE.
 #include "flusspferd/encodings.hpp"
 #include <sstream>
 #include <algorithm>
+#include <boost/ref.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 
 using namespace flusspferd;
+namespace fusion = boost::fusion;
 
 void flusspferd::load_binary_module(object container) {
   object exports = container.get_property_object("exports");
@@ -213,7 +216,7 @@ std::size_t binary::set_length(std::size_t n) {
 }
 
 object binary::to_byte_array() {
-  return create_native_object<byte_array>(object(), *this);
+  return flusspferd::create<byte_array>(fusion::vector1<binary const&>(*this));
 }
 
 array binary::to_array() {
@@ -257,7 +260,8 @@ int binary::last_index_of(
 byte_string &binary::byte_at(int offset) {
   if (offset < 0 || std::size_t(offset) > get_length())
     throw exception("Offset outside range", "RangeError");
-  return create_native_object<byte_string>(object(), &v_data[offset], 1);
+  return flusspferd::create<byte_string>(
+    fusion::make_vector(&v_data[offset], 1));
 }
 
 int binary::get(int offset) {
@@ -367,7 +371,8 @@ array binary::split(value delim, object options) {
 
       for (std::size_t i = 0; i < n; ++i) {
         binary &new_delim =
-          create_native_object<byte_string>(object(), (element_type*)0, 0);
+          flusspferd::create<byte_string>(
+            fusion::vector2<element_type*, std::size_t>(0, 0));
         arguments arg;
         arg.push_back(arr.get_element(i));
         new_delim.do_append(arg);
@@ -480,7 +485,7 @@ byte_string::byte_string(object const &o, element_type const *p, std::size_t n)
 {}
 
 binary &byte_string::create(element_type const *p, std::size_t n) {
-  return create_native_object<byte_string>(object(), p, n);
+  return flusspferd::create<byte_string>(fusion::make_vector(p, n));
 }
 
 value byte_string::element(element_type e) {
@@ -537,7 +542,8 @@ std::string byte_string::to_source() {
 byte_string &byte_string::join(array &arr, binary &delimiter)
 {
   byte_string &res =
-    create_native_object<byte_string>(object(), (element_type*) 0, 0);
+    flusspferd::create<byte_string>(
+      fusion::vector2<element_type*, std::size_t>(0, 0));
   root_object root_obj(res);
   std::size_t n = arr.length();
   for (std::size_t i = 0; i < n; ++i) {
@@ -565,7 +571,7 @@ byte_array::byte_array(object const &o, element_type const *p, std::size_t n)
 {}
 
 binary &byte_array::create(element_type const *p, std::size_t n) {
-  return create_native_object<byte_array>(object(), p, n);
+  return flusspferd::create<byte_array>(fusion::make_vector(p, n));
 }
 
 value byte_array::element(element_type e) {
@@ -581,7 +587,8 @@ std::string byte_array::to_string() {
 }
 
 object byte_array::to_byte_string() {
-  return create_native_object<byte_string>(object(), *this);
+  return flusspferd::create<byte_string>(
+    fusion::vector1<binary const &>(*this));
 }
 
 void byte_array::append(call_context &x) {
@@ -694,7 +701,8 @@ byte_array &byte_array::filter(function callback, object thisObj) {
     thisObj = flusspferd::scope_chain();
 
   byte_array &result =
-    create_native_object<byte_array>(object(), (element_type*)0, 0);
+    flusspferd::create<byte_array>(
+      fusion::vector2<element_type*, std::size_t>(0, 0));
   root_object root_obj(result);
 
   vector_type &v = get_data();
@@ -763,7 +771,8 @@ byte_array &byte_array::map(function callback, object thisObj) {
     thisObj = flusspferd::scope_chain();
 
   byte_array &result =
-    create_native_object<byte_array>(object(), (element_type*)0, 0);
+    flusspferd::create<byte_array>(
+      fusion::vector2<element_type*, std::size_t>(0, 0));
   root_object root_obj(result);
 
   vector_type &v = get_data();

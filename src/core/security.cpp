@@ -33,8 +33,8 @@ using namespace flusspferd;
 security &security::create(object container) {
   local_root_scope scope;
 
-  security &obj = create_native_object<security>(
-      flusspferd::create<object>().prototype());
+  security &obj = flusspferd::create<security>(
+      param::_prototype = flusspferd::create<object>().prototype());
 
   container.define_property("$security", obj);
 

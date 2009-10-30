@@ -27,11 +27,13 @@ THE SOFTWARE.
 #include "sqlite.hpp"
 #include <boost/assign/list_of.hpp>
 #include <boost/lexical_cast.hpp>
-
-namespace sqlite3_plugin {
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 using namespace flusspferd;
 using namespace boost::assign;
+namespace fusion = boost::fusion;
+
+namespace sqlite3_plugin {
 
 void raise_sqlite_error(::sqlite3* db)
 {
@@ -180,7 +182,7 @@ object sqlite3::compile(flusspferd::string sql_in, value bind ) {
         raise_sqlite_error(db);
     }
 
-    object cursor = create_native_object<sqlite3_cursor>(object(), sth);
+    object cursor = create<sqlite3_cursor>(fusion::make_vector(sth));
 
     string tail_str;
     if (tail) {
