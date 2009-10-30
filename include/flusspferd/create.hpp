@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include <boost/fusion/algorithm/transformation/push_front.hpp>
 #include <boost/fusion/algorithm/transformation/transform.hpp>
 #include <boost/fusion/container/vector/vector10.hpp>
+#include <boost/type_traits.hpp>
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
@@ -365,17 +366,19 @@ namespace detail {
     flusspferd::string const &file,
     unsigned line);
 
-  struct ref_functor {
+  struct cref_functor {
     template<typename>
     struct result;
 
     template<typename Self, typename A>
     struct result<Self (A)> {
-      typedef typename boost::add_reference<A>::type type;
+      typedef typename boost::add_reference<
+          typename boost::add_const<A>::type
+        >::type type;
     };
 
     template<typename A>
-    A &operator()(A &x) {
+    A const &operator()(A const &x) const {
       return x;
     }
   };
@@ -613,13 +616,13 @@ namespace detail {
 
       typedef typename boost::fusion::result_of::transform<
           input_arguments_type const,
-          ref_functor
+          cref_functor
         >::type ref_input_arguments_type;
 
       ref_input_arguments_type const &ref_input_arguments(
         boost::fusion::transform(
           input_arguments,
-          ref_functor()));
+          cref_functor()));
 
       typedef typename boost::fusion::result_of::push_front<
           ref_input_arguments_type const,

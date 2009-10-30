@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/init.hpp"
 #include "test_environment.hpp"
 #include <boost/assign/list_of.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 using namespace flusspferd::param;
 using namespace boost::assign;
@@ -41,14 +42,24 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 public:
   enum constructor_choice_t {
-    obj_only
+    obj_only,
+    ab
   };
 
   constructor_choice_t constructor_choice;
+  int a;
+  std::string b;
 
   my_class(object const &obj)
     : base_type(obj),
       constructor_choice(obj_only)
+  {}
+
+  my_class(object const &obj, int a, std::string const &b)
+    : base_type(obj),
+      constructor_choice(ab),
+      a(a),
+      b(b)
   {}
 };
 
@@ -144,6 +155,14 @@ BOOST_AUTO_TEST_CASE( MyClass ) {
   BOOST_CHECK_EQUAL(
     &obj,
     &flusspferd::get_native<my_class>(flusspferd::object(obj)));
+  BOOST_CHECK_EQUAL(obj.constructor_choice, my_class::obj_only);
+
+  my_class &obj2 = flusspferd::create<my_class>(
+    boost::fusion::make_vector(5, "hey"));
+  BOOST_CHECK(!obj2.is_null());
+  BOOST_CHECK_EQUAL(obj2.constructor_choice, my_class::ab);
+  BOOST_CHECK_EQUAL(obj2.a, 5);
+  BOOST_CHECK_EQUAL(obj2.b, "hey");
 }
 
 BOOST_AUTO_TEST_CASE( container ) {
