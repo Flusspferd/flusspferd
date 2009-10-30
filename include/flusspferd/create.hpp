@@ -41,6 +41,10 @@ THE SOFTWARE.
 #include <boost/parameter/keyword.hpp>
 #include <boost/parameter/name.hpp>
 #include <boost/parameter/binding.hpp>
+#include <boost/fusion/functional/invocation/invoke.hpp>
+#include <boost/fusion/algorithm/transformation/push_front.hpp>
+#include <boost/fusion/algorithm/transformation/transform.hpp>
+#include <boost/fusion/container/vector/vector10.hpp>
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
@@ -343,6 +347,8 @@ namespace param {
   BOOST_PARAMETER_NAME(source)
   BOOST_PARAMETER_NAME(file)
   BOOST_PARAMETER_NAME(line)
+
+  BOOST_PARAMETER_NAME(arguments)
 }
 
 namespace detail {
@@ -355,6 +361,52 @@ namespace detail {
     flusspferd::string const &file,
     unsigned line);
 
+  struct ref_functor {
+    template<typename>
+    struct result;
+
+    template<typename Self, typename A>
+    struct result<Self (A)> {
+      typedef typename boost::add_reference<A>::type type;
+    };
+
+    template<typename A>
+    A &operator()(A &x) {
+      return x;
+    }
+  };
+
+  template<typename Class>
+  struct new_functor {
+    template<typename>
+    struct result {
+      typedef Class &type;
+    };
+
+    Class &operator()() {
+      return *new Class;
+    }
+
+#define FLUSSPFERD_NEW_FUNCTOR_INVOKE(z, n, d) \
+    template< \
+      BOOST_PP_ENUM_PARAMS(n, typename T) \
+    > \
+    Class &operator()( \
+      BOOST_PP_ENUM_BINARY_PARAMS(n, T, const &x) \
+    ) \
+    { \
+      return *new Class(BOOST_PP_ENUM_PARAMS(n, x)); \
+    } \
+    /* */
+
+    BOOST_PP_REPEAT_FROM_TO(
+      1,
+      BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
+      FLUSSPFERD_NEW_FUNCTOR_INVOKE,
+      ~)
+
+#undef FLUSSPFERD_NEW_FUNCTOR_INVOKE
+  };
 
   template<typename Class, typename Cond = void>
   struct create_traits;
@@ -519,10 +571,51 @@ namespace detail {
   {
     typedef Class &result_type;
 
+    typedef boost::parameter::parameters<
+        param::tag::arguments,
+        name_spec,
+        container_spec,
+        attributes_spec
+      > parameters;
+
     static result_type create() {
-      local_root_scope scope;
-      object obj = detail::generic_create_native_object<Class>(object());
+      root_object obj((detail::generic_create_native_object<Class>(object())));
       return *new Class(obj);
+    }
+
+    template<typename ArgPack>
+    static result_type create(ArgPack const &args) {
+      root_object obj((detail::generic_create_native_object<Class>(object())));
+
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::arguments,
+          boost::fusion::vector0
+        >::type input_arguments_type;
+      input_arguments_type const &input_arguments(
+        args[param::_arguments | boost::fusion::vector0()]);
+
+      typedef typename boost::fusion::result_of::transform<
+          input_arguments_type const,
+          ref_functor
+        >::type ref_input_arguments_type;
+
+      ref_input_arguments_type const &ref_input_arguments(
+        boost::fusion::transform(
+          input_arguments,
+          ref_functor()));
+
+      typedef typename boost::fusion::result_of::push_front<
+          ref_input_arguments_type const,
+          object
+        >::type full_arguments_type;
+
+      full_arguments_type full_arguments(
+        boost::fusion::push_front(
+          ref_input_arguments,
+          object(obj)));
+
+      return boost::fusion::invoke(new_functor<Class>(), full_arguments);
     }
   };
 

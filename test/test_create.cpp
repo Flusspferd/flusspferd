@@ -186,11 +186,11 @@ BOOST_AUTO_TEST_CASE( container ) {
   BOOST_CHECK(cont.get_property_attributes("f", attr));
   BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);
 
-/*  my_class &m = flusspferd::create<my_class>(_name = "m", _container = cont);
+  my_class &m = flusspferd::create<my_class>(_name = "m", _container = cont);
   BOOST_CHECK(!m.is_null());
   BOOST_CHECK_EQUAL(cont.get_property("m"), m);
   BOOST_CHECK(cont.get_property_attributes("m", attr));
-  BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);*/
+  BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
