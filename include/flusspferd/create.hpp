@@ -577,6 +577,8 @@ namespace detail {
 
     typedef boost::parameter::parameters<
         param::tag::arguments,
+        param::tag::prototype,
+        param::tag::parent,
         name_spec,
         container_spec,
         attributes_spec
@@ -596,8 +598,8 @@ namespace detail {
     static result_type create(ArgPack const &args) {
       root_object obj((
           detail::generic_create_native_object<Class>(
-            object(),
-            object()
+            args[param::_prototype | object()],
+            args[param::_parent | object()]
           )
         ));
 
