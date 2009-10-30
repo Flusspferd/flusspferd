@@ -394,11 +394,11 @@ bool object::is_generator() const {
 }
 
 namespace {
-  void set_property_attributes(
-    property_attributes &attrs,
+  property_attributes
+  set_property_attributes(
     uintN sm_flags, void *getter_op, void *setter_op)
   {
-    attrs = property_attributes();
+    property_attributes attrs;
     if (~sm_flags & JSPROP_ENUMERATE)
       attrs.flags = attrs.flags | dont_enumerate;
     if (sm_flags & JSPROP_PERMANENT)
@@ -423,12 +423,12 @@ namespace {
         // What do i set attrs.setter to here....?
       }
     }
+    return attrs;
   }
 }
 
-bool object::get_property_attributes(
-    string const &name, property_attributes &attrs)
-{
+boost::optional<property_attributes>
+object::get_property_attributes(string const &name) const {
   if (is_null())
     throw exception("Could not get property attributes (object is null)");
 
@@ -437,7 +437,6 @@ bool object::get_property_attributes(
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;
-
   JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
           Impl::current_context(), get_const(), name.data(), name.length(),
           &sm_flags, &found,
@@ -447,16 +446,13 @@ bool object::get_property_attributes(
     throw exception("Could not query property attributes");
 
   if (!found)
-    return false;
+    return boost::none;
 
-  set_property_attributes(attrs, sm_flags, getter_op, setter_op);
-
-  return true;
+  return set_property_attributes(sm_flags, getter_op, setter_op);
 }
 
-bool object::get_property_attributes(
-    value const &id, property_attributes &attrs)
-{
+boost::optional<property_attributes>
+object::get_property_attributes(value const &id) const {
   if (is_null())
     throw exception("Could not get property attributes (object is null)");
 
@@ -474,9 +470,7 @@ bool object::get_property_attributes(
     throw exception("Could not query property attributes");
 
   if (!found)
-    return false;
+    return boost::none;
 
-  set_property_attributes(attrs, sm_flags, getter_op, setter_op);
-
-  return true;
+  return set_property_attributes(sm_flags, getter_op, setter_op);
 }

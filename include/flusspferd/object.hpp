@@ -313,19 +313,20 @@ FLUSSPFERD_CALLS(call, object const &)
    * Get a property's attributes.
    *
    * @param id The property's name / ID.
-   * @param[out] attrs The property's attributes.
-   * @return Whether the property exists.
+   * @return The attributes or boost::none if property does not exist.
    */
-  bool get_property_attributes(string const &id, property_attributes &attrs);
+  boost::optional<property_attributes>
+  get_property_attributes(string const &id) const;
 
   /**
    * Get a property's attributes.
    *
    * @param id The property's ID.
    * @param[out] attrs The property's attributes.
-   * @return Whether the property exists.
+   * @return The attributes or boost::none if property does not exist.
    */
-  bool get_property_attributes(value const &id, property_attributes &attrs);
+  boost::optional<property_attributes>
+  get_property_attributes(value const &id) const;
 
   /**
    * Set a property.
