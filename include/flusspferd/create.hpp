@@ -58,6 +58,8 @@ class native_function_base;
  */
 //@{
 
+namespace detail {
+
 /**
  * Create a new native function.
  *
@@ -79,6 +81,8 @@ function create_native_function(native_function_base *ptr);
  */
 function create_native_function(object const &o, native_function_base *ptr);
 
+}
+
 #ifndef IN_DOXYGEN
 
 #define FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION(z, n_args, d) \
@@ -91,7 +95,7 @@ function create_native_function(object const &o, native_function_base *ptr);
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
   ) { \
-    return create_native_function(o, new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
+    return detail::create_native_function(o, new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
   } \
   /* */
 

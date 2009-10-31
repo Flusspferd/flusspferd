@@ -113,7 +113,7 @@ function flusspferd::detail::create_source_function(
 }
 
 
-function flusspferd::create_native_function(native_function_base *ptr) {
+function flusspferd::detail::create_native_function(native_function_base *ptr) {
   try {
     return ptr->create_function();
   } catch (...) {
@@ -122,7 +122,7 @@ function flusspferd::create_native_function(native_function_base *ptr) {
   }
 }
 
-function flusspferd::create_native_function(
+function flusspferd::detail::create_native_function(
     object const &o_, native_function_base *ptr)
 {
   object o = o_;
