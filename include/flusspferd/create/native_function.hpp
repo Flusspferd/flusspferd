@@ -41,7 +41,7 @@ namespace detail {
     >::type
   >
   {
-    typedef object result_type;
+    typedef function result_type;
 
     typedef boost::parameter::parameters<
       param::tag::arguments,
