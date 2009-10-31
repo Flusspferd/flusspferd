@@ -271,6 +271,10 @@ namespace param {
   BOOST_PARAMETER_NAME(line)
 
   BOOST_PARAMETER_NAME(arguments)
+
+  /* For passing types. Like this: _param = param::type<int>() */
+  template<typename T>
+  struct type {};
 }
 
 namespace detail {
