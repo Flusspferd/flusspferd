@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
+#include "flusspferd/array.hpp"
 #include <boost/scoped_array.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
 #include <cstdlib>

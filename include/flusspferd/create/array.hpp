@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_ARRAY_HPP
 
 #include "../create.hpp"
+#include "../array.hpp"
 
 namespace flusspferd {
 
