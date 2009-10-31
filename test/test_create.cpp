@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE( MyFunctor ) {
 
 BOOST_AUTO_TEST_CASE( container ) {
   flusspferd::local_root_scope scope;
-  flusspferd::property_attributes attr;
+  boost::optional<flusspferd::property_attributes> attr;
 
   flusspferd::object cont = flusspferd::create<flusspferd::object>();
   BOOST_CHECK(!cont.is_null());
@@ -214,8 +214,8 @@ BOOST_AUTO_TEST_CASE( container ) {
     );
   BOOST_CHECK(!o.is_null());
   BOOST_CHECK_EQUAL(cont.get_property_object("o"), o);
-  BOOST_CHECK(cont.get_property_attributes("o", attr));
-  BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);
+  BOOST_CHECK(attr = cont.get_property_attributes("o"));
+  BOOST_CHECK_EQUAL(attr->flags, flusspferd::dont_enumerate);
 
   flusspferd::array a =
     flusspferd::create<flusspferd::array>(
@@ -225,8 +225,8 @@ BOOST_AUTO_TEST_CASE( container ) {
       _attributes = flusspferd::no_property_flag);
   BOOST_CHECK_EQUAL(a.length(), 5);
   BOOST_CHECK_EQUAL(cont.get_property_object("a"), a);
-  BOOST_CHECK(cont.get_property_attributes("a", attr));
-  BOOST_CHECK_EQUAL(attr.flags, flusspferd::no_property_flag);
+  BOOST_CHECK(attr = cont.get_property_attributes("a"));
+  BOOST_CHECK_EQUAL(attr->flags, flusspferd::no_property_flag);
 
   flusspferd::function f =
     flusspferd::create<flusspferd::function>(
@@ -237,14 +237,14 @@ BOOST_AUTO_TEST_CASE( container ) {
   BOOST_CHECK_EQUAL(f.call(flusspferd::global(), 1), flusspferd::value(2));
   BOOST_CHECK_EQUAL(cont.get_property("f"), f);
   BOOST_CHECK_EQUAL(cont.call("f", 2), flusspferd::value(3));
-  BOOST_CHECK(cont.get_property_attributes("f", attr));
-  BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);
+  BOOST_CHECK(attr = cont.get_property_attributes("f"));
+  BOOST_CHECK_EQUAL(attr->flags, flusspferd::dont_enumerate);
 
   my_class &m = flusspferd::create<my_class>(_name = "m", _container = cont);
   BOOST_CHECK(!m.is_null());
   BOOST_CHECK_EQUAL(cont.get_property("m"), m);
-  BOOST_CHECK(cont.get_property_attributes("m", attr));
-  BOOST_CHECK_EQUAL(attr.flags, flusspferd::dont_enumerate);
+  BOOST_CHECK(attr = cont.get_property_attributes("m"));
+  BOOST_CHECK_EQUAL(attr->flags, flusspferd::dont_enumerate);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
