@@ -65,6 +65,22 @@ namespace detail {
         arg[param::_file | flusspferd::string()],
         arg[param::_line | 0]);
     }
+
+    static result_type create(ArgPack const &arg, char const *func) {
+      return create(arg, flusspferd::string(func));
+    }
+
+    static result_type create(
+      ArgPack const &arg,
+      boost::function<void (call_context&)> const &fun)
+    {
+      local_root_scope scope;
+      return old_create_native_functor_function<native_function<void> >(
+        object(),
+        fun,
+        arg[param::_arity | 0],
+        string(arg[param::_name | string()]).to_string());
+    }
   };
 
   template<bool Method>
@@ -77,6 +93,7 @@ namespace detail {
         param::tag::argument_names,
         param::tag::file,
         param::tag::line,
+        param::tag::signature,
         container_spec,
         attributes_spec
       > parameters;
@@ -92,9 +109,39 @@ namespace detail {
     }
 
     template<typename ArgPack>
-    static result_type create(ArgPack const &arg) {
+    static
+    typename boost::enable_if<
+      boost::is_same<
+        typename boost::parameter::binding<
+          ArgPack, param::tag::signature, void
+        >::type,
+        void
+      >,
+      result_type
+    >::type
+    create(ArgPack const &arg) {
       typedef create_function_helper<Method, ArgPack> helper;
       return helper::create(arg, arg[param::_function]);
+    }
+
+    template<typename ArgPack>
+    static
+    typename boost::disable_if<
+      boost::is_same<
+        typename boost::parameter::binding<
+          ArgPack, param::tag::signature, void
+        >::type,
+        void
+      >,
+      result_type
+    >::type
+    create(ArgPack const &arg) {
+      typedef create_function_helper<Method, ArgPack> helper;
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::signature
+        >::type::parameter sig;
+      return helper::create(arg, boost::function<sig>(arg[param::_function]));
     }
   };
 

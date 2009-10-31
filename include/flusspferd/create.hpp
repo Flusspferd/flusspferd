@@ -252,12 +252,16 @@ namespace param {
   BOOST_PARAMETER_NAME(function)
   BOOST_PARAMETER_NAME(file)
   BOOST_PARAMETER_NAME(line)
+  BOOST_PARAMETER_NAME(signature)
+  BOOST_PARAMETER_NAME(arity)
 
   BOOST_PARAMETER_NAME(arguments)
 
   /* For passing types. Like this: _param = param::type<int>() */
   template<typename T>
-  struct type {};
+  struct type {
+    typedef T parameter;
+  };
 }
 
 namespace detail {
