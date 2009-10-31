@@ -27,7 +27,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CREATE_FUNCTION_HPP
 #define FLUSSPFERD_CREATE_FUNCTION_HPP
 
-#include "flusspferd/create.hpp"
+#include "../create.hpp"
 
 namespace flusspferd {
 
