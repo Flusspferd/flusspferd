@@ -25,19 +25,18 @@ THE SOFTWARE.
 */
 
 /**
- * @page ubuntu How to install Flusspferd on Ubuntu 9.04
+ * @page ubuntu How to install Flusspferd on Ubuntu 9.10
  *
- * This document describes how to build Flusspferd on Ubuntu 9.04. For older
+ * This document describes how to build Flusspferd on Ubuntu 9.10. For older
  * versions, you might need to compile some prerequisites yourself.
  *
  * @section precond Preconditions
  *
- * First of all we need to install the build tools, Boost 1.37 and Git
- * (optionally).
+ * First of all we need to install the build tools and Boost 1.40.
  *
  * @verbatim
 $ sudo apt-get install build-essential cmake
-$ sudo apt-get install libboost1.37-dev libboost-system1.37-dev libboost-thread1.37-dev libboost-filesystem1.37-dev
+$ sudo apt-get install libboost1.40-dev libboost-system1.40-dev libboost-thread1.40-dev libboost-filesystem1.40-dev libboost1.40-iostreams1.40-dev
 @endverbatim
  *
  * It's not necessary but to get a more comfortable REPL/Shell it's highly
@@ -48,9 +47,9 @@ $ sudo apt-get install libedit-dev   # optional but recommended
 @endverbatim
  *
  * If you want to run Flusspferd's unit test system you also need the
- * Boost.Test Library and to messure test coverage you need lcov
+ * Boost.Test Library
  * @verbatim
-$ sudo apt-get install libboost-test1.37-dev lcov   # optional
+$ sudo apt-get install libboost-test1.40-dev   # optional
 @endverbatim
  *
  * If you want to use the most current (but probably unstable) version of
@@ -61,12 +60,26 @@ $ sudo apt-get install git-core   # optional
  *
  * @section spidermonkey Building Spidermonkey
  *
- * Build Spidermonkey tip (from the HG repository mozilla-central), or
- * 1.8.1 if available.
+ * Flusspferd requires Spidermonkey 1.8.1 or higher. (Flusspferd versions 0.8 and older
+ * support Spidermonkey 1.7 and 1.8.0rc). Since at the time of
+ * writing Spidermonkey 1.8.1 was not released. You either have
+ * to build Spidermonkey tip (from the HG repository mozilla-central) or
+ * you can fetch an inofficial snapshot from
+ * http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2 .
  *
  * <a href="https://developer.mozilla.org/en/SpiderMonkey/Build_Documentation">
  * There is a detailed build documentation over at the Mozilla Developer
  * Center Wiki</a>.
+ *
+ * A quick installation guide.
+ * @verbatim
+$ wget http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2
+$ tar xjf http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2
+$ cd js/src
+$ ./configure
+$ make
+$ sudo make install
+@endverbatim
  *
  * @section flusspferd Building Flusspferd
  *
@@ -119,23 +132,6 @@ $ sudo cp /usr/local/etc/bash_completion.d/flusspferd /etc/bash_completion.d
  *
  * @verbatim
 $ sudo apt-get install libsqlite3-dev
-@endverbatim
- *
- * @subsection xml Building Flusspferd with XML support
- * Support for XML is enabled during configuration time when libxml2's dev-files
- * are available
- * @verbatim
-$ sudo apt-get install libxml2-dev
-@endverbatim
- *
- * @subsection curl Building Flusspferd with cURL support
- * You have to install cURL's headers. Either choose
- * @verbatim
-$ sudo apt-get install libcurl4-gnutls-dev
-@endverbatim
- * or
- * @verbatim
-$ sudo apt-get install libcurl4-openssl-dev
 @endverbatim
  *
  * @subsection gmp Building Flusspferd with GMP support

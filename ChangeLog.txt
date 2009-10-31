@@ -4,6 +4,11 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-10-30:
+- object::get_property_attributes API changed.
+- changed object to provide an id based API for properties (#155).
+- Boost 1.40 required.
+
 2009-10-26:
 - Replace create_* with create<> (#147).
 

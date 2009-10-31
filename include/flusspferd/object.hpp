@@ -280,7 +280,19 @@ FLUSSPFERD_CALLS(call, object const &)
   void define_property(
     string const &name,
     value const &init_value = value(),
-    property_attributes const attrs = property_attributes());
+    property_attributes const &attrs = property_attributes());
+
+  /**
+   * Define a property.
+   *
+   * @param id The property's ID.
+   * @param init_value The initial value.
+   * @param attrs The property's attributes.
+   */
+  void define_property(
+    value const &id,
+    value const &init_value = value(),
+    property_attributes const &attrs = property_attributes());
 
   /**
    * Define a property.
@@ -292,7 +304,7 @@ FLUSSPFERD_CALLS(call, object const &)
    */
   void define_property(
     string const &name,
-    property_attributes const attrs)
+    property_attributes const &attrs)
   {
     return define_property(name, value(), attrs);
   }
@@ -301,11 +313,21 @@ FLUSSPFERD_CALLS(call, object const &)
    * Get a property's attributes.
    *
    * @param id The property's name / ID.
-   * @param[out] attrs The property's attributes.
-   * @return Whether the property exists.
+   * @return The attributes or boost::none if property does not exist.
    */
-  bool get_property_attributes(string const &id, property_attributes &attrs);
-    
+  boost::optional<property_attributes>
+  get_property_attributes(string const &id) const;
+
+  /**
+   * Get a property's attributes.
+   *
+   * @param id The property's ID.
+   * @param[out] attrs The property's attributes.
+   * @return The attributes or boost::none if property does not exist.
+   */
+  boost::optional<property_attributes>
+  get_property_attributes(value const &id) const;
+
   /**
    * Set a property.
    *

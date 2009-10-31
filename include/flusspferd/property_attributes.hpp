@@ -90,10 +90,18 @@ struct property_attributes {
   /// The property's flags.
   property_flag flags;
 
-  /// The property's getter.
+  /**
+   *  The property's getter.
+   *
+   *  A function returning the property's value.
+   */
   boost::optional<function const &> getter;
 
-  /// The property's setter.
+  /**
+   * The property's setter.
+   *
+   * A function taking the property's value.
+   */
   boost::optional<function const &> setter;
 
   /// Construct default attributes.

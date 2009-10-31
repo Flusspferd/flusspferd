@@ -58,6 +58,8 @@ protected:
   friend value_impl wrap_jsval(jsval v);
   friend jsval *get_jsvalp(value_impl &v);
   friend value_impl wrap_jsvalp(jsval *p);
+  friend jsid get_jsid(value_impl const &v);
+  friend value_impl wrap_jsid(jsid id);
 
   template<typename T>
   static value_impl from_integer(T const &num);
@@ -86,6 +88,9 @@ public:
     return getp();
   }
 };
+
+jsid get_jsid(value_impl const &v);
+value_impl wrap_jsid(jsid id);
 
 inline jsval get_jsval(value_impl const &v) {
   return v.get();
