@@ -67,8 +67,8 @@ void ecma_define_own_property(object o, string p, object desc) {
 
   // TODO: Check if obj is sealed/not extensible
 
-  property_attributes attrs;
-  bool current = o.has_own_property(p) && o.get_property_attributes(p, attrs);
+  boost::optional<property_attributes> attrs = o.get_property_attributes(p);
+  bool current = o.has_own_property(p) && attrs;
 
   bool is_accessor = false, is_data = false,
        configurable = false, enumerable = false, writable = false;
@@ -77,10 +77,10 @@ void ecma_define_own_property(object o, string p, object desc) {
 
   // Short circuit if current property is permanent
   if (current) {
-    if (attrs.flags & permanent_property)
+    if (attrs->flags & permanent_property)
       throw exception("Cannot alter un-configurable properties");
 
-    flags = attrs.flags;
+    flags = attrs->flags;
   }
 
 
