@@ -83,8 +83,6 @@ function create_native_function(object const &o, native_function_base *ptr);
 
 }
 
-#ifndef IN_DOXYGEN
-
 #define FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION(z, n_args, d) \
   template< \
     typename T \
@@ -104,25 +102,6 @@ BOOST_PP_REPEAT(
   FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION,
   ~
 )
-
-#else
-
-/**
- * Create a new native function of type @p F as method of an object.
- *
- * @p F must inherit from #native_function_base.
- *
- * The new method of object @p o will have the name @c ptr->name().
- *
- * @param F The functor type.
- * @param o The object to add the method to.
- * @param ... The parameters to pass to the constructor of @p F.
- * @return The new method.
- */
-template<typename F>
-object create_native_functor_function(object const &o, ...);
-
-#endif
 
 /**
  * Create a new native method of an object.
