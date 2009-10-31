@@ -367,66 +367,6 @@ namespace detail {
   struct create_traits<
     Class,
     typename boost::enable_if<
-      boost::is_base_of<native_object_base, Class>
-    >::type
-  >
-  {
-    typedef Class &result_type;
-
-    typedef boost::parameter::parameters<
-        param::tag::arguments,
-        param::tag::prototype,
-        param::tag::parent,
-        name_spec,
-        container_spec,
-        attributes_spec
-      > parameters;
-
-    static result_type create() {
-      root_object obj((
-          detail::generic_create_native_object<Class>(
-            object(),
-            object()
-          )
-        ));
-      return *new Class(obj);
-    }
-
-    template<typename ArgPack>
-    static result_type create(ArgPack const &args) {
-      root_object obj((
-          detail::generic_create_native_object<Class>(
-            args[param::_prototype | object()],
-            args[param::_parent | object()]
-          )
-        ));
-
-      typedef typename boost::parameter::value_type<
-          ArgPack,
-          param::tag::arguments,
-          boost::fusion::vector0
-        >::type input_arguments_type;
-
-      input_arguments_type input_arguments(
-        args[param::_arguments | boost::fusion::vector0()]);
-
-      boost::fusion::vector1<object> obj_seq(obj);
-
-      typedef boost::fusion::joint_view<
-          boost::fusion::vector1<object>,
-          input_arguments_type
-        > full_arguments_type;
-
-      full_arguments_type full_arguments(obj_seq, input_arguments);
-
-      return boost::fusion::invoke(new_functor<Class>(), full_arguments);
-    }
-  };
-
-  template<typename Class>
-  struct create_traits<
-    Class,
-    typename boost::enable_if<
       boost::is_base_of<native_function_base, Class>
     >::type
   >

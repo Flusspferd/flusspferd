@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "native_function_base.hpp"
 #include "create/object.hpp"
+#include "create/native_object.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
 #include <boost/mpl/size_t.hpp>

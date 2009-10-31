@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "flusspferd/create/array.hpp"
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/function.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/encodings.hpp"
 #include "flusspferd/evaluate.hpp"
