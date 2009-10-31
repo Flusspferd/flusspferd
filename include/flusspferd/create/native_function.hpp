@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
 
 #include "../create.hpp"
+#include <boost/fusion/functional/invocation/invoke.hpp>
 
 namespace flusspferd {
 

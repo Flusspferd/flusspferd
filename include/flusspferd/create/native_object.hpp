@@ -28,6 +28,9 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_NATIVE_OBJECT_HPP
 
 #include "../create.hpp"
+#include <boost/fusion/functional/invocation/invoke.hpp>
+#include <boost/fusion/view/joint_view.hpp>
+#include <boost/fusion/container/vector/vector10.hpp>
 
 namespace flusspferd {
 
