@@ -31,9 +31,11 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+struct method {}; /* tag */
+
 namespace detail {
-  template<>
-  struct create_traits<function, void> {
+  template<bool Method>
+  struct create_function_traits {
     typedef function result_type;
 
     typedef boost::parameter::parameters<
@@ -75,6 +77,16 @@ namespace detail {
         arg[param::_line | 0]);
     }
   };
+
+  template<>
+  struct create_traits<function, void>
+  : create_function_traits<false>
+  {};
+
+  template<>
+  struct create_traits<method, void>
+  : create_function_traits<true>
+  {};
 }
 
 }
