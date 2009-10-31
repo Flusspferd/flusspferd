@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_FUNCTION_HPP
 
 #include "../create.hpp"
+#include "../string.hpp"
 
 namespace flusspferd {
 
@@ -40,6 +41,31 @@ namespace detail {
     flusspferd::string const &body,
     flusspferd::string const &file,
     unsigned line);
+
+  template<bool Method, typename ArgPack>
+  struct create_function_helper {
+    typedef function result_type;
+
+    typedef typename boost::parameter::value_type<
+        ArgPack,
+        param::tag::argument_names,
+        std::vector<flusspferd::string>
+      >::type ArgumentsRange;
+
+    static result_type create(ArgPack const &arg, flusspferd::string const &func) {
+      local_root_scope scope;
+      ArgumentsRange const &r =
+        arg[param::_argument_names | std::vector<flusspferd::string>()];
+      std::vector<flusspferd::string> arg_names(boost::begin(r), boost::end(r));
+     
+      return create_source_function(
+        flusspferd::string(arg[param::_name | flusspferd::string()]),
+        arg_names,
+        func,
+        arg[param::_file | flusspferd::string()],
+        arg[param::_line | 0]);
+    }
+  };
 
   template<bool Method>
   struct create_function_traits {
@@ -67,21 +93,8 @@ namespace detail {
 
     template<typename ArgPack>
     static result_type create(ArgPack const &arg) {
-      local_root_scope scope;
-      typedef typename boost::parameter::value_type<
-          ArgPack,
-          param::tag::argument_names,
-          std::vector<flusspferd::string>
-        >::type Range;
-      Range const &r = arg[param::_argument_names | std::vector<flusspferd::string>()];
-      std::vector<flusspferd::string> arg_names(boost::begin(r), boost::end(r));
-     
-      return create_source_function(
-        flusspferd::string(arg[param::_name | flusspferd::string()]),
-        arg_names,
-        arg[param::_function],
-        arg[param::_file | flusspferd::string()],
-        arg[param::_line | 0]);
+      typedef create_function_helper<Method, ArgPack> helper;
+      return helper::create(arg, arg[param::_function]);
     }
   };
 
