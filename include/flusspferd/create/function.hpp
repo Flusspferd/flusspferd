@@ -47,7 +47,7 @@ namespace detail {
 
     typedef boost::parameter::parameters<
         param::tag::name,
-        param::tag::source,
+        param::tag::function,
         param::tag::argument_names,
         param::tag::file,
         param::tag::line,
@@ -79,7 +79,7 @@ namespace detail {
       return create_source_function(
         flusspferd::string(arg[param::_name | flusspferd::string()]),
         arg_names,
-        arg[param::_source],
+        arg[param::_function],
         arg[param::_file | flusspferd::string()],
         arg[param::_line | 0]);
     }

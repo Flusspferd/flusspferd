@@ -228,7 +228,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
   function fn = flusspferd::create<flusspferd::function>(
       _name = fname,
       _argument_names = argnames,
-      _source = module_text,
+      _function = module_text,
       _file = fname.c_str(),
       _line = 1ul);
 
