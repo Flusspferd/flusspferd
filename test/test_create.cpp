@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( function ) {
 
   f = flusspferd::create<flusspferd::function>(
     _argument_names = list_of("a"),
-    _source = "return a * 2");
+    _function = "return a * 2");
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 4));
   BOOST_CHECK_EQUAL(v, flusspferd::value(8));
 
@@ -232,7 +232,7 @@ BOOST_AUTO_TEST_CASE( container ) {
     flusspferd::create<flusspferd::function>(
       "f",
       _container = cont,
-      _source = "return x+1",
+      _function = "return x+1",
       _argument_names = list_of("x"));
   BOOST_CHECK_EQUAL(f.call(flusspferd::global(), 1), flusspferd::value(2));
   BOOST_CHECK_EQUAL(cont.get_property("f"), f);

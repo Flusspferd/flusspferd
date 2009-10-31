@@ -249,7 +249,7 @@ namespace param {
   BOOST_PARAMETER_NAME(parent)
 
   BOOST_PARAMETER_NAME(argument_names)
-  BOOST_PARAMETER_NAME(source)
+  BOOST_PARAMETER_NAME(function)
   BOOST_PARAMETER_NAME(file)
   BOOST_PARAMETER_NAME(line)
 
