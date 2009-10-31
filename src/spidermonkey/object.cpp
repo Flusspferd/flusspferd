@@ -96,9 +96,9 @@ value object::set_property(value const &id, value const &v_) {
   local_root_scope scope;
   value v = v_;
   string name = id.to_string();
-  if (!JS_SetUCProperty(Impl::current_context(), get(),
-                        name.data(), name.length(),
-                        Impl::get_jsvalp(v)))
+  if (!JS_SetPropertyById(Impl::current_context(), get(),
+                          Impl::get_jsid(id),
+                          Impl::get_jsvalp(v)))
     throw exception("Could not set property");
   return v;
 }
@@ -123,9 +123,9 @@ value object::get_property(value const &id) const {
   value result;
   local_root_scope scope;
   string name = id.to_string();
-  if (!JS_GetUCProperty(Impl::current_context(), get_const(),
-                        name.data(), name.length(),
-                        Impl::get_jsvalp(result)))
+  if (!JS_GetPropertyById(Impl::current_context(), get_const(),
+                          Impl::get_jsid(id),
+                          Impl::get_jsvalp(result)))
     throw exception("Could not get property");
   return result;
 }
@@ -150,9 +150,9 @@ bool object::has_property(value const &id) const {
   local_root_scope scope;
   string name = id.to_string();
   JSBool foundp;
-  if (!JS_HasUCProperty(Impl::current_context(), get_const(),
-                        name.data(), name.length(),
-                        &foundp))
+  if (!JS_HasPropertyById(Impl::current_context(), get_const(),
+                          Impl::get_jsid(id),
+                          &foundp))
     throw exception("Could not check property");
   return foundp;
 }
@@ -175,8 +175,8 @@ bool object::has_own_property(value const &id) const {
 
   JSBool has;
   string name = id.to_string();
-  if (!JS_AlreadyHasOwnUCProperty(Impl::current_context(), get_const(),
-                                  name.data(), name.length(), &has))
+  if (!JS_AlreadyHasOwnPropertyById(Impl::current_context(), get_const(),
+                                    Impl::get_jsid(id), &has))
   {
     throw exception("Unable to check for own property");
   }
@@ -200,8 +200,8 @@ void object::delete_property(value const &id) {
   local_root_scope scope;
   string name = id.to_string();
   jsval dummy;
-  if (!JS_DeleteUCProperty2(Impl::current_context(), get(),
-                            name.data(), name.length(), &dummy))
+  if (!JS_DeletePropertyById2(Impl::current_context(), get(),
+                              Impl::get_jsid(id), &dummy))
     throw exception("Could not delete property");
 }
 
@@ -217,37 +217,74 @@ property_iterator object::end() const {
   return property_iterator();
 }
 
+namespace {
+  /// common function of define_property
+  void extract_attributes(
+    property_attributes const &attrs,
+    JSObject *&getter_o,
+    JSObject *&setter_o,
+    unsigned &sm_flags)
+  {
+    function getter;
+    if (attrs.getter) getter = attrs.getter.get();
+    function setter;
+    if (attrs.setter) setter = attrs.setter.get();
+
+    getter_o = Impl::get_object(getter);
+    setter_o = Impl::get_object(setter);
+
+    unsigned const flags = attrs.flags;
+    if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
+    if (flags & read_only_property) sm_flags |= JSPROP_READONLY;
+    if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
+    if (flags & shared_property) sm_flags |= JSPROP_SHARED;
+
+    if (getter_o) sm_flags |= JSPROP_GETTER;
+    if (setter_o) sm_flags |= JSPROP_SETTER;
+  }
+}
+
+void object::define_property(
+  value const &id,
+  value const &init_value, 
+  property_attributes const &attrs)
+{
+  if (is_null())
+    throw exception("Could not define property (object is null)");
+
+  root_value id_r(id);
+  root_value v(init_value);
+
+  JSObject *getter_o = 0x0;
+  JSObject *setter_o = 0x0;
+  unsigned sm_flags = 0;
+  extract_attributes(attrs, getter_o, setter_o, sm_flags);
+
+  if (!JS_DefinePropertyById(Impl::current_context(),
+                             get_const(),
+                             Impl::get_jsid(id),
+                             Impl::get_jsval(v),
+                             *(JSPropertyOp*) &getter_o,
+                             *(JSPropertyOp*) &setter_o,
+                             sm_flags))
+    throw exception("Could not define property");
+}
+
 void object::define_property(
   string const &name,
   value const &init_value, 
-  property_attributes const attrs)
+  property_attributes const &attrs)
 {
   if (is_null())
     throw exception("Could not define property (object is null)");
 
   root_string name_r(name);
+  root_value v(init_value);
 
-  unsigned flags = attrs.flags;
-  root_value v;
-  v = init_value;
-
-  function getter;
-  if (attrs.getter) getter = attrs.getter.get();
-  function setter;
-  if (attrs.setter) setter = attrs.setter.get();
-
-  JSObject *getter_o = Impl::get_object(getter);
-  JSObject *setter_o = Impl::get_object(setter);
-   
+  JSObject *getter_o = 0x0;
+  JSObject *setter_o = 0x0;
   unsigned sm_flags = 0;
-
-  if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
-  if (flags & read_only_property) sm_flags |= JSPROP_READONLY;
-  if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
-  if (flags & shared_property) sm_flags |= JSPROP_SHARED;
-
-  if (getter_o) sm_flags |= JSPROP_GETTER;
-  if (setter_o) sm_flags |= JSPROP_SETTER;
+  extract_attributes(attrs, getter_o, setter_o, sm_flags);
 
   if (!JS_DefineUCProperty(Impl::current_context(),
                            get_const(),
@@ -356,9 +393,42 @@ bool object::is_generator() const {
       && get_property("next").is_function();
 }
 
-bool object::get_property_attributes(
-    string const &name, property_attributes &attrs)
-{
+namespace {
+  property_attributes
+  set_property_attributes(
+    uintN sm_flags, void *getter_op, void *setter_op)
+  {
+    property_attributes attrs;
+    if (~sm_flags & JSPROP_ENUMERATE)
+      attrs.flags = attrs.flags | dont_enumerate;
+    if (sm_flags & JSPROP_PERMANENT)
+      attrs.flags = attrs.flags | permanent_property;
+    if (sm_flags & JSPROP_READONLY)
+      attrs.flags = attrs.flags | read_only_property;
+    if (sm_flags & JSPROP_SHARED)
+      attrs.flags = attrs.flags | shared_property;
+
+    if (getter_op) {
+      if (sm_flags & JSPROP_GETTER) {
+        attrs.getter = Impl::wrap_object((JSObject*)getter_op);
+      } else {
+        // What do i set attrs.getter to here....?
+      }
+    }
+  
+    if (setter_op) {
+      if (sm_flags & JSPROP_SETTER) {
+        attrs.setter = Impl::wrap_object((JSObject*)setter_op);
+      } else {
+        // What do i set attrs.setter to here....?
+      }
+    }
+    return attrs;
+  }
+}
+
+boost::optional<property_attributes>
+object::get_property_attributes(string const &name) const {
   if (is_null())
     throw exception("Could not get property attributes (object is null)");
 
@@ -367,10 +437,6 @@ bool object::get_property_attributes(
   JSBool found;
   void *getter_op, *setter_op;
   uintN sm_flags;
-
-  attrs.flags = no_property_flag;
-  attrs.getter = boost::none;
-  attrs.setter = boost::none;
   JSBool success = JS_GetUCPropertyAttrsGetterAndSetter(
           Impl::current_context(), get_const(), name.data(), name.length(),
           &sm_flags, &found,
@@ -380,31 +446,31 @@ bool object::get_property_attributes(
     throw exception("Could not query property attributes");
 
   if (!found)
-    return false;
+    return boost::none;
 
-  if (~sm_flags & JSPROP_ENUMERATE)
-    attrs.flags = attrs.flags | dont_enumerate;
-  if (sm_flags & JSPROP_PERMANENT)
-    attrs.flags = attrs.flags | permanent_property;
-  if (sm_flags & JSPROP_READONLY)
-    attrs.flags = attrs.flags | read_only_property;
-  if (sm_flags & JSPROP_SHARED)
-    attrs.flags = attrs.flags | shared_property;
+  return set_property_attributes(sm_flags, getter_op, setter_op);
+}
 
-  if (getter_op) {
-    if (sm_flags & JSPROP_GETTER) {
-      attrs.getter = Impl::wrap_object((JSObject*)getter_op);
-    } else {
-      // What do i set attrs.getter to here....?
-    }
-  }
-  
-  if (setter_op) {
-    if (sm_flags & JSPROP_SETTER) {
-      attrs.setter = Impl::wrap_object((JSObject*)setter_op);
-    } else {
-      // What do i set attrs.setter to here....?
-    }
-  }
-  return true;
+boost::optional<property_attributes>
+object::get_property_attributes(value const &id) const {
+  if (is_null())
+    throw exception("Could not get property attributes (object is null)");
+
+  flusspferd::root_value id_r(id);
+
+  JSBool found;
+  void *getter_op, *setter_op;
+  uintN sm_flags;
+  JSBool success = JS_GetPropertyAttrsGetterAndSetterById(
+          Impl::current_context(), get_const(), Impl::get_jsid(id),
+          &sm_flags, &found,
+          (JSPropertyOp*)&getter_op, (JSPropertyOp*)&setter_op);
+
+  if (!success)
+    throw exception("Could not query property attributes");
+
+  if (!found)
+    return boost::none;
+
+  return set_property_attributes(sm_flags, getter_op, setter_op);
 }

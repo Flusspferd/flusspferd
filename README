@@ -17,7 +17,7 @@ Requirements
 
 - Linux or Mac OS X or another POSIX system
 - Spidermonkey 1.8.1+ (NOT 1.8.0)
-- Boost 1.36+
+- Boost 1.40+
 - cmake 2.6+ (Build system)
 - iconv support
 
