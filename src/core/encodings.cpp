@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include <iconv.h>
 #include <errno.h>
 #include <sstream>

@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include "flusspferd/io/stream.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
 #include "flusspferd/create.hpp"

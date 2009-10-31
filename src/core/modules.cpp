@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/array.hpp"
 #include "flusspferd/create/function.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/binary.hpp"

@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/array.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include "flusspferd/version.hpp"
 #include "flusspferd/io/stream.hpp"
 #include <boost/fusion/container/generation/make_vector.hpp>
