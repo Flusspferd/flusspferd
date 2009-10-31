@@ -41,9 +41,6 @@ THE SOFTWARE.
 #include <boost/parameter/keyword.hpp>
 #include <boost/parameter/name.hpp>
 #include <boost/parameter/binding.hpp>
-#include <boost/fusion/functional/invocation/invoke.hpp>
-#include <boost/fusion/view/joint_view.hpp>
-#include <boost/fusion/container/vector/vector10.hpp>
 #include <boost/type_traits.hpp>
 #endif
 #include "detail/limit.hpp"
