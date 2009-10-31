@@ -80,6 +80,10 @@ struct my_functor : flusspferd::native_function_base {
   }
 };
 
+static int my_func_1(flusspferd::call_context &) {
+  return 0;
+}
+
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( object ) {
@@ -162,6 +166,16 @@ BOOST_AUTO_TEST_CASE( function ) {
   BOOST_CHECK_EQUAL(f.arity(), 2);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 1, 2));
   BOOST_CHECK_EQUAL(v, flusspferd::value(3));
+
+  f = flusspferd::create<flusspferd::function>(
+    "name2",
+    my_func_1,
+    flusspferd::param::_signature =
+      flusspferd::param::type< void (flusspferd::call_context&) >());
+  BOOST_CHECK_EQUAL(f.name(), "name2");
+  BOOST_CHECK_EQUAL(f.arity(), 0);
+  BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
+  BOOST_CHECK_EQUAL(v, flusspferd::value());
 }
 
 BOOST_AUTO_TEST_CASE( MyClass ) {
