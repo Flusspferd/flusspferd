@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/create/array.hpp"
 #include "flusspferd/create/function.hpp"
 #include "flusspferd/create/native_object.hpp"
+#include "flusspferd/create/native_function.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/binary.hpp"
@@ -91,7 +92,7 @@ require::~require() {}
 object require::create_require() {
   local_root_scope scope;
 
-  object fn = create_native_functor_function<require>(object());
+  object fn = create<require>();
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
   const property_flag perm_ro = permanent_property | read_only_property;
@@ -108,7 +109,7 @@ object require::create_require() {
 // different require.id property
 object require::new_require_function(string const &id) {
   // Use the copy ctor form to share the JS state variables.
-  object new_req = create_native_functor_function<require>(object(), *this);
+  object new_req = create<require>(fusion::vector1<require&>(*this));
   new_req.set_prototype(*this);
 
   new_req.define_property("id", id, permanent_property|read_only_property);
