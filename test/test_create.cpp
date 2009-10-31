@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/array.hpp"
 #include "flusspferd/create/function.hpp"
+#include "flusspferd/create/native_object.hpp"
+#include "flusspferd/create/native_function.hpp"
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/init.hpp"
 #include "flusspferd/native_function_base.hpp"
