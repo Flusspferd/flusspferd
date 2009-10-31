@@ -30,7 +30,6 @@ THE SOFTWARE.
 #ifndef PREPROC_DEBUG
 #include "object.hpp"
 #include "function.hpp"
-#include "array.hpp"
 #include "native_function.hpp"
 #include "local_root_scope.hpp"
 #include <boost/type_traits/is_function.hpp>
