@@ -32,6 +32,8 @@ THE SOFTWARE.
 namespace flusspferd {
 
 namespace detail {
+  object create_object(object const &prototype, object const &parent);
+
   template<>
   struct create_traits<flusspferd::object, void> {
     typedef flusspferd::object result_type;
