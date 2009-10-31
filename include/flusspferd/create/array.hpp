@@ -32,6 +32,7 @@ THE SOFTWARE.
 namespace flusspferd {
 
 namespace detail {
+  array create_length_array(std::size_t length);
 
   template<>
   struct create_traits<flusspferd::array, void> {

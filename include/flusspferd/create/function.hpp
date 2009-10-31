@@ -34,6 +34,13 @@ namespace flusspferd {
 struct method {}; /* tag */
 
 namespace detail {
+  function create_source_function(
+    flusspferd::string const &name,
+    std::vector<flusspferd::string> const &argnames,
+    flusspferd::string const &body,
+    flusspferd::string const &file,
+    unsigned line);
+
   template<bool Method>
   struct create_function_traits {
     typedef function result_type;

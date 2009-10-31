@@ -35,6 +35,37 @@ THE SOFTWARE.
 namespace flusspferd {
 
 namespace detail {
+  object create_native_object(
+    object const &proto, object const &parent);
+  object create_native_enumerable_object(
+    object const &proto, object const &parent);
+
+  template<typename T>
+  object generic_create_native_object(
+    object proto,
+    object const &parent,
+    typename boost::disable_if<
+      typename T::class_info::custom_enumerate
+    >::type * = 0)
+  {
+    if (proto.is_null())
+      proto = current_context().prototype<T>();
+    return detail::create_native_object(proto, parent);
+  }
+
+  template<typename T>
+  object generic_create_native_object(
+    object proto,
+    object const &parent,
+    typename boost::enable_if<
+      typename T::class_info::custom_enumerate
+    >::type * = 0)
+  {
+    if (proto.is_null())
+      proto = current_context().prototype<T>();
+    return detail::create_native_enumerable_object(proto, parent);
+  }
+
   template<typename Class>
   struct create_traits<
     Class,

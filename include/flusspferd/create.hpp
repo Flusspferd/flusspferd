@@ -53,43 +53,6 @@ class native_object_base;
 class function;
 class native_function_base;
 
-#ifndef IN_DOXYGEN
-namespace detail {
-
-object create_native_object(
-  object const &proto, object const &parent);
-object create_native_enumerable_object(
-  object const &proto, object const &parent);
-
-template<typename T>
-object generic_create_native_object(
-  object proto,
-  object const &parent,
-  typename boost::disable_if<
-    typename T::class_info::custom_enumerate
-  >::type * = 0)
-{
-  if (proto.is_null())
-    proto = current_context().prototype<T>();
-  return detail::create_native_object(proto, parent);
-}
-
-template<typename T>
-object generic_create_native_object(
-  object proto,
-  object const &parent,
-  typename boost::enable_if<
-    typename T::class_info::custom_enumerate
-  >::type * = 0)
-{
-  if (proto.is_null())
-    proto = current_context().prototype<T>();
-  return detail::create_native_enumerable_object(proto, parent);
-}
-
-}
-#endif
-
 /**
  * @name Creating functions
  * @addtogroup create_function
@@ -312,15 +275,6 @@ namespace param {
 }
 
 namespace detail {
-  object create_object(object const &prototype, object const &parent);
-  array create_length_array(std::size_t length);
-  function create_source_function(
-    flusspferd::string const &name,
-    std::vector<flusspferd::string> const &argnames,
-    flusspferd::string const &body,
-    flusspferd::string const &file,
-    unsigned line);
-
   template<typename Class>
   struct new_functor {
     template<typename>
