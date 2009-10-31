@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "native_function_base.hpp"
 #include "create/object.hpp"
 #include "create/native_object.hpp"
+#include "create/native_function.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
 #include <boost/mpl/size_t.hpp>
@@ -221,9 +222,9 @@ object load_class(
 
   if (constructor.is_null()) {
     constructor =
-      create_native_functor_function<
-          detail::class_constructor<T> 
-        >(flusspferd::object(), arity, full_name);
+      create<detail::class_constructor<T> >(
+        boost::fusion::make_vector(arity, full_name));
+
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }
@@ -256,9 +257,9 @@ object load_class(
   if (constructor.is_null()) {
     char const *full_name = T::class_info::full_name();
     constructor =
-      create_native_functor_function<
-          detail::unconstructible_class_constructor
-        >(flusspferd::object(), full_name);
+      create<detail::unconstructible_class_constructor>(
+        boost::fusion::make_vector(full_name));
+
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }

@@ -124,7 +124,7 @@ function create_native_function(object const &o, native_function_base *ptr);
     typename T \
     BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
   > \
-  object create_native_functor_function( \
+  object old_create_native_functor_function( \
     object const &o \
     BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
     typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
@@ -173,7 +173,7 @@ inline function create_native_function(
   boost::function<void (call_context &)> const &fn,
   unsigned arity = 0)
 {
-  return create_native_functor_function<native_function<void> >(
+  return old_create_native_functor_function<native_function<void> >(
       o, fn, arity, name);
 }
 
@@ -192,7 +192,7 @@ function create_native_function(
   std::string const &name,
   boost::function<T> const &fn)
 {
-  return create_native_functor_function<native_function<T,false> >(o, fn, name);
+  return old_create_native_functor_function<native_function<T,false> >(o, fn, name);
 }
 
 /**
@@ -212,7 +212,7 @@ function create_native_method(
   std::string const &name,
   boost::function<T> const &fn)
 {
-  return create_native_functor_function<native_function<T,true> >(o, fn, name);
+  return old_create_native_functor_function<native_function<T,true> >(o, fn, name);
 }
 
 /**
@@ -268,7 +268,7 @@ function create_native_method(
   void (T::*memfnptr)(call_context &),
   unsigned arity = 0)
 {
-  return create_native_functor_function<native_member_function<void, T> >(
+  return old_create_native_functor_function<native_member_function<void, T> >(
     o, memfnptr, arity, name);
 }
 
@@ -287,7 +287,7 @@ function create_native_method(
   std::string const &name,
   R T::*memfnptr)
 {
-  return create_native_functor_function<native_member_function<R, T> >(
+  return old_create_native_functor_function<native_member_function<R, T> >(
     o, memfnptr, name);
 }
 
