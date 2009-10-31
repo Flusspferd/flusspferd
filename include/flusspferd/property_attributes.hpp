@@ -95,14 +95,14 @@ struct property_attributes {
    *
    *  A function returning the property's value.
    */
-  boost::optional<function> getter;
+  boost::optional<function const &> getter;
 
   /**
    * The property's setter.
    *
    * A function taking the property's value.
    */
-  boost::optional<function> setter;
+  boost::optional<function const &> setter;
 
   /// Construct default attributes.
   property_attributes();
