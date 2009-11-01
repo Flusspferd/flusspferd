@@ -212,21 +212,19 @@ void require::require_js(fs::path filename, std::string const &id, object export
   // Reset the strict mode when we leave (the REPL might have it off)
   StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
 
-  local_root_scope root_scope;
-
-  string module_text = load_module_text(filename);
+  root_string module_text(load_module_text(filename));
 
   std::vector<std::string> argnames;
   argnames.push_back("exports");
   argnames.push_back("require");
   argnames.push_back("module");
 
-  std::string fname = filename.string();
-  function fn = ::flusspferd::create_function(
+  std::string fname(filename.string());
+  root_function fn(::flusspferd::create_function(
       fname, argnames.size(), argnames,
-      module_text, fname.c_str(), 1ul);
+      module_text, fname.c_str(), 1ul));
 
-  object module;
+  root_object module;
 
   // Are we requring the main module?
   if (main.get_property("id")== id) {
@@ -238,7 +236,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
     module.set_property("id", id);
   }
 
-  object require = new_require_function(id);
+  root_object require(new_require_function(id));
 
   fn.call(fn, exports, require, module);
 }
