@@ -163,6 +163,7 @@ namespace {
 	protected:
 		void trace(flusspferd::tracer &trc) {
 			trc("options", opt);
+			trc("writeFunction", writefunction_callback);
 		}
 
   public:
