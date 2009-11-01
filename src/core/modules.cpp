@@ -83,16 +83,22 @@ require::~require() {}
 
 // Static helper method to actually create |require| function objects
 object require::create_require() {
-  object fn = create_native_functor_function<require>(object());
+  root_object fn((create_native_functor_function<require>(object())));
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
   const property_flag perm_ro = permanent_property | read_only_property;
 
-  fn.define_property("module_cache", r->module_cache, perm_ro);
-  fn.define_property("paths", r->paths, perm_ro);
-  fn.define_property("alias", r->alias, perm_ro);
-  fn.define_property("preload", r->preload, perm_ro);
-  fn.define_property("main", r->main, perm_ro);
+  root_object module_cache(r->module_cache);
+  root_object paths(r->paths);
+  root_object alias(r->alias);
+  root_object preload(r->preload);
+  root_object main(r->main);
+
+  fn.define_property("module_cache", module_cache, perm_ro);
+  fn.define_property("paths", paths, perm_ro);
+  fn.define_property("alias", alias, perm_ro);
+  fn.define_property("preload", preload, perm_ro);
+  fn.define_property("main", main, perm_ro);
   return fn;
 }
 
@@ -100,7 +106,7 @@ object require::create_require() {
 // different require.id property
 object require::new_require_function(string const &id) {
   // Use the copy ctor form to share the JS state variables.
-  object new_req = create_native_functor_function<require>(object(), *this);
+  root_object new_req((create_native_functor_function<require>(object(), *this)));
   new_req.set_prototype(*this);
 
   new_req.define_property("id", id, permanent_property|read_only_property);
@@ -167,6 +173,8 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
+  local_root_scope scope;
+
   io::file &f = create_native_object<io::file>(
     object(),
     filename.string().c_str(),
@@ -329,7 +337,7 @@ object load_native_module(fs::path const &dso_name, object exports) {
 
   flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-  object context = global();
+  root_object context(global());
   func(exports, context);
 
   return exports;
@@ -362,8 +370,8 @@ object require::load_top_level_module(std::string &id) {
 
   security &sec = security::get();
 
-  object classes_object = flusspferd::global();
-  object ctx = flusspferd::create_object(classes_object);
+  root_object classes_object(flusspferd::global());
+  root_object ctx(flusspferd::create_object(classes_object));
   ctx.set_parent(classes_object);
 
   root_object exports(create_object());
