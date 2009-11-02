@@ -1,0 +1,166 @@
+// vim: ft=javascript:
+
+/**
+ * == Flusspferd Core ==
+ *
+ * Core flusspferd modules which are not (yet?) CommonJS
+ **/
+
+/** section: Flusspferd Core
+ * io
+ *
+ * File IO, Streams (and eventually Sockets etc. too)
+ **/
+
+
+/**
+ * class io.File < io.Stream
+ *  includes io.Stream
+ *
+ * File access from JavaScript. Files are instances of [[io.Stream]]s.
+ *
+ **/
+
+/**
+ * new io.File([filename])
+ * - filename (String): file to open
+ *
+ * Create a new file object, and optionally open a file. File objects can
+ * currently be created without being associated with an open file, but this
+ * might change.
+ **/
+
+
+/**
+ * io.File#open(filename) -> undefined
+ * - filename (String): file to open
+ *
+ * Open a file.
+ *
+ **/
+
+/**
+ * io.File#close() -> undefined
+ *
+ * Close the open file handle.
+ *
+ * Attempting to read a closed filed will do nothing, or throw. **check behaviour**
+ **/
+
+
+/**
+ * io.File.create(name[, perms=0666]) -> undefined
+ * - name (String): filename
+ * - perms (int): creation mode
+ *
+ * Create a file with the given permissions (which will be affected by the
+ * processes umask). When specifying permissions, don't forget to prefix with
+ * the leading '0' to as unix permissions are specified in octal.
+ **/
+
+/** deprecated
+ * io.File.exists(path) -> true | false
+ * - path (String): filename
+ *
+ * Check if something exists at the given path - will not distingush between
+ * files and directories.
+ *
+ * Deprecated in favour of [[fs_base.exists]].
+ **/
+
+
+
+/**
+ *  mixin io.Stream
+ *
+ *  Base stream beahviour that is shared between files, sockets and other
+ *  stream-like objects
+ **/
+
+/**
+ *  io.Stream#readWhole() -> String
+ *
+ *  Read the rest of the stream as a text
+ **/
+
+/**
+ *  io.Stream#readWholeBinary() -> binary.ByteString
+ *  io.Stream#readWholeBinary(read_into) ->  read_into
+ *  - read_into (binary.ByteArray): Append file contents into this blob
+ *
+ *  Read the rest of the stream as binary data.
+ *
+ *  If `read_into` is passed, the read data will be appended to it, and the
+ *  same ByteArray will be returned. Otherwise a new ByteString is returned.
+ *
+ **/
+
+/**
+ *  io.Stream#read([size = 4096]) -> String
+ *  - size (Integer): number of bytes to read
+ *
+ *  Read a chunk of text. The `size` param is the number of *bytes* to read
+ *  currently, and not number of characters as it should be.
+ **/
+
+/**
+ *  io.Stream#readBinary(size, read_into) -> binary
+ *  - size (Integer): number of bytes to read
+ *  - read_into (binary.ByteArray): append data into this blob
+ *
+ *  Read a chunk of data. Behaves similarly to [[#readWholebinary]], just reads
+ *  only the next `size` bytes, not everything.
+ **/
+
+/**
+ *  io.Stream#readLine([sep]) -> String
+ *  - sep (String): line seperator.
+ *
+ *  Read a line of text. A line is defined as everything up until EOF or until
+ *  `sep` is sene. Currently the separator must be a single character and must
+ *  be in the range \[0,127\].
+ **/
+
+/**
+ *  io.Stream#write(data) -> undefined
+ *  - data (Any): What to print
+ **/
+
+/**
+ *  io.Stream#print(args...) -> undefined
+ *  - args (String | Array): What to print
+ *
+ *  Print args to the stream, seperated by [[io.Stream#fieldSeparator]] and
+ *  terminated with a [[io.Stream#recordSeparator]].
+ *
+ *  If any of the arguments is an Array, it is expaneded out. That is to say,
+ *  the following two lines would print the same thing:
+ *
+ *      stream.print(1, [2, 3], 4)
+ *      stream.print(1, 2, 3, 4)
+ **/
+
+/**
+ *  io.Stream#flush() -> undefined
+ *
+ *  Tell the underlying OS to flush the file cache to disk.
+ **/
+
+/**
+ *  io.Stream#fieldSeparator -> String
+ *
+ *  Written between each argument passed to [[io.Stream#print]]. Default `" "`.
+ **/
+
+/**
+ *  io.Stream#recordSeparator -> String
+ *
+ *  Written once after each call to print. Default `"\n"` (new line). Set to
+ *  `null` or `undefined` to disable.
+ **/
+
+/**
+ *  io.Stream#autoFlush -> Bool
+ *
+ *  Should [[io.Stream#flush]] be called every every write. Default false.
+ **/
