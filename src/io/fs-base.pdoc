@@ -1,0 +1,194 @@
+// vim: ft=javascript:
+
+/** section: CommonJS Core
+ * fs_base
+ *
+ * Low-level filesystem access
+ **/
+
+/** section: CommonJS Core
+ *  $require(id) -> Object
+ *  - id (String): module id
+ *
+ *  This function is actually called `require`, its just PDoc doesn't yet know
+ *  how to treat top level functions as 'utility funcitons' and make them show
+ *  up in the menu unless they start with a dollar.
+ **/
+
+/**
+ *  fs_base.rawOpen(name[, mode[, perms]]) -> io.File
+ *  - name (String): filename
+ *  - mode (String | Object): file open mode (read/write etc)
+ *  - perms (?): file creation permissions -- not currently supported.
+ *
+ *  Open a file for reading
+ **/
+
+/**
+ * fs_base.canonial(path) -> String
+ * - path (String):
+ *
+ * Resolve symlinks and canonicalize `path`. If it is a directory, the returned
+ * string will be guarenteed to have a trailing '/'
+ **/
+
+/**
+ * fs_base.move(source, target) -> undefined
+ * - source (String): source file or directory
+ * - target (String): target destination
+ *
+ * Move the file or directory `source` to `target` using the underlying OS
+ * semantics (atomicity, file -> directory etc.)
+ **/
+
+/**
+ * fs_base.remove(file) -> undefined
+ * - file (String): file to remove
+ *
+ * Attempt to remove the `file` from disk. To remove directories use [[fs_base#removeDirectory]]
+ **/
+
+/**
+ * fs_base.touch(path[, mtime]) -> undefined
+ * - path (String): File or directory to touch
+ * - mtime (Date): Date to change last modified date to.
+ *
+ * 'touch' the path, setting the last modified date to `mtime` or now. If there
+ * is no file or directory at `path`, an empty file will be created.
+ **/
+
+/**
+ * fs_base.makeDirectory(dir) -> undefined
+ * - dir (String): directory to create
+ *
+ * Creates a (single) directory. If parent directories do not exist they will
+ * not be created by this method.
+ **/
+
+/**
+ * fs_base.removeDirectory(dir) -> undefined
+ * - dir (String): directory to remove
+ *
+ * Removes an empty directory. A symbolic link is itself removed, rather than
+ * the directory it resolves to being removed.
+ **/
+
+/**
+ * fs_base.workingDirectory() -> String
+ *
+ * Get the processes current working directory.
+ **/
+
+/**
+ * fs_base.changeWorkingDirectory(dir) -> undefined
+ * - dir (String): new working directory
+ *
+ * Change the processes current working directory to `dir`.
+ **/
+
+/**
+ * fs_base.readLink(link) -> String
+ * - link (String): symbolic link to read
+ *
+ * Read the symbolic link and return the (relative) path it links to. Uses
+ * [readlink] for the underlying implementation.
+ *
+ * [readlink]: http://www.opengroup.org/onlinepubs/000095399/functions/readlink.html "POSIX readlink function"
+ **/
+
+/**
+ * fs_base.link(link_target, name) -> undefined
+ * - link_target (String): path the symbolic link should point to
+ * - name (String): name of symbolic link to create
+ *
+ * Create a symbolic link in the same manner as `ln -s link_target name` (this
+ * function doesn't shell out, this is just an indicator of behaviour.)
+ **/
+
+/**
+ * fs_base.hardLink(link_target, name) -> undefined
+ * - link_target (String): path the hard link should point to
+ * - name (String): name of hard link to create
+ *
+ * Create a hard link in the same manner as `ln link_target name` (this
+ * function doesn't shell out, this is just an indicator of behaviour.)
+ **/
+
+/**
+ * fs_base.exists(path) -> Boolean
+ * - path (String): path to test
+ *
+ * Returns true if something exists on the filesystem at the given path, be it
+ * a directory, normal file, symlink or special file.
+ **/
+
+/**
+ * fs_base.isFile(path) -> Boolean
+ * - path (String): path to test
+ *
+ * Test if `path` is a ordinary file.
+ **/
+
+/**
+ * fs_base.isDirectory(path) -> Boolean
+ * - path (String): path to test
+ *
+ * Test if `path` is a directory.
+ **/
+
+/**
+ * fs_base.isLink(path) -> Boolean
+ * - path (String): path to test
+ *
+ * Test if `path` is a symbolic link.
+ **/
+
+/**
+ * fs_base.isReadable(path) -> Boolean
+ * - path (String): path to test
+ *
+ * Test if `path` is readable.
+ **/
+
+/**
+ * fs_base.isWriteable(path) -> Boolean
+ * - path (String): path to test
+ *
+ * Test if `path` is readable.
+ **/
+
+/**
+ * fs_base.size(path) -> Number
+ * - path (String): path
+ *
+ * Return the size of the file in bytes. Due to the way that ECMAScript
+ * behaves, if the file is larger than 65,536 terabytes accuracy will be lost.
+ **/
+
+/**
+ * fs_base.lastModified(path) -> Date
+ * - path (String): path
+ *
+ * Get the last modification time of `path` as a javascript [[Date]] object.
+ **/
+
+/**
+ * fs_base.same(path1, path2) -> Boolean
+ * - path1 (String): path to compare
+ * - path2 (String): path to compare
+ *
+ * Compare if the two paths are identical.
+ **/
+
+/**
+ * fs_base.list(dir) -> Array
+ * - dir (String): directory to list
+ *
+ * Return an array of the contents of the directory. The elements of the
+ * returned list will be prefixed with the directory name, for example:
+ *
+ *     fs.list('a/b');
+ *     // -> ['a/b/c.txt', 'a/b/d.js']
+ *
+ * The self ('.') and parent ('..') directory entries will not be returned.
+ **/
