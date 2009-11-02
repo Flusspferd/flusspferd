@@ -1,11 +1,5 @@
 // vim: ft=javascript:
 
-/**
- * == Flusspferd Core ==
- *
- * Core flusspferd modules which are not (yet?) CommonJS
- **/
-
 /** section: Flusspferd Core
  * io
  *
