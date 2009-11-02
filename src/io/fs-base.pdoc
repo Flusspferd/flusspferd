@@ -3,7 +3,12 @@
 /** section: CommonJS Core
  * fs_base
  *
- * Low-level filesystem access
+ * Low-level filesystem access.
+ *
+ * #####NOTE:#####
+ *
+ * This module is actually called `fs-base`. PDoc currently won't parse that,
+ * so it has been documented as `fs_base`'
  **/
 
 /** section: CommonJS Core
