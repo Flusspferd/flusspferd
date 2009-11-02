@@ -1,0 +1,21 @@
+// vim: ft=javascript:
+
+// Setup sections
+
+/**
+ *  == CommonJS Core ==
+ *
+ *  Modules/funcitons defined by the CommonJS specs or proposals
+ **/
+
+/**
+ * == Flusspferd Core ==
+ *
+ * Core flusspferd modules which are not (yet?) CommonJS
+ **/
+
+/**
+ * == Bundled Modules ==
+ *
+ * Flusspferd modules which are bundled with flusspferd by default.
+ **/
