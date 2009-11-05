@@ -136,6 +136,8 @@ Hello world!
  * On Gentoo, you can use our ebuilds, in the branch 'packages', directory
  * 'gentoo/' to compile and install Flusspferd.
  *
+ * These ebuilds can @b not be found in the official Gentoo repository.
+ *
  * @subsection macports Install on Mac OS X via Macports
  *
  * Flusspferd is included in the <a href="http://www.macports.org">Macports
