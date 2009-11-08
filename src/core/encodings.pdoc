@@ -1,0 +1,98 @@
+// vim: ft=javascript:
+
+/** section: CommonJS Core
+ * encodings
+ *
+ * Character set encoding
+ **/
+
+/**
+ *  encodings.convertToString(encoding, blob) -> String
+ *  - encoding (String): character set encoding to use
+ *  - blob (binary.Binary): blob to act on
+ *
+ *
+ *  Decode the binary data from `encoding` to the internal encoding needed for
+ *  strings, which is currently UTF-16. Uses a [[encodings.Transcoder]]
+ *  internally.
+ **/
+
+/**
+ *  encodings.convertFromString(encoding, blob) -> binary.ByteString
+ *  - encoding (String): character set encoding to use
+ *  - blob (binary.Binary): blob to act on
+ *
+ *  Encode the characters from the internal string representation -- UTF-16 --
+ *  into `encoding`. Uses a [[encodings.Transcoder]] internally.
+ **/
+
+/**
+ *  class encodings.Transcoder
+ *
+ *  Class to convert data from one character set to another.
+ *
+ *  An important thing to remember when using a Transcoder is to call
+ *  [[encodings.Transcoder#close]] once all data has been fed to the
+ *  transcoder, as some character sets have reset byte sequences that must be
+ *  occur at the end of the data - ISO-2022-JP for example.
+ **/
+
+/**
+ *  new encodings.Transcoder(source, dest)
+ *  - source (String): character set
+ *  - dest (String): character set
+ *
+ *  Create a transcoder which transcoder data from `source` and converts it
+ *  into `dest`.
+ **/
+
+/**
+ *  encodings.Transcoder#sourceCharset -> String
+ **/
+
+/**
+ *  encodings.Transcoder#destinationCharset -> String
+ **/
+
+/**
+ *  encodings.Transcoder#push(input[, output]) -> binary.Binary
+ *  - input (binary.Binary): chunk of data to convert
+ *  - output (binary.ByteArray): output byte array
+ *
+ *  Convert a chunk of data, and return the converted data, plus any buffered
+ *  output. 
+ *
+ *  If `output` is provided, any output will be appended to the byte array, and
+ *  the same byte array will be returned.  Otherwise a new
+ *  [[binary.ByteString]] will be returned. 
+ *
+ *  It is possible that no bytes will be output (for example if only the start
+ *  of a multi-byte character is passed as input) in which case no data will be
+ *  appended to `output` or an empty ByteString will be returned.
+ *
+ *  Will throw an Error when invalid data is found.
+ **/
+
+/**
+ *  encodings.Transcoder#pushAccumulate(input) -> undefined
+ *  - input (binary.Binary): chunk of data to convert
+ *
+ *  Convert a chunk of data and store it in the internal buffers. Buffered data
+ *  will be returned by next call to [[encodings.Transcoder#push]] or
+ *  [[encodings.Transcoder#close]].
+ **/
+
+/**
+ *  encodings.Transcoder#close([output]) -> binary.Binary
+ *  - output (binary.ByteArray): something
+ *
+ *  Signal to the transcoder that no further input will be given, and give the
+ *  underlying conversion mechanism the chance to append any necessary final
+ *  data.
+ *
+ *  Once closed, a transcoder cannot be reused.
+ *
+ *  If `output` is provided, any output will be appended to the byte array, and
+ *  the same byte array will be returned.  Otherwise a new
+ *  [[binary.ByteString]] will be returned. 
+ **/
