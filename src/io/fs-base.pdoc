@@ -11,15 +11,6 @@
  * so it has been documented as `fs_base`'
  **/
 
-/** section: CommonJS Core
- *  $require(id) -> Object
- *  - id (String): module id
- *
- *  This function is actually called `require`, its just PDoc doesn't yet know
- *  how to treat top level functions as 'utility funcitons' and make them show
- *  up in the menu unless they start with a dollar.
- **/
-
 /**
  *  fs_base.rawOpen(name[, mode[, perms]]) -> io.File
  *  - name (String): filename
