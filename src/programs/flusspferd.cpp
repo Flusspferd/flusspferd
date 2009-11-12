@@ -332,7 +332,7 @@ void flusspferd_repl::load_config() {
   config_loaded = true;
 
   // Get the prelude and execute it too
-  flusspferd::value prelude = co.global().get_property("prelude");
+  flusspferd::root_value prelude(co.global().get_property("prelude"));
   co.global().delete_property("prelude");
 
 
