@@ -70,7 +70,11 @@ protected:
 void flusspferd::load_system_module(object &context) {
   object exports = context.get_property_object("exports");
 
+  flusspferd::gc();//FIXME
+
   context.call("require", "io");
+
+  flusspferd::gc();//FIXME
 
   exports.define_property(
     "stdout",

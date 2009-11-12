@@ -116,8 +116,7 @@ array create_array(Range const &r)
   ) { \
     if (proto.is_null()) \
       proto = current_context().prototype<T>(); \
-    local_root_scope scope; \
-    object obj = detail::create_native_object(proto); \
+    root_object obj(detail::create_native_object(proto)); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
   } \
   \
@@ -134,8 +133,7 @@ array create_array(Range const &r)
   ) { \
     if (proto.is_null()) \
       proto = current_context().prototype<T>(); \
-    local_root_scope scope; \
-    object obj = detail::create_native_enumerable_object(proto); \
+    root_object obj(detail::create_native_enumerable_object(proto)); \
     return *(new T(obj BOOST_PP_ENUM_TRAILING_PARAMS(n_args, param))); \
   } \
   /* */

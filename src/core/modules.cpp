@@ -178,10 +178,16 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
+  flusspferd::gc();//FIXME
+
+  root_string read_only("r");
+
+  flusspferd::gc();//FIXME
+
   io::file &f = create_native_object<io::file>(
     object(),
     filename.string().c_str(),
-    value("r")
+    read_only
   );
   root_object f_o(f);
 
