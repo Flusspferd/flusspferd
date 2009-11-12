@@ -143,10 +143,9 @@ BOOST_AUTO_TEST_CASE( array ) {
 }
 
 BOOST_AUTO_TEST_CASE( function ) {
-  flusspferd::local_root_scope scope;
-
-  flusspferd::function f = flusspferd::create<flusspferd::function>();
-  flusspferd::value v;
+  flusspferd::root_function f;
+  f = flusspferd::create<flusspferd::function>();
+  flusspferd::root_value v;
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
   BOOST_CHECK_EQUAL(v, flusspferd::value());
 
@@ -197,9 +196,7 @@ BOOST_AUTO_TEST_CASE( MyClass ) {
 }
 
 BOOST_AUTO_TEST_CASE( MyFunctor ) {
-  flusspferd::local_root_scope scope;
-
-  flusspferd::object f;
+  flusspferd::root_object f;
   BOOST_CHECK_NO_THROW(f = flusspferd::create<my_functor>());
   BOOST_CHECK(!f.is_null());
   BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value());
