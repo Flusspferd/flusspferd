@@ -61,12 +61,7 @@ void flusspferd::load_require_function(object container) {
 
 
 require::require()
-  : native_function_base(1, "require"),
-    module_cache(create_object()),
-    paths(create_array()),
-    alias(create_object()),
-    preload(create_object()),
-    main(create_object())
+  : native_function_base(1, "require")
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
@@ -88,17 +83,27 @@ object require::create_require() {
 
   const property_flag perm_ro = permanent_property | read_only_property;
 
-  root_object module_cache(r->module_cache);
-  root_object paths(r->paths);
-  root_object alias(r->alias);
-  root_object preload(r->preload);
-  root_object main(r->main);
+  root_object module_cache(create_object());
+  r->module_cache = module_cache;
+
+  root_array paths(create_array());
+  r->paths = paths;
+
+  root_object alias(create_object());
+  r->alias = alias;
+
+  root_object preload(create_object());
+  r->preload = preload;
+
+  root_object main(create_object());
+  r->main = main;
 
   fn.define_property("module_cache", module_cache, perm_ro);
   fn.define_property("paths", paths, perm_ro);
   fn.define_property("alias", alias, perm_ro);
   fn.define_property("preload", preload, perm_ro);
   fn.define_property("main", main, perm_ro);
+
   return fn;
 }
 
@@ -173,13 +178,12 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
-  local_root_scope scope;
-
   io::file &f = create_native_object<io::file>(
     object(),
     filename.string().c_str(),
     value("r")
   );
+  root_object f_o(f);
 
   // buffer blob
   byte_array &blob = create_native_object<byte_array>(
@@ -187,6 +191,7 @@ string require::load_module_text(fs::path filename) {
     static_cast<binary::element_type*>(0),
     0
   );
+  root_object b_o(blob);
   binary::vector_type &buf = blob.get_data();
 
   // Look for a shebang line
@@ -352,6 +357,7 @@ std::string require::current_id() {
 // We need to check alias and prelaod, and also search the require paths for
 // .js files and DSOs
 object require::load_top_level_module(std::string &id) {
+  root_array paths(this->paths);
 
   if (alias.has_own_property(id)) {
     std::string new_id = alias.get_property(id).to_std_string();
@@ -440,6 +446,8 @@ object require::load_top_level_module(std::string &id) {
 
 boost::optional<fs::path>
 require::find_top_level_js_module(std::string const &id, bool fatal) {
+  root_array paths(this->paths);
+
   fs::path js_name = fs::path(id + ".js");
 
   size_t len = paths.length();
