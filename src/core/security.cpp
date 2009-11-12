@@ -31,10 +31,9 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 security &security::create(object container) {
-  local_root_scope scope;
-
   security &obj = create_native_object<security>(
       current_context().prototype(""));
+  root_object root_obj(obj);
 
   container.define_property("$security", obj);
 
