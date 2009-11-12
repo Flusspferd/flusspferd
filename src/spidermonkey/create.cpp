@@ -111,8 +111,8 @@ function flusspferd::create_native_function(native_function_base *ptr) {
 function flusspferd::create_native_function(
     object const &o_, native_function_base *ptr)
 {
-  object o = o_;
-  function fun = create_native_function(ptr);
+  root_object o(o_);
+  root_function fun(create_native_function(ptr));
   if (!o.is_null())
     o.define_property(ptr->name().c_str(), fun, dont_enumerate);
   return fun;
