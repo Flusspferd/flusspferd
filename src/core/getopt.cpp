@@ -66,7 +66,7 @@ struct optspec {
 
   map_type options;
   array const &arguments;
-  object result;
+  root_object result;
   bool stop_early;
 
   optspec(object const &spec, array const &arguments)
@@ -209,14 +209,20 @@ object flusspferd::getopt(
     return getopt(spec_, args);
   }
 
+  flusspferd::gc();//FIXME
+
   array const &arguments = arguments_.get();
 
   optspec spec(spec_, arguments);
 
   spec.result = create<object>();
 
+  flusspferd::gc();//FIXME
+
   array result_arguments = flusspferd::create<array>();
   spec.result.set_property("_", result_arguments);
+
+  flusspferd::gc();//FIXME
 
   bool accept_options = true;
 
@@ -236,6 +242,8 @@ object flusspferd::getopt(
         accept_options = false;
     }
   }
+
+  flusspferd::gc();//FIXME
 
   return spec.result;
 }

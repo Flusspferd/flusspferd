@@ -32,10 +32,9 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 security &security::create(object container) {
-  local_root_scope scope;
-
   security &obj = flusspferd::create<security>(
       param::_prototype = flusspferd::create<object>().prototype());
+  root_object root_obj(obj);
 
   container.define_property("$security", obj);
 

@@ -41,10 +41,15 @@ namespace fusion = boost::fusion;
 
 void flusspferd::load_binary_module(object container) {
   object exports = container.get_property_object("exports");
+  flusspferd::gc();//FIXME
   load_class<binary>(exports);
+  flusspferd::gc();//FIXME
   load_class<byte_string>(exports);
+  flusspferd::gc();//FIXME
   load_class<byte_array>(exports);
+  flusspferd::gc();//FIXME
   container.call("require", "encodings");
+  flusspferd::gc();//FIXME
 }
 
 // -- util ------------------------------------------------------------------
@@ -129,7 +134,7 @@ binary::binary(object const &o, element_type const *p, std::size_t n)
 void binary::augment_prototype(object &proto) {
   static const char* js_iterator =
     "function() { return require('util/range').Range(0, this.length) }";
-  value iter_val = evaluate(js_iterator, strlen(js_iterator));
+  root_value iter_val(evaluate(js_iterator, strlen(js_iterator)));
   proto.define_property("__iterator__", iter_val);
 
   static const char* js_val_iter =
@@ -139,12 +144,12 @@ void binary::augment_prototype(object &proto) {
     "  ++i;"
     "}"
     ;
-  function values_fn =
+  root_function values_fn(
     flusspferd::create<function>(
       param::_name = "values",
-      param::_function = string(js_val_iter),
+      param::_function = root_string(js_val_iter),
       param::_file = __FILE__,
-      param::_line = __LINE__);
+      param::_line = __LINE__));
 
   proto.define_property("values", value(),
       property_attributes(dont_enumerate, values_fn));
@@ -158,8 +163,8 @@ void binary::augment_prototype(object &proto) {
     "  }"
     "}";
 
-  function pairs_fn =
-      evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object();
+  root_function pairs_fn(
+      evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object());
 
   proto.define_property("pairs", value(),
       property_attributes(dont_enumerate, pairs_fn));
