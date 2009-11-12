@@ -54,20 +54,17 @@ property_iterator::property_iterator()
 property_iterator::property_iterator(object const &o_)
   : p(new impl)
 {
-  object o = o_;
-
-  local_root_scope scope;
+  root_object o(o_);
 
   if (o.is_null())
     throw exception("Could not create property iterator (object is null)");
 
-  JSObject *iterator =
-    JS_NewPropertyIterator(Impl::current_context(), Impl::get_object(o));
+  p->iterator = Impl::wrap_object(
+    JS_NewPropertyIterator(Impl::current_context(), Impl::get_object(o)));
 
-  if (!iterator)
+  if (p->iterator.is_null())
     throw exception("Could not create property iterator");
 
-  p->iterator = Impl::wrap_object(iterator);
   p->root_iterator = p->iterator;
 
   increment();
