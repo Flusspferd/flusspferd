@@ -130,9 +130,10 @@ public:
 
   /// Populate values in require.main for @c id
   void set_main_module(std::string const &id);
+
 protected:
   object module_cache;
-  array paths;
+  object paths;
   object alias;
   object preload;
   object main;

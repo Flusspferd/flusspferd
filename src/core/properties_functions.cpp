@@ -40,7 +40,7 @@ void flusspferd::load_properties_functions(object container) {
 
   if (!v.is_object())
     throw exception("Unable to get Object constructor");
-  object obj_ctor = v.to_object();
+  root_object obj_ctor(v.get_object());
 
   create_native_function(
       obj_ctor,

@@ -62,4 +62,9 @@ BOOST_AUTO_TEST_CASE( root_native_function ) {
   BOOST_CHECK_EQUAL(f_x.name(), "rnf");
 }
 
+BOOST_AUTO_TEST_CASE( is_null ) {
+  flusspferd::function f;
+  BOOST_CHECK(f.is_null());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -79,7 +79,7 @@ void object::set_prototype(object const &o) {
 value object::set_property(char const *name, value const &v_) {
   if (is_null())
     throw exception("Could not set property (object is null)");
-  value v = v_;
+  root_value v(v_);
   if (!JS_SetProperty(Impl::current_context(), get(), name,
                       Impl::get_jsvalp(v)))
     throw exception("Could not set property");
@@ -90,12 +90,11 @@ value object::set_property(std::string const &name, value const &v) {
   return set_property(name.c_str(), v);
 }
 
-value object::set_property(value const &id, value const &v_) {
+value object::set_property(value const &id_, value const &v_) {
   if (is_null())
     throw exception("Could not set property (object is null)");
-  local_root_scope scope;
-  value v = v_;
-  string name = id.to_string();
+  root_value id(id_);
+  root_value v(v_);
   if (!JS_SetPropertyById(Impl::current_context(), get(),
                           Impl::get_jsid(id),
                           Impl::get_jsvalp(v)))
@@ -106,7 +105,7 @@ value object::set_property(value const &id, value const &v_) {
 value object::get_property(char const *name) const {
   if (is_null())
     throw exception("Could not get property (object is null)");
-  value result;
+  root_value result;
   if (!JS_GetProperty(Impl::current_context(), get_const(),
                       name, Impl::get_jsvalp(result)))
     throw exception("Could not get property");
@@ -117,12 +116,11 @@ value object::get_property(std::string const &name) const {
   return get_property(name.c_str());
 }
 
-value object::get_property(value const &id) const {
+value object::get_property(value const &id_) const {
   if (is_null())
     throw exception("Could not get property (object is null)");
-  value result;
-  local_root_scope scope;
-  string name = id.to_string();
+  root_value result;
+  root_value id(id_);
   if (!JS_GetPropertyById(Impl::current_context(), get_const(),
                           Impl::get_jsid(id),
                           Impl::get_jsvalp(result)))
@@ -144,11 +142,10 @@ bool object::has_property(std::string const &name) const {
   return has_property(name.c_str());
 }
 
-bool object::has_property(value const &id) const {
+bool object::has_property(value const &id_) const {
   if (is_null())
     throw exception("Could not check property (object is null)");
-  local_root_scope scope;
-  string name = id.to_string();
+  root_value id(id_);
   JSBool foundp;
   if (!JS_HasPropertyById(Impl::current_context(), get_const(),
                           Impl::get_jsid(id),
@@ -158,14 +155,12 @@ bool object::has_property(value const &id) const {
 }
 
 bool object::has_own_property(char const *name_) const {
-  local_root_scope scope;
-  string name(name_);
+  root_string name(name_);
   return has_own_property(name);
 }
 
 bool object::has_own_property(std::string const &name_) const {
-  local_root_scope scope;
-  string name(name_);
+  root_string name(name_);
   return has_own_property(name);
 }
 
@@ -194,11 +189,10 @@ void object::delete_property(std::string const &name) {
   delete_property(name.c_str());
 }
 
-void object::delete_property(value const &id) {
+void object::delete_property(value const &id_) {
   if (is_null())
     throw exception("Could not delete property (object is null)");
-  local_root_scope scope;
-  string name = id.to_string();
+  root_value id(id_);
   jsval dummy;
   if (!JS_DeletePropertyById2(Impl::current_context(), get(),
                               Impl::get_jsid(id), &dummy))
