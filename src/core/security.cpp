@@ -34,7 +34,7 @@ security &security::create(object container) {
   local_root_scope scope;
 
   security &obj = create_native_object<security>(
-      create_object().prototype());
+      current_context().prototype(""));
 
   container.define_property("$security", obj);
 
