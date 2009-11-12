@@ -86,11 +86,6 @@ public:
     JS_BeginRequest(context);
 #endif
 
-#ifdef DEBUG
-    // This might want to be conditional on something else too
-    JS_SetGCZeal(context, 2);
-#endif
-
     JS_SetErrorReporter(context, spidermonkey_error_reporter);
 
     JSObject *global_ = JS_NewObject(context, &global_class, 0x0, 0x0);
@@ -105,7 +100,12 @@ public:
     JS_DeleteProperty(context, global_, "XML");
 
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
-  }
+
+#ifdef DEBUG
+    // This might want to be conditional on something else too
+    JS_SetGCZeal(context, 2);
+#endif
+}
 
   explicit impl(JSContext *context)
     : context(context), destroy(false)

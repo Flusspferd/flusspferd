@@ -35,8 +35,10 @@ THE SOFTWARE.
 class context_fixture {
 public:
   context_fixture() : scope(flusspferd::context::create()) {
+    flusspferd::gc();
     flusspferd::security::create(flusspferd::current_context().global());
-    flusspferd::load_core(flusspferd::current_context().global(), "exeName");
+    //flusspferd::load_core(flusspferd::current_context().global(), "exeName");
+    flusspferd::gc();
   }
 
   ~context_fixture() {
