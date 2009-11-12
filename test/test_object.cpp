@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/property_iterator.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include "test_environment.hpp"
 
 BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
@@ -144,10 +145,9 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
 }
 
 BOOST_AUTO_TEST_CASE( recursive_loop_on_set_property ) {
-  flusspferd::object object = flusspferd::create_object();
+  flusspferd::root_object object(flusspferd::create_object());
 
   object.set_property( flusspferd::string(), flusspferd::string() );
-  
 }
 
 BOOST_AUTO_TEST_SUITE_END()
