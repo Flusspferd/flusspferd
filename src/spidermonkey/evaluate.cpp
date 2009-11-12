@@ -81,9 +81,13 @@ value flusspferd::evaluate_in_scope(char const *source,
 value flusspferd::execute(char const *filename, object const &scope_) {
   JSContext *cx = Impl::current_context();
 
-  local_root_scope root_scope;
+  flusspferd::gc();//FIXME
 
-  string module_text = require::load_module_text(filename);
+  root_string module_text(require::load_module_text(filename));
+
+  flusspferd::gc();//FIXME
+
+  root_object scope_r(scope_);
 
   JSObject *scope = Impl::get_object(scope_);
 

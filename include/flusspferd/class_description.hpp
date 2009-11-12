@@ -152,9 +152,9 @@ THE SOFTWARE.
         return (p_full_name); \
       } \
       static ::flusspferd::object create_prototype() { \
-        ::flusspferd::object obj = ::flusspferd::create_object( \
+        ::flusspferd::root_object obj(::flusspferd::create_object( \
             ::flusspferd::prototype< p_base >() \
-          ); \
+          )); \
         FLUSSPFERD_CD_METHODS(p_methods) \
         FLUSSPFERD_CD_PROPERTIES(p_properties) \
         BOOST_PP_EXPR_IF( \
@@ -261,17 +261,21 @@ THE SOFTWARE.
     (p_property_name), \
     ::flusspferd::property_attributes( \
       ::flusspferd::permanent_shared_property, \
-      ::flusspferd::create_native_method( \
-        ::flusspferd::object(), \
-        "$get_" p_property_name, \
-        & Class :: \
-        BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
+      ::flusspferd::root_function( \
+        ::flusspferd::create_native_method( \
+          ::flusspferd::object(), \
+          "$get_" p_property_name, \
+          & Class :: \
+          BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
+        ) \
       ), \
-      ::flusspferd::create_native_method( \
-        ::flusspferd::object(), \
-        "$set_" p_property_name, \
-        & Class :: \
-        BOOST_PP_TUPLE_ELEM(2, 1, p_param) \
+      ::flusspferd::root_function( \
+        ::flusspferd::create_native_method( \
+          ::flusspferd::object(), \
+          "$set_" p_property_name, \
+          & Class :: \
+          BOOST_PP_TUPLE_ELEM(2, 1, p_param) \
+        ) \
       ) \
     ) \
   ); \
@@ -283,10 +287,12 @@ THE SOFTWARE.
     ::flusspferd::property_attributes( \
       ::flusspferd::permanent_shared_property \
       | ::flusspferd::read_only_property, \
-      ::flusspferd::create_native_method( \
-        ::flusspferd::object(), \
-        "$get_" p_property_name, \
-        & Class :: p_param \
+      ::flusspferd::root_function( \
+        ::flusspferd::create_native_method( \
+          ::flusspferd::object(), \
+          "$get_" p_property_name, \
+          & Class :: p_param \
+        ) \
       ) \
     ) \
   ); \
@@ -295,14 +301,14 @@ THE SOFTWARE.
 #define FLUSSPFERD_CD_PROPERTY__constant(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
-    ::flusspferd::value((p_param)), \
+    ::flusspferd::root_value(::flusspferd::value((p_param))), \
     ::flusspferd::read_only_property | ::flusspferd::permanent_property); \
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__variable(p_property_name, p_param) \
   obj.define_property( \
     (p_property_name), \
-    ::flusspferd::value((p_param))); \
+    ::flusspferd::root_value(::flusspferd::value((p_param)))); \
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__none(p_property_name, p_param) \
