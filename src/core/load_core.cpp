@@ -55,7 +55,12 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   // Initalize boost's copy of cwd as early as possible
   boost::filesystem::initial_path<boost::filesystem::path>();
 
+  flusspferd::gc();//FIXME
+
   flusspferd::load_require_function(scope);
+
+  flusspferd::gc();//FIXME
+
   flusspferd::load_properties_functions(scope);
 
   flusspferd::object require_fn = scope.get_property_object("require");
