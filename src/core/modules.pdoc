@@ -4,6 +4,9 @@
  *  $require(id) -> Object
  *  - id (String): module id
  *
+ *  Load a module. require is defined as a free-variable function in all module
+ *  and top level scopes.
+ *
  *  This function is actually called `require`, its just PDoc doesn't yet know
  *  how to treat top level functions as 'utility funcitons' and make them show
  *  up in the menu unless they start with a dollar.
