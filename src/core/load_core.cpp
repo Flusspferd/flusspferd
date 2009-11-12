@@ -50,7 +50,7 @@ namespace flusspferd { namespace detail {
 }}
 
 void flusspferd::load_core(object const &scope_, std::string const &argv0) {
-  object scope = scope_;
+  root_object scope(scope_);
 
   // Initalize boost's copy of cwd as early as possible
   boost::filesystem::initial_path<boost::filesystem::path>();
@@ -63,10 +63,10 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   // Create the top level |module| and |exports| properties.
   scope.define_property("module", require_fn.get_property("main"), dont_enumerate);
 
-  object exports = create_object();
+  root_object exports(create_object());
   scope.define_property("exports", exports, dont_enumerate);
 
-  flusspferd::object preload = require_fn.get_property_object("preload");
+  root_object preload(require_fn.get_property_object("preload"));
 
   flusspferd::create_native_method(
     preload, "binary",
