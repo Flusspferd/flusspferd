@@ -98,7 +98,10 @@ void load_class(
       || root_object(old_to_string.to_object()).get_property("auto").to_boolean())
   {
     root_object fn(
-      create_native_function(prototype, "toString", &default_to_string<T>));
+      flusspferd::create<function>(
+        "toString",
+        &default_to_string<T>,
+        param::_container = prototype));
     fn.set_property("auto", true);
   }
 
@@ -107,7 +110,10 @@ void load_class(
       || root_object(old_to_source.to_object()).get_property("auto").to_boolean())
   {
     root_object fn(
-      create_native_function(prototype, "toSource", &default_to_source<T>));
+      flusspferd::create<function>(
+        "toSource",
+        &default_to_source<T>,
+        param::_container = prototype));
     fn.set_property("auto", true);
   }
 
