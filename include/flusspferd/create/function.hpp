@@ -81,6 +81,15 @@ namespace detail {
         arg[param::_arity | 0],
         string(arg[param::_name | string()]).to_string());
     }
+
+    template<typename T>
+    static result_type create(
+      ArgPack const &arg,
+      T *fnptr,
+      typename boost::enable_if<boost::is_function<T> >::type* = 0)
+    {
+      return create(arg, boost::function<T>(fnptr));
+    }
   };
 
   template<bool Method>
