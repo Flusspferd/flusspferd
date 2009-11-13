@@ -120,6 +120,20 @@ namespace detail {
           arg[param::_arity | 0],
           string(arg[param::_name | string()]).to_string());
     }
+
+    template<typename R, typename T>
+    static result_type create(
+      ArgPack const &arg,
+      R T::*memfnptr)
+    {
+      BOOST_STATIC_ASSERT(Method);
+      return old_create_native_functor_function<
+          native_member_function<R, T>
+        >(
+          object(),
+          memfnptr,
+          string(arg[param::_name | string()]).to_string());
+    }
   };
 
   template<bool Method>
