@@ -77,7 +77,6 @@ public:
     options |= JSOPTION_VAROBJFIX;
     options |= JSOPTION_STRICT;
     options |= JSOPTION_DONT_REPORT_UNCAUGHT;
-    options &= ~JSOPTION_XML;
 
     JS_SetVersion(context, JSVersion(JS_VERSION));
     JS_SetOptions(context, options);
@@ -96,8 +95,6 @@ public:
 
     if(!JS_InitStandardClasses(context, global_))
       throw exception("Could not initialize Global Object");
-
-    JS_DeleteProperty(context, global_, "XML");
 
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
 
