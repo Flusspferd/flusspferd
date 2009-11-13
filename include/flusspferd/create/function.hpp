@@ -85,6 +85,20 @@ namespace detail {
     template<typename T>
     static result_type create(
       ArgPack const &arg,
+      boost::function<T> const &fun)
+    {
+      return old_create_native_functor_function<
+          native_function<T, Method>
+        >(
+          object(),
+          fun,
+          string(arg[param::_name | string()]).to_string()
+        );
+    }
+
+    template<typename T>
+    static result_type create(
+      ArgPack const &arg,
       T *fnptr,
       typename boost::enable_if<boost::is_function<T> >::type* = 0)
     {
