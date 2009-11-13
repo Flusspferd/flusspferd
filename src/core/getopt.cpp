@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/array.hpp"
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/root.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
@@ -46,10 +47,21 @@ using namespace flusspferd;
 void flusspferd::load_getopt_module(object container) {
   object exports = container.get_property_object("exports");
 
-  flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
-  flusspferd::create_native_function(exports, "getopt_help", &flusspferd::getopt_help);
-  flusspferd::create_native_function(exports, "getopt_man", &flusspferd::getopt_man);
-  flusspferd::create_native_function(exports, "getopt_bash", &flusspferd::getopt_bash);
+  flusspferd::create<flusspferd::function>(
+    "getopt", &flusspferd::getopt,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_help", &flusspferd::getopt_help,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_man", &flusspferd::getopt_man,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_bash", &flusspferd::getopt_bash,
+    param::_container = exports);
 }
 
 namespace {

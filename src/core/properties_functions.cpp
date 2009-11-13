@@ -26,8 +26,8 @@ THE SOFTWARE.
 #include "flusspferd/properties_functions.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/value.hpp"
-#include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
+#include "flusspferd/create/function.hpp"
 
 using namespace flusspferd;
 
@@ -42,19 +42,18 @@ void flusspferd::load_properties_functions(object container) {
     throw exception("Unable to get Object constructor");
   root_object obj_ctor(v.get_object());
 
-  create_native_function(
-      obj_ctor,
+  create<function>(
       "defineProperty",
-      ecma_define_own_property);
+      ecma_define_own_property,
+      param::_container = obj_ctor);
 
-  create_native_function(
-      obj_ctor,
+  create<function>(
       "defineProperties",
-      ecma_define_own_properties);
+      ecma_define_own_properties,
+      param::_container = obj_ctor);
 }
 
 void ecma_define_own_properties(object o, object desc) {
-
   for (flusspferd::property_iterator it = desc.begin(); it != desc.end(); ++it) {
     ecma_define_own_property(o, *it, desc.get_property_object(*it));
   }

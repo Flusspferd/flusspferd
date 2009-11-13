@@ -44,17 +44,17 @@ void flusspferd::load_encodings_module(object container) {
   // Load the binary module
   container.call("require", "binary");
 
-  create_native_function(
-    exports,
-    "convertToString", &encodings::convert_to_string);
+  create<function>(
+    "convertToString", &encodings::convert_to_string,
+    param::_container = exports);
 
-  create_native_function(
-    exports,
-    "convertFromString", &encodings::convert_from_string);
+  create<function>(
+    "convertFromString", &encodings::convert_from_string,
+    param::_container = exports);
 
-  create_native_function(
-    exports,
-    "convert", &encodings::convert);
+  create<function>(
+    "convert", &encodings::convert,
+    param::_container = exports);
 
   load_class<encodings::transcoder>(exports);
 }

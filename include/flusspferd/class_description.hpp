@@ -30,6 +30,7 @@ THE SOFTWARE.
 #ifndef PREPROC_DEBUG
 #include "class.hpp"
 #include "native_object_base.hpp"
+#include "create/function.hpp"
 #endif
 #include "detail/limit.hpp"
 #include <boost/preprocessor.hpp>
@@ -216,17 +217,17 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_METHOD__bind(p_method_name, p_bound) \
-  ::flusspferd::create_native_method( \
-      obj, \
-      (p_method_name), \
-      & Class :: p_bound); \
+  ::flusspferd::create< ::flusspferd::method>( \
+      ::flusspferd::param::_container = obj, \
+      ::flusspferd::param::_name = (p_method_name), \
+      ::flusspferd::param::_function = & Class :: p_bound); \
   /* */
 
 #define FLUSSPFERD_CD_METHOD__bind_static(p_method_name, p_bound) \
-  ::flusspferd::create_native_function( \
-      obj, \
-      (p_method_name), \
-      & Class :: p_bound); \
+  ::flusspferd::create< ::flusspferd::function>( \
+      ::flusspferd::param::_container = obj, \
+      ::flusspferd::param::_name = (p_method_name), \
+      ::flusspferd::param::_function = & Class :: p_bound); \
   /* */
 
 #define FLUSSPFERD_CD_METHOD__alias(p_method_name, p_alias) \
@@ -262,16 +263,14 @@ THE SOFTWARE.
     ::flusspferd::property_attributes( \
       ::flusspferd::permanent_shared_property, \
       ::flusspferd::root_function( \
-        ::flusspferd::create_native_method( \
-          ::flusspferd::object(), \
+        ::flusspferd::create< ::flusspferd::method>( \
           "$get_" p_property_name, \
           & Class :: \
           BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
         ) \
       ), \
       ::flusspferd::root_function( \
-        ::flusspferd::create_native_method( \
-          ::flusspferd::object(), \
+        ::flusspferd::create< ::flusspferd::method>( \
           "$set_" p_property_name, \
           & Class :: \
           BOOST_PP_TUPLE_ELEM(2, 1, p_param) \
@@ -288,8 +287,7 @@ THE SOFTWARE.
       ::flusspferd::permanent_shared_property \
       | ::flusspferd::read_only_property, \
       ::flusspferd::root_function( \
-        ::flusspferd::create_native_method( \
-          ::flusspferd::object(), \
+        ::flusspferd::create< ::flusspferd::method>( \
           "$get_" p_property_name, \
           & Class :: p_param \
         ) \
