@@ -199,7 +199,25 @@ BOOST_PP_REPEAT_FROM_TO(
 #else //IN_DOXYGEN
 
 /**
- * Create!
+ * Create an %object or %value of a type implied by @p Class.
+ *
+ * This %function takes a number of named parameters. Some named parameters can
+ * be specified in a specific order, or even in any order, depending on @p Class.
+ *
+ * The return %value is always convertible to flusspferd::value.
+ *
+ * A few simple examples:
+ * @code
+// Create an empty object.
+flusspferd::object o = flusspferd::create< flusspferd::object >();
+
+// Create an empty object with a prototype.
+o = flusspferd::create< flusspferd::object >(
+      flusspferd::param::_prototype = proto);
+
+// Create an array with three elements.
+flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::list_of(1)(2)(3));
+@endcode
  *
  * @ingroup create
  */
