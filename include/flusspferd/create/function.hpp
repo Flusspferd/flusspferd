@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "../create.hpp"
 #include "../string.hpp"
+#include <boost/static_assert.hpp>
 
 namespace flusspferd {
 
@@ -103,6 +104,21 @@ namespace detail {
       typename boost::enable_if<boost::is_function<T> >::type* = 0)
     {
       return create(arg, boost::function<T>(fnptr));
+    }
+
+    template<typename T>
+    static result_type create(
+      ArgPack const &arg,
+      void (T::*memfnptr)(call_context &))
+    {
+      BOOST_STATIC_ASSERT(Method);
+      return old_create_native_functor_function<
+          native_member_function<void, T>
+        >(
+          object(),
+          memfnptr,
+          arg[param::_arity | 0],
+          string(arg[param::_name | string()]).to_string());
     }
   };
 

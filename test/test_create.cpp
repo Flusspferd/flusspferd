@@ -67,6 +67,8 @@ public:
       a(a),
       b(b)
   {}
+
+  void my_method_1(flusspferd::call_context &) {}
 };
 
 struct my_functor : flusspferd::native_function_base {
@@ -198,6 +200,15 @@ BOOST_AUTO_TEST_CASE( function ) {
   BOOST_CHECK_EQUAL(f.arity(), 1);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 12345));
   BOOST_CHECK_EQUAL(v, flusspferd::value(12345));
+
+  f = flusspferd::create<flusspferd::method>(
+    "name5",
+    &my_class::my_method_1);
+  BOOST_CHECK_EQUAL(f.name(), "name5");
+  BOOST_CHECK_EQUAL(f.arity(), 0);
+  BOOST_CHECK_NO_THROW(v = f.call(
+    flusspferd::root_object(flusspferd::create<my_class>())));
+  BOOST_CHECK_EQUAL(v, flusspferd::value());
 }
 
 BOOST_AUTO_TEST_CASE( MyClass ) {
