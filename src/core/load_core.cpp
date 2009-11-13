@@ -110,7 +110,8 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   flusspferd::create<method>(
     "flusspferd",
     phoenix::bind(&flusspferd::load_flusspferd_module, args::arg1, argv0),
-    _signature = param::type<void (object)>());
+    _signature = param::type<void (object)>(),
+    _container = preload);
 
   if (!scope_.has_own_property("JSON")) {
     flusspferd::evaluate_in_scope(
