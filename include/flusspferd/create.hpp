@@ -52,31 +52,6 @@ class native_object_base;
 class function;
 class native_function_base;
 
-namespace detail {
-  function create_native_function(native_function_base *ptr);
-  function create_native_function(object const &o, native_function_base *ptr);
-}
-
-#define FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION(z, n_args, d) \
-  template< \
-    typename T \
-    BOOST_PP_ENUM_TRAILING_PARAMS(n_args, typename T) \
-  > \
-  object old_create_native_functor_function( \
-    object const &o \
-    BOOST_PP_ENUM_TRAILING_BINARY_PARAMS(n_args, T, const & param), \
-    typename boost::enable_if_c<!boost::is_function<T>::value>::type * = 0 \
-  ) { \
-    return detail::create_native_function(o, new T(BOOST_PP_ENUM_PARAMS(n_args, param))); \
-  } \
-  /* */
-
-BOOST_PP_REPEAT(
-  BOOST_PP_INC(FLUSSPFERD_PARAM_LIMIT),
-  FLUSSPFERD_FN_CREATE_NATIVE_FUNCTION,
-  ~
-)
-
 namespace param {
   BOOST_PARAMETER_NAME(container)
   BOOST_PARAMETER_NAME(name)

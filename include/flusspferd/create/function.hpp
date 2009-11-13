@@ -44,6 +44,8 @@ namespace detail {
     flusspferd::string const &file,
     unsigned line);
 
+  function create_native_function(native_function_base *ptr);
+
   template<bool Method, typename ArgPack>
   struct create_function_helper {
     typedef function result_type;
@@ -77,11 +79,11 @@ namespace detail {
       boost::function<void (call_context&)> const &fun)
     {
       local_root_scope scope;
-      return old_create_native_functor_function<native_function<void> >(
-        object(),
-        fun,
-        arg[param::_arity | 0],
-        string(arg[param::_name | string()]).to_string());
+      return create_native_function(
+        new native_function<void>(
+          fun,
+          arg[param::_arity | 0],
+          string(arg[param::_name | string()]).to_string()));
     }
 
     template<typename T>
@@ -89,13 +91,11 @@ namespace detail {
       ArgPack const &arg,
       boost::function<T> const &fun)
     {
-      return old_create_native_functor_function<
-          native_function<T, Method>
-        >(
-          object(),
+      return create_native_function(
+        new native_function<T, Method>(
           fun,
           string(arg[param::_name | string()]).to_string()
-        );
+        ));
     }
 
     template<typename T>
@@ -113,13 +113,11 @@ namespace detail {
       void (T::*memfnptr)(call_context &))
     {
       BOOST_STATIC_ASSERT(Method);
-      return old_create_native_functor_function<
-          native_member_function<void, T>
-        >(
-          object(),
+      return create_native_function(
+        new native_member_function<void, T>(
           memfnptr,
           arg[param::_arity | 0],
-          string(arg[param::_name | string()]).to_string());
+          string(arg[param::_name | string()]).to_string()));
     }
 
     template<typename R, typename T>
@@ -128,12 +126,10 @@ namespace detail {
       R T::*memfnptr)
     {
       BOOST_STATIC_ASSERT(Method);
-      return old_create_native_functor_function<
-          native_member_function<R, T>
-        >(
-          object(),
+      return create_native_function(
+        new native_member_function<R, T>(
           memfnptr,
-          string(arg[param::_name | string()]).to_string());
+          string(arg[param::_name | string()]).to_string()));
     }
   };
 
