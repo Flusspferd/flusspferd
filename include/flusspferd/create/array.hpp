@@ -99,9 +99,7 @@ namespace detail {
 
       Range const &r = arg[param::_contents];
 
-      local_root_scope scope;
-
-      array arr = create_length_array(0);
+      root_array arr(create_length_array(0));
 
       iterator first = boost::begin(r);
       iterator last = boost::end(r);

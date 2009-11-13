@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "object.hpp"
 #include "function.hpp"
 #include "native_function.hpp"
-#include "local_root_scope.hpp"
+#include "root.hpp"
 #include <boost/type_traits/is_function.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/mpl/bool.hpp>
@@ -173,11 +173,13 @@ namespace detail {
   >::type
   create_helper(ArgPack const &arg) {
     typedef create_traits<Class> traits;
-    local_root_scope scope;
 
-    typename traits::result_type result = traits::create(arg);
+    object container_o(arg[param::_container]);
+    root_object container(container_o);
 
-    object container(arg[param::_container]);
+    typename traits::result_type result(traits::create(arg));
+    root_value root_result(result);
+
     container.define_property(
       arg[param::_name],
       result,

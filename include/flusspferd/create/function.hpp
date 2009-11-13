@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "../create.hpp"
 #include "../string.hpp"
+#include "../local_root_scope.hpp"
 #include <boost/static_assert.hpp>
 
 namespace flusspferd {
