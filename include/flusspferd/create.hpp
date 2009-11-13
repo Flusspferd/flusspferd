@@ -78,6 +78,8 @@ namespace param {
   };
 }
 
+#ifndef IN_DOXYGEN
+
 namespace detail {
   template<typename Class>
   struct new_functor {
@@ -193,6 +195,18 @@ BOOST_PP_REPEAT_FROM_TO(
   ~)
 
 #undef FLUSSPFERD_CREATE
+
+#else //IN_DOXYGEN
+
+/**
+ * Create!
+ *
+ * @ingroup create
+ */
+template<typename Class>
+unspecified_type create(...);
+
+#endif
 
 }
 
