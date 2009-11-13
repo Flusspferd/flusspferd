@@ -121,13 +121,3 @@ function flusspferd::detail::create_native_function(native_function_base *ptr) {
     throw;
   }
 }
-
-function flusspferd::detail::create_native_function(
-    object const &o_, native_function_base *ptr)
-{
-  root_object o(o_);
-  root_function fun(create_native_function(ptr));
-  if (!o.is_null())
-    o.define_property(ptr->name().c_str(), fun, dont_enumerate);
-  return fun;
-}

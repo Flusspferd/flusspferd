@@ -45,14 +45,13 @@ namespace detail {
 
     typedef boost::parameter::parameters<
       param::tag::arguments,
-      param::tag::prototype,
       name_spec,
       container_spec,
       attributes_spec
     > parameters;
 
     static result_type create() {
-      return create_native_function(object(), new Class);
+      return create_native_function(new Class);
     }
 
     template<typename ArgPack>
@@ -68,7 +67,7 @@ namespace detail {
 
       Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
 
-      return create_native_function(args[param::_prototype | object()], &self);
+      return create_native_function(&self);
     }
   };
 }
