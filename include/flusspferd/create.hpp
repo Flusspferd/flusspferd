@@ -219,6 +219,22 @@ o = flusspferd::create< flusspferd::object >(
 flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::list_of(1)(2)(3));
 @endcode
  *
+ *
+ * <dl>
+ * <dt><b>Common parameters:</b></dt>
+ * <dd>
+ * <dl>
+ * <dt><tt>flusspferd::param::_container</tt></dt>
+ * <dd>The container object for storing the created %object.</dd>
+ * <dt><tt>flusspferd::param::_name</tt></dt>
+ * <dd>The name of the property to be used for storing the %object.</dd>
+ * <dt><tt>flusspferd::param::_attributes</tt></dt>
+ * <dd>Attributes to be used for creating the property.<br>
+ *     <em>Default</em>: flusspferd::dont_enumerate</dt>
+ * </dl>
+ * </dd>
+ * </dl>
+ *
  * @ingroup create
  */
 template<typename Class>
