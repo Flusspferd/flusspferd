@@ -87,6 +87,10 @@ static int my_func_1(flusspferd::call_context &) {
 static void my_func_2(flusspferd::call_context &)
 {}
 
+static int my_func_3(int x) {
+  return x;
+}
+
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( object ) {
@@ -186,6 +190,14 @@ BOOST_AUTO_TEST_CASE( function ) {
   BOOST_CHECK_EQUAL(f.arity(), 0);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
   BOOST_CHECK_EQUAL(v, flusspferd::value());
+
+  f = flusspferd::create<flusspferd::function>(
+    "name4",
+    my_func_3);
+  BOOST_CHECK_EQUAL(f.name(), "name4");
+  BOOST_CHECK_EQUAL(f.arity(), 1);
+  BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 12345));
+  BOOST_CHECK_EQUAL(v, flusspferd::value(12345));
 }
 
 BOOST_AUTO_TEST_CASE( MyClass ) {
