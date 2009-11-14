@@ -453,7 +453,16 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = class derived from <b>native_function_base</b></dt>
- * <dd>Header: flusspferd/create/native_function.hpp</dd>
+ * <dd>Header: flusspferd/create/native_function.hpp<br><br>
+ * <dl>
+ * <dt>flusspferd::param::_arguments</dt>
+ * <dd>The parameters to be passed to the Class constructor (in addition to the
+ *     first parameter, which is always the object itself), as a
+ *     <a href="http://www.boost.org/doc/libs/1_40_0/libs/fusion/doc/html/fusion/sequence/concepts/forward_sequence.html"
+ *     >fusion sequence</a>.<br>
+ *    <em>Default</em>: <tt>boost::fusion::vector0()</tt>
+ * </dl>
+ * </dd>
  * </dl>
  *
  * @ingroup create
