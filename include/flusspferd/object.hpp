@@ -309,6 +309,44 @@ FLUSSPFERD_CALLS(call, object const &)
     return define_property(name, value(), attrs);
   }
 
+private:
+  class define_property_helper {
+    object &obj;
+    property_attributes attr;
+
+  public:
+    define_property_helper(object &obj, property_attributes const &attr)
+      : obj(obj), attr(attr)
+    {}
+
+    template<typename T>
+    define_property_helper operator()(T const &id) {
+      obj.define_property(id, attr);
+      return *this;
+    }
+
+    template<typename T, typename U>
+    define_property_helper operator()(T const &id, U const &v) {
+      obj.define_property(id, flusspferd::value(v), attr);
+      return *this;
+    }
+  };
+
+public:
+  /**
+   * Define multiple properties.
+   *
+   * Example:
+   * @code
+   obj.define_properties(read_only_property)("name1", value1)("name2", value2)("name3");
+   @endcode
+   *
+   * @param attr The property attributes.
+   */
+  define_property_helper define_properties(property_attributes const &attr = property_attributes()) {
+    return define_property_helper(*this, attr);
+  }
+
   /**
    * Get a property's attributes.
    *
@@ -369,6 +407,36 @@ FLUSSPFERD_CALLS(call, object const &)
 #endif
   ) {
     return set_property(id, value(v));
+  }
+
+private:
+  struct set_property_helper {
+    object &obj;
+
+    set_property_helper(object &obj) : obj(obj) {}
+
+    template<typename T, typename U>
+    set_property_helper operator()(T const &id, U const &v) {
+      obj.set_property(id, v);
+      return *this;
+    }
+  };
+
+public:
+  /**
+   * Set multiple properties.
+   *
+   * Example:
+   * @code
+   obj.set_properties("name1", value1)("name2", value2);
+   @endcode
+   *
+   * @param id The first property's name / ID.
+   * @param v The new value for the first property.
+   */
+  template<typename T, typename U>
+  set_property_helper set_properties(T const &id, U const &v) {
+    return set_property_helper(*this)(id, v);
   }
 
   /**

@@ -152,4 +152,24 @@ BOOST_AUTO_TEST_CASE( recursive_loop_on_set_property ) {
   object.set_property( flusspferd::string(), flusspferd::string() );
 }
 
+BOOST_AUTO_TEST_CASE( set_properties ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::object>());
+
+  object.set_properties(flusspferd::value(1),2)("3",4);
+
+  BOOST_CHECK_EQUAL(object.get_property("1"), flusspferd::value(2));
+  BOOST_CHECK_EQUAL(object.get_property(flusspferd::value(3)), flusspferd::value(4));
+}
+
+BOOST_AUTO_TEST_CASE( define_properties ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::object>());
+
+  object.define_properties(flusspferd::read_only_property)(flusspferd::value(1),2)("3",4)("5");
+  object.set_property("1", 5); //no effect
+
+  BOOST_CHECK_EQUAL(object.get_property("1"), flusspferd::value(2));
+  BOOST_CHECK_EQUAL(object.get_property(flusspferd::value(3)), flusspferd::value(4));
+  BOOST_CHECK_EQUAL(object.get_property("5"), flusspferd::value());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
