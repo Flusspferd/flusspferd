@@ -1,0 +1,77 @@
+// vim: ft=javascript:
+
+// Docs in here based off the comments in http://www.JSON.org/json2.js (which
+// was public domain)
+
+/** section: Language
+ * JSON
+ *
+ * Builtin JSON parser
+ **/
+
+/**
+ *  JSON.parse(json[, reviver]) -> ?
+ *  - json (String): json string to parse
+ *
+ *  Parse `json` as [JSON][JSON]. Please note, this parser will onbly ever
+ *  parse JSON according to the strict definition of JSON -- in particular this
+ *  means that your keys must be in double quote.
+ *
+ *  [json]: http://json.org/
+ **/
+
+/**
+ *  JSON.parse(json[, replacer[, space]]) -> ?
+ *  - json (String): json string to parse
+ *  - replacer (Array | Function): change stringification behaviour
+ *  - space (String | Numer): indentation control
+ *
+ *  Produce a JSON string from a JavaScript value.
+ *
+ *  When serializing objects, if the object responds to `toJSON` it will be
+ *  called with `this` bound to the object and passed the key name as the only
+ *  argument. This function should reutrn the JSON representation for the
+ *  value.
+ *
+ *  For example this would serialize Dates as ISO-8601 strings:
+ *
+ *      Date.prototype.toJSON = function (key) {
+ *        function f(n) { return n &lt; 10 ? '0' : n : n; }
+ *        return this.getUTCFullYear()  + '-' +
+ *            f(this.getUTCMonth() + 1) + '-' +
+ *            f(this.getUTCDate())      + 'T' +
+ *            f(this.getUTCHours())     + ':' +
+ *            f(this.getUTCMinutes())   + ':' +
+ *            f(this.getUTCSeconds())   + 'Z';
+ *      }
+ *
+ *  It is worth noting that this example describes the default behaviour for
+ *  Dates
+ *  {: .callout}
+ *
+ *  Values that do not have JSON representations such as undefined or functions
+ *  will not be serialized. Such values in objects will be dropped; in arrays
+ *  they will be replaced with null. You can use a filter function to replace
+ *  those with custom JSON values.
+ *
+ *  ##### Filtering #
+ *
+ *  You can provide an optional `replacer` method. It will be passed the key and
+ *  value of each member, with this bound to the containing object. The value
+ *  that is returned from your method will be serialized. If your method
+ *  returns undefined, then the member will be excluded from the serialization.  
+ *
+ *  If `replacer` is an array of strings, then it will be used to select the
+ *  members to be serialized. It filters the results such that only members
+ *  with keys listed in the replacer array are stringified.
+ *
+ *
+ *  ##### Pretty Printing #
+ *
+ *  The optional `space` parameter produces a stringification of the value that
+ *  is filled with line breaks and indentation to make it easier to read.
+ *
+ *  If the `space` parameter is a non-empty string, then that string will be used
+ *  for indentation. If it is a number, then the indentation will be that many
+ *  spaces.
+ **/
