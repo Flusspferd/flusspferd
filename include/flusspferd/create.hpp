@@ -72,19 +72,102 @@ namespace param {
 
   BOOST_PARAMETER_NAME(arguments)
 #else
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _container;
+
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _name;
+
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _attributes;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _length;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _contents;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _prototype;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _parent;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _argument_names;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _function;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _file;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _line;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _signature;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _arity;
+ 
+  /**
+   * TODO
+   *
+   * @see flusspferd::create
+   */
   unspecified_parameter_keyword_type _arguments;
 #endif
 
