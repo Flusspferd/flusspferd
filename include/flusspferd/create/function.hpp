@@ -154,6 +154,7 @@ namespace detail {
         param::tag::file,
         param::tag::line,
         param::tag::signature,
+        param::tag::arity,
         container_spec,
         attributes_spec
       > parameters;
