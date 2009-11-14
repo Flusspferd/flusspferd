@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+#ifndef IN_DOXYGEN
+
 namespace detail {
   array create_length_array(std::size_t length);
 
@@ -112,6 +114,8 @@ namespace detail {
   };
 
 }
+
+#endif //IN_DOXYGEN
 
 }
 

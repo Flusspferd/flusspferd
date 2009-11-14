@@ -34,7 +34,17 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-struct method {}; /* tag */
+/**
+ * Tag class for flusspferd::create.
+ *
+ * Used as an alternative to flusspferd::function when the first C++
+ * parameter should be the Javascript 'this' object.
+ *
+ * @ingroup create
+ */
+struct method {};
+
+#ifndef IN_DOXYGEN
 
 namespace detail {
   function create_source_function(
@@ -205,6 +215,8 @@ namespace detail {
   : create_function_traits<true>
   {};
 }
+
+#endif //IN_DOXYGEN
 
 }
 

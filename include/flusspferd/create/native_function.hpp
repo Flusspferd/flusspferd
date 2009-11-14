@@ -32,6 +32,8 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+#ifndef IN_DOXYGEN
+
 namespace detail {
   template<typename Class>
   struct create_traits<
@@ -71,6 +73,8 @@ namespace detail {
     }
   };
 }
+
+#endif //IN_DOXYGEN
 
 }
 
