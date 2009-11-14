@@ -27,4 +27,10 @@ THE SOFTWARE.
 require('./util/array');
 require('./util/function');
 
+/** section: Flusspferd Core
+ * util
+ *
+ * Utilities that are always avilable in flusspferd.
+ **/
+
 exports.Range = require('./util/range').Range;
