@@ -430,7 +430,28 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = class derived from <b>native_object_base</b></dt>
- * <dd>Header: flusspferd/create/native_object.hpp</dd>
+ * <dd>Header: flusspferd/create/native_object.hpp<br><br>
+ * <dl>
+ * <dt>flusspferd::param::_arguments</dt>
+ * <dd>The parameters to be passed to the Class constructor (in addition to the
+ *     first parameter, which is always the object itself), as a
+ *     <a href="http://www.boost.org/doc/libs/1_40_0/libs/fusion/doc/html/fusion/sequence/concepts/forward_sequence.html"
+ *     >fusion sequence</a>.<br>
+ *    <em>Default</em>: <tt>boost::fusion::vector0()</tt>
+ * </dd>
+ * <dt>flusspferd::param::_prototype</dt>
+ * <dd>The prototype object to be used.<br>
+ *     <em>Default</em>: The class prototype.
+ * </dd>
+ * <dt>flusspferd::param::_parent</dt>
+ * <dd>The parent object to be used.<br>
+ *     <em>Default</em>: Determined by the Javascript engine.
+ * </dd>
+ * </dl>
+ * <br><em>Parameter order</em>: flusspferd::param::_arguments,
+ *     flusspferd::param::_prototype, flusspferd::param::_parent.
+ * <br><br>
+ * </dd>
  * <dt><tt>Class</tt> = class derived from <b>native_function_base</b></dt>
  * <dd>Header: flusspferd/create/native_function.hpp</dd>
  * </dl>
