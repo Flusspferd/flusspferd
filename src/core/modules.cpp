@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/spirit/home/phoenix/core.hpp>
 #include <sstream>
 
 #ifdef WIN32
@@ -391,6 +392,17 @@ object require::load_top_level_module(std::string &id) {
   ctx.set_parent(classes_object);
 
   root_object exports(flusspferd::create<object>());
+  
+  flusspferd::create<function>(
+    "toString",
+    boost::phoenix::val("[module " + id + "]"),
+    flusspferd::param::_signature = flusspferd::param::type<std::string ()>(),
+    flusspferd::param::_container = exports);
+  flusspferd::create<function>(
+    "toSource",
+    boost::phoenix::val("(require('" + id + "'))"),
+    flusspferd::param::_signature = flusspferd::param::type<std::string ()>(),
+    flusspferd::param::_container = exports);
 
   ctx.define_property(
     "exports",
