@@ -255,13 +255,32 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <dd>Attributes to be used for creating the property.<br>
  *     <em>Default</em>: flusspferd::dont_enumerate</dt>
  * </dl>
+ * <br>
  * </dd>
- * <dt><b>object</b></dt>
- * <dd>TODO</dd>
- * <dt><b>array</b></dt>
- * <dd>TODO</dd>
- * <dt><b>function</b> / <b>method</b></dt>
- * <dd>TODO</dd>
+ * <dt><tt>Class</tt> = <b>object</b></dt>
+ * <dd><em>Header</em>: flusspferd/create/object.hpp<br><br>
+ * <dl>
+ * <dt>flusspferd::param::_prototype</dt>
+ * <dd>The prototype object to be used.<br>
+ *     <em>Default</em>: <tt>Object.prototype</tt>
+ * </dd>
+ * <dt>flusspferd::param::_parent</dt>
+ * <dd>The parent object to be used.<br>
+ *     <em>Default</em>: Determined by the Javascript engine.
+ * </dd>
+ * </dl>
+ * <br><em>Parameter order</em>:
+ * flusspferd::param::_prototype, flusspferd::param::_parent
+ * <br><br>
+ * </dd>
+ * <dt><tt>Class</tt> = <b>array</b></dt>
+ * <dd>Header: flusspferd/create/object.hpp</dd>
+ * <dt><tt>Class</tt> = <b>function</b> / <b>method</b></dt>
+ * <dd>Header: flusspferd/create/function.hpp</dd>
+ * <dt><tt>Class</tt> = class derived from <b>native_object_base</b></dt>
+ * <dd>Header: flusspferd/create/native_object.hpp</dd>
+ * <dt><tt>Class</tt> = class derived from <b>native_function_base</b></dt>
+ * <dd>Header: flusspferd/create/native_function.hpp</dd>
  * </dl>
  *
  * @ingroup create
