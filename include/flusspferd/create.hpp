@@ -312,7 +312,7 @@ BOOST_PP_REPEAT_FROM_TO(
  *
  * The return %value is always convertible to flusspferd::value.
  *
- * A few simple examples:
+ * A few simple examples (rooting is ignored):
  * @code
 // Create an empty object.
 flusspferd::object o = flusspferd::create< flusspferd::object >();
@@ -323,6 +323,15 @@ o = flusspferd::create< flusspferd::object >(
 
 // Create an array with three elements.
 flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::list_of(1)(2)(3));
+
+// Create a native object of type my_class.
+my_class &no = flusspferd::create< my_class >(boost::fusion::make_vector(1, 2, 3));
+
+// Create a native function from a function pointer, directly on the global object.
+flusspferd::create< flusspferd::function >(
+  "fork",
+  &::fork,
+  flusspferd::param::_container = flusspferd::global());
 @endcode
  *
  *
