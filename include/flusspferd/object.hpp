@@ -360,7 +360,7 @@ FLUSSPFERD_CALLS(call, object const &)
    *
    * @param id The property's name / ID.
    * @param v The new value.
-   * @returnv @p v
+   * @return @p v
    */
   template<typename T, typename U>
   value set_property(T const &id, U const &v
