@@ -1,0 +1,256 @@
+// -*- mode: js2; -*- vim: ft=javascript
+
+/** section: Bundled Modules
+ * gmp
+ *
+ * GNU Multiple Precision Arithmetic Library.
+ *
+ * There are three different classes of large numbers in this module: the
+ * classic [[gmp.Integer]] and [[gmp.Float]], and a [[gmp.Rational]] class
+ * which represents fractional numbers as a pair of integers: numerator and
+ * denominator.
+ *
+ * ##### Example #
+ *
+ *     const GMP = require("gmp");
+ *     f = GMP.Float(2);
+ *     require("io").stdout.print(f.sqrt());
+ *     i = GMP.Integer("0x32432432ad45f7897e79c");
+ *     r = GMP.Rational("1/3");
+ *     i_plus_f = i.add(f);
+ **/
+
+/**
+ *  mixin gmp.Base
+ *
+ *  Common behaviour shared between all GMP classes.
+ *
+ *  All the methods on this mixin that return [[gmp.Base]] infact return
+ *  instances of the same type as the invocant -- i.e. if [[gmp.Base#abs]] is
+ *  called on a [[gmp.Integer]] it will return an Integer.
+ **/
+
+/**
+ *  gmp.Base#getDouble() -> Number
+ *
+ *  Returns the value as a floating point number
+ **/
+
+/**
+ *  gmp.Base#toString([base = 10]) -> String
+ *  - base (Number): base to represent value in.
+ *
+ * Returns the value as a string
+ **/
+
+/**
+ *  gmp.Base#sgn() -> Number
+ *
+ *  Return an integer indication the sign of the value: 1 if > 0, 0 if == 0,
+ *  and -1 if < 0.
+ **/
+
+/**
+ *  gmp.Base#abs() -> gmp.Base
+ *
+ *  Return the absolute value of `this`.
+ **/
+
+/**
+ *  gmp.Base#cmp(rhs) -> Number
+ *  - rhs (Number | gmp.Base): value to compare with
+ *
+ *  Returns a positive value if `this > rhs`, zero if `this == rhs`, and a negative
+ *  value if `this < rhs`.
+ **/
+
+/**
+ *  gmp.Base#add(rhs) -> gmp.Base
+ *  - rhs (Number | gmp.Base): operand
+ *
+ *  Returns `this + rhs` as the same concrete type as `this`.
+ **/
+
+/**
+ *  gmp.Base#sub(rhs) -> gmp.Base
+ *  - rhs (Number | gmp.Base): operand
+ *
+ *  Returns `this - rhs` as the same concrete type as `this`.
+ **/
+
+/**
+*  gmp.Base#mul(rhs) -> gmp.Base
+*  - rhs (Number | gmp.Base): operand
+*
+*  Returns `this * rhs` as the same concrete type as `this`.
+**/
+
+/**
+*  gmp.Base#div(rhs) -> gmp.Base
+*  - rhs (Number | gmp.Base): operand
+*
+*  Returns `this / rhs` as the same concrete type as `this`.
+**/
+
+
+/**
+ *  class gmp.Integer
+ *    includes gmp.Base
+ *
+ *  Provides a bignum integer class. See [gmp's mpz_class][mpz_class] for the
+ *  C++ API that is wrapped.
+ *
+ *  [mpz_class]: http://gmplib.org/manual/C_002b_002b-Interface-Integers.html#C_002b_002b-Interface-Integers
+ **/
+
+/**
+ *  new gmp.Integer(value)
+ *  new gmp.Integer(str, base)
+ *  - value (Number | String | gmp.Base): initial value
+ *  - str (String): value in a string
+ *  - base (Number): base to interpret `str` in
+ *
+ *  Construct a new GMP integer value, either from a primitive value, form an
+ *  existing [[gmp.Base]] or via a string representation.
+ *
+ *  White space is allowed in `str`, and is simply ignored. If `base` is 0 then
+ *  the leading characters are used: "0x" and "0X" for hexadecimal, "0b" and "0B" for
+ *  binary, "0" for octal, or decimal otherwise.
+ *
+ *  For bases up to 36, case is ignored; upper-case and lower-case letters have
+ *  the same value. For bases 37 to 62, upper-case letter represent the usual
+ *  10..35 while lower-case letter represent 36..61.
+ **/
+
+/**
+ *  gmp.Integer#sqrt() -> gmp.Float
+ *
+ *  Returns the square root of `this`.
+ **/
+
+/**
+ *  gmp.Integer#fitsInt() -> Boolean
+ *
+ *  Checks if the value fits into an integer.
+ **/
+
+/**
+ *  gmp.Integer#getInt() -> Integer
+ *
+ *  Returns the value as an integer.
+ **/
+
+
+/**
+ *  class gmp.Rational
+ *    includes gmp.Base
+ *
+ *  Provides a bignum fractional class for more accurately representing numbers
+ *  of the form `numerator/denominator`. See [gmp's mpq_class][mpq_class] for
+ *  the C++ API that is wrapped.
+ *
+ *  [mpq_class]: http://gmplib.org/manual/C_002b_002b-Interface-Rationals.html#C_002b_002b-Interface-Rationals
+ **/
+
+/**
+ *  new gmp.Rational(value)
+ *  new gmp.Rational(str, base)
+ *  new gmp.Rational(num, den)
+ *  - value (Number | String | gmp.Base): initial value
+ *  - str (String): value in a string
+ *  - base (Number): base to interpret `str` in
+ *  - num (Integer): numerator
+ *  - den (Integer): denominator
+ *
+ *  The `str` can be an integer like "41" or a fraction like "41/152". The
+ *  fraction must be in canonical form, or if not then
+ *  [[gmp.Rational#canonicalize]] must be called.
+ *
+ *  The numerator and optional denominator are parsed the same as in
+ *  [[gmp.Integer constructor]]. White space is allowed in the string, and is
+ *  simply ignored. The base can vary from 2 to 62, or if base is 0 then the
+ *  leading characters are used: "0x" or "0X" for hex, "0b" or "0B" for binary,
+ *  "0" for octal, or decimal otherwise. Note that this is done separately for
+ *  the numerator and denominator, so for instance "0xEF/100" is "239/100",
+ *  whereas "0xEF/0x100" is "239/256".
+ **/
+
+/**
+ *  gmp.Rational#canonicalize() -> undefined
+ *
+ *  Put the rational into canonical form by removing any factors that are
+ *  common to the numerator and denominator, and make the denominator positive.
+ **/
+
+/** deprecated
+ *  gmp.Rational#get_num() -> gmp.Integer
+ *
+ *  Returns the numerator
+ **/
+
+/** deprecated
+ *  gmp.Rational#get_den() -> gmp.Integer
+ *
+ *  Returns the denominator
+ **/
+
+
+/**
+ *  class gmp.Float
+ *    includes gmp.Base
+ *
+ *  Provides a bignum floating point class. See [gmp's mpf_class][mpf_class] for the
+ *  C++ API that is wrapped.
+ *
+ *  [mpz_class]: http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats
+ **/
+
+/**
+ *  gmp.Float#fitsInt() -> Boolean
+ *
+ *  Checks if the value fits into an integer.
+ **/
+
+/**
+ *  gmp.Float#getInt() -> Integer
+ *
+ *  Returns the value as an integer.
+ **/
+
+/** deprecated
+ *  gmp.Float#get_prec() -> Integer
+ *
+ *  Return the current precision of `this`, in number of bits.
+ **/
+
+/** deprecated
+ *  gmp.Float#set_prec(prec) -> undefined
+ *  - prec (Integer): desired minimum precision.
+ *
+ *  Set the precision of `this` to be at least `prec` bits. The value will be
+ *  truncated to the new precision.
+ **/
+
+/**
+ *  gmp.Float#sqrt() -> gmp.Float
+ *
+ *  Returns the square root of `this`.
+ **/
+
+/**
+ *  gmp.Float#ceil() -> gmp.Float
+ *
+ *  Returns the smallest integral value not less than `this`.
+ **/
+
+/**
+ *  gmp.Float#floor() -> gmp.Float
+ *  Returns the largest integral value not greater than `this`.
+ **/
+
+/**
+ *  gmp.Float#trunc() -> gmp.Float
+ *
+ *  Return the integral value nearest to but not larger in magnitude then `this`.
+ **/
+
