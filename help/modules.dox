@@ -49,14 +49,6 @@ THE SOFTWARE.
  */
 
 /**
- * @defgroup create_function Creating functions
- *
- * Functions for creating native functions.
- *
- * @see functions
- */
-
-/**
  * @defgroup gc Garbage collection
  *
  * Garbage collection and related things.
