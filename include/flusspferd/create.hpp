@@ -274,7 +274,25 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = <b>array</b></dt>
- * <dd>Header: flusspferd/create/object.hpp</dd>
+ * <dd>Header: flusspferd/create/array.hpp<br><br>
+ * <dl>
+ * <dt>flusspferd::param::_length</dt>
+ * <dd>The length of the array. The elements will be <tt>undefined</tt>.<br>
+ *     <em>Default</em>: <tt>0</tt>.
+ * <dt>flusspferd::param::_contents</dt>
+ * <dd>The contents of the array. Must be a valid
+ *     <a href="http://www.boost.org/doc/libs/1_40_0/libs/range/index.html"
+ *     >Boost.Range</a> (all STL containers fulfill this requirement). For
+ *     static contents, we recommend
+ *     <a href="http://www.boost.org/doc/libs/1_40_0/libs/assign/doc/index.html#list_of"
+ *     >boost::assign::list_of</a>.</dd>
+ * </dd>
+ * </dl>
+ * <br><em>Parameter order</em>:
+ * First parameter is deduced: Integer values are flusspferd::param::_length,
+ * otherwise it's flusspferd::param::_contents.
+ * <br><br>
+ * </dd>
  * <dt><tt>Class</tt> = <b>function</b> / <b>method</b></dt>
  * <dd>Header: flusspferd/create/function.hpp</dd>
  * <dt><tt>Class</tt> = class derived from <b>native_object_base</b></dt>
