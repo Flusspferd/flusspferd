@@ -25,6 +25,11 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
+#include "flusspferd/create/native_object.hpp"
+#include "flusspferd/create/native_function.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/native_object_base.hpp"
@@ -37,9 +42,14 @@ THE SOFTWARE.
 
 using namespace flusspferd;
 
-object flusspferd::create_object(object const &proto) {
+object flusspferd::detail::create_object(
+  object const &proto, object const &parent)
+{
   JSObject *o = JS_NewObject(
-      Impl::current_context(), 0, Impl::get_object(proto), 0);
+      Impl::current_context(),
+      0,
+      Impl::get_object(proto),
+      Impl::get_object(parent));
 
   if (!o)
     throw exception("Could not create object");
@@ -47,28 +57,31 @@ object flusspferd::create_object(object const &proto) {
   return Impl::wrap_object(o);
 }
 
-array flusspferd::create_array() {
-  JSObject *o = JS_NewArrayObject(Impl::current_context(), 0, 0);
+array flusspferd::detail::create_length_array(std::size_t length) {
+  JSObject *o = JS_NewArrayObject(Impl::current_context(), length, 0);
   if (!o)
     throw exception("Could not create array");
 
   return object(Impl::wrap_object(o));
 }
 
-object flusspferd::detail::create_native_object(object const &proto) {
-  return native_object_base::do_create_object(proto);
+object flusspferd::detail::create_native_object(
+  object const &proto, object const &parent)
+{
+  return native_object_base::do_create_object(proto, parent);
 }
 
-object flusspferd::detail::create_native_enumerable_object(object const &proto) {
-  return native_object_base::do_create_enumerable_object(proto);
+object flusspferd::detail::create_native_enumerable_object(
+  object const &proto, object const &parent)
+{
+  return native_object_base::do_create_enumerable_object(proto, parent);
 }
 
-function flusspferd::create_function(
-    std::string const &name,
-    unsigned n_args,
-    std::vector<std::string> argnames,
+function flusspferd::detail::create_source_function(
+    flusspferd::string const &name,
+    std::vector<flusspferd::string> const &argnames,
     flusspferd::string const &body,
-    std::string const &file,
+    flusspferd::string const &file,
     unsigned line)
 {
   JSContext *cx = Impl::current_context();
@@ -76,7 +89,7 @@ function flusspferd::create_function(
   std::vector<char const *> argnames_c;
   argnames_c.reserve(argnames.size());
 
-  for (std::vector<std::string>::const_iterator it = argnames.begin();
+  for (std::vector<flusspferd::string>::const_iterator it = argnames.begin();
       it != argnames.end();
       ++it)
     argnames_c.push_back(it->c_str());
@@ -86,7 +99,7 @@ function flusspferd::create_function(
         cx,
         0,
         name.c_str(),
-        n_args,
+        argnames_c.size(),
         &argnames_c[0],
         body.data(),
         body.length(),
@@ -99,21 +112,12 @@ function flusspferd::create_function(
   return Impl::wrap_function(fun);
 }
 
-function flusspferd::create_native_function(native_function_base *ptr) {
+
+function flusspferd::detail::create_native_function(native_function_base *ptr) {
   try {
     return ptr->create_function();
   } catch (...) {
     delete ptr;
     throw;
   }
-}
-
-function flusspferd::create_native_function(
-    object const &o_, native_function_base *ptr)
-{
-  root_object o(o_);
-  root_function fun(create_native_function(ptr));
-  if (!o.is_null())
-    o.define_property(ptr->name().c_str(), fun, dont_enumerate);
-  return fun;
 }

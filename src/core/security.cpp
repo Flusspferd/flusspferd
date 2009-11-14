@@ -25,14 +25,15 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/security.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include "flusspferd/local_root_scope.hpp"
 
 using namespace flusspferd;
 
 security &security::create(object container) {
-  security &obj = create_native_object<security>(
-      current_context().prototype(""));
+  security &obj = flusspferd::create<security>(
+      param::_prototype = flusspferd::create<object>().prototype());
   root_object root_obj(obj);
 
   container.define_property("$security", obj);

@@ -26,14 +26,17 @@ THE SOFTWARE.
 
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include <iconv.h>
 #include <errno.h>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
+#include <boost/ref.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 using namespace boost;
 using namespace flusspferd;
+using namespace fusion;
 
 void flusspferd::load_encodings_module(object container) {
   object exports = container.get_property_object("exports");
@@ -41,17 +44,17 @@ void flusspferd::load_encodings_module(object container) {
   // Load the binary module
   container.call("require", "binary");
 
-  create_native_function(
-    exports,
-    "convertToString", &encodings::convert_to_string);
+  create<function>(
+    "convertToString", &encodings::convert_to_string,
+    param::_container = exports);
 
-  create_native_function(
-    exports,
-    "convertFromString", &encodings::convert_from_string);
+  create<function>(
+    "convertFromString", &encodings::convert_from_string,
+    param::_container = exports);
 
-  create_native_function(
-    exports,
-    "convert", &encodings::convert);
+  create<function>(
+    "convert", &encodings::convert,
+    param::_container = exports);
 
   load_class<encodings::transcoder>(exports);
 }
@@ -69,7 +72,8 @@ static char const * const native_charset = bom_le == bom_native
 flusspferd::string
 encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
   transcoder &trans =
-    create_native_object<transcoder>(object(), enc_, native_charset);
+    create<transcoder>(
+      vector2<std::string const&, std::string const&>(enc_, native_charset));
   root_object root_obj(trans);
 
   trans.push_accumulate(source_binary);
@@ -84,13 +88,14 @@ encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
 object encodings::convert_from_string(std::string const &enc, string const &str)
 {
   transcoder &trans =
-    create_native_object<transcoder>(object(), native_charset, enc);
+    create<transcoder>(
+      vector2<std::string const&, std::string const&>(native_charset, enc));
   root_object root_obj(trans);
 
-  binary &source_binary = create_native_object<byte_string>(
-    object(),
-    reinterpret_cast<binary::element_type const *>(str.data()),
-    str.size() * sizeof(char16_t));
+  binary &source_binary = create<byte_string>(
+    vector2<binary::element_type const *, std::size_t>(
+      reinterpret_cast<binary::element_type const*>(str.data()),
+      str.size() * sizeof(char16_t)));
   root_object root_obj2(source_binary);
 
   trans.push_accumulate(source_binary);
@@ -101,8 +106,7 @@ object encodings::convert_from_string(std::string const &enc, string const &str)
 object encodings::convert(
   std::string const &from_, std::string const &to_, binary &source_binary)
 {
-  transcoder &trans =
-    create_native_object<transcoder>(object(), from_, to_);
+  transcoder &trans = create<transcoder>(make_vector(cref(from_), cref(to_)));
   root_object root_obj(trans);
 
   trans.push_accumulate(source_binary);
@@ -231,10 +235,7 @@ binary &encodings::transcoder::get_output_binary(
     output_
     ? static_cast<binary&>(output_.get())
     : static_cast<binary&>(
-        create_native_object<byte_string>(
-          object(),
-          (byte_string::element_type*)0,
-          0));
+        create<byte_string>(vector2<binary::element_type*, std::size_t>(0,0)));
 }
 
 

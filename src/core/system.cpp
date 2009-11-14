@@ -26,9 +26,12 @@ THE SOFTWARE.
 
 #include "flusspferd/system.hpp"
 #include "flusspferd/object.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
+#include "flusspferd/create/native_object.hpp"
 #include "flusspferd/version.hpp"
 #include "flusspferd/io/stream.hpp"
+#include <boost/fusion/container/generation/make_vector.hpp>
 #include <iostream>
 #include <ostream>
 
@@ -43,6 +46,7 @@ extern char** environ;
 # endif
 
 using namespace flusspferd;
+namespace fusion = boost::fusion;
 
 // The class for sys.env
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -78,32 +82,32 @@ void flusspferd::load_system_module(object &context) {
 
   exports.define_property(
     "stdout",
-    create_native_object<io::stream>(object(), std::cout.rdbuf()),
+    create<io::stream>(fusion::make_vector(std::cout.rdbuf())),
     read_only_property | permanent_property);
 
   exports.define_property(
     "stderr",
-    create_native_object<io::stream>(object(), std::cerr.rdbuf()),
+    create<io::stream>(fusion::make_vector(std::cerr.rdbuf())),
     read_only_property | permanent_property);
 
   exports.define_property(
     "stdin",
-    create_native_object<io::stream>(object(), std::cin.rdbuf()),
+    create<io::stream>(fusion::make_vector(std::cin.rdbuf())),
     read_only_property | permanent_property);
 
 
-  load_class<environment>(create_object());
+  load_class<environment>(create<object>());
   call_context x;
 
   exports.define_property(
     "env",
-    create_native_object<environment>(object(), boost::ref(x)),
+    create<environment>(fusion::vector1<call_context&>(x)),
     read_only_property | permanent_property
   );
 
   exports.define_property(
     "args",
-    create_array(),
+    create<array>(),
     read_only_property | permanent_property);
 
   exports.define_property(

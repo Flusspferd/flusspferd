@@ -76,7 +76,7 @@ public:
 
   template<typename T>
   Float &create_float(T mp) const {
-    return flusspferd::create_native_object<Float>(object(), mpf_class(mp));
+    return flusspferd::create<Float>(boost::fusion::vector1<mpf_class>(mp));
   }
 
   // this should be external but js doesn't support overloading!

@@ -24,40 +24,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/property_iterator.hpp"
-#include "flusspferd/object.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/value_io.hpp"
-#include "test_environment.hpp"
+#ifndef FLUSSPFERD_CREATE_OBJECT_HPP
+#define FLUSSPFERD_CREATE_OBJECT_HPP
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::property_iterator) //FIXME?
+#include "../create.hpp"
 
-BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
+namespace flusspferd {
 
-BOOST_AUTO_TEST_CASE( property_iterator ) {
-  flusspferd::object obj = flusspferd::create<flusspferd::object>();
-  flusspferd::value const name(flusspferd::string("foobar"));
-  flusspferd::value const v(409);
-  obj.set_property(name, v);
+#ifndef IN_DOXYGEN
 
-  flusspferd::property_iterator i = obj.begin();
-  BOOST_CHECK_EQUAL(i, obj.begin());
-  flusspferd::property_iterator j = obj.end();
-  BOOST_CHECK_EQUAL(j, obj.end());
-  flusspferd::property_iterator k;
-  k = j;
-  BOOST_CHECK_EQUAL(k, j);
-  flusspferd::property_iterator l = i;
-  BOOST_CHECK_EQUAL(l, i);
-  k.swap(l);
-  BOOST_CHECK_EQUAL(k, i);
-  BOOST_CHECK_EQUAL(l, j);
+namespace detail {
+  object create_object(object const &prototype, object const &parent);
 
-  BOOST_CHECK_NE(*i, v);
-  BOOST_CHECK_EQUAL(*i, name);
+  template<>
+  struct create_traits<flusspferd::object, void> {
+    typedef flusspferd::object result_type;
 
-  BOOST_CHECK_EQUAL(++i, j);
+    typedef boost::parameter::parameters<
+        param::tag::prototype,
+        param::tag::parent,
+        container_spec,
+        name_spec,
+        attributes_spec
+      > parameters;
+
+    static result_type create() {
+      return create_object(object(), object());
+    }
+
+    template<typename ArgPack>
+    static result_type create(ArgPack const &arg) {
+      return create_object(
+        arg[param::_prototype | object()],
+        arg[param::_parent | object()]);
+    }
+  };
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+#endif //IN_DOXYGEN
+
+}
+
+#endif

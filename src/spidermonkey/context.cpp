@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
 #include "flusspferd/spidermonkey/context.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
@@ -185,7 +185,7 @@ context context::create() {
   current_context_scope scope(c);
 
   // add standard prototype (for e.g. native_object_base)
-  object std_proto = create_object().prototype();
+  object std_proto = flusspferd::create<object>().prototype();
   c.add_prototype("", std_proto);
 
   return c;

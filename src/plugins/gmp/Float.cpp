@@ -69,7 +69,7 @@ namespace multi_precision {
   object Float::get_string() /*const*/ {
     mp_exp_t expo;
     std::string str = mp.get_str(expo);
-    object x = create_object();
+    object x = create<object>();
     x.set_property("string", value(str));
     x.set_property("exp", value(expo));
     return x;
@@ -78,7 +78,7 @@ namespace multi_precision {
   object Float::get_string_base(int base) /*const*/ {
     mp_exp_t expo;
     std::string str = mp.get_str(expo, base);
-    object x = create_object();
+    object x = create<object>();
     x.set_property("string", value(str));
     x.set_property("exp", value(expo));
     return x;
