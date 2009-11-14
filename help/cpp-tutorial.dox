@@ -145,7 +145,7 @@ obj.define_property("prop", initial_value, attr);
  *
  * @note Both @p getter_function and @p setter_function have to be of type
  *       flusspferd::function, which you can create with one of
- *       @ref create_function "these functions".
+ *       @ref create "these functions".
  *
  * And, among many other things, you can delete properties altogether:
  *
@@ -186,12 +186,12 @@ obj.delete_property("prop");
  * root values once the local_root_scope is no longer in scope.
  *
  * @code
-flusspferd::object o1 = flusspferd::create_object();
+flusspferd::object o1 = flusspferd::create<flusspferd::object>();
 
 {
     flusspferd::local_root_scope scope;
 
-    flusspferd::object o2 = flusspferd::create_object();
+    flusspferd::object o2 = flusspferd::create<flusspferd::object>();
 
     flusspferd::gc();
 
@@ -252,7 +252,7 @@ void my_function(call_context &x) {
 }
 @endcode
  *
- * @see @ref create_function
+ * @see @ref create
  *
  * Next: \ref cpp-tutorial-classes
  *
