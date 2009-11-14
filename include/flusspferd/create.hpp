@@ -353,7 +353,8 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * </dd>
  * </dl>
  * <br><em>Parameter order</em>:
- * flusspferd::param::_prototype, flusspferd::param::_parent
+ * flusspferd::param::_prototype, flusspferd::param::_parent.
+ * <br><em>Result type</em>: flusspferd::object.
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = <b>array</b></dt>
@@ -374,6 +375,7 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <br><em>Parameter order</em>:
  * First parameter is deduced: Integer values are flusspferd::param::_length,
  * otherwise it's flusspferd::param::_contents.
+ * <br><em>Result type</em>: flusspferd::array.
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = <b>function</b> / <b>method</b></dt>
@@ -427,6 +429,7 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  *     flusspferd::param::_function, flusspferd::param::_argument_names,
  *     flusspferd::param::_file, flusspferd::param::_line,
  *     flusspferd::param::_signature, flusspferd::param::_arity.
+ * <br><em>Result type</em>: flusspferd::function.
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = class derived from <b>native_object_base</b></dt>
@@ -450,6 +453,7 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * </dl>
  * <br><em>Parameter order</em>: flusspferd::param::_arguments,
  *     flusspferd::param::_prototype, flusspferd::param::_parent.
+ * <br><em>Result type</em>: <tt>Class &</tt>.
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = class derived from <b>native_function_base</b></dt>
@@ -462,6 +466,7 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  *     >fusion sequence</a>.<br>
  *    <em>Default</em>: <tt>boost::fusion::vector0()</tt>
  * </dl>
+ * <br><em>Result type</em>: flusspferd::function.
  * </dd>
  * </dl>
  *
