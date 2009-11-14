@@ -294,7 +294,58 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <br><br>
  * </dd>
  * <dt><tt>Class</tt> = <b>function</b> / <b>method</b></dt>
- * <dd>Header: flusspferd/create/function.hpp</dd>
+ * <dd>Header: flusspferd/create/function.hpp<br><br>
+ * <dl>
+ * <dt>flusspferd::param::_name</dt>
+ * <dd>The function name.<br>
+ *     <em>Default</em>: flusspferd::string()
+ * </dd>
+ * <dt>flusspferd::param::_function</dt>
+ * <dd>The %function source code or %function pointer or member %function
+ *     pointer (method only) or functor / boost::function.<br>
+ *     <tt>void ()(call_context &)</tt> and <tt>void (T::*)(call_context &)</tt>
+ *     are handled specially: The %function call information is all passed in
+ *     the call_context parameter, as is the return %value slot.<br>
+ *     <em>Default</em>: <tt>flusspferd::string()</tt>
+ * </dd>
+ * <dt>flusspferd::param::_argument_names</dt>
+ * <dd>For Javascript source functions only.<br>
+ *     The names of the %function %arguments. Must be compatible to Boost.Range.<br>
+ *     <em>Default</em>: <tt>std::vector<flusspferd::string>()</tt>
+ * </dd>
+ * <dt>flusspferd::param::_file</dt>
+ * <dd>For Javascript source functions only.<br>
+ *     The name of the source file from which the function comes.<br>
+ *     <em>Default</em>: <tt>flusspferd::string()</tt>
+ * </dd>
+ * <dt>flusspferd::param::_line</dt>
+ * <dd>For Javascript source functions only.<br>
+ *     The line number at which the function appears in the source file.<br>
+ *     <em>Default</em>: <tt>0</tt>
+ * </dd>
+ * <dt>flusspferd::param::_signature</dt>
+ * <dd>For native functions only.<br>
+ *     The %function signature type. Use flusspferd::param::type<Signature>().
+ *     The %function will be converted to boost::function<Signature> first.<br>
+ *     <em>Default</em>: If unspecified, the signature will be determined
+ *     automatically, if possible.
+ * </dd>
+ * <dt>flusspferd::param::_arity</dt>
+ * <dd>The function arity.<br>
+ *     Only used when the function arity can not otherwise be determined.<br>
+ *     <em>Default</em>: <tt>0</tt>
+ * </dd>
+ * </dl>
+ * <br>The difference between flusspferd::function and flusspferd::method is
+ *     that, for flusspferd::method, the Javascript 'this' object is passed as
+ *     the first C++ function parameter. For source functions, both have the
+ *     same effect.
+ * <br><br><em>Parameter order</em>: flusspferd::param::_name,
+ *     flusspferd::param::_function, flusspferd::param::_argument_names,
+ *     flusspferd::param::_file, flusspferd::param::_line,
+ *     flusspferd::param::_signature, flusspferd::param::_arity.
+ * <br><br>
+ * </dd>
  * <dt><tt>Class</tt> = class derived from <b>native_object_base</b></dt>
  * <dd>Header: flusspferd/create/native_object.hpp</dd>
  * <dt><tt>Class</tt> = class derived from <b>native_function_base</b></dt>
