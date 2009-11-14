@@ -53,6 +53,7 @@ class function;
 class native_function_base;
 
 namespace param {
+#ifndef IN_DOXYGEN
   BOOST_PARAMETER_NAME(container)
   BOOST_PARAMETER_NAME(name)
   BOOST_PARAMETER_NAME(attributes)
@@ -70,8 +71,30 @@ namespace param {
   BOOST_PARAMETER_NAME(arity)
 
   BOOST_PARAMETER_NAME(arguments)
+#else
+  unspecified_parameter_keyword_type _container;
+  unspecified_parameter_keyword_type _name;
+  unspecified_parameter_keyword_type _attributes;
+  unspecified_parameter_keyword_type _length;
+  unspecified_parameter_keyword_type _contents;
+  unspecified_parameter_keyword_type _prototype;
+  unspecified_parameter_keyword_type _parent;
+  unspecified_parameter_keyword_type _argument_names;
+  unspecified_parameter_keyword_type _function;
+  unspecified_parameter_keyword_type _file;
+  unspecified_parameter_keyword_type _line;
+  unspecified_parameter_keyword_type _signature;
+  unspecified_parameter_keyword_type _arity;
+  unspecified_parameter_keyword_type _arguments;
+#endif
 
-  /* For passing types. Like this: _param = param::type<int>() */
+  /**
+   * For passing types as function parameters.
+   *
+   * @code
+   _param = flusspferd::param::type<int>()
+   @endcode
+   */
   template<typename T>
   struct type {
     typedef T parameter;
@@ -224,15 +247,21 @@ flusspferd::array a = flusspferd::create< flusspferd::array >(boost::assign::lis
  * <dt><b>Common parameters:</b></dt>
  * <dd>
  * <dl>
- * <dt><tt>flusspferd::param::_container</tt></dt>
+ * <dt>flusspferd::param::_container</dt>
  * <dd>The container object for storing the created %object.</dd>
- * <dt><tt>flusspferd::param::_name</tt></dt>
+ * <dt>flusspferd::param::_name</dt>
  * <dd>The name of the property to be used for storing the %object.</dd>
- * <dt><tt>flusspferd::param::_attributes</tt></dt>
+ * <dt>flusspferd::param::_attributes</dt>
  * <dd>Attributes to be used for creating the property.<br>
  *     <em>Default</em>: flusspferd::dont_enumerate</dt>
  * </dl>
  * </dd>
+ * <dt><b>object</b></dt>
+ * <dd>TODO</dd>
+ * <dt><b>array</b></dt>
+ * <dd>TODO</dd>
+ * <dt><b>function</b> / <b>method</b></dt>
+ * <dd>TODO</dd>
  * </dl>
  *
  * @ingroup create

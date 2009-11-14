@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+#ifndef IN_DOXYGEN
+
 namespace detail {
   object create_object(object const &prototype, object const &parent);
 
@@ -58,6 +60,8 @@ namespace detail {
     }
   };
 }
+
+#endif //IN_DOXYGEN
 
 }
 
