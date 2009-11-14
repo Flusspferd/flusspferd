@@ -29,6 +29,11 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
+#include "flusspferd/create/native_object.hpp"
+#include "flusspferd/create/native_function.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/binary.hpp"
@@ -36,6 +41,7 @@ THE SOFTWARE.
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 #include <sstream>
 
 #ifdef WIN32
@@ -47,10 +53,11 @@ THE SOFTWARE.
 
 
 using namespace flusspferd;
+using namespace flusspferd::param;
 
 namespace algo = boost::algorithm;
 namespace fs = boost::filesystem;
-
+namespace fusion = boost::fusion;
 
 static fs::path make_dsoname(std::string const &id);
 
@@ -78,24 +85,24 @@ require::~require() {}
 
 // Static helper method to actually create |require| function objects
 object require::create_require() {
-  root_object fn((create_native_functor_function<require>(object())));
+  root_object fn(create<require>());
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
   const property_flag perm_ro = permanent_property | read_only_property;
 
-  root_object module_cache(create_object());
+  root_object module_cache(create<object>());
   r->module_cache = module_cache;
 
-  root_array paths(create_array());
+  root_array paths(create<array>());
   r->paths = paths;
 
-  root_object alias(create_object());
+  root_object alias(create<object>());
   r->alias = alias;
 
-  root_object preload(create_object());
+  root_object preload(create<object>());
   r->preload = preload;
 
-  root_object main(create_object());
+  root_object main(create<object>());
   r->main = main;
 
   fn.define_property("module_cache", module_cache, perm_ro);
@@ -111,7 +118,7 @@ object require::create_require() {
 // different require.id property
 object require::new_require_function(string const &id) {
   // Use the copy ctor form to share the JS state variables.
-  root_object new_req((create_native_functor_function<require>(object(), *this)));
+  root_object new_req(create<require>(fusion::vector1<require&>(*this)));
   new_req.set_prototype(*this);
 
   new_req.define_property("id", id, permanent_property|read_only_property);
@@ -184,19 +191,13 @@ string require::load_module_text(fs::path filename) {
 
   flusspferd::gc();//FIXME
 
-  io::file &f = create_native_object<io::file>(
-    object(),
-    filename.string().c_str(),
-    read_only
-  );
+  io::file &f = create<io::file>(
+    fusion::vector2<char const*, string>(filename.string().c_str(), read_only));
   root_object f_o(f);
 
   // buffer blob
-  byte_array &blob = create_native_object<byte_array>(
-    object(),
-    static_cast<binary::element_type*>(0),
-    0
-  );
+  byte_array &blob = create<byte_array>(
+    fusion::vector2<binary::element_type*, std::size_t>(0, 0));
   root_object b_o(blob);
   binary::vector_type &buf = blob.get_data();
 
@@ -238,10 +239,13 @@ void require::require_js(fs::path filename, std::string const &id, object export
   argnames.push_back("require");
   argnames.push_back("module");
 
-  std::string fname(filename.string());
-  root_function fn(::flusspferd::create_function(
-      fname, argnames.size(), argnames,
-      module_text, fname.c_str(), 1ul));
+  std::string fname = filename.string();
+  root_function fn(flusspferd::create<flusspferd::function>(
+      _name = fname,
+      _argument_names = argnames,
+      _function = module_text,
+      _file = fname.c_str(),
+      _line = 1ul));
 
   root_object module;
 
@@ -250,7 +254,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
     module = main;
   }
   else {
-    module = create_object();
+    module = create<object>();
     module.set_property("uri", id);
     module.set_property("id", id);
   }
@@ -383,10 +387,10 @@ object require::load_top_level_module(std::string &id) {
   security &sec = security::get();
 
   root_object classes_object(flusspferd::global());
-  root_object ctx(flusspferd::create_object(classes_object));
+  root_object ctx(flusspferd::create<object>(classes_object));
   ctx.set_parent(classes_object);
 
-  root_object exports(create_object());
+  root_object exports(flusspferd::create<object>());
 
   ctx.define_property(
     "exports",
@@ -489,7 +493,7 @@ object require::load_absolute_js_file(fs::path path, std::string &id) {
   if (sec.check_path(path.string(), security::READ) &&
       fs::exists(path))
   {
-    root_object exports(create_object());
+    root_object exports(flusspferd::create<object>());
 
     module_cache.set_property(id, exports);
     require_js(path, id, exports);

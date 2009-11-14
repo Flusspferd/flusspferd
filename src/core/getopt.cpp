@@ -27,7 +27,9 @@ THE SOFTWARE.
 #include "flusspferd/getopt.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/array.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/root.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
@@ -45,10 +47,21 @@ using namespace flusspferd;
 void flusspferd::load_getopt_module(object container) {
   object exports = container.get_property_object("exports");
 
-  flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
-  flusspferd::create_native_function(exports, "getopt_help", &flusspferd::getopt_help);
-  flusspferd::create_native_function(exports, "getopt_man", &flusspferd::getopt_man);
-  flusspferd::create_native_function(exports, "getopt_bash", &flusspferd::getopt_bash);
+  flusspferd::create<flusspferd::function>(
+    "getopt", &flusspferd::getopt,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_help", &flusspferd::getopt_help,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_man", &flusspferd::getopt_man,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_bash", &flusspferd::getopt_bash,
+    param::_container = exports);
 }
 
 namespace {
@@ -138,7 +151,7 @@ struct optspec {
       throw exception(("Unknown option " + name).c_str());
 
     if (!result.has_property(name))
-      result.set_property(name, create_array());
+      result.set_property(name, flusspferd::create<array>());
     array arr(result.get_property_object(name));
 
     if (eq == std::string::npos) {
@@ -173,7 +186,7 @@ struct optspec {
         throw exception(("Unknown option " + name).c_str());
 
       if (!result.has_property(name))
-        result.set_property(name, create_array());
+        result.set_property(name, flusspferd::create<array>());
       array arr(result.get_property_object(name));
       
       if (data->argument != item_type::none) {
@@ -214,11 +227,11 @@ object flusspferd::getopt(
 
   optspec spec(spec_, arguments);
 
-  spec.result = create_object();
+  spec.result = create<object>();
 
   flusspferd::gc();//FIXME
 
-  array result_arguments = create_array();
+  array result_arguments = flusspferd::create<array>();
   spec.result.set_property("_", result_arguments);
 
   flusspferd::gc();//FIXME

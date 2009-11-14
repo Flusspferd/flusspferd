@@ -24,40 +24,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/property_iterator.hpp"
-#include "flusspferd/object.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/value_io.hpp"
-#include "test_environment.hpp"
+#ifndef FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
+#define FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
 
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::property_iterator) //FIXME?
+#include "../create.hpp"
+#include <boost/fusion/functional/invocation/invoke.hpp>
 
-BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
+namespace flusspferd {
 
-BOOST_AUTO_TEST_CASE( property_iterator ) {
-  flusspferd::object obj = flusspferd::create<flusspferd::object>();
-  flusspferd::value const name(flusspferd::string("foobar"));
-  flusspferd::value const v(409);
-  obj.set_property(name, v);
+#ifndef IN_DOXYGEN
 
-  flusspferd::property_iterator i = obj.begin();
-  BOOST_CHECK_EQUAL(i, obj.begin());
-  flusspferd::property_iterator j = obj.end();
-  BOOST_CHECK_EQUAL(j, obj.end());
-  flusspferd::property_iterator k;
-  k = j;
-  BOOST_CHECK_EQUAL(k, j);
-  flusspferd::property_iterator l = i;
-  BOOST_CHECK_EQUAL(l, i);
-  k.swap(l);
-  BOOST_CHECK_EQUAL(k, i);
-  BOOST_CHECK_EQUAL(l, j);
+namespace detail {
+  template<typename Class>
+  struct create_traits<
+    Class,
+    typename boost::enable_if<
+      boost::is_base_of<native_function_base, Class>
+    >::type
+  >
+  {
+    typedef function result_type;
 
-  BOOST_CHECK_NE(*i, v);
-  BOOST_CHECK_EQUAL(*i, name);
+    typedef boost::parameter::parameters<
+      param::tag::arguments,
+      name_spec,
+      container_spec,
+      attributes_spec
+    > parameters;
 
-  BOOST_CHECK_EQUAL(++i, j);
+    static result_type create() {
+      return create_native_function(new Class);
+    }
+
+    template<typename ArgPack>
+    static result_type create(ArgPack const &args) {
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::arguments,
+          boost::fusion::vector0
+        >::type input_arguments_type;
+
+      input_arguments_type input_arguments(
+        args[param::_arguments | boost::fusion::vector0()]);
+
+      Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
+
+      return create_native_function(&self);
+    }
+  };
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+#endif //IN_DOXYGEN
+
+}
+
+#endif

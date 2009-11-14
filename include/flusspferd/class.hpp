@@ -28,13 +28,16 @@ THE SOFTWARE.
 #define FLUSSPFERD_CLASS_HPP
 
 #include "native_function_base.hpp"
-#include "create.hpp"
+#include "create/object.hpp"
+#include "create/native_object.hpp"
+#include "create/native_function.hpp"
 #include "init.hpp"
 #include "local_root_scope.hpp"
 #include <boost/mpl/size_t.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/ref.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 #include <sstream>
 
 namespace flusspferd {
@@ -58,9 +61,9 @@ struct class_constructor : native_function_base {
   {}
 
   void call(call_context &x) {
-    x.result = flusspferd::create_native_object<T>(
-        x.function.get_property_object("prototype"),
-        boost::ref(x));
+    x.result = flusspferd::create<T>(
+        boost::fusion::make_vector(boost::ref(x)),
+        x.function.get_property_object("prototype"));
   }
 };
 
@@ -95,7 +98,10 @@ void load_class(
       || root_object(old_to_string.to_object()).get_property("auto").to_boolean())
   {
     root_object fn(
-      create_native_function(prototype, "toString", &default_to_string<T>));
+      flusspferd::create<function>(
+        "toString",
+        &default_to_string<T>,
+        param::_container = prototype));
     fn.set_property("auto", true);
   }
 
@@ -104,7 +110,10 @@ void load_class(
       || root_object(old_to_source.to_object()).get_property("auto").to_boolean())
   {
     root_object fn(
-      create_native_function(prototype, "toSource", &default_to_source<T>));
+      flusspferd::create<function>(
+        "toSource",
+        &default_to_source<T>,
+        param::_container = prototype));
     fn.set_property("auto", true);
   }
 
@@ -187,7 +196,7 @@ struct class_info {
    * @return Return the newly created prototype object.
    */
   static object create_prototype() {
-    return create_object();
+    return create<object>();
   }
 };
 
@@ -215,9 +224,9 @@ object load_class(
 
   if (constructor.is_null()) {
     constructor =
-      create_native_functor_function<
-          detail::class_constructor<T> 
-        >(flusspferd::object(), arity, full_name);
+      create<detail::class_constructor<T> >(
+        boost::fusion::make_vector(arity, full_name));
+
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }
@@ -248,9 +257,9 @@ object load_class(
   if (constructor.is_null()) {
     char const *full_name = T::class_info::full_name();
     constructor =
-      create_native_functor_function<
-          detail::unconstructible_class_constructor
-        >(flusspferd::object(), full_name);
+      create<detail::unconstructible_class_constructor>(
+        boost::fusion::make_vector(full_name));
+
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
   }

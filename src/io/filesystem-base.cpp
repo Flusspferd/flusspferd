@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
 
 #ifdef WIN32
 #include <stdio.h>
@@ -49,6 +50,7 @@ using namespace flusspferd;
 using boost::format;
 namespace fs_base =  flusspferd::io::fs_base;
 namespace fs = boost::filesystem;
+namespace fusion = boost::fusion;
 
 // owner: No such file or directory "foo/bar"
 const format error_fmt("%1%: %2% \"%3%\"");
@@ -60,49 +62,49 @@ const format error_sec("%1%: security deined operation on \"%2%\"");
 void flusspferd::load_filesystem_base_module(object container) {
   object exports = container.get_property_object("exports");
 
-  create_native_function(exports, "rawOpen", &fs_base::raw_open);
+  create<function>("rawOpen", &fs_base::raw_open, param::_container = exports);
 
-  create_native_function(exports, "canonical", &fs_base::canonical);
-  create_native_function(exports, "lastModified", &fs_base::last_modified);
-  create_native_function(exports, "touch", &fs_base::touch);
-  create_native_function(exports, "size", &fs_base::size);
+  create<function>("canonical", &fs_base::canonical, param::_container = exports);
+  create<function>("lastModified", &fs_base::last_modified, param::_container = exports);
+  create<function>("touch", &fs_base::touch, param::_container = exports);
+  create<function>("size", &fs_base::size, param::_container = exports);
 
 
-  create_native_function(exports, "exists", &fs_base::exists);
-  create_native_function(exports, "isFile", &fs_base::is_file);
-  create_native_function(exports, "isDirectory", &fs_base::is_directory);
-  create_native_function(exports, "isLink", &fs_base::is_link);
-  create_native_function(exports, "isReadable", &fs_base::is_readable);
-  create_native_function(exports, "isWriteable", &fs_base::is_writeable);
-  create_native_function(exports, "same", &fs_base::same);
+  create<function>("exists", &fs_base::exists, param::_container = exports);
+  create<function>("isFile", &fs_base::is_file, param::_container = exports);
+  create<function>("isDirectory", &fs_base::is_directory, param::_container = exports);
+  create<function>("isLink", &fs_base::is_link, param::_container = exports);
+  create<function>("isReadable", &fs_base::is_readable, param::_container = exports);
+  create<function>("isWriteable", &fs_base::is_writeable, param::_container = exports);
+  create<function>("same", &fs_base::same, param::_container = exports);
 
 
 #ifndef WIN32
-  create_native_function(exports, "link", &fs_base::link);
-  create_native_function(exports, "hardLink", &fs_base::hard_link);
-  create_native_function(exports, "readLink", &fs_base::read_link);
+  create<function>("link", &fs_base::link, param::_container = exports);
+  create<function>("hardLink", &fs_base::hard_link, param::_container = exports);
+  create<function>("readLink", &fs_base::read_link, param::_container = exports);
 #endif
 
 
-  create_native_function(exports, "makeDirectory", &fs_base::make_directory);
-  create_native_function(exports, "removeDirectory", &fs_base::remove_directory);
+  create<function>("makeDirectory", &fs_base::make_directory, param::_container = exports);
+  create<function>("removeDirectory", &fs_base::remove_directory, param::_container = exports);
 
 
 
-  create_native_function(exports, "move", &fs_base::move);
-  create_native_function(exports, "remove", &fs_base::remove);
+  create<function>("move", &fs_base::move, param::_container = exports);
+  create<function>("remove", &fs_base::remove, param::_container = exports);
 
 
 
-  create_native_function(exports, "workingDirectory", &fs_base::working_directory);
-  create_native_function(exports, "changeWorkingDirectory", &fs_base::change_working_directory);
+  create<function>("workingDirectory", &fs_base::working_directory, param::_container = exports);
+  create<function>("changeWorkingDirectory", &fs_base::change_working_directory, param::_container = exports);
 
 
 
-  create_native_function(exports, "list", &fs_base::list);
+  create<function>("list", &fs_base::list, param::_container = exports);
 
 #ifdef FLUSSPFERD_HAVE_POSIX
-  create_native_function(exports, "owner", &fs_base::owner);
+  create<function>("owner", &fs_base::owner, param::_container = exports);
 #endif
 }
 
@@ -111,7 +113,7 @@ object fs_base::raw_open(char const* name, value mode, value perms) {
   if (!perms.is_undefined_or_null())
     throw exception("rawOpen: permissions not yet supported");
 
-  return create_native_object<io::file>(object(), name, mode);
+  return create<io::file>(fusion::make_vector(name, mode));
 }
 
 string fs_base::canonical(std::string const &path) {
@@ -444,7 +446,7 @@ array fs_base::list(std::string const &dir) {
     throw exception(boost::str(format(error_sec) % "list" % dir));
   }
 
-  root_array ret(create_array());
+  root_array ret(create<array>());
 
   fs::basic_directory_iterator<fs::path> it(dir);
 

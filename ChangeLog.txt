@@ -12,6 +12,9 @@ Release 0.9
 - changed object to provide an id based API for properties (#155).
 - Boost 1.40 required.
 
+2009-10-26:
+- Replace create_* with create<> (#147).
+
 2009-10-25:
 - Better toString and toSource for native objects (#139).
 - Allow enabling the Tracemonkey JIT mode from C++ (#140).

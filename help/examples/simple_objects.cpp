@@ -7,7 +7,7 @@ int main() {
         flusspferd::context::create());
 
     // Create a simple object
-    flusspferd::root_object x(flusspferd::create_object());
+    flusspferd::root_object x(flusspferd::create<flusspferd::object>());
 
     // Set a property
     x.set_property("property", 1234);

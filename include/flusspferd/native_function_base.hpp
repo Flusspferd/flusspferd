@@ -41,6 +41,10 @@ struct call_context;
 class tracer;
 #endif
 
+namespace detail {
+  function create_native_function(native_function_base *);
+}
+
 /**
  * Native function base.
  *
@@ -69,7 +73,7 @@ protected:
 private:
   function create_function();
 
-  friend function create_native_function(native_function_base *);
+  friend function detail::create_native_function(native_function_base *);
 
 private:
   class impl;

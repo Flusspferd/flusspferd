@@ -67,7 +67,7 @@ public:
 
   template<typename T>
   static Rational &create_rational(T mp) {
-    return flusspferd::create_native_object<Rational>(object(), mpq_class(mp));
+    return flusspferd::create<Rational>(boost::fusion::vector1<mpq_class>(mp));
   }
 
   int sgn() /*const*/;
