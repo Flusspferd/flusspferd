@@ -92,14 +92,6 @@ struct exception : virtual std::runtime_error, virtual boost::exception {
   bool is_js_exception() const;
 
   /**
-   * This function is an alias for #is_js_exception
-   * Just for compatibility purpose.
-   *
-   * @deprecated Use #is_js_exception. This function will be removed in future releases.
-   */
-  bool empty() const { return is_js_exception(); }
-
-  /**
    * This function returns the error message.
    */
   virtual char const *what() const throw();
