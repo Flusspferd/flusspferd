@@ -97,7 +97,9 @@
  *  class gmp.Integer
  *    includes gmp.Base
  *
- *  Provides a bignum integer class. See [gmp's mpz_class][mpz_class] for the
+ *  Provides a bignum integer class.
+ *
+ *  See [gmp's mpz_class][mpz_class] if you are curious about the underlying
  *  C++ API that is wrapped.
  *
  *  [mpz_class]: http://gmplib.org/manual/C_002b_002b-Interface-Integers.html#C_002b_002b-Interface-Integers
@@ -146,8 +148,10 @@
  *    includes gmp.Base
  *
  *  Provides a bignum fractional class for more accurately representing numbers
- *  of the form `numerator/denominator`. See [gmp's mpq_class][mpq_class] for
- *  the C++ API that is wrapped.
+ *  of the form `numerator/denominator`.
+ *
+ *  See [gmp's mpq_class][mpq_class] if you are curious about the underlying
+ *  C++ API that is wrapped.
  *
  *  [mpq_class]: http://gmplib.org/manual/C_002b_002b-Interface-Rationals.html#C_002b_002b-Interface-Rationals
  **/
@@ -199,10 +203,11 @@
  *  class gmp.Float
  *    includes gmp.Base
  *
- *  Provides a bignum floating point class. See [gmp's mpf_class][mpf_class] for the
- *  C++ API that is wrapped.
+ *  Provides a bignum floating point class.
  *
- *  [mpz_class]: http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats
+ *  See [gmp's mpf_class][mpf_class] if you are curious about the underlying C++ API that is wrapped.
+ *
+ *  [mpf_class]: http://gmplib.org/manual/C_002b_002b-Interface-Floats.html#C_002b_002b-Interface-Floats
  **/
 
 /**

@@ -46,7 +46,7 @@
  *  ###### Options #
  *
  *  Key names in the `spec` object beginning with `[` are reserved for
- *  special/meta-data keys.  Currently the only such key is "[options]", which
+ *  special/meta-data keys.  Currently the only such key is "\[options\]", which
  *  knows about the following options:
  *
  *  - `stop-early` (`Boolean`): stop looking for options as soon as a
