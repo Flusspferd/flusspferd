@@ -215,17 +215,12 @@ namespace {
   /// common function of define_property
   void extract_attributes(
     property_attributes const &attrs,
-    JSObject *&getter_o,
-    JSObject *&setter_o,
+    function &getter,
+    function &setter,
     unsigned &sm_flags)
   {
-    function getter;
     if (attrs.getter) getter = attrs.getter.get();
-    function setter;
     if (attrs.setter) setter = attrs.setter.get();
-
-    getter_o = Impl::get_object(getter);
-    setter_o = Impl::get_object(setter);
 
     unsigned const flags = attrs.flags;
     if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
@@ -233,8 +228,8 @@ namespace {
     if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
     if (flags & shared_property) sm_flags |= JSPROP_SHARED;
 
-    if (getter_o) sm_flags |= JSPROP_GETTER;
-    if (setter_o) sm_flags |= JSPROP_SETTER;
+    if (!getter.is_null()) sm_flags |= JSPROP_GETTER;
+    if (!setter.is_null()) sm_flags |= JSPROP_SETTER;
   }
 }
 
@@ -249,10 +244,13 @@ void object::define_property(
   root_value id_r(id);
   root_value v(init_value);
 
-  JSObject *getter_o = 0x0;
-  JSObject *setter_o = 0x0;
+  root_function getter;
+  root_function setter;
   unsigned sm_flags = 0;
-  extract_attributes(attrs, getter_o, setter_o, sm_flags);
+  extract_attributes(attrs, getter, setter, sm_flags);
+
+  JSObject *getter_o = Impl::get_object(getter);
+  JSObject *setter_o = Impl::get_object(setter);
 
   if (!JS_DefinePropertyById(Impl::current_context(),
                              get_const(),
@@ -275,10 +273,13 @@ void object::define_property(
   root_string name_r(name);
   root_value v(init_value);
 
-  JSObject *getter_o = 0x0;
-  JSObject *setter_o = 0x0;
+  root_function getter;
+  root_function setter;
   unsigned sm_flags = 0;
-  extract_attributes(attrs, getter_o, setter_o, sm_flags);
+  extract_attributes(attrs, getter, setter, sm_flags);
+
+  JSObject *getter_o = Impl::get_object(getter);
+  JSObject *setter_o = Impl::get_object(setter);
 
   if (!JS_DefineUCProperty(Impl::current_context(),
                            get_const(),
