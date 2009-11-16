@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE( function ) {
   BOOST_CHECK_EQUAL(f.name(), "name5");
   BOOST_CHECK_EQUAL(f.arity(), 0);
   BOOST_CHECK_NO_THROW(v = f.call(
-    flusspferd::root_object(flusspferd::create<my_class>())));
+    flusspferd::create<my_class>()));
   BOOST_CHECK_EQUAL(v, flusspferd::value());
 
   f = flusspferd::create<flusspferd::method>(
@@ -219,7 +219,7 @@ BOOST_AUTO_TEST_CASE( function ) {
   BOOST_CHECK_EQUAL(f.name(), "name6");
   BOOST_CHECK_EQUAL(f.arity(), 1);
   BOOST_CHECK_NO_THROW(v = f.call(
-    flusspferd::root_object(flusspferd::create<my_class>()),
+    flusspferd::create<my_class>(),
     5));
   BOOST_CHECK_EQUAL(v, flusspferd::value(2.5));
 }
