@@ -147,7 +147,7 @@ void binary::augment_prototype(object &proto) {
   root_function values_fn(
     flusspferd::create<function>(
       param::_name = "values",
-      param::_function = root_string(js_val_iter),
+      param::_function = js_val_iter,
       param::_file = __FILE__,
       param::_line = __LINE__));
 
