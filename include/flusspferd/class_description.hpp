@@ -258,42 +258,45 @@ THE SOFTWARE.
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__getter_setter(p_property_name, p_param) \
-  obj.define_property( \
-    (p_property_name), \
-    ::flusspferd::property_attributes( \
-      ::flusspferd::permanent_shared_property, \
-      ::flusspferd::root_function( \
+  { \
+    flusspferd::root_function getter( \
         ::flusspferd::create< ::flusspferd::method>( \
           "$get_" p_property_name, \
           & Class :: \
           BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
         ) \
-      ), \
-      ::flusspferd::root_function( \
+      ); \
+    flusspferd::root_function setter( \
         ::flusspferd::create< ::flusspferd::method>( \
           "$set_" p_property_name, \
           & Class :: \
           BOOST_PP_TUPLE_ELEM(2, 1, p_param) \
         ) \
-      ) \
-    ) \
-  ); \
+      ); \
+    obj.define_property( \
+      (p_property_name), \
+      ::flusspferd::property_attributes( \
+        ::flusspferd::permanent_shared_property, getter, setter)); \
+  } \
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__getter(p_property_name, p_param) \
-  obj.define_property( \
-    (p_property_name), \
-    ::flusspferd::property_attributes( \
-      ::flusspferd::permanent_shared_property \
-      | ::flusspferd::read_only_property, \
-      ::flusspferd::root_function( \
+  { \
+    ::flusspferd::root_function getter( \
         ::flusspferd::create< ::flusspferd::method>( \
           "$get_" p_property_name, \
           & Class :: p_param \
         ) \
+      ); \
+    obj.define_property( \
+      (p_property_name), \
+      ::flusspferd::property_attributes( \
+        ::flusspferd::permanent_shared_property \
+        | ::flusspferd::read_only_property, \
+        getter \
       ) \
-    ) \
-  ); \
+    ); \
+  } \
   /* */
 
 #define FLUSSPFERD_CD_PROPERTY__constant(p_property_name, p_param) \
