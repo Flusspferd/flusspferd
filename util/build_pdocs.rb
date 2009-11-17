@@ -1,8 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
-require 'rake'
-
 
 
 module HippoDocsHelper
@@ -44,6 +41,22 @@ module HippoDocsHelper
     exit 1;
   end
 
+  def self.require_gems()
+    begin
+      require 'rubygems'
+      require 'rake'
+    rescue LoadError => e
+      missing_file = e.message.sub('no such file to load -- ', '')
+      if missing_file == 'rubygems'
+        puts "\nIt looks like rubygems is missing! Please install it."
+      else
+        puts "\nIt looks like #{name} is missing the '#{missing_file}' gem. Just run:\n\n"
+        puts "  $ gem install #{missing_file}"
+        puts "\nand you should be all set.\n\n"
+      end
+      exit
+    end
+  end
 
   def self.require_submodule(name, path)
     begin
@@ -70,6 +83,7 @@ end
 end
 
 if __FILE__ == $0
+  HippoDocsHelper.require_gems
   HippoDocsHelper.require_pdoc
   HippoDocsHelper.build_docs
 end
