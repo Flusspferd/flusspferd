@@ -8,6 +8,7 @@ require 'rake'
 module HippoDocsHelper
   ROOT_DIR      = File.join(File.expand_path(File.dirname(__FILE__)), '..')
   DOC_DIR       = File.join(ROOT_DIR, 'build', 'html', 'js')
+  TEMPLATE_DIR  = File.join(ROOT_DIR, 'vendor', 'pdoc-template', 'html')
 
 
   def self.require_pdoc
@@ -29,7 +30,7 @@ module HippoDocsHelper
       end
       files << {
         :output => DOC_DIR,
-        :templates => "vendor/pdoc-template/html",
+        :templates => TEMPLATE_DIR,
         :syntax_highlighter => :none,
         #:index_page => 'README.markdown'
       }
