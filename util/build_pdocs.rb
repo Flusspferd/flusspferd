@@ -10,6 +10,10 @@ module HippoDocsHelper
 
   def self.require_pdoc
     require_submodule('PDoc', 'pdoc')
+    if !File.directory?(TEMPLATE_DIR)
+      puts missing_submodule_msg("the pdoc-templates", "pdoc-template")
+      exit
+    end
   end
   
 
@@ -58,16 +62,22 @@ module HippoDocsHelper
     end
   end
 
+  class << self
+    def missing_submodule_msg(name, path)
+      "\nIt looks like you're missing #{name}. Just run:\n\n" +
+      "  $ git submodule init\n" +
+      "  $ git submodule update vendor/#{path}\n" +
+      "\nand you should be all set.\n\n"
+    end
+  end
+
   def self.require_submodule(name, path)
     begin
       require path
     rescue LoadError => e
       missing_file = e.message.sub('no such file to load -- ', '')
       if missing_file == path
-        puts "\nIt looks like you're missing #{name}. Just run:\n\n"
-        puts "  $ git submodule init"
-        puts "  $ git submodule update vendor/#{path}"
-        puts "\nand you should be all set.\n\n"
+        puts missing_submodule_msg(name, path)
       else
         puts "\nIt looks like #{name} is missing the '#{missing_file}' gem. Just run:\n\n"
         puts "  $ gem install #{missing_file}"
