@@ -24,11 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-/**
- * Create an array from an arbitrary iterable object.
- *
- * @param iterable The source.
- */
+// Dont doc - deprecated
 Array.from = function from(iterable) {
   if (!iterable)
     return [];
@@ -38,9 +34,7 @@ Array.from = function from(iterable) {
 };
 Object.defineProperty(Array, 'from', {enumerable: false});
 
-/**
- * Create an array from a string.
- */
+// Dont doc - deprecated
 String.prototype.toArray = function toArray() {
   return this.split(/\s+/);
 };

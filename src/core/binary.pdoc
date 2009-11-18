@@ -1,0 +1,536 @@
+// vim: ft=javascript:
+
+/** section: CommonJS Core
+ * binary
+ *
+ * Blob data classes for storing byte data. A byte is exposed in javascript
+ * space as an integral number in the range \[0,255\]. There are two classes
+ * for manipulating binary data: [[binary.ByteArray ByteArray]], a mutable blob which an API
+ * similar to the built-in [[Array]], and [[binary.ByteString ByteString]] which is immutable and
+ * behaves similar to the built-in [[String]] class.
+ **/
+
+/**
+ *  mixin binary.Binary
+ *
+ *  Shared behaviour between [[binary.ByteArray ByteArrays]] and [[binary.ByteString ByteStrings]].
+ *
+ *  In Flusspferd, Binary is a class in its own right -- albeit one that you
+ *  can't constrauct from directly form javascript -- which is in the prototype
+ *  chain of which both ByteArrays and ByteStrings.
+ *
+ *  Please note however that this is an extension to the CommonJS spec, so if
+ *  you rely in this behaviour your code will become non-portable.
+ *
+ *  ### A note on range arguments #
+ *
+ *  A number of methods accept on blobs accept ranges, either in the form
+ *  `start, end` ([[binary.Binary#slice slice]]) or `start, length`
+ *  ([[binary.ByteString#substr]] or [[binary.ByteArray#splice]]). Most of
+ *  these parameters behave predictably, but it is worth noting that any of the
+ *  values of a range can be negative, in which case it counts backwards from
+ *  the end. See [[binary.Binary.range]] and [[binary.Binary.lengthRange]] for
+ *  more details.
+ **/
+
+/**
+ *  binary.Binary.range(start[, end]) -> [Number,Number]
+ *
+ *  **Note**: This is not an actual callable method, it just describes
+ *  behaviour.
+ *
+ *  Bytes ranging from \[`start`,`end`) (start is included, end is excluded).
+ *  If end is not provided, range from `start` to the end of the blob. 
+ *
+ *  Either `start` or `end` can be negative, in which case they count backwards
+ *  from the end of the blob. For example, given a blob which is 10 bytes
+ *  long, all the following ranges are the same, bytes 3,4 and 5:
+ *
+ *      3,6
+ *      3,-4
+ *      -7,6
+ *      -7,-4
+ *
+ *  If `end` is less than `start` (after both values have been corrected for
+ *  being negative and clamped to the length of the blob) then `end` is set to
+ *  `start`, meaning a range that covers 0 bytes is created.
+ *
+ *  This described behaviour is how [[Array#slice]] behaves.
+ *  [[String#substring]] behaves simiarly except for negative values.
+ **/
+
+/**
+ *  binary.Binary.lengthRange(start[, howMany]) -> [Number,Number]
+ *
+ *  **Note**: This is not an actual callable method, it just describes
+ *  behaviour.
+ *
+ *  A range of `howMany` bytes starting at position `start`.
+ *
+ *  `start` can be negative, in which case it counts backwards from the end of
+ *  the blob. `howMany` cannot be negative, and will never overflow past the end
+ *  of the blob.
+ *
+ *  For example, given a blob which is 10 bytes long, all the following ranges
+ *  are the same, bytes 3,4 and 5:
+ *
+ *      3,3
+ *      -7,3
+ *
+ *  This is how [[Array#splice]] and [[String#substr]] behaves.
+ **/
+
+
+/**
+ *  binary.Binary#toByteArray() -> binary.ByteArray
+ *
+ *  Create a new copy of this blob as a mutable ByteArray. If it is already a
+ *  ByteArray, a new copy will be created.
+ **/
+
+/**
+ *  binary.Binary#toByteString() -> binary.ByteString.
+ *
+ *  Coerce the blob into a ByteString. If it is already one it will be returned
+ *  directly as ByteStrings are immutable.
+ **/
+
+/**
+ *  binary.Binary#toArray() -> Array
+ *
+ *  Return an array containing the contents of this blob as an array of bytes (Numbers).
+ **/
+
+/**
+ *  binary.Binary#indexOf(byte[, start=0 [, stop]]) -> Array
+ *  - byte (Byte): byte to search for
+ *  - start (Number): Start of range to search for `byte` in. Default 0
+ *  - stop (Number): End of range.
+ *
+ *  Return the index of the first occurance of `byte` or -1 if it cannot be
+ *  found.
+ *
+ *  \[`start`,`stop`) form a [[binary.Binary.range]].
+ **/
+
+/**
+ *  binary.Binary#lastIndexOf(byte[, start=0 [, stop]]) -> Array
+ *  - byte (Byte): byte to search for
+ *  - start (Number): Index to start searching for `byte`.
+ *  - stop (Number): Index to stop searching at. Defaults to last byte the blob
+ *
+ *  Return the index of the lat occurance of `byte` in the specified range, or
+ *  -1 if it cannot be found.
+ *
+ *  \[`start`,`stop`) form a [[binary.Binary.range]].
+ **/
+
+/** alias of: binary.Binary#byteAt
+ *  binary.Binary#charAt(index) -> binary.ByteString
+ *  - index (Number): byte to get
+ *
+ *  Provided for compatibility with String. Return a ByteString of length one
+ *  for the given index. Will throw a [[RangeError]] if `index` is not valid.
+ **/
+
+/**
+ *  binary.Binary#byteAt(index) -> binary.ByteString
+ *  - index (Number): byte to get
+ *
+ *  Get the byte at the specified index as a ByteString. To get the actual byte
+ *  value, use [[binary.Binary#get <code>get(index)</code>]].
+ *
+ *  Currently CommonJS has speced this to return a ByteString of length one,
+ *  but this might well change in a future version of the spec.
+ **/
+
+/**
+ *  binary.Binary#get(index) -> Byte
+ *  - index (Number): byte to get
+ *
+ *  Return the actualy byte value at `index` -- i.e. a Number between 0 and 255. Can throw a [[RangeError]].
+ **/
+
+/**
+ *  binary.Binary#slice(start[, end]) -> binary.Binary
+ *  - start (Number): start index
+ *  - end (Number): end index. Defaults to end of blob
+ *
+ *  Return a slice of the blob containing the [[binary.Binary.range range]]
+ *  \[`start`, `end`).
+ *
+ *  The returned blob is of the same type as the invocant, i.e. a ByteString
+ *  when called on a ByteString.
+ **/
+
+/**
+ *  binary.Binary#split(delim[, options]) -> [binary.Binary...]
+ *  - delim (Byte | Array | binary.Binary): Byte value to split on
+ *  - options (Object): options dictionary.
+ *
+ *  Split the blob into an array of blobs (of the same type as the invocant)
+ *  about on a set of (single byte) delimiters. If `delim` is an array, each
+ *  element must be something accepted by the [[binary.ByteString]]
+ *  constructor.
+ *
+ *  The behaviour of this function can be tweaked by the following keys in the
+ *  `options` dictionary argument:
+ *
+ *  - `count` (Number): Maximum number of elements in the return array. If
+ *    count is 1 you will get an array containg just a copy of this blob.
+ *  - `includeDelimiter` (Boolean): should the matched delimiter be added as an
+ *    element in the return array
+ **/
+
+/**
+ *  binary.Binary#concat(args...) -> binary.Binary
+ *  - args (binary.Binary | Byte | Array): blobs to concatenate
+ *
+ *  Concatenate together this blob and the provided arguments into a new blob
+ *  of the same type as the invocant.
+ *
+ *  Each argument must be a Byte, an Array of Bytes or another blob.
+ **/
+
+/**
+ *  binary.Binary#decodeToString([charset="UTF-8"]) -> String
+ *  - charset (String): character set to interpret invocant as.
+ *
+ *  Decode the blob to a string of characters by using the [[encodings]] module.
+ **/
+
+/**
+ *  class binary.ByteString
+ *    includes binary.Binary
+ **/
+
+/**
+ *  binary.ByteString.join(args, sep) -> binary.ByteString
+ *  - args (Array):
+ *  - sep (binary.Binary):
+ **/
+
+/**
+ * new binary.ByteString(length)
+ * new binary.ByteString(bytes)
+ * new binary.ByteString(string[, charset="UTF-8"])
+ *  - length (Number): length of new string
+ *  - bytes (Array | binary.Binary): contents of new blob.
+ *
+ *  Create a new ByteString. `length` creates a new ByteString of this length
+ *  where every byte is 0. `bytes` is either another blob to copy, or an array
+ *  of byte values. The third form is constructed by encoding `string` to bytes
+ *  using `charset`.
+ *
+ *  ByteStrings are immutable.
+ **/
+
+/** alias of: binary.Binary#get
+ *  binary.ByteString#charCodeAt(index) -> Number
+ **/
+
+/**
+ *  binary.ByteString#substr(start[, howMany]) -> binary.ByteString
+ *  - start (Number): byte index to start at
+ *  - howMany (Number): maximum length of returned ByteString
+ *
+ *  Return a new ByteString with the contents of the
+ *  [[binary.Binary.lengthRange length range]] \[`start`, `howMany`).
+ *
+ *  Behaves similarly to [[String#substr]]
+ **/
+
+/**
+ *  binary.ByteString#substring(start[, end]) -> binary.ByteString
+ *  - start (Number): byte index to start at
+ *  - end (Number): final byte index. Defaults to end of blob
+ *
+ *  Return a new ByteString with the contents of the
+ *  [[binary.Binary.range range]] \[`start`, `end`).
+ *
+ *  Behaves similarly to [[String#substring]]
+ **/
+
+/**
+ *  binary.ByteString#length -> Number
+ *
+ *  Length of the string in bytes. Read Only
+ **/
+
+
+/**
+ *  class binary.ByteArray
+ *    includes binary.Binary
+ **/
+
+/**
+ * new binary.ByteArray(length)
+ * new binary.ByteArray(bytes)
+ * new binary.ByteArray(string[, charset="UTF-8"])
+ *  - length (Number): length of new string
+ *  - bytes (Array | binary.Binary): contents of new blob.
+ *
+ *  Create a new ByteArray. `length` creates a new ByteArray of this length
+ *  where every byte is 0. `bytes` is either another blob to copy, or an array
+ *  of byte values. The third form is constructed by encoding `string` to bytes
+ *  using `charset` via the [[encodings]] module.
+ *
+ *  ByteArrays are mutable, both in terms of length and of the data contained
+ *  within.
+ **/
+
+/**
+ *  binary.ByteArray#append(args...) -> Number
+ *  - args (binary.Binary | Byte | Array): data to append to this one
+ *
+ *  Concatenate the provided arguments onto the end of the existing blob.
+ *
+ *  Each argument must be a Byte, an Array of Bytes or another blob.
+ *
+ *  Return the new length of the blob.
+ **/
+
+/** alias of: binary.ByteArray#append
+ *  binary.ByteArray#push(args...) -> Number
+ *  - args (binary.Binary | Byte | Array): data to append to this blob
+ *
+ *  Provided for API compatibility with [[Array]].
+ **/
+
+/**
+ *  binary.ByteArray#pop() -> Byte
+ *
+ *  Remove the final byte from the blob and return it. If the blob is empty an
+ *  exception will be thrown.
+ *
+ *  This doesn't make a huge amount of sense on a ByteArray.
+ **/
+
+/**
+ *  binary.ByteArray#prepend(args...) -> Number
+ *  - args (binary.Binary | Byte | Array): data to append to this one
+ *
+ *  Prepend the concatenation of the provided arguments to the contents of this
+ *  blob.
+ *
+ *  Return the new length of the blob.
+ **/
+
+/** alias of: binary.ByteArray#prepend
+ *  binary.ByteArray#unshift(args...) -> Number
+ *  - args (binary.Binary | Byte | Array): data to prepend to this one
+ *
+ *  Insert new data before the start of the current data
+ *
+ *  Return the new length of the blob.
+ **/
+
+
+/**
+ *  binary.ByteArray#shift() -> Number
+ *
+ *  Remove and return the first byte of the blob. Will throw an exception if it
+ *  is empty.
+ *
+ *  This doesn't make a huge amount of sense on a ByteArray.
+ **/
+
+/**
+ *  binary.ByteArray#reverse() -> binary.ByteArray
+ *
+ *  Reverse the order of the bytes of this array in-place, and return it.
+ *
+ *  This behaves the same as [[Array#reverse]].
+ *
+ *  This doesn't make a huge amount of sense on a ByteArray.
+ **/
+
+/**
+ *  binary.ByteArray#sort([sorter]) -> binary.ByteArray
+ *  - sorter (Function): comparision function
+ *
+ *  This behaves the same as [[Array#sort]].
+ *
+ *  This doesn't make a huge amount of sense on a ByteArray.
+ **/
+
+/** non standard
+ *  binary.ByteArray#erase(begin[, end]) -> Number
+ *  - begin (Number): start of range
+ *  - end (Number): end of range
+ *
+ *  Erase a [[binary.Binary.range range]] of bytes \[`begin`, `end`) form this
+ *  blob. Bytes following `end` will be shifted down to start at index `begin`
+ *  and the length will be reduced.
+ *
+ *  Returns the new length of the blob.
+ **/
+
+/**
+ *  binary.ByteArray#displace(begin[, end[, args...]]) -> Number
+ *  - begin (Number): start of range
+ *  - end (Number): end of range
+ *  - args (binary.Binary | Byte | Array): data to insert at `begin`.
+ *
+ *  Remove the data in the [[binary.Binary.range range]] \[`begin`, `end`), and
+ *  optionally insert new data started at `begin`. Original data after `end` is
+ *  preserved.
+ *
+ *  Returns the new length of the blob. If you want the deleted data instead,
+ *  use [[binary.ByteArray#splice splice]]
+ *
+ *  **Note** This method is perhaps badly named.
+ **/
+
+/** non standard
+ *  binary.ByteArray#insert(pos, args...) -> Number
+ *  - pos (Number): position
+ *  - args (binary.Binary | Byte | Array): data to insert
+ *
+ *  Insert data into the byte array before `pos`.  Equivalent to calling
+ *  `blob.displace(pos,pos,args...)`
+ *
+ *  Returns the new length of the blob.
+ **/
+
+/**
+ *  binary.ByteArray#splice(begin[, end[, args...]]) -> binary.ByteArray
+ *  - begin (Number): start of range
+ *  - end (Number): end of range
+ *  - args (binary.Binary | Byte | Array): data to insert
+ *
+ *  Remove the data in the [[binary.Binary.range range]] \[`begin`, `end`), and
+ *  optionally insert new data started at `begin`. Original data after `end` is
+ *  preserved.
+ *
+ *  This method is similar to [[binary.ByteArray#displace displace]] but it
+ *  returns the removed bytes instead of the new length.
+ *
+ **/
+
+/**
+ *  binary.ByteArray#filter(callback[, thisobj]) -> binary.ByteArray
+ *  - callback (Function): filter callback function
+ *  - thisobj (?): optional invocant for `callback`
+ *
+ *  Calls the provided `callback` function for each byte in the blob, in order,
+ *  and constructs a new blob containing only the bytes for which the callback
+ *  returned a truthful value.
+ *
+ *  The callback is called with arguments of:
+ *
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/**
+ *  binary.ByteArray#forEach(callback[, thisobj]) -> undefined
+ *  - callback (Function): callback
+ *  - thisobj (?): invocant for `callback`
+ *
+ *  Call the `callback` function once for each byte, in order, with the
+ *  invocant optionally set to `thisobj`. The return value of the callback is
+ *  ignored.
+ *
+ *  The callback is called with arguments of:
+ *
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/**
+ *  binary.ByteArray#every(callback[, thisobj]) -> Boolean
+ *  - callback (Function): callback
+ *  - thisobj (?): invocant for `callback`
+ *
+ *  Invoke `callback` (with an invocant of `thisobj` if provided) and return
+ *  true iff the callback returns a truthful value for every byte in the array.
+ *
+ *  The callback is called with arguments of:
+ *
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/**
+ *  binary.ByteArray#some(callback[, thisobj]) -> Boolean
+ *  - callback (Function): callback
+ *  - thisobj (?): invocant for `callback`
+ *
+ *  Calls the provided `callback` function for each byte in the blob, in order,
+ *  and returns true as soon as the callback returns a truthful value. Will
+ *  return false if no true value is returned.
+ *  
+ *  The callback is called with arguments of:
+ *
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/** non standard
+ *  binary.ByteArray#count(callback[, thisobj]) -> Number
+ *  - callback (Function): callback
+ *  - thisobj (?): invocant for `callback`
+ *
+ *  Calls the provided `callback` function once for each byte in the blob, in
+ *  order, returns the number of bytes for which `callback` returned a truthful
+ *  value.
+ *
+ *  The callback is called with arguments of:
+ *
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/**
+ *  binary.ByteArray#map(callback[, thisobj]) -> binary.ByteArray
+ *  - callback (Function): callback
+ *  - thisobj (?): invocant for `callback`
+ *
+ *  Calls the provided `callback` function once for each byte in the blob, in
+ *  order, and constructs a new blob from the results. The callback must return
+ *  something that could be passed to [[binary.ByteArray.append append]] which
+ *  means that the new byte array could be longer or shorter then the original.
+ *
+ *  The callback is called with arguments of:
+ *
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/**
+ *  binary.ByteArray#reduce(callback[, initialValue]) -> ?
+ *  - callback (Function): callback
+ *  - initialValue (?): initial value passed to `callback`
+ *
+ *  Apply a function against an accumulator and each byte of the blob (from
+ *  left-to-right) as to reduce it to a single value.
+ *
+ *  Executes the `callback` function once for each blob in the blob, receiving
+ *  four arguments: the initial value (or value from the previous callback
+ *  call), the current byte, the current index, and the blob over which
+ *  iteration is occurring.
+ *
+ *  The return value is whaterver is returned from the last iteration.
+ *
+ *  The callback is called with arguments of:
+ *
+ *  - value (`?`): value returned from previous callback, or `initialValue`.
+ *  - byte (`Number`): the current byte
+ *  - index (`Number`): the byte offset from the start of the array
+ *  - blob ([[binary.ByteArray]]): the blob
+ **/
+
+/**
+ *  binary.ByteArray#reduceRight(callback[, initialValue]) -> ?
+ *
+ *  Apply a function against an accumulator and each byte of the blob (from
+ *  right-to-left) as to reduce it to a single value. See
+ *  [[binary.ByteArray#reduce reduce]] for a more detailed description.
+ **/

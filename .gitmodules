@@ -1,0 +1,6 @@
+[submodule "vendor/pdoc"]
+	path = vendor/pdoc
+	url = git://github.com/ashb/pdoc-commonjs.git
+[submodule "vendor/pdoc-template"]
+	path = vendor/pdoc-template
+	url = git://github.com/ashb/flusspferd-pdoc-template.git

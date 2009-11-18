@@ -1,0 +1,34 @@
+// vim: ft=javascript:
+
+// Setup sections
+
+/**
+ *  == CommonJS Core ==
+ *
+ *  Modules/funcitons defined by the CommonJS specs or proposals
+ **/
+
+/**
+ * == Flusspferd Core ==
+ *
+ * Core flusspferd modules which are not (yet?) CommonJS
+ **/
+
+/**
+ * == Language ==
+ *
+ * Additions to JavaScript's "standard library" to bring the primordials in
+ * line with ECMAScript 5.
+ **/
+
+/**
+ * == Bundled Modules ==
+ *
+ * Flusspferd modules which are bundled with flusspferd by default.
+ **/
+
+/** section: Language
+ * Function
+ *
+ * Function objects. Class constructors are also functions.
+ **/
