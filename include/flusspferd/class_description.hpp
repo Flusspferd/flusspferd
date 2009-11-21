@@ -242,7 +242,8 @@ THE SOFTWARE.
       ::flusspferd::param::_container = obj, \
       ::flusspferd::param::_name = (p_method_name), \
       ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(2, 1, p_expr), \
-      ::flusspferd::param::_signature = BOOST_P_TUPLE_ELEM(2, 0, p_expr)); \
+      ::flusspferd::param::_signature = \
+      ::flusspferd::param::type<BOOST_PP_TUPLE_ELEM(2, 0, p_expr)>());  \
   /* */
 
 
@@ -251,7 +252,8 @@ THE SOFTWARE.
       ::flusspferd::param::_container = obj, \
       ::flusspferd::param::_name = (p_method_name), \
       ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(2, 1, p_expr), \
-      ::flusspferd::param::_signature = BOOST_P_TUPLE_ELEM(2, 0, p_expr)); \
+      ::flusspferd::param::_signature = \
+      ::flusspferd::param::type<BOOST_PP_TUPLE_ELEM(2, 0, p_expr)>());  \
   /* */
 
 #define FLUSSPFERD_CD_METHOD__none(p_method_name, p_param) \
