@@ -24,38 +24,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_DOCUMENT_HPP
-#define FLUSSPFERD_XML_DOCUMENT_HPP
+#ifndef FLUSSPFERD_XML_NODE_LIST_HPP
+#define FLUSSPFERD_XML_NODE_LIST_HPP
 
-#include "node.hpp"
 
-#include <DOM/Document.hpp>
+#include <DOM/NodeList.hpp>
 
 namespace xml_plugin {
 
+
 FLUSSPFERD_CLASS_DESCRIPTION(
-    document,
-    (base, node)
-    (full_name, "xml.Document")
-    (constructor_name, "Document")
-    (methods,
-      ("getElementsByTagName", bind, getElementsByTagName)
+    node_list,
+    (full_name, "xml.NodeList")
+    (constructor_name, "NodeList")
+    (properties,
+      ("length", getter, get_length)
     )
-) {
+)
+{
+
 public:
-  typedef Arabica::DOM::Document<std::string> wrapped_type;
+  typedef Arabica::DOM::NodeList<std::string> wrapped_type;
 
-  document(flusspferd::object const &proto, flusspferd::call_context &);
+  node_list(flusspferd::object const &proto, flusspferd::call_context &);
+  node_list(flusspferd::object const &proto, wrapped_type const &node);
+  virtual ~node_list();
 
-  document(flusspferd::object const &proto, wrapped_type const &doc);
-  virtual ~document();
+  int get_length();
 
-  object getElementsByTagName(std::string tag);
 protected:
-  wrapped_type doc_;
 
+  void property_op(property_mode mode, flusspferd::value const &id, flusspferd::value &x);
+  bool property_resolve(flusspferd::value const &id, unsigned);
+
+  wrapped_type list_;
 };
 
 }
 
 #endif
+
