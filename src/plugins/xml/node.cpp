@@ -25,22 +25,30 @@ THE SOFTWARE.
 */
 
 #include <flusspferd.hpp>
-
-#include "dom_parser.hpp"
 #include "node.hpp"
-#include "document.hpp"
 
 using namespace flusspferd;
 
 namespace xml_plugin {
 
-FLUSSPFERD_LOADER_SIMPLE(exports) {
+node::node(object const &proto, call_context &)
+  : base_type(proto)
+{
+}
 
-  load_class<dom_parser>(exports);
-  load_class<node>(exports);
-  load_class<document>(exports);
+node::node(object const &proto)
+  : base_type(proto)
+{
+}
 
+node::node(object const &proto, node_type const &node)
+  : base_type(proto),
+    node_(node)
+{
+}
+
+
+node::~node() {
 }
 
 }
-
