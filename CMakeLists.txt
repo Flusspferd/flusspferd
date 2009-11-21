@@ -172,6 +172,7 @@ option(
     OFF)
 option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
+option(PLUGIN_XML "Build xml plugin" ON)
 set(
     LINE_EDITOR
     "libedit"
@@ -372,6 +373,17 @@ if(PLUGIN_GMP)
     endif()
 endif()
 
+## XML ######################################################################
+
+if(PLUGIN_XML)
+    FIND_PACKAGE(PkgConfig)
+    pkg_check_modules(ARABICA arabica)
+
+    if(FORCE_PLUGINS AND NOT ARABICA_FOUND)
+        message(SEND_ERROR "XML plugin required but arabica not found")
+    endif()
+endif()
+
 ## Library ##################################################################
 
 file(
@@ -522,6 +534,12 @@ if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
     include_directories(${GMP_INCLUDE_DIR})
+endif()
+
+if(PLUGIN_XML AND ARABICA_FOUND)
+    set(PLUGINS ${PLUGINS} xml)
+    set(xml_LIBRARIES ${ARABICA_LIBRARIES})
+    include_directories(${ARABICA_INCLUDE_DIR})
 endif()
 
 foreach(PLUGIN ${PLUGINS})
@@ -715,4 +733,4 @@ if (NOT WIN32)
       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/emacs/site-lisp)
 endif()
 
-message(STATUS "Configuration SUCCESSFUL. No fatal errors.")
+#message(STATUS "Configuration SUCCESSFUL. No fatal errors.")
