@@ -100,6 +100,6 @@ object dom_parser::parse_source(sax_source &is) {
       throw exception( eh.errors() );
   }
 
-  document::document_type const &doc = parser_.getDocument();
+  document::wrapped_type const &doc = parser_.getDocument();
   return create<document>( boost::fusion::make_vector(doc) );
 }
