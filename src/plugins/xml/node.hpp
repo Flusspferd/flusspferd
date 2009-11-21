@@ -55,6 +55,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       enum_prop(MAX_TYPE)
     )
     (methods,
+      ("toString", bind, to_string)
+
       ("normalize", bind, normalize)
     )
 )
@@ -64,6 +66,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 public:
   node(flusspferd::object const &proto, flusspferd::call_context &);
   virtual ~node();
+
+  std::string to_string();
 
   void normalize() { node_.normalize(); }
 

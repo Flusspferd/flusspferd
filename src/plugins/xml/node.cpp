@@ -27,6 +27,10 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include "node.hpp"
 
+#include <DOM/SAX2DOM/SAX2DOM.hpp>
+#include <DOM/io/Stream.hpp>
+#include <sstream>
+
 using namespace flusspferd;
 using namespace xml_plugin;
 
@@ -48,4 +52,11 @@ node::node(object const &proto, node_type const &node)
 
 
 node::~node() {
+}
+
+std::string node::to_string() {
+  std::ostringstream buf;
+  buf << node_;
+
+  return buf.str();
 }
