@@ -25,24 +25,71 @@ THE SOFTWARE.
 */
 
 #include <flusspferd.hpp>
+#include <flusspferd/aliases.hpp>
 
-#include "dom_parser.hpp"
-#include "node.hpp"
 #include "node_list.hpp"
-#include "document.hpp"
+#include "node.hpp"
+
 
 using namespace flusspferd;
+using namespace flusspferd::aliases;
+using namespace xml_plugin;
 
-namespace xml_plugin {
-
-FLUSSPFERD_LOADER_SIMPLE(exports) {
-
-  load_class<dom_parser>(exports);
-  load_class<node>(exports);
-  load_class<node_list>(exports);
-  load_class<document>(exports);
-
+node_list::node_list(object const &proto, call_context &)
+  : base_type(proto)
+{
 }
 
+node_list::node_list(object const &proto, wrapped_type const &list)
+  : base_type(proto),
+    list_(list)
+{
 }
 
+
+node_list::~node_list() {
+}
+
+int node_list::get_length() {
+  return list_.getLength();
+}
+
+bool node_list::property_resolve(value const &id, unsigned /*flags*/) {
+  if (!id.is_int())
+    return false;
+
+  int uid = id.get_int();
+
+  if (uid < 0)
+    return false;
+
+  if (size_t(uid) >= list_.getLength())
+    return false;
+ 
+  // TODO: ref-identity for nodes
+  //value v = element(v_data[uid]);
+  //define_property(id, v, permanent_shared_property);
+  //return true;
+  return false;
+}
+
+void node_list::property_op(property_mode mode, value const &id, value &x) {
+  int index;
+  if (id.is_int()) {
+    index = id.get_int();
+  } else {
+    this->native_object_base::property_op(mode, id, x);
+    return;
+  }
+
+  if (index < 0 || std::size_t(index) >= list_.getLength())
+    throw exception("Out of bounds on NodeList", "RangeError");
+
+  switch (mode) {
+  case property_get:
+    // TODO: ref-identity for nodes
+    x = create<node>( make_vector(list_.item(index)) );
+    break;
+  default: break;
+  };
+}
