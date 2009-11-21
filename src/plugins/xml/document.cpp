@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include "document.hpp"
 
 using namespace flusspferd;
-
-namespace xml_plugin {
+using namespace xml_plugin;
 
 document::document(object const &proto, call_context &)
   : base_type(proto)
@@ -44,6 +43,4 @@ document::document(object const &proto, document_type const &doc)
 }
 
 document::~document() {
-}
-
 }

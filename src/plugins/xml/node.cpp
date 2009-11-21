@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include "node.hpp"
 
 using namespace flusspferd;
-
-namespace xml_plugin {
+using namespace xml_plugin;
 
 node::node(object const &proto, call_context &)
   : base_type(proto)
@@ -49,6 +48,4 @@ node::node(object const &proto, node_type const &node)
 
 
 node::~node() {
-}
-
 }
