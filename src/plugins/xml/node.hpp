@@ -24,23 +24,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
+#ifndef FLUSSPFERD_XML_NODE_HPP
+#define FLUSSPFERD_XML_NODE_HPP
 
-#include "dom_parser.hpp"
-#include "node.hpp"
-#include "document.hpp"
 
-using namespace flusspferd;
+#include <DOM/Node.hpp>
 
 namespace xml_plugin {
 
-FLUSSPFERD_LOADER_SIMPLE(exports) {
 
-  load_class<dom_parser>(exports);
-  load_class<node>(exports);
-  load_class<document>(exports);
+#define enum_prop(x) (#x, constant, int(Arabica::DOM::Node_base:: x))
+FLUSSPFERD_CLASS_DESCRIPTION(
+    node,
+    (full_name, "xml.Node")
+    (constructor_name, "Node")
+    (constructor_properties,
+      enum_prop(ELEMENT_NODE)
+      enum_prop(ATTRIBUTE_NODE)
+      enum_prop(TEXT_NODE)
+      enum_prop(CDATA_SECTION_NODE)
+      enum_prop(ENTITY_REFERENCE_NODE)
+      enum_prop(ENTITY_NODE)
+      enum_prop(PROCESSING_INSTRUCTION_NODE)
+      enum_prop(COMMENT_NODE)
+      enum_prop(DOCUMENT_NODE)
+      enum_prop(DOCUMENT_TYPE_NODE)
+      enum_prop(DOCUMENT_FRAGMENT_NODE)
+      enum_prop(NOTATION_NODE)
+      // Do we need max type? Guess it doesn't hurt
+      enum_prop(MAX_TYPE)
+    )
+    (methods,
+      ("normalize", bind, normalize)
+    )
+)
+#undef enum_prop
+{
+
+public:
+  node(flusspferd::object const &proto, flusspferd::call_context &);
+  virtual ~node();
+
+  void normalize() { node_.normalize(); }
+
+protected:
+  typedef Arabica::DOM::Node<std::string> node_type;
+
+  node(flusspferd::object const &proto);
+  node(flusspferd::object const &proto, node_type const &node);
+
+  node_type node_;
+};
 
 }
 
-}
-
+#endif

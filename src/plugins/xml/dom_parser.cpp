@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <fstream>
 
 #include "dom_parser.hpp"
+#include "document.hpp"
 
 
 using boost::format;
@@ -99,5 +100,5 @@ object dom_parser::parse_source(sax_source &is) {
       throw exception( eh.errors() );
   }
 
-  return object();
+  return create<document>( boost::fusion::make_vector(parser_.getDocument()));
 }

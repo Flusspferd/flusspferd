@@ -24,23 +24,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
+#ifndef FLUSSPFERD_XML_DOCUMENT_HPP
+#define FLUSSPFERD_XML_DOCUMENT_HPP
 
-#include "dom_parser.hpp"
 #include "node.hpp"
-#include "document.hpp"
 
-using namespace flusspferd;
+#include <DOM/Document.hpp>
 
 namespace xml_plugin {
 
-FLUSSPFERD_LOADER_SIMPLE(exports) {
+FLUSSPFERD_CLASS_DESCRIPTION(
+    document,
+    (base, node)
+    (full_name, "xml.Document")
+    (constructor_name, "Document")
+) {
+public:
+  typedef Arabica::DOM::Document<std::string> document_type;
 
-  load_class<dom_parser>(exports);
-  load_class<node>(exports);
-  load_class<document>(exports);
+  document(flusspferd::object const &proto, flusspferd::call_context &);
+
+  document(flusspferd::object const &proto, document_type const &doc);
+  virtual ~document();
+protected:
+  document_type doc_;
+
+};
 
 }
 
-}
-
+#endif
