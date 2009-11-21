@@ -459,6 +459,38 @@ exports.asserts = {
   diag: function diag() {
     var suite = exports.__currentSuite__;
     suite.diag.apply(suite, arguments);
+  },
+
+  throwsOk: function( testcase, expected, message ) {
+    if ( message == undefined ) {
+      message = expected;
+      expected = undefined;
+    }
+    var suite = exports.__currentSuite__;
+
+    var a = {
+      type: "throwsOk",
+      ok: 0,
+      message: message,
+      defaultMsg: "throws error ok",
+    };
+
+    try {
+      testcase();
+      a.diag = "No error thrown";
+      suite.do_assert( a );
+    }
+    catch ( e ) {
+      if ( expected === undefined || expected == e.toString() ) {
+        a.ok = true;
+        suite.do_assert( a );
+      }
+      else {
+        a.diag = "   Got: " + e.toString() + "\n"
+                 "Wanted: " + expected;
+        suite.do_assert( a );
+      }
+    }
   }
 
 };
