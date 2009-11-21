@@ -237,6 +237,23 @@ THE SOFTWARE.
     ::flusspferd::dont_enumerate); \
   /* */
 
+#define FLUSSPFERD_CD_METHOD__function(p_method_name, p_expr) \
+  ::flusspferd::create< ::flusspferd::function>( \
+      ::flusspferd::param::_container = obj, \
+      ::flusspferd::param::_name = (p_method_name), \
+      ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(2, 1, p_expr), \
+      ::flusspferd::param::_signature = BOOST_P_TUPLE_ELEM(2, 0, p_expr)); \
+  /* */
+
+
+#define FLUSSPFERD_CD_METHOD__method(p_method_name, p_expr) \
+  ::flusspferd::create< ::flusspferd::method>( \
+      ::flusspferd::param::_container = obj, \
+      ::flusspferd::param::_name = (p_method_name), \
+      ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(2, 1, p_expr), \
+      ::flusspferd::param::_signature = BOOST_P_TUPLE_ELEM(2, 0, p_expr)); \
+  /* */
+
 #define FLUSSPFERD_CD_METHOD__none(p_method_name, p_param) \
   /* */
 
