@@ -44,7 +44,7 @@ node::node(object const &proto)
 {
 }
 
-node::node(object const &proto, node_type const &node)
+node::node(object const &proto, wrapped_type const &node)
   : base_type(proto),
     node_(node)
 {

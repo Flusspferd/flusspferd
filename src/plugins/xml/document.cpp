@@ -36,7 +36,7 @@ document::document(object const &proto, call_context &)
 }
 
 
-document::document(object const &proto, document_type const &doc)
+document::document(object const &proto, wrapped_type const &doc)
   : base_type(proto, doc),
     doc_(doc)
 {

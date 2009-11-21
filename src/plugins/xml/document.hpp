@@ -40,14 +40,14 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_name, "Document")
 ) {
 public:
-  typedef Arabica::DOM::Document<std::string> document_type;
+  typedef Arabica::DOM::Document<std::string> wrapped_type;
 
   document(flusspferd::object const &proto, flusspferd::call_context &);
 
-  document(flusspferd::object const &proto, document_type const &doc);
+  document(flusspferd::object const &proto, wrapped_type const &doc);
   virtual ~document();
 protected:
-  document_type doc_;
+  wrapped_type doc_;
 
 };
 

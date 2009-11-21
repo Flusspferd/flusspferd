@@ -64,7 +64,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 
 public:
+  typedef Arabica::DOM::Node<std::string> wrapped_type;
+
   node(flusspferd::object const &proto, flusspferd::call_context &);
+  node(flusspferd::object const &proto, wrapped_type const &node);
   virtual ~node();
 
   std::string to_string();
@@ -72,12 +75,9 @@ public:
   void normalize() { node_.normalize(); }
 
 protected:
-  typedef Arabica::DOM::Node<std::string> node_type;
-
   node(flusspferd::object const &proto);
-  node(flusspferd::object const &proto, node_type const &node);
 
-  node_type node_;
+  wrapped_type node_;
 };
 
 }
