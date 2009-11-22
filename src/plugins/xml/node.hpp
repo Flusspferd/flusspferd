@@ -54,6 +54,22 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       // Do we need max type? Guess it doesn't hurt
       enum_prop(MAX_TYPE)
     )
+    (properties,
+      ("nodeName", getter, getNodeName)
+      ("nodeValue", getter_setter, (getNodeValue, setNodeValue))
+      ("nodeType", getter, getNodeType)
+      ("parentNode", getter, getParentNode)
+      ("childNodes", getter, getChildNodes)
+      ("firstChild", getter, getFirstChild)
+      ("lastChild", getter, getLastChild)
+      ("previousSibling", getter, getPreviousSibling)
+      ("nextSibling", getter, getNextSibling)
+      ("attributes", getter, getAttributes)
+      ("ownerDocument", getter, getOwnerDocument)
+      ("namespaceURI", getter, getNamespaceURI)
+      ("prefix", getter_setter, (getPrefix, setPrefix))
+      ("localName", getter, getLocalName)
+    )
     (methods,
       ("toString", bind, to_string)
 
@@ -64,13 +80,31 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 
 public:
-  typedef Arabica::DOM::Node<std::string> wrapped_type;
+  typedef std::string string_type;
+  typedef Arabica::DOM::Node<string_type> wrapped_type;
 
   node(flusspferd::object const &proto, flusspferd::call_context &);
   node(flusspferd::object const &proto, wrapped_type const &node);
   virtual ~node();
 
-  std::string to_string();
+  string_type to_string();
+
+  string_type getNodeName() { return node_.getNodeName(); }
+  string_type getNodeValue() { return node_.getNodeValue(); }
+  void setNodeValue(string_type const &s) { node_.setNodeValue(s); }
+  int getNodeType() { return node_.getNodeType(); }
+  object getParentNode() { return get_node(node_.getParentNode()); }
+  object getChildNodes();
+  object getFirstChild() { return get_node(node_.getFirstChild()); }
+  object getLastChild() { return get_node(node_.getLastChild()); }
+  object getPreviousSibling() { return get_node(node_.getPreviousSibling()); }
+  object getNextSibling() { return get_node(node_.getNextSibling()); }
+  object getAttributes();
+  object getOwnerDocument();
+  flusspferd::value getNamespaceURI();
+  flusspferd::value getPrefix();
+  void setPrefix(string_type const &s) { node_.setPrefix(s); }
+  string_type getLocalName() { return node_.getLocalName(); }
 
   void normalize() { node_.normalize(); }
 
@@ -78,6 +112,8 @@ protected:
   node(flusspferd::object const &proto);
 
   wrapped_type node_;
+
+  object get_node(wrapped_type const &node);
 };
 
 }
