@@ -25,13 +25,17 @@ THE SOFTWARE.
 */
 
 #include <flusspferd.hpp>
+#include <flusspferd/aliases.hpp>
+
 #include "node.hpp"
+#include "node_list.hpp"
 
 #include <DOM/SAX2DOM/SAX2DOM.hpp>
 #include <DOM/io/Stream.hpp>
 #include <sstream>
 
 using namespace flusspferd;
+using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
 node::node(object const &proto, call_context &)
@@ -50,7 +54,6 @@ node::node(object const &proto, wrapped_type const &node)
 {
 }
 
-
 node::~node() {
 }
 
@@ -60,3 +63,33 @@ std::string node::to_string() {
 
   return buf.str();
 }
+
+value node::getPrefix() {
+  return node_.hasPrefix() ?
+         value(node_.getPrefix()) :
+         value(object());
+}
+
+
+value node::getNamespaceURI() {
+  return node_.hasNamespaceURI() ?
+         value(node_.getNamespaceURI()) :
+         object();
+}
+
+object node::get_node(wrapped_type const &) {
+  throw exception("not implemented");
+}
+
+object node::getChildNodes() {
+  return create<node_list>( make_vector(node_.getChildNodes()) );
+}
+
+object node::getAttributes() {
+  throw exception("not implemented");
+}
+
+object node::getOwnerDocument() {
+  throw exception("not implemented");
+}
+
