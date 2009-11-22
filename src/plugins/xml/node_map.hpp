@@ -35,7 +35,7 @@ THE SOFTWARE.
 #include <boost/weak_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include <iostream>
+//#include <iostream>
 
 namespace xml_plugin {
 
@@ -88,7 +88,7 @@ public:
   flusspferd::object get_node(U node) {
     void *ptr = static_cast<void*>(node.underlying_impl());
 
-    std::cout << "Looking for (" << int(ptr) << ") in the node_map" << std::endl;
+    //std::cout << "Looking for (" << int(ptr) << ") in the node_map" << std::endl;
     node_identiy_map::const_iterator it = node_map_.find(ptr);
 
     if (it == node_map_.end()) {
@@ -96,20 +96,20 @@ public:
       using namespace flusspferd::aliases;
 
       object o = create<T>( make_vector( node, shared_from_this() ) );
-      std::cout << "Put something (" << int(ptr) << ") in the node_map" << std::endl;
+      //std::cout << "Put something (" << int(ptr) << ") in the node_map" << std::endl;
       node_map_[ptr] = o;
       return o;
     }
 
     // Should i use dynamic cast here? Probably, but for now, eh.
-    std::cout << "Found (" << int(ptr) << ") in the node_map" << std::endl;
+    //std::cout << "Found (" << int(ptr) << ") in the node_map" << std::endl;
     return it->second;
   }
 
   template <class U>
   void remove_mapped_node(U node) {
     void *ptr = static_cast<void*>(node.underlying_impl());
-    std::cout << "Removing (" << int(ptr) << ") from the node_map_" << std::endl;
+    //std::cout << "Removing (" << int(ptr) << ") from the node_map_" << std::endl;
     node_map_.erase(ptr);
   }
 };
