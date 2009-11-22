@@ -33,9 +33,8 @@ using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
 element::element(object const &proto, wrapped_type const &node, weak_node_map map)
-  : base_type(proto),
-    element_(node),
-    node_map_(map)
+  : base_type(proto, node, map),
+    element_(node)
 { }
 
 element::~element()

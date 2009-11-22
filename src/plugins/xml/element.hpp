@@ -37,7 +37,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     element,
     (base, node)
     (constructible, false)
-    (full_name, "xml.Elements")
+    (full_name, "xml.Element")
     (constructor_name, "Element")
     (properties,
       ("tagName", getter, getTagName)
@@ -96,8 +96,6 @@ public:
 
 protected:
   wrapped_type element_;
-  weak_node_map node_map_;
-
 };
 
 }
