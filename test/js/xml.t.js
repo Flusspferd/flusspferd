@@ -50,17 +50,21 @@ exports.test_DOM = {
     setup.call(this);
 
     var a = this.doc.documentElement;
-    asserts.ok(a === a.firstChild.parentNode, "a === a.firstChild.parentNode");
+    asserts.instanceOf(a, xml.Element);
+    var b = a.firstChild;
+
+    asserts.ok(a === b.parentNode, "a === a.firstChild.parentNode");
 
     asserts.ok(this.doc === a.ownerDocument, "doc === a.ownerDocument");
 
     teardown.call(this);
   },
 
-  test_node_links: function() {
+  test_node_methods: function() {
     setup.call(this);
 
     var a = this.doc.documentElement;
+
     var b = a.cloneNode();
     asserts.ok(b !== a, "b !== a");
     asserts.same(b.hasChildNodes(), false, "cloned node has no children");
