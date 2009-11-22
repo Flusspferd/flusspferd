@@ -30,19 +30,11 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
-#include <map>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include "types.hpp"
 
 //#include <iostream>
 
 namespace xml_plugin {
-
-class node_map;
-class document;
-typedef boost::weak_ptr<node_map> weak_node_map;
-typedef boost::shared_ptr<node_map> node_map_ptr;
 
 class node_map : public boost::enable_shared_from_this<node_map> {
 public:
@@ -66,6 +58,7 @@ public:
 private:
   // Nothing can create instances of us directly
   node_map() {}
+
 protected:
   friend class document;
 
@@ -80,11 +73,12 @@ protected:
 
   node_identiy_map node_map_;
 
-public:
+  flusspferd::object create_object_from_node(arabica_node &node);
 
+public:
   ~node_map() {}
 
-  template <class T, class U>
+  template <class U>
   flusspferd::object get_node(U node) {
     void *ptr = static_cast<void*>(node.underlying_impl());
 
@@ -95,7 +89,7 @@ public:
       using namespace flusspferd;
       using namespace flusspferd::aliases;
 
-      object o = create<T>( make_vector( node, shared_from_this() ) );
+      object o = create_object_from_node(node);
       //std::cout << "Put something (" << int(ptr) << ") in the node_map" << std::endl;
       node_map_[ptr] = o;
       return o;

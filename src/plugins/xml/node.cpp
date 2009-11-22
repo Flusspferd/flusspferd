@@ -91,7 +91,7 @@ object node::get_node(wrapped_type const &n) {
   if (!map)
     throw exception("Internal error: node_map has gone away");
 
-  return map->get_node<node>(n);
+  return map->get_node(n);
 }
 
 object node::getChildNodes() {

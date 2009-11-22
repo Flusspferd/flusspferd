@@ -24,38 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
-#include <flusspferd/aliases.hpp>
+#ifndef FLUSSPFERD_XML_TYPES_HPP
+#define FLUSSPFERD_XML_TYPES_HPP
 
-#include "document.hpp"
-#include "node_list.hpp"
+#include <DOM/Node.hpp>
+#include <DOM/Element.hpp>
 
-using namespace flusspferd;
-using namespace flusspferd::aliases;
-using namespace xml_plugin;
+#include <map>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 
-document::document(object const &proto, call_context &)
-  : base_type(proto)
-{
+namespace xml_plugin {
+
+typedef std::string string_type;
+typedef Arabica::DOM::Node<string_type> arabica_node;
+typedef Arabica::DOM::Element<string_type> arabica_element;
+
+class node;
+class node_map;
+class document;
+class element;
+
+typedef boost::weak_ptr<node_map> weak_node_map;
+typedef boost::shared_ptr<node_map> node_map_ptr;
+
 }
 
+#endif;
 
-document::document(object const &proto, wrapped_type const &doc)
-  : base_type(proto, doc),
-    doc_(doc),
-    non_shared_node_map_(node_map::make(*this, doc_))
-{
-}
-
-document::~document() {
-}
-
-object document::getDocumentElement() {
-  return non_shared_node_map_->get_node(doc_.getDocumentElement());
-}
-
-object document::getElementsByTagName(std::string tagname) {
-  Arabica::DOM::NodeList<std::string> list = doc_.getElementsByTagName(tagname);
-
-  return create<node_list>( make_vector(list, non_shared_node_map_) );
-}

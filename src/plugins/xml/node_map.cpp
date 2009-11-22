@@ -27,71 +27,23 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
-#include "node_list.hpp"
+#include "node_map.hpp"
+#include "element.hpp"
 #include "node.hpp"
-
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-node_list::node_list(object const &proto, wrapped_type const &list, weak_node_map map)
-  : base_type(proto),
-    list_(list),
-    node_map_(map)
-{
-}
-
-node_list::~node_list() {
-}
-
-int node_list::get_length() {
-  return list_.getLength();
-}
-
-bool node_list::property_resolve(value const &id, unsigned /*flags*/) {
-  if (!id.is_int())
-    return false;
-
-  int uid = id.get_int();
-
-  if (uid < 0)
-    return false;
-
-  if (size_t(uid) >= list_.getLength())
-    return false;
- 
-  node_map_ptr map = node_map_.lock();
-  if (!map)
-    throw exception("Internal error: node_map has gone away");
-
-  value v = map->get_node(list_.item(uid));
-  define_property(id, v, permanent_shared_property);
-  return true;
-}
-
-void node_list::property_op(property_mode mode, value const &id, value &x) {
-  int index;
-  if (id.is_int()) {
-    index = id.get_int();
-  } else {
-    this->native_object_base::property_op(mode, id, x);
-    return;
-  }
-
-  if (index < 0 || std::size_t(index) >= list_.getLength())
-    throw exception("Out of bounds on NodeList", "RangeError");
-
-  switch (mode) {
-  case property_get:
+object node_map::create_object_from_node(arabica_node &a) {
+  switch (a.getNodeType()) {
+  case Arabica::DOM::Node_base::ELEMENT_NODE:
   {
-    node_map_ptr map = node_map_.lock();
-    if (!map)
-      throw exception("Internal error: node_map has gone away");
-
-    x = map->get_node(list_.item(index));
-    break;
+    return create<element>(
+      make_vector( static_cast<arabica_element>(a), shared_from_this() ) 
+    );
   }
-  default: break;
+  default:
+    return create<node>( make_vector( a, shared_from_this() ) );
   };
 }
