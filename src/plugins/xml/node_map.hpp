@@ -69,8 +69,13 @@ private:
 protected:
   friend class document;
 
-  static node_map_ptr make() {
-    return node_map_ptr(new node_map());
+  // Template this to avoid circular dep on document
+  template <class T, class U>
+  static node_map_ptr make(T &obj, U node) {
+    node_map_ptr map(new node_map());
+    void *ptr = static_cast<void*>(node.underlying_impl());
+    map->node_map_[ptr] = obj;
+    return map;
   }
 
   node_identiy_map node_map_;

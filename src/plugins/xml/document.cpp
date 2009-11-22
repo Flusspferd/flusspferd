@@ -43,7 +43,7 @@ document::document(object const &proto, call_context &)
 document::document(object const &proto, wrapped_type const &doc)
   : base_type(proto, doc),
     doc_(doc),
-    non_shared_node_map_(node_map::make())
+    non_shared_node_map_(node_map::make<>(*this, doc_))
 {
 }
 

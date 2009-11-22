@@ -82,8 +82,12 @@ value node::getNamespaceURI() {
          object();
 }
 
-object node::get_node(wrapped_type const &) {
-  throw exception("not implemented");
+object node::get_node(wrapped_type const &n) {
+  node_map_ptr map = node_map_.lock();
+  if (!map)
+    throw exception("Internal error: node_map has gone away");
+
+  return map->get_node<node>(n);
 }
 
 object node::getChildNodes() {
@@ -96,6 +100,6 @@ object node::getAttributes() {
 }
 
 object node::getOwnerDocument() {
-  throw exception("not implemented");
+  return get_node(node_.getOwnerDocument());
 }
 
