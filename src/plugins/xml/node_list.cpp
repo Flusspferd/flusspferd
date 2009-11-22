@@ -35,17 +35,12 @@ using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-node_list::node_list(object const &proto, call_context &)
-  : base_type(proto)
-{
-}
-
-node_list::node_list(object const &proto, wrapped_type const &list)
+node_list::node_list(object const &proto, wrapped_type const &list, weak_node_map map)
   : base_type(proto),
-    list_(list)
+    list_(list),
+    node_map_(map)
 {
 }
-
 
 node_list::~node_list() {
 }
@@ -66,11 +61,13 @@ bool node_list::property_resolve(value const &id, unsigned /*flags*/) {
   if (size_t(uid) >= list_.getLength())
     return false;
  
-  // TODO: ref-identity for nodes
-  //value v = element(v_data[uid]);
-  //define_property(id, v, permanent_shared_property);
-  //return true;
-  return false;
+  node_map_ptr map = node_map_.lock();
+  if (!map)
+    throw exception("Internal error: node_map has gone away");
+
+  value v = map->get_node<node>(list_.item(uid));
+  define_property(id, v, permanent_shared_property);
+  return true;
 }
 
 void node_list::property_op(property_mode mode, value const &id, value &x) {
@@ -87,9 +84,14 @@ void node_list::property_op(property_mode mode, value const &id, value &x) {
 
   switch (mode) {
   case property_get:
-    // TODO: ref-identity for nodes
-    x = create<node>( make_vector(list_.item(index)) );
+  {
+    node_map_ptr map = node_map_.lock();
+    if (!map)
+      throw exception("Internal error: node_map has gone away");
+
+    x = map->get_node<node>(list_.item(index));
     break;
+  }
   default: break;
   };
 }

@@ -42,7 +42,8 @@ document::document(object const &proto, call_context &)
 
 document::document(object const &proto, wrapped_type const &doc)
   : base_type(proto, doc),
-    doc_(doc)
+    doc_(doc),
+    non_shared_node_map_(node_map::make())
 {
 }
 
@@ -52,5 +53,5 @@ document::~document() {
 object document::getElementsByTagName(std::string tagname) {
   Arabica::DOM::NodeList<std::string> list = doc_.getElementsByTagName(tagname);
 
-  return create<node_list>( make_vector(list) );
+  return create<node_list>( make_vector(list, non_shared_node_map_) );
 }

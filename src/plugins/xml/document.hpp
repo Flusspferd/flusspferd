@@ -27,6 +27,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_XML_DOCUMENT_HPP
 #define FLUSSPFERD_XML_DOCUMENT_HPP
 
+#include "node_map.hpp"
 #include "node.hpp"
 
 #include <DOM/Document.hpp>
@@ -54,6 +55,7 @@ public:
 protected:
   wrapped_type doc_;
 
+  node_map_ptr non_shared_node_map_;
 };
 
 }

@@ -38,23 +38,28 @@ using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-node::node(object const &proto, call_context &)
-  : base_type(proto)
-{
-}
-
 node::node(object const &proto)
   : base_type(proto)
 {
 }
 
+// Used by document::document
 node::node(object const &proto, wrapped_type const &node)
   : base_type(proto),
     node_(node)
 {
 }
 
+node::node(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto),
+    node_(node),
+    node_map_(map)
+{
+}
+
 node::~node() {
+  if (node_map_ptr map = node_map_.lock())
+    map->remove_mapped_node(node_);
 }
 
 std::string node::to_string() {
@@ -82,7 +87,8 @@ object node::get_node(wrapped_type const &) {
 }
 
 object node::getChildNodes() {
-  return create<node_list>( make_vector(node_.getChildNodes()) );
+  //return create<node_list>( make_vector(node_.getChildNodes()) );
+  throw exception("not implemented");
 }
 
 object node::getAttributes() {
