@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "node.hpp"
 #include "node_list.hpp"
 #include "document.hpp"
+#include "element.hpp"
 
 using namespace flusspferd;
 
@@ -41,6 +42,7 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<node>(exports);
   load_class<node_list>(exports);
   load_class<document>(exports);
+  load_class<element>(exports);
 
 }
 
