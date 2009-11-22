@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 namespace xml_plugin {
 
-typedef std::string string_type;
-
 #define enum_prop(x) (#x, constant, int(Arabica::DOM::Node_base:: x))
 FLUSSPFERD_CLASS_DESCRIPTION(
     node,
@@ -91,7 +89,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 {
 
 public:
-  typedef Arabica::DOM::Node<string_type> wrapped_type;
+  typedef arabica_node wrapped_type;
 
   node(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
   virtual ~node();
