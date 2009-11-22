@@ -50,6 +50,10 @@ document::document(object const &proto, wrapped_type const &doc)
 document::~document() {
 }
 
+object document::getDocumentElement() {
+  return non_shared_node_map_->get_node<node>(doc_.getDocumentElement());
+}
+
 object document::getElementsByTagName(std::string tagname) {
   Arabica::DOM::NodeList<std::string> list = doc_.getElementsByTagName(tagname);
 

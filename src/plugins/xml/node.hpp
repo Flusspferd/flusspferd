@@ -74,7 +74,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (methods,
       ("toString", bind, to_string)
 
+      ("insertBefore", bind, insertBefore)
+      ("replaceChild", bind, replaceChild)
+      ("removeChild", bind, removeChild)
+      ("appendChild", bind, appendChild)
+      ("hasChildNodes", bind, hasChildNodes)
+      ("cloneNode", bind, cloneNode)
       ("normalize", bind, normalize)
+      ("isSupported", bind, isSupported)
+      ("hasAttributes", bind, hasAttributes)
     )
 )
 #undef enum_prop
@@ -89,6 +97,7 @@ public:
 
   string_type to_string();
 
+  // Property getters/setters
   string_type getNodeName() { return node_.getNodeName(); }
   string_type getNodeValue() { return node_.getNodeValue(); }
   void setNodeValue(string_type const &s) { node_.setNodeValue(s); }
@@ -106,7 +115,17 @@ public:
   void setPrefix(string_type const &s) { node_.setPrefix(s); }
   string_type getLocalName() { return node_.getLocalName(); }
 
+  // Methods
+  object insertBefore(node &newChild, node &refChild);
+  object replaceChild(node &newChild, node &oldChild);
+  object removeChild(node &oldChild);
+  object appendChild(node &newChild);
+  bool hasChildNodes() { return node_.hasChildNodes(); }
+  object cloneNode(bool deep);
   void normalize() { node_.normalize(); }
+  bool isSupported(string_type feat, string_type ver)
+    { return node_.isSupported(feat, ver); }
+  bool hasAttributes() { return node_.hasAttributes(); }
 
 protected:
   node(flusspferd::object const &proto);
