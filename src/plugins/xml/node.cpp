@@ -91,8 +91,7 @@ object node::get_node(wrapped_type const &n) {
 }
 
 object node::getChildNodes() {
-  //return create<node_list>( make_vector(node_.getChildNodes()) );
-  throw exception("not implemented");
+  return create<node_list>( make_vector(node_.getChildNodes(), node_map_) );
 }
 
 object node::getAttributes() {
@@ -102,4 +101,25 @@ object node::getAttributes() {
 object node::getOwnerDocument() {
   return get_node(node_.getOwnerDocument());
 }
+
+object node::insertBefore(node &newChild, node &refChild) {
+  throw exception("not implemented");
+}
+
+object node::replaceChild(node &newChild, node &oldChild) {
+  throw exception("not implemented");
+}
+
+object node::removeChild(node &oldChild) {
+  throw exception("not implemented");
+}
+
+object node::appendChild(node &newChild) {
+  throw exception("not implemented");
+}
+
+object node::cloneNode(bool deep) {
+  throw exception("not implemented");
+}
+
 

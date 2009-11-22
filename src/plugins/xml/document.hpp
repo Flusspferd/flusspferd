@@ -39,6 +39,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (base, node)
     (full_name, "xml.Document")
     (constructor_name, "Document")
+    (properties,
+      ("documentElement", getter, getDocumentElement)
+    )
     (methods,
       ("getElementsByTagName", bind, getElementsByTagName)
     )
@@ -50,6 +53,8 @@ public:
 
   document(flusspferd::object const &proto, wrapped_type const &doc);
   virtual ~document();
+
+  object getDocumentElement();
 
   object getElementsByTagName(std::string tag);
 protected:
