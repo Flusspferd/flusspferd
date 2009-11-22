@@ -55,6 +55,27 @@ exports.test_DOM = {
     asserts.ok(this.doc === a.ownerDocument, "doc === a.ownerDocument");
 
     teardown.call(this);
+  },
+
+  test_node_links: function() {
+    setup.call(this);
+
+    var a = this.doc.documentElement;
+    var b = a.cloneNode();
+    asserts.ok(b !== a, "b !== a");
+    asserts.same(b.hasChildNodes(), false, "cloned node has no children");
+    asserts.same(b.parentNode, null, "cloned node has no parent");
+    asserts.same(b.ownerDocument, this.doc, "cloned node has right ownerDocument");
+    gc();
+
+    var c = a.cloneNode(true);
+    asserts.ok(c !== a, "c !== a");
+    asserts.ok(c !== b, "c !== b");
+    asserts.same(c.hasChildNodes(), a.hasChildNodes(), "cloned node has children");
+    asserts.same(c.parentNode, null, "cloned node has no parent");
+    asserts.same(c.ownerDocument, this.doc, "cloned node has right ownerDocument");
+
+    teardown.call(this);
   }
 }
 
