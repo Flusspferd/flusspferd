@@ -83,6 +83,10 @@ value node::getNamespaceURI() {
 }
 
 object node::get_node(wrapped_type const &n) {
+  // n can be an 'empty' node, which we should represent as |null|
+  if (!n)
+    return object();
+
   node_map_ptr map = node_map_.lock();
   if (!map)
     throw exception("Internal error: node_map has gone away");
@@ -103,23 +107,23 @@ object node::getOwnerDocument() {
 }
 
 object node::insertBefore(node &newChild, node &refChild) {
-  throw exception("not implemented");
+  return get_node(node_.insertBefore(newChild.node_, refChild.node_));
 }
 
 object node::replaceChild(node &newChild, node &oldChild) {
-  throw exception("not implemented");
+  return get_node(node_.insertBefore(newChild.node_, oldChild.node_));
 }
 
 object node::removeChild(node &oldChild) {
-  throw exception("not implemented");
+  return get_node(node_.removeChild(oldChild.node_));
 }
 
 object node::appendChild(node &newChild) {
-  throw exception("not implemented");
+  return get_node(node_.appendChild(newChild.node_));
 }
 
 object node::cloneNode(bool deep) {
-  throw exception("not implemented");
+  return get_node(node_.cloneNode(deep));
 }
 
 
