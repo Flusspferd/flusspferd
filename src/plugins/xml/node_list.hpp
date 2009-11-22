@@ -27,6 +27,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_XML_NODE_LIST_HPP
 #define FLUSSPFERD_XML_NODE_LIST_HPP
 
+#include "node_map.hpp"
 
 #include <DOM/NodeList.hpp>
 
@@ -35,6 +36,7 @@ namespace xml_plugin {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
     node_list,
+    (constructible, false)
     (full_name, "xml.NodeList")
     (constructor_name, "NodeList")
     (properties,
@@ -46,8 +48,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 public:
   typedef Arabica::DOM::NodeList<std::string> wrapped_type;
 
-  node_list(flusspferd::object const &proto, flusspferd::call_context &);
-  node_list(flusspferd::object const &proto, wrapped_type const &node);
+  node_list(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
   virtual ~node_list();
 
   int get_length();
@@ -58,6 +59,7 @@ protected:
   bool property_resolve(flusspferd::value const &id, unsigned);
 
   wrapped_type list_;
+  weak_node_map node_map_;
 };
 
 }

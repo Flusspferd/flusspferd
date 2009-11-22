@@ -27,15 +27,16 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_XML_NODE_HPP
 #define FLUSSPFERD_XML_NODE_HPP
 
+#include "node_map.hpp"
 
 #include <DOM/Node.hpp>
 
 namespace xml_plugin {
 
-
 #define enum_prop(x) (#x, constant, int(Arabica::DOM::Node_base:: x))
 FLUSSPFERD_CLASS_DESCRIPTION(
     node,
+    (constructible, false)
     (full_name, "xml.Node")
     (constructor_name, "Node")
     (constructor_properties,
@@ -83,8 +84,7 @@ public:
   typedef std::string string_type;
   typedef Arabica::DOM::Node<string_type> wrapped_type;
 
-  node(flusspferd::object const &proto, flusspferd::call_context &);
-  node(flusspferd::object const &proto, wrapped_type const &node);
+  node(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
   virtual ~node();
 
   string_type to_string();
@@ -110,8 +110,11 @@ public:
 
 protected:
   node(flusspferd::object const &proto);
+  // Used by document::document
+  node(flusspferd::object const &proto, wrapped_type const &node);
 
   wrapped_type node_;
+  weak_node_map node_map_;
 
   object get_node(wrapped_type const &node);
 };
