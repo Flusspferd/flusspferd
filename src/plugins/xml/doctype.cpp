@@ -27,47 +27,38 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
-#include "node_map.hpp"
-#include "element.hpp"
-#include "node.hpp"
-#include "char_data.hpp"
-#include "attr.hpp"
+#include "named_node_map.hpp"
 #include "doctype.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-template <class T>
-static object make_it(arabica_node &a, weak_node_map map) {
-  return create<T>(
-    make_vector( static_cast<typename T::wrapped_type &>(a), map )
-  );
+doctype::doctype(object const &proto, wrapped_type const &impl, weak_node_map map)
+  : base_type(proto, impl, map),
+    impl_(impl)
+{ }
+
+string_type doctype::getName() {
+  return impl_.getName();
 }
 
-object node_map::create_object_from_node(arabica_node &a) {
-  switch (a.getNodeType()) {
-  case Arabica::DOM::Node_base::ELEMENT_NODE:
-    return make_it<element>(a, shared_from_this());
+object doctype::getEntities() {
+  return create<named_node_map>( make_vector( impl_.getEntities(), node_map_) );
+}
 
-  case Arabica::DOM::Node_base::TEXT_NODE:
-    return make_it<text>(a, shared_from_this());
+object doctype::getNotations() {
+  return create<named_node_map>( make_vector( impl_.getNotations(), node_map_) );
+}
 
-  case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
-    return make_it<cdata>(a, shared_from_this());
+string_type doctype::getPublicId() {
+  return impl_.getPublicId();
+}
 
-  case Arabica::DOM::Node_base::COMMENT_NODE:
-    throw exception("bug in Arabica::Comment constructor");
-    //return make_it<comment>(a, shared_from_this());
+string_type doctype::getSystemId() {
+  return impl_.getSystemId();
+}
 
-  case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
-    return make_it<attr>(a, shared_from_this());
-
-  case Arabica::DOM::Node_base::DOCUMENT_TYPE_NODE:
-    return make_it<doctype>(a, shared_from_this());
-
-
-  default:
-    return create<node>( make_vector( a, shared_from_this() ) );
-  };
+string_type doctype::getInternalSubset() {
+  return impl_.getInternalSubset();
 }
