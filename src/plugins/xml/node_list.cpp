@@ -49,6 +49,14 @@ int node_list::get_length() {
   return list_.getLength();
 }
 
+object node_list::item(int idx) {
+  node_map_ptr map = node_map_.lock();
+  if (!map)
+    throw exception("Internal error: node_map has gone away");
+
+  return map->get_node(list_.item(idx));
+}
+
 bool node_list::property_resolve(value const &id, unsigned /*flags*/) {
   if (!id.is_int())
     return false;
@@ -61,12 +69,7 @@ bool node_list::property_resolve(value const &id, unsigned /*flags*/) {
   if (size_t(uid) >= list_.getLength())
     return false;
  
-  node_map_ptr map = node_map_.lock();
-  if (!map)
-    throw exception("Internal error: node_map has gone away");
-
-  value v = map->get_node(list_.item(uid));
-  define_property(id, v, permanent_shared_property);
+  define_property(id, item(uid), permanent_shared_property);
   return true;
 }
 
@@ -84,14 +87,7 @@ void node_list::property_op(property_mode mode, value const &id, value &x) {
 
   switch (mode) {
   case property_get:
-  {
-    node_map_ptr map = node_map_.lock();
-    if (!map)
-      throw exception("Internal error: node_map has gone away");
-
-    x = map->get_node(list_.item(index));
-    break;
-  }
+    x = item(index);
   default: break;
   };
 }

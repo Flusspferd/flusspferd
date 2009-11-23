@@ -76,7 +76,7 @@ public:
 
   // Methods
   string_type getAttribute(string_type name);
-  void setAttribute(string_type name);
+  void setAttribute(string_type name, string_type value);
   void removeAttribute(string_type name);
   object getAttributeNode(string_type name);
   object setAttributeNode(string_type name);
@@ -84,7 +84,7 @@ public:
   object getElementsByTagName(string_type name);
 
   string_type getAttributeNS(string_type ns_uri, string_type local_name);
-  void setAttributeNS(string_type ns_uri, string_type local_name);
+  void setAttributeNS(string_type ns_uri, string_type local_name, string_type value);
   void removeAttributeNS(string_type ns_uri, string_type local_name);
   object getAttributeNodeNS(string_type ns_uri, string_type local_name);
   object setAttributeNodeNS(string_type ns_uri, string_type local_name);
