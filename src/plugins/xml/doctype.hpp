@@ -24,46 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_XML_TYPES_HPP
-#define FLUSSPFERD_XML_TYPES_HPP
+#ifndef FLUSSPFERD_XML_DOCTYPE_HPP
+#define FLUSSPFERD_XML_DOCTYPE_HPP
 
-#include <DOM/Node.hpp>
-#include <DOM/DocumentType.hpp>
-#include <DOM/Element.hpp>
-#include <DOM/CharacterData.hpp>
-#include <DOM/Text.hpp>
-#include <DOM/Comment.hpp>
-#include <DOM/CDATASection.hpp>
-#include <DOM/Attr.hpp>
-
-#include <map>
-#include <boost/shared_ptr.hpp>
-#include <boost/weak_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
+#include "types.hpp"
+#include "node.hpp"
 
 namespace xml_plugin {
 
-typedef std::string string_type;
-typedef Arabica::DOM::Node<string_type> arabica_node;
-typedef Arabica::DOM::DocumentType<string_type> arabica_doctype;
-typedef Arabica::DOM::Element<string_type> arabica_element;
-typedef Arabica::DOM::CharacterData<string_type> arabica_char_data;
-typedef Arabica::DOM::Text<string_type> arabica_text;
-typedef Arabica::DOM::Comment<string_type> arabica_comment;
-typedef Arabica::DOM::CDATASection<string_type> arabica_cdata;
-typedef Arabica::DOM::Attr<string_type> arabica_attr;
 
-class node_map;
+FLUSSPFERD_CLASS_DESCRIPTION(
+    doctype,
+    (base, node)
+    (constructible, false)
+    (full_name, "xml.DocumentType")
+    (constructor_name, "DocumentType")
+    (properties,
+      ("name", getter, getName)
+      ("entities", getter, getEntities)
+      ("notations", getter, getNotations)
+      ("publicId", getter, getPublicId)
+      ("systemId", getter, getSystemId)
+      ("internalSubset", getter, getInternalSubset)
+    )
+) {
+public:
+  typedef arabica_doctype wrapped_type;
 
-typedef boost::weak_ptr<node_map> weak_node_map;
-typedef boost::shared_ptr<node_map> node_map_ptr;
-class node;
-class node_list;
-class named_node_map;
-class document;
-class element;
+  doctype(flusspferd::object const &proto, wrapped_type const &impl, weak_node_map map);
+
+  // Property getters
+  string_type getName();
+  object getEntities();
+  object getNotations();
+  string_type getPublicId();
+  string_type getSystemId();
+  string_type getInternalSubset();
+
+protected:
+  wrapped_type impl_;
+};
 
 }
 
-#endif;
+#endif
 
