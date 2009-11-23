@@ -37,33 +37,30 @@ using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
+template <class T>
+static object make_it(arabica_node &a, weak_node_map map) {
+  return create<T>(
+    make_vector( static_cast<typename T::wrapped_type &>(a), map )
+  );
+}
+
 object node_map::create_object_from_node(arabica_node &a) {
   switch (a.getNodeType()) {
   case Arabica::DOM::Node_base::ELEMENT_NODE:
-    return create<element>(
-      make_vector( static_cast<arabica_element>(a), shared_from_this() ) 
-    );
+    return make_it<element>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::TEXT_NODE:
-    return create<text>(
-      make_vector( static_cast<arabica_text>(a), shared_from_this() )
-    );
+    return make_it<text>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
-    return create<cdata>(
-      make_vector( static_cast<arabica_cdata>(a), shared_from_this() )
-    );
+    return make_it<cdata>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::COMMENT_NODE:
     throw exception("bug in Arabica::Comment constructor");
-    /*return create<comment>(
-      make_vector( static_cast<arabica_comment>(a), shared_from_this() )
-    );*/
+    //return make_it<comment>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
-    return create<attr>(
-      make_vector( static_cast<arabica_attr>(a), shared_from_this() )
-    );
+    return make_it<attr>(a, shared_from_this());
 
 
   default:
