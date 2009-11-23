@@ -55,7 +55,8 @@ object document::getDocumentElement() {
 }
 
 object document::getElementsByTagName(std::string tagname) {
-  Arabica::DOM::NodeList<std::string> list = doc_.getElementsByTagName(tagname);
-
-  return create<node_list>( make_vector(list, non_shared_node_map_) );
+  return create<node_list>( make_vector(
+    doc_.getElementsByTagName(tagname),
+    non_shared_node_map_
+  ) );
 }

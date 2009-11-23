@@ -42,6 +42,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (properties,
       ("length", getter, get_length)
     )
+    (methods,
+      ("item", bind, item)
+    )
 )
 {
 
@@ -52,6 +55,8 @@ public:
   virtual ~node_list();
 
   int get_length();
+
+  flusspferd::object item(int idx);
 
 protected:
 

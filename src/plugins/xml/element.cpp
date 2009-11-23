@@ -25,8 +25,10 @@ THE SOFTWARE.
 */
 
 #include <flusspferd.hpp>
+#include <flusspferd/aliases.hpp>
 
 #include "element.hpp"
+#include "node_list.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -42,15 +44,15 @@ element::~element()
 
 
 string_type element::getAttribute(string_type name) {
-  throw exception("not implemented");
+  return element_.getAttribute(name);
 }
 
-void element::setAttribute(string_type name) {
-  throw exception("not implemented");
+void element::setAttribute(string_type name, string_type value) {
+  return element_.setAttribute(name, value);
 }
 
 void element::removeAttribute(string_type name) {
-  throw exception("not implemented");
+  element_.removeAttribute(name);
 }
 
 object element::getAttributeNode(string_type name) {
@@ -65,21 +67,24 @@ object element::removeAttributeNode(string_type name) {
   throw exception("not implemented");
 }
 
-object element::getElementsByTagName(string_type name) {
-  throw exception("not implemented");
+object element::getElementsByTagName(string_type tagname) {
+  return create<node_list>( make_vector(
+    element_.getElementsByTagName(tagname),
+    node_map_
+  ) );
 }
 
 
 string_type element::getAttributeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+  return element_.getAttributeNS(ns_uri, local_name);
 }
 
-void element::setAttributeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+void element::setAttributeNS(string_type ns_uri, string_type local_name, string_type value) {
+  element_.setAttributeNS(ns_uri, local_name, value);
 }
 
 void element::removeAttributeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+  element_.removeAttributeNS(ns_uri, local_name);
 }
 
 object element::getAttributeNodeNS(string_type ns_uri, string_type local_name) {
@@ -95,15 +100,18 @@ object element::removeAttributeNodeNS(string_type ns_uri, string_type local_name
 }
 
 object element::getElementsByTagNameNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+  return create<node_list>( make_vector(
+    element_.getElementsByTagNameNS(ns_uri, local_name),
+    node_map_
+  ) );
 }
 
 
 bool element::hasAttribute(string_type name) {
-  throw exception("not implemented");
+  return element_.hasAttribute(name);
 }
 
 bool element::hasAttributeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+  return element_.hasAttributeNS(ns_uri, local_name);
 }
 
