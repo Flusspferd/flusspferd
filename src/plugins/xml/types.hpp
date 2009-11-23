@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include <DOM/Text.hpp>
 #include <DOM/Comment.hpp>
 #include <DOM/CDATASection.hpp>
+#include <DOM/Attr.hpp>
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -48,6 +49,7 @@ typedef Arabica::DOM::CharacterData<string_type> arabica_char_data;
 typedef Arabica::DOM::Text<string_type> arabica_text;
 typedef Arabica::DOM::Comment<string_type> arabica_comment;
 typedef Arabica::DOM::CDATASection<string_type> arabica_cdata;
+typedef Arabica::DOM::Attr<string_type> arabica_attr;
 
 class node_map;
 
