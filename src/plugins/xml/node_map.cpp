@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "char_data.hpp"
 #include "attr.hpp"
 #include "doctype.hpp"
+#include "document.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -66,6 +67,8 @@ object node_map::create_object_from_node(arabica_node &a) {
   case Arabica::DOM::Node_base::DOCUMENT_TYPE_NODE:
     return make_it<doctype>(a, shared_from_this());
 
+  case Arabica::DOM::Node_base::DOCUMENT_FRAGMENT_NODE:
+    return make_it<document_fragment>(a, shared_from_this());
 
   default:
     return create<node>( make_vector( a, shared_from_this() ) );
