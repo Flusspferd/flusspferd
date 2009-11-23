@@ -47,7 +47,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     )
 ) {
 public:
-  typedef Arabica::DOM::Document<std::string> wrapped_type;
+  typedef arabica_document wrapped_type;
 
   document(flusspferd::object const &proto, flusspferd::call_context &);
 
@@ -63,6 +63,20 @@ protected:
   node_map_ptr non_shared_node_map_;
 };
 
-}
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+    document_fragment,
+    (base, node)
+    (constructible, false)
+    (full_name, "xml.DocumentFragment")
+    (constructor_name, "DocumentFragment")
+) {
+public:
+  typedef arabica_doc_fragment wrapped_type;
+
+  document_fragment(object const &proto, wrapped_type const &node, weak_node_map map);
+};
+
+} // namespace xml_plugin
 
 #endif

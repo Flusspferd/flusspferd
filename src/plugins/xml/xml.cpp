@@ -46,6 +46,7 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<node_list>(exports);
   load_class<named_node_map>(exports);
   load_class<document>(exports);
+  load_class<document_fragment>(exports);
   load_class<element>(exports);
   load_class<character_data>(exports);
   load_class<text>(exports);

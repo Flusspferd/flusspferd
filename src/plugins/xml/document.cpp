@@ -60,3 +60,10 @@ object document::getElementsByTagName(std::string tagname) {
     non_shared_node_map_
   ) );
 }
+
+
+
+
+document_fragment::document_fragment(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map)
+{ }
