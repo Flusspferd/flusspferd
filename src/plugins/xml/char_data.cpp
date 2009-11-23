@@ -27,39 +27,63 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
-#include "node_map.hpp"
-#include "element.hpp"
-#include "node.hpp"
 #include "char_data.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-object node_map::create_object_from_node(arabica_node &a) {
-  switch (a.getNodeType()) {
-  case Arabica::DOM::Node_base::ELEMENT_NODE:
-    return create<element>(
-      make_vector( static_cast<arabica_element>(a), shared_from_this() ) 
-    );
+character_data::character_data(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map),
+    impl_(node)
+{ }
 
-  case Arabica::DOM::Node_base::TEXT_NODE:
-    return create<text>(
-      make_vector( static_cast<arabica_text>(a), shared_from_this() )
-    );
+character_data::~character_data()
+{ }
 
-  case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
-    return create<cdata>(
-      make_vector( static_cast<arabica_cdata>(a), shared_from_this() )
-    );
 
-  case Arabica::DOM::Node_base::COMMENT_NODE:
-    throw exception("bug in Arabica::Comment constructor");
-    /*return create<comment>(
-      make_vector( static_cast<arabica_comment>(a), shared_from_this() )
-    );*/
-
-  default:
-    return create<node>( make_vector( a, shared_from_this() ) );
-  };
+string_type character_data::substringData(int offset, int count) {
+  return impl_.substringData(offset, count);
 }
+
+void character_data::appendData(string_type arg) {
+  impl_.appendData(arg);
+}
+
+void character_data::insertData(int offset, string_type arg) {
+  impl_.insertData(offset, arg);
+}
+
+void character_data::deleteData(int offset, int count) {
+  impl_.deleteData(offset, count);
+}
+
+void character_data::replaceData(int /*offset*/, int /*count*/, string_type /*arg*/) {
+  throw exception("not implemented - bug in arabica");
+  //impl_.replaceData(offset, count, arg);
+}
+
+
+
+
+text::text(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map)
+{ }
+
+object text::splitText(int /*offset*/) {
+  throw exception("not implemented - bug in arabica");
+  //return static_cast<arabica_text>(impl_).splitText(offset);
+}
+
+
+
+cdata::cdata(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map)
+{ }
+
+
+
+comment::comment(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map)
+{ }
+

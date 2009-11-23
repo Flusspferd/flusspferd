@@ -29,6 +29,10 @@ THE SOFTWARE.
 
 #include <DOM/Node.hpp>
 #include <DOM/Element.hpp>
+#include <DOM/CharacterData.hpp>
+#include <DOM/Text.hpp>
+#include <DOM/Comment.hpp>
+#include <DOM/CDATASection.hpp>
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -40,6 +44,10 @@ namespace xml_plugin {
 typedef std::string string_type;
 typedef Arabica::DOM::Node<string_type> arabica_node;
 typedef Arabica::DOM::Element<string_type> arabica_element;
+typedef Arabica::DOM::CharacterData<string_type> arabica_char_data;
+typedef Arabica::DOM::Text<string_type> arabica_text;
+typedef Arabica::DOM::Comment<string_type> arabica_comment;
+typedef Arabica::DOM::CDATASection<string_type> arabica_cdata;
 
 class node_map;
 

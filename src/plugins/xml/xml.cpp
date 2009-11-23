@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "named_node_map.hpp"
 #include "document.hpp"
 #include "element.hpp"
+#include "char_data.hpp"
 
 using namespace flusspferd;
 
@@ -45,6 +46,10 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<named_node_map>(exports);
   load_class<document>(exports);
   load_class<element>(exports);
+  load_class<character_data>(exports);
+  load_class<text>(exports);
+  load_class<comment>(exports);
+  load_class<cdata>(exports);
 
 }
 

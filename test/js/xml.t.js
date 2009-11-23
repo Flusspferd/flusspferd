@@ -96,6 +96,18 @@ exports.test_DOM = {
 
     teardown.call(this);
   },
+
+  test_char_nodes: function() {
+    setup.call(this);
+
+    var n = this.doc.documentElement.firstChild;
+
+    asserts.instanceOf(n, xml.Text);
+    asserts.same(n.nodeType, xml.Node.TEXT_NODE);
+    asserts.same(n.data, "\n  content\n  ");
+
+    teardown.call(this);
+  }
 }
 
 if (require.main === module)
