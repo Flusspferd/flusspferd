@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "node.hpp"
 #include "node_list.hpp"
+#include "named_node_map.hpp"
 
 #include <DOM/SAX2DOM/SAX2DOM.hpp>
 #include <DOM/io/Stream.hpp>
@@ -99,7 +100,7 @@ object node::getChildNodes() {
 }
 
 object node::getAttributes() {
-  throw exception("not implemented");
+  return create<named_node_map>( make_vector( node_.getAttributes(), node_map_) );
 }
 
 object node::getOwnerDocument() {

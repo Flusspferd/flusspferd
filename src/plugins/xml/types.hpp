@@ -41,13 +41,15 @@ typedef std::string string_type;
 typedef Arabica::DOM::Node<string_type> arabica_node;
 typedef Arabica::DOM::Element<string_type> arabica_element;
 
-class node;
 class node_map;
-class document;
-class element;
 
 typedef boost::weak_ptr<node_map> weak_node_map;
 typedef boost::shared_ptr<node_map> node_map_ptr;
+class node;
+class node_list;
+class named_node_map;
+class document;
+class element;
 
 }
 
