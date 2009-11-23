@@ -24,49 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
-#include <flusspferd/aliases.hpp>
+#ifndef FLUSSPFERD_XML_ATTR_HPP
+#define FLUSSPFERD_XML_ATTR_HPP
 
-#include "node_map.hpp"
-#include "element.hpp"
 #include "node.hpp"
-#include "char_data.hpp"
-#include "attr.hpp"
 
-using namespace flusspferd;
-using namespace flusspferd::aliases;
-using namespace xml_plugin;
+namespace xml_plugin {
 
-object node_map::create_object_from_node(arabica_node &a) {
-  switch (a.getNodeType()) {
-  case Arabica::DOM::Node_base::ELEMENT_NODE:
-    return create<element>(
-      make_vector( static_cast<arabica_element>(a), shared_from_this() ) 
-    );
+FLUSSPFERD_CLASS_DESCRIPTION(
+    attr,
+    (base, node)
+    (constructible, false)
+    (full_name, "xml.Attr")
+    (constructor_name, "Attr")
+    (properties,
+      ("name", getter, getName)
+      ("specified", getter, getSpecified)
+      ("value", getter_setter, (getValue, setValue))
+      ("ownerElement", getter, getOwnerElement)
+    )
+)
+{
 
-  case Arabica::DOM::Node_base::TEXT_NODE:
-    return create<text>(
-      make_vector( static_cast<arabica_text>(a), shared_from_this() )
-    );
+public:
+  typedef arabica_attr wrapped_type;
 
-  case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
-    return create<cdata>(
-      make_vector( static_cast<arabica_cdata>(a), shared_from_this() )
-    );
+  attr(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
 
-  case Arabica::DOM::Node_base::COMMENT_NODE:
-    throw exception("bug in Arabica::Comment constructor");
-    /*return create<comment>(
-      make_vector( static_cast<arabica_comment>(a), shared_from_this() )
-    );*/
+  // Property getters/setters
+  string_type getName();
+  bool getSpecified();
+  string_type getValue();
+  void setValue(string_type s);
+  object getOwnerElement();
 
-  case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
-    return create<attr>(
-      make_vector( static_cast<arabica_attr>(a), shared_from_this() )
-    );
+protected:
+  wrapped_type impl_;
+};
 
-
-  default:
-    return create<node>( make_vector( a, shared_from_this() ) );
-  };
 }
+
+#endif
+
+

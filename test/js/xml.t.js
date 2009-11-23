@@ -91,8 +91,13 @@ exports.test_DOM = {
     asserts.instanceOf(map, xml.NamedNodeMap);
     asserts.same(map.length, 2, "correct lenght")
 
-    asserts.ok(map.item(0), "can get an item");
-    asserts.ok(map.getNamedItem("foo"), "can get a named item");
+    var i0, foo;
+    asserts.ok(i0 = map.item(0), "can get an item");
+    asserts.ok(foo = map.getNamedItem("foo"), "can get a named item");
+    asserts.ok(i0 === foo, "same object via name and number");
+    asserts.instanceOf(foo, xml.Attr);
+    asserts.same(foo.name, "foo", "right name");
+    asserts.same(foo.value, "bar", "right value");
 
     teardown.call(this);
   },

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "document.hpp"
 #include "element.hpp"
 #include "char_data.hpp"
+#include "attr.hpp"
 
 using namespace flusspferd;
 
@@ -50,6 +51,7 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<text>(exports);
   load_class<comment>(exports);
   load_class<cdata>(exports);
+  load_class<attr>(exports);
 
 }
 

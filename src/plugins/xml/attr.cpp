@@ -27,46 +27,33 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
-#include "node_map.hpp"
-#include "element.hpp"
-#include "node.hpp"
-#include "char_data.hpp"
 #include "attr.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-object node_map::create_object_from_node(arabica_node &a) {
-  switch (a.getNodeType()) {
-  case Arabica::DOM::Node_base::ELEMENT_NODE:
-    return create<element>(
-      make_vector( static_cast<arabica_element>(a), shared_from_this() ) 
-    );
+attr::attr(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map),
+    impl_(node)
+{ }
 
-  case Arabica::DOM::Node_base::TEXT_NODE:
-    return create<text>(
-      make_vector( static_cast<arabica_text>(a), shared_from_this() )
-    );
+string_type attr::getName() {
+  return impl_.getName();
+}
 
-  case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
-    return create<cdata>(
-      make_vector( static_cast<arabica_cdata>(a), shared_from_this() )
-    );
+bool attr::getSpecified() {
+  return impl_.getSpecified();
+}
 
-  case Arabica::DOM::Node_base::COMMENT_NODE:
-    throw exception("bug in Arabica::Comment constructor");
-    /*return create<comment>(
-      make_vector( static_cast<arabica_comment>(a), shared_from_this() )
-    );*/
+string_type attr::getValue() {
+  return impl_.getValue();
+}
 
-  case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
-    return create<attr>(
-      make_vector( static_cast<arabica_attr>(a), shared_from_this() )
-    );
+void attr::setValue(string_type s) {
+  impl_.setValue(s);
+}
 
-
-  default:
-    return create<node>( make_vector( a, shared_from_this() ) );
-  };
+object attr::getOwnerElement() {
+  return get_node(impl_.getOwnerElement());
 }
