@@ -17,8 +17,9 @@ exports.test_DOMParser = {
 
 }
 
-function setup() {
-  this.doc = xml.DOMParser.parse("test/fixtures/xml/short_1.xml");
+function setup(file) {
+  file = file || "short_1.xml";
+  this.doc = xml.DOMParser.parse("test/fixtures/xml/" + file );
 }
 function teardown() {
   delete this.doc;
@@ -80,7 +81,21 @@ exports.test_DOM = {
     asserts.same(c.ownerDocument, this.doc, "cloned node has right ownerDocument");
 
     teardown.call(this);
-  }
+  },
+
+  test_named_node_map: function() {
+    setup.call(this, "attr_1.xml");
+
+    var map = this.doc.documentElement.attributes;
+
+    asserts.instanceOf(map, xml.NamedNodeMap);
+    asserts.same(map.length, 2, "correct lenght")
+
+    asserts.ok(map.item(0), "can get an item");
+    asserts.ok(map.getNamedItem("foo"), "can get a named item");
+
+    teardown.call(this);
+  },
 }
 
 if (require.main === module)

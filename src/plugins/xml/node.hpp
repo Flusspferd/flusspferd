@@ -127,6 +127,8 @@ public:
   bool hasAttributes() { return node_.hasAttributes(); }
 
 protected:
+  friend class named_node_map;
+
   node(flusspferd::object const &proto);
   // Used by document::document
   node(flusspferd::object const &proto, wrapped_type const &node);

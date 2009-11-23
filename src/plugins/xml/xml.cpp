@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "dom_parser.hpp"
 #include "node.hpp"
 #include "node_list.hpp"
+#include "named_node_map.hpp"
 #include "document.hpp"
 #include "element.hpp"
 
@@ -41,6 +42,7 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<dom_parser>(exports);
   load_class<node>(exports);
   load_class<node_list>(exports);
+  load_class<named_node_map>(exports);
   load_class<document>(exports);
   load_class<element>(exports);
 
