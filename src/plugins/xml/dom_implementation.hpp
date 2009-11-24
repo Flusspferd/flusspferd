@@ -34,6 +34,7 @@ namespace xml_plugin {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
     dom_implementation,
+    (constructible, false)
     (full_name, "xml.DOMImplementation")
     (constructor_name, "DOMImplementation")
     (methods,
@@ -45,15 +46,23 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 public:
   typedef arabica_dom_impl wrapped_type;
 
-  dom_implementation(flusspferd::object const &proto, flusspferd::call_context &x);
   dom_implementation(flusspferd::object const &proto, wrapped_type const &impl);
 
   bool hasFeature(string_type feature, string_type ver);
   object createDocumentType(string_type qname, string_type pub_id, string_type sys_id);
   object createDocument(string_type ns_uri, string_type qname, object &doctype);
 
+  static weak_node_map get_node_map() { return weak_node_map_; }
+
 protected:
   wrapped_type impl_;
+
+  node_map_ptr master_node_map_;
+
+  // Uggh. I dont like using globals, but there isn't much option since Arabica
+  // DOMImplementation is a singleton.
+  static weak_node_map weak_node_map_;
+
 };
 
 }

@@ -29,21 +29,26 @@ THE SOFTWARE.
 #include "document.hpp"
 #include "dom_implementation.hpp"
 
-#include <DOM/Simple/DOMImplementation.hpp>
-
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
-dom_implementation::dom_implementation(object const &proto, call_context &)
-  : base_type(proto),
-    impl_(Arabica::SimpleDOM::DOMImplementation<string_type>::getDOMImplementation())
-{ }
+
+// Global/class statics make Ash a sad panda. Can't see a way around this one tho
+/*static*/ weak_node_map dom_implementation::weak_node_map_;
+
 
 dom_implementation::dom_implementation(object const &proto, wrapped_type const &impl)
   : base_type(proto),
-    impl_(impl)
-{ }
+    impl_(impl),
+    master_node_map_(node_map::make(*this))
+{
+#ifdef DEBUG
+  // We are setup to only have one of these! check it is so
+  assert(weak_node_map_.expired());
+#endif
+  weak_node_map_ = master_node_map_;
+}
 
 bool dom_implementation::hasFeature(string_type feat, string_type ver) {
   return impl_.hasFeature(feat, ver);
@@ -55,15 +60,11 @@ object dom_implementation::createDocumentType(string_type qname, string_type pub
 }
 
 object dom_implementation::createDocument(string_type ns_uri, string_type qname, object &doctype) {
-  throw exception("not implemented");
-  object doc = create<document>( make_vector( 
+  return master_node_map_->get_node(
     impl_.createDocument(
       ns_uri, 
       qname, 
       Arabica::DOM::DocumentType<string_type>() 
     )
-  ) );
-
-  // TODO: add the doctype to the doc's node_map
-  return object();
+  );
 }

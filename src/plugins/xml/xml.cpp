@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 
 #include "dom_parser.hpp"
+#include "dom_implementation.hpp"
 #include "node.hpp"
 #include "node_list.hpp"
 #include "named_node_map.hpp"
@@ -36,12 +37,14 @@ THE SOFTWARE.
 #include "attr.hpp"
 
 using namespace flusspferd;
+using namespace flusspferd::aliases;
 
 namespace xml_plugin {
 
 FLUSSPFERD_LOADER_SIMPLE(exports) {
 
   load_class<dom_parser>(exports);
+  load_class<dom_implementation>(exports);
   load_class<node>(exports);
   load_class<node_list>(exports);
   load_class<named_node_map>(exports);
@@ -54,6 +57,15 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<cdata>(exports);
   load_class<attr>(exports);
 
+  // Create the singleton domImplementation
+  create<dom_implementation>(
+    _container = exports,
+    _name = "domImplementation",
+    _attributes = read_only_property | permanent_property,
+    _arguments = make_vector(
+      Arabica::SimpleDOM::DOMImplementation<string_type>::getDOMImplementation()
+    )
+  );
 }
 
 }

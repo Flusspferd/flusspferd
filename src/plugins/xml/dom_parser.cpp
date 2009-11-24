@@ -33,12 +33,14 @@ THE SOFTWARE.
 
 #include "dom_parser.hpp"
 #include "document.hpp"
+#include "dom_implementation.hpp"
 
 
 using boost::format;
 
 using namespace flusspferd;
 using namespace xml_plugin;
+
 
 dom_parser::dom_parser(flusspferd::object const &proto, flusspferd::call_context &)
   : base_type(proto)
@@ -101,5 +103,8 @@ object dom_parser::parse_source(sax_source &is) {
   }
 
   document::wrapped_type const &doc = parser_.getDocument();
-  return create<document>( boost::fusion::make_vector(doc) );
+  node_map_ptr map = dom_implementation::get_node_map().lock();
+  if (!map)
+    throw exception("Internal error: node_map has gone away");
+  return map->get_node(doc);
 }

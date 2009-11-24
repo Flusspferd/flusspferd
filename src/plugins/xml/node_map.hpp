@@ -36,6 +36,8 @@ THE SOFTWARE.
 
 namespace xml_plugin {
 
+class dom_implementation;
+
 class node_map : public boost::enable_shared_from_this<node_map> {
 public:
   /*
@@ -57,23 +59,24 @@ public:
   typedef std::map<void*, flusspferd::object> node_identiy_map;
 private:
   // Nothing can create instances of us directly
-  node_map() {}
+  node_map(dom_implementation &impl);
 
 protected:
-  friend class document;
+  friend class dom_implementation;
 
   // Template this to avoid circular dep on document
-  template <class T, class U>
-  static node_map_ptr make(T &obj, U node) {
-    node_map_ptr map(new node_map());
-    void *ptr = static_cast<void*>(node.underlying_impl());
-    map->node_map_[ptr] = obj;
+  static node_map_ptr make(dom_implementation &impl) {
+    node_map_ptr map(new node_map(impl));
     return map;
   }
 
   node_identiy_map node_map_;
+  // No GC hazzard here due to all classes only have this as a weak ref. the
+  // impl has the only shared_ptr to this node_map instance
+  dom_implementation &impl_;
 
   flusspferd::object create_object_from_node(arabica_node &node);
+
 
 public:
   ~node_map() {}
@@ -86,10 +89,8 @@ public:
     node_identiy_map::const_iterator it = node_map_.find(ptr);
 
     if (it == node_map_.end()) {
-      using namespace flusspferd;
-      using namespace flusspferd::aliases;
 
-      object o = create_object_from_node(node);
+      flusspferd::object o = create_object_from_node(node);
       //std::cout << "Put something (" << int(ptr) << ") in the node_map" << std::endl;
       node_map_[ptr] = o;
       return o;
