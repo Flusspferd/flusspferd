@@ -40,10 +40,9 @@ document::document(object const &proto, call_context &)
 }
 
 
-document::document(object const &proto, wrapped_type const &doc)
-  : base_type(proto, doc),
-    doc_(doc),
-    non_shared_node_map_(node_map::make(*this, doc_))
+document::document(object const &proto, wrapped_type const &doc, weak_node_map map)
+  : base_type(proto, doc, map),
+    doc_(doc)
 {
 }
 
@@ -51,13 +50,13 @@ document::~document() {
 }
 
 object document::getDocumentElement() {
-  return non_shared_node_map_->get_node(doc_.getDocumentElement());
+  return get_node(doc_.getDocumentElement());
 }
 
 object document::getElementsByTagName(std::string tagname) {
   return create<node_list>( make_vector(
     doc_.getElementsByTagName(tagname),
-    non_shared_node_map_
+    node_map_
   ) );
 }
 

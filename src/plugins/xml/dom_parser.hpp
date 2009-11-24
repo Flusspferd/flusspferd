@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include <SAX/helpers/CatchErrorHandler.hpp>
 #include <DOM/io/Stream.hpp>
 
+#include "types.hpp"
+
 namespace xml_plugin {
 
 FLUSSPFERD_CLASS_DESCRIPTION(

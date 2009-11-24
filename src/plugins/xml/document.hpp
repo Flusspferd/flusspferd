@@ -51,7 +51,7 @@ public:
 
   document(flusspferd::object const &proto, flusspferd::call_context &);
 
-  document(flusspferd::object const &proto, wrapped_type const &doc);
+  document(flusspferd::object const &proto, wrapped_type const &doc, weak_node_map map);
   virtual ~document();
 
   object getDocumentElement();
@@ -59,8 +59,6 @@ public:
   object getElementsByTagName(std::string tag);
 protected:
   wrapped_type doc_;
-
-  node_map_ptr non_shared_node_map_;
 };
 
 

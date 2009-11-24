@@ -39,6 +39,10 @@ using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
+node_map::node_map(dom_implementation &impl)
+  : impl_(impl)
+{ }
+
 template <class T>
 static object make_it(arabica_node &a, weak_node_map map) {
   return create<T>(
@@ -63,6 +67,9 @@ object node_map::create_object_from_node(arabica_node &a) {
 
   case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
     return make_it<attr>(a, shared_from_this());
+
+  case Arabica::DOM::Node_base::DOCUMENT_NODE:
+    return make_it<document>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::DOCUMENT_TYPE_NODE:
     return make_it<doctype>(a, shared_from_this());
