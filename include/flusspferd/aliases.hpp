@@ -38,6 +38,8 @@ namespace flusspferd { namespace aliases {
   using boost::fusion::make_vector;
   using boost::assign::list_of;
 
+  // Get _container, _name et al.
+  using namespace flusspferd::param;
 } }
 
 #endif
