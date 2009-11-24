@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "element.hpp"
 #include "char_data.hpp"
 #include "attr.hpp"
+#include "misc_nodes.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -56,6 +57,10 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
   load_class<comment>(exports);
   load_class<cdata>(exports);
   load_class<attr>(exports);
+  load_class<notation>(exports);
+  load_class<entity>(exports);
+  load_class<entity_ref>(exports);
+  load_class<processing_instruction>(exports);
 
   // Create the singleton domImplementation
   create<dom_implementation>(

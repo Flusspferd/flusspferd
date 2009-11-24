@@ -29,11 +29,13 @@ THE SOFTWARE.
 
 #include "node_map.hpp"
 #include "element.hpp"
+#include "attr.hpp"
 #include "node.hpp"
 #include "char_data.hpp"
 #include "attr.hpp"
 #include "doctype.hpp"
 #include "document.hpp"
+#include "misc_nodes.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -55,18 +57,24 @@ object node_map::create_object_from_node(arabica_node &a) {
   case Arabica::DOM::Node_base::ELEMENT_NODE:
     return make_it<element>(a, shared_from_this());
 
+  case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
+    return make_it<attr>(a, shared_from_this());
+
   case Arabica::DOM::Node_base::TEXT_NODE:
     return make_it<text>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
     return make_it<cdata>(a, shared_from_this());
 
+  case Arabica::DOM::Node_base::ENTITY_NODE:
+    return make_it<entity>(a, shared_from_this());
+
+  case Arabica::DOM::Node_base::PROCESSING_INSTRUCTION_NODE:
+    return make_it<processing_instruction>(a, shared_from_this());
+
   case Arabica::DOM::Node_base::COMMENT_NODE:
     throw exception("bug in Arabica::Comment constructor");
     //return make_it<comment>(a, shared_from_this());
-
-  case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
-    return make_it<attr>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::DOCUMENT_NODE:
     return make_it<document>(a, shared_from_this());
@@ -76,6 +84,10 @@ object node_map::create_object_from_node(arabica_node &a) {
 
   case Arabica::DOM::Node_base::DOCUMENT_FRAGMENT_NODE:
     return make_it<document_fragment>(a, shared_from_this());
+
+  case Arabica::DOM::Node_base::NOTATION_NODE:
+    throw exception("bug in Arabica::Notation");
+    //return make_it<notation>(a, shared_from_this());
 
   default:
     return create<node>( make_vector( a, shared_from_this() ) );

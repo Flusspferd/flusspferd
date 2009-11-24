@@ -38,6 +38,10 @@ THE SOFTWARE.
 #include <DOM/Comment.hpp>
 #include <DOM/CDATASection.hpp>
 #include <DOM/Attr.hpp>
+#include <DOM/Notation.hpp>
+#include <DOM/Entity.hpp>
+#include <DOM/EntityReference.hpp>
+#include <DOM/ProcessingInstruction.hpp>
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -58,6 +62,10 @@ typedef Arabica::DOM::Text<string_type> arabica_text;
 typedef Arabica::DOM::Comment<string_type> arabica_comment;
 typedef Arabica::DOM::CDATASection<string_type> arabica_cdata;
 typedef Arabica::DOM::Attr<string_type> arabica_attr;
+typedef Arabica::DOM::Notation<string_type> arabica_notation;
+typedef Arabica::DOM::Entity<string_type> arabica_entity;
+typedef Arabica::DOM::EntityReference<string_type> arabica_entity_ref;
+typedef Arabica::DOM::ProcessingInstruction<string_type> arabica_pi;
 
 class node_map;
 
