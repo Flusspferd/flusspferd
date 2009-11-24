@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <flusspferd/aliases.hpp>
 
 #include "document.hpp"
+#include "dom_implementation.hpp"
 #include "node_list.hpp"
 
 using namespace flusspferd;
@@ -49,8 +50,52 @@ document::document(object const &proto, wrapped_type const &doc, weak_node_map m
 document::~document() {
 }
 
+object document::getDoctype() {
+  return get_node(doc_.getDoctype());
+}
+
+object document::getImplementation() {
+  node_map_ptr map = node_map_.lock();
+  if (!map)
+    throw exception("Internal error: node_map has gone away");
+
+  return map->get_dom_implementation();
+}
+
 object document::getDocumentElement() {
   return get_node(doc_.getDocumentElement());
+}
+
+object document::createElement(string_type tag_name) {
+  return get_node(doc_.createElement(tag_name));
+}
+
+object document::createDocumentFragment() {
+  return get_node(doc_.createDocumentFragment());
+}
+
+object document::createTextNode(string_type data) {
+  return get_node(doc_.createTextNode(data));
+}
+
+object document::createComment(string_type data) {
+  return get_node(doc_.createComment(data));
+}
+
+object document::createCDATASection(string_type data) {
+  return get_node(doc_.createCDATASection(data));
+}
+
+object document::createProcessingInstruction(string_type target, string_type data) {
+  return get_node(doc_.createProcessingInstruction(target, data));
+}
+
+object document::createAttribute(string_type name) {
+  return get_node(doc_.createAttribute(name));
+}
+
+object document::createEntityReference(string_type name) {
+  return get_node(doc_.createEntityReference(name));
 }
 
 object document::getElementsByTagName(std::string tagname) {
@@ -58,6 +103,25 @@ object document::getElementsByTagName(std::string tagname) {
     doc_.getElementsByTagName(tagname),
     node_map_
   ) );
+}
+
+object document::importNode(node &arg, bool deep) {
+  return get_node(doc_.importNode(arg.underlying_impl(), deep));
+}
+
+object document::createElementNS(string_type ns_uri, string_type local_name) {
+  return get_node(doc_.createElementNS(ns_uri, local_name));
+}
+
+object document::getElementsByTagNameNS(string_type ns_uri, string_type local_name) {
+  return create<node_list>( make_vector(
+    doc_.getElementsByTagNameNS(ns_uri, local_name),
+    node_map_
+  ) );
+}
+
+object document::getElementById(string_type id) {
+  return get_node(doc_.getElementById(id));
 }
 
 
