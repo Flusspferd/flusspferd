@@ -40,10 +40,24 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (full_name, "xml.Document")
     (constructor_name, "Document")
     (properties,
+      ("doctype", getter, getDoctype)
+      ("implementation", getter, getImplementation)
       ("documentElement", getter, getDocumentElement)
     )
     (methods,
+      ("createElement", bind, createElement)
+      ("createDocumentFragment", bind, createDocumentFragment)
+      ("createTextNode", bind, createTextNode)
+      ("createComment", bind, createComment)
+      ("createCDATASection", bind, createCDATASection)
+      ("createProcessingInstruction", bind, createProcessingInstruction)
+      ("createAttribute", bind, createAttribute)
+      ("createEntityReference", bind, createEntityReference)
       ("getElementsByTagName", bind, getElementsByTagName)
+      ("importNode", bind, importNode)
+      ("createElementNS", bind, createElementNS)
+      ("getElementsByTagNameNS", bind, getElementsByTagNameNS)
+      ("getElementById", bind, getElementById)
     )
 ) {
 public:
@@ -54,9 +68,26 @@ public:
   document(flusspferd::object const &proto, wrapped_type const &doc, weak_node_map map);
   virtual ~document();
 
+  // Property getters
+  object getDoctype();
+  object getImplementation();
   object getDocumentElement();
 
-  object getElementsByTagName(std::string tag);
+  // Methods
+  object createElement(string_type tag_name);
+  object createDocumentFragment();
+  object createTextNode(string_type data);
+  object createComment(string_type data);
+  object createCDATASection(string_type data);
+  object createProcessingInstruction(string_type target, string_type data);
+  object createAttribute(string_type name);
+  object createEntityReference(string_type name);
+  object getElementsByTagName(string_type tag);
+  object importNode(node &arg, bool deep);
+  object createElementNS(string_type ns_uri, string_type local_name);
+  object getElementsByTagNameNS(string_type ns_uri, string_type local_name);
+  object getElementById(string_type id);
+
 protected:
   wrapped_type doc_;
 };

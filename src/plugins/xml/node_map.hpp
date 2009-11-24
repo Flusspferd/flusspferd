@@ -81,6 +81,8 @@ protected:
 public:
   ~node_map() {}
 
+  dom_implementation const &get_dom_implementation() { return impl_; }
+
   template <class U>
   flusspferd::object get_node(U node) {
     void *ptr = static_cast<void*>(node.underlying_impl());

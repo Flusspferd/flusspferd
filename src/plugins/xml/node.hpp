@@ -94,6 +94,8 @@ public:
   node(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
   virtual ~node();
 
+  arabica_node const & underlying_impl() { return node_; }
+
   string_type to_string();
 
   // Property getters/setters
@@ -127,7 +129,6 @@ public:
   bool hasAttributes() { return node_.hasAttributes(); }
 
 protected:
-  friend class named_node_map;
 
   node(flusspferd::object const &proto);
   // Used by document::document
