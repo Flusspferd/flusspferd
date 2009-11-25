@@ -28,11 +28,18 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
 
 #include "../create.hpp"
+#include <boost/version.hpp>
 #include <boost/fusion/functional/invocation/invoke.hpp>
 
 namespace flusspferd {
 
 #ifndef IN_DOXYGEN
+
+#if BOOST_VERSION < 104100
+#define VECTOR0 boost::fusion::vector0
+#else
+#define VECTOR0 boost::fusion::vector0<>
+#endif
 
 namespace detail {
   template<typename Class>
@@ -61,11 +68,11 @@ namespace detail {
       typedef typename boost::parameter::value_type<
           ArgPack,
           param::tag::arguments,
-          boost::fusion::vector0
+          VECTOR0
         >::type input_arguments_type;
 
       input_arguments_type input_arguments(
-        args[param::_arguments | boost::fusion::vector0()]);
+        args[param::_arguments | VECTOR0()]);
 
       Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
 
@@ -73,6 +80,8 @@ namespace detail {
     }
   };
 }
+
+#undef VECTOR0
 
 #endif //IN_DOXYGEN
 
