@@ -26,7 +26,7 @@ THE SOFTWARE.
 
 #include <flusspferd.hpp>
 
-#include "dom_parser.hpp"
+#include "parser.hpp"
 #include "dom_implementation.hpp"
 #include "node.hpp"
 #include "node_list.hpp"
@@ -44,7 +44,7 @@ namespace xml_plugin {
 
 FLUSSPFERD_LOADER_SIMPLE(exports) {
 
-  load_class<dom_parser>(exports);
+  load_class<xml_parser>(exports);
   load_class<dom_implementation>(exports);
   load_class<node>(exports);
   load_class<node_list>(exports);

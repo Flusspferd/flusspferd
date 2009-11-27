@@ -1,17 +1,17 @@
 const xml = require('xml');
 const asserts = require('test').asserts;
 
-// A few simple tests to make sure the DOMParser class is working right
-exports.test_DOMParser = {
+// A few simple tests to make sure the XMLParser class is working right
+exports.test_XMLParser = {
   test_simpleOk: function() {
-    var doc = xml.DOMParser.parse("test/fixtures/xml/var.xml");
+    var doc = xml.XMLParser.parse("test/fixtures/xml/var.xml");
     asserts.instanceOf(doc, xml.Document, "parse returned a Document");
     asserts.instanceOf(doc, xml.Node, "Document isa Node");
   },
 
   test_simpleFailure: function() {
     asserts.throwsOk( function() {
-      xml.DOMParser.parse("test/fixtures/xml/invalid_1.xml");
+      xml.XMLParser.parse("test/fixtures/xml/invalid_1.xml");
     } )
   }
 
@@ -19,7 +19,7 @@ exports.test_DOMParser = {
 
 function setup(file) {
   file = file || "short_1.xml";
-  this.doc = xml.DOMParser.parse("test/fixtures/xml/" + file );
+  this.doc = xml.XMLParser.parse("test/fixtures/xml/" + file );
 }
 function teardown() {
   delete this.doc;
