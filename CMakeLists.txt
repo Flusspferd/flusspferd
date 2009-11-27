@@ -539,7 +539,7 @@ endif()
 if(PLUGIN_XML AND ARABICA_FOUND)
     set(PLUGINS ${PLUGINS} xml)
     set(xml_LIBRARIES ${ARABICA_LIBRARIES})
-    include_directories(${ARABICA_INCLUDE_DIR})
+    include_directories(${ARABICA_INCLUDEDIR})
 endif()
 
 foreach(PLUGIN ${PLUGINS})
