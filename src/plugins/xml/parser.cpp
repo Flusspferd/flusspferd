@@ -117,9 +117,7 @@ arabica_document xml_parser::_parse(sax_source &is) {
       throw exception( eh.errors() );
   }
 
-  arabica_document const& doc = parser.getDocument();
-  arabica_document const& doc2 = doc;
-  return doc;
+  return parser.getDocument();
 }
 
 
