@@ -115,6 +115,13 @@ exports.test_DOM = {
   }
 }
 
+exports.test_HTML = function() {
+  var doc = xml.HTMLParser.parse("test/fixtures/xml/sample.html");
+  asserts.instanceOf(doc, xml.Document, "parse returned a Document");
+  asserts.instanceOf(doc, xml.Node, "Document isa Node");
+  asserts.same(String(doc), '<?xml version="1.0"?>\n<html xmlns="http://www.w3.org/1999/xhtml"><body>\n<p>foo <b>baz <i>quxx</i></b><i> flibble</i>\n</p><p>\n</p></body></html>', "XML output as expected");
+}
+
 if (require.main === module)
   require('test').runner(exports);
 
