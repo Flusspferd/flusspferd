@@ -20,6 +20,9 @@ Requirements
 - Boost 1.40+
 - cmake 2.6+ (Build system)
 - iconv support
+- A reasonably modern and C++-compliant compiler. If your compiler is too old,
+  then you're on your own. Sorry, but we don't intend to spend our unpaid time
+  writing work-arounds for broken compilers.
 
 Optionally:
 - libedit (BSD)
