@@ -31,9 +31,11 @@ THE SOFTWARE.
 #include <boost/format.hpp>
 #include <fstream>
 
-#include "dom_parser.hpp"
+#include "parser.hpp"
 #include "document.hpp"
 #include "dom_implementation.hpp"
+
+#include <Taggle/Taggle.hpp>
 
 
 using boost::format;
@@ -41,25 +43,12 @@ using boost::format;
 using namespace flusspferd;
 using namespace xml_plugin;
 
-
-dom_parser::dom_parser(flusspferd::object const &proto, flusspferd::call_context &)
+base_parser::base_parser(flusspferd::object const &proto)
   : base_type(proto)
 { }
 
-dom_parser::dom_parser(flusspferd::object const &proto)
-  : base_type(proto)
-{ }
 
-dom_parser::~dom_parser() {
-}
-
-object dom_parser::static_parse(value source) {
-  // Helper method. Create a parser and call the `parse` method
-  return create<dom_parser>().parse(source);
-}
-
-
-object dom_parser::parse(value source) {
+object base_parser::parse(value source) {
   if (source.is_object()) {
     object o = source.get_object();
 
@@ -80,7 +69,7 @@ object dom_parser::parse(value source) {
   security &sec = security::get();
   if (!sec.check_path(str, security::READ)) {
     throw exception( boost::str(
-      format("xml.DOMParser#parse: could not open file: 'denied by security' (%s)")
+      format("xml.Parser#parse: could not open file: 'denied by security' (%s)")
              % str
     ) );
   }
@@ -91,20 +80,73 @@ object dom_parser::parse(value source) {
   return parse_source(is);
 }
 
+#include <DOM/io/Stream.hpp>
 
-object dom_parser::parse_source(sax_source &is) {
-  Arabica::SAX::CatchErrorHandler<std::string> eh;
-  parser_.setErrorHandler(eh);
+object base_parser::parse_source(sax_source &is) {
 
-  parser_.parse(is);
-
-  if (eh.errorsReported()) {
-      throw exception( eh.errors() );
-  }
-
-  document::wrapped_type const &doc = parser_.getDocument();
+  arabica_document const& doc = _parse(is);
+  
   node_map_ptr map = dom_implementation::get_node_map().lock();
   if (!map)
     throw exception("Internal error: node_map has gone away");
   return map->get_node(doc);
 }
+
+
+xml_parser::xml_parser(flusspferd::object const &proto, flusspferd::call_context &)
+  : base_type(proto)
+{ }
+
+xml_parser::xml_parser(flusspferd::object const &proto)
+  : base_type(proto)
+{ }
+
+object xml_parser::static_parse(value source) {
+  // Helper method. Create a parser and call the `parse` method
+  return create<xml_parser>().parse(source);
+}
+
+arabica_document xml_parser::_parse(sax_source &is) {
+  Arabica::SAX2DOM::Parser<string_type> parser;
+  Arabica::SAX::CatchErrorHandler<string_type> eh;
+  parser.setErrorHandler(eh);
+
+  parser.parse(is);
+
+  if (eh.errorsReported()) {
+      throw exception( eh.errors() );
+  }
+
+  arabica_document const& doc = parser.getDocument();
+  arabica_document const& doc2 = doc;
+  return doc;
+}
+
+
+html_parser::html_parser(flusspferd::object const &proto, flusspferd::call_context &)
+  : base_type(proto)
+{ }
+
+html_parser::html_parser(flusspferd::object const &proto)
+  : base_type(proto)
+{ }
+
+object html_parser::static_parse(value source) {
+  // Helper method. Create a parser and call the `parse` method
+  return create<html_parser>().parse(source);
+}
+
+arabica_document html_parser::_parse(sax_source &is) {
+  Arabica::SAX2DOM::Parser<string_type, Arabica::SAX::Taggle<string_type> > parser;
+  Arabica::SAX::CatchErrorHandler<string_type> eh;
+  parser.setErrorHandler(eh);
+
+  parser.parse(is);
+
+  if (eh.errorsReported()) {
+      throw exception( eh.errors() );
+  }
+
+  return parser.getDocument();
+}
+

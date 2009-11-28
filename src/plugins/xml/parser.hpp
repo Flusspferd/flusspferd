@@ -36,32 +36,64 @@ THE SOFTWARE.
 namespace xml_plugin {
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-    dom_parser,
-    (full_name, "xml.DOMParser")
-    (constructor_name, "DOMParser")
-    (constructor_methods,
-      ("parse", bind_static, static_parse)
-    )
+    base_parser,
+    (constructible, false)
+    (full_name, "xml.Parser")
+    (constructor_name, "Parser")
     (methods,
       ("parse", bind, parse)
     )
 ) {
 public:
-  dom_parser(flusspferd::object const &proto, flusspferd::call_context &);
-  dom_parser(flusspferd::object const &proto);
-  virtual ~dom_parser();
+  base_parser(flusspferd::object const &proto);
+  virtual ~base_parser() {};
 
-  static flusspferd::object static_parse(flusspferd::value source);
   flusspferd::object parse(flusspferd::value source);
 protected:
-  typedef Arabica::SAX::InputSource<std::string> sax_source;
-
-  Arabica::SAX2DOM::Parser<std::string> parser_;
+  typedef Arabica::SAX::InputSource<string_type> sax_source;
 
   flusspferd::object parse_source(sax_source &stream);
+  virtual arabica_document _parse(sax_source &stream) = 0;
+};
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+    html_parser,
+    (base, base_parser)
+    (full_name, "xml.HTMLParser")
+    (constructor_name, "HTMLParser")
+    (constructor_methods,
+      ("parse", bind_static, static_parse)
+    )
+) {
+public:
+  html_parser(flusspferd::object const &proto, flusspferd::call_context &);
+  html_parser(flusspferd::object const &proto);
+
+  static flusspferd::object static_parse(flusspferd::value source);
+protected:
+  arabica_document _parse(sax_source &stream);
+};
+
+FLUSSPFERD_CLASS_DESCRIPTION(
+    xml_parser,
+    (base, base_parser)
+    (full_name, "xml.XMLParser")
+    (constructor_name, "XMLParser")
+    (constructor_methods,
+      ("parse", bind_static, static_parse)
+    )
+) {
+public:
+  xml_parser(flusspferd::object const &proto, flusspferd::call_context &);
+  xml_parser(flusspferd::object const &proto);
+
+  static flusspferd::object static_parse(flusspferd::value source);
+protected:
+  arabica_document _parse(sax_source &stream);
 };
 
 }
 
 #endif
+
 

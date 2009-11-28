@@ -45,6 +45,7 @@ namespace xml_plugin {
 FLUSSPFERD_LOADER_SIMPLE(exports) {
 
   load_class<xml_parser>(exports);
+  load_class<html_parser>(exports);
   load_class<dom_implementation>(exports);
   load_class<node>(exports);
   load_class<node_list>(exports);
