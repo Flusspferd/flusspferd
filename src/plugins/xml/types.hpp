@@ -76,6 +76,8 @@ class node_list;
 class named_node_map;
 class document;
 class element;
+class doctype;
+class attr;
 
 }
 

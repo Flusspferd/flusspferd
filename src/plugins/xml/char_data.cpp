@@ -58,9 +58,8 @@ void character_data::deleteData(int offset, int count) {
   impl_.deleteData(offset, count);
 }
 
-void character_data::replaceData(int /*offset*/, int /*count*/, string_type /*arg*/) {
-  throw exception("not implemented - bug in arabica");
-  //impl_.replaceData(offset, count, arg);
+void character_data::replaceData(int offset, int count, string_type arg) {
+  impl_.replaceData(offset, count, arg);
 }
 
 
@@ -70,9 +69,9 @@ text::text(object const &proto, wrapped_type const &node, weak_node_map map)
   : base_type(proto, node, map)
 { }
 
-object text::splitText(int /*offset*/) {
-  throw exception("not implemented - bug in arabica");
-  //return static_cast<arabica_text>(impl_).splitText(offset);
+object text::splitText(int offset) {
+  static_cast<arabica_text&>(impl_).splitText(offset);
+  return object();
 }
 
 
