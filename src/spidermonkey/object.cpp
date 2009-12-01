@@ -388,6 +388,24 @@ bool object::is_generator() const {
       && get_property("next").is_function();
 }
 
+bool object::instance_of(value constructor) const {
+  root_object cons(constructor.to_object());
+
+  if (cons.is_null())
+    throw exception("Could not check instance constructor: "
+                    "constructor has to be a non-null object");
+
+  JSBool result;
+  if (!JS_HasInstance(
+          Impl::current_context(),
+          Impl::get_object(cons),
+          Impl::get_jsval(value(*this)),
+          &result))
+    throw exception("Could not check instance constructor");
+
+  return result;
+}
+
 namespace {
   property_attributes
   set_property_attributes(
