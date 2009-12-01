@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 #include "document.hpp"
+#include "doctype.hpp"
 #include "dom_implementation.hpp"
 
 using namespace flusspferd;
@@ -55,16 +56,17 @@ bool dom_implementation::hasFeature(string_type feat, string_type ver) {
 }
 
 object dom_implementation::createDocumentType(string_type qname, string_type pub_id, string_type sys_id) {
-  throw exception("not implemented");
-  //return create<doctype>( make_vector(impl_.createDocumentType(qname, pub_id, sys_id)) );
+  return master_node_map_->get_node(
+    impl_.createDocumentType(qname, pub_id, sys_id)
+  );
 }
 
-object dom_implementation::createDocument(string_type ns_uri, string_type qname, object &doctype) {
+object dom_implementation::createDocument(string_type ns_uri, string_type qname, doctype &doctype) {
   return master_node_map_->get_node(
     impl_.createDocument(
       ns_uri, 
       qname, 
-      Arabica::DOM::DocumentType<string_type>() 
+      static_cast<arabica_doctype>(doctype.underlying_impl())
     )
   );
 }

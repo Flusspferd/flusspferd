@@ -28,9 +28,9 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_DOM_IMPLEMENTATION_HPP
 
 #include "types.hpp"
+#include "doctype.hpp"
 
 namespace xml_plugin {
-
 
 FLUSSPFERD_CLASS_DESCRIPTION(
     dom_implementation,
@@ -50,7 +50,7 @@ public:
 
   bool hasFeature(string_type feature, string_type ver);
   object createDocumentType(string_type qname, string_type pub_id, string_type sys_id);
-  object createDocument(string_type ns_uri, string_type qname, object &doctype);
+  object createDocument(string_type ns_uri, string_type qname, doctype &doctype);
 
   static weak_node_map get_node_map() { return weak_node_map_; }
 

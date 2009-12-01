@@ -73,8 +73,7 @@ object node_map::create_object_from_node(arabica_node &a) {
     return make_it<processing_instruction>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::COMMENT_NODE:
-    throw exception("bug in Arabica::Comment constructor");
-    //return make_it<comment>(a, shared_from_this());
+    return make_it<comment>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::DOCUMENT_NODE:
     return make_it<document>(a, shared_from_this());
@@ -86,8 +85,7 @@ object node_map::create_object_from_node(arabica_node &a) {
     return make_it<document_fragment>(a, shared_from_this());
 
   case Arabica::DOM::Node_base::NOTATION_NODE:
-    throw exception("bug in Arabica::Notation");
-    //return make_it<notation>(a, shared_from_this());
+    return make_it<notation>(a, shared_from_this());
 
   default:
     return create<node>( make_vector( a, shared_from_this() ) );

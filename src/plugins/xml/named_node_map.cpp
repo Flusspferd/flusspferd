@@ -101,10 +101,8 @@ object named_node_map::getNamedItem(string_type name) {
   return get_node(impl_.getNamedItem(name));
 }
 
-object named_node_map::setNamedItem(node &/*arg*/) {
-  throw exception("not implemented");
-  // Bug in arabica here :(
-  //return get_node(impl_.setNamedItem(arg.node_));
+object named_node_map::setNamedItem(node &arg) {
+  return get_node(impl_.setNamedItem(arg.underlying_impl()));
 }
  
 object named_node_map::removeNamedItem(string_type name) {
@@ -115,15 +113,11 @@ object named_node_map::getNamedItemNS(string_type ns_uri, string_type local_name
   return get_node(impl_.getNamedItemNS(ns_uri, local_name));
 }
 
-object named_node_map::setNamedItemNS(node &/*arg*/) {
-  throw exception("not implemented");
-  // Bug in arabica here :(
-  //return get_node(impl_.setNamedItemNS(arg.node_));
+object named_node_map::setNamedItemNS(node &arg) {
+  return get_node(impl_.setNamedItemNS(arg.underlying_impl()));
 }
 
-object named_node_map::removeNamedItemNS(string_type /*ns_uri*/, string_type /*local_name*/) {
-  throw exception("not implemented");
-  // Bug in arabica here :(
-  //return get_node(impl_.removeNamedItemNS(ns_uri, local_name));
+object named_node_map::removeNamedItemNS(string_type ns_uri, string_type local_name) {
+  return get_node(impl_.removeNamedItemNS(ns_uri, local_name));
 }
 

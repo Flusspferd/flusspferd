@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "element.hpp"
 #include "node_list.hpp"
+#include "attr.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -56,15 +57,19 @@ void element::removeAttribute(string_type name) {
 }
 
 object element::getAttributeNode(string_type name) {
-  throw exception("not implemented");
+  return get_node(element_.getAttributeNode(name));
 }
 
-object element::setAttributeNode(string_type name) {
-  throw exception("not implemented");
+object element::setAttributeNode(attr &a) {
+  return get_node( element_.setAttributeNode(
+    static_cast<arabica_attr>(a.underlying_impl())
+  ) );
 }
 
-object element::removeAttributeNode(string_type name) {
-  throw exception("not implemented");
+object element::removeAttributeNode(attr &a) {
+  return get_node( element_.removeAttributeNode(
+    static_cast<arabica_attr>(a.underlying_impl())
+  ) );
 }
 
 object element::getElementsByTagName(string_type tagname) {
@@ -88,15 +93,13 @@ void element::removeAttributeNS(string_type ns_uri, string_type local_name) {
 }
 
 object element::getAttributeNodeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+  return get_node(element_.getAttributeNodeNS(ns_uri, local_name));
 }
 
-object element::setAttributeNodeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
-}
-
-object element::removeAttributeNodeNS(string_type ns_uri, string_type local_name) {
-  throw exception("not implemented");
+object element::setAttributeNodeNS(attr &a) {
+  return get_node( element_.setAttributeNodeNS(
+    static_cast<arabica_attr>(a.underlying_impl())
+  ) );
 }
 
 object element::getElementsByTagNameNS(string_type ns_uri, string_type local_name) {

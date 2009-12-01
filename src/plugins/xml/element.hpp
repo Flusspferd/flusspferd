@@ -56,7 +56,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       ("removeAttributeNS", bind, removeAttributeNS)
       ("getAttributeNodeNS", bind, getAttributeNodeNS)
       ("setAttributeNodeNS", bind, setAttributeNodeNS)
-      ("removeAttributeNodeNS", bind, removeAttributeNodeNS)
+      // removeAttributeNodeNS is absent from DOM level 2. How odd
       ("getElementsByTagNameNS", bind, getElementsByTagNameNS)
 
       ("hasAttribute", bind, hasAttribute)
@@ -79,16 +79,15 @@ public:
   void setAttribute(string_type name, string_type value);
   void removeAttribute(string_type name);
   object getAttributeNode(string_type name);
-  object setAttributeNode(string_type name);
-  object removeAttributeNode(string_type name);
+  object setAttributeNode(attr &name);
+  object removeAttributeNode(attr &name);
   object getElementsByTagName(string_type name);
 
   string_type getAttributeNS(string_type ns_uri, string_type local_name);
   void setAttributeNS(string_type ns_uri, string_type local_name, string_type value);
   void removeAttributeNS(string_type ns_uri, string_type local_name);
   object getAttributeNodeNS(string_type ns_uri, string_type local_name);
-  object setAttributeNodeNS(string_type ns_uri, string_type local_name);
-  object removeAttributeNodeNS(string_type ns_uri, string_type local_name);
+  object setAttributeNodeNS(attr &a);
   object getElementsByTagNameNS(string_type ns_uri, string_type local_name);
 
   bool hasAttribute(string_type name);
