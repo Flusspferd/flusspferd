@@ -106,6 +106,14 @@ public:
   bool is_generator() const;
 
   /**
+   * Check if an object is an instance of the given constructor.
+   *
+   * @param constructor The constructor (not a string!).
+   * @return Whether the object is an instance of the constructor.
+   */
+  bool instance_of(value constructor) const;
+
+  /**
    * Seal the object.
    *
    * @param deep Whether to seal all reachable sub-objects, too.
