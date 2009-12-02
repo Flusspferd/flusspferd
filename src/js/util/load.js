@@ -24,15 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require('./util/array');
-require('./util/function');
+const io = require('io');
 
-/** section: Flusspferd Core
- * util
+/**
+ *  util.load(fileName) -> value
+ *  - fileName: name of file to load
  *
- * Utilities that are always avilable in flusspferd.
+ *  Evals the contents of a file.
+ *
+ *  ##### Example #
+ *
+ *      var returnValue = require('util').load('somefile.js');
  **/
-
-exports.Range = require('./util/range').Range;
-
-exports.load = require('./util/load').load;
+exports.load = function load(name) {
+  var file = new io.File(name, "r");
+  var code = file.readWhole();
+  return eval(code);
+}
