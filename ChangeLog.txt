@@ -13,6 +13,8 @@ Release 0.9
   $HOME/.flusspferd/modules (#116).
 - Overload flusspferd::is_native & flusspferd::get_native for classes deriving
   from native_function_base (#131).
+- create<NativeFunction> now passes name and arity to the constructor of
+  NativeFunction by default (#176).
 
 2009-11-14:
 - Add object::set_properties and object::define_properties for setting or

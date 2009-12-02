@@ -103,6 +103,8 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
 /// Functor object that backs the require('foo') in JavaScript
 class require : public flusspferd::native_function_base {
 public:
+  typedef boost::mpl::true_ ignore_name_arity;
+
   require();
   require(require const &rhs);
   ~require();
