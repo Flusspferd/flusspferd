@@ -62,6 +62,12 @@ object object::prototype() {
   return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
 }
 
+object object::constructor() {
+  if (is_null())
+    throw exception("Could not get object constructor (object is null)");
+  return Impl::wrap_object(JS_GetConstructor(Impl::current_context(), get()));
+}
+
 void object::set_parent(object const &o) {
   if (is_null())
     throw exception("Could not set parent (object is null)");

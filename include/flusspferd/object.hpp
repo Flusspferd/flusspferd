@@ -126,6 +126,9 @@ public:
   /// Get the object's prototype (__proto__).
   object prototype();
 
+  /// Get the object's constructor.
+  object constructor();
+
   /**
    * Set the object's parent (__parent__).
    *
