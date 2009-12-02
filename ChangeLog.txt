@@ -9,6 +9,8 @@ Release 0.9
 - Add object::constructor: it returns the object's constructor function (#172).
 - Make object::constructor/prototype/parent work on const objects (#175).
 - Add util/load module (#34).
+- Allow loading modules from $FLUSSPFERD_USER_MODULES or
+  $HOME/.flusspferd/modules (#116).
 
 2009-11-14:
 - Add object::set_properties and object::define_properties for setting or
