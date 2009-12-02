@@ -279,6 +279,7 @@ void flusspferd_repl::repl_loop() {
     catch(std::exception &e) {
       std::cerr << "ERROR: " << e.what() << '\n';
     }
+
     flusspferd::gc();
   }
 
@@ -512,8 +513,6 @@ flusspferd::object flusspferd_repl::option_spec() {
 }
 
 void flusspferd_repl::parse_cmdline() {
-  flusspferd::gc();//FIXME
-
   flusspferd::root_object spec(option_spec());
 
   flusspferd::root_array arguments(flusspferd::create<flusspferd::array>());
@@ -521,16 +520,10 @@ void flusspferd_repl::parse_cmdline() {
   for (int i = 1; i < argc; ++i)
     arguments.push(std::string(argv[i]));
 
-  flusspferd::gc();//FIXME
-
   flusspferd::root_object results(flusspferd::getopt(spec, arguments));
-
-  flusspferd::gc();//FIXME
 
   if (!config_loaded)
     load_config();
-
-  flusspferd::gc();//FIXME
 
   arguments = results.get_property_object("_");
 
@@ -550,11 +543,7 @@ void flusspferd_repl::parse_cmdline() {
 
   arguments.call("unshift", file);
 
-  flusspferd::gc();//FIXME
-
   flusspferd::root_object sys(flusspferd::global().call("require", "system").to_object());
-
-  flusspferd::gc();//FIXME
 
   sys.define_property("args", arguments,
                       flusspferd::read_only_property |

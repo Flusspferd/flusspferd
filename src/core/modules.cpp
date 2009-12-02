@@ -186,11 +186,7 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
-  flusspferd::gc();//FIXME
-
   root_string read_only("r");
-
-  flusspferd::gc();//FIXME
 
   io::file &f = create<io::file>(
     fusion::vector2<char const*, string>(filename.string().c_str(), read_only));
@@ -216,7 +212,6 @@ string require::load_module_text(fs::path filename) {
 
   // TODO: Some way of supporting other encodings is probably useful
   return encodings::convert_to_string("UTF-8", blob);
-
 }
 
 /// Load the given @c filename as a module
