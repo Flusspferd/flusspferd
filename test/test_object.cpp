@@ -32,8 +32,7 @@ THE SOFTWARE.
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "test_environment.hpp"
-
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
+#include <iostream> //FIXME
 
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
@@ -199,6 +198,23 @@ BOOST_AUTO_TEST_CASE( instance_of ) {
   BOOST_CHECK_THROW(
       object.instance_of(flusspferd::object()),
       flusspferd::exception);
+}
+
+BOOST_AUTO_TEST_CASE( constructor ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::array>());
+
+  flusspferd::root_value ctor_Object(
+      flusspferd::global().get_property("Object"));
+  flusspferd::root_value ctor_Array(
+      flusspferd::global().get_property("Array"));
+
+  flusspferd::root_value ctor(object.constructor());
+
+  BOOST_CHECK_NE(ctor, flusspferd::value());
+  BOOST_CHECK_NE(ctor, flusspferd::object());
+
+  BOOST_CHECK_NE(ctor, ctor_Object);
+  BOOST_CHECK_EQUAL(ctor, ctor_Array);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
