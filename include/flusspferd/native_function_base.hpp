@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "init.hpp"
 #include "function.hpp"
 #include "convert.hpp"
+#include <boost/type_traits/is_base_of.hpp>
+#include <boost/type_traits/is_member_function_pointer.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <string>
@@ -67,6 +69,7 @@ public:
    * @see @ref gc
    */
   virtual void trace(tracer &trc);
+
 protected:
   virtual void call(call_context &) = 0;
 
@@ -81,6 +84,64 @@ private:
 
   friend class impl;
 };
+
+template<typename T>
+T &cast_to_derived(native_function_base &o) {
+  T *ptr = dynamic_cast<T*>(&o);
+  if (!ptr)
+    throw exception("Could not convert native object to derived type");
+  return *ptr;
+}
+
+/**
+ * Gets @p o as native function of class @p T. If @p o is not a function, not
+ * native or not of class @p T then an exception will be thrown.
+ *
+ * @param o object to check
+ * @see is_native
+ * @ingroup classes
+ */
+template<typename T>
+typename boost::enable_if<
+  typename boost::is_base_of<native_function_base, T>::type,
+  T &>
+::type
+get_native(object const &o) {
+  return flusspferd::cast_to_derived<T>(*native_function_base::get_native(o));
+}
+
+template<typename T>
+bool is_derived(native_function_base &o) {
+  return dynamic_cast<T*>(&o);
+}
+
+/**
+ * Checks if @p o is a native function of class @p T.
+ *
+ * @code
+flusspferd::object o = v.get_object();
+if (flusspferd::is_native<my_fun>(o) {
+  my_fun &b = flusspferd::get_native<my_fun>(o);
+}
+@endcode
+ *
+ * @param o object to check
+ * @see get_native
+ * @ingroup classes
+ */
+template<typename T>
+typename boost::enable_if<
+  typename boost::is_base_of<native_function_base, T>::type,
+  bool>
+::type
+is_native(object const &o) {
+  try {
+    get_native<T>(o);
+    return true;
+  } catch (exception&) {
+    return false;
+  }
+}
 
 template<typename T>
 struct detail::convert_ptr<T, native_function_base> {

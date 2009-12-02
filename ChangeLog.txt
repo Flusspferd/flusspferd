@@ -11,6 +11,8 @@ Release 0.9
 - Add util/load module (#34).
 - Allow loading modules from $FLUSSPFERD_USER_MODULES or
   $HOME/.flusspferd/modules (#116).
+- Overload flusspferd::is_native & flusspferd::get_native for classes deriving
+  from native_function_base (#131).
 
 2009-11-14:
 - Add object::set_properties and object::define_properties for setting or
