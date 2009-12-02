@@ -153,7 +153,7 @@ void file::open(char const *name, value options) {
       exclusive = create = true;
     }
     else {
-      throw exception(str(format("File.open: mode '%s' not supported (yet?)") % mode));
+      throw exception(format("File.open: mode '%s' not supported (yet?)") % mode);
     }
   }else if (options.is_object()) {
     object obj = options.get_object();
@@ -191,9 +191,9 @@ void file::open(char const *name, value options) {
   if (create)                    sec_mode |= security::CREATE;
 
   if (!sec.check_path(name, sec_mode)) {
-    throw exception(str(
+    throw exception(
       format("File.open: could not open file: 'denied by security' (%s)") % name
-    ));
+    );
   }
 
   if (create) {

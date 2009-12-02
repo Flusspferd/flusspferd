@@ -118,7 +118,7 @@ object fs_base::raw_open(char const* name, value mode, value perms) {
 
 string fs_base::canonical(std::string const &path) {
   if (!security::get().check_path(path, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "canonical" % path));
+    throw exception(format(error_sec) % "canonical" % path);
   }
 
   return canonicalize(path).string();
@@ -157,10 +157,9 @@ fs::path fs_base::canonicalize(fs::path in) {
       char buff[PATH_MAX];
       ssize_t len = readlink(accum.string().c_str(), buff, PATH_MAX);
       if (len == -1) {
-        format fmt = format(error_fmt) % "canonical"
-                                       % std::strerror(errno)
-                                       % accum;
-        throw exception(fmt.str());
+        throw exception(format(error_fmt) % "canonical"
+                                          % std::strerror(errno)
+                                          % accum);
       }
       fs::path link_path = std::string(buff, len);
 
@@ -186,7 +185,7 @@ fs::path fs_base::canonicalize(fs::path in) {
 
 value fs_base::last_modified(std::string const &path) {
   if (!security::get().check_path(path, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "lastModified" % path));
+    throw exception(format(error_sec) % "lastModified" % path);
   }
 
   std::time_t last_mod = fs::last_write_time(path);
@@ -220,13 +219,13 @@ void fs_base::touch(std::string const &str, object mtime_o) {
   fs::path p(str);
   if (!fs::exists(p)) {
     if (!sec.check_path(str, security::CREATE))
-      throw exception(boost::str(format(error_sec) % "touch" % str));
+      throw exception(format(error_sec) % "touch" % str);
     // File doesn't exist, create
     fs::ofstream f(p);
   }
 
   if (!sec.check_path(str, security::WRITE))
-    throw exception(boost::str(format(error_sec) % "touch" % str));
+    throw exception(format(error_sec) % "touch" % str);
   fs::last_write_time(p, mtime);
 }
 
@@ -235,7 +234,7 @@ void fs_base::touch(std::string const &str, object mtime_o) {
 // better than only 30bits == 1gb! eek
 double fs_base::size(std::string const &file) {
   if (!security::get().check_path(file, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "size" % file));
+    throw exception(format(error_sec) % "size" % file);
   }
   uintmax_t fsize = fs::file_size(file);
   return fsize;
@@ -243,28 +242,28 @@ double fs_base::size(std::string const &file) {
 
 bool fs_base::exists(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "exists" % p));
+    throw exception(format(error_sec) % "exists" % p);
   }
   return fs::exists(p);
 }
 
 bool fs_base::is_file(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "isFile" % p));
+    throw exception(format(error_sec) % "isFile" % p);
   }
   return fs::is_regular_file(p);
 }
 
 bool fs_base::is_directory(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "isDirectory" % p));
+    throw exception(format(error_sec) % "isDirectory" % p);
   }
   return fs::is_directory(p);
 }
 
 bool fs_base::is_link(std::string const &p) {
   if (!security::get().check_path(p, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "isLink" % p));
+    throw exception(format(error_sec) % "isLink" % p);
   }
   return fs::is_symlink(p);
 }
@@ -272,7 +271,7 @@ bool fs_base::is_link(std::string const &p) {
 bool fs_base::is_readable(std::string const &p) {
   security &sec = security::get();
   if (!sec.check_path(p, security::ACCESS)) {
-    throw exception(str(format(error_sec) % "isReadable" % p));
+    throw exception(format(error_sec) % "isReadable" % p);
   }
 
   return (!security::get().check_path(p, security::READ)) &&
@@ -283,7 +282,7 @@ bool fs_base::is_writeable(std::string const &str) {
   fs::path p(str);
   security &sec = security::get();
   if (!sec.check_path(str, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "isWriteable" % str));
+    throw exception(format(error_sec) % "isWriteable" % str);
   }
 
   if (!sec.check_path(str, security::WRITE)) {
@@ -307,10 +306,10 @@ bool fs_base::is_writeable(std::string const &str) {
 bool fs_base::same(std::string const &source, std::string const &target) {\
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "same" % source));
+    throw exception(format(error_sec) % "same" % source);
   }
   if (!sec.check_path(target, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "same" % target));
+    throw exception(format(error_sec) % "same" % target);
   }
   // TODO: test if this behaves right w.r.t. symlinks
   return fs::equivalent(source, target);
@@ -320,59 +319,54 @@ bool fs_base::same(std::string const &source, std::string const &target) {\
 void fs_base::link(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "link" % source));
+    throw exception(format(error_sec) % "link" % source);
   }
   if (!sec.check_path(target, security::WRITE|security::CREATE)) {
-    throw exception(boost::str(format(error_sec) % "link" % target));
+    throw exception(format(error_sec) % "link" % target);
   }
 
   if (symlink(source.c_str(), target.c_str()) == 0)
     return;
 
-  // TODO: paths and system error message!
-  format e = format(error_fmt2)
-           % "link"
-           % std::strerror(errno)
-           % source
-           % target;
-  throw exception(e.str());
+  throw exception(format(error_fmt2)
+                   % "link"
+                   % std::strerror(errno)
+                   % source
+                   % target);
 }
 
 void fs_base::hard_link(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "hardLink" % source));
+    throw exception(format(error_sec) % "hardLink" % source);
   }
   if (!sec.check_path(target, security::WRITE|security::CREATE)) {
-    throw exception(boost::str(format(error_sec) % "hardLink" % target));
+    throw exception(format(error_sec) % "hardLink" % target);
   }
 
   if (::link(source.c_str(), target.c_str()) == 0)
     return;
 
-  // TODO: paths and system error message!
-  format e = format(error_fmt2)
-           % "hardLink"
-           % std::strerror(errno)
-           % source
-           % target;
-  throw exception(e.str());
+  throw exception(format(error_fmt2)
+                   % "hardLink"
+                   % std::strerror(errno)
+                   % source
+                   % target);
 }
 
 string fs_base::read_link(std::string const &link) {
   if (!security::get().check_path(link, security::READ)) {
-    throw exception(boost::str(format(error_sec) % "readLink" % link));
+    throw exception(format(error_sec) % "readLink" % link);
   }
 
   char buff[PATH_MAX];
 
   ssize_t len = readlink(link.c_str(), buff, PATH_MAX);
   if (len == -1) {
-    format e = format(error_fmt)
-             % "readLink"
-             % std::strerror(errno)
-             % link;
-    throw exception(e.str());
+    throw exception(format(error_fmt)
+                     % "readLink"
+                     % std::strerror(errno)
+                     % link);
   }
   return string(buff, len);
 }
@@ -380,7 +374,7 @@ string fs_base::read_link(std::string const &link) {
 
 void fs_base::make_directory(std::string const &dir) {
   if (!security::get().check_path(dir, security::CREATE)) {
-    throw exception(boost::str(format(error_sec) % "makeDirectory" % dir));
+    throw exception(format(error_sec) % "makeDirectory" % dir);
   }
 
   fs::create_directory(dir);
@@ -395,7 +389,7 @@ void fs_base::remove_directory(std::string const &dir) {
     throw exception("removeDirectory: " + p.string() + " isn't a directory");
 
   if (!security::get().check_path(dir, security::ACCESS|security::WRITE)) {
-    throw exception(boost::str(format(error_sec) % "removeDirectory" % dir));
+    throw exception(format(error_sec) % "removeDirectory" % dir);
   }
 
   fs::remove(p);
@@ -404,10 +398,10 @@ void fs_base::remove_directory(std::string const &dir) {
 void fs_base::move(std::string const &source, std::string const &target) {
   security &sec = security::get();
   if (!sec.check_path(source, security::READ)) {
-    throw exception(boost::str(format(error_sec) % "move" % source));
+    throw exception(format(error_sec) % "move" % source);
   }
   if (!sec.check_path(target, security::WRITE|security::CREATE)) {
-    throw exception(boost::str(format(error_sec) % "move" % target));
+    throw exception(format(error_sec) % "move" % target);
   }
 
   fs::rename(source, target);
@@ -415,7 +409,7 @@ void fs_base::move(std::string const &source, std::string const &target) {
 
 void fs_base::remove(std::string const &path) {
   if (!security::get().check_path(path, security::WRITE)) {
-    throw exception(boost::str(format(error_sec) % "remove" % path));
+    throw exception(format(error_sec) % "remove" % path);
   }
 
   fs::path p(path);
@@ -435,7 +429,7 @@ string fs_base::working_directory() {
 
 void fs_base::change_working_directory(std::string const &str) {
   if (!security::get().check_path(str, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "changeWorkingDirectory" % str));
+    throw exception(format(error_sec) % "changeWorkingDirectory" % str);
   }
 
   fs::current_path(str);
@@ -443,7 +437,7 @@ void fs_base::change_working_directory(std::string const &str) {
 
 array fs_base::list(std::string const &dir) {
   if (!security::get().check_path(dir, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "list" % dir));
+    throw exception(format(error_sec) % "list" % dir);
   }
 
   root_array ret(create<array>());
@@ -469,14 +463,13 @@ static void _get_stat(std::string const &path, struct stat *buf,
 {
   int ret = ::stat(path.c_str(), buf);
   if (ret != 0) {
-    format fmt = format(error_fmt) % fn_name % std::strerror(errno) % path;
-    throw exception(fmt.str());
+    throw exception(format(error_fmt) % fn_name % std::strerror(errno) % path);
   }
 }
 
 string fs_base::owner(std::string const &path) {
   if (!security::get().check_path(path, security::ACCESS)) {
-    throw exception(boost::str(format(error_sec) % "owner" % path));
+    throw exception(format(error_sec) % "owner" % path);
   }
 
   struct stat buf;
