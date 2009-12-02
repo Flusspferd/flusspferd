@@ -78,10 +78,11 @@ BOOST_AUTO_TEST_CASE( is_null ) {
 
 BOOST_AUTO_TEST_CASE( fn_struct ) {
   flusspferd::root_function f(
-      flusspferd::create<function_struct>());
+      flusspferd::create<function_struct>(
+          flusspferd::param::_name = "my_function"));
   BOOST_CHECK(!f.is_null());
   BOOST_CHECK_EQUAL(f.arity(), 0ul);
-  BOOST_CHECK_EQUAL(f.name(), "");
+  BOOST_CHECK_EQUAL(f.name(), "my_function");
   BOOST_CHECK_EQUAL(f.call(flusspferd::global()), flusspferd::value(387));
   BOOST_CHECK(flusspferd::is_native<function_struct>(f));
   BOOST_CHECK_EQUAL(flusspferd::get_native<function_struct>(f).v, 1234);

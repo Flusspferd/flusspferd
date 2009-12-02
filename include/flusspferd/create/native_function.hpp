@@ -30,6 +30,10 @@ THE SOFTWARE.
 #include "../create.hpp"
 #include <boost/version.hpp>
 #include <boost/fusion/functional/invocation/invoke.hpp>
+#include <boost/fusion/view/joint_view.hpp>
+#include <boost/fusion/container/vector/vector10.hpp>
+#include <boost/mpl/has_xxx.hpp>
+#include <boost/mpl/eval_if.hpp>
 
 namespace flusspferd {
 
@@ -42,11 +46,31 @@ namespace flusspferd {
 #endif
 
 namespace detail {
+  BOOST_MPL_HAS_XXX_TRAIT_DEF(ignore_name_arity)
+
+  template<typename T>
+  struct ignore_name_arity_test
+  {
+    typedef typename T::ignore_name_arity type;
+  };
+
+  template<typename T>
+  struct ignore_name_arity
+    : boost::mpl::eval_if<
+        has_ignore_name_arity<T>,
+        ignore_name_arity_test<T>,
+        boost::mpl::false_
+      >
+  {};
+
   template<typename Class>
   struct create_traits<
     Class,
     typename boost::enable_if<
-      boost::is_base_of<native_function_base, Class>
+      boost::mpl::and_<
+        boost::is_base_of<native_function_base, Class>,
+        ignore_name_arity<Class>
+      >
     >::type
   >
   {
@@ -59,7 +83,10 @@ namespace detail {
       attributes_spec
     > parameters;
 
-    static result_type create() {
+    typedef typename ignore_name_arity<Class>::type ignore_name_arity_type;
+
+    static result_type create()
+    {
       return create_native_function(new Class);
     }
 
@@ -75,6 +102,68 @@ namespace detail {
         args[param::_arguments | VECTOR0()]);
 
       Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
+
+      return create_native_function(&self);
+    }
+  };
+
+  template<typename Class>
+  struct create_traits<
+    Class,
+    typename boost::enable_if<
+      boost::mpl::and_<
+        boost::is_base_of<native_function_base, Class>,
+        boost::mpl::not_<ignore_name_arity<Class> >
+      >
+    >::type
+  >
+  {
+    typedef function result_type;
+
+    typedef boost::parameter::parameters<
+      param::tag::arguments,
+      name_spec,
+      container_spec,
+      attributes_spec
+    > parameters;
+
+    typedef typename ignore_name_arity<Class>::type ignore_name_arity_type;
+
+    static result_type create(
+        typename boost::disable_if<ignore_name_arity_type>::type * = 0)
+    {
+        return create_native_function(new Class(0U, std::string()));
+    }
+
+    template<typename ArgPack>
+    static
+    typename boost::disable_if<ignore_name_arity_type, result_type>::type
+    create(ArgPack const &args) {
+      typedef typename boost::parameter::value_type<
+          ArgPack,
+          param::tag::arguments,
+          VECTOR0
+        >::type input_arguments_type;
+
+      input_arguments_type input_arguments(
+        args[param::_arguments | VECTOR0()]);
+
+      typedef
+        boost::fusion::vector2<unsigned, std::string>
+        arity_name_seq_type;
+
+      arity_name_seq_type arity_name_seq(
+          args[param::_arity | 0u],
+          std::string(args[param::_name | std::string()]));
+
+      typedef boost::fusion::joint_view<
+          arity_name_seq_type,
+          input_arguments_type
+        > full_arguments_type;
+
+      full_arguments_type full_arguments(arity_name_seq, input_arguments);
+
+      Class &self = boost::fusion::invoke(new_functor<Class>(), full_arguments);
 
       return create_native_function(&self);
     }

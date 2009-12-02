@@ -47,8 +47,8 @@ namespace flusspferd {
 namespace detail {
 
 struct unconstructible_class_constructor : native_function_base {
-  unconstructible_class_constructor(char const *name)
-    : native_function_base(0, name)
+  unconstructible_class_constructor(unsigned arity, std::string const &name)
+    : native_function_base(arity, name)
   {}
 
   void call(call_context &);
@@ -56,7 +56,7 @@ struct unconstructible_class_constructor : native_function_base {
 
 template<typename T>
 struct class_constructor : native_function_base {
-  class_constructor(unsigned arity, char const *name)
+  class_constructor(unsigned arity, std::string const &name)
     : native_function_base(arity, name)
   {}
 
@@ -225,7 +225,8 @@ object load_class(
   if (constructor.is_null()) {
     constructor =
       create<detail::class_constructor<T> >(
-        boost::fusion::make_vector(arity, full_name));
+          param::_name = full_name,
+          param::_arity = arity);
 
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);
@@ -258,7 +259,7 @@ object load_class(
     char const *full_name = T::class_info::full_name();
     constructor =
       create<detail::unconstructible_class_constructor>(
-        boost::fusion::make_vector(full_name));
+          param::_name = full_name);
 
     ctx.add_constructor<T>(constructor);
     detail::load_class<T>(ctx, constructor);

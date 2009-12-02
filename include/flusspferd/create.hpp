@@ -469,10 +469,11 @@ flusspferd::create< flusspferd::function >(
  * <dd>Header: flusspferd/create/native_function.hpp<br><br>
  * <dl>
  * <dt>flusspferd::param::_arguments</dt>
- * <dd>The parameters to be passed to the Class constructor (in addition to the
- *     first parameter, which is always the object itself), as a
+ * <dd>The parameters to be passed to the Class constructor, as a
  *     <a href="http://www.boost.org/doc/libs/1_40_0/libs/fusion/doc/html/fusion/sequence/concepts/forward_sequence.html"
- *     >fusion sequence</a>.<br>
+ *     >fusion sequence</a>. If Class::ignore_name_arity is defined and boost::mpl::true_ or another truish type, then
+ *     only the elements in _arguments will be passed to the Class constructor, otherwise @p arity and @p name will be
+ *     prepended (first arity, then name).<br>
  *    <em>Default</em>: <tt>boost::fusion::vector0()</tt>
  * </dl>
  * <br><em>Result type</em>: flusspferd::function.

@@ -75,6 +75,8 @@ public:
 };
 
 struct my_functor : flusspferd::native_function_base {
+  typedef boost::mpl::true_ ignore_name_arity;
+
   bool x;
 
   my_functor() : x(true) {}
