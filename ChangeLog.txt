@@ -15,6 +15,7 @@ Release 0.9
   from native_function_base (#131).
 - create<NativeFunction> now passes name and arity to the constructor of
   NativeFunction by default (#176).
+- exception now accepts a (completed) boost::format parmeter (part of #44)
 
 2009-11-14:
 - Add object::set_properties and object::define_properties for setting or
