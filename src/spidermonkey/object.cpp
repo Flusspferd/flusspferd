@@ -50,22 +50,22 @@ void object::seal(bool deep) {
     throw exception("Could not seal object");
 }
 
-object object::parent() {
+object object::parent() const {
   if (is_null())
     throw exception("Could not get object parent (object is null)");
-  return Impl::wrap_object(JS_GetParent(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetParent(Impl::current_context(), get_const()));
 }
 
-object object::prototype() {
+object object::prototype() const {
   if (is_null())
     throw exception("Could not get object prototype (object is null)");
-  return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get_const()));
 }
 
-object object::constructor() {
+object object::constructor() const {
   if (is_null())
     throw exception("Could not get object constructor (object is null)");
-  return Impl::wrap_object(JS_GetConstructor(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetConstructor(Impl::current_context(), get_const()));
 }
 
 void object::set_parent(object const &o) {

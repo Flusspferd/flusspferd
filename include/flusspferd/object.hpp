@@ -121,13 +121,13 @@ public:
   void seal(bool deep);
 
   /// Get the object's parent (__parent__).
-  object parent();
+  object parent() const;
   
   /// Get the object's prototype (__proto__).
-  object prototype();
+  object prototype() const;
 
   /// Get the object's constructor.
-  object constructor();
+  object constructor() const;
 
   /**
    * Set the object's parent (__parent__).
