@@ -42,12 +42,19 @@ namespace {
   struct function_struct : flusspferd::native_function_base {
     function_struct(unsigned arity, std::string const &name)
       : flusspferd::native_function_base(arity, name)
-    { }
-    function_struct() { }
+    {
+      v = 1234;
+    }
+
+    function_struct() {
+      v = 0;
+    }
 
     void call(flusspferd::call_context &x) {
       x.result = flusspferd::value(387);
     }
+
+    int v;
   };
 }
 
@@ -57,6 +64,8 @@ BOOST_AUTO_TEST_CASE( root_native_function ) {
   flusspferd::root_function f_x(
       flusspferd::create<flusspferd::method>(
         "rnf", &root_native_function_));
+
+  BOOST_CHECK(!f_x.is_null());
   
   BOOST_CHECK_EQUAL(f_x.arity(), 1ul);
   BOOST_CHECK_EQUAL(f_x.name(), "rnf");
@@ -65,6 +74,17 @@ BOOST_AUTO_TEST_CASE( root_native_function ) {
 BOOST_AUTO_TEST_CASE( is_null ) {
   flusspferd::function f;
   BOOST_CHECK(f.is_null());
+}
+
+BOOST_AUTO_TEST_CASE( fn_struct ) {
+  flusspferd::root_function f(
+      flusspferd::create<function_struct>());
+  BOOST_CHECK(!f.is_null());
+  BOOST_CHECK_EQUAL(f.arity(), 0ul);
+  BOOST_CHECK_EQUAL(f.name(), "");
+  BOOST_CHECK_EQUAL(f.call(flusspferd::global()), flusspferd::value(387));
+  BOOST_CHECK(flusspferd::is_native<function_struct>(f));
+  BOOST_CHECK_EQUAL(flusspferd::get_native<function_struct>(f).v, 1234);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
