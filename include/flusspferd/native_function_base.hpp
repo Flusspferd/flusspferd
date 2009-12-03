@@ -70,7 +70,13 @@ public:
   virtual void trace(tracer &trc);
 
   /**
-   * ...
+   * Static function for determining the arity in flusspferd::create.
+   *
+   * Should be overwritten if you want to have an automatically determined
+   * arity, which will have precedence over any user-supplied arity.
+   *
+   * @return If an arity is determined, <tt>boost::optional<unsigned>(Arity)</tt>,
+   *         otherwise an empty <tt>boost::optional<unsigned>()</tt>.
    */
   static boost::optional<unsigned> determine_arity() {
     return boost::optional<unsigned>();

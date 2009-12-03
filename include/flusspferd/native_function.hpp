@@ -50,6 +50,10 @@ public:
     : native_function_base(obj), adapter(cb)
   {}
 
+  static boost::optional<unsigned> determine_arity() {
+    return adapter_type::arity;
+  }
+
 private:
   void call(call_context &x) {
     adapter(x);
@@ -93,6 +97,10 @@ public:
   native_member_function(function const &obj, callback_type const &cb)
     : native_function_base(obj), adapter(cb)
   {}
+
+  static boost::optional<unsigned> determine_arity() {
+    return adapter_type::arity;
+  }
 
 private:
   void call(call_context &x) {

@@ -65,18 +65,32 @@ namespace detail {
 
     static result_type create()
     {
+      boost::optional<unsigned> determined_arity(Class::determine_arity());
+
+      unsigned arity = 0u;
+      if (determined_arity)
+        arity = determined_arity.get();
+
       root_function fun(
-          native_function_base::create_function(0U, std::string()));
+          native_function_base::create_function(arity, std::string()));
       return *new Class(fun);
     }
 
     template<typename ArgPack>
     static result_type
     create(ArgPack const &args) {
+      boost::optional<unsigned> determined_arity(Class::determine_arity());
+
+      unsigned arity;
+      if (determined_arity)
+        arity = determined_arity.get();
+      else
+        arity = args[param::_arity | 0u];
+
       flusspferd::root_string name(args[param::_name | flusspferd::string()]);
       root_function fun(
           native_function_base::create_function(
-              args[param::_arity | 0u],
+              arity,
               name.to_string()));
 
       typedef typename boost::parameter::value_type<
