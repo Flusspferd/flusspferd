@@ -95,7 +95,7 @@ require::~require() {}
 
 // Static helper method to actually create |require| function objects
 object require::create_require() {
-  root_object fn(create<require>());
+  root_object fn(create<require>(param::_name = "require"));
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
   const property_flag perm_ro = permanent_property | read_only_property;
@@ -128,7 +128,9 @@ object require::create_require() {
 // different require.id property
 object require::new_require_function(string const &id) {
   // Use the copy ctor form to share the JS state variables.
-  root_object new_req(create<require>(fusion::vector1<require&>(*this)));
+  root_object new_req(create<require>(
+                          fusion::vector1<require&>(*this),
+                          param::_name = "require"));
   new_req.set_prototype(*this);
 
   new_req.define_property("id", id, permanent_property|read_only_property);
