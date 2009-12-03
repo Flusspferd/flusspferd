@@ -54,8 +54,7 @@ namespace detail {
  */
 class native_function_base : public function, private boost::noncopyable {
 public:
-  native_function_base(unsigned arity = 0);
-  native_function_base(unsigned arity, std::string const &name);
+  native_function_base(function const &obj);
   virtual ~native_function_base();
 
   static native_function_base *get_native(object const &o);
@@ -70,13 +69,23 @@ public:
    */
   virtual void trace(tracer &trc);
 
+  /**
+   * ...
+   */
+  static boost::optional<unsigned> determine_arity() {
+    return boost::optional<unsigned>();
+  }
+
 protected:
   virtual void call(call_context &) = 0;
 
-private:
-  function create_function();
+public:
+#ifndef IN_DOXYGEN
+  static function create_function(
+      unsigned arity, std::string const &name);
 
-  friend function detail::create_native_function(native_function_base *);
+  void load_into(function const &obj);
+#endif
 
 private:
   class impl;

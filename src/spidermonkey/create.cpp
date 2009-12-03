@@ -111,13 +111,3 @@ function flusspferd::detail::create_source_function(
 
   return Impl::wrap_function(fun);
 }
-
-
-function flusspferd::detail::create_native_function(native_function_base *ptr) {
-  try {
-    return ptr->create_function();
-  } catch (...) {
-    delete ptr;
-    throw;
-  }
-}

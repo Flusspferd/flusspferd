@@ -41,8 +41,7 @@ using namespace flusspferd;
 
 class native_function_base::impl {
 public:
-  impl(unsigned arity, std::string const &name)
-  : arity(arity), name(name)
+  impl()
   {}
 
   static JSBool call_helper(
@@ -51,22 +50,14 @@ public:
 
   static void trace_op(JSTracer *trc, JSObject *obj);
 
-  unsigned arity;
-  std::string name;
-
   static JSClass function_priv_class;
 };
 
-native_function_base::native_function_base(unsigned arity)
-: p(new impl(arity, std::string()))
-{}
-
-native_function_base::native_function_base(
-  unsigned arity,
-  std::string const &name
-)
-  : p(new impl(arity, name))
-{}
+native_function_base::native_function_base(function const &obj)
+  : p(new impl)
+{
+  load_into(obj);
+}
 
 native_function_base::~native_function_base() { }
 
@@ -93,37 +84,54 @@ JSClass native_function_base::impl::function_priv_class = {
 
 #undef MARK_TRACE_OP
 
-function native_function_base::create_function() {
+function native_function_base::create_function(
+    unsigned arity, std::string const &name)
+{
   JSContext *ctx = Impl::current_context();
 
-  JSFunction *fun;
+  JSObject *priv = JS_NewObject(ctx, &impl::function_priv_class, 0, 0);
 
-  {
-    local_root_scope scope;
+  root_object priv_o(Impl::wrap_object(priv));
 
-    JSObject *priv = JS_NewObject(ctx, &impl::function_priv_class, 0, 0);
+  if (!priv)
+    throw exception("Could not create native function");
 
-    if (!priv)
-      throw exception("Could not create native function");
+  JSFunction *fun = JS_NewFunction(
+      ctx, &impl::call_helper,
+      arity, 0, 0, name.c_str());
 
-    JS_SetPrivate(ctx, priv, this);
+  if (!fun)
+    throw exception("Could not create native function");
 
-    fun = JS_NewFunction(
-        ctx, &impl::call_helper,
-        p->arity, 0, 0, p->name.c_str());
+  function funx(Impl::wrap_function(fun));
 
-    if (!fun)
-      throw exception("Could not create native function");
+  JSObject *obj = Impl::get_object(funx);
 
-    function::operator=(Impl::wrap_function(fun));
+  JS_SetReservedSlot(ctx, obj, 0, OBJECT_TO_JSVAL(priv));
 
-    JSObject *obj = Impl::get_object(*this);
+  return funx;
+}
 
-    JS_SetReservedSlot(ctx, obj, 0, OBJECT_TO_JSVAL(priv));
-    JS_SetReservedSlot(ctx, obj, 1, PRIVATE_TO_JSVAL(this));
-  }
+void native_function_base::load_into(function const &fun) {
+  if (fun.is_null())
+    throw exception("Cannot initalise native_function_base "
+                    "with a null function");
 
-  return *static_cast<function *>(this);
+  JSContext *ctx = Impl::current_context();
+
+  function::operator=(fun);
+
+  JSObject *obj = Impl::get_object(*this);
+
+  value priv_v;
+  if (!JS_GetReservedSlot(ctx, obj, 0, Impl::get_jsvalp(priv_v)))
+    throw exception("Could not initialise native_function_base (internal error");
+
+  JSObject *priv = Impl::get_object(priv_v.get_object());
+
+  JS_SetPrivate(ctx, priv, this);
+
+  JS_SetReservedSlot(ctx, obj, 1, PRIVATE_TO_JSVAL(this));
 }
 
 JSBool native_function_base::impl::call_helper(
@@ -158,15 +166,35 @@ JSBool native_function_base::impl::call_helper(
 
 
 void native_function_base::impl::trace_op(
-    JSTracer *trc, JSObject *obj)
+    JSTracer *trc, JSObject *p)
 {
-  current_context_scope scope(Impl::wrap_context(trc->context));
+  // NOTE: avoid any rooting
 
-  native_function_base *self =
-    native_function_base::get_native(Impl::wrap_object(obj));
+  JSContext *ctx = trc->context;
 
-  tracer tracer_(trc);
-  self->trace(tracer_);
+  native_function_base *self = 0;
+
+  self = (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
+
+  if (!self) {
+    if (JS_ObjectIsFunction(ctx, p)) {
+      jsval p_val;
+
+      if (JS_GetReservedSlot(ctx, p, 0, &p_val)) {
+        p = JSVAL_TO_OBJECT(p_val);
+
+        if (p)
+          self =
+            (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
+      }
+    }
+  }
+
+  if (self) {
+    current_context_scope scope(Impl::wrap_context(ctx));
+    tracer tracer_(trc);
+    self->trace(tracer_);
+  }
 }
 
 void native_function_base::impl::finalize(JSContext *ctx, JSObject *priv) {
@@ -184,7 +212,7 @@ void native_function_base::impl::finalize(JSContext *ctx, JSObject *priv) {
 native_function_base *native_function_base::get_native(object const &o_) {
   JSContext *ctx = Impl::current_context();
 
-  object o = o_;
+  root_object o(o_);
   JSObject *p = Impl::get_object(o);
 
   native_function_base *self =
