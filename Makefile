@@ -23,7 +23,7 @@
 # THE SOFTWARE.
 #
 
-.PHONY: all clean install uninstall test
+.PHONY: all clean install uninstall test doc repl
 
 all: build
 	$(MAKE) -C build
@@ -51,3 +51,10 @@ uninstall: build
 
 test: all
 	@./util/run_tests.sh
+
+# needs "all" for manpage
+doc: all
+	@./util/docs.sh
+
+repl: all
+	@./util/jsrepl.sh
