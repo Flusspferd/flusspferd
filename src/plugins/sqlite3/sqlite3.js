@@ -41,6 +41,10 @@ THE SOFTWARE.
  *      }
  **/
 
+if(!exports.SQLite3) {
+  quit();
+}
+
 /**
  *  class sqlite3.SQLite3
  *

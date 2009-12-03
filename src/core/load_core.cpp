@@ -54,17 +54,16 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   root_object scope(scope_);
 
   // Initalize boost's copy of cwd as early as possible
-  boost::filesystem::initial_path<boost::filesystem::path>();
-
-  flusspferd::gc();//FIXME
+  boost::filesystem::path pwd = boost::filesystem::initial_path<boost::filesystem::path>();
 
   flusspferd::load_require_function(scope);
-
-  flusspferd::gc();//FIXME
 
   flusspferd::load_properties_functions(scope);
 
   flusspferd::object require_fn = scope.get_property_object("require");
+  flusspferd::require &require = flusspferd::get_native<flusspferd::require>(require_fn);
+
+  root_object preload(require_fn.get_property_object("preload"));
 
   // Create the top level |module| and |exports| properties.
   scope.define_property("module", require_fn.get_property("main"), dont_enumerate);
@@ -72,7 +71,8 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   root_object exports(create<object>());
   scope.define_property("exports", exports, dont_enumerate);
 
-  root_object preload(require_fn.get_property_object("preload"));
+  // Set the main.id to *something* so we always have properties.
+  require.set_main_module( "file://" + (pwd / "<typein>").string() );
 
   flusspferd::create<method>(
     "binary",

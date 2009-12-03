@@ -4,6 +4,24 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-12-03:
+- Improve constructor of native_function_base derived classes to have access
+  to the function already in the constructor, not just afterwards, which should
+  simplify the creation of custom native functions (#178).
+
+2009-12-02:
+- Add object::instance_of, which works like Javascript's "instanceof" (#128).
+- Add object::constructor: it returns the object's constructor function (#172).
+- Make object::constructor/prototype/parent work on const objects (#175).
+- Add util/load module (#34).
+- Allow loading modules from $FLUSSPFERD_USER_MODULES or
+  $HOME/.flusspferd/modules (#116).
+- Overload flusspferd::is_native & flusspferd::get_native for classes deriving
+  from native_function_base (#131).
+- create<NativeFunction> now passes name and arity to the constructor of
+  NativeFunction by default (#176).
+- exception now accepts a (completed) boost::format parmeter (part of #44)
+
 2009-11-14:
 - Add object::set_properties and object::define_properties for setting or
   defining multiple properties at once (#151).

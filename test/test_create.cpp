@@ -75,10 +75,14 @@ public:
 };
 
 struct my_functor : flusspferd::native_function_base {
+  typedef boost::mpl::true_ ignore_name_arity;
+
   bool x;
 
-  my_functor() : x(true) {}
-  my_functor(int) : x(false) {}
+  my_functor(flusspferd::function const &obj)
+    : flusspferd::native_function_base(obj), x(true) {}
+  my_functor(flusspferd::function const &obj, int)
+    : flusspferd::native_function_base(obj), x(false) {}
 
   void call(flusspferd::call_context &) {
     set_property("called", x);

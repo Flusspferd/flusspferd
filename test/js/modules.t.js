@@ -35,5 +35,15 @@ exports.test_varPolution = function() {
   asserts.same("a2" in global, false, "no a2 variable");
 }
 
+exports.test_module_resouce = function() {
+  asserts.matches(module.resource.resolve("x.ext"), ".*/test/js/x.ext$");
+  var a1 = require('./lib/modules-test/a1');
+  asserts.diag(a1.module);
+  asserts.matches(a1.module.resource.resolve("x.ext"), ".*/test/js/lib/modules-test/x.ext$");
+
+  // Check we can actually open things too!
+  asserts.same(a1.module.resource("a1.js").readLine(), "// First line of a1.js\n");
+}
+
 if (require.main === module)
   test.prove(module.id);

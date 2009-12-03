@@ -28,6 +28,10 @@ flusspferd \- interactive Javascript shell/repl
 .PP
 \fBflusspferd\fR is an interactive Javascript shell/repl based on the
 Flusspferd Javascript library. It can be used to run and test Javascript code.
+.PP
+It will look for modules in the system paths and additionally in
+\fI$FLUSSPFERD_USER_MODULES\fR if defined, or \fI$HOME\fR/.flusspferd/modules
+otherwise.
 .SH OPTIONS
 @OPTIONS@
 .SH EXAMPLES
