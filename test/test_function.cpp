@@ -40,14 +40,10 @@ namespace {
   }
 
   struct function_struct : flusspferd::native_function_base {
-    function_struct(unsigned arity, std::string const &name)
-      : flusspferd::native_function_base(arity, name)
+    function_struct(flusspferd::function const &obj)
+      : flusspferd::native_function_base(obj)
     {
       v = 1234;
-    }
-
-    function_struct() {
-      v = 0;
     }
 
     void call(flusspferd::call_context &x) {
