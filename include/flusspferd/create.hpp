@@ -471,12 +471,20 @@ flusspferd::create< flusspferd::function >(
  * <dt>flusspferd::param::_arguments</dt>
  * <dd>The parameters to be passed to the Class constructor, as a
  *     <a href="http://www.boost.org/doc/libs/1_40_0/libs/fusion/doc/html/fusion/sequence/concepts/forward_sequence.html"
- *     >fusion sequence</a>. If Class::ignore_name_arity is defined and boost::mpl::true_ or another truish type, then
- *     only the elements in _arguments will be passed to the Class constructor, otherwise @p arity and @p name will be
- *     prepended (first arity, then name).<br>
+ *     >fusion sequence</a>. The first argument to the constructor will always
+ *     be the function itself, after which these arguments will be passed.
  *    <em>Default</em>: <tt>boost::fusion::vector0()</tt>
+ * </dd>
+ * <dt>flusspferd::param::_arity</dt>
+ * <dd>The function arity. Only used when the function arity can not otherwise
+ *     be determined.<br>
+ *     The function arity will be tried to be determined by calling
+ *     Class::determine_arity(), see native_function_base::determine_arity().
+ *     <br>
+ *     <em>Default</em>: <tt>0</tt>
+ * </dd>
  * </dl>
- * <br><em>Result type</em>: flusspferd::function.
+ * <br><em>Result type</em>: <tt>Class &</tt>.
  * </dd>
  * </dl>
  *
