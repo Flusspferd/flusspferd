@@ -58,6 +58,7 @@ namespace detail {
 
     typedef boost::parameter::parameters<
       param::tag::arguments,
+      param::tag::arity,
       name_spec,
       container_spec,
       attributes_spec
