@@ -23,7 +23,7 @@
 # THE SOFTWARE.
 #
 
-.PHONY: all clean install uninstall
+.PHONY: all clean install uninstall test
 
 all: build
 	$(MAKE) -C build
@@ -48,3 +48,6 @@ uninstall: build
 	else 					    \
 	echo 'Flusspferd does not seem to be installed.'; \
 	fi
+
+test:
+	@./util/run_tests.sh
