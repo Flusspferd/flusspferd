@@ -28,11 +28,22 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
 
 #include "../create.hpp"
+#include <boost/version.hpp>
 #include <boost/fusion/functional/invocation/invoke.hpp>
+#include <boost/fusion/view/joint_view.hpp>
+#include <boost/fusion/container/vector/vector10.hpp>
+#include <boost/mpl/has_xxx.hpp>
+#include <boost/mpl/eval_if.hpp>
 
 namespace flusspferd {
 
 #ifndef IN_DOXYGEN
+
+#if BOOST_VERSION < 104100
+#define VECTOR0 boost::fusion::vector0
+#else
+#define VECTOR0 boost::fusion::vector0<>
+#endif
 
 namespace detail {
   template<typename Class>
@@ -43,36 +54,74 @@ namespace detail {
     >::type
   >
   {
-    typedef function result_type;
+    typedef Class &result_type;
 
     typedef boost::parameter::parameters<
       param::tag::arguments,
+      param::tag::arity,
       name_spec,
       container_spec,
       attributes_spec
     > parameters;
 
-    static result_type create() {
-      return create_native_function(new Class);
+    static result_type create()
+    {
+      boost::optional<unsigned> determined_arity(Class::determine_arity());
+
+      unsigned arity = 0u;
+      if (determined_arity)
+        arity = determined_arity.get();
+
+      root_function fun(
+          native_function_base::create_function(arity, std::string()));
+      return *new Class(fun);
     }
 
     template<typename ArgPack>
-    static result_type create(ArgPack const &args) {
+    static result_type
+    create(ArgPack const &args) {
+      boost::optional<unsigned> determined_arity(Class::determine_arity());
+
+      unsigned arity;
+      if (determined_arity)
+        arity = determined_arity.get();
+      else
+        arity = args[param::_arity | 0u];
+
+      flusspferd::root_string name(args[param::_name | flusspferd::string()]);
+      root_function fun(
+          native_function_base::create_function(
+              arity,
+              name.to_string()));
+
       typedef typename boost::parameter::value_type<
           ArgPack,
           param::tag::arguments,
-          boost::fusion::vector0
+          VECTOR0
         >::type input_arguments_type;
 
       input_arguments_type input_arguments(
-        args[param::_arguments | boost::fusion::vector0()]);
+          args[param::_arguments | VECTOR0()]);
 
-      Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
+      typedef
+        boost::fusion::vector1<function>
+        obj_seq_type;
 
-      return create_native_function(&self);
+      obj_seq_type obj_seq(fun);
+
+      typedef boost::fusion::joint_view<
+          obj_seq_type,
+          input_arguments_type
+        > full_arguments_type;
+
+      full_arguments_type full_arguments(obj_seq, input_arguments);
+
+      return boost::fusion::invoke(new_functor<Class>(), full_arguments);
     }
   };
 }
+
+#undef VECTOR0
 
 #endif //IN_DOXYGEN
 

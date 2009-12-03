@@ -583,7 +583,7 @@ foreach(PLUGIN ${PLUGINS})
 endforeach()
 
 set(JS_PLUGINS
-    util util/array util/function util/range test test/equiv http/headers)
+    util util/array util/function util/range util/load test test/equiv http/headers)
 
 foreach(JS_PLUGIN ${JS_PLUGINS})
 

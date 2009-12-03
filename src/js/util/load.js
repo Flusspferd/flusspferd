@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
+// vim:ts=2:sw=2:expandtab:autoindent:
 /*
 The MIT License
 
@@ -24,27 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_TEST_ENVIRONMENT_HPP
-#define FLUSSPFERD_TEST_ENVIRONMENT_HPP
+const io = require('io');
 
-#include "flusspferd/current_context_scope.hpp"
-#include "flusspferd/load_core.hpp"
-#include "flusspferd/security.hpp"
-#include <boost/test/unit_test.hpp>
-
-class context_fixture {
-public:
-  context_fixture() : scope(flusspferd::context::create()) {
-    flusspferd::security::create(flusspferd::current_context().global());
-    flusspferd::load_core(flusspferd::current_context().global(), "exeName");
-    flusspferd::gc();
-  }
-
-  ~context_fixture() {
-  }
-
-private:
-  flusspferd::current_context_scope scope;
-};
-
-#endif
+/**
+ *  util.load(fileName) -> value
+ *  - fileName: name of file to load
+ *
+ *  Evals the contents of a file.
+ *
+ *  ##### Example #
+ *
+ *      var returnValue = require('util').load('somefile.js');
+ **/
+exports.load = function load(name) {
+  var file = new io.File(name, "r");
+  var code = file.readWhole();
+  return eval(code);
+}

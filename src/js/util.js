@@ -34,3 +34,5 @@ require('./util/function');
  **/
 
 exports.Range = require('./util/range').Range;
+
+exports.load = require('./util/load').load;

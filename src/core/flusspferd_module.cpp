@@ -26,7 +26,6 @@ THE SOFTWARE.
 
 #include "flusspferd/version.hpp"
 #include "flusspferd/load_core.hpp"
-#include "flusspferd/create.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>

@@ -189,23 +189,22 @@ void flusspferd_repl::run_cmdline() {
     flusspferd::global()
       .get_property_object("require");
 
-  flusspferd::require require =
-      dynamic_cast<flusspferd::require&>(
-        *flusspferd::native_function_base::get_native(require_obj)
-      );
+  flusspferd::require &require = flusspferd::get_native<flusspferd::require>(require_obj);
 
   flusspferd::object module_obj = require_obj.get_property_object("main");
+
+
+  bool first = true;
 
   typedef std::list<std::pair<std::string, Type> >::const_iterator iter;
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     switch (i->second) {
     case File:
-      // TODO: Move this logic into modules.cpp and make it set the right values
-      if (!module_obj.has_own_property("id")) {
+      if (first) {
+        first = false;
         std::string id = "file://"
                        + flusspferd::io::fs_base::canonicalize(i->first).string();
         require.set_main_module(id);
-        require_obj.set_property("id", id);
       }
       flusspferd::execute(i->first.c_str());
       break;
@@ -219,10 +218,8 @@ void flusspferd_repl::run_cmdline() {
       require_obj.call(flusspferd::global(), i->first);
       break;
     case MainModule:
-      // TODO: make the module aware that it is the main module
-      std::cout << "Setting require.main.id\n";
+      first = false;
       require.set_main_module(i->first);
-      std::cout << "Running main module\n";
       require_obj.call(flusspferd::global(), i->first);
       break;
     }
@@ -279,6 +276,7 @@ void flusspferd_repl::repl_loop() {
     catch(std::exception &e) {
       std::cerr << "ERROR: " << e.what() << '\n';
     }
+
     flusspferd::gc();
   }
 
@@ -512,8 +510,6 @@ flusspferd::object flusspferd_repl::option_spec() {
 }
 
 void flusspferd_repl::parse_cmdline() {
-  flusspferd::gc();//FIXME
-
   flusspferd::root_object spec(option_spec());
 
   flusspferd::root_array arguments(flusspferd::create<flusspferd::array>());
@@ -521,16 +517,10 @@ void flusspferd_repl::parse_cmdline() {
   for (int i = 1; i < argc; ++i)
     arguments.push(std::string(argv[i]));
 
-  flusspferd::gc();//FIXME
-
   flusspferd::root_object results(flusspferd::getopt(spec, arguments));
-
-  flusspferd::gc();//FIXME
 
   if (!config_loaded)
     load_config();
-
-  flusspferd::gc();//FIXME
 
   arguments = results.get_property_object("_");
 
@@ -550,11 +540,7 @@ void flusspferd_repl::parse_cmdline() {
 
   arguments.call("unshift", file);
 
-  flusspferd::gc();//FIXME
-
   flusspferd::root_object sys(flusspferd::global().call("require", "system").to_object());
-
-  flusspferd::gc();//FIXME
 
   sys.define_property("args", arguments,
                       flusspferd::read_only_property |

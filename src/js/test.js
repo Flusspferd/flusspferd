@@ -117,7 +117,7 @@ merge(TAPProducer.prototype, {
 
   diag: function diag(msg,filter) {
     var self = this,
-        lines = msg.split(/\n/)
+        lines = String(msg).split(/\n/)
 
     lines = lines.map(function(l) {
       return self.padding + ("# " + l)
