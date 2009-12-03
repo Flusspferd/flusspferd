@@ -49,5 +49,5 @@ uninstall: build
 	echo 'Flusspferd does not seem to be installed.'; \
 	fi
 
-test:
+test: all
 	@./util/run_tests.sh
