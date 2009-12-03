@@ -4,6 +4,11 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-12-03:
+- Improve constructor of native_function_base derived classes to have access
+  to the function already in the constructor, not just afterwards, which should
+  simplify the creation of custom native functions (#178).
+
 2009-12-02:
 - Add object::instance_of, which works like Javascript's "instanceof" (#128).
 - Add object::constructor: it returns the object's constructor function (#172).
