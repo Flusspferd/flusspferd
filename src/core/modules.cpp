@@ -77,13 +77,13 @@ void flusspferd::load_require_function(object container) {
 }
 
 
-require::require()
-  : native_function_base(1, "require")
+require::require(function const &fun)
+  : native_function_base(fun)
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
-require::require(require const &rhs)
-  : native_function_base(1, "require"),
+require::require(function const &fun, require const &rhs)
+  : native_function_base(fun),
     module_cache(rhs.module_cache),
     paths(rhs.paths),
     alias(rhs.alias),

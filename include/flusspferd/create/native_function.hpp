@@ -46,35 +46,15 @@ namespace flusspferd {
 #endif
 
 namespace detail {
-  BOOST_MPL_HAS_XXX_TRAIT_DEF(ignore_name_arity)
-
-  template<typename T>
-  struct ignore_name_arity_test
-  {
-    typedef typename T::ignore_name_arity type;
-  };
-
-  template<typename T>
-  struct ignore_name_arity
-    : boost::mpl::eval_if<
-        has_ignore_name_arity<T>,
-        ignore_name_arity_test<T>,
-        boost::mpl::false_
-      >
-  {};
-
   template<typename Class>
   struct create_traits<
     Class,
     typename boost::enable_if<
-      boost::mpl::and_<
-        boost::is_base_of<native_function_base, Class>,
-        ignore_name_arity<Class>
-      >
+      boost::is_base_of<native_function_base, Class>
     >::type
   >
   {
-    typedef function result_type;
+    typedef Class &result_type;
 
     typedef boost::parameter::parameters<
       param::tag::arguments,
@@ -82,63 +62,23 @@ namespace detail {
       container_spec,
       attributes_spec
     > parameters;
-
-    typedef typename ignore_name_arity<Class>::type ignore_name_arity_type;
 
     static result_type create()
     {
-      return create_native_function(new Class);
+      root_function fun(
+          native_function_base::create_function(0U, std::string()));
+      return *new Class(fun);
     }
 
     template<typename ArgPack>
-    static result_type create(ArgPack const &args) {
-      typedef typename boost::parameter::value_type<
-          ArgPack,
-          param::tag::arguments,
-          VECTOR0
-        >::type input_arguments_type;
-
-      input_arguments_type input_arguments(
-        args[param::_arguments | VECTOR0()]);
-
-      Class &self = boost::fusion::invoke(new_functor<Class>(), input_arguments);
-
-      return create_native_function(&self);
-    }
-  };
-
-  template<typename Class>
-  struct create_traits<
-    Class,
-    typename boost::enable_if<
-      boost::mpl::and_<
-        boost::is_base_of<native_function_base, Class>,
-        boost::mpl::not_<ignore_name_arity<Class> >
-      >
-    >::type
-  >
-  {
-    typedef function result_type;
-
-    typedef boost::parameter::parameters<
-      param::tag::arguments,
-      name_spec,
-      container_spec,
-      attributes_spec
-    > parameters;
-
-    typedef typename ignore_name_arity<Class>::type ignore_name_arity_type;
-
-    static result_type create(
-        typename boost::disable_if<ignore_name_arity_type>::type * = 0)
-    {
-        return create_native_function(new Class(0U, std::string()));
-    }
-
-    template<typename ArgPack>
-    static
-    typename boost::disable_if<ignore_name_arity_type, result_type>::type
+    static result_type
     create(ArgPack const &args) {
+      flusspferd::root_string name(args[param::_name | flusspferd::string()]);
+      root_function fun(
+          native_function_base::create_function(
+              args[param::_arity | 0u],
+              name.to_string()));
+
       typedef typename boost::parameter::value_type<
           ArgPack,
           param::tag::arguments,
@@ -146,26 +86,22 @@ namespace detail {
         >::type input_arguments_type;
 
       input_arguments_type input_arguments(
-        args[param::_arguments | VECTOR0()]);
+          args[param::_arguments | VECTOR0()]);
 
       typedef
-        boost::fusion::vector2<unsigned, std::string>
-        arity_name_seq_type;
+        boost::fusion::vector1<function>
+        obj_seq_type;
 
-      arity_name_seq_type arity_name_seq(
-          args[param::_arity | 0u],
-          std::string(args[param::_name | std::string()]));
+      obj_seq_type obj_seq(fun);
 
       typedef boost::fusion::joint_view<
-          arity_name_seq_type,
+          obj_seq_type,
           input_arguments_type
         > full_arguments_type;
 
-      full_arguments_type full_arguments(arity_name_seq, input_arguments);
+      full_arguments_type full_arguments(obj_seq, input_arguments);
 
-      Class &self = boost::fusion::invoke(new_functor<Class>(), full_arguments);
-
-      return create_native_function(&self);
+      return boost::fusion::invoke(new_functor<Class>(), full_arguments);
     }
   };
 }

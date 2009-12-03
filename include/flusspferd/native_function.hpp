@@ -46,11 +46,8 @@ private:
 public:
   typedef boost::function<T> callback_type;
 
-  native_function(
-      callback_type const &cb,
-      std::string const &name = std::string()
-    )
-    : native_function_base(adapter_type::arity, name), adapter(cb)
+  native_function(function const &obj, callback_type const &cb)
+    : native_function_base(obj), adapter(cb)
   {}
 
 private:
@@ -67,12 +64,8 @@ class native_function<void, false> : public native_function_base {
 public:
   typedef boost::function<void (call_context &)> callback_type;
 
-  native_function(
-      callback_type const &cb,
-      unsigned arity = 0,
-      std::string const &name = std::string()
-    )
-    : native_function_base(arity, name), cb(cb)
+  native_function(function const &obj, callback_type const &cb)
+    : native_function_base(obj), cb(cb)
   {}
 
 private:
@@ -97,11 +90,8 @@ private:
 public:
   typedef R T::*callback_type;
 
-  native_member_function(
-      callback_type const &cb,
-      std::string const &name = std::string()
-    )
-    : native_function_base(adapter_type::arity, name), adapter(cb)
+  native_member_function(function const &obj, callback_type const &cb)
+    : native_function_base(obj), adapter(cb)
   {}
 
 private:
@@ -118,12 +108,8 @@ class native_member_function<void, T> : public native_function_base {
 public:
   typedef void (T::*callback_type)(call_context &);
 
-  native_member_function(
-      callback_type const &cb,
-      unsigned arity = 0,
-      std::string const &name = std::string()
-    )
-    : native_function_base(arity, name), cb(cb)
+  native_member_function(function const &obj, callback_type const &cb)
+    : native_function_base(obj), cb(cb)
   {}
 
 private:

@@ -47,8 +47,8 @@ namespace flusspferd {
 namespace detail {
 
 struct unconstructible_class_constructor : native_function_base {
-  unconstructible_class_constructor(unsigned arity, std::string const &name)
-    : native_function_base(arity, name)
+  unconstructible_class_constructor(function const &obj)
+    : native_function_base(obj)
   {}
 
   void call(call_context &);
@@ -56,8 +56,8 @@ struct unconstructible_class_constructor : native_function_base {
 
 template<typename T>
 struct class_constructor : native_function_base {
-  class_constructor(unsigned arity, std::string const &name)
-    : native_function_base(arity, name)
+  class_constructor(function const &obj)
+    : native_function_base(obj)
   {}
 
   void call(call_context &x) {
