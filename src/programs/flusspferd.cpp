@@ -29,10 +29,7 @@ THE SOFTWARE.
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
-#include <boost/spirit/home/phoenix/core.hpp>
-#include <boost/spirit/home/phoenix/bind.hpp>
-#include <boost/spirit/home/phoenix/operator.hpp>
-#include <boost/spirit/home/phoenix/statement/sequence.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>

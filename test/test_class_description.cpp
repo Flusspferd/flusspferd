@@ -28,9 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/class_description.hpp"
 #include "flusspferd/create/native_object.hpp"
 #include "flusspferd/value_io.hpp"
-#include <boost/spirit/home/phoenix/core.hpp>
-#include <boost/spirit/home/phoenix/bind.hpp>
-#include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 
 namespace phoenix = boost::phoenix;
 using namespace phoenix::arg_names;
