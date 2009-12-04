@@ -25,14 +25,11 @@ public:
             flusspferd::object proto = flusspferd::create<flusspferd::object>();
 
             // Add the methods.
-            flusspferd::create<flusspferd::method>(
-                "dump", &StringSet::dump, _container = proto);
-            flusspferd::create<flusspferd::method>(
-                "add", &StringSet::add, _container = proto);
-            flusspferd::create<flusspferd::method>(
-                "delete", &StringSet::delete_, _container = proto);
-            flusspferd::create<flusspferd::method>(
-                "toArray", &StringSet::to_array, _container = proto);
+            flusspferd::create_on(proto)
+                .create<flusspferd::method>("dump", &StringSet::dump)
+                .create<flusspferd::method>("add", &StringSet::add)
+                .create<flusspferd::method>("delete", &StringSet::delete_)
+                .create<flusspferd::method>("toArray", &StringSet::to_array);
 
             return proto;
         }
