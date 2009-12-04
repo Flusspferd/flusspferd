@@ -299,6 +299,25 @@ THE SOFTWARE.
   } \
   /* */
 
+#define FLUSSPFERD_CD_PROPERTY__getter_setter_expression(p_property_name, p_expr) \
+  { \
+    ::flusspferd::root_function getter(::flusspferd::create< ::flusspferd::method>( \
+      ::flusspferd::param::_name = (p_property_name), \
+      ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(4, 1, p_expr), \
+      ::flusspferd::param::_signature = \
+      ::flusspferd::param::type<BOOST_PP_TUPLE_ELEM(4, 0, p_expr)>())); \
+    ::flusspferd::root_function setter(::flusspferd::create< ::flusspferd::method>( \
+      ::flusspferd::param::_name = (p_property_name), \
+      ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(4, 3, p_expr), \
+      ::flusspferd::param::_signature = \
+      ::flusspferd::param::type<BOOST_PP_TUPLE_ELEM(4, 2, p_expr)>())); \
+    obj.define_property( \
+      (p_property_name), \
+      ::flusspferd::property_attributes( \
+        ::flusspferd::permanent_shared_property, getter, setter)); \
+  } \
+  /* */
+
 #define FLUSSPFERD_CD_PROPERTY__getter(p_property_name, p_param) \
   { \
     ::flusspferd::root_function getter( \
@@ -307,6 +326,24 @@ THE SOFTWARE.
           & Class :: p_param \
         ) \
       ); \
+    obj.define_property( \
+      (p_property_name), \
+      ::flusspferd::property_attributes( \
+        ::flusspferd::permanent_shared_property \
+        | ::flusspferd::read_only_property, \
+        getter \
+      ) \
+    ); \
+  } \
+  /* */
+
+#define FLUSSPFERD_CD_PROPERTY__getter_expression(p_property_name, p_expr) \
+  { \
+    ::flusspferd::root_function getter(::flusspferd::create< ::flusspferd::method>( \
+      ::flusspferd::param::_name = (p_property_name), \
+      ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(2, 1, p_expr), \
+      ::flusspferd::param::_signature = \
+      ::flusspferd::param::type<BOOST_PP_TUPLE_ELEM(2, 0, p_expr)>())); \
     obj.define_property( \
       (p_property_name), \
       ::flusspferd::property_attributes( \
@@ -492,6 +529,18 @@ FLUSSPFERD_CLASS_DESCRIPTION(
  *     <dd>Generates a standard property with the initial value @p initial_value.</dd>
  *     <dt><code>(name, <b>constant</b>, value)</code></dt>
  *     <dd>Generates a constant property with the value @p value.</dd>
+ *     <dt><code>(name, <b>getter_expression</b>, (signature, expression))</code></dt>
+ *     <dd>Generates a @em constant property that is accessed through a getter
+ *         expression (a functor or a Boost.Phoenix expression, for example)
+ *         with a given function signature. The class object @em will be passed.
+ *         @note Use (literally) @p Class instead of the class name in the
+ *               expression!</dd>
+ *     <dt><code>(name, <b>getter_setter_expression</b>, (getter_signature, getter_expression, setter_signature, setter_expression))</code></dt>
+ *     <dd>Generates a  property that is accessed through each a getter and
+ *         setter expression (a functor or a Boost.Phoenix expression, for example)
+ *         with a given function signature. The class object @em will be passed.
+ *         @note Use (literally) @p Class instead of the class name in the
+ *               expression!</dd>
  *     </dl>
  * </dd></dl>
  *
