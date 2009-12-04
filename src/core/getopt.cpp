@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include <boost/assign/list_of.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
-#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <algorithm>

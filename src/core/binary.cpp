@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <sstream>
 #include <algorithm>
 #include <boost/ref.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 

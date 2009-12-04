@@ -42,7 +42,7 @@ THE SOFTWARE.
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <sstream>
 

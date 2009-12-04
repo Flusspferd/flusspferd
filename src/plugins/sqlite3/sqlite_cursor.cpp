@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <sstream>
 #include <new>
 #include <boost/lexical_cast.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace flusspferd;
 namespace fusion = boost::fusion;
