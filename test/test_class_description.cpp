@@ -75,6 +75,13 @@ BOOST_AUTO_TEST_CASE(methods_function)
   BOOST_CHECK(!obj.is_null());
   BOOST_CHECK(obj.has_property("methods_function"));
   BOOST_CHECK_EQUAL(obj.call("methods_function"), flusspferd::value(666));
+}
+
+BOOST_AUTO_TEST_CASE(methods_var)
+{
+  flusspferd::load_class<my_class>(flusspferd::global());
+  flusspferd::root_object obj(flusspferd::create<my_class>());
+  BOOST_CHECK(!obj.is_null());
 
   BOOST_CHECK(obj.has_property("methods_var"));
   BOOST_CHECK_EQUAL(obj.call("methods_var"), flusspferd::value(1234));
