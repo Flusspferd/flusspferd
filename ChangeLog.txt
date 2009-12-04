@@ -22,6 +22,12 @@ Release 0.9
   NativeFunction by default (#176).
 - exception now accepts a (completed) boost::format parmeter (part of #44)
 
+2009-11-21:
+- Add the new directives method and function (under the methods parameter), as
+  well as the directives getter_expression and getter_setter_expression (under
+  the properties parameter) for specifying methods and properties as function
+  expressions (#167).
+
 2009-11-14:
 - Add object::set_properties and object::define_properties for setting or
   defining multiple properties at once (#151).
