@@ -50,7 +50,7 @@ public:
     : native_function_base(obj), adapter(cb)
   {}
 
-  static boost::optional<unsigned> determine_arity() {
+  static boost::optional<std::size_t> determine_arity() {
     return adapter_type::arity;
   }
 
@@ -98,7 +98,7 @@ public:
     : native_function_base(obj), adapter(cb)
   {}
 
-  static boost::optional<unsigned> determine_arity() {
+  static boost::optional<std::size_t> determine_arity() {
     return adapter_type::arity;
   }
 
