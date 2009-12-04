@@ -128,7 +128,7 @@ T get_native_object_parameter2(call_context &x) {
       x.result = to_value.perform( \
         function(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0))); \
     } \
-    static std::size_t const arity = (n_args); \
+    static unsigned const arity = (n_args); \
   }; \
   /* */
 
@@ -140,7 +140,7 @@ T get_native_object_parameter2(call_context &x) {
       (void)x; \
       function(FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
     } \
-    static std::size_t const arity = (n_args); \
+    static unsigned const arity = (n_args); \
   }; \
   /* */
 
@@ -162,7 +162,7 @@ T get_native_object_parameter2(call_context &x) {
           FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
         )); \
     } \
-    static std::size_t const arity = BOOST_PP_DEC(n_args); \
+    static unsigned const arity = BOOST_PP_DEC(n_args); \
   }; \
   /* */
 
@@ -182,7 +182,7 @@ T get_native_object_parameter2(call_context &x) {
         FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
       ); \
     } \
-    static std::size_t const arity = BOOST_PP_DEC(n_args); \
+    static unsigned const arity = BOOST_PP_DEC(n_args); \
   }; \
   /* */
 
@@ -203,7 +203,7 @@ T get_native_object_parameter2(call_context &x) {
           FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
         )); \
     } \
-    static std::size_t const arity = BOOST_PP_DEC(n_args); \
+    static unsigned const arity = BOOST_PP_DEC(n_args); \
   }; \
   /* */
 
@@ -223,7 +223,7 @@ T get_native_object_parameter2(call_context &x) {
         FLUSSPFERD_CONVERT_ARGS(2, n_args, 1) \
       ); \
     } \
-    static std::size_t const arity = BOOST_PP_DEC(n_args); \
+    static unsigned const arity = BOOST_PP_DEC(n_args); \
   }; \
   /* */
 
@@ -249,7 +249,7 @@ T get_native_object_parameter2(call_context &x) {
         (get_native_object_parameter2<T*>(x)->*fun) \
           (FLUSSPFERD_CONVERT_ARGS(1, n_args, 0))); \
     } \
-    static std::size_t const arity = (n_args); \
+    static unsigned const arity = (n_args); \
   }; \
   /* */
 
@@ -269,7 +269,7 @@ T get_native_object_parameter2(call_context &x) {
       (get_native_object_parameter2<T*>(x)->*fun) \
           (FLUSSPFERD_CONVERT_ARGS(1, n_args, 0)); \
     } \
-    static std::size_t const arity = (n_args); \
+    static unsigned const arity = (n_args); \
   }; \
   /* */
 
@@ -285,7 +285,7 @@ template<
   typename Type,
   bool Method,
   typename ResultType = typename Type::result_type,
-  std::size_t Arity = Type::arity,
+  unsigned Arity = Type::arity,
   typename Condition = void>
 struct function_adapter;
 
@@ -337,7 +337,7 @@ public:
     function_adapter_implementation.action(function, x);
   }
 
-  static std::size_t const arity = adapter_type::arity;
+  static unsigned const arity = adapter_type::arity;
 
 private:
   function_type function;
@@ -365,7 +365,7 @@ public:
     function_adapter_implementation_memfn.action(funptr, x);
   }
 
-  static std::size_t const arity = adapter_type::arity;
+  static unsigned const arity = adapter_type::arity;
 
 private:
   R T::*funptr;
