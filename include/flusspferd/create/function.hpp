@@ -154,6 +154,17 @@ namespace detail {
         attributes_spec
       > parameters;
 
+    typedef boost::parameter::parameters<
+        boost::parameter::required<param::tag::name>,
+        param::tag::function,
+        param::tag::argument_names,
+        param::tag::file,
+        param::tag::line,
+        param::tag::signature,
+        param::tag::arity,
+        attributes_spec
+      > create_on_parameters;
+
     static result_type create() {
       flusspferd::root_string empty((flusspferd::string()));
       return create_source_function(

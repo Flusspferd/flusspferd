@@ -56,6 +56,20 @@ namespace detail {
       >
       parameters;
 
+    typedef boost::parameter::parameters<
+        boost::parameter::required<param::tag::name>,
+        boost::parameter::optional<
+          boost::parameter::deduced<param::tag::length>,
+          boost::is_integral<boost::mpl::_>
+        >,
+        boost::parameter::optional<
+          boost::parameter::deduced<param::tag::contents>,
+          boost::mpl::not_<boost::is_integral<boost::mpl::_> >
+        >,
+        attributes_spec
+      >
+      create_on_parameters;
+
     static flusspferd::array create() {
       return create_length_array(0);
     }
