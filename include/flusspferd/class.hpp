@@ -209,7 +209,7 @@ object load_class(
     typename T::class_info::constructible
   >::type * = 0)
 {
-  std::size_t const arity = T::class_info::constructor_arity::value;
+  unsigned const arity = T::class_info::constructor_arity::value;
   char const *name = T::class_info::constructor_name();
   char const *full_name = T::class_info::full_name();
 
