@@ -28,6 +28,10 @@ THE SOFTWARE.
 #include "flusspferd/class_description.hpp"
 #include "flusspferd/create/native_object.hpp"
 #include "flusspferd/value_io.hpp"
+#include <boost/spirit/home/phoenix/core.hpp>
+#include <boost/spirit/home/phoenix/bind.hpp>
+
+namespace phoenix = boost::phoenix;
 
 struct my_functor {
   int operator() () const {
@@ -46,14 +50,19 @@ FLUSSPFERD_CLASS_DESCRIPTION(
             int (),
             my_functor()
         ))
+        ("methods_var", method, (
+            int (Class &),
+            phoenix::bind(&Class::var, phoenix::arg_names::arg1)))
     )
 )
 {
 public:
   my_class(object const &o)
-    : base_type(o)
+    : base_type(o), var(1234)
     {
     }
+
+  int var;
 };
 
 BOOST_FIXTURE_TEST_SUITE(
@@ -64,8 +73,11 @@ BOOST_AUTO_TEST_CASE(methods_function)
   flusspferd::load_class<my_class>(flusspferd::global());
   flusspferd::root_object obj(flusspferd::create<my_class>());
   BOOST_CHECK(!obj.is_null());
-  BOOST_CHECK(obj.has_property("methods_function"));// FIXME why does this fail?
+  BOOST_CHECK(obj.has_property("methods_function"));
   BOOST_CHECK_EQUAL(obj.call("methods_function"), flusspferd::value(666));
+
+  BOOST_CHECK(obj.has_property("methods_var"));
+  BOOST_CHECK_EQUAL(obj.call("methods_var"), flusspferd::value(1234));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
