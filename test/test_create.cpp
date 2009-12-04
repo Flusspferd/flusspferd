@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+#include "flusspferd/create_on.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/array.hpp"
@@ -308,5 +309,83 @@ BOOST_AUTO_TEST_CASE( container ) {
   BOOST_CHECK(attr = cont.get_property_attributes("m"));
   BOOST_CHECK_EQUAL(attr->flags, flusspferd::dont_enumerate);
 }
+
+BOOST_AUTO_TEST_SUITE(create_on)
+
+BOOST_AUTO_TEST_CASE(object) {
+  flusspferd::create_on(flusspferd::global())
+    .create<flusspferd::object>(flusspferd::param::_name = "my_obj")
+    .create<flusspferd::object>("my_obj2");
+  BOOST_CHECK(flusspferd::global().has_property("my_obj"));
+  BOOST_CHECK(flusspferd::global().has_property("my_obj2"));
+  BOOST_CHECK(!flusspferd::global().get_property_object("my_obj").is_null());
+  BOOST_CHECK(!flusspferd::global().get_property_object("my_obj2").is_null());
+  BOOST_CHECK_NE(
+      flusspferd::global().get_property("my_obj"),
+      flusspferd::global().get_property("my_obj2"));
+}
+
+BOOST_AUTO_TEST_CASE(array) {
+  flusspferd::create_on(flusspferd::global())
+    .create<flusspferd::array>("name", 12);
+  BOOST_CHECK(flusspferd::global().has_property("name"));
+  try {
+    flusspferd::array arr(flusspferd::global().get_property_object("name"));
+    BOOST_CHECK_EQUAL(arr.length(), 12);
+  } catch (flusspferd::exception&) {
+    BOOST_CHECK(!"No throw!");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(native_function) {
+  flusspferd::create_on(flusspferd::global())
+    .create<my_functor>("name", boost::fusion::make_vector(0));
+  try {
+    flusspferd::function f(flusspferd::global().get_property_object("name"));
+    BOOST_CHECK(!f.is_null());
+    BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value());
+    BOOST_CHECK_NO_THROW(f.call(flusspferd::global()));
+    BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value(false));
+  } catch (flusspferd::exception&) {
+    BOOST_CHECK(!"No throw!");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(native_object) {
+  flusspferd::create_on(flusspferd::global())
+    .create<my_class>("name", boost::fusion::make_vector(5, "hey"));
+  try {
+    my_class &x = flusspferd::get_native<my_class>(
+        flusspferd::global().get_property_object("name"));
+    BOOST_CHECK(!x.is_null());
+    BOOST_CHECK_EQUAL(x.constructor_choice, my_class::ab);
+    BOOST_CHECK_EQUAL(x.a, 5);
+    BOOST_CHECK_EQUAL(x.b, "hey");
+  } catch (flusspferd::exception&) {
+    BOOST_CHECK(!"No throw!");
+  }
+}
+
+BOOST_AUTO_TEST_CASE(function) {
+  flusspferd::create_on(flusspferd::global())
+    .create<flusspferd::function>(
+        "name",
+        "return x + y",
+        list_of("x")("y"),
+        "file",
+        666);
+  try {
+    flusspferd::function f(flusspferd::global().get_property_object("name"));
+    BOOST_CHECK_EQUAL(f.name(), "name");
+    BOOST_CHECK_EQUAL(f.arity(), 2);
+    flusspferd::root_value v;
+    BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 1, 2));
+    BOOST_CHECK_EQUAL(v, flusspferd::value(3));
+  } catch (flusspferd::exception&) {
+    BOOST_CHECK(!"No throw!");
+  }
+}
+
+BOOST_AUTO_TEST_SUITE_END() // create_on
 
 BOOST_AUTO_TEST_SUITE_END()

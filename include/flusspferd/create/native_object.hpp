@@ -94,6 +94,14 @@ namespace detail {
         attributes_spec
       > parameters;
 
+    typedef boost::parameter::parameters<
+        boost::parameter::required<param::tag::name>,
+        param::tag::arguments,
+        param::tag::prototype,
+        param::tag::parent,
+        attributes_spec
+      > create_on_parameters;
+
     static result_type create() {
       root_object obj((
           detail::generic_create_native_object<Class>(

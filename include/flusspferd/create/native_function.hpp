@@ -64,6 +64,13 @@ namespace detail {
       attributes_spec
     > parameters;
 
+    typedef boost::parameter::parameters<
+      boost::parameter::required<param::tag::name>,
+      param::tag::arguments,
+      param::tag::arity,
+      attributes_spec
+    > create_on_parameters;
+
     static result_type create()
     {
       boost::optional<unsigned> determined_arity(Class::determine_arity());
