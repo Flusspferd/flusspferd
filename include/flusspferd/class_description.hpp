@@ -458,6 +458,18 @@ FLUSSPFERD_CLASS_DESCRIPTION(
  *     <dt><code>(name, <b>alias</b>, alias_name)</code></dt>
  *     <dd>Copies the method @p alias_name into a property with name @p name. The method
  *         @p alias_name must be already defined @em above this method.</dd>
+ *     <dt><code>(name, <b>function</b>, (signature, expression))</code></dt>
+ *     <dd>Add a function expression (a functor or a Boost.Phoenix expression,
+ *         for example) with a given function signature. The class object will
+ *         @em not be passed.
+ *         @note Use (literally) @p Class instead of the class name in the
+ *               expression.</dd>
+ *     <dt><code>(name, <b>method</b>, (signature, expression))</code></dt>
+ *     <dd>Add a function expression (a functor or a Boost.Phoenix expression,
+ *         for example) with a given function signature. The class object
+ *         @em will be passed.
+ *         @note Use (literally) @p Class instead of the class name in the
+ *               expression!</dd>
  *     </dl>
  * </dd></dl>
  *
