@@ -39,6 +39,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     my_class,
     (constructor_name, "MyClass")
     (full_name, "MyClass")
+    (constructible, false)
     (
         methods,
         ("methods_function", function, (
@@ -53,13 +54,14 @@ public:
     : base_type(o)
     {
     }
-}; 
+};
 
 BOOST_FIXTURE_TEST_SUITE(
     with_context, context_fixture)
 
 BOOST_AUTO_TEST_CASE(methods_function)
 {
+  flusspferd::load_class<my_class>(flusspferd::global());
   flusspferd::root_object obj(flusspferd::create<my_class>());
   BOOST_CHECK(!obj.is_null());
   BOOST_CHECK(obj.has_property("methods_function"));// FIXME why does this fail?
