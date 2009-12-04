@@ -287,7 +287,9 @@ create()
   typename detail::create_traits<Class>::result_type \
   create( \
     BOOST_PP_ENUM_BINARY_PARAMS(n, T, const &x), \
-    typename detail::create_traits<Class>::parameters::template match<T0>::type kw = typename detail::create_traits<Class>::parameters()) \
+    typename detail::create_traits<Class>::parameters::template match< \
+      BOOST_PP_ENUM_PARAMS(n, T) \
+    >::type kw = typename detail::create_traits<Class>::parameters()) \
   { \
     typedef detail::create_traits<Class> traits; \
     return detail::create_helper<Class>(kw(BOOST_PP_ENUM_PARAMS(n, x))); \
