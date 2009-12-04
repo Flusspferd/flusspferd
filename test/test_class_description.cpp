@@ -30,8 +30,10 @@ THE SOFTWARE.
 #include "flusspferd/value_io.hpp"
 #include <boost/spirit/home/phoenix/core.hpp>
 #include <boost/spirit/home/phoenix/bind.hpp>
+#include <boost/spirit/home/phoenix/operator.hpp>
 
 namespace phoenix = boost::phoenix;
+using namespace phoenix::arg_names;
 
 struct my_functor {
   int operator() () const {
@@ -52,7 +54,18 @@ FLUSSPFERD_CLASS_DESCRIPTION(
         ))
         ("methods_var", method, (
             int (Class &),
-            phoenix::bind(&Class::var, phoenix::arg_names::arg1)))
+            phoenix::bind(&Class::var, arg1)))
+    )
+    (
+        properties,
+        ("prop_var", getter_expression, (
+            int (Class &),
+            phoenix::bind(&Class::var, arg1)))
+        ("prop_var2", getter_setter_expression, (
+            int (Class &),
+            phoenix::bind(&Class::var, arg1),
+            void (Class &, int),
+            phoenix::bind(&Class::var, arg1) = (arg2 * 2)))
     )
 )
 {
@@ -63,6 +76,7 @@ public:
     }
 
   int var;
+  int var2;
 };
 
 BOOST_FIXTURE_TEST_SUITE(
@@ -85,6 +99,27 @@ BOOST_AUTO_TEST_CASE(methods_var)
 
   BOOST_CHECK(obj.has_property("methods_var"));
   BOOST_CHECK_EQUAL(obj.call("methods_var"), flusspferd::value(1234));
+}
+
+BOOST_AUTO_TEST_CASE(prop_var)
+{
+  flusspferd::load_class<my_class>(flusspferd::global());
+  flusspferd::root_object obj(flusspferd::create<my_class>());
+  BOOST_CHECK(!obj.is_null());
+
+  BOOST_CHECK(obj.has_property("prop_var"));
+  BOOST_CHECK_EQUAL(obj.get_property("prop_var"), flusspferd::value(1234));
+}
+
+BOOST_AUTO_TEST_CASE(prop_var2)
+{
+  flusspferd::load_class<my_class>(flusspferd::global());
+  flusspferd::root_object obj(flusspferd::create<my_class>());
+  BOOST_CHECK(!obj.is_null());
+
+  BOOST_CHECK(obj.has_property("prop_var2"));
+  obj.set_property("prop_var2", 4);
+  BOOST_CHECK_EQUAL(obj.get_property("prop_var2"), flusspferd::value(8));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
