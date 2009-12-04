@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "sqlite.hpp"
 #include <boost/assign/list_of.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace flusspferd;
 using namespace boost::assign;

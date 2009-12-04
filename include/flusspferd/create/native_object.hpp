@@ -29,9 +29,9 @@ THE SOFTWARE.
 
 #include "../create.hpp"
 #include <boost/version.hpp>
-#include <boost/fusion/functional/invocation/invoke.hpp>
-#include <boost/fusion/view/joint_view.hpp>
-#include <boost/fusion/container/vector/vector10.hpp>
+#include <boost/fusion/include/invoke.hpp>
+#include <boost/fusion/include/joint_view.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace flusspferd {
 

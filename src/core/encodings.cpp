@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/ref.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace boost;
 using namespace flusspferd;

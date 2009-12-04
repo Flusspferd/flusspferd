@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include "flusspferd/native_function_base.hpp"
 #include "test_environment.hpp"
 #include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace flusspferd::param;
 using namespace boost::assign;

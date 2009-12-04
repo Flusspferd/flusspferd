@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "flusspferd/create/native_object.hpp"
 #include "flusspferd/version.hpp"
 #include "flusspferd/io/stream.hpp"
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 #include <iostream>
 #include <ostream>
 

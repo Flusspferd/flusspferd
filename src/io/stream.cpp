@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/binary.hpp"
 #include "flusspferd/array.hpp"
 #include <boost/scoped_array.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 #include <cstdlib>
 
 using namespace flusspferd;

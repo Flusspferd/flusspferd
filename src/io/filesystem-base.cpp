@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 #ifdef WIN32
 #include <stdio.h>

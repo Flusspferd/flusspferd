@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/ref.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 #include <sstream>
 
 namespace flusspferd {
