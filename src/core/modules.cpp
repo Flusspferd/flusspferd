@@ -43,8 +43,7 @@ THE SOFTWARE.
 #include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/spirit/home/phoenix/core.hpp>
-#include <boost/spirit/home/phoenix/bind.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 #include <sstream>
 
 #ifdef WIN32
