@@ -89,7 +89,7 @@ public:
    *
    * @return The arity.
    */
-  std::size_t arity() const;
+  unsigned arity() const;
 
   /**
    * Get the function name.
