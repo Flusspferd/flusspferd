@@ -91,7 +91,7 @@ value flusspferd::execute(char const *filename, object const &scope_) {
     scope = Impl::get_object(flusspferd::global());
 
   int oldopts = JS_GetOptions(cx);
-  JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO );
+  JS_SetOptions(cx, oldopts | JSOPTION_COMPILE_N_GO);
   JSScript *script = JS_CompileUCScript(
     cx, scope,
     module_text.data(), module_text.length(),
@@ -106,19 +106,18 @@ value flusspferd::execute(char const *filename, object const &scope_) {
 
   JS_SetOptions(cx, oldopts);
 
-  value result;
+  // JS_NewScriptObject is needed because otherwise the Garbage Collector
+  // may go amok!
+  root_object script_o(Impl::wrap_object(JS_NewScriptObject(cx, script)));
+
+  root_value result;
 
   JSBool ok = JS_ExecuteScript(cx, scope, script, Impl::get_jsvalp(result));
 
-  if (!ok) {
-    exception e("Script execution failed");
-    if (!e.is_js_exception()) {
-      JS_DestroyScript(cx, script);
-      throw e;
-    }
-  }
+  if (!ok)
+    throw exception("Script execution failed");
 
-  JS_DestroyScript(cx, script);
+  JS_MaybeGC(cx);
 
   return result;
 }
