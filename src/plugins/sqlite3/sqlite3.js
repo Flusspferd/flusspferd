@@ -42,7 +42,9 @@ THE SOFTWARE.
  **/
 
 if(!exports.SQLite3) {
-  quit();
+  // The only time this will be the case is when in the dev REPL where the JS
+  // in is the search path but the module was not built.
+  throw new Error("Unable to find library 'sqlite3'. (No native module found)");
 }
 
 /**
