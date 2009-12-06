@@ -69,8 +69,8 @@ struct exception : virtual std::runtime_error, virtual boost::exception {
   /**
    * Value constructor.
    *
-   * Will create an exception containing @p val. The error message will be the
-   * string representation of @p val.
+   * Will create an exception containing @p val. If this propogates to
+   * javascript, it will be thrown as @p val directly.
    *
    * @param val The value to stringify.
    */
@@ -151,6 +151,10 @@ public:
       x.throw_js_INTERNAL(); \
       return JS_FALSE; \
     } catch (::flusspferd::js_quit&) {\
+      return JS_FALSE; \
+    } catch (::flusspferd::value &v) { \
+      ::flusspferd::exception x(v); \
+      x.throw_js_INTERNAL(); \
       return JS_FALSE; \
     } \
     return JS_TRUE
