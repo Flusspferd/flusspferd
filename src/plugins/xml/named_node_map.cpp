@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 #include "node.hpp"
 #include "named_node_map.hpp"
-
+#include "dom_exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -54,12 +54,16 @@ object named_node_map::get_node(arabica_node node) {
   if (!map)
     throw exception("Internal error: node_map has gone away");
 
-  return map->get_node(node);
+  XML_CB_TRY {
+    return map->get_node(node);
+  } XML_CB_CATCH
 }
 
 object named_node_map::item(int idx) {
   arabica_node n = impl_.item(idx);
-  return get_node(n);
+  XML_CB_TRY {
+    return get_node(n);
+  } XML_CB_CATCH
 }
 
 bool named_node_map::property_resolve(value const &id, unsigned /*flags*/) {
@@ -98,26 +102,38 @@ void named_node_map::property_op(property_mode mode, value const &id, value &x) 
 }
 
 object named_node_map::getNamedItem(string_type name) {
-  return get_node(impl_.getNamedItem(name));
+  XML_CB_TRY {
+    return get_node(impl_.getNamedItem(name));
+  } XML_CB_CATCH
 }
 
 object named_node_map::setNamedItem(node &arg) {
-  return get_node(impl_.setNamedItem(arg.underlying_impl()));
+  XML_CB_TRY {
+    return get_node(impl_.setNamedItem(arg.underlying_impl()));
+  } XML_CB_CATCH
 }
- 
+
 object named_node_map::removeNamedItem(string_type name) {
-  return get_node(impl_.removeNamedItem(name));
+  XML_CB_TRY {
+    return get_node(impl_.removeNamedItem(name));
+  } XML_CB_CATCH
 }
 
 object named_node_map::getNamedItemNS(string_type ns_uri, string_type local_name) {
-  return get_node(impl_.getNamedItemNS(ns_uri, local_name));
+  XML_CB_TRY {
+    return get_node(impl_.getNamedItemNS(ns_uri, local_name));
+  } XML_CB_CATCH
 }
 
 object named_node_map::setNamedItemNS(node &arg) {
-  return get_node(impl_.setNamedItemNS(arg.underlying_impl()));
+  XML_CB_TRY {
+    return get_node(impl_.setNamedItemNS(arg.underlying_impl()));
+  } XML_CB_CATCH
 }
 
 object named_node_map::removeNamedItemNS(string_type ns_uri, string_type local_name) {
-  return get_node(impl_.removeNamedItemNS(ns_uri, local_name));
+  XML_CB_TRY {
+    return get_node(impl_.removeNamedItemNS(ns_uri, local_name));
+  } XML_CB_CATCH
 }
 

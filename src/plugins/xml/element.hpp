@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_ELEMENT_HPP
 
 #include "node.hpp"
+#include "dom_exception.hpp"
 
 #include <DOM/Element.hpp>
 

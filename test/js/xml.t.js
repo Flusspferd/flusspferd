@@ -122,6 +122,27 @@ exports.test_HTML = function() {
   asserts.same(String(doc), '<?xml version="1.0"?>\n<html xmlns="http://www.w3.org/1999/xhtml"><body>\n<p>foo <b>baz <i>quxx</i></b><i> flibble</i>\n</p><p>\n</p></body></html>', "XML output as expected");
 }
 
+exports.test_DOMException = function() {
+  setup.call(this);
+
+  var err, doc = this.doc;
+
+  // Cant use throwsOk cos we want the error
+  try {
+    doc.insertBefore(doc.documentElement, doc.documentElement);
+    asserts.ok(false, "DOMException thrown");
+  }
+  catch (e) {
+    err = e;
+  };
+  asserts.instanceOf(err, xml.DOMException);
+
+  // const unsigned short      HIERARCHY_REQUEST_ERR          = 3;
+  asserts.same(err.code, 3, "err.code == HIERARCHY_REQUEST_ERR");
+
+  teardown.call(this);
+}
+
 if (require.main === module)
   require('test').runner(exports);
 

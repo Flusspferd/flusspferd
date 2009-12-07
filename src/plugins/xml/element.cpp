@@ -45,76 +45,106 @@ element::~element()
 
 
 string_type element::getAttribute(string_type name) {
-  return element_.getAttribute(name);
+  XML_CB_TRY {
+    return element_.getAttribute(name);
+  } XML_CB_CATCH
 }
 
 void element::setAttribute(string_type name, string_type value) {
-  return element_.setAttribute(name, value);
+  XML_CB_TRY {
+    return element_.setAttribute(name, value);
+  } XML_CB_CATCH
 }
 
 void element::removeAttribute(string_type name) {
-  element_.removeAttribute(name);
+  XML_CB_TRY {
+    element_.removeAttribute(name);
+  } XML_CB_CATCH
 }
 
 object element::getAttributeNode(string_type name) {
-  return get_node(element_.getAttributeNode(name));
+  XML_CB_TRY {
+    return get_node(element_.getAttributeNode(name));
+  } XML_CB_CATCH
 }
 
 object element::setAttributeNode(attr &a) {
-  return get_node( element_.setAttributeNode(
-    static_cast<arabica_attr>(a.underlying_impl())
-  ) );
+  XML_CB_TRY {
+    return get_node( element_.setAttributeNode(
+      static_cast<arabica_attr>(a.underlying_impl())
+    ) );
+  } XML_CB_CATCH
 }
 
 object element::removeAttributeNode(attr &a) {
-  return get_node( element_.removeAttributeNode(
-    static_cast<arabica_attr>(a.underlying_impl())
-  ) );
+  XML_CB_TRY {
+    return get_node( element_.removeAttributeNode(
+      static_cast<arabica_attr>(a.underlying_impl())
+    ) );
+  } XML_CB_CATCH
 }
 
 object element::getElementsByTagName(string_type tagname) {
-  return create<node_list>( make_vector(
-    element_.getElementsByTagName(tagname),
-    node_map_
-  ) );
+  XML_CB_TRY {
+    return create<node_list>( make_vector(
+      element_.getElementsByTagName(tagname),
+      node_map_
+    ) );
+  } XML_CB_CATCH
 }
 
 
 string_type element::getAttributeNS(string_type ns_uri, string_type local_name) {
-  return element_.getAttributeNS(ns_uri, local_name);
+  XML_CB_TRY {
+    return element_.getAttributeNS(ns_uri, local_name);
+  } XML_CB_CATCH
 }
 
 void element::setAttributeNS(string_type ns_uri, string_type local_name, string_type value) {
-  element_.setAttributeNS(ns_uri, local_name, value);
+  XML_CB_TRY {
+    element_.setAttributeNS(ns_uri, local_name, value);
+  } XML_CB_CATCH
 }
 
 void element::removeAttributeNS(string_type ns_uri, string_type local_name) {
-  element_.removeAttributeNS(ns_uri, local_name);
+  XML_CB_TRY {
+    element_.removeAttributeNS(ns_uri, local_name);
+  } XML_CB_CATCH
 }
 
 object element::getAttributeNodeNS(string_type ns_uri, string_type local_name) {
-  return get_node(element_.getAttributeNodeNS(ns_uri, local_name));
+  XML_CB_TRY {
+    return get_node(element_.getAttributeNodeNS(ns_uri, local_name));
+  } XML_CB_CATCH
 }
 
 object element::setAttributeNodeNS(attr &a) {
-  return get_node( element_.setAttributeNodeNS(
-    static_cast<arabica_attr>(a.underlying_impl())
-  ) );
+  XML_CB_TRY {
+    return get_node( element_.setAttributeNodeNS(
+      static_cast<arabica_attr>(a.underlying_impl())
+    ) );
+  } XML_CB_CATCH
 }
 
 object element::getElementsByTagNameNS(string_type ns_uri, string_type local_name) {
-  return create<node_list>( make_vector(
-    element_.getElementsByTagNameNS(ns_uri, local_name),
-    node_map_
-  ) );
+  XML_CB_TRY {
+    return create<node_list>( make_vector(
+      element_.getElementsByTagNameNS(ns_uri, local_name),
+      node_map_
+    ) );
+  } XML_CB_CATCH
 }
 
 
 bool element::hasAttribute(string_type name) {
-  return element_.hasAttribute(name);
+  XML_CB_TRY {
+    return element_.hasAttribute(name);
+  } XML_CB_CATCH
 }
 
 bool element::hasAttributeNS(string_type ns_uri, string_type local_name) {
-  return element_.hasAttributeNS(ns_uri, local_name);
+  XML_CB_TRY {
+    return element_.hasAttributeNS(ns_uri, local_name);
+  } XML_CB_CATCH
 }
 

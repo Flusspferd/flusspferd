@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "node.hpp"
 #include "node_list.hpp"
 #include "named_node_map.hpp"
+#include "dom_exception.hpp"
+
 
 #include <DOM/SAX2DOM/SAX2DOM.hpp>
 #include <DOM/io/Stream.hpp>
@@ -64,23 +66,42 @@ node::~node() {
 }
 
 std::string node::to_string() {
-  std::ostringstream buf;
-  buf << node_;
+  XML_CB_TRY {
+    std::ostringstream buf;
+    buf << node_;
 
-  return buf.str();
+    return buf.str();
+  }XML_CB_CATCH
+}
+
+
+void node::setNodeValue(string_type const &s) {
+  XML_CB_TRY {
+    node_.setNodeValue(s);
+  } XML_CB_CATCH
+}
+
+void node::setPrefix(string_type const &s) {
+  XML_CB_TRY {
+    node_.setPrefix(s);
+  } XML_CB_CATCH
 }
 
 value node::getPrefix() {
-  return node_.hasPrefix() ?
-         value(node_.getPrefix()) :
-         value(object());
+  XML_CB_TRY {
+    return node_.hasPrefix() ?
+           value(node_.getPrefix()) :
+           value(object());
+  } XML_CB_CATCH
 }
 
 
 value node::getNamespaceURI() {
-  return node_.hasNamespaceURI() ?
-         value(node_.getNamespaceURI()) :
-         object();
+  XML_CB_TRY {
+    return node_.hasNamespaceURI() ?
+           value(node_.getNamespaceURI()) :
+           object();
+  } XML_CB_CATCH
 }
 
 object node::get_node(wrapped_type const &n) {
@@ -92,39 +113,57 @@ object node::get_node(wrapped_type const &n) {
   if (!map)
     throw exception("Internal error: node_map has gone away");
 
-  return map->get_node(n);
+  XML_CB_TRY {
+    return map->get_node(n);
+  } XML_CB_CATCH
 }
 
 object node::getChildNodes() {
-  return create<node_list>( make_vector(node_.getChildNodes(), node_map_) );
+  XML_CB_TRY {
+    return create<node_list>( make_vector(node_.getChildNodes(), node_map_) );
+  } XML_CB_CATCH
 }
 
 object node::getAttributes() {
-  return create<named_node_map>( make_vector( node_.getAttributes(), node_map_) );
+  XML_CB_TRY {
+    return create<named_node_map>( make_vector( node_.getAttributes(), node_map_) );
+  } XML_CB_CATCH
 }
 
 object node::getOwnerDocument() {
-  return get_node(node_.getOwnerDocument());
+  XML_CB_TRY {
+    return get_node(node_.getOwnerDocument());
+  } XML_CB_CATCH
 }
 
 object node::insertBefore(node &newChild, node &refChild) {
-  return get_node(node_.insertBefore(newChild.node_, refChild.node_));
+  XML_CB_TRY {
+    return get_node(node_.insertBefore(newChild.node_, refChild.node_));
+  } XML_CB_CATCH
 }
 
 object node::replaceChild(node &newChild, node &oldChild) {
-  return get_node(node_.insertBefore(newChild.node_, oldChild.node_));
+  XML_CB_TRY {
+    return get_node(node_.insertBefore(newChild.node_, oldChild.node_));
+  } XML_CB_CATCH
 }
 
 object node::removeChild(node &oldChild) {
-  return get_node(node_.removeChild(oldChild.node_));
+  XML_CB_TRY {
+    return get_node(node_.removeChild(oldChild.node_));
+  } XML_CB_CATCH
 }
 
 object node::appendChild(node &newChild) {
-  return get_node(node_.appendChild(newChild.node_));
+  XML_CB_TRY {
+    return get_node(node_.appendChild(newChild.node_));
+  } XML_CB_CATCH
 }
 
 object node::cloneNode(bool deep) {
-  return get_node(node_.cloneNode(deep));
+  XML_CB_TRY {
+    return get_node(node_.cloneNode(deep));
+  } XML_CB_CATCH
 }
 
 

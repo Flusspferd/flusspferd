@@ -29,10 +29,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace xml_plugin;
 
+#include <iostream>
 dom_exception::dom_exception(object const &proto, wrapped_type e)
   : base_type(proto)
 { 
-  set_properties("code", int(e.code()) )("message", e.what());
+  // Arabica DOM error codes are out by 1
+  set_properties("code", int(e.code()+1) )("message", e.what());
 }
 
 void dom_exception::augment_prototype(object &proto) {
@@ -44,4 +46,5 @@ void dom_exception::augment_prototype(object &proto) {
                                       .get_property_object("prototype");
 
   proto.set_prototype(error_proto);
+  proto.set_property("name", "DOMException");
 }

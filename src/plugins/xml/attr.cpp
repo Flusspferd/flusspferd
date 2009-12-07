@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <flusspferd/aliases.hpp>
 
 #include "attr.hpp"
+#include "dom_exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -39,21 +40,31 @@ attr::attr(object const &proto, wrapped_type const &node, weak_node_map map)
 { }
 
 string_type attr::getName() {
-  return impl_.getName();
+  XML_CB_TRY {
+    return impl_.getName();
+  } XML_CB_CATCH
 }
 
 bool attr::getSpecified() {
-  return impl_.getSpecified();
+  XML_CB_TRY {
+    return impl_.getSpecified();
+  } XML_CB_CATCH
 }
 
 string_type attr::getValue() {
-  return impl_.getValue();
+  XML_CB_TRY {
+    return impl_.getValue();
+  } XML_CB_CATCH
 }
 
 void attr::setValue(string_type s) {
-  impl_.setValue(s);
+  XML_CB_TRY {
+    impl_.setValue(s);
+  } XML_CB_CATCH
 }
 
 object attr::getOwnerElement() {
-  return get_node(impl_.getOwnerElement());
+  XML_CB_TRY {
+    return get_node(impl_.getOwnerElement());
+  } XML_CB_CATCH
 }
