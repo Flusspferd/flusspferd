@@ -156,6 +156,11 @@ public:
       ::flusspferd::exception x(v); \
       x.throw_js_INTERNAL(); \
       return JS_FALSE; \
+    } catch (::flusspferd::object &o) { \
+      ::flusspferd::value v(o); \
+      ::flusspferd::exception x(v); \
+      x.throw_js_INTERNAL(); \
+      return JS_FALSE; \
     } \
     return JS_TRUE
 
