@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "document.hpp"
 #include "doctype.hpp"
 #include "dom_implementation.hpp"
+#include "dom_exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -56,17 +57,20 @@ bool dom_implementation::hasFeature(string_type feat, string_type ver) {
 }
 
 object dom_implementation::createDocumentType(string_type qname, string_type pub_id, string_type sys_id) {
-  return master_node_map_->get_node(
-    impl_.createDocumentType(qname, pub_id, sys_id)
-  );
+  XML_CB_TRY {
+    return master_node_map_->get_node(
+      impl_.createDocumentType(qname, pub_id, sys_id)
+    );
+  } XML_CB_CATCH
 }
 
-object dom_implementation::createDocument(string_type ns_uri, string_type qname, doctype &doctype) {
-  return master_node_map_->get_node(
-    impl_.createDocument(
-      ns_uri, 
-      qname, 
-      static_cast<arabica_doctype>(doctype.underlying_impl())
-    )
-  );
+object dom_implementation::createDocument(string_type ns_uri, string_type qname,
+                                          boost::optional<doctype&> doctype) {
+  arabica_doctype dt = doctype
+                     ? static_cast<arabica_doctype>(doctype->underlying_impl())
+                     : arabica_doctype();
+
+  XML_CB_TRY {
+    return master_node_map_->get_node( impl_.createDocument( ns_uri, qname, dt ) );
+  } XML_CB_CATCH
 }

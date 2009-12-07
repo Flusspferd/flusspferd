@@ -59,8 +59,8 @@ public:
   virtual ~character_data();
 
   // Property getters/setters
-  string_type getData() { return impl_.getData(); }
-  void setData(string_type s) { impl_.setData(s); }
+  string_type getData();
+  void setData(string_type s);
   int getLength() { return impl_.getLength(); }
 
   // Methods

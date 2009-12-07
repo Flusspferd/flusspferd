@@ -30,9 +30,13 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 #include "types.hpp"
 
+#include <boost/fusion/include/make_vector.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+
 namespace xml_plugin {
 
-#define enum_prop(x) (#x, constant, int(Arabica::DOM::DOMException:: x))
+// Arabica's DOMException codes are out by one
+#define enum_prop(x) (#x, constant, int(Arabica::DOM::DOMException:: x)+1)
 FLUSSPFERD_CLASS_DESCRIPTION(
   dom_exception,
   (constructible, false)
@@ -66,6 +70,17 @@ public:
   static void augment_prototype(flusspferd::object &proto);
 };
 
-}
+
+#define XML_CB_TRY try
+#define XML_CB_CATCH \
+  catch (arabica_dom_exception &e) { \
+    /* Convert the C++ dom_exception to a JS DOMException object */ \
+    flusspferd::value v = flusspferd::create<dom_exception>( \
+      boost::fusion::make_vector(e) \
+    ); \
+    throw flusspferd::exception(v); \
+  }
+
+} // namespace xml_plugin
 
 #endif

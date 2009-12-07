@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <flusspferd/aliases.hpp>
 
 #include "char_data.hpp"
+#include "dom_exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -42,24 +43,46 @@ character_data::~character_data()
 { }
 
 
+string_type character_data::getData() {
+  XML_CB_TRY {
+    return impl_.getData();
+  } XML_CB_CATCH
+}
+
+void character_data::setData(string_type s) {
+  XML_CB_TRY {
+    impl_.setData(s);
+  } XML_CB_CATCH
+}
+
 string_type character_data::substringData(int offset, int count) {
-  return impl_.substringData(offset, count);
+  XML_CB_TRY {
+    return impl_.substringData(offset, count);
+  } XML_CB_CATCH
 }
 
 void character_data::appendData(string_type arg) {
-  impl_.appendData(arg);
+  XML_CB_TRY {
+    impl_.appendData(arg);
+  } XML_CB_CATCH
 }
 
 void character_data::insertData(int offset, string_type arg) {
-  impl_.insertData(offset, arg);
+  XML_CB_TRY {
+    impl_.insertData(offset, arg);
+  } XML_CB_CATCH
 }
 
 void character_data::deleteData(int offset, int count) {
-  impl_.deleteData(offset, count);
+  XML_CB_TRY {
+    impl_.deleteData(offset, count);
+  } XML_CB_CATCH
 }
 
 void character_data::replaceData(int offset, int count, string_type arg) {
-  impl_.replaceData(offset, count, arg);
+  XML_CB_TRY {
+    impl_.replaceData(offset, count, arg);
+  } XML_CB_CATCH
 }
 
 
@@ -70,8 +93,9 @@ text::text(object const &proto, wrapped_type const &node, weak_node_map map)
 { }
 
 object text::splitText(int offset) {
-  static_cast<arabica_text&>(impl_).splitText(offset);
-  return object();
+  XML_CB_TRY {
+    return get_node(static_cast<arabica_text&>(impl_).splitText(offset));
+  } XML_CB_CATCH
 }
 
 

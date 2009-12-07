@@ -30,8 +30,12 @@ THE SOFTWARE.
 #include "node_map.hpp"
 
 #include <DOM/Node.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 
 namespace xml_plugin {
+
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
 
 #define enum_prop(x) (#x, constant, int(Arabica::DOM::Node_base:: x))
 FLUSSPFERD_CLASS_DESCRIPTION(
@@ -101,7 +105,7 @@ public:
   // Property getters/setters
   string_type getNodeName() { return node_.getNodeName(); }
   string_type getNodeValue() { return node_.getNodeValue(); }
-  void setNodeValue(string_type const &s) { node_.setNodeValue(s); }
+  void setNodeValue(string_type const &s);
   int getNodeType() { return node_.getNodeType(); }
   object getParentNode() { return get_node(node_.getParentNode()); }
   object getChildNodes();
@@ -113,7 +117,7 @@ public:
   object getOwnerDocument();
   flusspferd::value getNamespaceURI();
   flusspferd::value getPrefix();
-  void setPrefix(string_type const &s) { node_.setPrefix(s); }
+  void setPrefix(string_type const &s);
   string_type getLocalName() { return node_.getLocalName(); }
 
   // Methods

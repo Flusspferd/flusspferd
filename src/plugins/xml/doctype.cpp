@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include "named_node_map.hpp"
 #include "doctype.hpp"
+#include "dom_exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -40,25 +41,37 @@ doctype::doctype(object const &proto, wrapped_type const &impl, weak_node_map ma
 { }
 
 string_type doctype::getName() {
-  return impl_.getName();
+  XML_CB_TRY {
+    return impl_.getName();
+  } XML_CB_CATCH
 }
 
 object doctype::getEntities() {
-  return create<named_node_map>( make_vector( impl_.getEntities(), node_map_) );
+  XML_CB_TRY {
+    return create<named_node_map>( make_vector( impl_.getEntities(), node_map_) );
+  } XML_CB_CATCH
 }
 
 object doctype::getNotations() {
-  return create<named_node_map>( make_vector( impl_.getNotations(), node_map_) );
+  XML_CB_TRY {
+    return create<named_node_map>( make_vector( impl_.getNotations(), node_map_) );
+  } XML_CB_CATCH
 }
 
 string_type doctype::getPublicId() {
-  return impl_.getPublicId();
+  XML_CB_TRY {
+    return impl_.getPublicId();
+  } XML_CB_CATCH
 }
 
 string_type doctype::getSystemId() {
-  return impl_.getSystemId();
+  XML_CB_TRY {
+    return impl_.getSystemId();
+  } XML_CB_CATCH
 }
 
 string_type doctype::getInternalSubset() {
-  return impl_.getInternalSubset();
+  XML_CB_TRY {
+    return impl_.getInternalSubset();
+  } XML_CB_CATCH
 }

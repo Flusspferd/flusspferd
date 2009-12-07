@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "document.hpp"
 #include "dom_implementation.hpp"
 #include "node_list.hpp"
+#include "dom_exception.hpp"
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
@@ -67,61 +68,87 @@ object document::getDocumentElement() {
 }
 
 object document::createElement(string_type tag_name) {
-  return get_node(doc_.createElement(tag_name));
+  XML_CB_TRY {
+    return get_node(doc_.createElement(tag_name));
+  } XML_CB_CATCH
 }
 
 object document::createDocumentFragment() {
-  return get_node(doc_.createDocumentFragment());
+  XML_CB_TRY {
+    return get_node(doc_.createDocumentFragment());
+  } XML_CB_CATCH
 }
 
 object document::createTextNode(string_type data) {
-  return get_node(doc_.createTextNode(data));
+  XML_CB_TRY {
+    return get_node(doc_.createTextNode(data));
+  } XML_CB_CATCH
 }
 
 object document::createComment(string_type data) {
-  return get_node(doc_.createComment(data));
+  XML_CB_TRY {
+    return get_node(doc_.createComment(data));
+  } XML_CB_CATCH
 }
 
 object document::createCDATASection(string_type data) {
-  return get_node(doc_.createCDATASection(data));
+  XML_CB_TRY {
+    return get_node(doc_.createCDATASection(data));
+  } XML_CB_CATCH
 }
 
 object document::createProcessingInstruction(string_type target, string_type data) {
-  return get_node(doc_.createProcessingInstruction(target, data));
+  XML_CB_TRY {
+    return get_node(doc_.createProcessingInstruction(target, data));
+  } XML_CB_CATCH
 }
 
 object document::createAttribute(string_type name) {
-  return get_node(doc_.createAttribute(name));
+  XML_CB_TRY {
+    return get_node(doc_.createAttribute(name));
+  } XML_CB_CATCH
 }
 
 object document::createEntityReference(string_type name) {
-  return get_node(doc_.createEntityReference(name));
+  XML_CB_TRY {
+    return get_node(doc_.createEntityReference(name));
+  } XML_CB_CATCH
 }
 
 object document::getElementsByTagName(std::string tagname) {
-  return create<node_list>( make_vector(
-    doc_.getElementsByTagName(tagname),
-    node_map_
-  ) );
+  XML_CB_TRY {
+    return create<node_list>( make_vector(
+      doc_.getElementsByTagName(tagname),
+      node_map_
+    ) );
+  } XML_CB_CATCH
 }
 
 object document::importNode(node &arg, bool deep) {
-  return get_node(doc_.importNode(arg.underlying_impl(), deep));
+  XML_CB_TRY {
+    return get_node(doc_.importNode(arg.underlying_impl(), deep));
+  } XML_CB_CATCH
 }
 
 object document::createElementNS(string_type ns_uri, string_type local_name) {
-  return get_node(doc_.createElementNS(ns_uri, local_name));
+  XML_CB_TRY {
+    return get_node(doc_.createElementNS(ns_uri, local_name));
+  } XML_CB_CATCH
 }
 
 object document::getElementsByTagNameNS(string_type ns_uri, string_type local_name) {
-  return create<node_list>( make_vector(
-    doc_.getElementsByTagNameNS(ns_uri, local_name),
-    node_map_
-  ) );
+  XML_CB_TRY {
+    return create<node_list>( make_vector(
+      doc_.getElementsByTagNameNS(ns_uri, local_name),
+      node_map_
+    ) );
+  } XML_CB_CATCH
 }
 
 object document::getElementById(string_type id) {
-  return get_node(doc_.getElementById(id));
+  XML_CB_TRY {
+    return get_node(doc_.getElementById(id));
+  } XML_CB_CATCH
 }
 
 
