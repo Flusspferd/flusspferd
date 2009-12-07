@@ -41,6 +41,8 @@ using boost::assign::list_of;
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 static void thrower(flusspferd::value v) {
+  if (v.is_object())
+    throw v.get_object();
   throw v;
 }
 
