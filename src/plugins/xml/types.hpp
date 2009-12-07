@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_TYPES_HPP
 
 #include <DOM/Node.hpp>
+#include <DOM/DOMException.hpp>
 #include <DOM/DOMImplementation.hpp>
 #include <DOM/Document.hpp>
 #include <DOM/DocumentFragment.hpp>
@@ -52,6 +53,7 @@ namespace xml_plugin {
 
 typedef std::string string_type;
 typedef Arabica::DOM::Node<string_type> arabica_node;
+typedef Arabica::DOM::DOMException arabica_dom_exception;
 typedef Arabica::DOM::DOMImplementation<string_type> arabica_dom_impl;
 typedef Arabica::DOM::Document<string_type> arabica_document;
 typedef Arabica::DOM::DocumentFragment<string_type> arabica_doc_fragment;

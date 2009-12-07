@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include <flusspferd.hpp>
 
 #include "parser.hpp"
+#include "dom_exception.hpp"
 #include "dom_implementation.hpp"
 #include "node.hpp"
 #include "node_list.hpp"
@@ -46,6 +47,7 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
 
   load_class<xml_parser>(exports);
   load_class<html_parser>(exports);
+  load_class<dom_exception>(exports);
   load_class<dom_implementation>(exports);
   load_class<node>(exports);
   load_class<node_list>(exports);
