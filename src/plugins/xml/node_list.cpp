@@ -83,7 +83,7 @@ void node_list::property_op(property_mode mode, value const &id, value &x) {
   }
 
   if (index < 0 || std::size_t(index) >= list_.getLength())
-    throw exception("Out of bounds on NodeList", "RangeError");
+    return;
 
   switch (mode) {
   case property_get:
