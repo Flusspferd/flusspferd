@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( instance_of ) {
       flusspferd::global().get_property("Array"));
   flusspferd::root_value ctor_Date(
       flusspferd::global().get_property("Date"));
-  flusspferd::root_string string_Date("Object");
+  flusspferd::root_string string_Date("Date");
 
   BOOST_CHECK(object.instance_of(ctor_Object));
   BOOST_CHECK(object.instance_of(ctor_Array));

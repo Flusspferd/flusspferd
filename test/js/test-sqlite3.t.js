@@ -151,17 +151,20 @@ exports.test_sqlite3_placeholder_query_row_object = function() {
     asserts.same(index, data.length);
 }
 
-if (require.main === module)
-  require('test').runner(exports);
-
 }
 catch(e) {
   // this sucks we really should change the exception system (#44)
   // this line has to changed if line 359f in src/code/modules.cpp changes
-/*  if(e.message.match(/^Unable to find library 'sqlite3'/)) {
-    print("Not running sqlite3 test (Module not build)");
+  if(e.message.match(/'sqlite3'/)) {
+    exports.test_skip = function() {
+      require('test').asserts.diag("Not running sqlite3 test (Module not built)");
+    }
   }
-  else {*/
+  else {
     throw e;
-//  }
+  }
 }
+
+if (require.main === module)
+  require('test').runner(exports);
+
