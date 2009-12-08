@@ -53,6 +53,9 @@ static object make_it(arabica_node &a, weak_node_map map) {
 }
 
 object node_map::create_object_from_node(arabica_node &a) {
+  if (!a)
+    return object();
+
   switch (a.getNodeType()) {
   case Arabica::DOM::Node_base::ELEMENT_NODE:
     return make_it<element>(a, shared_from_this());
