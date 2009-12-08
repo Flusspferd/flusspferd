@@ -175,7 +175,7 @@ object sqlite3::compile(flusspferd::string sql_in, value bind ) {
 
     size_t n_bytes = sql_in.length() * 2;
     sqlite3_stmt * sth = 0;
-    char16_t * tail = 0; // uncompiled part of the sql (when multiple stmts)
+    js_char16_t * tail = 0; // uncompiled part of the sql (when multiple stmts)
     
     if (sqlite3_prepare16_v2(db, sql_in.data(), n_bytes, &sth, (const void**)&tail) != SQLITE_OK)
     {
