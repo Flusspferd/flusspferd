@@ -66,6 +66,9 @@ object node_map::create_object_from_node(arabica_node &a) {
   case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
     return make_it<cdata>(a, shared_from_this());
 
+  case Arabica::DOM::Node_base::ENTITY_REFERENCE_NODE:
+    return make_it<entity_ref>(a, shared_from_this());
+
   case Arabica::DOM::Node_base::ENTITY_NODE:
     return make_it<entity>(a, shared_from_this());
 
