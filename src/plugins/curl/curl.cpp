@@ -46,6 +46,8 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 namespace {
+	namespace bf = boost::fusion;
+
 	typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
 
 	struct exception
@@ -110,7 +112,7 @@ namespace {
 		{	}
 
 		static EasyOpt &create(Easy &p) {
-			return flusspferd::create_native_object<EasyOpt>(object(), boost::ref(p));
+			return flusspferd::create<EasyOpt>(bf::make_vector(boost::ref(p)));
 		}
 	protected:
 		bool property_resolve(value const &id, unsigned access);
@@ -235,7 +237,7 @@ namespace {
     }
 
     static Easy &create(CURL *hnd) {
-      return flusspferd::create_native_object<Easy>(object(), hnd);
+      return flusspferd::create<Easy>(bf::make_vector(hnd));
     }
 
 		//private:
@@ -259,10 +261,10 @@ namespace {
 		template<CURLoption What>
 		struct integer_option : handle_option {
 			function getter() const {
-				return create_native_method(object(), "$get_", &get);
+				return create<flusspferd::method>("$get_", &get);
 			}
 			function setter() const {
-				return create_native_method(object(), "$set_", &set);
+				return create<flusspferd::method>("$set_", &set);
 			}
 			boost::any data() const { return 0l; }
 			CURLoption what() const { return What; }
@@ -281,10 +283,10 @@ namespace {
 		template<CURLoption What>
 		struct string_option : handle_option {
 			function getter() const {
-				return create_native_method(object(), "$get_", &get);
+				return create<flusspferd::method>("$get_", &get);
 			}
 			function setter() const {
-				return create_native_method(object(), "$set_", &set);
+				return create<flusspferd::method>("$set_", &set);
 			}
 			boost::any data() const { return std::string(); }
 			CURLoption what() const { return What; }
@@ -303,10 +305,10 @@ namespace {
 		struct write_function_option : handle_option {
 			static CURLoption const What = CURLOPT_WRITEFUNCTION;
 			function getter() const {
-				return create_native_method(object(), "$get_writeFunction", &get);
+				return create<flusspferd::method>("$get_writeFunction", &get);
 			}
 			function setter() const {
-				return create_native_method(object(), "$set_writeFunction", &set);
+				return create<flusspferd::method>("$set_writeFunction", &set);
 			}
 			boost::any data() const { return function(); }
 			CURLoption what() const { return What; }
@@ -375,7 +377,7 @@ namespace {
                          read_only_property | permanent_property);
     cURL.define_property("GLOBAL_NOTHING", value(CURL_GLOBAL_NOTHING),
                          read_only_property | permanent_property);
-    create_native_function(cURL, "globalInit", &global_init);
+    create<flusspferd::function>("globalInit", &global_init, param::_container = cURL);
     cURL.define_property("version", value(curl_version()),
                          read_only_property | permanent_property);
 		load_class<EasyOpt>(cURL);
