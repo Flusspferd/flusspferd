@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
 #include "flusspferd/spidermonkey/context.hpp"
 #include "flusspferd/spidermonkey/value.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
@@ -77,7 +77,6 @@ public:
     options |= JSOPTION_VAROBJFIX;
     options |= JSOPTION_STRICT;
     options |= JSOPTION_DONT_REPORT_UNCAUGHT;
-    options &= ~JSOPTION_XML;
 
     JS_SetVersion(context, JSVersion(JS_VERSION));
     JS_SetOptions(context, options);
@@ -97,10 +96,13 @@ public:
     if(!JS_InitStandardClasses(context, global_))
       throw exception("Could not initialize Global Object");
 
-    JS_DeleteProperty(context, global_, "XML");
-
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
-  }
+
+#ifdef DEBUG
+    // This might want to be conditional on something else too
+    JS_SetGCZeal(context, 2);
+#endif
+}
 
   explicit impl(JSContext *context)
     : context(context), destroy(false)
@@ -183,7 +185,7 @@ context context::create() {
   current_context_scope scope(c);
 
   // add standard prototype (for e.g. native_object_base)
-  object std_proto = create_object().prototype();
+  object std_proto = flusspferd::create<object>().prototype();
   c.add_prototype("", std_proto);
 
   return c;

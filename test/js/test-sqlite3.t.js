@@ -24,6 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+try {
 const asserts = require('test').asserts,
       sqlite3 = require('sqlite3'),
       sqlite3_testblob = require('binary').ByteString("0123456789");
@@ -148,6 +149,20 @@ exports.test_sqlite3_placeholder_query_row_object = function() {
         ++index;
     }
     asserts.same(index, data.length);
+}
+
+}
+catch(e) {
+  // this sucks we really should change the exception system (#44)
+  // this line has to changed if line 359f in src/code/modules.cpp changes
+  if(e.message.match(/'sqlite3'/)) {
+    exports.test_skip = function() {
+      require('test').asserts.diag("Not running sqlite3 test (Module not built)");
+    }
+  }
+  else {
+    throw e;
+  }
 }
 
 if (require.main === module)

@@ -117,7 +117,7 @@ merge(TAPProducer.prototype, {
 
   diag: function diag(msg,filter) {
     var self = this,
-        lines = msg.split(/\n/)
+        lines = String(msg).split(/\n/)
 
     lines = lines.map(function(l) {
       return self.padding + ("# " + l)
@@ -155,11 +155,11 @@ const Suite = exports.Suite = function Suite(cases) {
   // TODO: setup and teardown methods
   for (let [k,t] in Iterator(cases)) {
 
-    if (/^test_/.test(k) == false)
+    if (/^test/.test(k) == false)
       continue;
 
     let testCase = {
-      name: k.replace(/^test_(.*)/, "$1"),
+      name: k.replace(/^test[_ ]?/, ""),
       index: this._state.cases.length,
       numAsserts: 0,
       assertsFailed: []
@@ -363,7 +363,7 @@ exports.prove = function prove() {
       var id  = fs.canonical(filename);
 
       var test = require('file://' + id);
-      testObject['test_' + id] = test;
+      testObject['test ' + id] = test;
     }
 
     return testObject;
@@ -459,6 +459,38 @@ exports.asserts = {
   diag: function diag() {
     var suite = exports.__currentSuite__;
     suite.diag.apply(suite, arguments);
+  },
+
+  throwsOk: function( testcase, expected, message ) {
+    if ( message == undefined ) {
+      message = expected;
+      expected = undefined;
+    }
+    var suite = exports.__currentSuite__;
+
+    var a = {
+      type: "throwsOk",
+      ok: 0,
+      message: message,
+      defaultMsg: "throws error ok",
+    };
+
+    try {
+      testcase();
+      a.diag = "No error thrown";
+      suite.do_assert( a );
+    }
+    catch ( e ) {
+      if ( expected === undefined || expected == e.toString() ) {
+        a.ok = true;
+        suite.do_assert( a );
+      }
+      else {
+        a.diag = "   Got: " + e.toString() + "\n"
+                 "Wanted: " + expected;
+        suite.do_assert( a );
+      }
+    }
   }
 
 };

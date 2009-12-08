@@ -25,13 +25,14 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/object.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
 #include "flusspferd/property_iterator.hpp"
+#include "flusspferd/local_root_scope.hpp"
 #include "test_environment.hpp"
-
-BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::object) //FIXME?
+#include <iostream> //FIXME
 
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
@@ -48,7 +49,8 @@ BOOST_AUTO_TEST_CASE( null_object ) {
 }
 
 BOOST_AUTO_TEST_CASE( plain_object ) {
-  flusspferd::object const &plain_object = flusspferd::create_object();
+  flusspferd::object const &plain_object =
+    flusspferd::create<flusspferd::object>();
   BOOST_CHECK(!plain_object.is_null());
 
   BOOST_CHECK_EQUAL(plain_object, plain_object);
@@ -59,12 +61,13 @@ BOOST_AUTO_TEST_CASE( plain_object ) {
 
   BOOST_CHECK_EQUAL(plain_object, object_copy);
 
-  flusspferd::object const &plain_object2 = flusspferd::create_object();
+  flusspferd::object const &plain_object2 =
+    flusspferd::create<flusspferd::object>();
   BOOST_CHECK_NE(plain_object, plain_object2);
 }
 
 BOOST_AUTO_TEST_CASE( object_property ) {
-  flusspferd::object obj = flusspferd::create_object();
+  flusspferd::object obj = flusspferd::create<flusspferd::object>();
   std::string const name = "foobar";
   flusspferd::value const v(409);
   obj.set_property(name, v);
@@ -77,7 +80,7 @@ BOOST_AUTO_TEST_CASE( object_property ) {
 }
 
 BOOST_AUTO_TEST_CASE( object_property_value ) {
-  flusspferd::object obj = flusspferd::create_object();
+  flusspferd::object obj = flusspferd::create<flusspferd::object>();
   flusspferd::value const name = flusspferd::string("foobar");
   flusspferd::value const v(409);
   obj.set_property(name, v);
@@ -144,10 +147,74 @@ BOOST_AUTO_TEST_CASE( call_on_invalid ) {
 }
 
 BOOST_AUTO_TEST_CASE( recursive_loop_on_set_property ) {
-  flusspferd::object object = flusspferd::create_object();
+  flusspferd::root_object object(flusspferd::create<flusspferd::object>());
 
   object.set_property( flusspferd::string(), flusspferd::string() );
-  
+}
+
+BOOST_AUTO_TEST_CASE( set_properties ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::object>());
+
+  object.set_properties(flusspferd::value(1),2)("3",4);
+
+  BOOST_CHECK_EQUAL(object.get_property("1"), flusspferd::value(2));
+  BOOST_CHECK_EQUAL(object.get_property(flusspferd::value(3)), flusspferd::value(4));
+}
+
+BOOST_AUTO_TEST_CASE( define_properties ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::object>());
+
+  object.define_properties(flusspferd::read_only_property)(flusspferd::value(1),2)("3",4)("5");
+  object.set_property("1", 5); //no effect
+  object.set_property("5", 5); //no effect
+
+  BOOST_CHECK_EQUAL(object.get_property("1"), flusspferd::value(2));
+  BOOST_CHECK_EQUAL(object.get_property(flusspferd::value(3)), flusspferd::value(4));
+  BOOST_CHECK_EQUAL(object.get_property("5"), flusspferd::value());
+}
+
+BOOST_AUTO_TEST_CASE( instance_of ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::array>());
+
+  flusspferd::root_value ctor_Object(
+      flusspferd::global().get_property("Object"));
+  flusspferd::root_value ctor_Array(
+      flusspferd::global().get_property("Array"));
+  flusspferd::root_value ctor_Date(
+      flusspferd::global().get_property("Date"));
+  flusspferd::root_string string_Date("Date");
+
+  BOOST_CHECK(object.instance_of(ctor_Object));
+  BOOST_CHECK(object.instance_of(ctor_Array));
+  BOOST_CHECK(!object.instance_of(ctor_Date));
+
+  BOOST_CHECK_THROW(
+      object.instance_of(string_Date),
+      flusspferd::exception);
+
+  BOOST_CHECK_THROW(
+      object.instance_of(flusspferd::value()),
+      flusspferd::exception);
+  BOOST_CHECK_THROW(
+      object.instance_of(flusspferd::object()),
+      flusspferd::exception);
+}
+
+BOOST_AUTO_TEST_CASE( constructor ) {
+  flusspferd::root_object object(flusspferd::create<flusspferd::array>());
+
+  flusspferd::root_value ctor_Object(
+      flusspferd::global().get_property("Object"));
+  flusspferd::root_value ctor_Array(
+      flusspferd::global().get_property("Array"));
+
+  flusspferd::root_value ctor(object.constructor());
+
+  BOOST_CHECK_NE(ctor, flusspferd::value());
+  BOOST_CHECK_NE(ctor, flusspferd::object());
+
+  BOOST_CHECK_NE(ctor, ctor_Object);
+  BOOST_CHECK_EQUAL(ctor, ctor_Array);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -29,11 +29,12 @@ THE SOFTWARE.
 #include <sstream>
 #include <new>
 #include <boost/lexical_cast.hpp>
-
-
-namespace sqlite3_plugin {
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace flusspferd;
+namespace fusion = boost::fusion;
+
+namespace sqlite3_plugin {
 
 ///////////////////////////
 // 'Private' constructor that is called from sqlite3::cursor
@@ -120,7 +121,7 @@ object sqlite3_cursor::create_result_array() {
     local_root_scope scope;
     // Build up the row object.
     int cols = sqlite3_column_count(sth);
-    array row = create_array();
+    array row = create<array>();
     for (int i=0; i < cols; i++)
     {
         row.set_element(i, get_column(i) );
@@ -133,7 +134,7 @@ object sqlite3_cursor::create_result_object() {
     local_root_scope scope;
     // Build up the row object.
     int cols = sqlite3_column_count(sth);
-    object row = create_object();
+    object row = create<object>();
     for (int i=0; i < cols; i++)
     {
         char16_t const * name_str = reinterpret_cast<char16_t const *>( sqlite3_column_name16(sth, i) );
@@ -171,7 +172,7 @@ value sqlite3_cursor::get_column(int i) {
             }
 
             size_t length = sqlite3_column_bytes(sth, i);
-            col = create_native_object<byte_string>(object(), bytes, length);
+            col = create<byte_string>(fusion::make_vector(bytes, length));
         }
         break;
         case SQLITE_TEXT:

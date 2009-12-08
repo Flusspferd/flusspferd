@@ -272,6 +272,10 @@ if(NOT Boost_FOUND)
     message(STATUS "Boost not found!")
 endif()
 
+set(BOOST_PARAMETER_MAX_ARITY "-DBOOST_PARAMETER_MAX_ARITY=10")
+add_definitions(${BOOST_PARAMETER_MAX_ARITY})
+set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${BOOST_PARAMETER_MAX_ARITY}")
+
 ## Spidermonkey #############################################################
 
 set(Spidermonkey_REQUIRED TRUE)
@@ -596,7 +600,7 @@ foreach(PLUGIN ${PLUGINS})
 endforeach()
 
 set(JS_PLUGINS
-    util util/array util/function util/range test test/equiv http/headers)
+    util util/array util/function util/range util/load test test/equiv http/headers)
 
 foreach(JS_PLUGIN ${JS_PLUGINS})
 
@@ -655,7 +659,7 @@ install(
 
 if(NOT MSVC)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
-        "-I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
+        "${FLUSSPFERD_EXTERNAL_CFLAGS} -I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
     foreach(_FLAG @SPIDERMONKEY_DEFINITIONS@)
         set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")

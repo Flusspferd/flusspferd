@@ -64,6 +64,7 @@ protected:
   template<typename T>
   static value_impl from_integer(T const &num);
   static value_impl from_double(double num);
+  static value_impl from_int(int num);
   static value_impl from_boolean(bool x);
   static value_impl from_string(string const &x);
   static value_impl from_object(object const &x);
@@ -111,7 +112,7 @@ inline value_impl wrap_jsvalp(jsval *p) {
 template<typename T>
 value_impl value_impl::from_integer(T const &num) {
   if (INT_FITS_IN_JSVAL(num)) {
-    return wrap_jsval(INT_TO_JSVAL(num));
+    return from_int(num);
   } else {
     //TODO: check range?
     return from_double(num);

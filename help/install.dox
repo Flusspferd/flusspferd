@@ -127,14 +127,16 @@ Hello world!
  * Flusspferd uses <a href="http://cmake.org/">CMake</a> as its build
  * system.
  *
- * @subsection ubu Install on Ubuntu 9.04
+ * @subsection ubu Install on Ubuntu 9.10
  *
- * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 9.04" and similar distributions.
+ * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 9.10" and similar distributions.
  *
  * @subsection ebuild Install on Gentoo
  *
  * On Gentoo, you can use our ebuilds, in the branch 'packages', directory
  * 'gentoo/' to compile and install Flusspferd.
+ *
+ * These ebuilds can @b not be found in the official Gentoo repository.
  *
  * @subsection macports Install on Mac OS X via Macports
  *

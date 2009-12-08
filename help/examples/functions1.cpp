@@ -3,6 +3,9 @@
 #include <ostream>
 #include <cmath>
 
+// For the named parameters.
+using namespace flusspferd::param;
+
 // This function (as seen from Javascript) prints its first parameter on the
 // screen.
 void print(flusspferd::string const &x) {
@@ -27,21 +30,21 @@ int main() {
 
     // Create a method of the global object (= global function) with name print
     // that calls print().
-    flusspferd::create_native_function(g, "print", &print);
+    flusspferd::create<flusspferd::function>("print", &print, _container = g);
 
     // Create a global function that calls exp_i().
-    flusspferd::create_native_function(g, "exp", &exp_i);
+    flusspferd::create<flusspferd::function>("exp", &exp_i, _container = g);
 
     flusspferd::object p = flusspferd::evaluate("Object.prototype").to_object();
 
     // Create a method of Object.prototype that calls print_object().
-    // The difference between create_native_function and create_native_method is
-    // that the latter passes Javascript's 'this' as parameter to the function.
+    // The difference between create<function> and create<method> is that the
+    // latter passes Javascript's 'this' as parameter to the function.
     //
     // (Note that every normal object ultimately has as prototype the value of
-    // Object.prototype. However create_native_method and create_native_function
-    // create the properties with dont_enum, so doing this is safe.)
-    flusspferd::create_native_method(p, "print", &print_object);
+    // Object.prototype. However create<> creates the properties with dont_enum
+    // by default, so doing this is safe.)
+    flusspferd::create<flusspferd::method>("print", &print_object, _container = p);
 
     // Print e.
     // (Note that 1.2 is rounded down to 1.)

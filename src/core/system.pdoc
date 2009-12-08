@@ -1,0 +1,45 @@
+// vim: ft=javascript:
+
+/** section: CommonJS Core
+ * system
+ *
+ * System module
+ **/
+
+/**
+ *  system.args -> Array
+ *
+ *  Command line arguments. This first element of this array will be the name
+ *  of the script.
+ **/
+
+/**
+ *  system.env -> Object
+ *
+ *  Enviornment variables. Changes to the properties in this object will be
+ *  reflected in the environment seen by newly create subprocesses.
+ **/
+
+/**
+ *  system.stdin -> io.Stream
+ *
+ *  Standard input stream.
+ **/
+
+/**
+ *  system.stdout -> io.Stream
+ *
+ *  Standard output stream.
+ **/
+
+/**
+ *  system.stderr -> io.Stream
+ *
+ *  Standard error stream.
+ **/
+
+/**
+ *  system.platform -> String
+ *
+ *  Name of the platform. Obviously this is a constant string of "flusspferd".
+ **/

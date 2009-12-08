@@ -27,14 +27,16 @@ THE SOFTWARE.
 #include "flusspferd/getopt.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/array.hpp"
-#include "flusspferd/create.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
 #include "flusspferd/property_iterator.hpp"
 #include "flusspferd/root.hpp"
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
-#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <algorithm>
@@ -45,16 +47,28 @@ using namespace flusspferd;
 void flusspferd::load_getopt_module(object container) {
   object exports = container.get_property_object("exports");
 
-  flusspferd::create_native_function(exports, "getopt", &flusspferd::getopt);
-  flusspferd::create_native_function(exports, "getopt_help", &flusspferd::getopt_help);
-  flusspferd::create_native_function(exports, "getopt_man", &flusspferd::getopt_man);
-  flusspferd::create_native_function(exports, "getopt_bash", &flusspferd::getopt_bash);
+  flusspferd::create<flusspferd::function>(
+    "getopt", &flusspferd::getopt,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_help", &flusspferd::getopt_help,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_man", &flusspferd::getopt_man,
+    param::_container = exports);
+
+  flusspferd::create<flusspferd::function>(
+    "getopt_bash", &flusspferd::getopt_bash,
+    param::_container = exports);
 }
 
 namespace {
 struct optspec {
   struct item_type {
     enum argument_type { required = 1, optional = 2, none = 0 };
+    std::string canonical_name;
     argument_type argument;
     root_function callback;
 
@@ -65,7 +79,7 @@ struct optspec {
 
   map_type options;
   array const &arguments;
-  object result;
+  root_object result;
   bool stop_early;
 
   optspec(object const &spec, array const &arguments)
@@ -86,6 +100,7 @@ struct optspec {
         break;
 
       item_pointer data(new item_type);
+      data->canonical_name = name;
 
       options.insert(map_type::value_type(name, data));
 
@@ -137,8 +152,10 @@ struct optspec {
     if (!data)
       throw exception(("Unknown option " + name).c_str());
 
+    name = data->canonical_name;
+
     if (!result.has_property(name))
-      result.set_property(name, create_array());
+      result.set_property(name, flusspferd::create<array>());
     array arr(result.get_property_object(name));
 
     if (eq == std::string::npos) {
@@ -172,8 +189,10 @@ struct optspec {
       if (!data)
         throw exception(("Unknown option " + name).c_str());
 
+      name = data->canonical_name;
+
       if (!result.has_property(name))
-        result.set_property(name, create_array());
+        result.set_property(name, flusspferd::create<array>());
       array arr(result.get_property_object(name));
       
       if (data->argument != item_type::none) {
@@ -212,9 +231,9 @@ object flusspferd::getopt(
 
   optspec spec(spec_, arguments);
 
-  spec.result = create_object();
+  spec.result = create<object>();
 
-  array result_arguments = create_array();
+  array result_arguments = flusspferd::create<array>();
   spec.result.set_property("_", result_arguments);
 
   bool accept_options = true;

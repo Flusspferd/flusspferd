@@ -27,15 +27,20 @@ THE SOFTWARE.
 var Util = exports;
 
 /**
- * Create an iterable object returning all objects in a range, starting
- * at "from", up to (not including) "to", incrementing by "by" in each step.
+ *  util.Range(form, to[, increment=1]) -> Iterator
+ *  - from (Number): start of the range
+ *  - end (Number): end of the range (non-inclusive)
+ *  - increment (Number): increment value by this amount each loop.
  *
- * @param {number} from The start of the range.
- * @param {number} to The (non-inclusive) end of the range.
- * @param {number} by The increment. Default: 1.
+ *  Create an iterable object returning all objects in a range, starting at
+ *  "from", up to (not including) "to", incrementing by "by" in each step.
  *
- * @class
- */
+ *  ##### Example #
+ *
+ *      for (i in require('util').Range(2,10)) {
+ *        print(i); // Prints 2 through 9
+ *      }
+ **/
 Util.Range = function Range(from,to, by) {
   var i = from;
   by = by || 1;

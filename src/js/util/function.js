@@ -25,17 +25,16 @@ THE SOFTWARE.
 */
 
 /**
- * Bind a function to an object.
+ *  Function.bind(@function, obj) -> Function
+ *  - obj (`?`) : value to bind to `this`.
  *
- * @param {Object} obj The object to bind "this" to.
+ *  Bind a function with the given invocant. Returns a closure function that always call the original function with the requested `this` value.
  *
- * @example
- * function myfunc() { ... }
- * bound = myfunc.bind(myobj)
- * bound() // calls myfunc with myobj as "this"
+ *      function myfunc() { ... }
+ *      var bound = myfunc.bind(myobj)
+ *      bound() // calls myfunc with myobj as "this"
  *
- * @name Function.prototype.bind
- */
+ **/
 Function.prototype.bind = function bind(obj) {
   var fun = this;
   return function bound_func() {
@@ -43,16 +42,6 @@ Function.prototype.bind = function bind(obj) {
     }
 };
 
-/**
- * Bind an object method to its object so that it can be called without the
- * object.
- *
- * @param {Object} obj   The object that contains the method and also the object
- *                       to bind the method to.
- * @param {string} name  The method name.
- *
- * @name Function.bind
- */
 Function.bind = function bind(obj, name) {
   var fun = obj[name];
   if (!fun || !(fun instanceof Function))

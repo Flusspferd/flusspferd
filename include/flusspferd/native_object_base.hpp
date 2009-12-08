@@ -46,8 +46,10 @@ struct call_context;
 class tracer;
 
 namespace detail {
-  object create_native_object(object const &proto);
-  object create_native_enumerable_object(object const &proto);
+  object create_native_object(
+    object const &proto, object const &parent);
+  object create_native_enumerable_object(
+    object const &proto, object const &parent);
 }
 #endif
 
@@ -268,11 +270,15 @@ protected:
 
 private:
 #ifndef IN_DOXYGEN
-  static object do_create_object(object const &proto);
-  static object do_create_enumerable_object(object const &proto);
+  static object do_create_object(
+    object const &proto, object const &parent);
+  static object do_create_enumerable_object(
+    object const &proto, object const &parent);
 
-  friend object detail::create_native_object(object const &proto);
-  friend object detail::create_native_enumerable_object(object const &proto);
+  friend object detail::create_native_object(
+    object const &proto, object const &parent);
+  friend object detail::create_native_enumerable_object(
+    object const &proto, object const &parent);
 
 private:
   class impl;
@@ -299,7 +305,11 @@ T &cast_to_derived(native_object_base &o) {
  * @ingroup classes
  */
 template<typename T>
-T &get_native(object const &o) {
+typename boost::enable_if<
+  typename boost::is_base_of<native_object_base, T>::type,
+  T &>
+::type
+get_native(object const &o) {
   return cast_to_derived<T>(native_object_base::get_native(o));
 }
 
@@ -323,7 +333,11 @@ if (flusspferd::is_native<flusspferd::binary>(o) {
  * @ingroup classes
  */
 template<typename T>
-bool is_native(object const &o) {
+typename boost::enable_if<
+  typename boost::is_base_of<native_object_base, T>::type,
+  bool>
+::type
+is_native(object const &o) {
   if ( native_object_base::is_object_native(o) ) {
     return is_derived<T>(native_object_base::get_native(o));
   }
