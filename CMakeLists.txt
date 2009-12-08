@@ -600,18 +600,10 @@ foreach(PLUGIN ${PLUGINS})
 
 endforeach()
 
-set(JS_PLUGINS
-    util util/array util/function util/range util/load test test/equiv http/headers)
-
-foreach(JS_PLUGIN ${JS_PLUGINS})
-
-    string(REGEX MATCH ".*/" ${JS_PLUGIN}_DIR ${JS_PLUGIN})
-
-    install(FILES
-        src/js/${JS_PLUGIN}.js
-        DESTINATION ${INSTALL_MODULES_PATH}/${${JS_PLUGIN}_DIR})
-
-endforeach()
+install(
+    DIRECTORY src/js/
+    DESTINATION ${INSTALL_MODULES_PATH}
+    FILES_MATCHING PATTERN "*.js")
 
 ## Headers ##################################################################
 
