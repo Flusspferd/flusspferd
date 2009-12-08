@@ -140,24 +140,20 @@ namespace {
 	public: // TODO
 		object writefunction_callback;
 		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
-			//std::cout << "writefunction" << std::endl;
 			assert(stream);
 			Easy &self = *reinterpret_cast<Easy*>(stream);
 			if(self.writefunction_callback.is_null()) {
-				//std::cout << "writefunction*1" << std::endl;
 				return 0;
 			}
 			else {
-				//std::cout << "writefunction^2" << std::endl;
-				byte_array data(object(),
-												reinterpret_cast<byte_array::element_type*>(ptr),
-												size*nmemb);
+				byte_array &data = flusspferd::create<byte_array>(
+  				bf::make_vector(reinterpret_cast<byte_array::element_type*>(ptr),
+													size*nmemb));
+				root_object d(data);
 				arguments arg;
 				arg.push_back(value(data));
 				arg.push_back(value(size));
-				//std::cout << "writefunction^3" << std::endl;
 				value v = self.writefunction_callback.call(arg);
-				//std::cout << "writefunction^4" << std::endl;
 				return v.to_number();
 			}
 		}
