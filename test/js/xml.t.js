@@ -99,6 +99,9 @@ exports.test_DOM = {
     asserts.same(foo.name, "foo", "right name");
     asserts.same(foo.value, "bar", "right value");
 
+
+    asserts.same(map.getNamedItem("idontexist"), null, "non-existent item is null");
+
     teardown.call(this);
   },
 
