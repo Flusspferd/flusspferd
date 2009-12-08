@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-12-08:
+- C++0x compatibility: flusspferd::char16_t renamed to flusspferd::js_char16_t (#180)
+
 2009-12-06:
 - You can now throw a flusspferd::value or a flusspferd::object (or a subclass)
   from C++ rather than just specific Error types.
