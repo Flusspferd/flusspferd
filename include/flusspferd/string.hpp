@@ -67,7 +67,7 @@ public:
    * @param str The UTF-16 string.
    * @param length The length in UTF-16 words.
    */
-  string(char16_t const *str, std::size_t length);
+  string(js_char16_t const *str, std::size_t length);
 
   /**
    * Construct a string from a UTF-8 std::string.
@@ -81,7 +81,7 @@ public:
    *
    * @param s The std::basic_string.
    */
-  string(std::basic_string<char16_t> const &s);
+  string(std::basic_string<js_char16_t> const &s);
 
 #ifndef IN_DOXYGEN
   string(Impl::string_impl const &s)
@@ -147,7 +147,7 @@ public:
    *
    * @return The converted string.
    */
-  std::basic_string<char16_t> to_utf16_string() const;
+  std::basic_string<js_char16_t> to_utf16_string() const;
 
   /**
    * Get a UTF-16 buffer.
@@ -156,7 +156,7 @@ public:
    *
    * @return The buffer.
    */
-  char16_t const *data() const;
+  js_char16_t const *data() const;
 
   /**
    * Create a substring object.
@@ -235,8 +235,8 @@ struct detail::convert<std::string> {
 };
 
 template<>
-struct detail::convert<std::basic_string<char16_t> > {
-  typedef std::basic_string<char16_t> string_t;
+struct detail::convert<std::basic_string<js_char16_t> > {
+  typedef std::basic_string<js_char16_t> string_t;
 
   typedef to_value_helper<string_t, string> to_value;
 
