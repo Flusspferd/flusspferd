@@ -74,6 +74,24 @@ std::string node::to_string() {
   }XML_CB_CATCH
 }
 
+value node::getNodeValue() {
+  switch (node_.getNodeType()) {
+  // Only these 5 nodes have nodeValue
+  case Arabica::DOM::Node_base::ATTRIBUTE_NODE:
+  case Arabica::DOM::Node_base::CDATA_SECTION_NODE:
+  case Arabica::DOM::Node_base::COMMENT_NODE:
+  case Arabica::DOM::Node_base::PROCESSING_INSTRUCTION_NODE:
+  case Arabica::DOM::Node_base::TEXT_NODE:
+    XML_CB_TRY {
+      return value(node_.getNodeValue());
+    } XML_CB_CATCH
+
+  // All other node types should have null node value
+  default:
+    return object();
+  }
+}
+
 
 void node::setNodeValue(string_type const &s) {
   XML_CB_TRY {
@@ -125,9 +143,12 @@ object node::getChildNodes() {
 }
 
 object node::getAttributes() {
-  XML_CB_TRY {
-    return create<named_node_map>( make_vector( node_.getAttributes(), node_map_) );
-  } XML_CB_CATCH
+  if (node_.hasAttributes()) {
+    XML_CB_TRY {
+      return create<named_node_map>( make_vector( node_.getAttributes(), node_map_) );
+    } XML_CB_CATCH
+  }
+  return object();
 }
 
 object node::getOwnerDocument() {

@@ -104,7 +104,7 @@ public:
 
   // Property getters/setters
   string_type getNodeName() { return node_.getNodeName(); }
-  string_type getNodeValue() { return node_.getNodeValue(); }
+  flusspferd::value getNodeValue();
   void setNodeValue(string_type const &s);
   int getNodeType() { return node_.getNodeType(); }
   object getParentNode() { return get_node(node_.getParentNode()); }
