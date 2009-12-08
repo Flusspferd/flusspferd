@@ -158,10 +158,36 @@ namespace {
 			}
 		}
 
+		object readfunction_callback;
+		static size_t readfunction(void *ptr, size_t size, size_t nmemb, void *stream) {
+			assert(stream);
+			Easy &self = *reinterpret_cast<Easy*>(stream);
+			if(self.readfunction_callback.is_null()) {
+				return CURL_READFUNC_ABORT;
+			}
+			else {
+				byte_array &data = flusspferd::create<byte_array>(
+          bf::vector2<binary::element_type*, std::size_t>(0x0, 0));
+				root_object d(data);
+				arguments arg;
+				arg.push_back(value(data));
+				arg.push_back(value(size));
+				arg.push_back(value(nmemb));
+				value v = self.readfunction_callback.call(arg);
+				if(data.get_length() > size*nmemb) {
+					throw flusspferd::exception("Out of Range");
+				}
+				std::copy(data.get_data().begin(), data.get_data().end(),
+									static_cast<binary::element_type*>(ptr));
+				return v.to_number();
+			}
+		}
+
 	protected:
 		void trace(flusspferd::tracer &trc) {
 			trc("options", opt);
 			trc("writeFunction", writefunction_callback);
+			trc("readFunction", readfunction_callback);
 		}
 
   public:
@@ -326,6 +352,34 @@ namespace {
 			}
 		};
 
+		struct read_function_option : handle_option {
+			static CURLoption const What = CURLOPT_READFUNCTION;
+			function getter() const {
+				return create<flusspferd::method>("$get_readFunction", &get);
+			}
+			function setter() const {
+				return create<flusspferd::method>("$set_readFunction", &set);
+			}
+			boost::any data() const { return function(); }
+			CURLoption what() const { return What; }
+		private:
+			static object get(EasyOpt *o) {
+				assert(o);
+				return o->parent.readfunction_callback;
+			}
+			static void set(EasyOpt *o, object val) {
+				assert(o);
+				o->parent.readfunction_callback = val;
+				if(val.is_null()) {
+					o->parent.do_setopt(CURLOPT_READFUNCTION, 0x0);
+				}
+				else {
+					o->parent.do_setopt(CURLOPT_READFUNCTION, &Easy::readfunction);
+					o->parent.do_setopt(CURLOPT_READDATA, &o->parent);
+				}
+			}
+		};
+
 		options_map_t const &get_options() {
 			static options_map_t map;
 			if(map.empty()) {
@@ -340,6 +394,8 @@ namespace {
 					("noSignal");
 				ptr_map_insert< write_function_option >(map)
 					("writeFunction");
+				ptr_map_insert< read_function_option >(map)
+					("readFunction");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
 			}
 			return map;
