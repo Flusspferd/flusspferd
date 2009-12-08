@@ -50,16 +50,22 @@ void object::seal(bool deep) {
     throw exception("Could not seal object");
 }
 
-object object::parent() {
+object object::parent() const {
   if (is_null())
     throw exception("Could not get object parent (object is null)");
-  return Impl::wrap_object(JS_GetParent(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetParent(Impl::current_context(), get_const()));
 }
 
-object object::prototype() {
+object object::prototype() const {
   if (is_null())
     throw exception("Could not get object prototype (object is null)");
-  return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get_const()));
+}
+
+object object::constructor() const {
+  if (is_null())
+    throw exception("Could not get object constructor (object is null)");
+  return Impl::wrap_object(JS_GetConstructor(Impl::current_context(), get_const()));
 }
 
 void object::set_parent(object const &o) {
@@ -79,7 +85,7 @@ void object::set_prototype(object const &o) {
 value object::set_property(char const *name, value const &v_) {
   if (is_null())
     throw exception("Could not set property (object is null)");
-  value v = v_;
+  root_value v(v_);
   if (!JS_SetProperty(Impl::current_context(), get(), name,
                       Impl::get_jsvalp(v)))
     throw exception("Could not set property");
@@ -90,12 +96,11 @@ value object::set_property(std::string const &name, value const &v) {
   return set_property(name.c_str(), v);
 }
 
-value object::set_property(value const &id, value const &v_) {
+value object::set_property(value const &id_, value const &v_) {
   if (is_null())
     throw exception("Could not set property (object is null)");
-  local_root_scope scope;
-  value v = v_;
-  string name = id.to_string();
+  root_value id(id_);
+  root_value v(v_);
   if (!JS_SetPropertyById(Impl::current_context(), get(),
                           Impl::get_jsid(id),
                           Impl::get_jsvalp(v)))
@@ -106,7 +111,7 @@ value object::set_property(value const &id, value const &v_) {
 value object::get_property(char const *name) const {
   if (is_null())
     throw exception("Could not get property (object is null)");
-  value result;
+  root_value result;
   if (!JS_GetProperty(Impl::current_context(), get_const(),
                       name, Impl::get_jsvalp(result)))
     throw exception("Could not get property");
@@ -117,12 +122,11 @@ value object::get_property(std::string const &name) const {
   return get_property(name.c_str());
 }
 
-value object::get_property(value const &id) const {
+value object::get_property(value const &id_) const {
   if (is_null())
     throw exception("Could not get property (object is null)");
-  value result;
-  local_root_scope scope;
-  string name = id.to_string();
+  root_value result;
+  root_value id(id_);
   if (!JS_GetPropertyById(Impl::current_context(), get_const(),
                           Impl::get_jsid(id),
                           Impl::get_jsvalp(result)))
@@ -144,11 +148,10 @@ bool object::has_property(std::string const &name) const {
   return has_property(name.c_str());
 }
 
-bool object::has_property(value const &id) const {
+bool object::has_property(value const &id_) const {
   if (is_null())
     throw exception("Could not check property (object is null)");
-  local_root_scope scope;
-  string name = id.to_string();
+  root_value id(id_);
   JSBool foundp;
   if (!JS_HasPropertyById(Impl::current_context(), get_const(),
                           Impl::get_jsid(id),
@@ -158,14 +161,12 @@ bool object::has_property(value const &id) const {
 }
 
 bool object::has_own_property(char const *name_) const {
-  local_root_scope scope;
-  string name(name_);
+  root_string name(name_);
   return has_own_property(name);
 }
 
 bool object::has_own_property(std::string const &name_) const {
-  local_root_scope scope;
-  string name(name_);
+  root_string name(name_);
   return has_own_property(name);
 }
 
@@ -194,11 +195,10 @@ void object::delete_property(std::string const &name) {
   delete_property(name.c_str());
 }
 
-void object::delete_property(value const &id) {
+void object::delete_property(value const &id_) {
   if (is_null())
     throw exception("Could not delete property (object is null)");
-  local_root_scope scope;
-  string name = id.to_string();
+  root_value id(id_);
   jsval dummy;
   if (!JS_DeletePropertyById2(Impl::current_context(), get(),
                               Impl::get_jsid(id), &dummy))
@@ -221,17 +221,12 @@ namespace {
   /// common function of define_property
   void extract_attributes(
     property_attributes const &attrs,
-    JSObject *&getter_o,
-    JSObject *&setter_o,
+    function &getter,
+    function &setter,
     unsigned &sm_flags)
   {
-    function getter;
     if (attrs.getter) getter = attrs.getter.get();
-    function setter;
     if (attrs.setter) setter = attrs.setter.get();
-
-    getter_o = Impl::get_object(getter);
-    setter_o = Impl::get_object(setter);
 
     unsigned const flags = attrs.flags;
     if (~flags & dont_enumerate) sm_flags |= JSPROP_ENUMERATE;
@@ -239,8 +234,8 @@ namespace {
     if (flags & permanent_property) sm_flags |= JSPROP_PERMANENT;
     if (flags & shared_property) sm_flags |= JSPROP_SHARED;
 
-    if (getter_o) sm_flags |= JSPROP_GETTER;
-    if (setter_o) sm_flags |= JSPROP_SETTER;
+    if (!getter.is_null()) sm_flags |= JSPROP_GETTER;
+    if (!setter.is_null()) sm_flags |= JSPROP_SETTER;
   }
 }
 
@@ -255,10 +250,13 @@ void object::define_property(
   root_value id_r(id);
   root_value v(init_value);
 
-  JSObject *getter_o = 0x0;
-  JSObject *setter_o = 0x0;
+  root_function getter;
+  root_function setter;
   unsigned sm_flags = 0;
-  extract_attributes(attrs, getter_o, setter_o, sm_flags);
+  extract_attributes(attrs, getter, setter, sm_flags);
+
+  JSObject *getter_o = Impl::get_object(getter);
+  JSObject *setter_o = Impl::get_object(setter);
 
   if (!JS_DefinePropertyById(Impl::current_context(),
                              get_const(),
@@ -281,10 +279,13 @@ void object::define_property(
   root_string name_r(name);
   root_value v(init_value);
 
-  JSObject *getter_o = 0x0;
-  JSObject *setter_o = 0x0;
+  root_function getter;
+  root_function setter;
   unsigned sm_flags = 0;
-  extract_attributes(attrs, getter_o, setter_o, sm_flags);
+  extract_attributes(attrs, getter, setter, sm_flags);
+
+  JSObject *getter_o = Impl::get_object(getter);
+  JSObject *setter_o = Impl::get_object(setter);
 
   if (!JS_DefineUCProperty(Impl::current_context(),
                            get_const(),
@@ -391,6 +392,24 @@ bool object::is_generator() const {
 
   return strcmp(our_class->name, "Generator") == 0
       && get_property("next").is_function();
+}
+
+bool object::instance_of(value constructor) const {
+  root_object cons(constructor.to_object());
+
+  if (cons.is_null())
+    throw exception("Could not check instance constructor: "
+                    "constructor has to be a non-null object");
+
+  JSBool result;
+  if (!JS_HasInstance(
+          Impl::current_context(),
+          Impl::get_object(cons),
+          Impl::get_jsval(value(*this)),
+          &result))
+    throw exception("Could not check instance constructor");
+
+  return result;
 }
 
 namespace {

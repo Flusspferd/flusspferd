@@ -1,0 +1,36 @@
+// vim: ft=javascript:
+
+/** section: Flusspferd Core
+ * flusspferd
+ *
+ * Flusspferd meta-module -- contains information about the running flusspferd
+ * instance
+ **/
+
+/**
+ *  flusspferd.version -> String
+ *
+ *  Version of the current flusspferd library.
+ **/
+
+/**
+ *  flusspferd.relocatable -> Boolean
+ *
+ *  Was this flusspferd build compiled with relocatable include paths.
+ **/
+
+/**
+ *  flusspferd.installPrefix -> String
+ *
+ *  The compile time install prefix, under which `bin/`, `lib/` and `etc/`
+ *  and similar directories should be found. If the binary has been relocated
+ *  then this directory might not be in use. Use with caution in this case.
+ **/
+
+/**
+ *  flusspferd.executableName -> String
+ *
+ *  The full path to the running executable. Flusspferd will do its best to
+ *  canonicalize this and turn it into an absolute path, but on some platforms
+ *  this might not be possible.
+ **/

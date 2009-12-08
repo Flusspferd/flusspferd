@@ -1,0 +1,126 @@
+// vim: ft=javascript:
+
+/** section: Flusspferd Core
+ * getopt
+ *
+ * Argument parsing module that is modeled after GNU getopt function. 
+ **/
+
+/**
+ *  getopt.getopt(spec[, arguments]) -> Object
+ *  - spec (Object): options specification
+ *  - arguments (Array): arguments to parse.
+ *
+ *  If `arguments` is not provided, then [[system.args]] will be used instead.
+ *
+ *  The returned object has a key for each option found on the command line,
+ *  and all remaining arguments in an array under the `_` key:
+ *
+ *      { "name": ["arguments"],
+ *        "verbose": [undefined],
+ *        // ...,
+ *        "_": [ "remaining", "arguments" ]
+ *      }
+ *
+ *  Options present in the command line always create an array, even if the
+ *  value only occurs once. If the option doesn't take (or doesn't have) an
+ *  argument the array will contain an `undefined` value.
+ *
+ *  ##### getopt Specifications #
+ *
+ *  A `getopt` specification is an Object (dictionary/hash) with keys as the
+ *  option names and values of option specification -- an object with any of
+ *  the following keys (none of which are required):
+ *
+ *  - `alias` (`String`): other names for the option.
+ *  - `aliases` (`Array`): another name for the `alias` option.
+ *  - `callback` (`Function`): post process callback.
+ *  - `argument` (`String`): type of argument required. One of "none",
+ *    "required" or "optional". Defaults to "none" if not specified.
+ *  - `hidden` (`Boolean`): hide form help functions.
+ *  - `argument_type` (`String`): specify the type of argument required.
+ *    Currently only used for informative purposes for `getopt_help`.
+ *  - `argument_bash` (`String`): specify the type for bash completion output.
+ *  - `doc` (`String`): Free form doc string for man and help outputs.
+ *
+ *  ###### Options #
+ *
+ *  Key names in the `spec` object beginning with `[` are reserved for
+ *  special/meta-data keys.  Currently the only such key is "\[options\]", which
+ *  knows about the following options:
+ *
+ *  - `stop-early` (`Boolean`): stop looking for options as soon as a
+ *  non-option argument is found. Default is to carry on searching for options.
+ *
+ *  ###### Long versus Short Arguments #
+ *
+ *  This module will accept both long (`"--long"`) and short (`"-s"`) option
+ *  forms. However short forms are only allowed for single letter names or
+ *  aliases.
+ *
+ *  ###### Bundling #
+ *
+ *  With bundling it is possible to set several single-character options at
+ *  once. For example if a , v and x are all valid options,
+ *
+ *      -vax
+ *
+ *  would set all three options. Bundling currently only works for short form
+ *  options with an `argument` type of "none".
+ *
+ *  ###### Callbacks #
+ *
+ *  You can provide callback functions which get called once the option has
+ *  been parsed. The callback should have the following signature:
+ *
+ *      function(result, name, argValue) {
+ *
+ *  If they option has an argument, it will be passed in. The return value from
+ *  the callback is ignored -- if you wish to change the value for the option,
+ *  adjust the `result` object:
+ *
+ *        // result[name] is always an array
+ *        var a = result[name];
+ *        a[ a.length - 1] = "New value";
+ *
+ *  ###### Exmaples #
+ *
+ *      spec = {
+ *        name: { alias: "n", argument: "required" },
+ *        verbose: { alias: "v" },
+ *        bdager: { aliases: ["b","bad"] },
+ *      }
+ *      opts = require('getopt').getopt(spec, ['-bvv', '--name=arg', '1', '2', '3']);
+ *      // ({_:["1", "2", "3"], b:[undefined], v:[undefined,undefined], name:["arg"]})
+ *      
+ **/
+
+/**
+ *  getopt.getopt_help(spec) -> String
+ *  - spec (Object): options specification
+ *
+ *  Return help text for the corresponding getopt call. See [[getopt.getopt]]
+ *  for the format of the `spec` parameter.
+ **/
+
+/**
+ *  getopt.getopt_man(spec) -> String
+ *  - spec (Object): options specification
+ *
+ *  Returns a (nroff formated) manpage part to a corresponding getopt call. See
+ *  [[getopt.getopt]] for the format of the `spec` parameter.
+ **/
+
+/**
+ *  getopt.getopt_bash(spec) -> String
+ *  - spec (Object): options specification
+ *
+ *  Returns the content of a bash_completion function. See [[getopt.getopt]]
+ *  for the format of the `spec` parameter.
+ *
+ *  Has completions for all argument types supported by compgen/complete -A.
+ *  See [Programmable Completion Builtins][bash_completion] for more
+ *  information.
+ *
+ *  [bash_completion]: http://www.gnu.org/software/bash/manual/bashref.html#Programmable-Completion-Builtins
+ **/

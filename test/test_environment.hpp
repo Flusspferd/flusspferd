@@ -37,6 +37,7 @@ public:
   context_fixture() : scope(flusspferd::context::create()) {
     flusspferd::security::create(flusspferd::current_context().global());
     flusspferd::load_core(flusspferd::current_context().global(), "exeName");
+    flusspferd::gc();
   }
 
   ~context_fixture() {

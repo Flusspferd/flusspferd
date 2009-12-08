@@ -29,13 +29,21 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
+#include "flusspferd/create/object.hpp"
+#include "flusspferd/create/array.hpp"
+#include "flusspferd/create/function.hpp"
+#include "flusspferd/create/native_object.hpp"
+#include "flusspferd/create/native_function.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/fusion/include/make_vector.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 #include <sstream>
 
 #ifdef WIN32
@@ -47,12 +55,20 @@ THE SOFTWARE.
 
 
 using namespace flusspferd;
+using namespace flusspferd::param;
 
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
 namespace algo = boost::algorithm;
 namespace fs = boost::filesystem;
-
+namespace fusion = boost::fusion;
+using boost::format;
 
 static fs::path make_dsoname(std::string const &id);
+static void setup_module_resolve_fns(object &module, fs::path const &id);
+
+static std::string module_resource_resolve(fs::path const &module_dir, std::string const &x);
+static object module_resource(const fs::path &module_dir, std::string const &x_, value mode);
 
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
@@ -60,18 +76,13 @@ void flusspferd::load_require_function(object container) {
 }
 
 
-require::require()
-  : native_function_base(1, "require"),
-    module_cache(create_object()),
-    paths(create_array()),
-    alias(create_object()),
-    preload(create_object()),
-    main(create_object())
+require::require(function const &fun)
+  : native_function_base(fun)
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
-require::require(require const &rhs)
-  : native_function_base(1, "require"),
+require::require(function const &fun, require const &rhs)
+  : native_function_base(fun),
     module_cache(rhs.module_cache),
     paths(rhs.paths),
     alias(rhs.alias),
@@ -83,24 +94,45 @@ require::~require() {}
 
 // Static helper method to actually create |require| function objects
 object require::create_require() {
-  object fn = create_native_functor_function<require>(object());
+  root_object fn(create<require>(param::_name = "require"));
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
   const property_flag perm_ro = permanent_property | read_only_property;
 
-  fn.define_property("module_cache", r->module_cache, perm_ro);
-  fn.define_property("paths", r->paths, perm_ro);
-  fn.define_property("alias", r->alias, perm_ro);
-  fn.define_property("preload", r->preload, perm_ro);
-  fn.define_property("main", r->main, perm_ro);
+  root_object module_cache(create<object>());
+  r->module_cache = module_cache;
+
+  root_array paths(create<array>());
+  r->paths = paths;
+
+  root_object alias(create<object>());
+  r->alias = alias;
+
+  root_object preload(create<object>());
+  r->preload = preload;
+
+  root_object main(create<object>());
+  r->main = main;
+
+  fn.define_property("module_cache", module_cache, perm_ro);
+  fn.define_property("paths", paths, perm_ro);
+  fn.define_property("alias", alias, perm_ro);
+  fn.define_property("preload", preload, perm_ro);
+  fn.define_property("main", main, perm_ro);
+
   return fn;
 }
 
 // Each module wants a different |require| object, so that it can have a
 // different require.id property
-object require::new_require_function(string const &id) {
+object require::new_require_function(string const &id_) {
+  root_string id(id_);
+
   // Use the copy ctor form to share the JS state variables.
-  object new_req = create_native_functor_function<require>(object(), *this);
+  root_object new_req(create<require>(
+                          fusion::vector1<require&>(*this)
+                          , param::_name = "require"
+                      ));
   new_req.set_prototype(*this);
 
   new_req.define_property("id", id, permanent_property|read_only_property);
@@ -116,7 +148,12 @@ void require::set_main_module(std::string const &id_) {
 
   fs::path mod;
   if (type == top_level) {
-    mod = find_top_level_js_module(id_, true).get_value_or("ARGH");
+    boost::optional<fs::path> mod_ = find_top_level_js_module(id_, true);
+
+    if (!mod_) {
+      throw exception(format("unable to find top level module when setting require.main: \"%s\"") % id_);
+    }
+    mod = *mod_;
   }
   else {
     mod = io::fs_base::canonicalize( id_.substr(strlen("file://")) );
@@ -125,6 +162,8 @@ void require::set_main_module(std::string const &id_) {
   std::string id = "file://" + mod.string();
   main.set_property("id", id);
   main.set_property("uri", id);
+  setup_module_resolve_fns(main, mod);
+  set_property("id", id);
 }
 
 // The implementation of the |require()| function that is available to JS
@@ -167,18 +206,16 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
-  io::file &f = create_native_object<io::file>(
-    object(),
-    filename.string().c_str(),
-    value("r")
-  );
+  root_string read_only("r");
+
+  io::file &f = create<io::file>(
+    fusion::vector2<char const*, string>(filename.string().c_str(), read_only));
+  root_object f_o(f);
 
   // buffer blob
-  byte_array &blob = create_native_object<byte_array>(
-    object(),
-    static_cast<binary::element_type*>(0),
-    0
-  );
+  byte_array &blob = create<byte_array>(
+    fusion::vector2<binary::element_type*, std::size_t>(0, 0));
+  root_object b_o(blob);
   binary::vector_type &buf = blob.get_data();
 
   // Look for a shebang line
@@ -195,7 +232,6 @@ string require::load_module_text(fs::path filename) {
 
   // TODO: Some way of supporting other encodings is probably useful
   return encodings::convert_to_string("UTF-8", blob);
-
 }
 
 /// Load the given @c filename as a module
@@ -212,9 +248,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
   // Reset the strict mode when we leave (the REPL might have it off)
   StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
 
-  local_root_scope root_scope;
-
-  string module_text = load_module_text(filename);
+  root_string module_text(load_module_text(filename));
 
   std::vector<std::string> argnames;
   argnames.push_back("exports");
@@ -222,23 +256,27 @@ void require::require_js(fs::path filename, std::string const &id, object export
   argnames.push_back("module");
 
   std::string fname = filename.string();
-  function fn = ::flusspferd::create_function(
-      fname, argnames.size(), argnames,
-      module_text, fname.c_str(), 1ul);
+  root_function fn(flusspferd::create<flusspferd::function>(
+      _name = fname,
+      _argument_names = argnames,
+      _function = module_text,
+      _file = fname.c_str(),
+      _line = 1ul));
 
-  object module;
+  root_object module;
 
   // Are we requring the main module?
   if (main.get_property("id")== id) {
     module = main;
   }
   else {
-    module = create_object();
+    module = create<object>();
     module.set_property("uri", id);
     module.set_property("id", id);
+    setup_module_resolve_fns(module, filename);
   }
 
-  object require = new_require_function(id);
+  root_object require(new_require_function(id));
 
   fn.call(fn, exports, require, module);
 }
@@ -331,7 +369,7 @@ object load_native_module(fs::path const &dso_name, object exports) {
 
   flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
-  object context = global();
+  root_object context(global());
   func(exports, context);
 
   return exports;
@@ -346,6 +384,7 @@ std::string require::current_id() {
 // We need to check alias and prelaod, and also search the require paths for
 // .js files and DSOs
 object require::load_top_level_module(std::string &id) {
+  root_array paths(this->paths);
 
   if (alias.has_own_property(id)) {
     std::string new_id = alias.get_property(id).to_std_string();
@@ -364,11 +403,22 @@ object require::load_top_level_module(std::string &id) {
 
   security &sec = security::get();
 
-  object classes_object = flusspferd::global();
-  object ctx = flusspferd::create_object(classes_object);
+  root_object classes_object(flusspferd::global());
+  root_object ctx(flusspferd::create<object>(classes_object));
   ctx.set_parent(classes_object);
 
-  root_object exports(create_object());
+  root_object exports(flusspferd::create<object>());
+  
+  flusspferd::create<function>(
+    "toString",
+    boost::phoenix::val("[module " + id + "]"),
+    flusspferd::param::_signature = flusspferd::param::type<std::string ()>(),
+    flusspferd::param::_container = exports);
+  flusspferd::create<function>(
+    "toSource",
+    boost::phoenix::val("(require('" + id + "'))"),
+    flusspferd::param::_signature = flusspferd::param::type<std::string ()>(),
+    flusspferd::param::_container = exports);
 
   ctx.define_property(
     "exports",
@@ -434,6 +484,8 @@ object require::load_top_level_module(std::string &id) {
 
 boost::optional<fs::path>
 require::find_top_level_js_module(std::string const &id, bool fatal) {
+  root_array paths(this->paths);
+
   fs::path js_name = fs::path(id + ".js");
 
   size_t len = paths.length();
@@ -469,7 +521,7 @@ object require::load_absolute_js_file(fs::path path, std::string &id) {
   if (sec.check_path(path.string(), security::READ) &&
       fs::exists(path))
   {
-    root_object exports(create_object());
+    root_object exports(flusspferd::create<object>());
 
     module_cache.set_property(id, exports);
     require_js(path, id, exports);
@@ -495,3 +547,46 @@ static fs::path make_dsoname(std::string const &id) {
   return p;
 }
 
+
+static void setup_module_resolve_fns(object &module, fs::path const &path) {
+
+  fs::path module_dir = fs::path(path).remove_filename();
+
+  // Create the module.resource function. This isn't yet a CJS proposal, but it
+  // has been hinted at. And its *damn* useful.
+  object mod_req = flusspferd::create<flusspferd::function>(
+    _name = "resource",
+    _container = module,
+    _function = phoenix::bind(&module_resource, module_dir, args::arg1, args::arg2),
+    _signature = param::type<object (std::string const &, value)>()
+  );
+
+  phoenix::bind(&module_resource_resolve, module_dir, args::arg1);
+  flusspferd::create<flusspferd::function>(
+    _name = "resolve",
+    _container = mod_req,
+    _function = phoenix::bind(&module_resource_resolve, module_dir, args::arg1),
+    _signature = param::type<std::string (std::string const &)>()
+  );
+
+}
+
+// owner: No such file or directory "foo/bar"
+const format error_fmt("module.resource.resolve: %1% \"%2%\"");
+
+static std::string module_resource_resolve(const fs::path &module_dir, std::string const &x_) {
+  fs::path x = x_;
+
+  if (x.has_root_path() || x.has_root_name()) {
+    throw exception(format(error_fmt) % "absolute paths are not allowed" % x_);
+  }
+
+  return io::fs_base::canonicalize(module_dir / x).string();
+}
+
+static object module_resource(const fs::path &module_dir, std::string const &x_, value mode) {
+
+  std::string const &path = module_resource_resolve(module_dir, x_);
+
+  return create<io::file>(fusion::make_vector(path.c_str(), mode));
+}

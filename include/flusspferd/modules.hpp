@@ -103,8 +103,10 @@ typedef void (*flusspferd_load_t)(object &exports, object &context);
 /// Functor object that backs the require('foo') in JavaScript
 class require : public flusspferd::native_function_base {
 public:
-  require();
-  require(require const &rhs);
+  typedef boost::mpl::true_ ignore_name_arity;
+
+  require(function const &fun);
+  require(function const &fun, require const &rhs);
   ~require();
 
   /// The different types of IDs understood by require
@@ -130,9 +132,10 @@ public:
 
   /// Populate values in require.main for @c id
   void set_main_module(std::string const &id);
+
 protected:
   object module_cache;
-  array paths;
+  object paths;
   object alias;
   object preload;
   object main;

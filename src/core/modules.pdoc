@@ -1,0 +1,97 @@
+// vim: ft=javascript:
+
+/** section: CommonJS Core
+ *  $require(id) -> Object
+ *  - id (String): module id
+ *
+ *  Load a module. require is defined as a free-variable function in all module
+ *  and top level scopes.
+ *
+ *  This function is actually called `require`, its just PDoc doesn't yet know
+ *  how to treat top level functions as 'utility funcitons' and make them show
+ *  up in the menu unless they start with a dollar.
+ **/
+
+/** section: CommonJS Core
+ * require
+ *
+ * Properties of the `require()` function
+ **/
+
+/** alias of: module#id
+ *  require#id -> Sting
+ *
+ *  The id of the current module
+ **/
+
+/**
+ *  require.paths -> Array
+ *
+ *  Search paths for the default module loader. The `paths` parameter itself is
+ *  read-only, meaning you cannot reassign to `require.paths` -- to make
+ *  changes use one of the Array functions, such as push.
+ **/
+
+/** non standard
+ *  require.module_cache -> Object
+ *
+ *  Dictionary of loaded modules.
+ **/
+
+/** non standard
+ *  require.preload -> Object
+ *
+ *  Dictionary of callback functions. The first time a top-level module name
+ *  matching a key in `perload` is loaded, the function stored there will be
+ *  called.
+ **/
+
+/** non standard
+ *  require.alias -> Object
+ *
+ *  Dictionary of aliases. The top-level module id is designated by a string
+ *  only. There is no recursive alias lookup. Aliases will be resolved before
+ *  anything else.
+ **/
+
+/** section: CommonJS Core
+ * module
+ *
+ * Metadata object representing the current module.
+ **/
+
+/**
+ *  module#id -> String
+ *
+ *  The id of this module, in such a form that `require(module.id)` will return
+ *  the exports object from which the module.id originated. (That is to say
+ *  module.id can be passed to another module, and requiring that must return
+ *  the original module).
+ **/
+
+/**
+ *  module#uri -> String
+ *
+ *  The URI for the location of this module. Currently this will always be a
+ *  string starting with `file://`. If you wish to load a file relative to a
+ *  module, it is recommended to use the [[module#resource]] method.
+ **/
+
+/** non standard
+ *  module#resource(name[, mode[, permissions]]) -> io.Stream
+ *  - name (String): resource name
+ *  - mode (String | Object): open mode
+ *  - permissions (?): currently not supported
+ *
+ *  Open a stream to a resource relative to the module current module (or to
+ *  the module from which this `module` object originated).
+ *
+ *  As this method only accepts relative identifiers `./foo.txt` and `foo.txt`
+ *  will both open the same file. Absolute paths will cause an error to be thrown.
+ *
+ *  This method will be changed in the future to return a Path object with its
+ *  own `open()` method rather than an already open stream. Until that point,
+ *  if you need a file name instead of an open stream, use
+ *  `module.require.resolve(name)`.
+ **/
+

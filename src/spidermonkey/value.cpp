@@ -155,6 +155,10 @@ bool flusspferd::operator==(value const &a, value const &b) {
     Impl::get_jsval(b));
 }
 
+Impl::value_impl Impl::value_impl::from_int(int num) {
+  return wrap_jsval(INT_TO_JSVAL(num));
+}
+
 Impl::value_impl Impl::value_impl::from_double(double num) {
   value_impl result;
   if (!JS_NewNumberValue(

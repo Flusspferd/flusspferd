@@ -106,6 +106,14 @@ public:
   bool is_generator() const;
 
   /**
+   * Check if an object is an instance of the given constructor.
+   *
+   * @param constructor The constructor (not a string!).
+   * @return Whether the object is an instance of the constructor.
+   */
+  bool instance_of(value constructor) const;
+
+  /**
    * Seal the object.
    *
    * @param deep Whether to seal all reachable sub-objects, too.
@@ -113,10 +121,13 @@ public:
   void seal(bool deep);
 
   /// Get the object's parent (__parent__).
-  object parent();
+  object parent() const;
   
   /// Get the object's prototype (__proto__).
-  object prototype();
+  object prototype() const;
+
+  /// Get the object's constructor.
+  object constructor() const;
 
   /**
    * Set the object's parent (__parent__).
@@ -309,6 +320,44 @@ FLUSSPFERD_CALLS(call, object const &)
     return define_property(name, value(), attrs);
   }
 
+private:
+  class define_property_helper {
+    object &obj;
+    property_attributes attr;
+
+  public:
+    define_property_helper(object &obj, property_attributes const &attr)
+      : obj(obj), attr(attr)
+    {}
+
+    template<typename T>
+    define_property_helper operator()(T const &id) {
+      obj.define_property(id, attr);
+      return *this;
+    }
+
+    template<typename T, typename U>
+    define_property_helper operator()(T const &id, U const &v) {
+      obj.define_property(id, flusspferd::value(v), attr);
+      return *this;
+    }
+  };
+
+public:
+  /**
+   * Define multiple properties.
+   *
+   * Example:
+   * @code
+   obj.define_properties(read_only_property)("name1", value1)("name2", value2)("name3");
+   @endcode
+   *
+   * @param attr The property attributes.
+   */
+  define_property_helper define_properties(property_attributes const &attr = property_attributes()) {
+    return define_property_helper(*this, attr);
+  }
+
   /**
    * Get a property's attributes.
    *
@@ -360,7 +409,7 @@ FLUSSPFERD_CALLS(call, object const &)
    *
    * @param id The property's name / ID.
    * @param v The new value.
-   * @returnv @p v
+   * @return @p v
    */
   template<typename T, typename U>
   value set_property(T const &id, U const &v
@@ -369,6 +418,36 @@ FLUSSPFERD_CALLS(call, object const &)
 #endif
   ) {
     return set_property(id, value(v));
+  }
+
+private:
+  struct set_property_helper {
+    object &obj;
+
+    set_property_helper(object &obj) : obj(obj) {}
+
+    template<typename T, typename U>
+    set_property_helper operator()(T const &id, U const &v) {
+      obj.set_property(id, v);
+      return *this;
+    }
+  };
+
+public:
+  /**
+   * Set multiple properties.
+   *
+   * Example:
+   * @code
+   obj.set_properties("name1", value1)("name2", value2);
+   @endcode
+   *
+   * @param id The first property's name / ID.
+   * @param v The new value for the first property.
+   */
+  template<typename T, typename U>
+  set_property_helper set_properties(T const &id, U const &v) {
+    return set_property_helper(*this)(id, v);
   }
 
   /**

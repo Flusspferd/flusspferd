@@ -4,6 +4,8 @@
 #include <set>
 #include <string>
 
+using namespace flusspferd::param;
+
 // Inherit from flusspferd::native_object_base or a class that derives from it.
 class StringSet : public flusspferd::native_object_base {
 public:
@@ -20,13 +22,14 @@ public:
         // Function for creating the class prototype.
         static object create_prototype() {
             // Create a prototype object (with default prototype).
-            flusspferd::object proto = flusspferd::create_object();
+            flusspferd::object proto = flusspferd::create<flusspferd::object>();
 
             // Add the methods.
-            create_native_method(proto, "dump", &StringSet::dump);
-            create_native_method(proto, "add", &StringSet::add);
-            create_native_method(proto, "delete", &StringSet::delete_);
-            create_native_method(proto, "toArray", &StringSet::to_array);
+            flusspferd::create_on(proto)
+                .create<flusspferd::method>("dump", &StringSet::dump)
+                .create<flusspferd::method>("add", &StringSet::add)
+                .create<flusspferd::method>("delete", &StringSet::delete_)
+                .create<flusspferd::method>("toArray", &StringSet::to_array);
 
             return proto;
         }
@@ -74,7 +77,7 @@ private:
     }
 
     flusspferd::array to_array() {
-        flusspferd::array result = flusspferd::create_array();
+        flusspferd::root_array result(flusspferd::create<flusspferd::array>());
 
         for (iterator it = data.begin(); it != data.end(); ++it) {
             result.push(*it);
@@ -95,7 +98,7 @@ int main() {
     flusspferd::current_context_scope context_scope(
         flusspferd::context::create());
 
-    flusspferd::create_native_function(flusspferd::global(), "print", &print);
+    flusspferd::create<flusspferd::function>("print", &print, _container = flusspferd::global());
 
     flusspferd::load_class<StringSet>();
 

@@ -64,7 +64,7 @@ function::function(Impl::object_impl const &o)
     object(o)
 { }
 
-std::size_t function::arity() const {
+unsigned function::arity() const {
   if (is_null())
     throw exception("Could not get function arity: object is null");
   return JS_GetFunctionArity(Impl::function_impl::get_const());

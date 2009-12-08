@@ -36,7 +36,7 @@ BOOST_TEST_DONT_PRINT_LOG_VALUE(flusspferd::property_iterator) //FIXME?
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( property_iterator ) {
-  flusspferd::object obj = flusspferd::create_object();
+  flusspferd::object obj = flusspferd::create<flusspferd::object>();
   flusspferd::value const name(flusspferd::string("foobar"));
   flusspferd::value const v(409);
   obj.set_property(name, v);
