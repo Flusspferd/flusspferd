@@ -43,5 +43,6 @@ c.options.progressfunction = function(dltotal, dlnow, ultotal, ulnow) {
 c.options.headerfunction = function(data, size) {
 	print("Header: " + data.decodeToString());
 	return data.length;
-}
+};
+//c.options.httppost = { name: "test", contents: "Hello World!" };
 c.perform();
