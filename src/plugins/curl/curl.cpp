@@ -662,143 +662,76 @@ namespace {
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
     local_root_scope scope;
 
-    cURL.define_property("GLOBAL_ALL", value(CURL_GLOBAL_ALL),
-                         read_only_property | permanent_property);
-    cURL.define_property("GLOBAL_SSL", value(CURL_GLOBAL_SSL),
-                         read_only_property | permanent_property);
-    cURL.define_property("GLOBAL_WIN32", value(CURL_GLOBAL_WIN32),
-                         read_only_property | permanent_property);
-    cURL.define_property("GLOBAL_NOTHING", value(CURL_GLOBAL_NOTHING),
-                         read_only_property | permanent_property);
     create<flusspferd::function>("globalInit", &global_init, param::_container = cURL);
-    cURL.define_property("version", value(curl_version()),
-                         read_only_property | permanent_property);
     load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
-    cURL.define_property("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_HTTPS", value(static_cast<int>(CURLPROTO_HTTPS)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_FTP", value(static_cast<int>(CURLPROTO_FTP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_FTPS", value(static_cast<int>(CURLPROTO_FTPS)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_SCP", value(static_cast<int>(CURLPROTO_SCP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_SFTP", value(static_cast<int>(CURLPROTO_SFTP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_TELNET", value(static_cast<int>(CURLPROTO_TELNET)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_LDAP", value(static_cast<int>(CURLPROTO_LDAP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_LDAPS", value(static_cast<int>(CURLPROTO_LDAPS)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_DICT", value(static_cast<int>(CURLPROTO_DICT)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_FILE", value(static_cast<int>(CURLPROTO_FILE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_TFTP", value(static_cast<int>(CURLPROTO_TFTP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROTO_ALL", value(static_cast<int>(CURLPROTO_ALL)),
-                         read_only_property | permanent_property);
-    cURL.define_property("INFO_TEXT", value(static_cast<int>(CURLINFO_TEXT)),
-                         read_only_property | permanent_property);
-    cURL.define_property("INFO_HEADER_IN", value(static_cast<int>(CURLINFO_HEADER_IN)),
-                         read_only_property | permanent_property);
-    cURL.define_property("INFO_HEADER_OUT", value(static_cast<int>(CURLINFO_HEADER_OUT)),
-                         read_only_property | permanent_property);
-    cURL.define_property("INFO_DATA_IN", value(static_cast<int>(CURLINFO_DATA_IN)),
-                         read_only_property | permanent_property);
-    cURL.define_property("INFO_DATA_OUT", value(static_cast<int>(CURLINFO_DATA_OUT)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROXY_HTTP", value(static_cast<int>(CURLPROXY_HTTP)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROXY_HTTP_1_0", value(static_cast<int>(CURLPROXY_HTTP_1_0)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROXY_SOCKS4", value(static_cast<int>(CURLPROXY_SOCKS4)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROXY_SOCKS5", value(static_cast<int>(CURLPROXY_SOCKS5)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROXY_SOCKS4A", value(static_cast<int>(CURLPROXY_SOCKS4A)),
-                         read_only_property | permanent_property);
-    cURL.define_property("PROXY_SOCKS5_HOSTNAME", 
-                         value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)),
-                         read_only_property | permanent_property);
-    cURL.define_property("NETRC_OPTIONAL",
-                         value(static_cast<int>(CURL_NETRC_OPTIONAL)),
-                         read_only_property | permanent_property);
-    cURL.define_property("NETRC_IGNORED",
-                         value(static_cast<int>(CURL_NETRC_IGNORED)),
-                         read_only_property | permanent_property);
-    cURL.define_property("NETRC_REQUIRED",
-                         value(static_cast<int>(CURL_NETRC_REQUIRED)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_BASIC", value(static_cast<int>(CURLAUTH_BASIC)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_DIGEST", value(static_cast<int>(CURLAUTH_DIGEST)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_DIGEST_IE", value(static_cast<int>(CURLAUTH_DIGEST_IE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_GSSNEGOTIATE", value(static_cast<int>(CURLAUTH_GSSNEGOTIATE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_NTLM", value(static_cast<int>(CURLAUTH_NTLM)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_ANY", value(static_cast<int>(CURLAUTH_ANY)),
-                         read_only_property | permanent_property);
-    cURL.define_property("AUTH_ANYSAFE", value(static_cast<int>(CURLAUTH_ANYSAFE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("REDIR_POST_301", value(static_cast<int>(CURL_REDIR_POST_301)),
-                         read_only_property | permanent_property);
-    cURL.define_property("REDIR_POST_302", value(static_cast<int>(CURL_REDIR_POST_302)),
-                         read_only_property | permanent_property);
-    cURL.define_property("REDIR_POST_ALL", value(static_cast<int>(CURL_REDIR_POST_ALL)),
-                         read_only_property | permanent_property);
-    cURL.define_property("HTTP_VERSION_NONE", value(static_cast<int>(CURL_HTTP_VERSION_NONE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("HTTP_VERSION_1_0", value(static_cast<int>(CURL_HTTP_VERSION_1_0)),
-                         read_only_property | permanent_property);
-    cURL.define_property("HTTP_VERSION_1_1", value(static_cast<int>(CURL_HTTP_VERSION_1_1)),
-                         read_only_property | permanent_property);
-    cURL.define_property("USESSL_NONE", value(static_cast<int>(CURLUSESSL_NONE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("USESSL_TRY", value(static_cast<int>(CURLUSESSL_TRY)),
-                         read_only_property | permanent_property);
-    cURL.define_property("USESSL_CONTROL", value(static_cast<int>(CURLUSESSL_CONTROL)),
-                         read_only_property | permanent_property);
-    cURL.define_property("USESSL_ALL", value(static_cast<int>(CURLUSESSL_ALL)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPAUTH_DEFAULT", value(static_cast<int>(CURLFTPAUTH_DEFAULT)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPAUTH_SSL", value(static_cast<int>(CURLFTPAUTH_SSL)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPAUTH_TLS", value(static_cast<int>(CURLFTPAUTH_TLS)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPSSL_CCC_NONE", value(static_cast<int>(CURLFTPSSL_CCC_NONE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPSSL_CCC_PASSIVE", value(static_cast<int>(CURLFTPSSL_CCC_PASSIVE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPSSL_CCC_ACTIVE", value(static_cast<int>(CURLFTPSSL_CCC_ACTIVE)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPMETHOD_MULTICWD", value(static_cast<int>(CURLFTPMETHOD_MULTICWD)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPMETHOD_NOCWD", value(static_cast<int>(CURLFTPMETHOD_NOCWD)),
-                         read_only_property | permanent_property);
-    cURL.define_property("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)),
-                         read_only_property | permanent_property);
-    cURL.define_property("IPRESOLVE_WHATEVER",
-                         value(static_cast<int>(CURL_IPRESOLVE_WHATEVER)),
-                         read_only_property | permanent_property);
-    cURL.define_property("IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)),
-                         read_only_property | permanent_property);
-    cURL.define_property("IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)),
-                         read_only_property | permanent_property);
-    cURL.define_property("SSLVERSION_DEFAULT", value(static_cast<int>(CURL_SSLVERSION_DEFAULT)),
-                         read_only_property | permanent_property);
-    cURL.define_property("SSLVERSION_TLSv1", value(static_cast<int>(CURL_SSLVERSION_TLSv1)),
-                         read_only_property | permanent_property);
-    cURL.define_property("SSLVERSION_SSLv2", value(static_cast<int>(CURL_SSLVERSION_SSLv2)),
-                         read_only_property | permanent_property);
-    cURL.define_property("SSLVERSION_SSLv3", value(static_cast<int>(CURL_SSLVERSION_SSLv3)),
-                         read_only_property | permanent_property);
+
+    cURL.define_properties(read_only_property | permanent_property)
+        ("version", value(curl_version()))
+        ("GLOBAL_ALL", value(CURL_GLOBAL_ALL))
+        ("GLOBAL_SSL", value(CURL_GLOBAL_SSL))
+        ("GLOBAL_WIN32", value(CURL_GLOBAL_WIN32))
+        ("GLOBAL_NOTHING", value(CURL_GLOBAL_NOTHING))
+        ("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)))
+        ("PROTO_HTTPS", value(static_cast<int>(CURLPROTO_HTTPS)))
+        ("PROTO_FTP", value(static_cast<int>(CURLPROTO_FTP)))
+        ("PROTO_FTPS", value(static_cast<int>(CURLPROTO_FTPS)))
+        ("PROTO_SCP", value(static_cast<int>(CURLPROTO_SCP)))
+        ("PROTO_SFTP", value(static_cast<int>(CURLPROTO_SFTP)))
+        ("PROTO_TELNET", value(static_cast<int>(CURLPROTO_TELNET)))
+        ("PROTO_LDAP", value(static_cast<int>(CURLPROTO_LDAP)))
+        ("PROTO_LDAPS", value(static_cast<int>(CURLPROTO_LDAPS)))
+        ("PROTO_DICT", value(static_cast<int>(CURLPROTO_DICT)))
+        ("PROTO_FILE", value(static_cast<int>(CURLPROTO_FILE)))
+        ("PROTO_TFTP", value(static_cast<int>(CURLPROTO_TFTP)))
+        ("PROTO_ALL", value(static_cast<int>(CURLPROTO_ALL)))
+        ("INFO_TEXT", value(static_cast<int>(CURLINFO_TEXT)))
+        ("INFO_HEADER_IN", value(static_cast<int>(CURLINFO_HEADER_IN)))
+        ("INFO_HEADER_OUT", value(static_cast<int>(CURLINFO_HEADER_OUT)))
+        ("INFO_DATA_IN", value(static_cast<int>(CURLINFO_DATA_IN)))
+        ("INFO_DATA_OUT", value(static_cast<int>(CURLINFO_DATA_OUT)))
+        ("PROXY_HTTP", value(static_cast<int>(CURLPROXY_HTTP)))
+        ("PROXY_HTTP_1_0", value(static_cast<int>(CURLPROXY_HTTP_1_0)))
+        ("PROXY_SOCKS4", value(static_cast<int>(CURLPROXY_SOCKS4)))
+        ("PROXY_SOCKS5", value(static_cast<int>(CURLPROXY_SOCKS5)))
+        ("PROXY_SOCKS4A", value(static_cast<int>(CURLPROXY_SOCKS4A)))
+        ("PROXY_SOCKS5_HOSTNAME", value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)))
+        ("NETRC_OPTIONAL", value(static_cast<int>(CURL_NETRC_OPTIONAL)))
+        ("NETRC_IGNORED", value(static_cast<int>(CURL_NETRC_IGNORED)))
+        ("NETRC_REQUIRED", value(static_cast<int>(CURL_NETRC_REQUIRED)))
+        ("AUTH_BASIC", value(static_cast<int>(CURLAUTH_BASIC)))
+        ("AUTH_DIGEST", value(static_cast<int>(CURLAUTH_DIGEST)))
+        ("AUTH_DIGEST_IE", value(static_cast<int>(CURLAUTH_DIGEST_IE)))
+        ("AUTH_GSSNEGOTIATE", value(static_cast<int>(CURLAUTH_GSSNEGOTIATE)))
+        ("AUTH_NTLM", value(static_cast<int>(CURLAUTH_NTLM)))
+        ("AUTH_ANY", value(static_cast<int>(CURLAUTH_ANY)))
+        ("AUTH_ANYSAFE", value(static_cast<int>(CURLAUTH_ANYSAFE)))
+        ("REDIR_POST_301", value(static_cast<int>(CURL_REDIR_POST_301)))
+        ("REDIR_POST_302", value(static_cast<int>(CURL_REDIR_POST_302)))
+        ("REDIR_POST_ALL", value(static_cast<int>(CURL_REDIR_POST_ALL)))
+        ("HTTP_VERSION_NONE", value(static_cast<int>(CURL_HTTP_VERSION_NONE)))
+        ("HTTP_VERSION_1_0", value(static_cast<int>(CURL_HTTP_VERSION_1_0)))
+        ("HTTP_VERSION_1_1", value(static_cast<int>(CURL_HTTP_VERSION_1_1)))
+        ("USESSL_NONE", value(static_cast<int>(CURLUSESSL_NONE)))
+        ("USESSL_TRY", value(static_cast<int>(CURLUSESSL_TRY)))
+        ("USESSL_CONTROL", value(static_cast<int>(CURLUSESSL_CONTROL)))
+        ("USESSL_ALL", value(static_cast<int>(CURLUSESSL_ALL)))
+        ("FTPAUTH_DEFAULT", value(static_cast<int>(CURLFTPAUTH_DEFAULT)))
+        ("FTPAUTH_SSL", value(static_cast<int>(CURLFTPAUTH_SSL)))
+        ("FTPAUTH_TLS", value(static_cast<int>(CURLFTPAUTH_TLS)))
+        ("FTPSSL_CCC_NONE", value(static_cast<int>(CURLFTPSSL_CCC_NONE)))
+        ("FTPSSL_CCC_PASSIVE", value(static_cast<int>(CURLFTPSSL_CCC_PASSIVE)))
+        ("FTPSSL_CCC_ACTIVE", value(static_cast<int>(CURLFTPSSL_CCC_ACTIVE)))
+        ("FTPMETHOD_MULTICWD", value(static_cast<int>(CURLFTPMETHOD_MULTICWD)))
+        ("FTPMETHOD_NOCWD", value(static_cast<int>(CURLFTPMETHOD_NOCWD)))
+        ("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)))
+        ("IPRESOLVE_WHATEVER", value(static_cast<int>(CURL_IPRESOLVE_WHATEVER)))
+        ("IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)))
+        ("IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)))
+        ("SSLVERSION_DEFAULT", value(static_cast<int>(CURL_SSLVERSION_DEFAULT)))
+        ("SSLVERSION_TLSv1", value(static_cast<int>(CURL_SSLVERSION_TLSv1)))
+        ("SSLVERSION_SSLv2", value(static_cast<int>(CURL_SSLVERSION_SSLv2)))
+        ("SSLVERSION_SSLv3", value(static_cast<int>(CURL_SSLVERSION_SSLv3)));
+
   }
 }
