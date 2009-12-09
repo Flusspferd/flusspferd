@@ -475,6 +475,8 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
         // NAMES and PASSWORDS OPTIONS (Authentication)
+        ptr_map_insert< integer_option<CURLOPT_NETRC> >(map)("netrc");
+        ptr_map_insert< string_option<CURLOPT_NETRC_FILE> >(map)("netrc_file");
         ptr_map_insert< string_option<CURLOPT_USERPWD> >(map)("userPwd");
         ptr_map_insert< string_option<CURLOPT_PROXYUSERPWD> >(map)("proxyUserPwd");
         ptr_map_insert< string_option<CURLOPT_USERNAME> >(map)("username");
@@ -615,6 +617,15 @@ namespace {
                          read_only_property | permanent_property);
     cURL.define_property("PROXY_SOCKS5_HOSTNAME", 
                          value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)),
+                         read_only_property | permanent_property);
+    cURL.define_property("NETRC_OPTIONAL",
+                         value(static_cast<int>(CURL_NETRC_OPTIONAL)),
+                         read_only_property | permanent_property);
+    cURL.define_property("NETRC_IGNORED",
+                         value(static_cast<int>(CURL_NETRC_IGNORED)),
+                         read_only_property | permanent_property);
+    cURL.define_property("NETRC_REQUIRED",
+                         value(static_cast<int>(CURL_NETRC_REQUIRED)),
                          read_only_property | permanent_property);
     cURL.define_property("AUTH_BASIC", value(static_cast<int>(CURLAUTH_BASIC)),
                          read_only_property | permanent_property);
