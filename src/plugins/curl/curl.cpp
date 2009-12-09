@@ -422,8 +422,9 @@ namespace {
 				ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
 					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
 					("progressFunction");
-				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)
-					("port");
+				ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
+        ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localPort");
+				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
 				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
 				ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
