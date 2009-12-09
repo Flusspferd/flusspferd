@@ -12,6 +12,8 @@ const cURL = require('curl');
 var c = new cURL.Easy();
 c.options.userAgent = 'Flussperd!';
 c.options.cookie = 'flusspferd=cool';
+//c.options.interface = 'eth0';
+//c.options.localPort = 8234;
 c.options.port = 80;
 c.options.url = 'http://flusspferd.org/foo.txt';
 c.options.writeFunction = function(data,size) { // size is element width not data.length! confusing? :-D
