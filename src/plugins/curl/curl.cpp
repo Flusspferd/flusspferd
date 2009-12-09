@@ -112,6 +112,18 @@ namespace {
     static EasyOpt &create(Easy &p) {
       return flusspferd::create<EasyOpt>(bf::make_vector(boost::ref(p)));
     }
+
+    void clear() {
+      for(options_map_t::const_iterator i = get_options().begin();
+          i != get_options().end();
+          ++i)
+      {
+        if(has_property(i->first)) {
+          delete_property(i->first);
+        }
+      }
+      data.clear();
+    }
   protected:
     bool property_resolve(value const &id, unsigned access);
   };
@@ -268,17 +280,17 @@ namespace {
 
     Easy(flusspferd::object const &self, flusspferd::call_context&)
       : base_type(self), handle(curl_easy_init()), opt(EasyOpt::create(*this))
-      {
-        if(!handle) {
-          throw flusspferd::exception("curl_easy_init");
-        }
+    {
+      if(!handle) {
+        throw flusspferd::exception("curl_easy_init");
       }
+    }
 
     Easy(flusspferd::object const &self, CURL *hnd)
       : base_type(self), handle(hnd), opt(EasyOpt::create(*this))
-      {
-        assert(handle);
-      }
+    {
+      assert(handle);
+    }
 
     void cleanup() {
       if(handle) {
@@ -298,7 +310,7 @@ namespace {
 
     void reset() {
       curl_easy_reset(get());
-      // TODO clear EasyOpt
+      opt.clear();
     }
 
     std::string unescape(char const *input) {
