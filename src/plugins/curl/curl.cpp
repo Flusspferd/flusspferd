@@ -428,6 +428,8 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxyType"); // see cURL.PROXY_
         ptr_map_insert< string_option<CURLOPT_NOPROXY> >(map)("noProxy");
         ptr_map_insert< integer_option<CURLOPT_HTTPPROXYTUNNEL> >(map)("httpProxyTunnel");
+        ptr_map_insert< string_option<CURLOPT_SOCKS5_GSSAPI_SERVICE> >(map)("socks5GssapiService");
+        ptr_map_insert< integer_option<CURLOPT_SOCKS5_GSSAPI_NEC> >(map)("socks5GssapiNec");
 				ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localPort");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localPortRange");
