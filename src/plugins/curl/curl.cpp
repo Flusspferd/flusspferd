@@ -474,7 +474,13 @@ namespace {
         /* HEADER{
            cURL.Easy.options -> EasyOpt
 
-           Set connection options (see curl_easy_setopt).
+           The options property is used to set connection options (see curl_easy_setopt).
+
+           ## Example #
+           %      c.options.url = 'http://www.google.com'
+
+           ## Options #
+           The following options are supported.
            }HEADER
          */
         // BEHAVIOR OPTIONS
@@ -506,7 +512,7 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
         ptr_map_insert< string_option<CURLOPT_PROXY> >(map)("proxy");
         ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyport");
-        ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxytype"); // see cURL.PROXY_
+        ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxytype"); // See cURL.PROXY_
         ptr_map_insert< string_option<CURLOPT_NOPROXY> >(map)("noproxy");
         ptr_map_insert< integer_option<CURLOPT_HTTPPROXYTUNNEL> >(map)("httpProxyTunnel");
         ptr_map_insert< string_option<CURLOPT_SOCKS5_GSSAPI_SERVICE> >(map)("socks5GssapiService");
@@ -529,7 +535,7 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_PASSWORD> >(map)("password");
         ptr_map_insert< string_option<CURLOPT_PROXYUSERNAME> >(map)("proxyusername");
         ptr_map_insert< string_option<CURLOPT_PROXYPASSWORD> >(map)("proxypassword");
-        ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpauth"); // see cURL.AUTH_*
+        ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpauth"); // See cURL.AUTH_*
         ptr_map_insert< integer_option<CURLOPT_PROXYAUTH> >(map)("proxyauth");
         // HTTP OPTIONS
         ptr_map_insert< integer_option<CURLOPT_AUTOREFERER> >(map)("autoreferer");
@@ -537,7 +543,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_FOLLOWLOCATION> >(map)("followlocation");
         ptr_map_insert< integer_option<CURLOPT_UNRESTRICTED_AUTH> >(map)("unrestrictedAuth");
         ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxredirs");
-        ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // see cURL.REDIR_*
+        ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // See cURL.REDIR_*
         // TODO: POST*
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
         ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
@@ -548,7 +554,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_COOKIESESSION> >(map)("cookiesession");
         ptr_map_insert< string_option<CURLOPT_COOKIELIST> >(map)("cookielist");
         ptr_map_insert< integer_option<CURLOPT_HTTPGET> >(map)("httpGet");
-        ptr_map_insert< integer_option<CURLOPT_HTTP_VERSION> >(map)("httpVersion"); // see cURL.HTTP_VERSION_*
+        ptr_map_insert< integer_option<CURLOPT_HTTP_VERSION> >(map)("httpVersion"); // See cURL.HTTP_VERSION_*
         ptr_map_insert< integer_option<CURLOPT_IGNORE_CONTENT_LENGTH> >(map)("ignoreContentLength");
         ptr_map_insert< integer_option<CURLOPT_HTTP_CONTENT_DECODING> >(map)("httpContentDecoding");
         ptr_map_insert< integer_option<CURLOPT_HTTP_TRANSFER_DECODING> >(map)("httpTransferDecoding");
@@ -595,7 +601,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_FORBID_REUSE> >(map)("forbidReuse");
         ptr_map_insert< integer_option<CURLOPT_CONNECTTIMEOUT> >(map)("connecttimeout");
         ptr_map_insert< integer_option<CURLOPT_CONNECTTIMEOUT_MS> >(map)("connecttimeoutMS");
-        ptr_map_insert< integer_option<CURLOPT_IPRESOLVE> >(map)("ipresolve"); // see cURL.IPRESOLVE_*
+        ptr_map_insert< integer_option<CURLOPT_IPRESOLVE> >(map)("ipresolve"); // See cURL.IPRESOLVE_*
         ptr_map_insert< integer_option<CURLOPT_CONNECT_ONLY> >(map)("connectOnly");
         // SSL and SECURITY OPTIONS
         ptr_map_insert< string_option<CURLOPT_SSLCERT> >(map)("sslcert");
@@ -605,7 +611,7 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_KEYPASSWD> >(map)("keypasswd");
         ptr_map_insert< string_option<CURLOPT_SSLENGINE> >(map)("sslengine");
         ptr_map_insert< string_option<CURLOPT_SSLENGINE_DEFAULT> >(map)("sslengineDefault");
-        ptr_map_insert< integer_option<CURLOPT_SSLVERSION> >(map)("sslversion"); // see cURL.SSLVERSION_*
+        ptr_map_insert< integer_option<CURLOPT_SSLVERSION> >(map)("sslversion"); // See cURL.SSLVERSION_*
         ptr_map_insert< integer_option<CURLOPT_SSL_VERIFYPEER> >(map)("sslVerifypeer");
         ptr_map_insert< string_option<CURLOPT_CAINFO> >(map)("cainfo");
         ptr_map_insert< string_option<CURLOPT_ISSUERCERT> >(map)("issuercert");
@@ -619,7 +625,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_SSL_SESSIONID_CACHE> >(map)("sslSessionidCache");
         ptr_map_insert< string_option<CURLOPT_KRBLEVEL> >(map)("krblevel");
         // SSH OPTIONS
-        ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // see cURL.SSH_AUTH*
+        ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // See cURL.SSH_AUTH*
         ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMd5");
         ptr_map_insert< string_option<CURLOPT_SSH_PUBLIC_KEYFILE> >(map)("sshPublicKeyfile");
         ptr_map_insert< string_option<CURLOPT_SSH_PRIVATE_KEYFILE> >(map)("sshPrivateKeyfile");

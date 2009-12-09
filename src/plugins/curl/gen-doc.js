@@ -1,5 +1,7 @@
 #!/usr/bin/env flusspferd
 
+// cd src/plugins/curl && git checkout curl.pdoc && flusspferd gen-doc.js >> curl.pdoc && cd ../../.. && make doc
+
 const io = require('io');
 
 function print(x) {
@@ -7,7 +9,8 @@ function print(x) {
 }
 
 function trim(x) {
-  return x.replace(/\s*$/,'').replace(/^\s*/,'');
+  var t = x.replace(/\s*$/,'').replace(/^\s*/,'');
+  return t.replace(/^%/,''); // % is a hack to stop triming if indentation is important
 }
 
 const file = 'curl.cpp';
@@ -41,12 +44,14 @@ while( (line = fh.readLine()) ) {
   else if(in_doc) {
     var m;
     if( (m = line.match(/ptr_map_insert< (.*?)_option<(.*?)> >\(map\)\("(.*?)"\)/)) ) {
-      var out = ' * + [' + m[2] +
-                  '](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#' +
-                    m[2].replace(/_/g,'') + ') -> ' + m[3] + ' (' + m[1]+ ')';
-      if( (m = line.match(/\/\/ (.*)/)) ) {
-        out += ' ' + m[1];
+      var out = ' * + ' + m[3] + ', ' + m[1];
+      var n;
+      if( (n = line.match(/\/\/ (.*)/)) ) {
+        out += '. ' + n[1];
       }
+      out += ' ([' + m[2] +
+        '](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#' +
+        m[2].replace(/_/g,'') + '))';
       print(out);
     }
     else if( (m = line.match(/HEADER{/))) {
