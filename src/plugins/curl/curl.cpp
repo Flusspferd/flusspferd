@@ -438,6 +438,14 @@ namespace {
 				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
+        ptr_map_insert< string_option<CURLOPT_USERPWD> >(map)("userPwd");
+        ptr_map_insert< string_option<CURLOPT_PROXYUSERPWD> >(map)("proxyUserPwd");
+        ptr_map_insert< string_option<CURLOPT_USERNAME> >(map)("username");
+        ptr_map_insert< string_option<CURLOPT_PASSWORD> >(map)("password");
+        ptr_map_insert< string_option<CURLOPT_PROXYUSERNAME> >(map)("proxyUsername");
+        ptr_map_insert< string_option<CURLOPT_PROXYPASSWORD> >(map)("proxyPassword");
+        ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpAuth"); // see cURL.AUTH_*
+        ptr_map_insert< integer_option<CURLOPT_PROXYAUTH> >(map)("proxyAuth");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
 				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
 				ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
@@ -490,6 +498,20 @@ namespace {
                          read_only_property | permanent_property);
     cURL.define_property("PROXY_SOCKS5_HOSTNAME", 
                          value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_BASIC", value(static_cast<int>(CURLAUTH_BASIC)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_DIGEST", value(static_cast<int>(CURLAUTH_DIGEST)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_DIGEST_IE", value(static_cast<int>(CURLAUTH_DIGEST_IE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_GSSNEGOTIATE", value(static_cast<int>(CURLAUTH_GSSNEGOTIATE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_NTLM", value(static_cast<int>(CURLAUTH_NTLM)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_ANY", value(static_cast<int>(CURLAUTH_ANY)),
+                         read_only_property | permanent_property);
+    cURL.define_property("AUTH_ANYSAFE", value(static_cast<int>(CURLAUTH_ANYSAFE)),
                          read_only_property | permanent_property);
   }
 }
