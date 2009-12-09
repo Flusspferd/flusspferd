@@ -470,6 +470,7 @@ namespace {
       static options_map_t map;
       if(map.empty()) {
         using namespace boost::assign;
+        // BEGIN DOC{
         // BEHAVIOR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)("verbose");
         ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)("header");
@@ -623,6 +624,7 @@ namespace {
         // OTHER OPTIONS
         ptr_map_insert< integer_option<CURLOPT_NEW_FILE_PERMS> >(map)("newFilePerms");
         ptr_map_insert< integer_option<CURLOPT_NEW_DIRECTORY_PERMS> >(map)("newDirectoryPerms");
+        // }END DOC
       }
       return map;
     }
