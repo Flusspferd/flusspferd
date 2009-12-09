@@ -32,7 +32,7 @@
  **/
 
 /**
- * cURL.globalInit(int) -> null
+ * cURL.globalInit(int) -> undefined
  *
  * Initialise cURL. See [curl_global_init](http://curl.haxx.se/libcurl/c/curl_global_init.html).
  **/
@@ -48,42 +48,42 @@
  **/
 
 /**
- * cURL.Easy.cleanup() -> null
+ * cURL.Easy#cleanup() -> undefined
  *
  * Destroy cURL object and free resources.
  * See [curl_easy_cleanup](http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html).
  **/
 
 /**
- * cURL.Easy.perform() -> null
+ * cURL.Easy#perform() -> undefined
  *
  * Perform the file transfer. Throws an exception on error.
  * See [curl_easy_perform](http://curl.haxx.se/libcurl/c/curl_easy_perform.html).
  **/
 
 /**
- * cURL.Easy.reset() -> null
+ * cURL.Easy#reset() -> undefined
  *
  * Reset options to initial defaults.
  * See [curl_easy_reset](http://curl.haxx.se/libcurl/c/curl_easy_reset.html).
  **/
 
 /**
- * cURL.Easy.escape(String) -> String
+ * cURL.Easy#escape(String) -> String
  *
  * URL encodes the given string.
  * See [curl_easy_escape](http://curl.haxx.se/libcurl/c/curl_easy_escape.html)
  **/
 
 /**
- * cURL.Easy.unescape(String) -> String
+ * cURL.Easy#unescape(String) -> String
  *
  * URL decodes the given string.
  * See [curl_easy_unescape](http://curl.haxx.se/libcurl/c/curl_easy_unescape.html)
  **/
 
 /**
- * cURL.Easy.valid() -> bool
+ * cURL.Easy#valid() -> bool
  *
  * Returns true if the object is valid.
  * See cURL.Easy.cleanup()

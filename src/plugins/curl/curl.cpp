@@ -473,7 +473,7 @@ namespace {
         using namespace boost::assign;
         // BEGIN DOC{
         /* HEADER{
-           cURL.Easy.options -> EasyOpt
+           cURL.Easy#options -> EasyOpt
 
            The options property is used to set connection options (see curl_easy_setopt).
 
