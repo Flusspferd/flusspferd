@@ -14,6 +14,13 @@ c.options.userAgent = 'Flussperd!';
 c.options.cookie = 'flusspferd=cool';
 //c.options.interface = 'eth0';
 //c.options.localPort = 8234;
+/*
+// ssh -NfD 8080 <somehost>
+c.options.proxy = 'localhost';
+c.options.proxyPort = 8080;
+c.options.proxyType = cURL.PROXY_SOCKS5;
+c.options.noProxy = 'flusspferd.org';
+*/
 c.options.port = 80;
 c.options.url = 'http://flusspferd.org/foo.txt';
 c.options.writeFunction = function(data,size) { // size is element width not data.length! confusing? :-D

@@ -423,6 +423,11 @@ namespace {
 					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
 					("progressFunction");
         ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failOnError");
+        ptr_map_insert< string_option<CURLOPT_PROXY> >(map)("proxy");
+        ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyPort");
+        ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxyType"); // see cURL.PROXY_
+        ptr_map_insert< string_option<CURLOPT_NOPROXY> >(map)("noProxy");
+        ptr_map_insert< integer_option<CURLOPT_HTTPPROXYTUNNEL> >(map)("httpProxyTunnel");
 				ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localPort");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localPortRange");
@@ -469,5 +474,18 @@ namespace {
                          read_only_property | permanent_property);
 		load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
+    cURL.define_property("PROXY_HTTP", value(static_cast<int>(CURLPROXY_HTTP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROXY_HTTP_1_0", value(static_cast<int>(CURLPROXY_HTTP_1_0)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROXY_SOCKS4", value(static_cast<int>(CURLPROXY_SOCKS4)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROXY_SOCKS5", value(static_cast<int>(CURLPROXY_SOCKS5)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROXY_SOCKS4A", value(static_cast<int>(CURLPROXY_SOCKS4A)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROXY_SOCKS5_HOSTNAME", 
+                         value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)),
+                         read_only_property | permanent_property);
   }
 }
