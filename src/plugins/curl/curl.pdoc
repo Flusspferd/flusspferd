@@ -35,6 +35,9 @@
  * cURL.globalInit(int) -> undefined
  *
  * Initialise cURL. See [curl_global_init](http://curl.haxx.se/libcurl/c/curl_global_init.html).
+ *
+ * ## Example #
+ *       cURL.globalInit(cURL.GLOBAL_ALL);
  **/
 
 /**
