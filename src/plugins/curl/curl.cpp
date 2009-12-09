@@ -41,8 +41,6 @@ THE SOFTWARE.
 #include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/any.hpp>
 
-//#include <iostream> //DEBUG
-
 using namespace flusspferd;
 
 namespace {
@@ -428,6 +426,21 @@ namespace {
 		};
 
 		options_map_t const &get_options() {
+      /* elisp helper (+ keyboard macros):
+(defun insopt (type name)
+  (interactive "sTyp: \nsOpt: \n")
+  (if (string= (downcase type) "i")
+      (setq type "integer")
+      (if (string= (downcase type) "s")
+          (setq type "string")))
+  (setq name (replace-regexp-in-string "^CURLOPT_" "" name))
+  (insert (concat "ptr_map_insert< " type "_option<CURLOPT_" name "> >(map)(\"" (downcase name) "\");")))
+(defun insreg (begin end type)
+  (interactive "r\nsTyp: ")
+  (insopt type (buffer-substring begin end))
+  (kill-region begin end)
+  (c-indent-line-or-region))
+       */
 			static options_map_t map;
 			if(map.empty()) {
 				using namespace boost::assign;
