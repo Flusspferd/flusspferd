@@ -85,6 +85,7 @@ namespace {
       virtual function setter() const =0;
       virtual boost::any data() const =0;
       virtual CURLoption what() const =0;
+      virtual void trace(boost::any const &, flusspferd::tracer &) const { }
     };
     handle_option::~handle_option() { }
 
@@ -126,6 +127,23 @@ namespace {
     }
   protected:
     bool property_resolve(value const &id, unsigned access);
+
+    void trace(flusspferd::tracer &trc) {
+      for(data_map_t::const_iterator i = data.begin();
+          i != data.end();
+          ++i)
+      {
+        for(options_map_t::const_iterator j = get_options().begin();
+            j != get_options().end();
+            ++j)
+        {
+          if(j->second->what() == i->first) {
+            j->second->trace(i->second, trc);
+            break;
+          }
+        }
+      }
+    }
   };
 
   FLUSSPFERD_CLASS_DESCRIPTION
@@ -467,13 +485,16 @@ namespace {
     struct http_post_option : handle_option {
       static CURLoption const What;
       function getter() const {
-        return create<flusspferd::method>("$get_", &get);
+        return create<flusspferd::method>("$get_httppost", &get);
       }
       function setter() const {
-        return create<flusspferd::method>("$set_", &set);
+        return create<flusspferd::method>("$set_httppost", &set);
       }
       boost::any data() const { return object(); }
       CURLoption what() const { return What; }
+      void trace(boost::any const &data, flusspferd::tracer &trc) const {
+        trc("httppost", boost::any_cast<object>(data));
+      }
     private:
       static object get(EasyOpt *o) {
         assert(o);
