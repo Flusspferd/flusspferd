@@ -1,0 +1,36 @@
+// -*- mode: js2; -*- vim: ft=javascript
+
+/** section: Bundled Modules
+ * cURL
+ *
+ * "libcurl is a free and easy-to-use client-side URL transfer library, supporting FTP, FTPS, HTTP,
+ *  HTTPS, SCP, SFTP, TFTP, TELNET, DICT, LDAP, LDAPS and FILE. libcurl supports SSL certificates,
+ *  HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, proxies, cookies, user+password
+ *  authentication (Basic, Digest, NTLM, Negotiate, Kerberos4), file transfer resume, http proxy
+ *  tunneling and more!"
+ * [libcurl][libcurlhp]
+ * [libcurlhp]: http://curl.haxx.se/libcurl/
+ *
+ * ##### Example #
+ *
+ *     const cURL = require('curl');
+ *     
+ *     cURL.globalInit(cURL.GLOBAL_ALL);
+ *     var c = new cURL.Easy();
+ *     c.options.url = 'http://flusspferd.org/foo.txt';
+ *     c.options.writefunction = function(data,size) {
+ *       print(data.decodeToString());
+ *       return data.length;
+ *     }
+ *     c.perform();
+ **/
+
+/**
+ * class cURL.Easy
+ *
+ * Provides a synchronous and quick interface.
+ *
+ * See [cURL's easy Interface][curl_easy] if you are curious about the underlying C API.
+ *
+ * [curl_easy]: http://curl.haxx.se/libcurl/c/libcurl-easy.html
+ **/
