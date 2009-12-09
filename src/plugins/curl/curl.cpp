@@ -464,6 +464,105 @@ namespace {
       }
     };
 
+    struct http_post_option : handle_option {
+      static CURLoption const What;
+      function getter() const {
+        return create<flusspferd::method>("$get_", &get);
+      }
+      function setter() const {
+        return create<flusspferd::method>("$set_", &set);
+      }
+      boost::any data() const { return object(); }
+      CURLoption what() const { return What; }
+    private:
+      static object get(EasyOpt *o) {
+        assert(o);
+        return boost::any_cast<object>(o->data[What]);
+      }
+      static char const *get_data_ptr(value v) {
+        if(!v.is_string()) { // TODO binary stuff
+          throw flusspferd::exception("data is not a string");
+        }
+        return v.get_string().c_str();
+      }
+
+      static void add_data(std::vector<curl_forms> &forms, CURLformoption option,
+                           char const *name, object o)
+      {
+        if(o.has_property(name)) {
+          curl_forms form;
+          form.option = option;
+          form.value = get_data_ptr(o.get_property(name));
+          forms.push_back(form);
+        }
+      }
+      static void add_length(std::vector<curl_forms> &forms, CURLformoption option,
+                             char const *name, object o)
+      {
+        if(o.has_property(name)) {
+          curl_forms form;
+          form.option = option;
+          value v = o.get_property(name);
+          if(!v.is_int()) {
+            throw flusspferd::exception("data is not an int");
+          }
+          // yay curl's api is weird
+          form.value = reinterpret_cast<char const*>(v.get_int());
+          forms.push_back(form);
+        }
+      }
+      static void object2form(object o, curl_httppost *&post, curl_httppost *&last) {
+        if(!o.has_property("name")) {
+          throw flusspferd::exception("object has no `name' property");
+        }
+        std::vector<curl_forms> forms;
+        curl_forms form;
+        add_data(forms, CURLFORM_PTRCONTENTS, "contents", o);
+        add_length(forms, CURLFORM_CONTENTSLENGTH, "contentslength", o);
+        add_length(forms, CURLFORM_CONTENTSLENGTH, "contentsLength", o); // alt
+        add_data(forms, CURLFORM_FILECONTENT, "filecontent", o);
+        add_data(forms, CURLFORM_FILECONTENT, "fileContent", o); // alt
+        add_data(forms, CURLFORM_FILE, "file", o);
+        add_data(forms, CURLFORM_CONTENTTYPE, "contenttype", o);
+        add_data(forms, CURLFORM_CONTENTTYPE, "contentType", o); // alt
+        add_data(forms, CURLFORM_FILENAME, "filename", o);
+        add_data(forms, CURLFORM_FILENAME, "fileName", o); // alt
+        // TODO buffer ...
+        form.option = CURLFORM_END;
+        form.value = 0x0;
+        forms.push_back(form);
+        CURLFORMcode ret = curl_formadd(
+          &post, &last,
+          CURLFORM_PTRNAME, get_data_ptr(o.get_property("name")),
+          CURLFORM_ARRAY, &forms[0], CURLFORM_END);
+        if(ret != 0) {
+          std::stringstream sstr;
+          sstr << "curl_formadd failed! " << static_cast<unsigned>(ret);
+          throw flusspferd::exception(sstr.str());
+        }
+      }
+      static void set(EasyOpt *o, object val) {
+        assert(o);
+        o->data[What] = val;
+        curl_httppost *post = 0x0;
+        curl_httppost *last = 0x0;
+        if(val.is_array()) {
+          array const a(val);
+          for(array::iterator i = a.begin(); i != a.end(); ++i) {
+            if(!i->is_object()) {
+              throw flusspferd::exception("array member not an object");
+            }
+            object2form(i->get_object(), post, last);
+          }
+        }
+        else {
+          object2form(val, post, last);
+        }
+        o->parent.do_setopt(What, post);
+      }
+    };
+    CURLoption const http_post_option::What = CURLOPT_HTTPPOST;
+
     options_map_t const &get_options() {
       /* elisp helper (+ keyboard macros):
 (defun insopt (type name)
@@ -558,6 +657,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxredirs");
         ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // See cURL.REDIR_*
         // TODO: POST*
+        ptr_map_insert< http_post_option >(map)("httppost");
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
         ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
         // TODO: HTTPHEADER,HTTP200ALIASES
