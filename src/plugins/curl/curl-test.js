@@ -13,17 +13,17 @@ var c = new cURL.Easy();
 c.options.userAgent = 'Flussperd!';
 c.options.cookie = 'flusspferd=cool';
 //c.options.interface = 'eth0';
-//c.options.localPort = 8234;
+//c.options.localport = 8234;
 /*
 // ssh -NfD 8080 <somehost>
 c.options.proxy = 'localhost';
-c.options.proxyPort = 8080;
-c.options.proxyType = cURL.PROXY_SOCKS5;
-c.options.noProxy = 'flusspferd.org';
+c.options.proxyport = 8080;
+c.options.proxytype = cURL.PROXY_SOCKS5;
+c.options.noproxy = 'flusspferd.org';
 */
 c.options.port = 80;
 c.options.url = 'http://flusspferd.org/foo.txt';
-c.options.writeFunction = function(data,size) { // size is element width not data.length! confusing? :-D
+c.options.writefunction = function(data,size) { // size is element width not data.length! confusing? :-D
 	if(data.decodeToString() === 'foo\n') {
 		print("Ok");
 	}
@@ -33,8 +33,8 @@ c.options.writeFunction = function(data,size) { // size is element width not dat
 	}
 	return data.length; // return sth. else if error
 };
-c.options.noProgress = 0; // set to 0 or else progressFunction won't get called!
-c.options.progressFunction = function(dltotal, dlnow, ultotal, ulnow) {
+c.options.noprogress = 0; // set to 0 or else progressFunction won't get called!
+c.options.progressfunction = function(dltotal, dlnow, ultotal, ulnow) {
 	if(dltotal != 0) {
 		print("loading... " + dlnow/dltotal*100 + "%");
 	}
