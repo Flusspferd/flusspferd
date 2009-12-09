@@ -475,6 +475,19 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_HTTP_TRANSFER_DECODING> >(map)("httpTransferDecoding");
         // TFTP OPTIONS
         ptr_map_insert< integer_option<CURLOPT_TFTP_BLKSIZE> >(map)("tftpBlksize");
+
+        // FTP OPTIONS
+        ptr_map_insert< string_option<CURLOPT_FTPPORT> >(map)("ftpPort");
+        // TODO: CURLOPT_QUOTE, CURLOPT_POSTQUOTE, CURLOPT_PREQUOTE
+        ptr_map_insert< integer_option<CURLOPT_DIRLISTONLY> >(map)("dirListOnly");
+        ptr_map_insert< integer_option<CURLOPT_APPEND> >(map)("append");
+        ptr_map_insert< integer_option<CURLOPT_FTP_USE_EPRT> >(map)("ftpUseEprt");
+        ptr_map_insert< integer_option<CURLOPT_FTP_USE_EPSV> >(map)("ftpUseEpsv");
+        ptr_map_insert< integer_option<CURLOPT_FTP_CREATE_MISSING_DIRS> >(map)("ftpCreateMissingDirs");
+        ptr_map_insert< integer_option<CURLOPT_FTP_RESPONSE_TIMEOUT> >(map)("ftpResponseTimeout");
+        ptr_map_insert< string_option<CURLOPT_FTP_ALTERNATIVE_TO_USER> >(map)("ftpAltnerativeToUser");
+        ptr_map_insert< integer_option<CURLOPT_FTP_SKIP_PASV_IP> >(map)("ftpSkipPasvIp");
+        
 			}
 			return map;
 		}
