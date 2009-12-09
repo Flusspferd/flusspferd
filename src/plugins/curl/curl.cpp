@@ -183,11 +183,34 @@ namespace {
 			}
 		}
 
+		object progressfunction_callback;
+		static int progressfunction(
+      void *clientp,
+			double dltotal, double dlnow,
+			double ultotal, double ulnow)
+		{
+			assert(clientp);
+			Easy &self = *reinterpret_cast<Easy*>(clientp);
+			if(self.progressfunction_callback.is_null()) {
+				return 0;
+			}
+			else {
+				arguments arg;
+				arg.push_back(value(dltotal));
+				arg.push_back(value(dlnow));
+				arg.push_back(value(ultotal));
+				arg.push_back(value(ulnow));
+				value v = self.progressfunction_callback.call(arg);
+				return v.to_number();
+			}
+		}
+
 	protected:
 		void trace(flusspferd::tracer &trc) {
 			trc("options", opt);
 			trc("writeFunction", writefunction_callback);
 			trc("readFunction", readfunction_callback);
+			trc("progressFunction", progressfunction_callback);
 		}
 
   public:
@@ -342,6 +365,11 @@ namespace {
 			typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
 			static type get() { return &Easy::readfunction; }
 		};
+		template<>
+		struct map_to_callback<CURLOPT_PROGRESSFUNCTION> {
+			typedef curl_progress_callback type;
+			static type get() { return &Easy::progressfunction; }
+		};
 
 		template<CURLoption What, CURLoption WhatData,
 						 object (Easy::*Obj)>
@@ -391,6 +419,9 @@ namespace {
 				ptr_map_insert< function_option<CURLOPT_READFUNCTION,
 					CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
 					("readFunction");
+				ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
+					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
+					("progressFunction");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
 			}
 			return map;
