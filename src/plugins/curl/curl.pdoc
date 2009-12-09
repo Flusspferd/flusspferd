@@ -86,5 +86,5 @@
  * cURL.Easy#valid() -> bool
  *
  * Returns true if the object is valid.
- * See cURL.Easy.cleanup()
+ * See [[cURL.Easy#cleanup]].
  **/
