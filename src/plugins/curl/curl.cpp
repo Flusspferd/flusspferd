@@ -427,6 +427,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localPortRange");
 				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
+        ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
 				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
 				ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
