@@ -551,6 +551,27 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_CONNECTTIMEOUT_MS> >(map)("connecttimeoutMS");
         ptr_map_insert< integer_option<CURLOPT_IPRESOLVE> >(map)("ipresolve"); // see cURL.IPRESOLVE_*
         ptr_map_insert< integer_option<CURLOPT_CONNECT_ONLY> >(map)("connectOnly");
+        // SSL and SECURITY OPTIONS
+        ptr_map_insert< string_option<CURLOPT_SSLCERT> >(map)("sslcert");
+        ptr_map_insert< string_option<CURLOPT_SSLCERTTYPE> >(map)("sslcerttype");
+        ptr_map_insert< string_option<CURLOPT_SSLKEY> >(map)("sslkey");
+        ptr_map_insert< string_option<CURLOPT_SSLKEYTYPE> >(map)("sslkeytype");
+        ptr_map_insert< string_option<CURLOPT_KEYPASSWD> >(map)("keypasswd");
+        ptr_map_insert< string_option<CURLOPT_SSLENGINE> >(map)("sslengine");
+        ptr_map_insert< string_option<CURLOPT_SSLENGINE_DEFAULT> >(map)("sslengineDefault");
+        ptr_map_insert< integer_option<CURLOPT_SSLVERSION> >(map)("sslversion"); // see cURL.SSLVERSION_*
+        ptr_map_insert< integer_option<CURLOPT_SSL_VERIFYPEER> >(map)("sslVerifypeer");
+        ptr_map_insert< string_option<CURLOPT_CAINFO> >(map)("cainfo");
+        ptr_map_insert< string_option<CURLOPT_ISSUERCERT> >(map)("issuercert");
+        ptr_map_insert< string_option<CURLOPT_CAPATH> >(map)("capath");
+        ptr_map_insert< string_option<CURLOPT_CRLFILE> >(map)("crlfile");
+        ptr_map_insert< integer_option<CURLOPT_CERTINFO> >(map)("certinfo");
+        ptr_map_insert< string_option<CURLOPT_RANDOM_FILE> >(map)("randomFile");
+        ptr_map_insert< string_option<CURLOPT_EGDSOCKET> >(map)("egdsocket");
+        ptr_map_insert< integer_option<CURLOPT_SSL_VERIFYHOST> >(map)("sslVerifyhost");
+        ptr_map_insert< string_option<CURLOPT_SSL_CIPHER_LIST> >(map)("sslCipherList");
+        ptr_map_insert< integer_option<CURLOPT_SSL_SESSIONID_CACHE> >(map)("sslSessionidCache");
+        ptr_map_insert< string_option<CURLOPT_KRBLEVEL> >(map)("krblevel");
         // SSH OPTIONS
         ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // see cURL.SSH_AUTH*
         ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMD5");
@@ -710,12 +731,20 @@ namespace {
                          read_only_property | permanent_property);
     cURL.define_property("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)),
                          read_only_property | permanent_property);
-    cURL.define_property("CURL_IPRESOLVE_WHATEVER",
+    cURL.define_property("IPRESOLVE_WHATEVER",
                          value(static_cast<int>(CURL_IPRESOLVE_WHATEVER)),
                          read_only_property | permanent_property);
-    cURL.define_property("CURL_IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)),
+    cURL.define_property("IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)),
                          read_only_property | permanent_property);
-    cURL.define_property("CURL_IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)),
+    cURL.define_property("IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)),
+                         read_only_property | permanent_property);
+    cURL.define_property("SSLVERSION_DEFAULT", value(static_cast<int>(CURL_SSLVERSION_DEFAULT)),
+                         read_only_property | permanent_property);
+    cURL.define_property("SSLVERSION_TLSv1", value(static_cast<int>(CURL_SSLVERSION_TLSv1)),
+                         read_only_property | permanent_property);
+    cURL.define_property("SSLVERSION_SSLv2", value(static_cast<int>(CURL_SSLVERSION_SSLv2)),
+                         read_only_property | permanent_property);
+    cURL.define_property("SSLVERSION_SSLv3", value(static_cast<int>(CURL_SSLVERSION_SSLv3)),
                          read_only_property | permanent_property);
   }
 }
