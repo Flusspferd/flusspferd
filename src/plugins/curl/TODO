@@ -103,8 +103,6 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 * CURLOPT_SSH_KEYDATA
 * CURLOPT_PRIVATE
 * CURLOPT_SHARE
-* CURLOPT_NEW_FILE_PERMS
-* CURLOPT_NEW_DIRECTORY_PERMS
 * CURLOPT_TELNETOPTIONS
 
 and more :-)
