@@ -520,6 +520,11 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_FTP_RESPONSE_TIMEOUT> >(map)("ftpResponseTimeout");
         ptr_map_insert< string_option<CURLOPT_FTP_ALTERNATIVE_TO_USER> >(map)("ftpAltnerativeToUser");
         ptr_map_insert< integer_option<CURLOPT_FTP_SKIP_PASV_IP> >(map)("ftpSkipPasvIp");
+        ptr_map_insert< integer_option<CURLOPT_USE_SSL> >(map)("useSSL");
+        ptr_map_insert< integer_option<CURLOPT_FTPSSLAUTH> >(map)("ftpSSLAuth");
+        ptr_map_insert< integer_option<CURLOPT_FTP_SSL_CCC> >(map)("ftpSSLccc");
+        ptr_map_insert< string_option<CURLOPT_FTP_ACCOUNT> >(map)("ftpAccount");
+        ptr_map_insert< integer_option<CURLOPT_FTP_FILEMETHOD> >(map)("ftpFilemethod");
         // SSH OPTIONS
         ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // see cURL.SSH_AUTH*
         ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMD5");
@@ -652,6 +657,32 @@ namespace {
     cURL.define_property("HTTP_VERSION_1_0", value(static_cast<int>(CURL_HTTP_VERSION_1_0)),
                          read_only_property | permanent_property);
     cURL.define_property("HTTP_VERSION_1_1", value(static_cast<int>(CURL_HTTP_VERSION_1_1)),
+                         read_only_property | permanent_property);
+    cURL.define_property("USESSL_NONE", value(static_cast<int>(CURLUSESSL_NONE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("USESSL_TRY", value(static_cast<int>(CURLUSESSL_TRY)),
+                         read_only_property | permanent_property);
+    cURL.define_property("USESSL_CONTROL", value(static_cast<int>(CURLUSESSL_CONTROL)),
+                         read_only_property | permanent_property);
+    cURL.define_property("USESSL_ALL", value(static_cast<int>(CURLUSESSL_ALL)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPAUTH_DEFAULT", value(static_cast<int>(CURLFTPAUTH_DEFAULT)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPAUTH_SSL", value(static_cast<int>(CURLFTPAUTH_SSL)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPAUTH_TLS", value(static_cast<int>(CURLFTPAUTH_TLS)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPSSL_CCC_NONE", value(static_cast<int>(CURLFTPSSL_CCC_NONE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPSSL_CCC_PASSIVE", value(static_cast<int>(CURLFTPSSL_CCC_PASSIVE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPSSL_CCC_ACTIVE", value(static_cast<int>(CURLFTPSSL_CCC_ACTIVE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPMETHOD_MULTICWD", value(static_cast<int>(CURLFTPMETHOD_MULTICWD)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPMETHOD_NOCWD", value(static_cast<int>(CURLFTPMETHOD_NOCWD)),
+                         read_only_property | permanent_property);
+    cURL.define_property("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)),
                          read_only_property | permanent_property);
   }
 }
