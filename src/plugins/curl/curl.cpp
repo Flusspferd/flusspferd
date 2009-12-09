@@ -565,6 +565,16 @@ namespace {
                          read_only_property | permanent_property);
 		load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
+    cURL.define_property("INFO_TEXT", value(static_cast<int>(CURLINFO_TEXT)),
+                         read_only_property | permanent_property);
+    cURL.define_property("INFO_HEADER_IN", value(static_cast<int>(CURLINFO_HEADER_IN)),
+                         read_only_property | permanent_property);
+    cURL.define_property("INFO_HEADER_OUT", value(static_cast<int>(CURLINFO_HEADER_OUT)),
+                         read_only_property | permanent_property);
+    cURL.define_property("INFO_DATA_IN", value(static_cast<int>(CURLINFO_DATA_IN)),
+                         read_only_property | permanent_property);
+    cURL.define_property("INFO_DATA_OUT", value(static_cast<int>(CURLINFO_DATA_OUT)),
+                         read_only_property | permanent_property);
     cURL.define_property("PROXY_HTTP", value(static_cast<int>(CURLPROXY_HTTP)),
                          read_only_property | permanent_property);
     cURL.define_property("PROXY_HTTP_1_0", value(static_cast<int>(CURLPROXY_HTTP_1_0)),
