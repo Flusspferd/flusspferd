@@ -298,6 +298,7 @@ namespace {
 
     void reset() {
       curl_easy_reset(get());
+      // TODO clear EasyOpt
     }
 
     std::string unescape(char const *input) {

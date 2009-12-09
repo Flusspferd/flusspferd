@@ -14,7 +14,7 @@
  * ##### Example #
  *
  *     const cURL = require('curl');
- *     
+ *
  *     cURL.globalInit(cURL.GLOBAL_ALL);
  *     var c = new cURL.Easy();
  *     c.options.url = 'http://flusspferd.org/foo.txt';
@@ -26,6 +26,18 @@
  **/
 
 /**
+ * cURL.version -> String
+ *
+ * Version of libcurl. See [curl_version](http://curl.haxx.se/libcurl/c/curl_version.html).
+ **/
+
+/**
+ * cURL.globalInit(int) -> null
+ *
+ * Initialise cURL. See [curl_global_init](http://curl.haxx.se/libcurl/c/curl_global_init.html).
+ **/
+
+/**
  * class cURL.Easy
  *
  * Provides a synchronous and quick interface.
@@ -33,4 +45,46 @@
  * See [cURL's easy Interface][curl_easy] if you are curious about the underlying C API.
  *
  * [curl_easy]: http://curl.haxx.se/libcurl/c/libcurl-easy.html
+ **/
+
+/**
+ * cURL.Easy.cleanup() -> null
+ *
+ * Destroy cURL object and free resources.
+ * See [curl_easy_cleanup](http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html).
+ **/
+
+/**
+ * cURL.Easy.perform() -> null
+ *
+ * Perform the file transfer. Throws an exception on error.
+ * See [curl_easy_perform](http://curl.haxx.se/libcurl/c/curl_easy_perform.html).
+ **/
+
+/**
+ * cURL.Easy.reset() -> null
+ *
+ * Reset options to initial defaults.
+ * See [curl_easy_reset](http://curl.haxx.se/libcurl/c/curl_easy_reset.html).
+ **/
+
+/**
+ * cURL.Easy.escape(String) -> String
+ *
+ * URL encodes the given string.
+ * See [curl_easy_escape](http://curl.haxx.se/libcurl/c/curl_easy_escape.html)
+ **/
+
+/**
+ * cURL.Easy.unescape(String) -> String
+ *
+ * URL decodes the given string.
+ * See [curl_easy_unescape](http://curl.haxx.se/libcurl/c/curl_easy_unescape.html)
+ **/
+
+/**
+ * cURL.Easy.valid() -> bool
+ *
+ * Returns true if the object is valid.
+ * See cURL.Easy.cleanup()
  **/

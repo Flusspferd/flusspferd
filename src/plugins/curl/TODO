@@ -41,5 +41,8 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 * CURLOPT_SHARE
 * CURLOPT_TELNETOPTIONS
 
+Functions:
+* curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html
+
 and more :-)
 ...
