@@ -471,6 +471,12 @@ namespace {
       if(map.empty()) {
         using namespace boost::assign;
         // BEGIN DOC{
+        /* HEADER{
+           cURL.Easy.options -> EasyOpt
+
+           Set connection options (see curl_easy_setopt).
+           }HEADER
+         */
         // BEHAVIOR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)("verbose");
         ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)("header");
