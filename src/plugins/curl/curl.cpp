@@ -425,6 +425,7 @@ namespace {
 				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)
 					("port");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
+				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
 			}
 			return map;
 		}
