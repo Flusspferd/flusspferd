@@ -667,7 +667,7 @@ namespace {
     load_class<Easy>(cURL);
 
     cURL.define_properties(read_only_property | permanent_property)
-        ("version", value(curl_version()))
+        ("version", string(curl_version()))
         ("GLOBAL_ALL", value(CURL_GLOBAL_ALL))
         ("GLOBAL_SSL", value(CURL_GLOBAL_SSL))
         ("GLOBAL_WIN32", value(CURL_GLOBAL_WIN32))
