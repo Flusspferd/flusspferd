@@ -10,6 +10,7 @@
 const cURL = require('curl');
 
 var c = new cURL.Easy();
+c.options.port = 80;
 c.options.url = 'http://flusspferd.org/foo.txt';
 c.options.writeFunction = function(data,size) { // size is element width not data.length! confusing? :-D
 	if(data.decodeToString() === 'foo\n') {
