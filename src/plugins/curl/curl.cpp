@@ -453,19 +453,19 @@ namespace {
 
     options_map_t const &get_options() {
       /* elisp helper (+ keyboard macros):
-         (defun insopt (type name)
-         (interactive "sTyp: \nsOpt: \n")
-         (if (string= (downcase type) "i")
-         (setq type "integer")
-         (if (string= (downcase type) "s")
-         (setq type "string")))
-         (setq name (replace-regexp-in-string "^CURLOPT_" "" name))
-         (insert (concat "ptr_map_insert< " type "_option<CURLOPT_" name "> >(map)(\"" (downcase name) "\");")))
-         (defun insreg (begin end type)
-         (interactive "r\nsTyp: ")
-         (insopt type (buffer-substring begin end))
-         (kill-region begin end)
-         (c-indent-line-or-region))
+(defun insopt (type name)
+  (interactive "sTyp: \nsOpt: \n")
+  (if (string= (downcase type) "i")
+      (setq type "integer")
+      (if (string= (downcase type) "s")
+          (setq type "string")))
+  (setq name (replace-regexp-in-string "^CURLOPT_" "" name))
+  (insert (concat "ptr_map_insert< " type "_option<CURLOPT_" name "> >(map)(\"" (downcase name) "\");")))
+(defun insreg (begin end type)
+  (interactive "r\nsTyp: ")
+  (insopt type (buffer-substring begin end))
+  (kill-region begin end)
+  (c-indent-line-or-region))
       */
       static options_map_t map;
       if(map.empty()) {
@@ -509,6 +509,7 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localportrange");
         ptr_map_insert< integer_option<CURLOPT_DNS_CACHE_TIMEOUT> >(map)("dnsCacheTimeout");
         ptr_map_insert< integer_option<CURLOPT_DNS_USE_GLOBAL_CACHE> >(map)("dnsUseGlobalCache");
+        ptr_map_insert< integer_option<CURLOPT_BUFFERSIZE> >(map)("buffersize");
         ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
@@ -530,10 +531,10 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_UNRESTRICTED_AUTH> >(map)("unrestrictedAuth");
         ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxredirs");
         ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // see cURL.REDIR_*
-        // TODO POST*
+        // TODO: POST*
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
         ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
-        // TODO HTTPHEADER,HTTP200ALIASES
+        // TODO: HTTPHEADER,HTTP200ALIASES
         ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
         ptr_map_insert< string_option<CURLOPT_COOKIEFILE> >(map)("cookieFile");
         ptr_map_insert< string_option<CURLOPT_COOKIEJAR> >(map)("cookiejar");
