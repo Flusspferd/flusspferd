@@ -539,6 +539,18 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_MAXFILESIZE> >(map)("maxfilesize");
         ptr_map_insert< integer_option<CURLOPT_TIMECONDITION> >(map)("timecondition");
         ptr_map_insert< integer_option<CURLOPT_TIMEVALUE> >(map)("timevalue");
+        // CONNECTION OPTIONS
+        ptr_map_insert< integer_option<CURLOPT_TIMEOUT> >(map)("timeout");
+        ptr_map_insert< integer_option<CURLOPT_TIMEOUT_MS> >(map)("timeoutMS");
+        ptr_map_insert< integer_option<CURLOPT_LOW_SPEED_LIMIT> >(map)("lowSpeedLimit");
+        ptr_map_insert< integer_option<CURLOPT_LOW_SPEED_TIME> >(map)("lowSpeedTime");
+        ptr_map_insert< integer_option<CURLOPT_MAXCONNECTS> >(map)("maxconnects");
+        ptr_map_insert< integer_option<CURLOPT_FRESH_CONNECT> >(map)("freshConnect");
+        ptr_map_insert< integer_option<CURLOPT_FORBID_REUSE> >(map)("forbidReuse");
+        ptr_map_insert< integer_option<CURLOPT_CONNECTTIMEOUT> >(map)("connecttimeout");
+        ptr_map_insert< integer_option<CURLOPT_CONNECTTIMEOUT_MS> >(map)("connecttimeoutMS");
+        ptr_map_insert< integer_option<CURLOPT_IPRESOLVE> >(map)("ipresolve"); // see cURL.IPRESOLVE_*
+        ptr_map_insert< integer_option<CURLOPT_CONNECT_ONLY> >(map)("connectOnly");
         // SSH OPTIONS
         ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // see cURL.SSH_AUTH*
         ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMD5");
@@ -697,6 +709,13 @@ namespace {
     cURL.define_property("FTPMETHOD_NOCWD", value(static_cast<int>(CURLFTPMETHOD_NOCWD)),
                          read_only_property | permanent_property);
     cURL.define_property("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)),
+                         read_only_property | permanent_property);
+    cURL.define_property("CURL_IPRESOLVE_WHATEVER",
+                         value(static_cast<int>(CURL_IPRESOLVE_WHATEVER)),
+                         read_only_property | permanent_property);
+    cURL.define_property("CURL_IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)),
+                         read_only_property | permanent_property);
+    cURL.define_property("CURL_IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)),
                          read_only_property | permanent_property);
   }
 }
