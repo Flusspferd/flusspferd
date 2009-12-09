@@ -456,6 +456,8 @@ namespace {
         // ERROR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failOnError");
         // NETWORK OPTIONS
+        ptr_map_insert< integer_option<CURLOPT_PROTOCOLS> >(map)("protocols");
+        ptr_map_insert< integer_option<CURLOPT_REDIR_PROTOCOLS> >(map)("redirProtocols");
         ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
         ptr_map_insert< string_option<CURLOPT_PROXY> >(map)("proxy");
         ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyPort");
@@ -565,6 +567,32 @@ namespace {
                          read_only_property | permanent_property);
 		load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
+    cURL.define_property("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_HTTPS", value(static_cast<int>(CURLPROTO_HTTPS)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_FTP", value(static_cast<int>(CURLPROTO_FTP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_FTPS", value(static_cast<int>(CURLPROTO_FTPS)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_SCP", value(static_cast<int>(CURLPROTO_SCP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_SFTP", value(static_cast<int>(CURLPROTO_SFTP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_TELNET", value(static_cast<int>(CURLPROTO_TELNET)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_LDAP", value(static_cast<int>(CURLPROTO_LDAP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_LDAPS", value(static_cast<int>(CURLPROTO_LDAPS)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_DICT", value(static_cast<int>(CURLPROTO_DICT)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_FILE", value(static_cast<int>(CURLPROTO_FILE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_TFTP", value(static_cast<int>(CURLPROTO_TFTP)),
+                         read_only_property | permanent_property);
+    cURL.define_property("PROTO_ALL", value(static_cast<int>(CURLPROTO_ALL)),
+                         read_only_property | permanent_property);
     cURL.define_property("INFO_TEXT", value(static_cast<int>(CURLINFO_TEXT)),
                          read_only_property | permanent_property);
     cURL.define_property("INFO_HEADER_IN", value(static_cast<int>(CURLINFO_HEADER_IN)),
