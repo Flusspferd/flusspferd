@@ -433,6 +433,8 @@ namespace {
 				ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localPort");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localPortRange");
+        ptr_map_insert< integer_option<CURLOPT_DNS_CACHE_TIMEOUT> >(map)("dnsCacheTimeout");
+        ptr_map_insert< integer_option<CURLOPT_DNS_USE_GLOBAL_CACHE> >(map)("dnsUseGlobalCache");
 				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
