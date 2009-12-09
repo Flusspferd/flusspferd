@@ -1,27 +1,27 @@
 // -*- mode:c++;coding:utf-8; -*- vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:enc=utf-8:
 /*
-The MIT License
+  The MIT License
 
-Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
-                                       http://flusspferd.org/contributors.txt)
+  Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+  http://flusspferd.org/contributors.txt)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
 */
 
 #include "flusspferd/create.hpp"
@@ -44,77 +44,77 @@ THE SOFTWARE.
 using namespace flusspferd;
 
 namespace {
-	namespace bf = boost::fusion;
+  namespace bf = boost::fusion;
 
-	typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
+  typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
 
-	struct exception
-		: flusspferd::exception
-	{
-		exception(std::string const &what)
-			: std::runtime_error(what), flusspferd::exception(what)
-		{ }
+  struct exception
+    : flusspferd::exception
+  {
+    exception(std::string const &what)
+      : std::runtime_error(what), flusspferd::exception(what)
+    { }
 
-		char const *what() const throw() {
-			if(CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
-				std::string what_ = flusspferd::exception::what();
-				what_ += ": ";
-				what_ += curl_easy_strerror(*code);
-				return what_.c_str();
-			}
-			else {
-				return flusspferd::exception::what();
-			}
-		}
-	};
+    char const *what() const throw() {
+      if(CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
+        std::string what_ = flusspferd::exception::what();
+        what_ += ": ";
+        what_ += curl_easy_strerror(*code);
+        return what_.c_str();
+      }
+      else {
+        return flusspferd::exception::what();
+      }
+    }
+  };
 
   void global_init(long flags) {
     CURLcode ret = curl_global_init(flags);
-		if(ret != 0) {
-			throw flusspferd::exception(std::string("curl_global_init: ")
-																	+ curl_easy_strerror(ret));
-		}
+    if(ret != 0) {
+      throw flusspferd::exception(std::string("curl_global_init: ")
+                                  + curl_easy_strerror(ret));
+    }
   }
 
-	class Easy;
+  class Easy;
 
-	namespace {
-		struct handle_option {
-			virtual ~handle_option() =0;
-			virtual function getter() const =0;
-			virtual function setter() const =0;
-			virtual boost::any data() const =0;
-			virtual CURLoption what() const =0;
-		};
-		handle_option::~handle_option() { }
+  namespace {
+    struct handle_option {
+      virtual ~handle_option() =0;
+      virtual function getter() const =0;
+      virtual function setter() const =0;
+      virtual boost::any data() const =0;
+      virtual CURLoption what() const =0;
+    };
+    handle_option::~handle_option() { }
 
-		typedef boost::ptr_unordered_map<std::string, handle_option> options_map_t;
-		options_map_t const &get_options();
-	}
+    typedef boost::ptr_unordered_map<std::string, handle_option> options_map_t;
+    options_map_t const &get_options();
+  }
 
-	FLUSSPFERD_CLASS_DESCRIPTION
-	(
-	 EasyOpt,
-	 (constructor_name, "EasyOpt")
-	 (full_name, "cURL.Easy.EasyOpt")
-	 (constructible, false)
-	 )
-	{
-	public: // TODO
-		typedef boost::unordered_map<CURLoption, boost::any> data_map_t;
-		data_map_t data;
-		Easy &parent;
-	public:
-		EasyOpt(flusspferd::object const &self, Easy &parent)
-			: base_type(self), parent(parent)
-		{	}
+  FLUSSPFERD_CLASS_DESCRIPTION
+  (
+   EasyOpt,
+   (constructor_name, "EasyOpt")
+   (full_name, "cURL.Easy.EasyOpt")
+   (constructible, false)
+   )
+  {
+  public: // TODO
+    typedef boost::unordered_map<CURLoption, boost::any> data_map_t;
+    data_map_t data;
+    Easy &parent;
+  public:
+    EasyOpt(flusspferd::object const &self, Easy &parent)
+      : base_type(self), parent(parent)
+    {	}
 
-		static EasyOpt &create(Easy &p) {
-			return flusspferd::create<EasyOpt>(bf::make_vector(boost::ref(p)));
-		}
-	protected:
-		bool property_resolve(value const &id, unsigned access);
-	};
+    static EasyOpt &create(Easy &p) {
+      return flusspferd::create<EasyOpt>(bf::make_vector(boost::ref(p)));
+    }
+  protected:
+    bool property_resolve(value const &id, unsigned access);
+  };
 
   FLUSSPFERD_CLASS_DESCRIPTION
   (
@@ -128,89 +128,109 @@ namespace {
     ("escape",   bind, escape)
     ("unescape", bind, unescape)
     ("valid",    bind, valid))
-	 (properties,
-		("options", getter, get_opt))
+   (properties,
+    ("options", getter, get_opt))
    )
   {
     CURL *handle;
-		EasyOpt &opt;
+    EasyOpt &opt;
 
-	public: // TODO
-		object writefunction_callback;
-		static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
-			assert(stream);
-			Easy &self = *reinterpret_cast<Easy*>(stream);
-			if(self.writefunction_callback.is_null()) {
-				return 0;
-			}
-			else {
-				byte_array &data = flusspferd::create<byte_array>(
-  				bf::make_vector(reinterpret_cast<byte_array::element_type*>(ptr),
-													size*nmemb));
-				root_object d(data);
-				arguments arg;
-				arg.push_back(value(data));
-				arg.push_back(value(size));
-				value v = self.writefunction_callback.call(arg);
-				return v.to_number();
-			}
-		}
+  public: // TODO
+    object writefunction_callback;
+    static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
+      assert(stream);
+      Easy &self = *reinterpret_cast<Easy*>(stream);
+      if(self.writefunction_callback.is_null()) {
+        return 0;
+      }
+      else {
+        byte_array &data = flusspferd::create<byte_array>(
+          bf::make_vector(reinterpret_cast<byte_array::element_type*>(ptr),
+                          size*nmemb));
+        root_object d(data);
+        arguments arg;
+        arg.push_back(value(data));
+        arg.push_back(value(size));
+        value v = self.writefunction_callback.call(arg);
+        return v.to_number();
+      }
+    }
 
-		object readfunction_callback;
-		static size_t readfunction(void *ptr, size_t size, size_t nmemb, void *stream) {
-			assert(stream);
-			Easy &self = *reinterpret_cast<Easy*>(stream);
-			if(self.readfunction_callback.is_null()) {
-				return CURL_READFUNC_ABORT;
-			}
-			else {
-				byte_array &data = flusspferd::create<byte_array>(
+    object readfunction_callback;
+    static size_t readfunction(void *ptr, size_t size, size_t nmemb, void *stream) {
+      assert(stream);
+      Easy &self = *reinterpret_cast<Easy*>(stream);
+      if(self.readfunction_callback.is_null()) {
+        return CURL_READFUNC_ABORT;
+      }
+      else {
+        byte_array &data = flusspferd::create<byte_array>(
           bf::vector2<binary::element_type*, std::size_t>(0x0, 0));
-				root_object d(data);
-				arguments arg;
-				arg.push_back(value(data));
-				arg.push_back(value(size));
-				arg.push_back(value(nmemb));
-				value v = self.readfunction_callback.call(arg);
-				if(data.get_length() > size*nmemb) {
-					throw flusspferd::exception("Out of Range");
-				}
-				std::copy(data.get_data().begin(), data.get_data().end(),
-									static_cast<binary::element_type*>(ptr));
-				return v.to_number();
-			}
-		}
+        root_object d(data);
+        arguments arg;
+        arg.push_back(value(data));
+        arg.push_back(value(size));
+        arg.push_back(value(nmemb));
+        value v = self.readfunction_callback.call(arg);
+        if(data.get_length() > size*nmemb) {
+          throw flusspferd::exception("Out of Range");
+        }
+        std::copy(data.get_data().begin(), data.get_data().end(),
+                  static_cast<binary::element_type*>(ptr));
+        return v.to_number();
+      }
+    }
 
-		object progressfunction_callback;
-		static int progressfunction(
+    object headerfunction_callback;
+    static size_t headerfunction(void *ptr, size_t size, size_t nmemb, void *stream) {
+      assert(stream);
+      Easy &self = *reinterpret_cast<Easy*>(stream);
+      if(self.headerfunction_callback.is_null()) {
+        return 0;
+      }
+      else {
+        byte_array &data = flusspferd::create<byte_array>(
+          bf::make_vector(reinterpret_cast<byte_array::element_type*>(ptr),
+                          size*nmemb));
+        root_object d(data);
+        arguments arg;
+        arg.push_back(value(data));
+        arg.push_back(value(size));
+        value v = self.headerfunction_callback.call(arg);
+        return v.to_number();
+      }
+    }
+
+    object progressfunction_callback;
+    static int progressfunction(
       void *clientp,
-			double dltotal, double dlnow,
-			double ultotal, double ulnow)
-		{
-			assert(clientp);
-			Easy &self = *reinterpret_cast<Easy*>(clientp);
-			if(self.progressfunction_callback.is_null()) {
-				return 0;
-			}
-			else {
-				arguments arg;
-				arg.push_back(value(dltotal));
-				arg.push_back(value(dlnow));
-				arg.push_back(value(ultotal));
-				arg.push_back(value(ulnow));
-				value v = self.progressfunction_callback.call(arg);
-				return v.to_number();
-			}
-		}
+      double dltotal, double dlnow,
+      double ultotal, double ulnow)
+    {
+      assert(clientp);
+      Easy &self = *reinterpret_cast<Easy*>(clientp);
+      if(self.progressfunction_callback.is_null()) {
+        return 0;
+      }
+      else {
+        arguments arg;
+        arg.push_back(value(dltotal));
+        arg.push_back(value(dlnow));
+        arg.push_back(value(ultotal));
+        arg.push_back(value(ulnow));
+        value v = self.progressfunction_callback.call(arg);
+        return v.to_number();
+      }
+    }
 
     object debugfunction_callback;
     static int debugfunction(CURL *hnd, curl_infotype i, char *buf, size_t len, void *p) {
       assert(p);
       Easy &self = *reinterpret_cast<Easy*>(p);
       if(self.progressfunction_callback.is_null() || hnd != self.handle) {
-				return 0;
-			}
-			else {
+        return 0;
+      }
+      else {
         arguments arg;
         byte_array &data = flusspferd::create<byte_array>(
           bf::vector2<binary::element_type*, std::size_t>(
@@ -223,14 +243,15 @@ namespace {
       }
     }
 
-	protected:
-		void trace(flusspferd::tracer &trc) {
-			trc("options", opt);
-			trc("writeFunction", writefunction_callback);
-			trc("readFunction", readfunction_callback);
-			trc("progressFunction", progressfunction_callback);
+  protected:
+    void trace(flusspferd::tracer &trc) {
+      trc("options", opt);
+      trc("writeFunction", writefunction_callback);
+      trc("readFunction", readfunction_callback);
+      trc("progressFunction", progressfunction_callback);
+      trc("headerFunction", headerfunction_callback);
       trc("debugFunction", debugfunction_callback);
-		}
+    }
 
   public:
     CURL *data() { return handle; }
@@ -241,23 +262,23 @@ namespace {
       }
       return handle;
     }
-		EasyOpt &get_opt() {
-			return opt;
-		}
+    EasyOpt &get_opt() {
+      return opt;
+    }
 
     Easy(flusspferd::object const &self, flusspferd::call_context&)
       : base_type(self), handle(curl_easy_init()), opt(EasyOpt::create(*this))
-    {
-      if(!handle) {
-        throw flusspferd::exception("curl_easy_init");
+      {
+        if(!handle) {
+          throw flusspferd::exception("curl_easy_init");
+        }
       }
-    }
 
     Easy(flusspferd::object const &self, CURL *hnd)
       : base_type(self), handle(hnd), opt(EasyOpt::create(*this))
-    {
-      assert(handle);
-    }
+      {
+        assert(handle);
+      }
 
     void cleanup() {
       if(handle) {
@@ -268,11 +289,11 @@ namespace {
     ~Easy() { cleanup(); }
 
     void perform() {
-			CURLcode res = curl_easy_perform(get());
-			if(res != 0) {
-				throw flusspferd::exception(std::string("curl_easy_perform: ") +
-																		curl_easy_strerror(res));
-			}
+      CURLcode res = curl_easy_perform(get());
+      if(res != 0) {
+        throw flusspferd::exception(std::string("curl_easy_perform: ") +
+                                    curl_easy_strerror(res));
+      }
     }
 
     void reset() {
@@ -304,15 +325,15 @@ namespace {
       return flusspferd::create<Easy>(bf::make_vector(hnd));
     }
 
-		//private:
-		template<typename T>
-		void do_setopt(CURLoption what, T data) {
-			CURLcode res = curl_easy_setopt(get(), what, data);
-			if(res != 0) {
-				throw flusspferd::exception(std::string("curl_easy_setopt: ") +
-																		curl_easy_strerror(res));
-			}
-		}
+    //private:
+    template<typename T>
+      void do_setopt(CURLoption what, T data) {
+      CURLcode res = curl_easy_setopt(get(), what, data);
+      if(res != 0) {
+        throw flusspferd::exception(std::string("curl_easy_setopt: ") +
+                                    curl_easy_strerror(res));
+      }
+    }
   };
   Easy &wrap(CURL *hnd) {
     return Easy::create(hnd);
@@ -321,147 +342,155 @@ namespace {
     return c.data();
   }
 
-	namespace {
-		template<CURLoption What>
-		struct integer_option : handle_option {
-			function getter() const {
-				return create<flusspferd::method>("$get_", &get);
-			}
-			function setter() const {
-				return create<flusspferd::method>("$set_", &set);
-			}
-			boost::any data() const { return 0l; }
-			CURLoption what() const { return What; }
-  	private:
-			static long get(EasyOpt *o) {
-				assert(o);
-				return boost::any_cast<long>(o->data[What]);
-			}
-			static void set(EasyOpt *o, long opt) {
-				assert(o);
-				o->data[What] = opt;
-				o->parent.do_setopt(What, opt);
-			}
-		};
+  namespace {
+    template<CURLoption What>
+    struct integer_option : handle_option {
+      function getter() const {
+        return create<flusspferd::method>("$get_", &get);
+      }
+      function setter() const {
+        return create<flusspferd::method>("$set_", &set);
+      }
+      boost::any data() const { return 0l; }
+      CURLoption what() const { return What; }
+    private:
+      static long get(EasyOpt *o) {
+        assert(o);
+        return boost::any_cast<long>(o->data[What]);
+      }
+      static void set(EasyOpt *o, long opt) {
+        assert(o);
+        o->data[What] = opt;
+        o->parent.do_setopt(What, opt);
+      }
+    };
 
-		template<CURLoption What>
-		struct string_option : handle_option {
-			function getter() const {
-				return create<flusspferd::method>("$get_", &get);
-			}
-			function setter() const {
-				return create<flusspferd::method>("$set_", &set);
-			}
-			boost::any data() const { return std::string(); }
-			CURLoption what() const { return What; }
-		private:
-			static std::string get(EasyOpt *o) {
-				assert(o);
-				return boost::any_cast<std::string>(o->data[What]);
-			}
-			static void set(EasyOpt *o, std::string const &val) {
-				assert(o);
-				o->data[What] = val;
-				o->parent.do_setopt(What, boost::any_cast<std::string&>(o->data[What]).c_str());
-			}
-		};
+    template<CURLoption What>
+    struct string_option : handle_option {
+      function getter() const {
+        return create<flusspferd::method>("$get_", &get);
+      }
+      function setter() const {
+        return create<flusspferd::method>("$set_", &set);
+      }
+      boost::any data() const { return std::string(); }
+      CURLoption what() const { return What; }
+    private:
+      static std::string get(EasyOpt *o) {
+        assert(o);
+        return boost::any_cast<std::string>(o->data[What]);
+      }
+      static void set(EasyOpt *o, std::string const &val) {
+        assert(o);
+        o->data[What] = val;
+        o->parent.do_setopt(What, boost::any_cast<std::string&>(o->data[What]).c_str());
+      }
+    };
 
-		/*
-			add a specialisation of this template to map to the real callback.
+    /*
+      add a specialisation of this template to map to the real callback.
 
-			this is actually a hack. If you know a better way please replace it. But it's
-			better to add this for each callback than writing the complete function_option.
-		*/
-		template<CURLoption What>
-		struct map_to_callback;
-		template<>
-		struct map_to_callback<CURLOPT_WRITEFUNCTION> {
-			typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
-			static type get() { return &Easy::writefunction; }
-		};
-		template<>
-		struct map_to_callback<CURLOPT_READFUNCTION> {
-			typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
-			static type get() { return &Easy::readfunction; }
-		};
-		template<>
-		struct map_to_callback<CURLOPT_PROGRESSFUNCTION> {
-			typedef curl_progress_callback type;
-			static type get() { return &Easy::progressfunction; }
-		};
+      this is actually a hack. If you know a better way please replace it. But it's
+      better to add this for each callback than writing the complete function_option.
+    */
+    template<CURLoption What>
+    struct map_to_callback;
+    template<>
+    struct map_to_callback<CURLOPT_WRITEFUNCTION> {
+      typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
+      static type get() { return &Easy::writefunction; }
+    };
+    template<>
+    struct map_to_callback<CURLOPT_READFUNCTION> {
+      typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
+      static type get() { return &Easy::readfunction; }
+    };
+    template<>
+    struct map_to_callback<CURLOPT_PROGRESSFUNCTION> {
+      typedef curl_progress_callback type;
+      static type get() { return &Easy::progressfunction; }
+    };
+    template<>
+    struct map_to_callback<CURLOPT_HEADERFUNCTION> {
+      typedef size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
+      static type get() { return &Easy::headerfunction; }
+    };
     template<>
     struct map_to_callback<CURLOPT_DEBUGFUNCTION> {
       typedef curl_debug_callback type;
       static type get() { return &Easy::debugfunction; }
     };
 
-		template<CURLoption What, CURLoption WhatData,
-						 object (Easy::*Obj)>
-		struct function_option : handle_option {
-			function getter() const {
-				return create<flusspferd::method>("$get_", &get);
-			}
-			function setter() const {
-				return create<flusspferd::method>("$set_", &set);
-			}
-			boost::any data() const { return function(); }
-			CURLoption what() const { return What; }
-		private:
-			static object get(EasyOpt *o) {
-				assert(o);
-				return o->parent.*(Obj);
-			}
-			static void set(EasyOpt *o, object val) {
-				assert(o);
-				o->parent.*(Obj) = val;
-				if(val.is_null()) {
-					o->parent.do_setopt(What, 0x0);
-				}
-				else {
-					// specialise map_to_callback<What> if you want to add a new callback!
-					o->parent.do_setopt(What, map_to_callback<What>::get());
-					o->parent.do_setopt(WhatData, &o->parent);
-				}
-			}
-		};
+    template<CURLoption What, CURLoption WhatData,
+             object (Easy::*Obj)>
+    struct function_option : handle_option {
+      function getter() const {
+        return create<flusspferd::method>("$get_", &get);
+      }
+      function setter() const {
+        return create<flusspferd::method>("$set_", &set);
+      }
+      boost::any data() const { return function(); }
+      CURLoption what() const { return What; }
+    private:
+      static object get(EasyOpt *o) {
+        assert(o);
+        return o->parent.*(Obj);
+      }
+      static void set(EasyOpt *o, object val) {
+        assert(o);
+        o->parent.*(Obj) = val;
+        if(val.is_null()) {
+          o->parent.do_setopt(What, 0x0);
+        }
+        else {
+          // specialise map_to_callback<What> if you want to add a new callback!
+          o->parent.do_setopt(What, map_to_callback<What>::get());
+          o->parent.do_setopt(WhatData, &o->parent);
+        }
+      }
+    };
 
-		options_map_t const &get_options() {
+    options_map_t const &get_options() {
       /* elisp helper (+ keyboard macros):
-(defun insopt (type name)
-  (interactive "sTyp: \nsOpt: \n")
-  (if (string= (downcase type) "i")
-      (setq type "integer")
-      (if (string= (downcase type) "s")
-          (setq type "string")))
-  (setq name (replace-regexp-in-string "^CURLOPT_" "" name))
-  (insert (concat "ptr_map_insert< " type "_option<CURLOPT_" name "> >(map)(\"" (downcase name) "\");")))
-(defun insreg (begin end type)
-  (interactive "r\nsTyp: ")
-  (insopt type (buffer-substring begin end))
-  (kill-region begin end)
-  (c-indent-line-or-region))
-       */
-			static options_map_t map;
-			if(map.empty()) {
-				using namespace boost::assign;
+         (defun insopt (type name)
+         (interactive "sTyp: \nsOpt: \n")
+         (if (string= (downcase type) "i")
+         (setq type "integer")
+         (if (string= (downcase type) "s")
+         (setq type "string")))
+         (setq name (replace-regexp-in-string "^CURLOPT_" "" name))
+         (insert (concat "ptr_map_insert< " type "_option<CURLOPT_" name "> >(map)(\"" (downcase name) "\");")))
+         (defun insreg (begin end type)
+         (interactive "r\nsTyp: ")
+         (insopt type (buffer-substring begin end))
+         (kill-region begin end)
+         (c-indent-line-or-region))
+      */
+      static options_map_t map;
+      if(map.empty()) {
+        using namespace boost::assign;
         // BEHAVIOR OPTIONS
-				ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)("verbose");
-				ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)("header");
-				ptr_map_insert< integer_option<CURLOPT_NOPROGRESS> >(map)("noprogress");
-				ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)("nosignal");
+        ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)("verbose");
+        ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)("header");
+        ptr_map_insert< integer_option<CURLOPT_NOPROGRESS> >(map)("noprogress");
+        ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)("nosignal");
         // CALLBACK OPTIONS
-				ptr_map_insert< function_option<CURLOPT_WRITEFUNCTION,
-					CURLOPT_WRITEDATA, &Easy::writefunction_callback> >(map)
-					("writefunction");
-				ptr_map_insert< function_option<CURLOPT_READFUNCTION,
-					CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
-					("readfunction");
-				ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
-					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
-					("progressfunction");
+        ptr_map_insert< function_option<CURLOPT_WRITEFUNCTION,
+          CURLOPT_WRITEDATA, &Easy::writefunction_callback> >(map)
+          ("writefunction");
+        ptr_map_insert< function_option<CURLOPT_READFUNCTION,
+          CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
+          ("readfunction");
+        ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
+          CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
+          ("progressfunction");
+        ptr_map_insert< function_option<CURLOPT_HEADERFUNCTION,
+          CURLOPT_HEADERDATA, &Easy::headerfunction_callback> >(map)
+          ("headerfunction");
         ptr_map_insert< function_option<CURLOPT_DEBUGFUNCTION,
-					CURLOPT_DEBUGDATA, &Easy::debugfunction_callback> >(map)
-					("debugfunction");
+          CURLOPT_DEBUGDATA, &Easy::debugfunction_callback> >(map)
+          ("debugfunction");
         // ERROR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failonerror");
         // NETWORK OPTIONS
@@ -475,12 +504,12 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_HTTPPROXYTUNNEL> >(map)("httpProxyTunnel");
         ptr_map_insert< string_option<CURLOPT_SOCKS5_GSSAPI_SERVICE> >(map)("socks5GssapiService");
         ptr_map_insert< integer_option<CURLOPT_SOCKS5_GSSAPI_NEC> >(map)("socks5GssapiNec");
-				ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
+        ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localport");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localportrange");
         ptr_map_insert< integer_option<CURLOPT_DNS_CACHE_TIMEOUT> >(map)("dnsCacheTimeout");
         ptr_map_insert< integer_option<CURLOPT_DNS_USE_GLOBAL_CACHE> >(map)("dnsUseGlobalCache");
-				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
+        ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
         // NAMES and PASSWORDS OPTIONS (Authentication)
@@ -503,9 +532,9 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // see cURL.REDIR_*
         // TODO POST*
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
-				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
+        ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
         // TODO HTTPHEADER,HTTP200ALIASES
-				ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
+        ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
         ptr_map_insert< string_option<CURLOPT_COOKIEFILE> >(map)("cookieFile");
         ptr_map_insert< string_option<CURLOPT_COOKIEJAR> >(map)("cookiejar");
         ptr_map_insert< integer_option<CURLOPT_COOKIESESSION> >(map)("cookiesession");
@@ -593,26 +622,26 @@ namespace {
         // OTHER OPTIONS
         ptr_map_insert< integer_option<CURLOPT_NEW_FILE_PERMS> >(map)("newFilePerms");
         ptr_map_insert< integer_option<CURLOPT_NEW_DIRECTORY_PERMS> >(map)("newDirectoryPerms");
-			}
-			return map;
-		}
-	}
+      }
+      return map;
+    }
+  }
 
-	bool EasyOpt::property_resolve(value const &id, unsigned) {
-		std::string const name = id.to_std_string();
-		options_map_t::const_iterator const i = get_options().find(name);
-		if(i != get_options().end()) {
-			property_attributes attr(no_property_flag,
-															 i->second->getter(),
-															 i->second->setter());
-			define_property(id.get_string(), value(), attr);
-			data[i->second->what()] = i->second->data();
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+  bool EasyOpt::property_resolve(value const &id, unsigned) {
+    std::string const name = id.to_std_string();
+    options_map_t::const_iterator const i = get_options().find(name);
+    if(i != get_options().end()) {
+      property_attributes attr(no_property_flag,
+                               i->second->getter(),
+                               i->second->setter());
+      define_property(id.get_string(), value(), attr);
+      data[i->second->what()] = i->second->data();
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
     local_root_scope scope;
@@ -628,7 +657,7 @@ namespace {
     create<flusspferd::function>("globalInit", &global_init, param::_container = cURL);
     cURL.define_property("version", value(curl_version()),
                          read_only_property | permanent_property);
-		load_class<EasyOpt>(cURL);
+    load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
     cURL.define_property("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)),
                          read_only_property | permanent_property);

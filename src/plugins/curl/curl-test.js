@@ -40,4 +40,8 @@ c.options.progressfunction = function(dltotal, dlnow, ultotal, ulnow) {
 	}
 	return 0; // return 0 if ok. else abort!
 };
+c.options.headerfunction = function(data, size) {
+	print("Header: " + data.decodeToString());
+	return data.length;
+}
 c.perform();
