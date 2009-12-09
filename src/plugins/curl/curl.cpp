@@ -205,12 +205,33 @@ namespace {
 			}
 		}
 
+    object debugfunction_callback;
+    static int debugfunction(CURL *hnd, curl_infotype i, char *buf, size_t len, void *p) {
+      assert(p);
+      Easy &self = *reinterpret_cast<Easy*>(p);
+      if(self.progressfunction_callback.is_null() || hnd != self.handle) {
+				return 0;
+			}
+			else {
+        arguments arg;
+        byte_array &data = flusspferd::create<byte_array>(
+          bf::vector2<binary::element_type*, std::size_t>(
+            reinterpret_cast<binary::element_type*>(buf), len));
+        root_object d(data);
+        arg.push_back(value(static_cast<int>(i)));
+        arg.push_back(value(data));
+        value v = self.debugfunction_callback.call(arg);
+        return v.to_number();
+      }
+    }
+
 	protected:
 		void trace(flusspferd::tracer &trc) {
 			trc("options", opt);
 			trc("writeFunction", writefunction_callback);
 			trc("readFunction", readfunction_callback);
 			trc("progressFunction", progressfunction_callback);
+      trc("debugFunction", debugfunction_callback);
 		}
 
   public:
@@ -370,6 +391,11 @@ namespace {
 			typedef curl_progress_callback type;
 			static type get() { return &Easy::progressfunction; }
 		};
+    template<>
+    struct map_to_callback<CURLOPT_DEBUGFUNCTION> {
+      typedef curl_debug_callback type;
+      static type get() { return &Easy::debugfunction; }
+    };
 
 		template<CURLoption What, CURLoption WhatData,
 						 object (Easy::*Obj)>
@@ -424,6 +450,9 @@ namespace {
 				ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
 					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
 					("progressFunction");
+        ptr_map_insert< function_option<CURLOPT_DEBUGFUNCTION,
+					CURLOPT_DEBUGDATA, &Easy::debugfunction_callback> >(map)
+					("debugFunction");
         // ERROR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failOnError");
         // NETWORK OPTIONS
