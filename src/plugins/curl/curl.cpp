@@ -525,6 +525,20 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_FTP_SSL_CCC> >(map)("ftpSSLccc");
         ptr_map_insert< string_option<CURLOPT_FTP_ACCOUNT> >(map)("ftpAccount");
         ptr_map_insert< integer_option<CURLOPT_FTP_FILEMETHOD> >(map)("ftpFilemethod");
+        // PROTOCOL OPTIONS
+        ptr_map_insert< integer_option<CURLOPT_TRANSFERTEXT> >(map)("transfertext");
+        ptr_map_insert< integer_option<CURLOPT_PROXY_TRANSFER_MODE> >(map)("proxyTransferMode");
+        ptr_map_insert< integer_option<CURLOPT_CRLF> >(map)("crlf");
+        ptr_map_insert< string_option<CURLOPT_RANGE> >(map)("range");
+        ptr_map_insert< integer_option<CURLOPT_RESUME_FROM> >(map)("resumeFrom");
+        ptr_map_insert< string_option<CURLOPT_CUSTOMREQUEST> >(map)("customrequest");
+        ptr_map_insert< integer_option<CURLOPT_FILETIME> >(map)("filetime");
+        ptr_map_insert< integer_option<CURLOPT_NOBODY> >(map)("nobody");
+        ptr_map_insert< integer_option<CURLOPT_INFILESIZE> >(map)("infilesize");
+        ptr_map_insert< integer_option<CURLOPT_UPLOAD> >(map)("upload");
+        ptr_map_insert< integer_option<CURLOPT_MAXFILESIZE> >(map)("maxfilesize");
+        ptr_map_insert< integer_option<CURLOPT_TIMECONDITION> >(map)("timecondition");
+        ptr_map_insert< integer_option<CURLOPT_TIMEVALUE> >(map)("timevalue");
         // SSH OPTIONS
         ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // see cURL.SSH_AUTH*
         ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMD5");
