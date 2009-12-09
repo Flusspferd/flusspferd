@@ -324,58 +324,51 @@ namespace {
 			}
 		};
 
-		struct write_function_option : handle_option {
-			static CURLoption const What = CURLOPT_WRITEFUNCTION;
-			function getter() const {
-				return create<flusspferd::method>("$get_writeFunction", &get);
-			}
-			function setter() const {
-				return create<flusspferd::method>("$set_writeFunction", &set);
-			}
-			boost::any data() const { return function(); }
-			CURLoption what() const { return What; }
-		private:
-			static object get(EasyOpt *o) {
-				assert(o);
-				return o->parent.writefunction_callback;
-			}
-			static void set(EasyOpt *o, object val) {
-				assert(o);
-				o->parent.writefunction_callback = val;
-				if(val.is_null()) {
-					o->parent.do_setopt(CURLOPT_WRITEFUNCTION, 0x0);
-				}
-				else {
-					o->parent.do_setopt(CURLOPT_WRITEFUNCTION, &Easy::writefunction);
-					o->parent.do_setopt(CURLOPT_WRITEDATA, &o->parent);
-				}
-			}
+		/*
+			add a specialisation of this template to map to the real callback.
+
+			this is actually a hack. If you know a better way please replace it. But it's
+			better to add this for each callback than writing the complete function_option.
+		*/
+		template<CURLoption What>
+		struct map_to_callback;
+		template<>
+		struct map_to_callback<CURLOPT_WRITEFUNCTION> {
+			typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
+			static type get() { return &Easy::writefunction; }
+		};
+		template<>
+		struct map_to_callback<CURLOPT_READFUNCTION> {
+			typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
+			static type get() { return &Easy::readfunction; }
 		};
 
-		struct read_function_option : handle_option {
-			static CURLoption const What = CURLOPT_READFUNCTION;
+		template<CURLoption What, CURLoption WhatData,
+						 object (Easy::*Obj)>
+		struct function_option : handle_option {
 			function getter() const {
-				return create<flusspferd::method>("$get_readFunction", &get);
+				return create<flusspferd::method>("$get_", &get);
 			}
 			function setter() const {
-				return create<flusspferd::method>("$set_readFunction", &set);
+				return create<flusspferd::method>("$set_", &set);
 			}
 			boost::any data() const { return function(); }
 			CURLoption what() const { return What; }
 		private:
 			static object get(EasyOpt *o) {
 				assert(o);
-				return o->parent.readfunction_callback;
+				return o->parent.*(Obj);
 			}
 			static void set(EasyOpt *o, object val) {
 				assert(o);
-				o->parent.readfunction_callback = val;
+				o->parent.*(Obj) = val;
 				if(val.is_null()) {
-					o->parent.do_setopt(CURLOPT_READFUNCTION, 0x0);
+					o->parent.do_setopt(What, 0x0);
 				}
 				else {
-					o->parent.do_setopt(CURLOPT_READFUNCTION, &Easy::readfunction);
-					o->parent.do_setopt(CURLOPT_READDATA, &o->parent);
+					// specialise map_to_callback<What> if you want to add a new callback!
+					o->parent.do_setopt(What, map_to_callback<What>::get());
+					o->parent.do_setopt(WhatData, &o->parent);
 				}
 			}
 		};
@@ -392,9 +385,11 @@ namespace {
 					("noProgress");
 				ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)
 					("noSignal");
-				ptr_map_insert< write_function_option >(map)
+				ptr_map_insert< function_option<CURLOPT_WRITEFUNCTION,
+					CURLOPT_WRITEDATA, &Easy::writefunction_callback> >(map)
 					("writeFunction");
-				ptr_map_insert< read_function_option >(map)
+				ptr_map_insert< function_option<CURLOPT_READFUNCTION,
+					CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
 					("readFunction");
 				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
 			}
