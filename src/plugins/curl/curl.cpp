@@ -405,6 +405,7 @@ namespace {
 			static options_map_t map;
 			if(map.empty()) {
 				using namespace boost::assign;
+        // BEHAVIOR OPTIONS
 				ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)
 					("verbose");
 				ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)
@@ -413,6 +414,7 @@ namespace {
 					("noProgress");
 				ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)
 					("noSignal");
+        // CALLBACK OPTIONS
 				ptr_map_insert< function_option<CURLOPT_WRITEFUNCTION,
 					CURLOPT_WRITEDATA, &Easy::writefunction_callback> >(map)
 					("writeFunction");
@@ -422,7 +424,10 @@ namespace {
 				ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
 					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
 					("progressFunction");
+        // ERROR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failOnError");
+        // NETWORK OPTIONS
+        ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
         ptr_map_insert< string_option<CURLOPT_PROXY> >(map)("proxy");
         ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyPort");
         ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxyType"); // see cURL.PROXY_
@@ -438,6 +443,7 @@ namespace {
 				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
+        // NAMES and PASSWORDS OPTIONS (Authentication)
         ptr_map_insert< string_option<CURLOPT_USERPWD> >(map)("userPwd");
         ptr_map_insert< string_option<CURLOPT_PROXYUSERPWD> >(map)("proxyUserPwd");
         ptr_map_insert< string_option<CURLOPT_USERNAME> >(map)("username");
@@ -446,9 +452,27 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_PROXYPASSWORD> >(map)("proxyPassword");
         ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpAuth"); // see cURL.AUTH_*
         ptr_map_insert< integer_option<CURLOPT_PROXYAUTH> >(map)("proxyAuth");
-				ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
+        // HTTP OPTIONS
+        ptr_map_insert< integer_option<CURLOPT_AUTOREFERER> >(map)("autoReferer");
+        ptr_map_insert< string_option<CURLOPT_ENCODING> >(map)("encoding");
+        ptr_map_insert< integer_option<CURLOPT_FOLLOWLOCATION> >(map)("followLocation");
+        ptr_map_insert< integer_option<CURLOPT_UNRESTRICTED_AUTH> >(map)("unrestrictedAuth");
+        ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxRedirs");
+        ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postRedir"); // see cURL.REDIR_*
+        // TODO POST*
+        ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
 				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
+        // TODO HTTPHEADER,HTTP200ALIASES
 				ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
+        ptr_map_insert< string_option<CURLOPT_COOKIEFILE> >(map)("cookieFile");
+        ptr_map_insert< string_option<CURLOPT_COOKIEJAR> >(map)("cookieJar");
+        ptr_map_insert< integer_option<CURLOPT_COOKIESESSION> >(map)("cookieSession");
+        ptr_map_insert< string_option<CURLOPT_COOKIELIST> >(map)("cookieList");
+        ptr_map_insert< integer_option<CURLOPT_HTTPGET> >(map)("httpGet");
+        ptr_map_insert< integer_option<CURLOPT_HTTP_VERSION> >(map)("httpVersion"); // see cURL.HTTP_VERSION_*
+        ptr_map_insert< integer_option<CURLOPT_IGNORE_CONTENT_LENGTH> >(map)("ignoreContentLength");
+        ptr_map_insert< integer_option<CURLOPT_HTTP_CONTENT_DECODING> >(map)("httpContentDecoding");
+        ptr_map_insert< integer_option<CURLOPT_HTTP_TRANSFER_DECODING> >(map)("httpTransferDecoding");
 			}
 			return map;
 		}
@@ -512,6 +536,18 @@ namespace {
     cURL.define_property("AUTH_ANY", value(static_cast<int>(CURLAUTH_ANY)),
                          read_only_property | permanent_property);
     cURL.define_property("AUTH_ANYSAFE", value(static_cast<int>(CURLAUTH_ANYSAFE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("REDIR_POST_301", value(static_cast<int>(CURL_REDIR_POST_301)),
+                         read_only_property | permanent_property);
+    cURL.define_property("REDIR_POST_302", value(static_cast<int>(CURL_REDIR_POST_302)),
+                         read_only_property | permanent_property);
+    cURL.define_property("REDIR_POST_ALL", value(static_cast<int>(CURL_REDIR_POST_ALL)),
+                         read_only_property | permanent_property);
+    cURL.define_property("HTTP_VERSION_NONE", value(static_cast<int>(CURL_HTTP_VERSION_NONE)),
+                         read_only_property | permanent_property);
+    cURL.define_property("HTTP_VERSION_1_0", value(static_cast<int>(CURL_HTTP_VERSION_1_0)),
+                         read_only_property | permanent_property);
+    cURL.define_property("HTTP_VERSION_1_1", value(static_cast<int>(CURL_HTTP_VERSION_1_1)),
                          read_only_property | permanent_property);
   }
 }
