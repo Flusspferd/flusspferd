@@ -13,7 +13,8 @@ function trim(x) {
   return t.replace(/^%/,''); // % is a hack to stop triming if indentation is important
 }
 
-const file = 'curl.cpp';
+const sys = require('system');
+const file = sys.args.length > 1 ? sys.args[1] : 'curl.cpp';
 
 var fh = new io.File();
 fh.open(file);
