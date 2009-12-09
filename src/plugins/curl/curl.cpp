@@ -432,43 +432,39 @@ namespace {
 			if(map.empty()) {
 				using namespace boost::assign;
         // BEHAVIOR OPTIONS
-				ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)
-					("verbose");
-				ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)
-					("header");
-				ptr_map_insert< integer_option<CURLOPT_NOPROGRESS> >(map)
-					("noProgress");
-				ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)
-					("noSignal");
+				ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)("verbose");
+				ptr_map_insert< integer_option<CURLOPT_HEADER> >(map)("header");
+				ptr_map_insert< integer_option<CURLOPT_NOPROGRESS> >(map)("noprogress");
+				ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)("nosignal");
         // CALLBACK OPTIONS
 				ptr_map_insert< function_option<CURLOPT_WRITEFUNCTION,
 					CURLOPT_WRITEDATA, &Easy::writefunction_callback> >(map)
-					("writeFunction");
+					("writefunction");
 				ptr_map_insert< function_option<CURLOPT_READFUNCTION,
 					CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
-					("readFunction");
+					("readfunction");
 				ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
 					CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
-					("progressFunction");
+					("progressfunction");
         ptr_map_insert< function_option<CURLOPT_DEBUGFUNCTION,
 					CURLOPT_DEBUGDATA, &Easy::debugfunction_callback> >(map)
-					("debugFunction");
+					("debugfunction");
         // ERROR OPTIONS
-        ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failOnError");
+        ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failonerror");
         // NETWORK OPTIONS
         ptr_map_insert< integer_option<CURLOPT_PROTOCOLS> >(map)("protocols");
         ptr_map_insert< integer_option<CURLOPT_REDIR_PROTOCOLS> >(map)("redirProtocols");
         ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
         ptr_map_insert< string_option<CURLOPT_PROXY> >(map)("proxy");
-        ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyPort");
-        ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxyType"); // see cURL.PROXY_
-        ptr_map_insert< string_option<CURLOPT_NOPROXY> >(map)("noProxy");
+        ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyport");
+        ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxytype"); // see cURL.PROXY_
+        ptr_map_insert< string_option<CURLOPT_NOPROXY> >(map)("noproxy");
         ptr_map_insert< integer_option<CURLOPT_HTTPPROXYTUNNEL> >(map)("httpProxyTunnel");
         ptr_map_insert< string_option<CURLOPT_SOCKS5_GSSAPI_SERVICE> >(map)("socks5GssapiService");
         ptr_map_insert< integer_option<CURLOPT_SOCKS5_GSSAPI_NEC> >(map)("socks5GssapiNec");
 				ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
-        ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localPort");
-        ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localPortRange");
+        ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localport");
+        ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localportrange");
         ptr_map_insert< integer_option<CURLOPT_DNS_CACHE_TIMEOUT> >(map)("dnsCacheTimeout");
         ptr_map_insert< integer_option<CURLOPT_DNS_USE_GLOBAL_CACHE> >(map)("dnsUseGlobalCache");
 				ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
@@ -476,31 +472,31 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
         // NAMES and PASSWORDS OPTIONS (Authentication)
         ptr_map_insert< integer_option<CURLOPT_NETRC> >(map)("netrc");
-        ptr_map_insert< string_option<CURLOPT_NETRC_FILE> >(map)("netrc_file");
-        ptr_map_insert< string_option<CURLOPT_USERPWD> >(map)("userPwd");
-        ptr_map_insert< string_option<CURLOPT_PROXYUSERPWD> >(map)("proxyUserPwd");
+        ptr_map_insert< string_option<CURLOPT_NETRC_FILE> >(map)("netrcFile");
+        ptr_map_insert< string_option<CURLOPT_USERPWD> >(map)("userpwd");
+        ptr_map_insert< string_option<CURLOPT_PROXYUSERPWD> >(map)("proxyuserpwd");
         ptr_map_insert< string_option<CURLOPT_USERNAME> >(map)("username");
         ptr_map_insert< string_option<CURLOPT_PASSWORD> >(map)("password");
-        ptr_map_insert< string_option<CURLOPT_PROXYUSERNAME> >(map)("proxyUsername");
-        ptr_map_insert< string_option<CURLOPT_PROXYPASSWORD> >(map)("proxyPassword");
-        ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpAuth"); // see cURL.AUTH_*
-        ptr_map_insert< integer_option<CURLOPT_PROXYAUTH> >(map)("proxyAuth");
+        ptr_map_insert< string_option<CURLOPT_PROXYUSERNAME> >(map)("proxyusername");
+        ptr_map_insert< string_option<CURLOPT_PROXYPASSWORD> >(map)("proxypassword");
+        ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpauth"); // see cURL.AUTH_*
+        ptr_map_insert< integer_option<CURLOPT_PROXYAUTH> >(map)("proxyauth");
         // HTTP OPTIONS
-        ptr_map_insert< integer_option<CURLOPT_AUTOREFERER> >(map)("autoReferer");
+        ptr_map_insert< integer_option<CURLOPT_AUTOREFERER> >(map)("autoreferer");
         ptr_map_insert< string_option<CURLOPT_ENCODING> >(map)("encoding");
-        ptr_map_insert< integer_option<CURLOPT_FOLLOWLOCATION> >(map)("followLocation");
+        ptr_map_insert< integer_option<CURLOPT_FOLLOWLOCATION> >(map)("followlocation");
         ptr_map_insert< integer_option<CURLOPT_UNRESTRICTED_AUTH> >(map)("unrestrictedAuth");
-        ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxRedirs");
-        ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postRedir"); // see cURL.REDIR_*
+        ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxredirs");
+        ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // see cURL.REDIR_*
         // TODO POST*
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
 				ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
         // TODO HTTPHEADER,HTTP200ALIASES
 				ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
         ptr_map_insert< string_option<CURLOPT_COOKIEFILE> >(map)("cookieFile");
-        ptr_map_insert< string_option<CURLOPT_COOKIEJAR> >(map)("cookieJar");
-        ptr_map_insert< integer_option<CURLOPT_COOKIESESSION> >(map)("cookieSession");
-        ptr_map_insert< string_option<CURLOPT_COOKIELIST> >(map)("cookieList");
+        ptr_map_insert< string_option<CURLOPT_COOKIEJAR> >(map)("cookiejar");
+        ptr_map_insert< integer_option<CURLOPT_COOKIESESSION> >(map)("cookiesession");
+        ptr_map_insert< string_option<CURLOPT_COOKIELIST> >(map)("cookielist");
         ptr_map_insert< integer_option<CURLOPT_HTTPGET> >(map)("httpGet");
         ptr_map_insert< integer_option<CURLOPT_HTTP_VERSION> >(map)("httpVersion"); // see cURL.HTTP_VERSION_*
         ptr_map_insert< integer_option<CURLOPT_IGNORE_CONTENT_LENGTH> >(map)("ignoreContentLength");
@@ -520,9 +516,9 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_FTP_RESPONSE_TIMEOUT> >(map)("ftpResponseTimeout");
         ptr_map_insert< string_option<CURLOPT_FTP_ALTERNATIVE_TO_USER> >(map)("ftpAltnerativeToUser");
         ptr_map_insert< integer_option<CURLOPT_FTP_SKIP_PASV_IP> >(map)("ftpSkipPasvIp");
-        ptr_map_insert< integer_option<CURLOPT_USE_SSL> >(map)("useSSL");
-        ptr_map_insert< integer_option<CURLOPT_FTPSSLAUTH> >(map)("ftpSSLAuth");
-        ptr_map_insert< integer_option<CURLOPT_FTP_SSL_CCC> >(map)("ftpSSLccc");
+        ptr_map_insert< integer_option<CURLOPT_USE_SSL> >(map)("usessl");
+        ptr_map_insert< integer_option<CURLOPT_FTPSSLAUTH> >(map)("ftpsslauth");
+        ptr_map_insert< integer_option<CURLOPT_FTP_SSL_CCC> >(map)("ftpSslCcc");
         ptr_map_insert< string_option<CURLOPT_FTP_ACCOUNT> >(map)("ftpAccount");
         ptr_map_insert< integer_option<CURLOPT_FTP_FILEMETHOD> >(map)("ftpFilemethod");
         // PROTOCOL OPTIONS
@@ -574,11 +570,11 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_KRBLEVEL> >(map)("krblevel");
         // SSH OPTIONS
         ptr_map_insert< integer_option<CURLOPT_SSH_AUTH_TYPES> >(map)("sshAuthTypes"); // see cURL.SSH_AUTH*
-        ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMD5");
+        ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMd5");
         ptr_map_insert< string_option<CURLOPT_SSH_PUBLIC_KEYFILE> >(map)("sshPublicKeyfile");
         ptr_map_insert< string_option<CURLOPT_SSH_PRIVATE_KEYFILE> >(map)("sshPrivateKeyfile");
 #if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 6)
-        ptr_map_insert< string_option<CURLOPT_SSH_KNOWNHOSTS> >(map)("sshKnownHosts");
+        ptr_map_insert< string_option<CURLOPT_SSH_KNOWNHOSTS> >(map)("sshKnownhosts");
 #endif
         // TODO: SSH_KEYFUNCTION/DATA
         // OTHER OPTIONS
