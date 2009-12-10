@@ -407,7 +407,7 @@ namespace {
 
     //private:
     template<typename T>
-      void do_setopt(CURLoption what, T data) {
+    void do_setopt(CURLoption what, T data) {
       CURLcode res = curl_easy_setopt(get(), what, data);
       if(res != 0) {
         throw flusspferd::exception(std::string("curl_easy_setopt: ") +
@@ -609,15 +609,29 @@ namespace {
       function setter() const {
         return create<flusspferd::method>("$set_httppost", &set);
       }
-      boost::any data() const { return create<array>(); }
+      boost::any data() const { return data_t(create<array>(), 0x0); }
       CURLoption what() const { return What; }
       void trace(boost::any const &data, flusspferd::tracer &trc) const {
-        trc("httppost", boost::any_cast<array>(data));
+        data_t const &d = boost::any_cast<data_t const&>(data);
+        if(d.second) {
+          trc("httppost", d.first);
+        }
+      }
+      void cleanup(boost::any &data) const {
+        reset(boost::any_cast<data_t&>(data));        
       }
     private:
+      typedef std::pair<array, curl_httppost*> data_t;
+      static void reset(data_t &d) {
+        if(d.second) {
+          curl_formfree(d.second);
+          d.second = 0x0;
+        }
+      }
+
       static object get(EasyOpt *o) {
         assert(o);
-        return boost::any_cast<array>(o->data[What]);
+        return boost::any_cast<data_t&>(o->data[What]).first;
       }
       static char const *get_data_ptr(value v) {
         if(!v.is_string()) { // TODO binary stuff
@@ -682,7 +696,6 @@ namespace {
         }
       }
       static void set(EasyOpt *o, object val) {
-        // TODO free old data
         assert(o);
         curl_httppost *post = 0x0;
         curl_httppost *last = 0x0;
@@ -697,13 +710,17 @@ namespace {
             }
             object2form(i->get_object(), post, last);
           }
-          o->data[What] = a;
+          data_t &old = boost::any_cast<data_t&>(o->data[What]);
+          reset(old);
+          old = data_t(a, post);
         }
         else {
           array a = flusspferd::create<flusspferd::array>();
           a.push(val);
-          o->data[What] = a;
           object2form(val, post, last);
+          data_t &old = boost::any_cast<data_t&>(o->data[What]);
+          reset(old);
+          old = data_t(a, post);
         }
         o->parent.do_setopt(What, post);
       }

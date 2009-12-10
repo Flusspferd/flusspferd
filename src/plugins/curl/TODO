@@ -22,10 +22,17 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 
 - FILE* this would require to access the data inside the file object and use fdopen
 
+Formdata/cURL.Easy#options.httppost:
+Make objects immutable or just set when calling perform
+
+Doesn't work!
+  var foo = { name: "bar", contents: "moep" };
+  c.options.httppost = foo;
+  foo.name += 'baz';
+
 Functions:
 * curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html (needed?)
-
-What about global_cleanup? This should be handled by the module!
+* curl_easy_getinfo (needed?)
 
 Documentation:
 * callback options
