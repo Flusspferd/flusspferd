@@ -721,7 +721,13 @@ namespace {
            %      c.options.url = 'http://www.google.com'
 
            ## Options #
-           The following options are supported.
+           The following options are supported. See the libcurl documentation links.
+           Flag parameters are class constants of [[cURL]] without the leading `CURL(_)`.
+           (e.g. `CURLPROTO_HTTP` -> `cURL.PROTO_HTTP`)
+
+           + integer: boolean or number
+           + string: string
+           + list: array of strings
            }HEADER
          */
         // BEHAVIOR OPTIONS

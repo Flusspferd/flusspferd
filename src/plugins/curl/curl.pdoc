@@ -8,7 +8,7 @@
  *  HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, proxies, cookies, user+password
  *  authentication (Basic, Digest, NTLM, Negotiate, Kerberos4), file transfer resume, http proxy
  *  tunneling and more!"
- * [libcurl][http://curl.haxx.se/libcurl/]
+ * [libcurl](http://curl.haxx.se/libcurl/)
  *
  * ## Example #
  *
