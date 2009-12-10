@@ -46,7 +46,6 @@ THE SOFTWARE.
  * - @subpage js-tutorial
  *   - @ref js-tutorial-invoke
  *   - @ref js-tutorial-io
- *   - @ref js-tutorial-xml
  *   - @ref js-tutorial-getopt
  *   - @see @ref cpp-tutorial-modules
  */
