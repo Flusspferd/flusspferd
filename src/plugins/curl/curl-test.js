@@ -33,7 +33,7 @@ c.options.writefunction = function(data,size) { // size is element width not dat
 	}
 	return data.length; // return sth. else if error
 };
-c.options.noprogress = 0; // set to 0 or else progressFunction won't get called!
+c.options.noprogress = false; // set to 0 or else progressFunction won't get called!
 c.options.progressfunction = function(dltotal, dlnow, ultotal, ulnow) {
 	if(dltotal != 0) {
 		print("loading... " + dlnow/dltotal*100 + "%");
