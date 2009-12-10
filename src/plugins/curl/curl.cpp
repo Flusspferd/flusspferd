@@ -80,6 +80,15 @@ namespace {
     }
   }
 
+  /*
+   * cURL.Easy#options implementation:
+   *
+   * handle_option is the base class for option mappers to map between CURLOPT_*
+   * and JavaScript. Data is stored as boost::any in EasyOpt::data. Getters/setters
+   * are created (handle_option::getter/setter) on the fly in EasyOpt::property_resolve.
+   * get_options() returns a map of all property names to their corresponding handle_option.
+   */
+
   class Easy;
 
   namespace {
@@ -87,9 +96,12 @@ namespace {
       virtual ~handle_option() =0;
       virtual function getter() const =0;
       virtual function setter() const =0;
+      // initial data
       virtual boost::any data() const =0;
       virtual CURLoption what() const =0;
+      // called during tracing to prevent the GC from collecting data
       virtual void trace(boost::any const &, flusspferd::tracer &) const { }
+      // called during destruction/cleanup of EasyOpt
       virtual void cleanup(boost::any &) const { }
     };
     handle_option::~handle_option() { }
@@ -98,6 +110,7 @@ namespace {
     options_map_t const &get_options();
   }
 
+  // the class behind cURL.Easy#options.
   FLUSSPFERD_CLASS_DESCRIPTION
   (
    EasyOpt,
@@ -106,7 +119,7 @@ namespace {
    (constructible, false)
    )
   {
-  public: // TODO
+  public: // TODO this should be private
     typedef boost::unordered_map<CURLoption, boost::any> data_map_t;
     data_map_t data;
     Easy &parent;
@@ -181,7 +194,17 @@ namespace {
     CURL *handle;
     EasyOpt &opt;
 
-  public: // TODO
+  public: // TODO this should be private
+    /*
+     * Callbacks are implemented by storing the javascript callback in an object
+     * (named `function`_callback;) and providing a static function which gets called
+     * by curl and than calls the javascript callback.
+     *
+     * See function_option below.
+     *
+     * WARNING: make sure the callback object gets traced! (see Easy::trace)
+     */
+
     object writefunction_callback;
     static size_t writefunction(void *ptr, size_t size, size_t nmemb, void *stream) {
       assert(stream);
@@ -709,6 +732,7 @@ namespace {
       static options_map_t map;
       if(map.empty()) {
         using namespace boost::assign;
+        // this is used to auto generate some documentation. See gen-doc.js!
         // BEGIN DOC{
         /* HEADER{
            cURL.Easy#options -> EasyOpt
@@ -908,6 +932,7 @@ namespace {
       return true;
     }
     else {
+      // TODO: throw exception if option is unkown?
       return false;
     }
   }
