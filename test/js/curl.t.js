@@ -2,7 +2,6 @@ const cURL = require('curl');
 const asserts = require('test').asserts;
 
 exports.test_curlCleanup = function() {
-  cURL.globalInit(cURL.GLOBAL_ALL);
   var c = new cURL.Easy();
   asserts.ok(c.valid());
   c.cleanup();
@@ -10,7 +9,6 @@ exports.test_curlCleanup = function() {
 };
 
 exports.test_curlReset = function() {
-  cURL.globalInit(cURL.GLOBAL_ALL);
   var c = new cURL.Easy();
   asserts.ok(c.valid());
   c.options.url = 'foo';
@@ -21,7 +19,6 @@ exports.test_curlReset = function() {
 };
 
 exports.test_curlEncode = function() {
-  cURL.globalInit(cURL.GLOBAL_ALL);
   var c = new cURL.Easy();
   asserts.ok(c.valid());
   var input = 'Hellö Wörld!';
