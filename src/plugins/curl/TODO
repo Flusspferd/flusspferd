@@ -35,7 +35,6 @@ Functions:
 * curl_easy_getinfo (needed?)
 
 Documentation:
-* callback options
 * constants
 
 and more :-)

@@ -750,7 +750,7 @@ namespace {
         using namespace boost::assign;
         // this is used to auto generate some documentation. See gen-doc.js!
         // BEGIN DOC{
-        /* HEADER{
+        /* DOC{
            cURL.Easy#options -> EasyOpt
 
            The options property is used to set connection options (see curl_easy_setopt).
@@ -766,7 +766,7 @@ namespace {
            + integer: boolean or number
            + string: string
            + list: array of strings
-           }HEADER
+           }DOC
          */
         // BEHAVIOR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_VERBOSE> >(map)("verbose");
@@ -774,21 +774,40 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_NOPROGRESS> >(map)("noprogress");
         ptr_map_insert< integer_option<CURLOPT_NOSIGNAL> >(map)("nosignal");
         // CALLBACK OPTIONS
+        /* DOC{
+           + writefunction, function(buffer,size). [CURLOPT_WRITEFUNCTION](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_WRITEFUNCTION)
+           Callback should except buffer and size as parameter. Buffer is a [[binary.ByteArray]] and size the size of each object. Should return the length of the buffer if everything is okay.
+         }DOC*/
         ptr_map_insert< function_option<CURLOPT_WRITEFUNCTION,
           CURLOPT_WRITEDATA, &Easy::writefunction_callback> >(map)
           ("writefunction");
+        /* DOC{
+           + readfunction, function(buffer,size,nmemb). [CURLOPT_READFUNCTION](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_READFUNCTION)
+         }DOC*/
         ptr_map_insert< function_option<CURLOPT_READFUNCTION,
           CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
           ("readfunction");
+        /* DOC{
+           + seekfunction, function(offset,origin). [CURLOPT_SEEKFUNCTION](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_SEEKFUNCTION)
+         }DOC*/
         ptr_map_insert< function_option<CURLOPT_SEEKFUNCTION,
           CURLOPT_SEEKDATA, &Easy::seekfunction_callback> >(map)
           ("seekfunction");
+        /* DOC{
+           + progressfunction, function(dltotal,dlnow,ultotal,ulnow). [CURLOPT_SEEKFUNCTION](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_PROGRESSFUNCTION)
+           }DOC*/
         ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
           CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
           ("progressfunction");
+        /* DOC{
+           + headerfunction, function(data,size). [CURLOPT_HEADERFUNCTION](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_HEADERFUNCTION)
+         }DOC*/
         ptr_map_insert< function_option<CURLOPT_HEADERFUNCTION,
           CURLOPT_HEADERDATA, &Easy::headerfunction_callback> >(map)
           ("headerfunction");
+        /* DOC{
+           + debugfunction, function(infotype,buffer). [CURLOPT_DEBUGFUNCTION](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_DEBUGFUNCTION)
+         }DOC*/
         ptr_map_insert< function_option<CURLOPT_DEBUGFUNCTION,
           CURLOPT_DEBUGDATA, &Easy::debugfunction_callback> >(map)
           ("debugfunction");
@@ -835,6 +854,10 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_POST> >(map)("post");
         ptr_map_insert< string_option<CURLOPT_POSTFIELDS> >(map)("postfields");
         ptr_map_insert< integer_option<CURLOPT_POSTFIELDSIZE> >(map)("postfieldsize");
+        /* DOC{
+           + httppost, array of objects|object [CURLOPT_HTTPPOST](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPT_HTTPPOST)
+           Expects a single object or an array of objects containing a property `name` and either `contents`, `contentslength`, `filecontent`, `file`, `contenttype` or `filename`. See libcurl docs.
+           }DOC*/
         ptr_map_insert< http_post_option >(map)("httppost");
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
         ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
