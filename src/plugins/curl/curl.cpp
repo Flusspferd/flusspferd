@@ -45,8 +45,6 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/any.hpp>
 
-#include <iostream>
-
 using namespace flusspferd;
 
 namespace {
@@ -887,10 +885,6 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_SSH_HOST_PUBLIC_KEY_MD5> >(map)("sshHostPublicKeyMd5");
         ptr_map_insert< string_option<CURLOPT_SSH_PUBLIC_KEYFILE> >(map)("sshPublicKeyfile");
         ptr_map_insert< string_option<CURLOPT_SSH_PRIVATE_KEYFILE> >(map)("sshPrivateKeyfile");
-#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 6)
-        ptr_map_insert< string_option<CURLOPT_SSH_KNOWNHOSTS> >(map)("sshKnownhosts");
-        // TODO: SSH_KEYFUNCTION/DATA
-#endif
         // OTHER OPTIONS
         ptr_map_insert< integer_option<CURLOPT_NEW_FILE_PERMS> >(map)("newFilePerms");
         ptr_map_insert< integer_option<CURLOPT_NEW_DIRECTORY_PERMS> >(map)("newDirectoryPerms");
