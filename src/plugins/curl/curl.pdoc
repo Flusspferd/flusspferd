@@ -41,6 +41,7 @@
  * + curl_getdate  ---  might be added.
  * + curl_global_cleanup
  * + curl_global_init_mem
+ * + curl_global_init  ---  called when loading the module
  * + curl_slist_append/curl_slist_free_all  ---  hidden in options.
  * + curl_version_info
  * + curl_version  ---  see [[cURL.version]].
@@ -52,15 +53,6 @@
  * cURL.version -> String
  *
  * Version of libcurl. See [curl_version](http://curl.haxx.se/libcurl/c/curl_version.html).
- **/
-
-/**
- * cURL.globalInit(int) -> undefined
- *
- * Initialise cURL. See [curl_global_init](http://curl.haxx.se/libcurl/c/curl_global_init.html).
- *
- * ## Example #
- *       cURL.globalInit(cURL.GLOBAL_ALL);
  **/
 
 /**

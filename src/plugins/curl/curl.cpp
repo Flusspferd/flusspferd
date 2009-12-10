@@ -43,6 +43,7 @@
 #include <boost/exception/get_error_info.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/thread/once.hpp>
 #include <boost/any.hpp>
 
 using namespace flusspferd;
@@ -71,14 +72,6 @@ namespace {
       }
     }
   };
-
-  void global_init(long flags) {
-    CURLcode ret = curl_global_init(flags);
-    if(ret != 0) {
-      throw flusspferd::exception(std::string("curl_global_init: ")
-                                  + curl_easy_strerror(ret));
-    }
-  }
 
   /*
    * cURL.Easy#options implementation:
@@ -943,19 +936,27 @@ namespace {
     }
   }
 
+  namespace {
+    void global_init() {
+      CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
+      if(ret != 0) {
+        throw flusspferd::exception(std::string("curl_global_init: ")
+                                    + curl_easy_strerror(ret));
+      }
+    }
+  }
+
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
     local_root_scope scope;
 
-    create<flusspferd::function>("globalInit", &global_init, param::_container = cURL);
+    static boost::once_flag flag = BOOST_ONCE_INIT;
+    boost::call_once(flag, &global_init);
+
     load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
 
     cURL.define_properties(read_only_property | permanent_property)
         ("version", string(curl_version()))
-        ("GLOBAL_ALL", value(CURL_GLOBAL_ALL))
-        ("GLOBAL_SSL", value(CURL_GLOBAL_SSL))
-        ("GLOBAL_WIN32", value(CURL_GLOBAL_WIN32))
-        ("GLOBAL_NOTHING", value(CURL_GLOBAL_NOTHING))
         ("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)))
         ("PROTO_HTTPS", value(static_cast<int>(CURLPROTO_HTTPS)))
         ("PROTO_FTP", value(static_cast<int>(CURLPROTO_FTP)))

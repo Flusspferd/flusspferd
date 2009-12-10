@@ -25,9 +25,7 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 Functions:
 * curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html (needed?)
 
-What about init/global_cleanup? This should be handled by the module!
-
-(init is auto called anyway. but not considered good practice by the libcurl docs)
+What about global_cleanup? This should be handled by the module!
 
 Documentation:
 * callback options
