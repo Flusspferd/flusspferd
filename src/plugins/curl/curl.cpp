@@ -769,6 +769,8 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_TIMEOUT_MS> >(map)("timeoutMS");
         ptr_map_insert< integer_option<CURLOPT_LOW_SPEED_LIMIT> >(map)("lowSpeedLimit");
         ptr_map_insert< integer_option<CURLOPT_LOW_SPEED_TIME> >(map)("lowSpeedTime");
+        ptr_map_insert< integer_option<CURLOPT_MAX_SEND_SPEED_LARGE> >(map)("maxSendSpeed");
+        ptr_map_insert< integer_option<CURLOPT_MAX_RECV_SPEED_LARGE> >(map)("maxRecvSpeed");
         ptr_map_insert< integer_option<CURLOPT_MAXCONNECTS> >(map)("maxconnects");
         ptr_map_insert< integer_option<CURLOPT_FRESH_CONNECT> >(map)("freshConnect");
         ptr_map_insert< integer_option<CURLOPT_FORBID_REUSE> >(map)("forbidReuse");
