@@ -43,7 +43,7 @@
 #include <boost/exception/get_error_info.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/thread/once.hpp>
+#include <boost/thread/mutex.hpp>
 #include <boost/any.hpp>
 
 using namespace flusspferd;
@@ -937,20 +937,42 @@ namespace {
   }
 
   namespace {
-    void global_init() {
-      CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
-      if(ret != 0) {
-        throw flusspferd::exception(std::string("curl_global_init: ")
-                                    + curl_easy_strerror(ret));
+    boost::mutex cookie;
+
+    /* To make sure that curl_global_init are never called from parallel
+       threads and are paired cleanly. */
+    FLUSSPFERD_CLASS_DESCRIPTION(
+        cURL_cookie,
+        (constructor_name, "$$cURL_cookie")
+        (full_name, "cURL.$$cURL_cookie")
+        (constructible, false)
+    ) {
+    public:
+      cURL_cookie(object const &obj)
+        : base_type(obj)
+      {
+        boost::mutex::scoped_lock lock(cookie);
+        CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
+        if(ret != 0)
+          throw flusspferd::exception(std::string("curl_global_init: ")
+                                      + curl_easy_strerror(ret));
       }
-    }
+
+      ~cURL_cookie() {
+        boost::mutex::scoped_lock lock(cookie);
+        curl_global_cleanup();
+      }
+    };
   }
 
   FLUSSPFERD_LOADER_SIMPLE(cURL) {
     local_root_scope scope;
 
-    static boost::once_flag flag = BOOST_ONCE_INIT;
-    boost::call_once(flag, &global_init);
+    load_class<cURL_cookie>(cURL);
+
+    create<cURL_cookie>(
+        param::_name = "$cURL_cookie",
+        param::_container = cURL);
 
     load_class<EasyOpt>(cURL);
     load_class<Easy>(cURL);
