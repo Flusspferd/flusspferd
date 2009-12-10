@@ -217,6 +217,22 @@ namespace {
       }
     }
 
+    object seekfunction_callback;
+    static int seekfunction(void *stream, curl_off_t offset, int origin) {
+      assert(stream);
+      Easy &self = *reinterpret_cast<Easy*>(stream);
+      if(self.readfunction_callback.is_null()) {
+        return CURL_SEEKFUNC_CANTSEEK;
+      }
+      else {
+        arguments arg;
+        arg.push_back(value(offset));
+        arg.push_back(value(origin));
+        value v = self.seekfunction_callback.call(arg);
+        return v.to_number();
+      }
+    }
+
     object headerfunction_callback;
     static size_t headerfunction(void *ptr, size_t size, size_t nmemb, void *stream) {
       assert(stream);
@@ -284,6 +300,7 @@ namespace {
       trc("options", opt);
       trc("writeFunction", writefunction_callback);
       trc("readFunction", readfunction_callback);
+      trc("seekFunction", seekfunction_callback);
       trc("progressFunction", progressfunction_callback);
       trc("headerFunction", headerfunction_callback);
       trc("debugFunction", debugfunction_callback);
@@ -441,6 +458,11 @@ namespace {
     struct map_to_callback<CURLOPT_READFUNCTION> {
       typedef std::size_t (*type)(void *ptr, size_t size, size_t nmemb, void *stream);
       static type get() { return &Easy::readfunction; }
+    };
+    template<>
+    struct map_to_callback<CURLOPT_SEEKFUNCTION> {
+      typedef int (*type)(void *instream, curl_off_t offset, int origin);
+      static type get() { return &Easy::seekfunction; }
     };
     template<>
     struct map_to_callback<CURLOPT_PROGRESSFUNCTION> {
@@ -640,6 +662,9 @@ namespace {
         ptr_map_insert< function_option<CURLOPT_READFUNCTION,
           CURLOPT_READDATA, &Easy::readfunction_callback> >(map)
           ("readfunction");
+        ptr_map_insert< function_option<CURLOPT_SEEKFUNCTION,
+          CURLOPT_SEEKDATA, &Easy::seekfunction_callback> >(map)
+          ("seekfunction");
         ptr_map_insert< function_option<CURLOPT_PROGRESSFUNCTION,
           CURLOPT_PROGRESSDATA, &Easy::progressfunction_callback> >(map)
           ("progressfunction");
@@ -877,6 +902,5 @@ namespace {
         ("SSLVERSION_TLSv1", value(static_cast<int>(CURL_SSLVERSION_TLSv1)))
         ("SSLVERSION_SSLv2", value(static_cast<int>(CURL_SSLVERSION_SSLv2)))
         ("SSLVERSION_SSLv3", value(static_cast<int>(CURL_SSLVERSION_SSLv3)));
-
   }
 }

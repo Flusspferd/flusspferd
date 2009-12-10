@@ -5,8 +5,6 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 * CURLOPT_READDATA - see readfunction
 * CURLOPT_IOCTLFUNCTION
 * CURLOPT_IOCTLDATA
-* CURLOPT_SEEKFUNCTION
-* CURLOPT_SEEKDATA
 * CURLOPT_SOCKOPTFUNCTION
 * CURLOPT_SOCKOPTDATA
 * CURLOPT_OPENSOCKETFUNCTION
@@ -43,6 +41,11 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 
 Functions:
 * curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html
+* ...
+
+Documentation:
+* callback options
+* constants
 
 and more :-)
 ...
