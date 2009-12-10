@@ -24,6 +24,7 @@
   THE SOFTWARE.
 */
 
+#include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
 #include "flusspferd/tracer.hpp"
@@ -33,13 +34,18 @@
 #include "flusspferd/class_description.hpp"
 #include "flusspferd/property_iterator.hpp"
 
+#include "flusspferd/create/array.hpp"
+
 #include <sstream>
 #include <curl/curl.h>
 
 #include <boost/ptr_container/ptr_unordered_map.hpp>
 #include <boost/exception/get_error_info.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
+#include <boost/range/iterator_range.hpp>
 #include <boost/any.hpp>
+
+#include <iostream>
 
 using namespace flusspferd;
 
@@ -490,15 +496,15 @@ namespace {
       function setter() const {
         return create<flusspferd::method>("$set_httppost", &set);
       }
-      boost::any data() const { return object(); }
+      boost::any data() const { return create<array>(); }
       CURLoption what() const { return What; }
       void trace(boost::any const &data, flusspferd::tracer &trc) const {
-        trc("httppost", boost::any_cast<object>(data));
+        trc("httppost", boost::any_cast<array>(data));
       }
     private:
       static object get(EasyOpt *o) {
         assert(o);
-        return boost::any_cast<object>(o->data[What]);
+        return boost::any_cast<array>(o->data[What]);
       }
       static char const *get_data_ptr(value v) {
         if(!v.is_string()) { // TODO binary stuff
@@ -564,19 +570,25 @@ namespace {
       }
       static void set(EasyOpt *o, object val) {
         assert(o);
-        o->data[What] = val;
         curl_httppost *post = 0x0;
         curl_httppost *last = 0x0;
         if(val.is_array()) {
-          array const a(val);
+          // copy the array
+          array const ain(val);
+          array a = flusspferd::create<flusspferd::array>(
+            boost::make_iterator_range(ain.begin(), ain.end()));
           for(array::iterator i = a.begin(); i != a.end(); ++i) {
             if(!i->is_object()) {
               throw flusspferd::exception("array member not an object");
             }
             object2form(i->get_object(), post, last);
           }
+          o->data[What] = a;
         }
         else {
+          array a = flusspferd::create<flusspferd::array>();
+          a.push(val);
+          o->data[What] = a;
           object2form(val, post, last);
         }
         o->parent.do_setopt(What, post);
