@@ -485,51 +485,57 @@ namespace {
       boost::any data() const { return data_t(create<array>(), 0x0); }
       CURLoption what() const { return What; }
       void trace(boost::any const &data, flusspferd::tracer &trc) const {
-        trc("list", boost::any_cast<data_t const&>(data).first);
+        data_t const &d = boost::any_cast<data_t const&>(data);
+        if(d.second) {
+          trc("list", d.first);
+        }
       }
       void cleanup(boost::any &data) const {
         data_t &d = boost::any_cast<data_t&>(data);
-        curl_slist *&list = d.second;
-        if(list) {
-          curl_slist_free_all(list);
-          list = 0x0;
+        if(d.second) {
+          curl_slist_free_all(d.second);
+          d.second = 0x0;
         }
       }
     private:
       typedef std::pair<array,curl_slist*> data_t;
+      static void reset(data_t &d) {
+        if(d.second) {
+          curl_slist_free_all(d.second);
+          d.second = 0x0;
+          d.first = create<array>();
+        }
+      }
       static array get(EasyOpt *o) {
         assert(o);
         return boost::any_cast<data_t&>(o->data[What]).first;
       }
       static void set(EasyOpt *o, array ain) {
-        // TODO cleanup this mess
-        // TODO handle empty array (setopt to NULL)
         assert(o);
-        data_t &d = boost::any_cast<data_t&>(o->data[What]);
-        curl_slist *&list = d.second;
-        if(list) {
-          curl_slist_free_all(list);
-          list = 0x0;
-        }
-        array &a = d.first;
-        a = create<array>(boost::make_iterator_range(ain.begin(), ain.end()));
-        for(array::iterator i = a.begin(); i != a.end(); ++i) {
-          if(!i->is_string()) {
-            curl_slist_free_all(list);
-            list = 0x0;
-            a = create<array>();
-            throw flusspferd::exception("array data not a string");
+        data_t d(
+          create<array>(boost::make_iterator_range(ain.begin(), ain.end())),
+          0x0);
+        try {
+          for(array::iterator i = d.first.begin(); i != d.first.end(); ++i) {
+            if(!i->is_string()) {
+              throw flusspferd::exception("array data not a string");
+            }
+            curl_slist *r = curl_slist_append(
+              d.second, i->get_string().c_str());
+            if(!r) {
+              throw flusspferd::exception("curl_slist_append");
+            }
+            d.second = r;
           }
-          curl_slist *r = curl_slist_append(list, i->get_string().c_str());
-          if(!r) {
-            curl_slist_free_all(list);
-            list = 0x0;
-            a = create<array>();
-            throw flusspferd::exception("curl_slist_append");
-          }
-          list = r;
         }
-        o->parent.do_setopt(What, list);
+        catch(...) {
+          reset(d);
+          throw;
+        }
+        o->parent.do_setopt(What, d.second);
+        data_t &old = boost::any_cast<data_t&>(o->data[What]);
+        reset(old);
+        old = d;
       }
     };
 
