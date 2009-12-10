@@ -33,14 +33,17 @@ while( (line = fh.readLine()) ) {
     in_doc = false;
   }
   else if(in_header) {
-    if(line.match(/}HEADER/)) {
+    if(line.match(/}DOC/)) {
       for each(var i in header) {
         print(' * ' + i);
       }
       print(' * ');
       in_header = false;
+      header = new Array;
     }
-    header.push(trim(line));
+    else {
+      header.push(trim(line));
+    }
   }
   else if(in_doc) {
     var m;
@@ -55,12 +58,12 @@ while( (line = fh.readLine()) ) {
         m[2].replace(/_/g,'') + '))';
       print(out);
     }
-    else if( (m = line.match(/HEADER{/))) {
+    else if( (m = line.match(/DOC{/))) {
       in_header = true;
     }
     else if( (m = line.match(/^\s*\/\/ (.*)/))) {
       if(m[1].indexOf('TODO') == -1) {
-        print(' * ###### ' + m[1]);
+        print(' * ###### ' + m[1] + ' ##');
       }
     }
   }

@@ -32,7 +32,7 @@
  * exported by the cURL module.
  *
  * + curl_easy_duphandle
- * + curl_easy_getinfo/curl_easy_setopt  ---  hidden in [[cURL.Easy#options]].
+ * + curl_easy_setopt  ---  hidden in [[cURL.Easy#options]].
  * + curl_easy_pause  ---  might be added.
  * + curl_easy_strerror  ---  used when an exception is thrown.
  * + curl_escape  ---  obsolete. See [[cURL.Easy#escape]] and [[cURL.Easy#unescape]].
