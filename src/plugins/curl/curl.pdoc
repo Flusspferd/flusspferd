@@ -8,13 +8,11 @@
  *  HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, proxies, cookies, user+password
  *  authentication (Basic, Digest, NTLM, Negotiate, Kerberos4), file transfer resume, http proxy
  *  tunneling and more!"
- * [libcurl][libcurlhp]
- * [libcurlhp]: http://curl.haxx.se/libcurl/
+ * [libcurl][http://curl.haxx.se/libcurl/]
  *
- * ##### Example #
+ * ## Example #
  *
  *     const cURL = require('curl');
- *
  *     cURL.globalInit(cURL.GLOBAL_ALL);
  *     var c = new cURL.Easy();
  *     c.options.url = 'http://flusspferd.org/foo.txt';
@@ -23,6 +21,31 @@
  *       return data.length;
  *     }
  *     c.perform();
+ *
+ * ## Implementation Notes #
+ *
+ * Instead of returning an error code functions throw an exception.
+ *
+ * ##### Not implemented #
+ *
+ * Some functions of libcurl which are considered too low level or not JS compatible are not
+ * exported by the cURL module.
+ *
+ * + curl_easy_duphandle
+ * + curl_easy_getinfo/curl_easy_setopt  ---  hidden in [[cURL.Easy#options]].
+ * + curl_easy_pause  ---  might be added.
+ * + curl_easy_strerror  ---  used when an exception is thrown.
+ * + curl_escape  ---  obsolete. See [[cURL.Easy#escape]] and [[cURL.Easy#unescape]].
+ * + curl_formadd/curl_formfree  ---  hidden in options.httppost
+ * + curl_free
+ * + curl_getdate  ---  might be added.
+ * + curl_global_cleanup
+ * + curl_global_init_mem
+ * + curl_slist_append/curl_slist_free_all  ---  hidden in options.
+ * + curl_version_info
+ * + curl_version  ---  see [[cURL.version]].
+ *
+ * Multi/Share interface will be added in the future.
  **/
 
 /**

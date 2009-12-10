@@ -3,9 +3,9 @@ Implement the following Options:
 see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 * CURLOPT_WRITEDATA - FILE*. But see writefunction
 * CURLOPT_READDATA - FILE*. But see readfunction
-* CURLOPT_IOCTLFUNCTION/CURLOPT_IOCTLDATA
-* CURLOPT_SOCKOPTFUNCTION/CURLOPT_SOCKOPTDATA
-* CURLOPT_OPENSOCKETFUNCTION/CURLOPT_OPENSOCKETDATA
+* CURLOPT_IOCTLFUNCTION/CURLOPT_IOCTLDATA - unnecessary (atm?), Use seekfunction instead
+* CURLOPT_SOCKOPTFUNCTION/CURLOPT_SOCKOPTDATA - unnecessary (atm?)
+* CURLOPT_OPENSOCKETFUNCTION/CURLOPT_OPENSOCKETDATA - unnecessary (atm?)
 * CURLOPT_WRITEHEADER - FILE*. But see headerfunction
 * CURLOPT_SSL_CTX_FUNCTION/CURLOPT_SSL_CTX_DATA - unnecessary (only for OpenSSL)
 * CURLOPT_CONV_TO_NETWORK_FUNCTION/CURLOPT_CONV_FROM_NETWORK_FUNCTION/CURLOPT_CONV_FROM_UTF8_FUNCTION - not exportable due to lack of data parameter. But probably unnecessary anyway
@@ -21,17 +21,20 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 * CURLOPT_RESUME_FROM_LARGE - unnecessary
 * CURLOPT_INFILESIZE_LARGE - unnecessary
 * CURLOPT_MAXFILESIZE_LARGE - unnecessary
-* CURLOPT_SSH_KEYFUNCTION/CURLOPT_SSH_KEYDATA
+* CURLOPT_SSH_KEYFUNCTION/CURLOPT_SSH_KEYDATA - too new (7.19.6)
 * CURLOPT_PRIVATE - unnecessary
 * CURLOPT_SHARE - if curl shared stuff is implemented.
 * CURLOPT_TELNETOPTIONS - list
 
 - FILE* this would require to access the data inside the file object and use fdopen
-- list: implement list studd
+- list: implement list stuff. (Just take array and convert it)
 
 Functions:
 * curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html (needed?)
-* ...
+
+What about init/global_cleanup? This should be handled by the module!
+
+(init is auto called anyway. but not considered good practice by the libcurl docs)
 
 Documentation:
 * callback options
