@@ -1,6 +1,14 @@
 const cURL = require('curl');
 const asserts = require('test').asserts;
 
+exports.test_curlCleanup = function() {
+  cURL.globalInit(cURL.GLOBAL_ALL);
+  var c = new cURL.Easy();
+  asserts.ok(c.valid());
+  c.cleanup();
+  asserts.ok(!c.valid());
+};
+
 exports.test_curlReset = function() {
   cURL.globalInit(cURL.GLOBAL_ALL);
   var c = new cURL.Easy();
