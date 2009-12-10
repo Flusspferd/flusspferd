@@ -75,14 +75,16 @@
  * cURL.Easy#escape(String) -> String
  *
  * URL encodes the given string.
- * See [curl_easy_escape](http://curl.haxx.se/libcurl/c/curl_easy_escape.html)
+ * See [curl_easy_escape](http://curl.haxx.se/libcurl/c/curl_easy_escape.html) and
+ * [[cURL.Easy#unescape]].
  **/
 
 /**
  * cURL.Easy#unescape(String) -> String
  *
  * URL decodes the given string.
- * See [curl_easy_unescape](http://curl.haxx.se/libcurl/c/curl_easy_unescape.html)
+ * See [curl_easy_unescape](http://curl.haxx.se/libcurl/c/curl_easy_unescape.html) and
+ * [[cURL.Easy#escape]].
  **/
 
 /**
