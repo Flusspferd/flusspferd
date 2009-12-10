@@ -714,7 +714,9 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_UNRESTRICTED_AUTH> >(map)("unrestrictedAuth");
         ptr_map_insert< integer_option<CURLOPT_MAXREDIRS> >(map)("maxredirs");
         ptr_map_insert< integer_option<CURLOPT_POSTREDIR> >(map)("postredir"); // See cURL.REDIR_*
-        // TODO: POST*
+        ptr_map_insert< integer_option<CURLOPT_POST> >(map)("post");
+        ptr_map_insert< string_option<CURLOPT_POSTFIELDS> >(map)("postfields");
+        ptr_map_insert< integer_option<CURLOPT_POSTFIELDSIZE> >(map)("postfieldsize");
         ptr_map_insert< http_post_option >(map)("httppost");
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
         ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
