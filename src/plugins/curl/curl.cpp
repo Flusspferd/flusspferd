@@ -92,6 +92,7 @@ namespace {
       virtual boost::any data() const =0;
       virtual CURLoption what() const =0;
       virtual void trace(boost::any const &, flusspferd::tracer &) const { }
+      virtual void cleanup(boost::any &) const { }
     };
     handle_option::~handle_option() { }
 
@@ -115,6 +116,17 @@ namespace {
     EasyOpt(flusspferd::object const &self, Easy &parent)
       : base_type(self), parent(parent)
     {	}
+    ~EasyOpt() {
+      for(options_map_t::const_iterator i = get_options().begin();
+          i != get_options().end();
+          ++i)
+      {
+        data_map_t::iterator j = data.find(i->second->what());
+        if(j != data.end()) {
+          i->second->cleanup(j->second);
+        }
+      }
+    }
 
     static EasyOpt &create(Easy &p) {
       return flusspferd::create<EasyOpt>(bf::make_vector(boost::ref(p)));
@@ -441,6 +453,65 @@ namespace {
       }
     };
 
+    template<CURLoption What>
+    struct list_option : handle_option {
+      function getter() const {
+        return create<flusspferd::method>("$get_", &get);
+      }
+      function setter() const {
+        return create<flusspferd::method>("$set_", &set);
+      }
+      boost::any data() const { return data_t(create<array>(), 0x0); }
+      CURLoption what() const { return What; }
+      void trace(boost::any const &data, flusspferd::tracer &trc) const {
+        trc("list", boost::any_cast<data_t const&>(data).first);
+      }
+      void cleanup(boost::any &data) const {
+        data_t &d = boost::any_cast<data_t&>(data);
+        curl_slist *&list = d.second;
+        if(list) {
+          curl_slist_free_all(list);
+          list = 0x0;
+        }
+      }
+    private:
+      typedef std::pair<array,curl_slist*> data_t;
+      static array get(EasyOpt *o) {
+        assert(o);
+        return boost::any_cast<data_t&>(o->data[What]).first;
+      }
+      static void set(EasyOpt *o, array ain) {
+        // TODO cleanup this mess
+        // TODO handle empty array (setopt to NULL)
+        assert(o);
+        data_t &d = boost::any_cast<data_t&>(o->data[What]);
+        curl_slist *&list = d.second;
+        if(list) {
+          curl_slist_free_all(list);
+          list = 0x0;
+        }
+        array &a = d.first;
+        a = create<array>(boost::make_iterator_range(ain.begin(), ain.end()));
+        for(array::iterator i = a.begin(); i != a.end(); ++i) {
+          if(!i->is_string()) {
+            curl_slist_free_all(list);
+            list = 0x0;
+            a = create<array>();
+            throw flusspferd::exception("array data not a string");
+          }
+          curl_slist *r = curl_slist_append(list, i->get_string().c_str());
+          if(!r) {
+            curl_slist_free_all(list);
+            list = 0x0;
+            a = create<array>();
+            throw flusspferd::exception("curl_slist_append");
+          }
+          list = r;
+        }
+        o->parent.do_setopt(What, list);
+      }
+    };
+
     /*
       add a specialisation of this template to map to the real callback.
 
@@ -583,7 +654,7 @@ namespace {
         CURLFORMcode ret = curl_formadd(
           &post, &last,
           CURLFORM_PTRNAME, get_data_ptr(o.get_property("name")),
-          CURLFORM_ARRAY, &forms[0], CURLFORM_END);
+          CURLFORM_ARRAY, &forms[0], CURLFORM_END); // TODO free data
         if(ret != 0) {
           std::stringstream sstr;
           sstr << "curl_formadd failed! " << static_cast<unsigned>(ret);
@@ -591,6 +662,7 @@ namespace {
         }
       }
       static void set(EasyOpt *o, object val) {
+        // TODO free old data
         assert(o);
         curl_httppost *post = 0x0;
         curl_httppost *last = 0x0;
@@ -625,7 +697,9 @@ namespace {
   (if (string= (downcase type) "i")
       (setq type "integer")
       (if (string= (downcase type) "s")
-          (setq type "string")))
+          (setq type "string")
+          (if (string= (downcase type) "l")
+              (setq type "list"))))
   (setq name (replace-regexp-in-string "^CURLOPT_" "" name))
   (insert (concat "ptr_map_insert< " type "_option<CURLOPT_" name "> >(map)(\"" (downcase name) "\");")))
 (defun insreg (begin end type)
@@ -720,7 +794,8 @@ namespace {
         ptr_map_insert< http_post_option >(map)("httppost");
         ptr_map_insert< string_option<CURLOPT_REFERER> >(map)("referer");
         ptr_map_insert< string_option<CURLOPT_USERAGENT> >(map)("userAgent");
-        // TODO: HTTPHEADER,HTTP200ALIASES
+        ptr_map_insert< list_option<CURLOPT_HTTPHEADER> >(map)("httpheader");
+        ptr_map_insert< list_option<CURLOPT_HTTP200ALIASES> >(map)("http200aliases");
         ptr_map_insert< string_option<CURLOPT_COOKIE> >(map)("cookie");
         ptr_map_insert< string_option<CURLOPT_COOKIEFILE> >(map)("cookieFile");
         ptr_map_insert< string_option<CURLOPT_COOKIEJAR> >(map)("cookiejar");
@@ -736,7 +811,9 @@ namespace {
 
         // FTP OPTIONS
         ptr_map_insert< string_option<CURLOPT_FTPPORT> >(map)("ftpPort");
-        // TODO: CURLOPT_QUOTE, CURLOPT_POSTQUOTE, CURLOPT_PREQUOTE
+        ptr_map_insert< list_option<CURLOPT_QUOTE> >(map)("quote");
+        ptr_map_insert< list_option<CURLOPT_POSTQUOTE> >(map)("postquote");
+        ptr_map_insert< list_option<CURLOPT_PREQUOTE> >(map)("prequote");
         ptr_map_insert< integer_option<CURLOPT_DIRLISTONLY> >(map)("dirListOnly");
         ptr_map_insert< integer_option<CURLOPT_APPEND> >(map)("append");
         ptr_map_insert< integer_option<CURLOPT_FTP_USE_EPRT> >(map)("ftpUseEprt");
@@ -806,11 +883,13 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_SSH_PRIVATE_KEYFILE> >(map)("sshPrivateKeyfile");
 #if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 6)
         ptr_map_insert< string_option<CURLOPT_SSH_KNOWNHOSTS> >(map)("sshKnownhosts");
-#endif
         // TODO: SSH_KEYFUNCTION/DATA
+#endif
         // OTHER OPTIONS
         ptr_map_insert< integer_option<CURLOPT_NEW_FILE_PERMS> >(map)("newFilePerms");
         ptr_map_insert< integer_option<CURLOPT_NEW_DIRECTORY_PERMS> >(map)("newDirectoryPerms");
+        // TELNET OPTIONS
+        ptr_map_insert< list_option<CURLOPT_TELNETOPTIONS> >(map)("telnetoptions");
         // }END DOC
       }
       return map;

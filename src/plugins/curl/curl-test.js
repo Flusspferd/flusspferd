@@ -48,4 +48,5 @@ c.options.headerfunction = function(data, size) {
 c.options.httppost = [{ name: "test", contents: "Hello World!" },
                       { name: "foo", contents: "bar" }];
 */
+c.options.httpheader = ['x-flusspferd: ruled'];
 c.perform();

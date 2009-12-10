@@ -13,21 +13,14 @@ see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
 * CURLOPT_STDERR - FILE*
 * CURLOPT_POSTFIELDSIZE_LARGE - unnecessary
 * CURLOPT_COPYPOSTFIELDS - unnecessary
-* CURLOPT_HTTPHEADER - list
-* CURLOPT_HTTP200ALIASES - list
-* CURLOPT_QUOTE - list
-* CURLOPT_POSTQUOTE - list
-* CURLOPT_PREQUOTE - list
 * CURLOPT_RESUME_FROM_LARGE - unnecessary
 * CURLOPT_INFILESIZE_LARGE - unnecessary
 * CURLOPT_MAXFILESIZE_LARGE - unnecessary
 * CURLOPT_SSH_KEYFUNCTION/CURLOPT_SSH_KEYDATA - too new (7.19.6)
 * CURLOPT_PRIVATE - unnecessary
 * CURLOPT_SHARE - if curl shared stuff is implemented.
-* CURLOPT_TELNETOPTIONS - list
 
 - FILE* this would require to access the data inside the file object and use fdopen
-- list: implement list stuff. (Just take array and convert it)
 
 Functions:
 * curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html (needed?)
