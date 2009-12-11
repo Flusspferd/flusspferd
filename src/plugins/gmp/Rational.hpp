@@ -39,9 +39,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "Rational")
   (full_name, "gmp.Rational")
   (methods,
-    ("get_double",        bind,   get_double)
+    ("get_double",        bind,   get_double) // deprecated
     ("toDouble",          alias,  "get_double")
-    ("get_string",        bind,   get_string)
+    ("get_string",        bind,   get_string) // deprecated
     ("toString",          alias,  "get_string")
     ("get_string_base",   alias,  "get_string") // deprecated
     ("sgn",               bind,   sgn)

@@ -19,8 +19,11 @@ namespace multi_precision {
     else if(x.arg.size() == 2) {
       value v = x.arg.front();
       value u = x.arg.back();
-      if(v.is_string() && u.is_int())
-        mp.set_str(v.to_std_string(), u.get_int());
+      if(v.is_string() && u.is_int()) {
+        if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
+          throw flusspferd::exception("string representation not valid");
+        }
+      }
       else {
         mp.set_prec(u.get_int());
         init_with_value(v);
@@ -32,7 +35,9 @@ namespace multi_precision {
       value w = x.arg[2];
       if(v.is_string() && u.is_int() && w.is_int()) {
         mp.set_prec(u.get_int());
-        mp.set_str(v.to_std_string(), w.get_int());
+        if(mp.set_str(v.to_std_string(), w.get_int()) != 0) {
+          throw flusspferd::exception("string representation not valid");
+        }
       }
       else
         throw flusspferd::exception("Wrong arguments! (string, int, int) expected.");

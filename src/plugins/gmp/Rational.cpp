@@ -33,12 +33,17 @@ namespace multi_precision {
     else if(x.arg.size() == 2) {
       flusspferd::value v = x.arg.front();
       flusspferd::value u = x.arg.back();
-      if(v.is_int() && u.is_int())
+      if(v.is_int() && u.is_int()) {
         mp = mpq_class(v.get_int(), u.get_int());
-      else if(v.is_string() && u.is_int())
-        mp.set_str(v.to_std_string(), u.get_int());
-      else
+      }
+      else if(v.is_string() && u.is_int()) {
+        if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
+          throw flusspferd::exception("string representation not valid");
+        }
+      }
+      else {
         throw flusspferd::exception("Wrong arguments! (string, int) expected.");
+      }
     }
     else
       throw flusspferd::exception("Wrong number of arguments");
