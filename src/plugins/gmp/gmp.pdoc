@@ -223,7 +223,7 @@
  **/
 
 /**
- *  gmp.Float#precision() -> Integer
+ *  gmp.Float#precision -> Integer
  *
  * Precision in bits. (rw)
  *
@@ -253,3 +253,9 @@
  *  Return the integral value nearest to but not larger in magnitude then `this`.
  **/
 
+/**
+ *  gmp.Float#getString([base = 10]) -> Object
+ * - base (Number): base to represent value in.
+ *
+ * Returns an object containing the string as property `string` and the exponential as `exp`.
+ **/
