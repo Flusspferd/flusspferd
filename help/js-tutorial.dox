@@ -386,7 +386,7 @@ var spec = {
  *
  * Using the cURL module is straight forward
  *
- * @verbatim:
+ * @verbatim
  const cURL = require('curl');
 
  var c = new cURL.Easy();
