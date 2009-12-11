@@ -15,7 +15,6 @@
  * ## Example #
  *
  *     const cURL = require('curl');
- *     cURL.globalInit(cURL.GLOBAL_ALL);
  *     var c = new cURL.Easy();
  *     c.options.url = 'http://flusspferd.org/foo.txt';
  *     c.options.writefunction = function(data,size) {
@@ -62,21 +61,23 @@
  *
  * Provides a synchronous and quick interface.
  *
- * See [cURL's easy Interface][curl_easy] if you are curious about the underlying C API.
- *
- * [curl_easy]: http://curl.haxx.se/libcurl/c/libcurl-easy.html
+ * See [cURL's easy Interface](http://curl.haxx.se/libcurl/c/libcurl-easy.html) if you are curious about the underlying C API.
  **/
 
 /**
  * new cURL.Easy()
  *
- * Create a new cURL.Easy handle. See [curl_easy_init](http://curl.haxx.se/libcurl/c/curl_easy_init.html).
+ * Create a new cURL.Easy handle.
+ *
+ * See [curl_easy_init](http://curl.haxx.se/libcurl/c/curl_easy_init.html).
  **/
 
 /**
  * cURL.Easy#cleanup() -> undefined
  *
- * Destroy cURL object and free resources.
+ * Destroy cURL object and free resources. cURL objects are cleaned up when garbage collected.
+ * You do not need to call this manually.
+ *
  * See [curl_easy_cleanup](http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html).
  **/
 
@@ -84,6 +85,7 @@
  * cURL.Easy#perform() -> undefined
  *
  * Perform the file transfer. Throws an exception on error.
+ *
  * See [curl_easy_perform](http://curl.haxx.se/libcurl/c/curl_easy_perform.html).
  **/
 
@@ -91,6 +93,7 @@
  * cURL.Easy#reset() -> undefined
  *
  * Reset options to initial defaults.
+ *
  * See [curl_easy_reset](http://curl.haxx.se/libcurl/c/curl_easy_reset.html).
  **/
 
@@ -98,6 +101,7 @@
  * cURL.Easy#escape(String) -> String
  *
  * URL encodes the given string.
+ *
  * See [curl_easy_escape](http://curl.haxx.se/libcurl/c/curl_easy_escape.html) and
  * [[cURL.Easy#unescape]].
  **/
@@ -106,13 +110,15 @@
  * cURL.Easy#unescape(String) -> String
  *
  * URL decodes the given string.
+ *
  * See [curl_easy_unescape](http://curl.haxx.se/libcurl/c/curl_easy_unescape.html) and
  * [[cURL.Easy#escape]].
  **/
 
 /**
- * cURL.Easy#valid() -> bool
+ * cURL.Easy#valid() -> Boolean
  *
  * Returns true if the object is valid.
+ *
  * See [[cURL.Easy#cleanup]].
  **/
