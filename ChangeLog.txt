@@ -4,6 +4,19 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-12-11:
+- Improved GMP Module:
+  - Deprecated C style functions (containing a _)
+  - gmp.Float#precision instead of get/set_prec
+  - gmp.Rational#numerator/denominator instead of get_den/num (and added set!)
+  - gmp.Base#toString now accepts an optional base parameter (get_string_base deprecated!)
+  - gmp.Float#getString similar to gmp.Base#toString
+  - replaced asserts with exceptions
+  - added error checks to ctors
+  - fixed bug in gmp.Float#toString when the number was a multiple of 10
+  - improved documentation
+  (#164)
+
 2009-12-08:
 - C++0x compatibility: flusspferd::char16_t renamed to flusspferd::js_char16_t (#180)
 
