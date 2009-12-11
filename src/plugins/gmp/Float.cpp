@@ -66,22 +66,25 @@ namespace multi_precision {
     }
   }
 
-  object Float::get_string() /*const*/ {
+  void Float::get_string(flusspferd::call_context &cc) /*const*/ {
     mp_exp_t expo;
-    std::string str = mp.get_str(expo);
+    std::string str;
+    if(cc.arg.size() == 0) {
+      str = mp.get_str(expo);
+    }
+    else if(cc.arg.size() == 1) { // base parameter
+      if(!cc.arg[0].is_int()) {
+        throw flusspferd::exception("gmp.Float#getString expects and Integer or none parameter.");
+      }
+      str = mp.get_str(expo, cc.arg[0].get_int());
+    }
+    else {
+      throw flusspferd::exception("gmp.Float#getString expects one or zero parameters.");
+    }
     object x = create<object>();
     x.set_property("string", value(str));
     x.set_property("exp", value(expo));
-    return x;
-  }
-
-  object Float::get_string_base(int base) /*const*/ {
-    mp_exp_t expo;
-    std::string str = mp.get_str(expo, base);
-    object x = create<object>();
-    x.set_property("string", value(str));
-    x.set_property("exp", value(expo));
-    return x;
+    cc.result = x;
   }
 
   int Float::get_prec() /*const*/ {
