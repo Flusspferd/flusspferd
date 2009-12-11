@@ -753,7 +753,7 @@ namespace {
         /* DOC{
            cURL.Easy#options -> EasyOpt
 
-           The options property is used to set connection options (see curl_easy_setopt).
+           The options property is used to set connection options (see [curl_easy_setopt](http://curl.haxx.se/libcurl/c/curl_easy_setopt.html)).
 
            ## Example #
            %      c.options.url = 'http://www.google.com'
