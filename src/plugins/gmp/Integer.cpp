@@ -1,6 +1,8 @@
 
 #include "Integer.hpp"
 
+#include "exception.hpp"
+
 #include "Float.hpp"
 #include "Rational.hpp"
 
@@ -27,22 +29,23 @@ namespace multi_precision {
       else if(flusspferd::is_native<Float>(v.get_object()))
         mp = flusspferd::get_native<Float>(v.get_object()).mp;
       else
-        throw flusspferd::exception("Wrong parameter type");
+        throw type_error("Wrong parameter type");
     }
     else if(x.arg.size() == 2) {
       flusspferd::value v = x.arg.front();
       flusspferd::value u = x.arg.back();
       if(v.is_string() && u.is_int()) {
         if(mp.set_str(v.to_std_string(), u.get_int()) == -1) {
-          throw flusspferd::exception("string representation not valid");
+          throw runtime_error("string representation not valid");
         }
       }
       else {
-        throw flusspferd::exception("Wrong arguments! (string, int) expected.");
+        throw argument_error("Wrong arguments! (string, int) expected.");
       }
     }
-    else
-      throw flusspferd::exception("Wrong number of arguments!");
+    else {
+      throw argument_error("Wrong number of arguments!");
+    }
   }
 
   bool Integer::fits_int() /*const*/ {
@@ -50,7 +53,7 @@ namespace multi_precision {
   }
   int Integer::get_int() /*const*/ {
     if(!fits_int()) {
-      throw flusspferd::exception("gmp.Integer does not fit into Javascript Number!");
+      throw runtime_error("gmp.Integer does not fit into Javascript Number!");
     }
     return mp.get_si();
   }
@@ -63,12 +66,12 @@ namespace multi_precision {
     }
     else if(cc.arg.size() == 1) {
       if(!cc.arg[0].is_int()) {
-        throw flusspferd::exception("gmp.Integer#toString wrong parameter type");
+        throw type_error("gmp.Integer#toString wrong parameter type");
       }
       cc.result = mp.get_str(cc.arg[0].get_int());
     }
     else {
-      throw flusspferd::exception("gmp.Integer#toString wrong number of parameters");
+      throw argument_error("gmp.Integer#toString wrong number of parameters");
     }
   }
 
@@ -86,7 +89,7 @@ namespace multi_precision {
 
   void Integer::cmp(flusspferd::call_context &x) /*const*/ {
     if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected one parameter");
+      throw argument_error("Expected one parameter");
     flusspferd::value v = x.arg.front();
     if(v.is_int())
       x.result = ::cmp(mp, v.get_int());
@@ -99,13 +102,13 @@ namespace multi_precision {
     else if(flusspferd::is_native<Integer>(v.get_object()))
       x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
     else
-      throw flusspferd::exception("Wrong parameter type");
+      throw type_error("Wrong parameter type");
   }
 
 #define OPERATOR(name, op)                                              \
   void Integer:: name (flusspferd::call_context &x) /*const*/ {         \
     if(x.arg.empty() || x.arg.size() > 1)                               \
-      throw flusspferd::exception("Expected one parameter");            \
+      throw argument_error("Expected one parameter");                   \
     flusspferd::value v = x.arg.front();                                \
     if(v.is_int())                                                      \
       x.result = create_integer(mp op v.get_int());                     \
@@ -118,7 +121,7 @@ namespace multi_precision {
     else if(flusspferd::is_native<Integer>(v.get_object()))             \
       x.result = create_integer(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
     else                                                                \
-      throw flusspferd::exception("Wrong parameter type");              \
+      throw type_error("Wrong parameter type");                         \
   }                                                                     \
   /* */
 
