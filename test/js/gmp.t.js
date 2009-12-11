@@ -28,6 +28,16 @@ exports.testInteger = function() {
   asserts.same(r.toString(2), '101');
 };
 
+exports.testRational = function() {
+  var q = gmp.Rational(10,1);
+  asserts.same(q.toDouble(), 10);
+  asserts.same(q.toString(), '10');
+  asserts.same(q.toString(2), '1010');
+  q.denominator = gmp.Integer(3);
+  //asserts.same(q.denominator.getInt(), 3); // TODO
+  asserts.same(q.toString(), '10/3');
+};
+
 exports.testFloat = function() {
   var f = gmp.Float(10);
   asserts.same(f.toInt(), 10);
