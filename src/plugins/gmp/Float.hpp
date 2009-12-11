@@ -72,7 +72,7 @@ public:
   bool fits_int() /*const*/;
   int get_int() /*const*/;
   double get_double() /*const*/;
-  std::string toString() /* const */;
+  void toString(flusspferd::call_context &x) /* const */;
   void get_string(flusspferd::call_context &x) /*const*/;
   int get_prec() /*const*/;
   void set_prec(int p);
@@ -102,6 +102,7 @@ public:
   
 private:
   void init_with_value(flusspferd::value v);
+  std::pair<std::string,mp_exp_t> get_string_impl(flusspferd::call_context &cc) const;
 };
 
 }
