@@ -44,10 +44,6 @@ namespace args = phoenix::arg_names;
 using namespace flusspferd;
 using namespace flusspferd::param;
 
-namespace flusspferd { namespace detail {
-  extern char const * const json2;
-}}
-
 void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   root_object scope(scope_);
 
@@ -110,13 +106,4 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
     phoenix::bind(&flusspferd::load_flusspferd_module, args::arg1, argv0),
     _signature = param::type<void (object)>(),
     _container = preload);
-
-  if (!scope_.has_own_property("JSON")) {
-    flusspferd::evaluate_in_scope(
-      detail::json2,
-      std::strlen(detail::json2),
-      0x0, // Filename
-      0,   // Linenumber
-      scope_);
-  }
 }
