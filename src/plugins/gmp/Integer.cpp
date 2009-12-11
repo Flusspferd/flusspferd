@@ -51,11 +51,19 @@ namespace multi_precision {
   double Integer::get_double() /*const*/ {
     return mp.get_d();
   }
-  std::string Integer::get_string() /*const*/ {
-    return mp.get_str();
-  }
-  std::string Integer::get_string_base(int base) /*const*/ {
-    return mp.get_str(base);
+  void Integer::get_string(flusspferd::call_context &cc) /*const*/ {
+    if(cc.arg.size() == 0) {
+      cc.result = mp.get_str();
+    }
+    else if(cc.arg.size() == 1) {
+      if(!cc.arg[0].is_int()) {
+        throw flusspferd::exception("gmp.Integer#toString wrong parameter type");
+      }
+      cc.result = mp.get_str(cc.arg[0].get_int());
+    }
+    else {
+      throw flusspferd::exception("gmp.Integer#toString wrong number of parameters");
+    }
   }
 
   Integer &Integer::sqrt() /*const*/ {
