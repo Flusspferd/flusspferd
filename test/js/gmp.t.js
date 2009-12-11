@@ -28,5 +28,13 @@ exports.testInteger = function() {
   asserts.same(r.toString(2), '101');
 };
 
+exports.testFloat = function() {
+  var f = gmp.Float(10);
+  asserts.same(f.toInt(), 10);
+  asserts.same(f.toString(), '10.0');
+  asserts.same(f.toString(2), '1010.0');
+  asserts.ok(f.fitsInt());
+};
+
 if (require.main === module)
   require('test').runner(exports);
