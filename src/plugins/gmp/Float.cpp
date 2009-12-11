@@ -51,7 +51,9 @@ namespace multi_precision {
   }
 
   int Float::get_int() /*const*/ {
-    assert(fits_int());
+    if(!fits_int()) {
+      throw flusspferd::exception("gmp.Float does not fit into Javascript Number!");
+    }
     return mp.get_si();
   }
 
