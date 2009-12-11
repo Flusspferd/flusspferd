@@ -27,5 +27,15 @@ exports.test_curlEncode = function() {
   asserts.same(input, result);
 };
 
+exports.test_options = function() {
+  var c = new cURL.Easy();
+  asserts.ok(c.valid());
+  asserts.throwsOk(function() {
+    c.options.httppost = {
+      noname : "yes"
+    };
+                 }, TypeError);
+};
+
 if (require.main === module)
   require('test').runner(exports);
