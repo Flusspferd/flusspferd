@@ -38,13 +38,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (full_name, "gmp.Float")
   (methods,
     ("fits_int",         bind,    fits_int)
+    ("fitsInt",          alias,   "fits_int")
     ("get_int",          bind,    get_int)
     ("toInt",            alias,   "get_int")
     ("get_double",       bind,    get_double)
     ("toDouble",         alias,   "get_double")
     ("get_string",       bind,    get_string)
+    ("getString",        alias,   "get_string")
     ("toString",         bind,    toString)
-    ("get_string_base",  bind,    get_string_base)
+    ("get_string_base",  alias,   "get_string") // deprecated
     ("get_prec",         bind,    get_prec)
     ("set_prec",         bind,    set_prec)
     ("sqrt",             bind,    sqrt)
@@ -57,7 +59,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("add",              bind,    add)
     ("sub",              bind,    sub)
     ("mul",              bind,    mul)
-    ("div",              bind,    div)))
+    ("div",              bind,    div))
+  (properties,
+   ("precision", getter_setter, (get_prec, set_prec))))
 {
 public:
   mpf_class mp;
@@ -69,8 +73,7 @@ public:
   int get_int() /*const*/;
   double get_double() /*const*/;
   std::string toString() /* const */;
-  object get_string() /*const*/;
-  object get_string_base(int base) /*const*/;
+  void get_string(flusspferd::call_context &x) /*const*/;
   int get_prec() /*const*/;
   void set_prec(int p);
 
