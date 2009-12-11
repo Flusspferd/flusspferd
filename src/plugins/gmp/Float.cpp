@@ -76,12 +76,16 @@ namespace multi_precision {
   void Float::toString(flusspferd::call_context &cc) /* const */ {
     std::pair<std::string,mp_exp_t> p = get_string_impl(cc);
     assert(p.second >= 0);
-    if(static_cast<std::size_t>(p.second) >= p.first.size()) {
-      // TODO expand! BUG
-      cc.result = p.first + ".0";
+    std::size_t const expo = static_cast<std::size_t>(p.second);
+    if(expo >= p.first.size()) {
+      for(std::size_t i = p.first.size(); i < expo; ++i) {
+        p.first += '0';
+      }
+      p.first += ".0";
+      cc.result = p.first;
     }
     else {
-      cc.result = p.first.substr(0, p.second) + '.' + p.first.substr(p.second);
+      cc.result = p.first.substr(0, expo) + '.' + p.first.substr(expo);
     }
   }
 
