@@ -31,7 +31,7 @@
  **/
 
 /**
- *  gmp.Base#getDouble() -> Number
+ *  gmp.Base#toDouble() -> Number
  *
  *  Returns the value as a floating point number
  **/
@@ -127,7 +127,7 @@
 /**
  *  gmp.Integer#sqrt() -> gmp.Integer
  *
- *  Returns the square root of `this`.
+ *  Returns the integer(!) square root of `this`.
  **/
 
 /**
@@ -211,6 +211,22 @@
  **/
 
 /**
+ *  new gmp.Float(value)
+ *  new gmp.Float(str, base)
+ *  new gmp.Float(prec, value)
+ *  new gmp.Float(prec, str, base)
+ *  - value (Number | String | gmp.Base): initial value
+ *  - str (String): value in a string
+ *  - base (Integer): base to interpret `str` in
+ *  - prec (Integer): initial precision in bits
+ *
+ * Construct a new GMP float value, either from a primitive value, form an
+ * existing [[gmp.Base]] or via a string representation.
+ *
+ * `prec` is the initial precision in bits. If no `prec` is given the default precision is used.
+ **/
+
+/**
  *  gmp.Float#fitsInt() -> Boolean
  *
  *  Checks if the value fits into an integer.
@@ -258,4 +274,5 @@
  * - base (Number): base to represent value in.
  *
  * Returns an object containing the string as property `string` and the exponential as `exp`.
+ * See [[gmp.Base#toString]].
  **/
