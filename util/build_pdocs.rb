@@ -17,12 +17,13 @@ module HippoDocsHelper
   end
   
 
-  def self.build_docs()
+  def self.build_docs(extras)
 
     rm_rf DOC_DIR
     begin
       files = Dir.glob( File.join(ROOT_DIR, "src", "**","*.pdoc") )
       files << Dir.glob( File.join(ROOT_DIR, "src","**","*.js") )
+      files << extras
       files.flatten!
 
       if files.empty?
@@ -95,5 +96,5 @@ end
 if __FILE__ == $0
   HippoDocsHelper.require_gems
   HippoDocsHelper.require_pdoc
-  HippoDocsHelper.build_docs
+  HippoDocsHelper.build_docs(ARGV)
 end
