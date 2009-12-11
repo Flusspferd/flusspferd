@@ -127,19 +127,25 @@
 /**
  *  gmp.Integer#sqrt() -> gmp.Integer
  *
- *  Returns the integer(!) square root of `this`.
+ *  Returns the **integer** square root of `this`.
+ *
+ *  See [[gmp.Float#sqrt]].
  **/
 
 /**
  *  gmp.Integer#fitsInt() -> Boolean
  *
  *  Checks if the value fits into an integer.
+ *
+ *  See [[gmp.Float#fitsInt]].
  **/
 
 /**
- *  gmp.Integer#getInt() -> Integer
+ *  gmp.Integer#toInt() -> Integer
  *
  *  Returns the value as an integer.
+ *
+ *  See [[gmp.Float#toInt]], [[gmp.Base#toDouble]], [[gmp.Base#toString]].
  **/
 
 
@@ -230,12 +236,16 @@
  *  gmp.Float#fitsInt() -> Boolean
  *
  *  Checks if the value fits into an integer.
+ *
+ *  See [[gmp.Integer#fitsInt]].
  **/
 
 /**
  *  gmp.Float#toInt() -> Integer
  *
  *  Returns the value as an integer.
+ *
+ *  See [[gmp.Integer#toInt]], [[gmp.Base#toDouble]], [[gmp.Base#toString]].
  **/
 
 /**
@@ -250,6 +260,8 @@
  *  gmp.Float#sqrt() -> gmp.Float
  *
  *  Returns the square root of `this`.
+ *
+ *  See [[gmp.Integer#sqrt]].
  **/
 
 /**
@@ -271,8 +283,8 @@
 
 /**
  *  gmp.Float#getString([base = 10]) -> Object
- * - base (Number): base to represent value in.
+ *  - base (Number): base to represent value in.
  *
- * Returns an object containing the string as property `string` and the exponential as `exp`.
- * See [[gmp.Base#toString]].
+ *  Returns an object containing the string as property `string` and the exponential as `exp`.
+ *  See [[gmp.Base#toString]].
  **/
