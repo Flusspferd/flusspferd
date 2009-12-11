@@ -49,7 +49,9 @@ namespace multi_precision {
     return mp.fits_sint_p();
   }
   int Integer::get_int() /*const*/ {
-    assert(fits_int());
+    if(!fits_int()) {
+      throw flusspferd::exception("gmp.Integer does not fit into Javascript Number!");
+    }
     return mp.get_si();
   }
   double Integer::get_double() /*const*/ {
