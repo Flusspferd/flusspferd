@@ -222,18 +222,12 @@
  *  Returns the value as an integer.
  **/
 
-/** deprecated
- *  gmp.Float#get_prec() -> Integer
+/**
+ *  gmp.Float#precision() -> Integer
  *
- *  Return the current precision of `this`, in number of bits.
- **/
-
-/** deprecated
- *  gmp.Float#set_prec(prec) -> undefined
- *  - prec (Integer): desired minimum precision.
+ * Precision in bits. (rw)
  *
- *  Set the precision of `this` to be at least `prec` bits. The value will be
- *  truncated to the new precision.
+ * Replaces get_prec/set_prec.
  **/
 
 /**
