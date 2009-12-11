@@ -3,22 +3,30 @@ const asserts = require('test').asserts;
 
 exports.testInteger = function() {
   var j = gmp.Integer(10);
+  asserts.ok(j.fitsInt());
   asserts.same(j.toInt(), 10);
+  asserts.same(j.toDouble(), 10.0);
   asserts.same(j.toString(), '10');
   asserts.same(j.toString(2), '1010');
+  asserts.ok(j.sgn() > 0);
   var z = gmp.Integer(1);
+  asserts.ok(z.fitsInt());
   asserts.same(z.toInt(), 1);
   asserts.same(z.toString(), '1');
   asserts.same(z.toString(2), '1');
   var r = j.add(z);
+  asserts.ok(r.fitsInt());
   asserts.same(r.toInt(), 11);
   asserts.same(r.toString(), '11');
   asserts.same(r.toString(2), '1011');
   z = gmp.Integer(-5);
+  asserts.ok(z.fitsInt());
   asserts.same(z.toInt(), -5);
   asserts.same(z.toString(), '-5');
   asserts.same(z.toString(2), '-101');
+  asserts.ok(z.sgn() < 0);
   r = j.add(z);
+  asserts.ok(r.fitsInt());
   asserts.same(r.toInt(), 5);
   asserts.same(r.toString(), '5');
   asserts.same(r.toString(2), '101');
@@ -26,6 +34,17 @@ exports.testInteger = function() {
   asserts.same(r.toInt(), 5);
   asserts.same(r.toString(), '5');
   asserts.same(r.toString(2), '101');
+  asserts.same(r.sqrt().cmp(gmp.Integer(2)), 0);
+  asserts.ok(r.cmp(j) < 0);
+  asserts.ok(j.cmp(r) > 0);
+  asserts.same(r.cmp(gmp.Integer(5)), 0);
+  j = gmp.Integer("0xFFFF");
+  asserts.ok(j.fitsInt());
+  asserts.same(j.toInt(), 0xFFFF);
+  asserts.same(j.toString(), '65535');
+  j = gmp.Integer("0xFFFFFFFFFFFF");
+  asserts.ok(!j.fitsInt());
+  asserts.ok(j.cmp(r) > 0);
 };
 
 exports.testRational = function() {
@@ -45,16 +64,28 @@ exports.testRational = function() {
   asserts.ok(q.cmp(p) < 0);
   asserts.ok(p.cmp(q) > 0);
   p.numerator = gmp.Integer(1);
-  asserts.ok(p.cmp(q) == q.cmp(p));
-  asserts.ok(p.cmp(q) == 0);
+  asserts.same(p.cmp(q), q.cmp(p));
+  asserts.same(p.cmp(q), 0);
+  p.numerator = gmp.Integer(2);
+  var pp = gmp.Rational("2");
+  asserts.same(p.cmp(pp), 0);
 };
 
 exports.testFloat = function() {
   var f = gmp.Float(10);
+  asserts.ok(f.fitsInt());
   asserts.same(f.toInt(), 10);
   asserts.same(f.toString(), '10.0');
   asserts.same(f.toString(2), '1010.0');
   asserts.ok(f.fitsInt());
+  var t = gmp.Float(2);
+  asserts.ok(t.fitsInt());
+  asserts.same(t.toInt(), 2);
+  var s = t.sqrt();
+  asserts.ok(s.cmp(t) < 0);
+  asserts.ok(s.cmp(1) > 0);
+  asserts.same(s.floor().cmp(1), 0);
+  asserts.same(s.ceil().cmp(2), 0);
 };
 
 if (require.main === module)
