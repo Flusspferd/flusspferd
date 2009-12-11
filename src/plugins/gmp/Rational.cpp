@@ -48,12 +48,19 @@ namespace multi_precision {
     return mp.get_d();
   }
 
-  std::string Rational::get_string() /*const*/ {
-    return mp.get_str();
-  }
-
-  std::string Rational::get_string_base(int base) /*const*/ {
-    return mp.get_str(base);
+  void Rational::get_string(flusspferd::call_context &cc) /*const*/ {
+    if(cc.arg.size() == 0) {
+      cc.result = mp.get_str();
+    }
+    else if(cc.arg.size() == 1) {
+      if(!cc.arg[0].is_int()) {
+        throw flusspferd::exception("gmp.Rational#toString wrong parameter type");
+      }
+      cc.result = mp.get_str(cc.arg[0].get_int());
+    }
+    else {
+      throw flusspferd::exception("gmp.Rational#toString wrong number of parameters");
+    }
   }
 
   int Rational::sgn() /*const*/ {

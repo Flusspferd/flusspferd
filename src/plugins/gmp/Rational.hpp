@@ -43,7 +43,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("toDouble",          alias,  "get_double")
     ("get_string",        bind,   get_string)
     ("toString",          alias,  "get_string")
-    ("get_string_base",   bind,   get_string_base)
+    ("get_string_base",   alias,  "get_string") // deprecated
     ("sgn",               bind,   sgn)
     ("abs",               bind,   abs)
     ("canonicalize",      bind,   canonicalize)
@@ -62,8 +62,7 @@ public:
   Rational(flusspferd::object const &self, flusspferd::call_context &x);
 
   double get_double() /*const*/;
-  std::string get_string() /*const*/;
-  std::string get_string_base(int base) /*const*/;
+  void get_string(flusspferd::call_context &cc) /*const*/;
 
   template<typename T>
   static Rational &create_rational(T mp) {
