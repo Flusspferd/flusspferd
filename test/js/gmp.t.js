@@ -34,8 +34,19 @@ exports.testRational = function() {
   asserts.same(q.toString(), '10');
   asserts.same(q.toString(2), '1010');
   q.denominator = gmp.Integer(3);
-  //asserts.same(q.denominator.getInt(), 3); // TODO
+  asserts.same(q.denominator.toInt(), 3);
   asserts.same(q.toString(), '10/3');
+  q.numerator = gmp.Integer(3);
+  asserts.same(q.numerator.toInt(), 3);
+  asserts.same(q.toString(), '3/3');
+  q.canonicalize();
+  asserts.same(q.toString(), '1');
+  var p = gmp.Rational(2,1);
+  asserts.ok(q.cmp(p) < 0);
+  asserts.ok(p.cmp(q) > 0);
+  p.numerator = gmp.Integer(1);
+  asserts.ok(p.cmp(q) == q.cmp(p));
+  asserts.ok(p.cmp(q) == 0);
 };
 
 exports.testFloat = function() {
