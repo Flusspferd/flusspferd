@@ -37,18 +37,18 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "Float")
   (full_name, "gmp.Float")
   (methods,
-    ("fits_int",         bind,    fits_int)
+    ("fits_int",         bind,    fits_int) // deprecated
     ("fitsInt",          alias,   "fits_int")
-    ("get_int",          bind,    get_int)
+    ("get_int",          bind,    get_int) // deprecated
     ("toInt",            alias,   "get_int")
-    ("get_double",       bind,    get_double)
+    ("get_double",       bind,    get_double) // deprecated
     ("toDouble",         alias,   "get_double")
-    ("get_string",       bind,    get_string)
+    ("get_string",       bind,    get_string) // deprecated
     ("getString",        alias,   "get_string")
     ("toString",         bind,    toString)
     ("get_string_base",  alias,   "get_string") // deprecated
-    ("get_prec",         bind,    get_prec)
-    ("set_prec",         bind,    set_prec)
+    ("get_prec",         bind,    get_prec) // deprecated
+    ("set_prec",         bind,    set_prec) // deprecated
     ("sqrt",             bind,    sqrt)
     ("sgn",              bind,    sgn)
     ("abs",              bind,    abs)

@@ -37,13 +37,13 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "Integer")
   (full_name, "gmp.Integer")
   (methods,
-    ("fits_int",         bind,   fits_int)
+    ("fits_int",         bind,   fits_int) // deprecated
     ("fitsInt",          alias,  "fits_int")
-    ("get_int",          bind,   get_int)
+    ("get_int",          bind,   get_int) // deprecated
     ("toInt",            alias,  "get_int")
-    ("get_double",       bind,   get_double)
+    ("get_double",       bind,   get_double) // deprecated
     ("toDouble",         alias,  "get_double")
-    ("get_string",       bind,   get_string)
+    ("get_string",       bind,   get_string) // deprecated
     ("toString",         alias,  "get_string")
     ("get_string_base",  alias,  "get_string") // deprecated
     ("sqrt",             bind,   sqrt)
