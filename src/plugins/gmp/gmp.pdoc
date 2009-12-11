@@ -125,7 +125,7 @@
  **/
 
 /**
- *  gmp.Integer#sqrt() -> gmp.Float
+ *  gmp.Integer#sqrt() -> gmp.Integer
  *
  *  Returns the square root of `this`.
  **/
