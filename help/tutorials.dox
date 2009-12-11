@@ -47,5 +47,6 @@ THE SOFTWARE.
  *   - @ref js-tutorial-invoke
  *   - @ref js-tutorial-io
  *   - @ref js-tutorial-getopt
+ *   - @ref js-tutorial-curl
  *   - @see @ref cpp-tutorial-modules
  */
