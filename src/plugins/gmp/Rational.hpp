@@ -47,13 +47,16 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("sgn",               bind,   sgn)
     ("abs",               bind,   abs)
     ("canonicalize",      bind,   canonicalize)
-    ("get_num",           bind,   get_num)
-    ("get_den",           bind,   get_den)
+    ("get_num",           bind,   get_num) // deprecated
+    ("get_den",           bind,   get_den) // deprecated
     ("cmp",               bind,   cmp)
     ("add",               bind,   add)
     ("sub",               bind,   sub)
     ("mul",               bind,   mul)
-    ("div",               bind,   div)))
+    ("div",               bind,   div))
+  (properties,
+   ("numerator", getter_setter, (get_num, set_num))
+   ("denominator", getter_setter, (get_den, set_den))))
 {
 public:
   mpq_class mp;
@@ -74,7 +77,9 @@ public:
   void canonicalize();
   
   Integer &get_num() /*const*/;
+  void set_num(Integer &i);
   Integer &get_den() /*const*/;
+  void set_den(Integer &i);
 
   // operators
   void cmp(flusspferd::call_context &x) /*const*/;

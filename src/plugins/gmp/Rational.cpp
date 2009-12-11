@@ -72,13 +72,21 @@ namespace multi_precision {
   void Rational::canonicalize() {
     mp.canonicalize();
   }
-  
+
   Integer &Rational::get_num() /*const*/ {
     return Integer::create_integer(mp.get_num());
   }
 
+  void Rational::set_num(Integer &i) {
+    mpq_set_num(mp.get_mpq_t(), i.mp.get_mpz_t());
+  }
+
   Integer &Rational::get_den() /*const*/ {
     return Integer::create_integer(mp.get_den());
+  }
+
+  void Rational::set_den(Integer &i) {
+    mpq_set_den(mp.get_mpq_t(), i.mp.get_mpz_t());
   }
 
   void Rational::cmp(flusspferd::call_context &x) /*const*/ {

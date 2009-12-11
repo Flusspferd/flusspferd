@@ -186,16 +186,16 @@
  *  common to the numerator and denominator, and make the denominator positive.
  **/
 
-/** deprecated
- *  gmp.Rational#get_num() -> gmp.Integer
+/**
+ *  gmp.Rational#numerator -> gmp.Integer
  *
- *  Returns the numerator
+ *  Numerator.
  **/
 
-/** deprecated
- *  gmp.Rational#get_den() -> gmp.Integer
+/**
+ *  gmp.Rational#denominator -> gmp.Integer
  *
- *  Returns the denominator
+ *  Denominator.
  **/
 
 
