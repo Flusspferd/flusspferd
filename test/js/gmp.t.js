@@ -45,6 +45,11 @@ exports.testInteger = function() {
   j = gmp.Integer("0xFFFFFFFFFFFF");
   asserts.ok(!j.fitsInt());
   asserts.ok(j.cmp(r) > 0);
+
+  asserts.throwsOk(function() { gmp.Integer(true); }, TypeError);
+  asserts.throwsOk(function() { gmp.Integer("invalid"); });
+  asserts.throwsOk(function() { gmp.Integer("invalid", 10); });
+  asserts.throwsOk(function() { gmp.Integer(1,2,3,4,5); });
 };
 
 exports.testRational = function() {
@@ -69,6 +74,11 @@ exports.testRational = function() {
   p.numerator = gmp.Integer(2);
   var pp = gmp.Rational("2");
   asserts.same(p.cmp(pp), 0);
+
+  asserts.throwsOk(function() { gmp.Rational(true); }, TypeError);
+  asserts.throwsOk(function() { gmp.Rational("invalid"); });
+  asserts.throwsOk(function() { gmp.Rational("invalid", 10); });
+  asserts.throwsOk(function() { gmp.Rational(1,2,3,4,5); });
 };
 
 exports.testFloat = function() {
@@ -86,6 +96,11 @@ exports.testFloat = function() {
   asserts.ok(s.cmp(1) > 0);
   asserts.same(s.floor().cmp(1), 0);
   asserts.same(s.ceil().cmp(2), 0);
+
+  asserts.throwsOk(function() { gmp.Float(true); }, TypeError);
+  asserts.throwsOk(function() { gmp.Float("invalid"); });
+  asserts.throwsOk(function() { gmp.Float("invalid", 10); });
+  asserts.throwsOk(function() { gmp.Float(1,2,3,4,5); });
 };
 
 if (require.main === module)

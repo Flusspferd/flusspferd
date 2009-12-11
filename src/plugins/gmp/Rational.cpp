@@ -15,44 +15,49 @@ namespace multi_precision {
   Rational::Rational(flusspferd::object const &self, flusspferd::call_context &x)
     : base_type(self)
   {
-    if(x.arg.size() == 1) {
-      flusspferd::value v = x.arg.front();
-      if(v.is_double())
-        mp = v.get_double();
-      else if(v.is_int())
-        mp = v.get_int();
-      else if(v.is_string())
-        mp = v.to_std_string();
-      else if(v.is_object()) {
-        if(flusspferd::is_native<Integer>(v.get_object()))
-          mp = flusspferd::get_native<Integer>(v.get_object()).mp;
-        else if(flusspferd::is_native<Rational>(v.get_object()))
-          mp = flusspferd::get_native<Rational>(v.get_object()).mp;
-        else if(flusspferd::is_native<Float>(v.get_object()))
-          mp = flusspferd::get_native<Float>(v.get_object()).mp;
+    try {
+      if(x.arg.size() == 1) {
+        flusspferd::value v = x.arg.front();
+        if(v.is_double())
+          mp = v.get_double();
+        else if(v.is_int())
+          mp = v.get_int();
+        else if(v.is_string())
+          mp = v.to_std_string();
+        else if(v.is_object()) {
+          if(flusspferd::is_native<Integer>(v.get_object()))
+            mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+          else if(flusspferd::is_native<Rational>(v.get_object()))
+            mp = flusspferd::get_native<Rational>(v.get_object()).mp;
+          else if(flusspferd::is_native<Float>(v.get_object()))
+            mp = flusspferd::get_native<Float>(v.get_object()).mp;
+          else
+            throw type_error("Wrong parameter type");
+        }
         else
           throw type_error("Wrong parameter type");
       }
-      else
-        throw type_error("Wrong parameter type");
-    }
-    else if(x.arg.size() == 2) {
-      flusspferd::value v = x.arg.front();
-      flusspferd::value u = x.arg.back();
-      if(v.is_int() && u.is_int()) {
-        mp = mpq_class(v.get_int(), u.get_int());
-      }
-      else if(v.is_string() && u.is_int()) {
-        if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
-          throw runtime_error("string representation not valid");
+      else if(x.arg.size() == 2) {
+        flusspferd::value v = x.arg.front();
+        flusspferd::value u = x.arg.back();
+        if(v.is_int() && u.is_int()) {
+          mp = mpq_class(v.get_int(), u.get_int());
+        }
+        else if(v.is_string() && u.is_int()) {
+          if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
+            throw runtime_error("string representation not valid");
+          }
+        }
+        else {
+          throw argument_error("Wrong arguments! (string, int) expected.");
         }
       }
       else {
-        throw argument_error("Wrong arguments! (string, int) expected.");
+        throw argument_error("Wrong number of arguments");
       }
     }
-    else {
-      throw argument_error("Wrong number of arguments");
+    catch(std::invalid_argument &e) {
+      throw runtime_error(e.what());
     }
   }
 
