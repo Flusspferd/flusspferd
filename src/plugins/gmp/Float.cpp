@@ -15,37 +15,42 @@ namespace multi_precision {
   Float::Float(flusspferd::object const &self, flusspferd::call_context &x)
     : base_type(self)
   {
-    if(x.arg.size() == 1) {
-      init_with_value(x.arg.front());
-    }
-    else if(x.arg.size() == 2) {
-      value v = x.arg.front();
-      value u = x.arg.back();
-      if(v.is_string() && u.is_int()) {
-        if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
-          throw runtime_error("string representation not valid");
+    try {
+      if(x.arg.size() == 1) {
+        init_with_value(x.arg.front());
+      }
+      else if(x.arg.size() == 2) {
+        value v = x.arg.front();
+        value u = x.arg.back();
+        if(v.is_string() && u.is_int()) {
+          if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
+            throw runtime_error("string representation not valid");
+          }
+        }
+        else {
+          mp.set_prec(u.get_int());
+          init_with_value(v);
         }
       }
-      else {
-        mp.set_prec(u.get_int());
-        init_with_value(v);
-      }
-    }
-    else if(x.arg.size() == 3) {
-      value v = x.arg[0];
-      value u = x.arg[1];
-      value w = x.arg[2];
-      if(v.is_string() && u.is_int() && w.is_int()) {
-        mp.set_prec(u.get_int());
-        if(mp.set_str(v.to_std_string(), w.get_int()) != 0) {
-          throw runtime_error("string representation not valid");
+      else if(x.arg.size() == 3) {
+        value v = x.arg[0];
+        value u = x.arg[1];
+        value w = x.arg[2];
+        if(v.is_string() && u.is_int() && w.is_int()) {
+          mp.set_prec(u.get_int());
+          if(mp.set_str(v.to_std_string(), w.get_int()) != 0) {
+            throw runtime_error("string representation not valid");
+          }
         }
+        else
+          throw argument_error("Wrong arguments! (string, int, int) expected.");
       }
       else
-        throw argument_error("Wrong arguments! (string, int, int) expected.");
+        throw argument_error("Wrong number of arguments!");
     }
-    else
-      throw argument_error("Wrong number of arguments!");
+    catch(std::invalid_argument &e) {
+      throw runtime_error(e.what());
+    }
   }
 
   bool Float::fits_int() /*const*/ {
