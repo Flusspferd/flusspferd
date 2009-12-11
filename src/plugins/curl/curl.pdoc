@@ -10,6 +10,8 @@
  *  tunneling and more!"
  * [libcurl](http://curl.haxx.se/libcurl/)
  *
+ * See [Using the cURL module ](../../js-tutorial-curl.html) for a small tutorial.
+ *
  * ## Example #
  *
  *     const cURL = require('curl');
@@ -63,6 +65,12 @@
  * See [cURL's easy Interface][curl_easy] if you are curious about the underlying C API.
  *
  * [curl_easy]: http://curl.haxx.se/libcurl/c/libcurl-easy.html
+ **/
+
+/**
+ * new cURL.Easy()
+ *
+ * Create a new cURL.Easy handle. See [curl_easy_init](http://curl.haxx.se/libcurl/c/curl_easy_init.html).
  **/
 
 /**
