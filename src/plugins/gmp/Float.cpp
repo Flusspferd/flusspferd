@@ -54,19 +54,8 @@ namespace multi_precision {
     return mp.get_d();
   }
 
-  std::string Float::toString() /* const */ {
-    mp_exp_t expo;
-    std::string str = mp.get_str(expo);
-    assert(expo >= 0);
-    if(static_cast<std::size_t>(expo) >= str.size()) {
-      return str + ".0";
-    }
-    else {
-      return str.substr(0, expo) + '.' + str.substr(expo);
-    }
-  }
-
-  void Float::get_string(flusspferd::call_context &cc) /*const*/ {
+  std::pair<std::string,mp_exp_t>
+  Float::get_string_impl(flusspferd::call_context &cc) const {
     mp_exp_t expo;
     std::string str;
     if(cc.arg.size() == 0) {
@@ -81,9 +70,26 @@ namespace multi_precision {
     else {
       throw flusspferd::exception("gmp.Float#getString expects one or zero parameters.");
     }
+    return std::make_pair(str, expo);
+  }
+
+  void Float::toString(flusspferd::call_context &cc) /* const */ {
+    std::pair<std::string,mp_exp_t> p = get_string_impl(cc);
+    assert(p.second >= 0);
+    if(static_cast<std::size_t>(p.second) >= p.first.size()) {
+      // TODO expand! BUG
+      cc.result = p.first + ".0";
+    }
+    else {
+      cc.result = p.first.substr(0, p.second) + '.' + p.first.substr(p.second);
+    }
+  }
+
+  void Float::get_string(flusspferd::call_context &cc) /*const*/ {
+    std::pair<std::string,mp_exp_t> p = get_string_impl(cc);
     object x = create<object>();
-    x.set_property("string", value(str));
-    x.set_property("exp", value(expo));
+    x.set_property("string", value(p.first));
+    x.set_property("exp", value(p.second));
     cc.result = x;
   }
 

@@ -217,7 +217,7 @@
  **/
 
 /**
- *  gmp.Float#getInt() -> Integer
+ *  gmp.Float#toInt() -> Integer
  *
  *  Returns the value as an integer.
  **/
