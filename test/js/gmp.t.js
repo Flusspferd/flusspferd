@@ -1,3 +1,4 @@
+try {
 const gmp = require('gmp');
 const asserts = require('test').asserts;
 
@@ -103,5 +104,13 @@ exports.testFloat = function() {
   asserts.throwsOk(function() { gmp.Float(1,2,3,4,5); });
 };
 
+} catch(e if e.message && e.message.match(/'gmp'/)) {
+  // this sucks we really should change the exception system (#44)
+  exports.test_skip = function() {
+    require('test').asserts.diag("Not running gmp test (Module not built)");
+  }
+}
+
 if (require.main === module)
   require('test').runner(exports);
+
