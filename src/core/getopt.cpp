@@ -36,7 +36,7 @@ THE SOFTWARE.
 #include <boost/assign/list_of.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
-#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <algorithm>
@@ -68,6 +68,7 @@ namespace {
 struct optspec {
   struct item_type {
     enum argument_type { required = 1, optional = 2, none = 0 };
+    std::string canonical_name;
     argument_type argument;
     root_function callback;
 
@@ -99,6 +100,7 @@ struct optspec {
         break;
 
       item_pointer data(new item_type);
+      data->canonical_name = name;
 
       options.insert(map_type::value_type(name, data));
 
@@ -150,6 +152,8 @@ struct optspec {
     if (!data)
       throw exception(("Unknown option " + name).c_str());
 
+    name = data->canonical_name;
+
     if (!result.has_property(name))
       result.set_property(name, flusspferd::create<array>());
     array arr(result.get_property_object(name));
@@ -184,6 +188,8 @@ struct optspec {
       item_pointer data = options[name];
       if (!data)
         throw exception(("Unknown option " + name).c_str());
+
+      name = data->canonical_name;
 
       if (!result.has_property(name))
         result.set_property(name, flusspferd::create<array>());
@@ -221,20 +227,14 @@ object flusspferd::getopt(
     return getopt(spec_, args);
   }
 
-  flusspferd::gc();//FIXME
-
   array const &arguments = arguments_.get();
 
   optspec spec(spec_, arguments);
 
   spec.result = create<object>();
 
-  flusspferd::gc();//FIXME
-
   array result_arguments = flusspferd::create<array>();
   spec.result.set_property("_", result_arguments);
-
-  flusspferd::gc();//FIXME
 
   bool accept_options = true;
 
@@ -254,8 +254,6 @@ object flusspferd::getopt(
         accept_options = false;
     }
   }
-
-  flusspferd::gc();//FIXME
 
   return spec.result;
 }

@@ -237,7 +237,7 @@ template<>
 struct convert<std::string>;
 
 template<>
-struct convert<std::basic_string<char16_t> >;
+struct convert<std::basic_string<js_char16_t> >;
 
 template<typename T>
 struct convert_ptr<T, native_object_base>;

@@ -35,36 +35,29 @@ THE SOFTWARE.
 #include "flusspferd/io/io.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/create.hpp"
-
 #include <boost/filesystem.hpp>
-#include <boost/spirit/home/phoenix/core.hpp>
-#include <boost/spirit/home/phoenix/bind.hpp>
-#include <boost/spirit/home/phoenix/operator.hpp>
+#include <boost/spirit/include/phoenix.hpp>
+
 namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
 
 using namespace flusspferd;
 using namespace flusspferd::param;
 
-namespace flusspferd { namespace detail {
-  extern char const * const json2;
-}}
-
 void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   root_object scope(scope_);
 
   // Initalize boost's copy of cwd as early as possible
-  boost::filesystem::initial_path<boost::filesystem::path>();
-
-  flusspferd::gc();//FIXME
+  boost::filesystem::path pwd = boost::filesystem::initial_path<boost::filesystem::path>();
 
   flusspferd::load_require_function(scope);
-
-  flusspferd::gc();//FIXME
 
   flusspferd::load_properties_functions(scope);
 
   flusspferd::object require_fn = scope.get_property_object("require");
+  flusspferd::require &require = flusspferd::get_native<flusspferd::require>(require_fn);
+
+  root_object preload(require_fn.get_property_object("preload"));
 
   // Create the top level |module| and |exports| properties.
   scope.define_property("module", require_fn.get_property("main"), dont_enumerate);
@@ -72,7 +65,8 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   root_object exports(create<object>());
   scope.define_property("exports", exports, dont_enumerate);
 
-  root_object preload(require_fn.get_property_object("preload"));
+  // Set the main.id to *something* so we always have properties.
+  require.set_main_module( "file://" + (pwd / "<typein>").string() );
 
   flusspferd::create<method>(
     "binary",
@@ -112,13 +106,4 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
     phoenix::bind(&flusspferd::load_flusspferd_module, args::arg1, argv0),
     _signature = param::type<void (object)>(),
     _container = preload);
-
-  if (!scope_.has_own_property("JSON")) {
-    flusspferd::evaluate_in_scope(
-      detail::json2,
-      std::strlen(detail::json2),
-      0x0, // Filename
-      0,   // Linenumber
-      scope_);
-  }
 }

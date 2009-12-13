@@ -40,9 +40,10 @@ THE SOFTWARE.
 #include "flusspferd/encodings.hpp"
 #include <boost/filesystem/fstream.hpp>
 #include <boost/foreach.hpp>
+#include <boost/format.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/spirit/home/phoenix/core.hpp>
+#include <boost/fusion/include/make_vector.hpp>
+#include <boost/spirit/include/phoenix.hpp>
 #include <sstream>
 
 #ifdef WIN32
@@ -56,11 +57,18 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::param;
 
+namespace phoenix = boost::phoenix;
+namespace args = phoenix::arg_names;
 namespace algo = boost::algorithm;
 namespace fs = boost::filesystem;
 namespace fusion = boost::fusion;
+using boost::format;
 
 static fs::path make_dsoname(std::string const &id);
+static void setup_module_resolve_fns(object &module, fs::path const &id);
+
+static std::string module_resource_resolve(fs::path const &module_dir, std::string const &x);
+static object module_resource(const fs::path &module_dir, std::string const &x_, value mode);
 
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
@@ -68,13 +76,13 @@ void flusspferd::load_require_function(object container) {
 }
 
 
-require::require()
-  : native_function_base(1, "require")
+require::require(function const &fun)
+  : native_function_base(fun)
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
-require::require(require const &rhs)
-  : native_function_base(1, "require"),
+require::require(function const &fun, require const &rhs)
+  : native_function_base(fun),
     module_cache(rhs.module_cache),
     paths(rhs.paths),
     alias(rhs.alias),
@@ -86,7 +94,7 @@ require::~require() {}
 
 // Static helper method to actually create |require| function objects
 object require::create_require() {
-  root_object fn(create<require>());
+  root_object fn(create<require>(param::_name = "require"));
   require* r = static_cast<require*>(native_function_base::get_native(fn));
 
   const property_flag perm_ro = permanent_property | read_only_property;
@@ -117,9 +125,14 @@ object require::create_require() {
 
 // Each module wants a different |require| object, so that it can have a
 // different require.id property
-object require::new_require_function(string const &id) {
+object require::new_require_function(string const &id_) {
+  root_string id(id_);
+
   // Use the copy ctor form to share the JS state variables.
-  root_object new_req(create<require>(fusion::vector1<require&>(*this)));
+  root_object new_req(create<require>(
+                          fusion::vector1<require&>(*this)
+                          , param::_name = "require"
+                      ));
   new_req.set_prototype(*this);
 
   new_req.define_property("id", id, permanent_property|read_only_property);
@@ -135,7 +148,12 @@ void require::set_main_module(std::string const &id_) {
 
   fs::path mod;
   if (type == top_level) {
-    mod = find_top_level_js_module(id_, true).get_value_or("ARGH");
+    boost::optional<fs::path> mod_ = find_top_level_js_module(id_, true);
+
+    if (!mod_) {
+      throw exception(format("unable to find top level module when setting require.main: \"%s\"") % id_);
+    }
+    mod = *mod_;
   }
   else {
     mod = io::fs_base::canonicalize( id_.substr(strlen("file://")) );
@@ -144,6 +162,8 @@ void require::set_main_module(std::string const &id_) {
   std::string id = "file://" + mod.string();
   main.set_property("id", id);
   main.set_property("uri", id);
+  setup_module_resolve_fns(main, mod);
+  set_property("id", id);
 }
 
 // The implementation of the |require()| function that is available to JS
@@ -186,11 +206,7 @@ void require::call(call_context &x) {
 
 
 string require::load_module_text(fs::path filename) {
-  flusspferd::gc();//FIXME
-
   root_string read_only("r");
-
-  flusspferd::gc();//FIXME
 
   io::file &f = create<io::file>(
     fusion::vector2<char const*, string>(filename.string().c_str(), read_only));
@@ -216,7 +232,6 @@ string require::load_module_text(fs::path filename) {
 
   // TODO: Some way of supporting other encodings is probably useful
   return encodings::convert_to_string("UTF-8", blob);
-
 }
 
 /// Load the given @c filename as a module
@@ -258,6 +273,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
     module = create<object>();
     module.set_property("uri", id);
     module.set_property("id", id);
+    setup_module_resolve_fns(module, filename);
   }
 
   root_object require(new_require_function(id));
@@ -531,3 +547,46 @@ static fs::path make_dsoname(std::string const &id) {
   return p;
 }
 
+
+static void setup_module_resolve_fns(object &module, fs::path const &path) {
+
+  fs::path module_dir = fs::path(path).remove_filename();
+
+  // Create the module.resource function. This isn't yet a CJS proposal, but it
+  // has been hinted at. And its *damn* useful.
+  object mod_req = flusspferd::create<flusspferd::function>(
+    _name = "resource",
+    _container = module,
+    _function = phoenix::bind(&module_resource, module_dir, args::arg1, args::arg2),
+    _signature = param::type<object (std::string const &, value)>()
+  );
+
+  phoenix::bind(&module_resource_resolve, module_dir, args::arg1);
+  flusspferd::create<flusspferd::function>(
+    _name = "resolve",
+    _container = mod_req,
+    _function = phoenix::bind(&module_resource_resolve, module_dir, args::arg1),
+    _signature = param::type<std::string (std::string const &)>()
+  );
+
+}
+
+// owner: No such file or directory "foo/bar"
+const format error_fmt("module.resource.resolve: %1% \"%2%\"");
+
+static std::string module_resource_resolve(const fs::path &module_dir, std::string const &x_) {
+  fs::path x = x_;
+
+  if (x.has_root_path() || x.has_root_name()) {
+    throw exception(format(error_fmt) % "absolute paths are not allowed" % x_);
+  }
+
+  return io::fs_base::canonicalize(module_dir / x).string();
+}
+
+static object module_resource(const fs::path &module_dir, std::string const &x_, value mode) {
+
+  std::string const &path = module_resource_resolve(module_dir, x_);
+
+  return create<io::file>(fusion::make_vector(path.c_str(), mode));
+}

@@ -36,3 +36,12 @@ if (require('flusspferd').relocatable) {
 
   prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
 }
+
+(function() {
+  var env = require('system').env;
+
+  if (env.hasOwnProperty("FLUSSPFERD_USER_PATH"))
+    require.paths.push(env["FLUSSPFERD_USER_MODULES"]);
+  else
+    require.paths.push(env["HOME"] + "/.flusspferd/modules");
+})();

@@ -37,14 +37,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "Integer")
   (full_name, "gmp.Integer")
   (methods,
-    ("fits_int",         bind,   fits_int)
-    ("get_int",          bind,   get_int)
+    ("fits_int",         bind,   fits_int) // deprecated
+    ("fitsInt",          alias,  "fits_int")
+    ("get_int",          bind,   get_int) // deprecated
     ("toInt",            alias,  "get_int")
-    ("get_double",       bind,   get_double)
+    ("get_double",       bind,   get_double) // deprecated
     ("toDouble",         alias,  "get_double")
-    ("get_string",       bind,   get_string)
+    ("get_string",       bind,   get_string) // deprecated
     ("toString",         alias,  "get_string")
-    ("get_string_base",  bind,   get_string_base)
+    ("get_string_base",  alias,  "get_string") // deprecated
     ("sqrt",             bind,   sqrt)
     ("sgn",              bind,   sgn)
     ("abs",              bind,   abs)
@@ -63,8 +64,7 @@ public:
   bool fits_int() /*const*/;
   int get_int() /*const*/;
   double get_double() /*const*/;
-  std::string get_string() /*const*/;
-  std::string get_string_base(int base) /*const*/;
+  void get_string(flusspferd::call_context &cc) /*const*/;
 
   template<typename T>
   static Integer &create_integer(T mp) {

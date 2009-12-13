@@ -29,9 +29,9 @@ THE SOFTWARE.
 
 #include "../create.hpp"
 #include <boost/version.hpp>
-#include <boost/fusion/functional/invocation/invoke.hpp>
-#include <boost/fusion/view/joint_view.hpp>
-#include <boost/fusion/container/vector/vector10.hpp>
+#include <boost/fusion/include/invoke.hpp>
+#include <boost/fusion/include/joint_view.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace flusspferd {
 
@@ -93,6 +93,14 @@ namespace detail {
         container_spec,
         attributes_spec
       > parameters;
+
+    typedef boost::parameter::parameters<
+        boost::parameter::required<param::tag::name>,
+        param::tag::arguments,
+        param::tag::prototype,
+        param::tag::parent,
+        attributes_spec
+      > create_on_parameters;
 
     static result_type create() {
       root_object obj((
