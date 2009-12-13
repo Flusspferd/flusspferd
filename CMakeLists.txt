@@ -173,6 +173,7 @@ option(
     OFF)
 option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
+option(PLUGIN_READLINE "Build Readline plugin" ON)
 set(
     LINE_EDITOR
     "libedit"
@@ -512,6 +513,18 @@ if(ENABLE_TESTS)
 endif()
 
 ## Plugins #################################################################
+
+if(PLUGIN_READLINE)
+  if(LIBEDIT_FOUND AND NOT LINE_EDITOR STREQUAL "readline")
+    set(PLUGINS ${PLUGINS} readline)
+    set(readline_LIBRARIES ${LIBEDIT_LIBRARIES})
+  elseif(READLINE_FOUND)
+    set(PLUGINS ${PLUGINS} readline)
+    set(readline_LIBRARIES ${READLINE_LIBRARIES})
+  elseif(FORCE_PLUGINS)
+    message(SEND_ERROR "Readline plugin required but neither GNU/Readline nor libedit found")
+  endif()
+endif()
 
 if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
     set(PLUGINS ${PLUGINS} sqlite3)
