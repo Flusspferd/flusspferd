@@ -27,6 +27,7 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_CREATE_FUNCTION_HPP
 #define FLUSSPFERD_CREATE_FUNCTION_HPP
 
+#include "native_function.hpp"
 #include "../create.hpp"
 #include "../string.hpp"
 #include "../local_root_scope.hpp"
@@ -53,8 +54,6 @@ namespace detail {
     flusspferd::string const &body,
     flusspferd::string const &file,
     unsigned line);
-
-  function create_native_function(native_function_base *ptr);
 
   template<bool Method, typename ArgPack>
   struct create_function_helper {
@@ -88,12 +87,10 @@ namespace detail {
       ArgPack const &arg,
       boost::function<void (call_context&)> const &fun)
     {
-      local_root_scope scope;
-      return create_native_function(
-        new native_function<void>(
-          fun,
-          arg[param::_arity | 0],
-          string(arg[param::_name | string()]).to_string()));
+      return flusspferd::create<native_function<void> >(
+          boost::fusion::vector1<boost::function<void (call_context &)> >(fun),
+          param::_name = arg[param::_name | flusspferd::string()],
+          param::_arity = arg[param::_arity | 0]);
     }
 
     template<typename T>
@@ -101,11 +98,10 @@ namespace detail {
       ArgPack const &arg,
       boost::function<T> const &fun)
     {
-      return create_native_function(
-        new native_function<T, Method>(
-          fun,
-          string(arg[param::_name | string()]).to_string()
-        ));
+      return flusspferd::create<native_function<T, Method> >(
+          boost::fusion::vector1<boost::function<T> >(fun),
+          param::_name = arg[param::_name | flusspferd::string()],
+          param::_arity = arg[param::_arity | 0]);
     }
 
     template<typename T>
@@ -123,11 +119,10 @@ namespace detail {
       void (T::*memfnptr)(call_context &))
     {
       BOOST_STATIC_ASSERT(Method);
-      return create_native_function(
-        new native_member_function<void, T>(
-          memfnptr,
-          arg[param::_arity | 0],
-          string(arg[param::_name | string()]).to_string()));
+      return flusspferd::create<native_member_function<void, T> >(
+          boost::fusion::vector1<void (T::*)(call_context&)>(memfnptr),
+          param::_name = arg[param::_name | flusspferd::string()],
+          param::_arity = arg[param::_arity | 0]);
     }
 
     template<typename R, typename T>
@@ -136,10 +131,10 @@ namespace detail {
       R T::*memfnptr)
     {
       BOOST_STATIC_ASSERT(Method);
-      return create_native_function(
-        new native_member_function<R, T>(
-          memfnptr,
-          string(arg[param::_name | string()]).to_string()));
+      return flusspferd::create<native_member_function<R, T> >(
+          boost::fusion::vector1<R T::*>(memfnptr),
+          param::_name = arg[param::_name | flusspferd::string()],
+          param::_arity = arg[param::_arity | 0]);
     }
   };
 
@@ -158,6 +153,17 @@ namespace detail {
         container_spec,
         attributes_spec
       > parameters;
+
+    typedef boost::parameter::parameters<
+        boost::parameter::required<param::tag::name>,
+        param::tag::function,
+        param::tag::argument_names,
+        param::tag::file,
+        param::tag::line,
+        param::tag::signature,
+        param::tag::arity,
+        attributes_spec
+      > create_on_parameters;
 
     static result_type create() {
       flusspferd::root_string empty((flusspferd::string()));

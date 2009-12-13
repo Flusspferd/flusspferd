@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "flusspferd/create/native_object.hpp"
 #include "flusspferd/version.hpp"
 #include "flusspferd/io/stream.hpp"
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 #include <iostream>
 #include <ostream>
 
@@ -74,11 +74,7 @@ protected:
 void flusspferd::load_system_module(object &context) {
   object exports = context.get_property_object("exports");
 
-  flusspferd::gc();//FIXME
-
   context.call("require", "io");
-
-  flusspferd::gc();//FIXME
 
   exports.define_property(
     "stdout",

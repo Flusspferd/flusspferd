@@ -305,7 +305,11 @@ T &cast_to_derived(native_object_base &o) {
  * @ingroup classes
  */
 template<typename T>
-T &get_native(object const &o) {
+typename boost::enable_if<
+  typename boost::is_base_of<native_object_base, T>::type,
+  T &>
+::type
+get_native(object const &o) {
   return cast_to_derived<T>(native_object_base::get_native(o));
 }
 
@@ -329,7 +333,11 @@ if (flusspferd::is_native<flusspferd::binary>(o) {
  * @ingroup classes
  */
 template<typename T>
-bool is_native(object const &o) {
+typename boost::enable_if<
+  typename boost::is_base_of<native_object_base, T>::type,
+  bool>
+::type
+is_native(object const &o) {
   if ( native_object_base::is_object_native(o) ) {
     return is_derived<T>(native_object_base::get_native(o));
   }

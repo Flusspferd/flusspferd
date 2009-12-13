@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/ref.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace boost;
 using namespace flusspferd;
@@ -60,8 +60,8 @@ void flusspferd::load_encodings_module(object container) {
 }
 
 // the UTF-16 bom is codepoint U+feff
-static char16_t const bom_le = *(char16_t*)"\xff\xfe";
-static char16_t const bom_native = 0xfeff;
+static js_char16_t const bom_le = *(js_char16_t*)"\xff\xfe";
+static js_char16_t const bom_native = 0xfeff;
 
 static char const * const native_charset = bom_le == bom_native
                                          ? "utf-16le" : "utf-16be";
@@ -81,8 +81,8 @@ encodings::convert_to_string(std::string const &enc_, binary &source_binary) {
   binary &out = trans.close(boost::none);
 
   return flusspferd::string(
-    reinterpret_cast<char16_t const *>(&out.get_data()[0]),
-    out.get_length() / sizeof(char16_t));
+    reinterpret_cast<js_char16_t const *>(&out.get_data()[0]),
+    out.get_length() / sizeof(js_char16_t));
 }
 
 object encodings::convert_from_string(std::string const &enc, string const &str)
@@ -95,7 +95,7 @@ object encodings::convert_from_string(std::string const &enc, string const &str)
   binary &source_binary = create<byte_string>(
     vector2<binary::element_type const *, std::size_t>(
       reinterpret_cast<binary::element_type const*>(str.data()),
-      str.size() * sizeof(char16_t)));
+      str.size() * sizeof(js_char16_t)));
   root_object root_obj2(source_binary);
 
   trans.push_accumulate(source_binary);
@@ -106,7 +106,8 @@ object encodings::convert_from_string(std::string const &enc, string const &str)
 object encodings::convert(
   std::string const &from_, std::string const &to_, binary &source_binary)
 {
-  transcoder &trans = create<transcoder>(make_vector(cref(from_), cref(to_)));
+  transcoder &trans = create<transcoder>(make_vector(boost::cref(from_),
+                                                     boost::cref(to_)));
   root_object root_obj(trans);
 
   trans.push_accumulate(source_binary);

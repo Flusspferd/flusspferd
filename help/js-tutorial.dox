@@ -34,7 +34,6 @@ THE SOFTWARE.
  *
  * - @subpage js-tutorial-invoke
  * - @subpage js-tutorial-io
- * - @subpage js-tutorial-xml
  * - @subpage js-tutorial-getopt
  *
  * @see
@@ -120,7 +119,7 @@ Same.
  *
  * In fact, @c print is a short form for the latter syntax. However, the print
  * abbreviation is not available in modules. To spare you the hassle of typing
- * require("system").stdout.print everytime, you can assign the module to a
+ * require("system").stdout.print every time, you can assign the module to a
  * variable.
  *
  * @verbatim
@@ -150,68 +149,6 @@ bcd
  * There are many more things that you can do with this and the 'io' module,
  * see <a href="js/IO">the documentation for <code>io</code></a>.
  *
- * Next: \ref js-tutorial-xml
- *
- */
-
-/**
- * @page js-tutorial-xml Using XML
- *
- * Previous: \ref js-tutorial-io
- *
- * Let us begin by loading an XML document from Jeni Tennison's website:
- *
- * @verbatim
-> XML = require("XML")
-> doc = XML.parse("http://www.jenitennison.com/index.xml")
-<?xml version="1.0" encoding="UTF-16"?>
-<?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>
-<my:doc xmlns:my="http://www.jenitennison.com/" xmlns="http://www.w3.org/1999/xhtml" ...>
-  ...
-</my:doc>
-@endverbatim
- *
- * @note You may notice the encoding of UTF-16 above, because @c doc.toString()
- *       (which is implicitly called here) converts to a Javascript string, and
- *       in Javascript, strings are encoded in UTF-16, internally.
- *
- * Now let's look at that document in a few basic ways.
- *
- * @verbatim
-> doc.rootElement
-ELEMENT:doc
-> doc.rootElement.firstChild = null // => delete document contents
-null
-> doc
-<?xml version="1.0" encoding="UTF-16"?>
-<?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>
-<my:doc xmlns:my="http://www.jenitennison.com/" xmlns="http://www.w3.org/1999/xhtml" ... />
-> doc.firstChild
-PI:xml-stylesheet
-> doc.type
-DOCUMENT
-@endverbatim
- *
- * Or, leveraging XPath:
- *
- * @verbatim
-> doc = XML.parse("http://www.jenitennison.com/index.xml")
-...
-> xpath = new XML.XPath(doc, {my: "http://www.jenitennison.com/"})
-[object NativeObject]
-> xpath.ns.html = "http://www.w3.org/1999/xhtml" // now, namespaces html and my can be accessed
-http://www.w3.org/1999/xhtml
-> links = xpath("//my:links/my:link")
-ELEMENT:link,ELEMENT:link,ELEMENT:link,ELEMENT:link
-> links.forEach(function(x) { print(x.getAttribute("href"), x.content); })
-www.w3.org/XML W3C XML Page
-www.xml.com XML.com
-www.xml.org XML.org from OASIS
-www.bayes.co.uk/xml Chris Bayes' XML Portal
-@endverbatim
- *
- * @note Reference documentation has not been written yet.
- *
  * Next: \ref js-tutorial-getopt
  *
  */
@@ -219,7 +156,7 @@ www.bayes.co.uk/xml Chris Bayes' XML Portal
 /**
  * @page js-tutorial-getopt Using Getopt
  *
- * Previous: \ref js-tutorial-xml
+ * Previous: \ref js-tutorial-io
  *
  * Flusspferd provides with getopt a module to parse command line parameters.
  * The module has a C++ and a Javascript API and is also used by the

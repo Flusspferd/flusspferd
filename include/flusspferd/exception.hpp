@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_EXCEPTION_HPP
 
 #include <boost/exception/exception.hpp>
+#include <boost/format.hpp>
 #include <boost/shared_ptr.hpp>
 #include <stdexcept>
 
@@ -68,10 +69,23 @@ struct exception : virtual std::runtime_error, virtual boost::exception {
   /**
    * Value constructor.
    *
-   * Will create an exception containing @p val. The error message will be the
-   * string representation of @p val.
+   * Will create an exception containing @p val. If this propogates to
+   * javascript, it will be thrown as @p val directly.
+   *
+   * @param val The value to stringify.
    */
   exception(value const &val);
+
+  /**
+   * Format constructor.
+   *
+   * Will create an exception of type @p type from the given (completed)
+   * boost::format.
+   *
+   * @param what The error message.
+   * @param type The error type (if applicable).
+   */
+  exception(boost::format const &fmt, std::string const &type = "Error");
 
   /// Destructor.
   ~exception() throw();
@@ -137,6 +151,15 @@ public:
       x.throw_js_INTERNAL(); \
       return JS_FALSE; \
     } catch (::flusspferd::js_quit&) {\
+      return JS_FALSE; \
+    } catch (::flusspferd::value &v) { \
+      ::flusspferd::exception x(v); \
+      x.throw_js_INTERNAL(); \
+      return JS_FALSE; \
+    } catch (::flusspferd::object &o) { \
+      ::flusspferd::value v(o); \
+      ::flusspferd::exception x(v); \
+      x.throw_js_INTERNAL(); \
       return JS_FALSE; \
     } \
     return JS_TRUE

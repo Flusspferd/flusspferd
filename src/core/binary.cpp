@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include <sstream>
 #include <algorithm>
 #include <boost/ref.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 static char const *DEFAULT_ENCODING = "UTF-8";
 
@@ -41,15 +41,10 @@ namespace fusion = boost::fusion;
 
 void flusspferd::load_binary_module(object container) {
   object exports = container.get_property_object("exports");
-  flusspferd::gc();//FIXME
   load_class<binary>(exports);
-  flusspferd::gc();//FIXME
   load_class<byte_string>(exports);
-  flusspferd::gc();//FIXME
   load_class<byte_array>(exports);
-  flusspferd::gc();//FIXME
   container.call("require", "encodings");
-  flusspferd::gc();//FIXME
 }
 
 // -- util ------------------------------------------------------------------

@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "sqlite.hpp"
 #include <boost/assign/list_of.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
 
 using namespace flusspferd;
 using namespace boost::assign;
@@ -175,7 +175,7 @@ object sqlite3::compile(flusspferd::string sql_in, value bind ) {
 
     size_t n_bytes = sql_in.length() * 2;
     sqlite3_stmt * sth = 0;
-    char16_t * tail = 0; // uncompiled part of the sql (when multiple stmts)
+    js_char16_t * tail = 0; // uncompiled part of the sql (when multiple stmts)
     
     if (sqlite3_prepare16_v2(db, sql_in.data(), n_bytes, &sth, (const void**)&tail) != SQLITE_OK)
     {

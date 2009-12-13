@@ -50,16 +50,22 @@ void object::seal(bool deep) {
     throw exception("Could not seal object");
 }
 
-object object::parent() {
+object object::parent() const {
   if (is_null())
     throw exception("Could not get object parent (object is null)");
-  return Impl::wrap_object(JS_GetParent(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetParent(Impl::current_context(), get_const()));
 }
 
-object object::prototype() {
+object object::prototype() const {
   if (is_null())
     throw exception("Could not get object prototype (object is null)");
-  return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get()));
+  return Impl::wrap_object(JS_GetPrototype(Impl::current_context(), get_const()));
+}
+
+object object::constructor() const {
+  if (is_null())
+    throw exception("Could not get object constructor (object is null)");
+  return Impl::wrap_object(JS_GetConstructor(Impl::current_context(), get_const()));
 }
 
 void object::set_parent(object const &o) {
@@ -386,6 +392,24 @@ bool object::is_generator() const {
 
   return strcmp(our_class->name, "Generator") == 0
       && get_property("next").is_function();
+}
+
+bool object::instance_of(value constructor) const {
+  root_object cons(constructor.to_object());
+
+  if (cons.is_null())
+    throw exception("Could not check instance constructor: "
+                    "constructor has to be a non-null object");
+
+  JSBool result;
+  if (!JS_HasInstance(
+          Impl::current_context(),
+          Impl::get_object(cons),
+          Impl::get_jsval(value(*this)),
+          &result))
+    throw exception("Could not check instance constructor");
+
+  return result;
 }
 
 namespace {

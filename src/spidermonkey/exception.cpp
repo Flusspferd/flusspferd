@@ -117,6 +117,11 @@ exception::exception(value const &val)
     p(new impl(val))
 { }
 
+exception::exception(boost::format const &fmt, std::string const &type)
+  : std::runtime_error(exception_message(fmt.str().c_str())),
+    p(new impl(fmt.str(), type))
+{ }
+
 exception::~exception() throw()
 { }
 

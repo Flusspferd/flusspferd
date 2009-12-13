@@ -48,6 +48,13 @@ namespace detail {
         attributes_spec
       > parameters;
 
+    typedef boost::parameter::parameters<
+        boost::parameter::required<param::tag::name>,
+        param::tag::prototype,
+        param::tag::parent,
+        attributes_spec
+      > create_on_parameters;
+
     static result_type create() {
       return create_object(object(), object());
     }

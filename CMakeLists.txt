@@ -26,7 +26,7 @@
 
 project(Flusspferd)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
@@ -120,18 +120,20 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     # MinGW doesn't set this by default
     if(WIN32)
         add_definitions(-DWIN32)
+    else()
+        # This causes problems with MinGW and #include <string>. swprintf on
+        # windows has a non-standard signature
+        add_definitions("-ansi")
+        # Boost 1.39 on mingw seems to produce a lot of these - they are very
+        # noisy
+        add_definitions("-Wstrict-aliasing=1")
     endif()
 
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
     add_definitions("-pedantic-errors -Wall -Wextra"
-    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo")
-
-    if (NOT WIN32)
-        # Boost 1.39 on mingw seems to produce a lot of these - they are very
-        # noisy
-        add_definitions("-Wstrict-aliasing=1")
-    endif()
+        "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo"
+        "-Wno-long-long")
 
     if(ENABLE_DEBUG_WARNINGS)
         add_definitions("-Wpadded -Weffc++")
@@ -142,7 +144,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
-    add_definitions("-Wno-long-long -ansi")
 
     set(CMAKE_REQUIRED_FLAGS "")
 
@@ -583,7 +584,7 @@ foreach(PLUGIN ${PLUGINS})
 endforeach()
 
 set(JS_PLUGINS
-    util util/array util/function util/range test test/equiv http/headers)
+    util util/array util/function util/range util/load test test/equiv http/headers)
 
 foreach(JS_PLUGIN ${JS_PLUGINS})
 
