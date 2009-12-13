@@ -335,18 +335,29 @@ endif()
 if(PLUGIN_CURL)
     find_package(CURL)
 
-    check_cxx_source_runs(
-      "#include <curl/curl.h>
-       #include <cstdlib>
-       int main() {
-         return (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19) ?
-                EXIT_SUCCESS :
-                EXIT_FAILURE; 
-       }"
-      CURL_CORRECT_VERSION)
-    if(NOT CURL_CORRECT_VERSION)
-      message(STATUS "CURL version too old (7.19.0 or better required) or error during compilation")
-    endif()
+    if(CURL_FOUND)
+      set(TMP_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+      set(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+
+      set(TMP_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
+      set(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+      check_cxx_source_runs(
+        "#include <curl/curl.h>
+         #include <cstdlib>
+         int main() {
+           return (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19) ?
+                  EXIT_SUCCESS :
+                  EXIT_FAILURE; 
+         }"
+         CURL_CORRECT_VERSION)
+       set(CMAKE_REQUIRED_LIBRARIES ${TMP_CMAKE_REQUIRED_LIBRARIES})
+       set(CMAKE_REQUIRED_INCLUDES ${TMP_CMAKE_REQUIRED_INCLUDES})
+
+       if(NOT CURL_CORRECT_VERSION)
+         message(STATUS "CURL version too old (7.19.0 or better required) or error during compilation")
+         set(CURL_FOUND FALSE)
+       endif()
+     endif()
 
     if(FORCE_PLUGINS AND NOT CURL_FOUND)
         message(SEND_ERROR "CURL plugin required but cURL not found")
