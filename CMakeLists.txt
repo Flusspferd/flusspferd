@@ -335,6 +335,19 @@ endif()
 if(PLUGIN_CURL)
     find_package(CURL)
 
+    check_cxx_source_runs(
+      "#include <curl/curl.h>
+       #include <cstdlib>
+       int main() {
+         return (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19) ?
+                EXIT_SUCCESS :
+                EXIT_FAILURE; 
+       }"
+      CURL_CORRECT_VERSION)
+    if(NOT CURL_CORRECT_VERSION)
+      message(STATUS "CURL version too old (7.19.0 or better required) or error during compilation")
+    endif()
+
     if(FORCE_PLUGINS AND NOT CURL_FOUND)
         message(SEND_ERROR "CURL plugin required but cURL not found")
     endif()

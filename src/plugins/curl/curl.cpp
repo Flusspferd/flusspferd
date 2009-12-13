@@ -46,6 +46,16 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/any.hpp>
 
+#ifndef CURL_SEEKFUNC_OK
+#define CURL_SEEKFUNC_OK 0
+#endif
+#ifndef CURL_SEEKFUNC_FAIL
+#define CURL_SEEKFUNC_FAIL 1
+#endif
+#ifndef CURL_SEEKFUNC_CANTSEEK
+#define CURL_SEEKFUNC_CANTSEEK 2
+#endif
+
 using namespace flusspferd;
 
 namespace {
@@ -814,16 +824,22 @@ namespace {
         // ERROR OPTIONS
         ptr_map_insert< integer_option<CURLOPT_FAILONERROR> >(map)("failonerror");
         // NETWORK OPTIONS
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 4)
         ptr_map_insert< integer_option<CURLOPT_PROTOCOLS> >(map)("protocols");
         ptr_map_insert< integer_option<CURLOPT_REDIR_PROTOCOLS> >(map)("redirProtocols");
+#endif
         ptr_map_insert< string_option<CURLOPT_URL> >(map)("url");
         ptr_map_insert< string_option<CURLOPT_PROXY> >(map)("proxy");
         ptr_map_insert< integer_option<CURLOPT_PROXYPORT> >(map)("proxyport");
         ptr_map_insert< integer_option<CURLOPT_PROXYTYPE> >(map)("proxytype"); // See cURL.PROXY_
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 4)
         ptr_map_insert< string_option<CURLOPT_NOPROXY> >(map)("noproxy");
+#endif
         ptr_map_insert< integer_option<CURLOPT_HTTPPROXYTUNNEL> >(map)("httpProxyTunnel");
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 4)
         ptr_map_insert< string_option<CURLOPT_SOCKS5_GSSAPI_SERVICE> >(map)("socks5GssapiService");
         ptr_map_insert< integer_option<CURLOPT_SOCKS5_GSSAPI_NEC> >(map)("socks5GssapiNec");
+#endif
         ptr_map_insert< string_option<CURLOPT_INTERFACE> >(map)("interface");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORT> >(map)("localport");
         ptr_map_insert< integer_option<CURLOPT_LOCALPORTRANGE> >(map)("localportrange");
@@ -832,16 +848,20 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_BUFFERSIZE> >(map)("buffersize");
         ptr_map_insert< integer_option<CURLOPT_PORT> >(map)("port");
         ptr_map_insert< integer_option<CURLOPT_TCP_NODELAY> >(map)("tcpNoDelay");
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 4)
         ptr_map_insert< integer_option<CURLOPT_ADDRESS_SCOPE> >(map)("addressScope");
+#endif
         // NAMES and PASSWORDS OPTIONS (Authentication)
         ptr_map_insert< integer_option<CURLOPT_NETRC> >(map)("netrc");
         ptr_map_insert< string_option<CURLOPT_NETRC_FILE> >(map)("netrcFile");
         ptr_map_insert< string_option<CURLOPT_USERPWD> >(map)("userpwd");
         ptr_map_insert< string_option<CURLOPT_PROXYUSERPWD> >(map)("proxyuserpwd");
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 1)
         ptr_map_insert< string_option<CURLOPT_USERNAME> >(map)("username");
         ptr_map_insert< string_option<CURLOPT_PASSWORD> >(map)("password");
         ptr_map_insert< string_option<CURLOPT_PROXYUSERNAME> >(map)("proxyusername");
         ptr_map_insert< string_option<CURLOPT_PROXYPASSWORD> >(map)("proxypassword");
+#endif
         ptr_map_insert< integer_option<CURLOPT_HTTPAUTH> >(map)("httpauth"); // See cURL.AUTH_*
         ptr_map_insert< integer_option<CURLOPT_PROXYAUTH> >(map)("proxyauth");
         // HTTP OPTIONS
@@ -874,8 +894,9 @@ namespace {
         ptr_map_insert< integer_option<CURLOPT_HTTP_CONTENT_DECODING> >(map)("httpContentDecoding");
         ptr_map_insert< integer_option<CURLOPT_HTTP_TRANSFER_DECODING> >(map)("httpTransferDecoding");
         // TFTP OPTIONS
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 4)
         ptr_map_insert< integer_option<CURLOPT_TFTP_BLKSIZE> >(map)("tftpBlksize");
-
+#endif
         // FTP OPTIONS
         ptr_map_insert< string_option<CURLOPT_FTPPORT> >(map)("ftpPort");
         ptr_map_insert< list_option<CURLOPT_QUOTE> >(map)("quote");
@@ -936,7 +957,9 @@ namespace {
         ptr_map_insert< string_option<CURLOPT_ISSUERCERT> >(map)("issuercert");
         ptr_map_insert< string_option<CURLOPT_CAPATH> >(map)("capath");
         ptr_map_insert< string_option<CURLOPT_CRLFILE> >(map)("crlfile");
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 1)
         ptr_map_insert< integer_option<CURLOPT_CERTINFO> >(map)("certinfo");
+#endif
         ptr_map_insert< string_option<CURLOPT_RANDOM_FILE> >(map)("randomFile");
         ptr_map_insert< string_option<CURLOPT_EGDSOCKET> >(map)("egdsocket");
         ptr_map_insert< integer_option<CURLOPT_SSL_VERIFYHOST> >(map)("sslVerifyhost");
@@ -1018,66 +1041,73 @@ namespace {
     load_class<Easy>(cURL);
 
     cURL.define_properties(read_only_property | permanent_property)
-        ("version", string(curl_version()))
-        ("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)))
-        ("PROTO_HTTPS", value(static_cast<int>(CURLPROTO_HTTPS)))
-        ("PROTO_FTP", value(static_cast<int>(CURLPROTO_FTP)))
-        ("PROTO_FTPS", value(static_cast<int>(CURLPROTO_FTPS)))
-        ("PROTO_SCP", value(static_cast<int>(CURLPROTO_SCP)))
-        ("PROTO_SFTP", value(static_cast<int>(CURLPROTO_SFTP)))
-        ("PROTO_TELNET", value(static_cast<int>(CURLPROTO_TELNET)))
-        ("PROTO_LDAP", value(static_cast<int>(CURLPROTO_LDAP)))
-        ("PROTO_LDAPS", value(static_cast<int>(CURLPROTO_LDAPS)))
-        ("PROTO_DICT", value(static_cast<int>(CURLPROTO_DICT)))
-        ("PROTO_FILE", value(static_cast<int>(CURLPROTO_FILE)))
-        ("PROTO_TFTP", value(static_cast<int>(CURLPROTO_TFTP)))
-        ("PROTO_ALL", value(static_cast<int>(CURLPROTO_ALL)))
-        ("INFO_TEXT", value(static_cast<int>(CURLINFO_TEXT)))
-        ("INFO_HEADER_IN", value(static_cast<int>(CURLINFO_HEADER_IN)))
-        ("INFO_HEADER_OUT", value(static_cast<int>(CURLINFO_HEADER_OUT)))
-        ("INFO_DATA_IN", value(static_cast<int>(CURLINFO_DATA_IN)))
-        ("INFO_DATA_OUT", value(static_cast<int>(CURLINFO_DATA_OUT)))
-        ("PROXY_HTTP", value(static_cast<int>(CURLPROXY_HTTP)))
-        ("PROXY_HTTP_1_0", value(static_cast<int>(CURLPROXY_HTTP_1_0)))
-        ("PROXY_SOCKS4", value(static_cast<int>(CURLPROXY_SOCKS4)))
-        ("PROXY_SOCKS5", value(static_cast<int>(CURLPROXY_SOCKS5)))
-        ("PROXY_SOCKS4A", value(static_cast<int>(CURLPROXY_SOCKS4A)))
-        ("PROXY_SOCKS5_HOSTNAME", value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)))
-        ("NETRC_OPTIONAL", value(static_cast<int>(CURL_NETRC_OPTIONAL)))
-        ("NETRC_IGNORED", value(static_cast<int>(CURL_NETRC_IGNORED)))
-        ("NETRC_REQUIRED", value(static_cast<int>(CURL_NETRC_REQUIRED)))
-        ("AUTH_BASIC", value(static_cast<int>(CURLAUTH_BASIC)))
-        ("AUTH_DIGEST", value(static_cast<int>(CURLAUTH_DIGEST)))
-        ("AUTH_DIGEST_IE", value(static_cast<int>(CURLAUTH_DIGEST_IE)))
-        ("AUTH_GSSNEGOTIATE", value(static_cast<int>(CURLAUTH_GSSNEGOTIATE)))
-        ("AUTH_NTLM", value(static_cast<int>(CURLAUTH_NTLM)))
-        ("AUTH_ANY", value(static_cast<int>(CURLAUTH_ANY)))
-        ("AUTH_ANYSAFE", value(static_cast<int>(CURLAUTH_ANYSAFE)))
-        ("REDIR_POST_301", value(static_cast<int>(CURL_REDIR_POST_301)))
-        ("REDIR_POST_302", value(static_cast<int>(CURL_REDIR_POST_302)))
-        ("REDIR_POST_ALL", value(static_cast<int>(CURL_REDIR_POST_ALL)))
-        ("HTTP_VERSION_NONE", value(static_cast<int>(CURL_HTTP_VERSION_NONE)))
-        ("HTTP_VERSION_1_0", value(static_cast<int>(CURL_HTTP_VERSION_1_0)))
-        ("HTTP_VERSION_1_1", value(static_cast<int>(CURL_HTTP_VERSION_1_1)))
-        ("USESSL_NONE", value(static_cast<int>(CURLUSESSL_NONE)))
-        ("USESSL_TRY", value(static_cast<int>(CURLUSESSL_TRY)))
-        ("USESSL_CONTROL", value(static_cast<int>(CURLUSESSL_CONTROL)))
-        ("USESSL_ALL", value(static_cast<int>(CURLUSESSL_ALL)))
-        ("FTPAUTH_DEFAULT", value(static_cast<int>(CURLFTPAUTH_DEFAULT)))
-        ("FTPAUTH_SSL", value(static_cast<int>(CURLFTPAUTH_SSL)))
-        ("FTPAUTH_TLS", value(static_cast<int>(CURLFTPAUTH_TLS)))
-        ("FTPSSL_CCC_NONE", value(static_cast<int>(CURLFTPSSL_CCC_NONE)))
-        ("FTPSSL_CCC_PASSIVE", value(static_cast<int>(CURLFTPSSL_CCC_PASSIVE)))
-        ("FTPSSL_CCC_ACTIVE", value(static_cast<int>(CURLFTPSSL_CCC_ACTIVE)))
-        ("FTPMETHOD_MULTICWD", value(static_cast<int>(CURLFTPMETHOD_MULTICWD)))
-        ("FTPMETHOD_NOCWD", value(static_cast<int>(CURLFTPMETHOD_NOCWD)))
-        ("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)))
-        ("IPRESOLVE_WHATEVER", value(static_cast<int>(CURL_IPRESOLVE_WHATEVER)))
-        ("IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)))
-        ("IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)))
-        ("SSLVERSION_DEFAULT", value(static_cast<int>(CURL_SSLVERSION_DEFAULT)))
-        ("SSLVERSION_TLSv1", value(static_cast<int>(CURL_SSLVERSION_TLSv1)))
-        ("SSLVERSION_SSLv2", value(static_cast<int>(CURL_SSLVERSION_SSLv2)))
-        ("SSLVERSION_SSLv3", value(static_cast<int>(CURL_SSLVERSION_SSLv3)));
+      ("version", string(curl_version()))
+      ("PROTO_HTTP", value(static_cast<int>(CURLPROTO_HTTP)))
+      ("PROTO_HTTPS", value(static_cast<int>(CURLPROTO_HTTPS)))
+      ("PROTO_FTP", value(static_cast<int>(CURLPROTO_FTP)))
+      ("PROTO_FTPS", value(static_cast<int>(CURLPROTO_FTPS)))
+      ("PROTO_SCP", value(static_cast<int>(CURLPROTO_SCP)))
+      ("PROTO_SFTP", value(static_cast<int>(CURLPROTO_SFTP)))
+      ("PROTO_TELNET", value(static_cast<int>(CURLPROTO_TELNET)))
+      ("PROTO_LDAP", value(static_cast<int>(CURLPROTO_LDAP)))
+      ("PROTO_LDAPS", value(static_cast<int>(CURLPROTO_LDAPS)))
+      ("PROTO_DICT", value(static_cast<int>(CURLPROTO_DICT)))
+      ("PROTO_FILE", value(static_cast<int>(CURLPROTO_FILE)))
+      ("PROTO_TFTP", value(static_cast<int>(CURLPROTO_TFTP)))
+      ("PROTO_ALL", value(static_cast<int>(CURLPROTO_ALL)))
+      ("INFO_TEXT", value(static_cast<int>(CURLINFO_TEXT)))
+      ("INFO_HEADER_IN", value(static_cast<int>(CURLINFO_HEADER_IN)))
+      ("INFO_HEADER_OUT", value(static_cast<int>(CURLINFO_HEADER_OUT)))
+      ("INFO_DATA_IN", value(static_cast<int>(CURLINFO_DATA_IN)))
+      ("INFO_DATA_OUT", value(static_cast<int>(CURLINFO_DATA_OUT)))
+      ("PROXY_HTTP", value(static_cast<int>(CURLPROXY_HTTP)))
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 4)
+      ("PROXY_HTTP_1_0", value(static_cast<int>(CURLPROXY_HTTP_1_0)))
+#endif
+      ("PROXY_SOCKS4", value(static_cast<int>(CURLPROXY_SOCKS4)))
+      ("PROXY_SOCKS5", value(static_cast<int>(CURLPROXY_SOCKS5)))
+      ("PROXY_SOCKS4A", value(static_cast<int>(CURLPROXY_SOCKS4A)))
+      ("PROXY_SOCKS5_HOSTNAME", value(static_cast<int>(CURLPROXY_SOCKS5_HOSTNAME)))
+      ("NETRC_OPTIONAL", value(static_cast<int>(CURL_NETRC_OPTIONAL)))
+      ("NETRC_IGNORED", value(static_cast<int>(CURL_NETRC_IGNORED)))
+      ("NETRC_REQUIRED", value(static_cast<int>(CURL_NETRC_REQUIRED)))
+      ("AUTH_BASIC", value(static_cast<int>(CURLAUTH_BASIC)))
+      ("AUTH_DIGEST", value(static_cast<int>(CURLAUTH_DIGEST)))
+#if (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19 && LIBCURL_VERSION_PATH >= 3)
+      ("AUTH_DIGEST_IE", value(static_cast<int>(CURLAUTH_DIGEST_IE)))
+#endif
+      ("AUTH_GSSNEGOTIATE", value(static_cast<int>(CURLAUTH_GSSNEGOTIATE)))
+      ("AUTH_NTLM", value(static_cast<int>(CURLAUTH_NTLM)))
+      ("AUTH_ANY", value(static_cast<int>(CURLAUTH_ANY)))
+      ("AUTH_ANYSAFE", value(static_cast<int>(CURLAUTH_ANYSAFE)))
+      ("REDIR_POST_301", value(static_cast<int>(CURL_REDIR_POST_301)))
+      ("REDIR_POST_302", value(static_cast<int>(CURL_REDIR_POST_302)))
+      ("REDIR_POST_ALL", value(static_cast<int>(CURL_REDIR_POST_ALL)))
+      ("HTTP_VERSION_NONE", value(static_cast<int>(CURL_HTTP_VERSION_NONE)))
+      ("HTTP_VERSION_1_0", value(static_cast<int>(CURL_HTTP_VERSION_1_0)))
+      ("HTTP_VERSION_1_1", value(static_cast<int>(CURL_HTTP_VERSION_1_1)))
+      ("USESSL_NONE", value(static_cast<int>(CURLUSESSL_NONE)))
+      ("USESSL_TRY", value(static_cast<int>(CURLUSESSL_TRY)))
+      ("USESSL_CONTROL", value(static_cast<int>(CURLUSESSL_CONTROL)))
+      ("USESSL_ALL", value(static_cast<int>(CURLUSESSL_ALL)))
+      ("FTPAUTH_DEFAULT", value(static_cast<int>(CURLFTPAUTH_DEFAULT)))
+      ("FTPAUTH_SSL", value(static_cast<int>(CURLFTPAUTH_SSL)))
+      ("FTPAUTH_TLS", value(static_cast<int>(CURLFTPAUTH_TLS)))
+      ("FTPSSL_CCC_NONE", value(static_cast<int>(CURLFTPSSL_CCC_NONE)))
+      ("FTPSSL_CCC_PASSIVE", value(static_cast<int>(CURLFTPSSL_CCC_PASSIVE)))
+      ("FTPSSL_CCC_ACTIVE", value(static_cast<int>(CURLFTPSSL_CCC_ACTIVE)))
+      ("FTPMETHOD_MULTICWD", value(static_cast<int>(CURLFTPMETHOD_MULTICWD)))
+      ("FTPMETHOD_NOCWD", value(static_cast<int>(CURLFTPMETHOD_NOCWD)))
+      ("FTPMETHOD_SINGLECWD", value(static_cast<int>(CURLFTPMETHOD_SINGLECWD)))
+      ("IPRESOLVE_WHATEVER", value(static_cast<int>(CURL_IPRESOLVE_WHATEVER)))
+      ("IPRESOLVE_V4", value(static_cast<int>(CURL_IPRESOLVE_V4)))
+      ("IPRESOLVE_V6", value(static_cast<int>(CURL_IPRESOLVE_V6)))
+      ("SSLVERSION_DEFAULT", value(static_cast<int>(CURL_SSLVERSION_DEFAULT)))
+      ("SSLVERSION_TLSv1", value(static_cast<int>(CURL_SSLVERSION_TLSv1)))
+      ("SSLVERSION_SSLv2", value(static_cast<int>(CURL_SSLVERSION_SSLv2)))
+      ("SSLVERSION_SSLv3", value(static_cast<int>(CURL_SSLVERSION_SSLv3)))
+      ("SEEKFUNC_OK", value(CURL_SEEKFUNC_OK))
+      ("SEEKFUNC_FAIL", value(CURL_SEEKFUNC_FAIL))
+      ("SEEKFUNC_CANTSEEK", value(CURL_SEEKFUNC_CANTSEEK));
   }
 }

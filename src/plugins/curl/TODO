@@ -36,6 +36,10 @@ Functions:
 
 Documentation:
 * constants
+* add version dependency to docs
+
+Other:
+* Support older versione? (currently 7.19.0 (or even newer) required)
 
 and more :-)
 ...
