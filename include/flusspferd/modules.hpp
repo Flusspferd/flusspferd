@@ -143,14 +143,19 @@ protected:
 
   std::string current_id();
 
-  object load_top_level_module(std::string &id);
-  object load_absolute_js_file(boost::filesystem::path path, std::string &id);
+  object call_helper(std::string const &id);
+
+  /// Setup an empty cache entry for @p id in the module_cache
+  object create_cache_entry(std::string const &id);
+
+  object load_top_level_module(std::string const &id);
+  object load_absolute_js_file(boost::filesystem::path path, std::string const &id);
 
   boost::filesystem::path resolve_relative_id(std::string const &id);
 
   void require_js(boost::filesystem::path filename,
                   std::string const &id,
-                  object exports);
+                  object cache);
 
   static id_classification classify_id(std::string const &id);
 
