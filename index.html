@@ -47,7 +47,7 @@
         <div class="subcontent">
           <p><em>Flusspferd</em>: Javascript bindings for C++, a Javascript interpreter
           and shell, and a Javascript/C++ module system. Also, Flusspferd includes a few
-          Javascript classes and modules: binary blobs, <a href=
+          Javascript classes and <a href="#bindings">modules</a>: binary blobs, <a href=
           "http://www.sqlite.org/">SQLite 3</a>, <a href="http://gmplib.org/">GMP</a> and
           others. It is designed to support easy embedding of Javascript in C++ - and
           vice versa. It supports <a href=
@@ -55,7 +55,7 @@
           backend, and possibly support for other engines will be added later. Read the
           <a href="http://redmine.flusspferd.org/projects/flusspferd/news">latest
           News</a> on Flusspferd or follow us on
-          <a href="https://twitter.com/flusspferdjs">twitter</a>.</p>
+          <a href="https://twitter.com/flusspferdjs">Twitter</a>.</p>
 
           <p>Flusspferd is licensed under the <a href=
           "http://redmine.flusspferd.org/wiki/flusspferd/MIT_License">MIT license</a>
@@ -348,6 +348,43 @@
             and analysis)</li>
           </ul>
         </div>
+
+        <h2 id="bindings" class="heading"><a class="inthead" href="#bindings">Bindings</a></h2>
+
+        <h3 id="included_bindings" class="heading"><a class="inthead" href="#included_bindings">
+            Included</a></h3>
+        <div class="subcontent">
+          <ul>
+            <li>GMP - Bignum arithmetic. Bindings for <a href="http://gmplib.org">
+                GNU Multiple Precision Arithmetic Library (<i>GMP</i>)</a> (since
+              <a href="#v0.6">0.6</a>).</li>
+            <li>SQLite3 - Bindings for <a href="http://www.sqlite.org/">SQLite</a>.</li>
+          </ul>
+        </div>
+
+        <h3 id="external_bindings" class="heading"><a class="inthead" href="#external_bindings">
+            External</a></h3>
+        <div class="subcontent">
+          <ul>
+            <li><a href="http://github.com/ruediger/flusspferd-sdl">Flusspferd-SDL</a> - bindings
+              for <a href="http://www.libsdl.org">SDL</a>.</li>
+            <li><a href="http://juicejs.org/">Juice</a> - a webframework based on Flusspferd.</li>
+            <li><a href="http://github.com/ashb/Zest">Zest</a> - Simple HTTP server that speaks
+              JSGI (primarily for use with Juice)</li>
+            <li><a href="http://github.com/ashb/mongodb-flusspferd">MongoDB-Flusspferd</a> -
+              bindings for <a href="http://www.mongodb.org">MongoDB</a>.</li>
+            <li><a href="http://github.com/ruediger/flusspferd/tree/xml_arabica">XML</a> - XML
+              library based on <a href="http://www.jezuk.co.uk/cgi-bin/view/arabica">Arabica</a>.
+              Will be part of Flusspferd 0.9 and replace the XML module
+              removed in <a href="#v0.8">0.8</a>.</li>
+            <li><a href="http://github.com/ruediger/flusspferd/tree/curl">cURL</a> - Bindings for
+              <a href="http://curl.haxx.se/libcurl/">libcurl</a>. Will be part of Flusspferd 0.9
+              and replace the cURL module removed in <a href="#v0.8">0.8</a>.</li>
+            <li><a href="http://github.com/ashb/http-fetch-flusspferd">http-fetch-flusspferd</a> -
+              http fetcher (based on the cURL module).</li>
+          </ul>
+        </div>
+        
 
         <h2 id="related" class="heading"><a class="inthead" href="#related">Related
         projects</a></h2>
