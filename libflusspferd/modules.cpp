@@ -42,7 +42,9 @@ THE SOFTWARE.
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/xpressive/xpressive.hpp>
 #include <sstream>
+#include <algorithm>
 
 #ifdef WIN32
 #include <windows.h>
@@ -209,7 +211,7 @@ object require::call_helper(std::string const &id_) {
 }
 
 
-string require::load_module_text(fs::path filename) {
+string require::load_module_text(fs::path filename, boost::optional<object> cache) {
   root_string read_only("r");
 
   io::file &f = create<io::file>(
@@ -225,17 +227,66 @@ string require::load_module_text(fs::path filename) {
   // Look for a shebang line
   f.read_binary(2, blob);
 
+  binary::vector_type::iterator i, s;
+
   if (buf[0] == '#' && buf[1] == '!') {
     // Shebang line - skip the line, but insert an empty one in there to keep
     // source line numbers right
     buf.clear();
-    buf.push_back('\n');
-    f.read_line(value("\n"));
+    buf.push_back('/');
+    buf.push_back('/');
   }
   f.read_whole_binary(blob);
 
+  if (!cache) {
+    // Look for option lines. An option line looks like
+    // "// flusspferd: x"
+    // We continue looking until we see a blank comment or a non comment line
+
+    std::string options, warnings;
+
+    using namespace boost::xpressive;
+    sregex re = sregex::compile("^\\s*(flusspferd|warnings):\\s*(.*)$");
+    //sregex re = *_s >> (s1 = (as_xpr("flusspferd")|"warnings")) >> ":" >> +_s >> (s3 = *_) >> eos;
+
+    for (i = buf.begin(); i != buf.end(); ++i) {
+      if (*(i++) != '/' || *(i++) != '/') {
+        // Not a comment line, or an empty comment - stop!
+        break;
+      }
+      binary::vector_type::iterator e;
+      e = std::find(i, buf.end(), '\n');
+      if (e == buf.end())
+        break;
+
+      std::string line(
+        reinterpret_cast<char const *>(&*i),
+        size_t(e-i));
+
+      // Move onto next line
+      i = e;
+
+      // Empty comment line - stop looking
+      sregex empty = bos >> *_s >> eos;
+      if (regex_match(line, empty))
+        break;
+
+      smatch m;
+      if (!regex_match(line, m, re)) {
+        // Not a line we are interested in. skip
+        continue;
+      }
+
+      if (m[1] == "flusspferd")
+        options += m[2] + " ";
+      else
+        warnings += m[2] + " ";
+    }
+  }
+
   // TODO: Some way of supporting other encodings is probably useful
   return encodings::convert_to_string("UTF-8", blob);
+
 }
 
 /// Load the given @c filename as a module
@@ -252,7 +303,7 @@ void require::require_js(fs::path filename, std::string const &id, object cache)
   // Reset the strict mode when we leave (the REPL might have it off)
   StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
 
-  root_string module_text(load_module_text(filename));
+  root_string module_text(load_module_text(filename, cache));
 
   std::vector<std::string> argnames;
   argnames.push_back("exports");

@@ -125,7 +125,7 @@ public:
    */
   static object create_require();
 
-  static string load_module_text(boost::filesystem::path filename);
+  static string load_module_text(boost::filesystem::path filename, boost::optional<object> cache = boost::none);
 
   /// Create a sub-%require object for the given module id
   object new_require_function(string const &id);
