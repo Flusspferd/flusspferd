@@ -60,7 +60,7 @@ namespace {
   void write_history_(char const *file) {
     int const err = ::write_history(file);
     if(err != 0) {
-      throw flusspferd::exception(std::string("readline.readHistory: failed to read history `")
+      throw flusspferd::exception(std::string("readline.writeHistory: failed to write history `")
                                   + std::strerror(err) + "`");
     }
   }
