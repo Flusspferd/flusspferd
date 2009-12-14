@@ -34,12 +34,45 @@ THE SOFTWARE.
 #include <readline/history.h>
 #endif
 
+#include <string>
+#include <cstring>
+#include <cstdlib>
+
+namespace {
+  flusspferd::value readline_(char const *prompt) {
+    char *read = ::readline(prompt);
+    if(read) {
+      std::string const ret = read;
+      std::free(read);
+      return flusspferd::value(ret);
+    }
+    return flusspferd::value();
+  }
+
+  void read_history_(char const *file) {
+    int const err = ::read_history(file);
+    if(err != 0) {
+      throw flusspferd::exception(std::string("readline.readHistory: failed to read history `")
+                                  + std::strerror(err) + "`");
+    }
+  }
+
+  void write_history_(char const *file) {
+    int const err = ::write_history(file);
+    if(err != 0) {
+      throw flusspferd::exception(std::string("readline.readHistory: failed to read history `")
+                                  + std::strerror(err) + "`");
+    }
+  }
+}
+
 using namespace flusspferd;
 
 FLUSSPFERD_LOADER_SIMPLE(readline) {
   create_on(readline)
-    .create<function>("readline", &::readline)
-    .create<function>("readHistory", &::read_history)
+    .create<function>("readline", &readline_)
+    .create<function>("usingHistory", &::using_history)
+    .create<function>("readHistory", &read_history_)
     .create<function>("addHistory", &::add_history)
-    .create<function>("writeHistory", &::write_history);
+    .create<function>("writeHistory", &write_history_);
 }
