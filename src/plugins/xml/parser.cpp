@@ -25,11 +25,12 @@ THE SOFTWARE.
 */
 
 
-#include <flusspferd.hpp>
 #include <flusspferd/io/stream.hpp>
+#include <flusspferd/binary.hpp>
 
 #include <boost/format.hpp>
 #include <fstream>
+#include <sstream>
 
 #include "parser.hpp"
 #include "document.hpp"
@@ -52,8 +53,8 @@ object base_parser::parse(value source) {
   if (source.is_object()) {
     object o = source.get_object();
 
-    if (is_native<flusspferd::io::stream>(o)) {
-      flusspferd::io::stream &s = flusspferd::get_native<flusspferd::io::stream>(o);
+    if (is_native<io::stream>(o)) {
+      io::stream &s = flusspferd::get_native<io::stream>(o);
 
       // TODO: Work out if the stream is readable or not!
       std::ifstream stream;
@@ -62,16 +63,41 @@ object base_parser::parse(value source) {
       is.setByteStream(stream);
       return parse_source(is);
     }
+    /*else if (is_native<binary>(o)) {
+      // Couldn't get this working. Compile errors
+      binary &b = flusspferd::get_native<flusspferd::binary>(o);
+
+      call_context c;
+      c.arg.push_back(b);
+      create<io::binary_stream>(c);
+      root_object s(b_s);
+
+      std::ifstream stream;
+      dynamic_cast<std::ios&>(stream).rdbuf( b_s.streambuf() );
+      sax_source is;
+      is.setByteStream(stream);
+      return parse_source(is);
+    }*/
+    else if (o.is_array()) {
+      // Since js has no reference type, treat ['<?xml ....'] as a source
+      // literal, not a filename
+      root_string s(source.to_string());
+
+      std::istringstream sb(s.to_string());
+      sax_source is;
+      is.setByteStream(sb);
+      return parse_source(is);
+    }
   }
 
   std::string str = source.to_std_string();
 
   security &sec = security::get();
   if (!sec.check_path(str, security::READ)) {
-    throw exception( boost::str(
+    throw exception(
       format("xml.Parser#parse: could not open file: 'denied by security' (%s)")
              % str
-    ) );
+    );
   }
 
   sax_source is;
