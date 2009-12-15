@@ -33,7 +33,11 @@ THE SOFTWARE.
 
 namespace flusspferd { namespace aliases {
 
+#if BOOST_VERSION < 104100
   typedef boost::fusion::vector0 vector0;
+#else
+  typedef boost::fusion::vector0<> vector0;
+#endif
 
   using boost::fusion::make_vector;
   using boost::assign::list_of;
