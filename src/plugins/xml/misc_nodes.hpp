@@ -69,11 +69,13 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructible, false)
     (full_name, "xml.Entity")
     (constructor_name, "Entity")
+    /*
     (properties,
       //("publicId", getter, getPublicId)
       //("systemId", getter, getSystemId)
       //("notationName", getter, getNotationName)
     )
+    */
 )
 {
 public:
