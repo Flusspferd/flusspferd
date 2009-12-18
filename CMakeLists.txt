@@ -650,6 +650,8 @@ if(PLUGIN_CURL AND CURL_FOUND)
       src/plugins/curl/exception.cpp
       src/plugins/curl/handle_option.hpp
       src/plugins/curl/handle_option.cpp
+      src/plugins/curl/get_options.hpp
+      src/plugins/curl/get_options.cpp
       src/plugins/curl/curl.cpp
     )
     include_directories(${CURL_INCLUDE_DIR})
