@@ -28,6 +28,7 @@
 #include "handle_option.hpp"
 #include "get_options.hpp"
 #include "EasyOpt.hpp"
+#include "defines.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
@@ -47,16 +48,6 @@
 #include <boost/range/iterator_range.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/any.hpp>
-
-#ifndef CURL_SEEKFUNC_OK
-#define CURL_SEEKFUNC_OK 0
-#endif
-#ifndef CURL_SEEKFUNC_FAIL
-#define CURL_SEEKFUNC_FAIL 1
-#endif
-#ifndef CURL_SEEKFUNC_CANTSEEK
-#define CURL_SEEKFUNC_CANTSEEK 2
-#endif
 
 using namespace flusspferd;
 
