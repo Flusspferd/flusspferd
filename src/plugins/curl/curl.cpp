@@ -24,6 +24,7 @@
   THE SOFTWARE.
 */
 
+#include "exception.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
@@ -40,7 +41,6 @@
 #include <curl/curl.h>
 
 #include <boost/ptr_container/ptr_unordered_map.hpp>
-#include <boost/exception/get_error_info.hpp>
 #include <boost/assign/ptr_map_inserter.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/thread/mutex.hpp>
@@ -58,30 +58,8 @@
 
 using namespace flusspferd;
 
-namespace {
+namespace curl {
   namespace bf = boost::fusion;
-
-  typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
-
-  struct exception
-    : flusspferd::exception
-  {
-    exception(std::string const &what)
-      : std::runtime_error(what), flusspferd::exception(what)
-    { }
-
-    char const *what() const throw() {
-      if(CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
-        std::string what_ = flusspferd::exception::what();
-        what_ += ": ";
-        what_ += curl_easy_strerror(*code);
-        return what_.c_str();
-      }
-      else {
-        return flusspferd::exception::what();
-      }
-    }
-  };
 
   /*
    * cURL.Easy#options implementation:
@@ -95,20 +73,6 @@ namespace {
   class Easy;
 
   namespace {
-    struct handle_option {
-      virtual ~handle_option() =0;
-      virtual function getter() const =0;
-      virtual function setter() const =0;
-      // initial data
-      virtual boost::any data() const =0;
-      virtual CURLoption what() const =0;
-      // called during tracing to prevent the GC from collecting data
-      virtual void trace(boost::any const &, flusspferd::tracer &) const { }
-      // called during destruction/cleanup of EasyOpt
-      virtual void cleanup(boost::any &) const { }
-    };
-    handle_option::~handle_option() { }
-
     typedef boost::ptr_unordered_map<std::string, handle_option> options_map_t;
     options_map_t const &get_options();
   }
