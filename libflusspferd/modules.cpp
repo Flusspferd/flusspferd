@@ -211,7 +211,7 @@ object require::call_helper(std::string const &id_) {
 }
 
 
-string require::load_module_text(fs::path filename, boost::optional<object> cache) {
+string require::load_module_text(fs::path filename, boost::optional<object> opts) {
   root_string read_only("r");
 
   io::file &f = create<io::file>(
@@ -238,54 +238,73 @@ string require::load_module_text(fs::path filename, boost::optional<object> cach
   }
   f.read_whole_binary(blob);
 
-  if (!cache) {
-    // Look for option lines. An option line looks like
-    // "// flusspferd: x"
-    // We continue looking until we see a blank comment or a non comment line
 
-    std::string options, warnings;
+  // Look for option lines. An option line looks like
+  // "// -*- coding=utf-8 -*-
+  //
+  // or
+  //
+  // "// flusspferd: -xboo"
+  // We continue looking until we see a blank comment or a non comment line
 
-    using namespace boost::xpressive;
-    sregex re = sregex::compile("^\\s*(flusspferd|warnings):\\s*(.*)$");
-    //sregex re = *_s >> (s1 = (as_xpr("flusspferd")|"warnings")) >> ":" >> +_s >> (s3 = *_) >> eos;
+  std::string options, warnings;
 
-    for (i = buf.begin(); i != buf.end(); ++i) {
-      if (*(i++) != '/' || *(i++) != '/') {
-        // Not a comment line, or an empty comment - stop!
-        break;
-      }
-      binary::vector_type::iterator e;
-      e = std::find(i, buf.end(), '\n');
-      if (e == buf.end())
-        break;
+  using namespace boost::xpressive;
+  sregex opt_re = sregex::compile("^\\s*([-\\w.]+):\\s*(.*)$");
+  sregex coding_re = sregex::compile("^.*coding[:=]\\s*([-\\w.]+)");
 
-      std::string line(
-        reinterpret_cast<char const *>(&*i),
-        size_t(e-i));
+  // We only want to look for a coding comment on line 1 or 2
+  int look_for_coding = 2;
+  std::string encoding = "UTF-8";
 
-      // Move onto next line
-      i = e;
+  for (i = buf.begin(); i != buf.end(); ++i) {
+    if (*(i++) != '/' || *(i++) != '/') {
+      // Not a comment line, or an empty comment - stop!
+      break;
+    }
+    binary::vector_type::iterator e;
+    e = std::find(i, buf.end(), '\n');
+    if (e == buf.end())
+      break;
 
-      // Empty comment line - stop looking
-      sregex empty = bos >> *_s >> eos;
-      if (regex_match(line, empty))
-        break;
+    std::string line(
+      reinterpret_cast<char const *>(&*i),
+      size_t(e-i));
 
+    // Move onto next line
+    i = e;
+
+    if (look_for_coding--) {
       smatch m;
-      if (!regex_match(line, m, re)) {
-        // Not a line we are interested in. skip
+      if (regex_match(line, m, coding_re)) {
+        // Huzzah! We have an encoding!
+        encoding = m[1];
+        look_for_coding = 0;
+
         continue;
       }
-
-      if (m[1] == "flusspferd")
-        options += m[2] + " ";
-      else
-        warnings += m[2] + " ";
+    } if (!opts) {
+      // If no cache to store options, stop looking for then
+      break;
     }
+
+    // Empty comment line - stop looking
+    sregex empty = bos >> *_s >> eos;
+    if (regex_match(line, empty))
+      break;
+
+    smatch m;
+    if (!regex_match(line, m, opt_re)) {
+      // Not a line we are interested in. skip
+      continue;
+    }
+
+    if (opts)
+      opts->set_property(m[1].str(), m[2].str());
   }
 
   // TODO: Some way of supporting other encodings is probably useful
-  return encodings::convert_to_string("UTF-8", blob);
+  return encodings::convert_to_string(encoding, blob);
 
 }
 
@@ -303,7 +322,7 @@ void require::require_js(fs::path filename, std::string const &id, object cache)
   // Reset the strict mode when we leave (the REPL might have it off)
   StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
 
-  root_string module_text(load_module_text(filename, cache));
+  root_string module_text(load_module_text(filename, cache.get_property_object("options")));
 
   std::vector<std::string> argnames;
   argnames.push_back("exports");
