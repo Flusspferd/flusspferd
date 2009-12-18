@@ -654,6 +654,8 @@ if(PLUGIN_CURL AND CURL_FOUND)
       src/plugins/curl/get_options.cpp
       src/plugins/curl/EasyOpt.hpp
       src/plugins/curl/EasyOpt.cpp
+      src/plugins/curl/Easy.hpp
+      src/plugins/curl/Easy.cpp
       src/plugins/curl/defines.hpp
       src/plugins/curl/curl.cpp
     )
