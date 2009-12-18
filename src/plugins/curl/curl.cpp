@@ -27,6 +27,7 @@
 #include "exception.hpp"
 #include "handle_option.hpp"
 #include "get_options.hpp"
+#include "EasyOpt.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
@@ -72,71 +73,6 @@ namespace curl {
    */
 
   class Easy;
-
-  // the class behind cURL.Easy#options.
-  FLUSSPFERD_CLASS_DESCRIPTION
-  (
-      EasyOpt,
-      (constructor_name, "EasyOpt")
-      (full_name, "cURL.Easy.EasyOpt")
-      (constructible, false)
-  )
-  {
-  public: // TODO this should be private
-    typedef boost::unordered_map<CURLoption, boost::any> data_map_t;
-    data_map_t data;
-    Easy &parent;
-  public:
-    EasyOpt(flusspferd::object const &self, Easy &parent)
-      : base_type(self), parent(parent)
-    {	}
-    ~EasyOpt() {
-      for(options_map_t::const_iterator i = get_options().begin();
-          i != get_options().end();
-          ++i)
-        {
-          data_map_t::iterator j = data.find(i->second->what());
-          if(j != data.end()) {
-            i->second->cleanup(j->second);
-          }
-        }
-    }
-
-    static EasyOpt &create(Easy &p) {
-      return flusspferd::create<EasyOpt>(bf::make_vector(boost::ref(p)));
-    }
-
-    void clear() {
-      for(options_map_t::const_iterator i = get_options().begin();
-          i != get_options().end();
-          ++i)
-        {
-          if(has_property(i->first)) {
-            delete_property(i->first);
-          }
-        }
-      data.clear();
-    }
-  protected:
-    bool property_resolve(value const &id, unsigned access);
-
-    void trace(flusspferd::tracer &trc) {
-      for(data_map_t::const_iterator i = data.begin();
-          i != data.end();
-          ++i)
-        {
-          for(options_map_t::const_iterator j = get_options().begin();
-              j != get_options().end();
-              ++j)
-            {
-              if(j->second->what() == i->first) {
-                j->second->trace(i->second, trc);
-                break;
-              }
-            }
-        }
-    }
-  };
 
   FLUSSPFERD_CLASS_DESCRIPTION
   (
@@ -940,23 +876,6 @@ namespace curl {
       // }END DOC
     }
     return map;
-  }
-
-  bool EasyOpt::property_resolve(value const &id, unsigned) {
-    std::string const name = id.to_std_string();
-    options_map_t::const_iterator const i = get_options().find(name);
-    if(i != get_options().end()) {
-      property_attributes attr(no_property_flag,
-                               i->second->getter(),
-                               i->second->setter());
-      define_property(id.get_string(), value(), attr);
-      data[i->second->what()] = i->second->data();
-      return true;
-    }
-    else {
-      // TODO: throw exception if option is unkown?
-      return false;
-    }
   }
 
   namespace {
