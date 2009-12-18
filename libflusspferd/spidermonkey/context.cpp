@@ -132,6 +132,32 @@ public:
       return;
     }
 
+    bool should_warn = true;
+
+    // Check for erro options on the file. Stored in the
+    // `require.module_cache[id].options.warnings` field
+    if (report->filename) {
+      value m = Impl::wrap_context(cx)
+                 .global()
+                 .get_property_object("require")
+                 .get_property_object("module_cache")
+                 .get_property(std::string("file://") + report->filename);
+
+      if (m.is_object() && !m.is_null()) {
+        object mod = m.to_object();
+        value opts = m.get_object()
+                      .get_property_object("options")
+                      .get_property("warnings");
+
+        if (opts.to_std_string() == "no")
+          should_warn = false;
+      }
+    }
+
+    // TODO: We should always warn for "assiging to X without var"
+    if (!should_warn)
+      return;
+
     std::cerr << (JSREPORT_IS_STRICT(report->flags) ? "Strict warning: " : "Warning: ")
               << message;
 
