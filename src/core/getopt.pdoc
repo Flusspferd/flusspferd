@@ -16,7 +16,8 @@
  *  The returned object has a key for each option found on the command line,
  *  and all remaining arguments in an array under the `_` key:
  *
- *      { "name": ["arguments"],
+ *      {
+ *        "name": ["arguments"],
  *        "verbose": [undefined],
  *        // ...,
  *        "_": [ "remaining", "arguments" ]
@@ -83,14 +84,16 @@
  *        var a = result[name];
  *        a[ a.length - 1] = "New value";
  *
- *  ###### Exmaples #
+ *  ###### Examples #
  *
  *      spec = {
  *        name: { alias: "n", argument: "required" },
  *        verbose: { alias: "v" },
- *        bdager: { aliases: ["b","bad"] },
+ *        badger: { aliases: ["b","bad"] },
  *      }
  *      opts = require('getopt').getopt(spec, ['-bvv', '--name=arg', '1', '2', '3']);
+ *      // ({_:["1", "2", "3"], badger:[undefined], verbose:[undefined,undefined], name:["arg"]})
+ *      // NB: There's a bug in 0.8 causing this result to be reported as:
  *      // ({_:["1", "2", "3"], b:[undefined], v:[undefined,undefined], name:["arg"]})
  *      
  **/

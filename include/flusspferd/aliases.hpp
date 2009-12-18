@@ -1,4 +1,4 @@
-// vim:ts=2:sw=2:expandtab:autoindent:
+// vim:ts=2:sw=2:expandtab:autoindent:filetype=cpp:
 /*
 The MIT License
 
@@ -24,35 +24,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// We're not running as a module here, so everything is in global scope
-(function() {
-  var canon = require('fs-base').canonical;
-  var paths = require.paths;
+#ifndef FLUSSPFERD_HELPER_NS_HPP
+#define FLUSSPFERD_HELPER_NS_HPP
 
-  if (require('flusspferd').relocatable) {
-    var binDir = require('flusspferd').executableName
-                                      .replace(/flusspferd(?:\.exe)?$/, '');
+#include "create.hpp"
 
+#include <boost/assign/list_of.hpp>
 
-    paths.push( canon(binDir + '@INSTALL_RELATIVE_MODULES_PATH@') );
+namespace flusspferd { namespace aliases {
 
-    prelude = binDir + '@INSTALL_RELATIVE_LIBDATA_PATH@/prelude.js';
-  } else {
-    paths.push( canon('@INSTALL_MODULES_PATH@') );
+#if BOOST_VERSION < 104100
+  typedef boost::fusion::vector0 vector0;
+#else
+  typedef boost::fusion::vector0<> vector0;
+#endif
 
-    prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
-  }
+  using boost::fusion::make_vector;
+  using boost::assign::list_of;
 
-  var env = require('system').env;
+  // Get _container, _name et al.
+  using namespace flusspferd::param;
+} }
 
-  if ("FLUSSPFERD_USER_MOUDLES" in env)
-    paths.push(env["FLUSSPFERD_USER_MODULES"]);
-  else if ("HOME" in env)
-    paths.unshift(env["HOME"] + "/.flusspferd/modules");
-  else if ("APPDATA" in env)
-    // Windows
-    paths.unshift(env["APPDATA"] + "/flusspferd/modules");
-
-  // Finally put '.' at the from of the search path
-  paths.unshift(".");
-})();
+#endif
