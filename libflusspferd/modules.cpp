@@ -577,25 +577,26 @@ object require::create_cache_entry(std::string const &id) {
   // module_cache[id] = {};
   object cache = create<object>(
     _name = id,
-    _container = module_cache
+    _container = module_cache,
+    _attributes = no_property_flag
   );
 
   // module_cache[id].exports = ...
   object exports = create<object>(
-    param::_name = "exports",
-    param::_container = cache,
-    param::_attributes = read_only_property | permanent_property
+    _name = "exports",
+    _container = cache,
+    _attributes = read_only_property | permanent_property
   );
 
   create_on(exports)
     .create<function>(
       "toString",
       boost::phoenix::val("[module " + id + "]"),
-      param::_signature = param::type<std::string ()>() )
+      _signature = param::type<std::string ()>() )
     .create<function>(
       "toSource",
       boost::phoenix::val("(require('" + id + "'))"),
-      param::_signature = flusspferd::param::type<std::string ()>() );
+      _signature = flusspferd::param::type<std::string ()>() );
 
   // module_cache[id].options
   create<array>(
