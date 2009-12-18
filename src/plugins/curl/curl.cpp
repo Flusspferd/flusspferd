@@ -25,6 +25,7 @@
 */
 
 #include "exception.hpp"
+#include "handle_option.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
