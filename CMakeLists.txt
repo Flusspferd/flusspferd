@@ -646,6 +646,8 @@ if(PLUGIN_CURL AND CURL_FOUND)
     set(PLUGINS ${PLUGINS} curl)
     set(curl_LIBRARIES ${CURL_LIBRARIES})
     set(curl_SOURCES
+      src/plugins/curl/exception.hpp
+      src/plugins/curl/exception.cpp
       src/plugins/curl/curl.cpp
     )
     include_directories(${CURL_INCLUDE_DIR})
