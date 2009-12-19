@@ -30,6 +30,8 @@
 #include <boost/exception/get_error_info.hpp>
 #include <curl/curl.h>
 
+/* TODO: UNUSED!!! */
+
 namespace curl {
   typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
 
