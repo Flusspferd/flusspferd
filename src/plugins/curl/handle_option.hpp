@@ -31,6 +31,18 @@
 #include <boost/any.hpp>
 #include <curl/curl.h>
 
+/*
+ * cURL.Easy#options implementation:
+ *
+ * handle_option is the base class for option mappers to map between CURLOPT_*
+ * and JavaScript. Data is stored as boost::any in EasyOpt::data. Getters/setters
+ * are created (handle_option::getter/setter) on the fly in
+ * EasyOpt::property_resolve.
+ *
+ * get_options() returns a map of all property names to their corresponding
+ * handle_option.
+ */
+
 namespace curl {
   struct handle_option {
     virtual ~handle_option() =0;
