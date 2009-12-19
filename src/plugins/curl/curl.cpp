@@ -28,6 +28,7 @@
 #include "EasyOpt.hpp"
 #include "Easy.hpp"
 #include "defines.hpp"
+#include "curl_cookie.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/binary.hpp"
@@ -51,35 +52,6 @@ using namespace flusspferd;
 
 namespace curl {
   namespace bf = boost::fusion;
-
-  namespace {
-    boost::mutex cookie;
-
-    /* To make sure that curl_global_init are never called from parallel
-       threads and are paired cleanly. */
-    FLUSSPFERD_CLASS_DESCRIPTION(
-        cURL_cookie,
-        (constructor_name, "$$cURL_cookie")
-        (full_name, "cURL.$$cURL_cookie")
-        (constructible, false)
-    ) {
-    public:
-      cURL_cookie(object const &obj)
-        : base_type(obj)
-        {
-          boost::mutex::scoped_lock lock(cookie);
-          CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
-          if(ret != 0)
-            throw flusspferd::exception(std::string("curl_global_init: ")
-                                        + curl_easy_strerror(ret));
-        }
-
-      ~cURL_cookie() {
-        boost::mutex::scoped_lock lock(cookie);
-        curl_global_cleanup();
-      }
-    };
-  }
 }
 
 FLUSSPFERD_LOADER_SIMPLE(cURL) {
