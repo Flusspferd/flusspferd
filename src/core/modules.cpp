@@ -168,6 +168,8 @@ void require::set_main_module(std::string const &id_) {
 
 // The implementation of the |require()| function that is available to JS
 void require::call(call_context &x) {
+  gc(true); // maybe-gc
+
   std::string id = x.arg[0].to_std_string();
 
   // If what ever they require is already loaded, give it to them
@@ -202,6 +204,8 @@ void require::call(call_context &x) {
   }
 
   x.result = load_absolute_js_file(module_path, id);
+
+  gc(true); //maybe-gc
 }
 
 

@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-12-19:
+- Add API for maybe-calling the GC (parameter maybe=true, #181).
+
 2009-12-11:
 - Improved GMP Module:
   - Deprecated C style functions (containing a _)
