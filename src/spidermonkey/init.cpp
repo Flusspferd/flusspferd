@@ -46,7 +46,7 @@ static boost::once_flag runtime_created = BOOST_ONCE_INIT;
 
 class init::impl {
 public:
-  // we use a single JS_Runtime for each process!
+  // we use a single JS_Runtime for each thread!
   impl()
   {
     boost::call_once(runtime_created, JS_SetCStringsAreUTF8);
