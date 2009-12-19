@@ -22,7 +22,7 @@ Release 0.9
 
 2009-12-06:
 - You can now throw a flusspferd::value or a flusspferd::object (or a subclass)
-  from C++ rather than just specific Error types.
+  from C++ rather than just specific Error types (#174).
 
 2009-12-04:
 - Add flusspferd::create_on API for creating multiple objects on the same
