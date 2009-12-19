@@ -24,35 +24,14 @@
   THE SOFTWARE.
 */
 
-#include "exception.hpp"
 #include "EasyOpt.hpp"
 #include "Easy.hpp"
-#include "defines.hpp"
 #include "curl_cookie.hpp"
-#include "flusspferd/array.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/binary.hpp"
-#include "flusspferd/tracer.hpp"
+#include "flusspferd/class.hpp"
 #include "flusspferd/modules.hpp"
-#include "flusspferd/security.hpp"
-#include "flusspferd/arguments.hpp"
-#include "flusspferd/class_description.hpp"
-#include "flusspferd/property_iterator.hpp"
-
-#include "flusspferd/create/array.hpp"
-
-#include <sstream>
 #include <curl/curl.h>
 
-#include <boost/range/iterator_range.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/any.hpp>
-
 using namespace flusspferd;
-
-namespace curl {
-  namespace bf = boost::fusion;
-}
 
 FLUSSPFERD_LOADER_SIMPLE(cURL) {
   local_root_scope scope;
