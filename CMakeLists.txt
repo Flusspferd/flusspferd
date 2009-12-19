@@ -663,6 +663,8 @@ if(PLUGIN_CURL AND CURL_FOUND)
       src/plugins/curl/Easy.hpp
       src/plugins/curl/Easy.cpp
       src/plugins/curl/defines.hpp
+      src/plugins/curl/curl_cookie.hpp
+      src/plugins/curl/curl_cookie.cpp
       src/plugins/curl/curl.cpp
     )
     include_directories(${CURL_INCLUDE_DIR})
