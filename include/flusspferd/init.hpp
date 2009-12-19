@@ -140,12 +140,16 @@ inline object scope_chain() {
 /**
  * Run the garbage collector on the current context.
  *
+ * @param maybe Whether the engine may, at its discretion, choose whether
+ *              to actually garbage collect. Default: false, i.e., always
+ *              collect.
+ *
  * @see current_context, context::gc
  *
  * @ingroup gc
  */
-inline void gc() {
-  return current_context().gc();
+inline void gc(bool maybe = false) {
+  return current_context().gc(maybe);
 }
 
 /**
