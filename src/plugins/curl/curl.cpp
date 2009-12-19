@@ -60,15 +60,6 @@ using namespace flusspferd;
 namespace curl {
   namespace bf = boost::fusion;
 
-  /*
-   * cURL.Easy#options implementation:
-   *
-   * handle_option is the base class for option mappers to map between CURLOPT_*
-   * and JavaScript. Data is stored as boost::any in EasyOpt::data. Getters/setters
-   * are created (handle_option::getter/setter) on the fly in EasyOpt::property_resolve.
-   * get_options() returns a map of all property names to their corresponding handle_option.
-   */
-
   options_map_t const &get_options() {
     /* elisp helper (+ keyboard macros):
        (defun insopt (type name)
