@@ -106,7 +106,7 @@ size_t Easy::headerfunction(void *ptr, size_t size, size_t nmemb, void *stream) 
   }
 }
 
-int progressfunction(
+int Easy::progressfunction(
     void *clientp, double dltotal, double dlnow, double ultotal, double ulnow)
 {
   assert(clientp);
