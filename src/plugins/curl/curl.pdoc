@@ -1,0 +1,124 @@
+// -*- mode: js2; -*- vim: ft=javascript
+
+/** section: Bundled Modules
+ * cURL
+ *
+ * "libcurl is a free and easy-to-use client-side URL transfer library, supporting FTP, FTPS, HTTP,
+ *  HTTPS, SCP, SFTP, TFTP, TELNET, DICT, LDAP, LDAPS and FILE. libcurl supports SSL certificates,
+ *  HTTP POST, HTTP PUT, FTP uploading, HTTP form based upload, proxies, cookies, user+password
+ *  authentication (Basic, Digest, NTLM, Negotiate, Kerberos4), file transfer resume, http proxy
+ *  tunneling and more!"
+ * [libcurl](http://curl.haxx.se/libcurl/)
+ *
+ * See [Using the cURL module ](../../js-tutorial-curl.html) for a small tutorial.
+ *
+ * ## Example #
+ *
+ *     const cURL = require('curl');
+ *     var c = new cURL.Easy();
+ *     c.options.url = 'http://flusspferd.org/foo.txt';
+ *     c.options.writefunction = function(data,size) {
+ *       print(data.decodeToString());
+ *       return data.length;
+ *     }
+ *     c.perform();
+ *
+ * ## Implementation Notes #
+ *
+ * Instead of returning an error code functions throw an exception.
+ *
+ * ##### Not implemented #
+ *
+ * Some functions of libcurl which are considered too low level or not JS compatible are not
+ * exported by the cURL module.
+ *
+ * + curl_easy_duphandle
+ * + curl_easy_setopt  ---  hidden in [[cURL.Easy#options]].
+ * + curl_easy_pause  ---  might be added.
+ * + curl_easy_strerror  ---  used when an exception is thrown.
+ * + curl_escape  ---  obsolete. See [[cURL.Easy#escape]] and [[cURL.Easy#unescape]].
+ * + curl_formadd/curl_formfree  ---  hidden in options.httppost
+ * + curl_free
+ * + curl_getdate  ---  might be added.
+ * + curl_global_cleanup
+ * + curl_global_init_mem
+ * + curl_global_init  ---  called when loading the module
+ * + curl_slist_append/curl_slist_free_all  ---  hidden in options.
+ * + curl_version_info
+ * + curl_version  ---  see [[cURL.version]].
+ *
+ * Multi/Share interface will be added in the future.
+ **/
+
+/**
+ * cURL.version -> String
+ *
+ * Version of libcurl. See [curl_version](http://curl.haxx.se/libcurl/c/curl_version.html).
+ **/
+
+/**
+ * class cURL.Easy
+ *
+ * Provides a synchronous and quick interface.
+ *
+ * See [cURL's easy Interface](http://curl.haxx.se/libcurl/c/libcurl-easy.html) if you are curious about the underlying C API.
+ **/
+
+/**
+ * new cURL.Easy()
+ *
+ * Create a new cURL.Easy handle.
+ *
+ * See [curl_easy_init](http://curl.haxx.se/libcurl/c/curl_easy_init.html).
+ **/
+
+/**
+ * cURL.Easy#cleanup() -> undefined
+ *
+ * Destroy cURL object and free resources. cURL objects are cleaned up when garbage collected.
+ * You do not need to call this manually.
+ *
+ * See [curl_easy_cleanup](http://curl.haxx.se/libcurl/c/curl_easy_cleanup.html).
+ **/
+
+/**
+ * cURL.Easy#perform() -> undefined
+ *
+ * Perform the file transfer. Throws an exception on error.
+ *
+ * See [curl_easy_perform](http://curl.haxx.se/libcurl/c/curl_easy_perform.html).
+ **/
+
+/**
+ * cURL.Easy#reset() -> undefined
+ *
+ * Reset options to initial defaults.
+ *
+ * See [curl_easy_reset](http://curl.haxx.se/libcurl/c/curl_easy_reset.html).
+ **/
+
+/**
+ * cURL.Easy#escape(String) -> String
+ *
+ * URL encodes the given string.
+ *
+ * See [curl_easy_escape](http://curl.haxx.se/libcurl/c/curl_easy_escape.html) and
+ * [[cURL.Easy#unescape]].
+ **/
+
+/**
+ * cURL.Easy#unescape(String) -> String
+ *
+ * URL decodes the given string.
+ *
+ * See [curl_easy_unescape](http://curl.haxx.se/libcurl/c/curl_easy_unescape.html) and
+ * [[cURL.Easy#escape]].
+ **/
+
+/**
+ * cURL.Easy#valid() -> Boolean
+ *
+ * Returns true if the object is valid.
+ *
+ * See [[cURL.Easy#cleanup]].
+ **/
