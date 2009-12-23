@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
+2009-12-23:
+- Re-added overhauled cURL module (#112).
+
 2009-12-19:
 - Add API for maybe-calling the GC (parameter maybe=true, #181).
 
