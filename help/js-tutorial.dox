@@ -35,6 +35,7 @@ THE SOFTWARE.
  * - @subpage js-tutorial-invoke
  * - @subpage js-tutorial-io
  * - @subpage js-tutorial-getopt
+ * - @subpage js-tutorial-curl
  *
  * @see
  *   - @ref cpp-tutorial-modules
@@ -363,5 +364,54 @@ var spec = {
  * See @p help/getopt-example.js or @p misc/replace-var.js for examples on
  * the usage of getopt with Javascript or take a look at
  * @p src/programs/flusspferd.cpp for the getopt usage with C++.
+ *
+ * Next: \ref js-tutorial-curl
+ *
+ */
+
+/**
+ * @page js-tutorial-curl Using the cURL module
+ *
+ * Previous: \ref js-tutorial-getopt
+ *
+ * Flusspferd provides an interface for <a href="http://curl.haxx.se/libcurl/">libcurl</a>.
+ * libcurl is a very extensive data transfer library. It supports HTTP(s), FTP, SSH and several
+ * other protocols with different authentication mechanisms and it is quite popular.
+ *
+ * Flusspferd's <a href="js/bundled modules/curl.html">cURL module</a> is very similar to the
+ * interface of libcurl and people familiar with using libcurl in other languages should feel
+ * right at home. But names are converted into Javascript style and some functions and options
+ * were omitted or hidden (see
+ * <a href="js/bundled modules/curl.html#implementation_notes">implementation notes</a>).
+ *
+ * Using the cURL module is straight forward
+ *
+ * @verbatim
+ const cURL = require('curl');
+
+ var c = new cURL.Easy();
+ c.options.url = 'http://www.google.com';
+ c.perform();
+@endverbatim
+ *
+ * This should print the html data from google.com. Of course you usually do not want to print
+ * the data. You can add a callback to handle the retrieved data
+ *
+ * @verbatim
+ var buffer;
+ c.options.writefunction = function(data,size) {
+   buffer = data.decodeToString();
+   return data.length; // return data.length if everything is ok.
+ }
+ c.options.url = 'http://www.google.com';
+ c.perform();
+
+ // do something with buffer
+ print("Got this: " + buffer);
+@endverbatim
+ *
+ * cURL provides a lot of options and you can fine tune your requests. See
+ * <a href="js/bundled modules/curl/easy.html#options-instance_property">cURL.Easy#options</a> for
+ * more.
  *
  */

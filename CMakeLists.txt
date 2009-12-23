@@ -171,6 +171,7 @@ option(
     FORCE_PLUGINS
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
+option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 set(
@@ -328,6 +329,40 @@ if(LINE_EDITOR STREQUAL "readline")
   if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
         message(SEND_ERROR "readline required but it was not found")
   endif()
+endif()
+
+## libcurl ##################################################################
+
+if(PLUGIN_CURL)
+    find_package(CURL)
+
+    if(CURL_FOUND)
+      set(TMP_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+      set(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+
+      set(TMP_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
+      set(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+      check_cxx_source_runs(
+        "#include <curl/curl.h>
+         #include <cstdlib>
+         int main() {
+           return (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19) ?
+                  EXIT_SUCCESS :
+                  EXIT_FAILURE; 
+         }"
+         CURL_CORRECT_VERSION)
+       set(CMAKE_REQUIRED_LIBRARIES ${TMP_CMAKE_REQUIRED_LIBRARIES})
+       set(CMAKE_REQUIRED_INCLUDES ${TMP_CMAKE_REQUIRED_INCLUDES})
+
+       if(NOT CURL_CORRECT_VERSION)
+         message(STATUS "CURL version too old (7.19.0 or better required) or error during compilation")
+         set(CURL_FOUND FALSE)
+       endif()
+     endif()
+
+    if(FORCE_PLUGINS AND NOT CURL_FOUND)
+        message(SEND_ERROR "CURL plugin required but cURL not found")
+    endif()
 endif()
 
 ## sqlite3 ##################################################################
@@ -606,6 +641,34 @@ if(ENABLE_TESTS)
 endif()
 
 ## Plugins #################################################################
+
+if(PLUGIN_CURL AND CURL_FOUND)
+    set(PLUGINS ${PLUGINS} curl)
+    set(curl_LIBRARIES ${CURL_LIBRARIES})
+    set(curl_SOURCES
+      src/plugins/curl/exception.hpp
+      src/plugins/curl/exception.cpp
+      src/plugins/curl/handle_option.hpp
+      src/plugins/curl/handle_option.cpp
+      src/plugins/curl/get_options.hpp
+      src/plugins/curl/get_options.cpp
+      src/plugins/curl/integer_option.hpp
+      src/plugins/curl/string_option.hpp
+      src/plugins/curl/list_option.hpp
+      src/plugins/curl/function_option.hpp
+      src/plugins/curl/http_post_option.hpp
+      src/plugins/curl/http_post_option.cpp
+      src/plugins/curl/EasyOpt.hpp
+      src/plugins/curl/EasyOpt.cpp
+      src/plugins/curl/Easy.hpp
+      src/plugins/curl/Easy.cpp
+      src/plugins/curl/defines.hpp
+      src/plugins/curl/curl_cookie.hpp
+      src/plugins/curl/curl_cookie.cpp
+      src/plugins/curl/curl.cpp
+    )
+    include_directories(${CURL_INCLUDE_DIR})
+endif()
 
 if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
     set(PLUGINS ${PLUGINS} sqlite3)
