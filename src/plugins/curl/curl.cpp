@@ -24,6 +24,7 @@
   THE SOFTWARE.
 */
 
+#include "defines.hpp"
 #include "EasyOpt.hpp"
 #include "Easy.hpp"
 #include "curl_cookie.hpp"

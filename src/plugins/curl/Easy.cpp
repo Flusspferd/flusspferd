@@ -23,6 +23,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
+#include "defines.hpp"
 #include "Easy.hpp"
 #include "EasyOpt.hpp"
 #include "flusspferd/binary.hpp"
