@@ -85,16 +85,6 @@ object base_parser::parse(value source) {
       is.setByteStream(stream);
       return parse_source(is);
     }*/
-    else if (o.is_array()) {
-      // Since js has no reference type, treat ['<?xml ....'] as a source
-      // literal, not a filename
-      root_string s(source.to_string());
-
-      std::istringstream sb(s.to_string());
-      sax_source is;
-      is.setByteStream(sb);
-      return parse_source(is);
-    }
   }
 
   std::string str = source.to_std_string();
@@ -110,6 +100,14 @@ object base_parser::parse(value source) {
   sax_source is;
   is.setSystemId(str);
 
+  return parse_source(is);
+}
+
+object base_parser::parse_string(std::string &str) {
+
+  std::istringstream sb(str);
+  sax_source is;
+  is.setByteStream(sb);
   return parse_source(is);
 }
 
@@ -139,6 +137,12 @@ object xml_parser::static_parse(value source) {
   return create<xml_parser>().parse(source);
 }
 
+object xml_parser::static_parse_string(std::string &source) {
+  // Helper method. Create a parser and call the `parse` method
+  return create<xml_parser>().parse_string(source);
+}
+
+
 arabica_document xml_parser::_parse(sax_source &is) {
   Arabica::SAX2DOM::Parser<string_type> parser;
   Arabica::SAX::CatchErrorHandler<string_type> eh;
@@ -166,6 +170,12 @@ object html_parser::static_parse(value source) {
   // Helper method. Create a parser and call the `parse` method
   return create<html_parser>().parse(source);
 }
+
+object html_parser::static_parse_string(std::string &source) {
+  // Helper method. Create a parser and call the `parse` method
+  return create<html_parser>().parse_string(source);
+}
+
 
 arabica_document html_parser::_parse(sax_source &is) {
   Arabica::SAX2DOM::Parser<string_type, Arabica::SAX::Taggle<string_type> > parser;
