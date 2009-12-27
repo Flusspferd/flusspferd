@@ -129,7 +129,7 @@ exports.test_parseHTMLString = function() {
   var str = "<html>\n<body>\n<p>foo <b>baz <i>quxx</b> flibble</i>\n<p>",
       want = '<?xml version="1.0"?>\n<html xmlns="http://www.w3.org/1999/xhtml"><body>\n<p>foo <b>baz <i>quxx</i></b><i> flibble</i>\n</p><p/></body></html>';
 
-  var doc = xml.HTMLParser.parse([str]);
+  var doc = xml.HTMLParser.parseString(str);
   asserts.same(String(doc), want, "XML output as expected from string literal");
 
   // Couldn't get BinaryStream ctor working in C++

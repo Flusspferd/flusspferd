@@ -42,6 +42,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_name, "Parser")
     (methods,
       ("parse", bind, parse)
+      ("parseString", bind, parse_string)
     )
 ) {
 public:
@@ -49,6 +50,7 @@ public:
   virtual ~base_parser() {};
 
   flusspferd::object parse(flusspferd::value source);
+  flusspferd::object parse_string(std::string &str);
 protected:
   typedef Arabica::SAX::InputSource<string_type> sax_source;
 
@@ -63,6 +65,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_name, "HTMLParser")
     (constructor_methods,
       ("parse", bind_static, static_parse)
+      ("parseString", bind_static, static_parse_string)
     )
 ) {
 public:
@@ -70,6 +73,7 @@ public:
   html_parser(flusspferd::object const &proto);
 
   static flusspferd::object static_parse(flusspferd::value source);
+  static flusspferd::object static_parse_string(std::string &str);
 protected:
   arabica_document _parse(sax_source &stream);
 };
@@ -81,6 +85,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     (constructor_name, "XMLParser")
     (constructor_methods,
       ("parse", bind_static, static_parse)
+      ("parseString", bind_static, static_parse_string)
     )
 ) {
 public:
@@ -88,6 +93,7 @@ public:
   xml_parser(flusspferd::object const &proto);
 
   static flusspferd::object static_parse(flusspferd::value source);
+  static flusspferd::object static_parse_string(std::string &str);
 protected:
   arabica_document _parse(sax_source &stream);
 };
