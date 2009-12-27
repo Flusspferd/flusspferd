@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
 #include "char_data.hpp"
@@ -33,6 +32,15 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
+
+namespace xml_plugin {
+  void load_char_classes(object &exports) {
+    load_class<character_data>(exports);
+    load_class<text>(exports);
+    load_class<comment>(exports);
+    load_class<cdata>(exports);
+  }
+}
 
 character_data::character_data(object const &proto, wrapped_type const &node, weak_node_map map)
   : base_type(proto, node, map),

@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
 #include "node_list.hpp"
@@ -34,6 +33,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
+
+namespace xml_plugin {
+  void load_nodelist(object &exports) {
+    load_class<node_list>(exports);
+  }
+}
 
 node_list::node_list(object const &proto, wrapped_type const &list, weak_node_map map)
   : base_type(proto),

@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
 #include "attr.hpp"
@@ -33,6 +32,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
+
+namespace xml_plugin {
+  void load_attr_class(object &exports) {
+    load_class<attr>(exports);
+  }
+}
 
 attr::attr(object const &proto, wrapped_type const &node, weak_node_map map)
   : base_type(proto, node, map),

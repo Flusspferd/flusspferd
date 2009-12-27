@@ -24,19 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
+#include <flusspferd/aliases.hpp>
 
-#include "parser.hpp"
-#include "dom_exception.hpp"
-#include "dom_implementation.hpp"
-#include "doctype.hpp"
-#include "node.hpp"
-#include "node_list.hpp"
-#include "named_node_map.hpp"
-#include "document.hpp"
-#include "element.hpp"
-#include "char_data.hpp"
-#include "attr.hpp"
 #include "misc_nodes.hpp"
 
 using namespace flusspferd;
@@ -44,38 +33,38 @@ using namespace flusspferd::aliases;
 
 namespace xml_plugin {
 
+extern void load_parsers(object &exports);
+extern void load_exception_class(object &exports);
+extern void load_domimpl_class(object &exports);
+extern void load_node(object &exports);
+extern void load_nodelist(object &exports);
+extern void load_doc_classes(object &exports);
+extern void load_doctype_class(object &exports);
+extern void load_char_classes(object &exports);
+extern void load_attr_class(object &exports);
+extern void load_element_class(object &exports);
+extern void load_namedmap_class(object &exports);
+
 FLUSSPFERD_LOADER_SIMPLE(exports) {
 
-  load_class<xml_parser>(exports);
-  load_class<html_parser>(exports);
-  load_class<dom_exception>(exports);
-  load_class<dom_implementation>(exports);
-  load_class<node>(exports);
-  load_class<node_list>(exports);
-  load_class<named_node_map>(exports);
-  load_class<document>(exports);
-  load_class<document_fragment>(exports);
-  load_class<doctype>(exports);
-  load_class<element>(exports);
-  load_class<character_data>(exports);
-  load_class<text>(exports);
-  load_class<comment>(exports);
-  load_class<cdata>(exports);
-  load_class<attr>(exports);
-  load_class<notation>(exports);
+  load_parsers(exports);
+  load_exception_class(exports);
+  load_domimpl_class(exports);
+  load_node(exports);
+  load_nodelist(exports);
+  load_doc_classes(exports);
+  load_doctype_class(exports);
+  load_char_classes(exports);
+  load_attr_class(exports);
+  load_doctype_class(exports);
+  load_element_class(exports);
+  load_namedmap_class(exports);
+
   load_class<entity>(exports);
   load_class<entity_ref>(exports);
+  load_class<notation>(exports);
   load_class<processing_instruction>(exports);
 
-  // Create the singleton domImplementation
-  create<dom_implementation>(
-    _container = exports,
-    _name = "domImplementation",
-    _attributes = read_only_property | permanent_property,
-    _arguments = make_vector(
-      Arabica::SimpleDOM::DOMImplementation<string_type>::getDOMImplementation()
-    )
-  );
 }
 
 }

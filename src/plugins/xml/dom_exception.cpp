@@ -29,7 +29,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace xml_plugin;
 
-#include <iostream>
+namespace xml_plugin {
+  void load_exception_class(object &exports) {
+    load_class<dom_exception>(exports);
+  }
+}
+
 dom_exception::dom_exception(object const &proto, wrapped_type e)
   : base_type(proto)
 { 

@@ -29,7 +29,13 @@ THE SOFTWARE.
 
 #include "create.hpp"
 
+#include <boost/version.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/fusion/container/generation/make_vector.hpp>
+#include <boost/fusion/container/vector.hpp>
+#include <boost/fusion/include/make_vector.hpp>
+#include <boost/fusion/include/vector.hpp>
+
 
 namespace flusspferd { namespace aliases {
 
