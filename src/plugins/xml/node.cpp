@@ -24,7 +24,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
 
 #include "node.hpp"
@@ -40,6 +39,12 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
+
+namespace xml_plugin {
+  void load_node(object &exports) {
+    load_class<node>(exports);
+  }
+}
 
 node::node(object const &proto)
   : base_type(proto)

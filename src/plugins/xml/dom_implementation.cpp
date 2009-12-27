@@ -24,17 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <flusspferd.hpp>
 #include <flusspferd/aliases.hpp>
-#include "document.hpp"
-#include "doctype.hpp"
+
 #include "dom_implementation.hpp"
 #include "dom_exception.hpp"
+
+#include <DOM/Simple/DOMImplementation.hpp>
 
 using namespace flusspferd;
 using namespace flusspferd::aliases;
 using namespace xml_plugin;
 
+namespace xml_plugin {
+  void load_domimpl_class(object &exports) {
+    load_class<dom_implementation>(exports);
+
+    // Create the singleton domImplementation
+    create<dom_implementation>(
+      _container = exports,
+      _name = "domImplementation",
+      _attributes = read_only_property | permanent_property,
+      _arguments = make_vector(
+        Arabica::SimpleDOM::DOMImplementation<string_type>::getDOMImplementation()
+      )
+    );
+  }
+}
 
 // Global/class statics make Ash a sad panda. Can't see a way around this one tho
 /*static*/ weak_node_map dom_implementation::weak_node_map_;

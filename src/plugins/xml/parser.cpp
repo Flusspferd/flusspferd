@@ -44,6 +44,13 @@ using boost::format;
 using namespace flusspferd;
 using namespace xml_plugin;
 
+namespace xml_plugin {
+  void load_parsers(object &exports) {
+    load_class<xml_parser>(exports);
+    load_class<html_parser>(exports);
+  }
+}
+
 base_parser::base_parser(flusspferd::object const &proto)
   : base_type(proto)
 { }
