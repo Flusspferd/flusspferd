@@ -725,6 +725,41 @@ if(PLUGIN_XML AND ARABICA_FOUND)
     set(PLUGINS ${PLUGINS} xml)
     set(xml_LIBRARIES ${ARABICA_LIBRARIES})
     include_directories(${ARABICA_INCLUDEDIR})
+
+    set(
+      xml_SOURCES
+      src/plugins/xml/attr.cpp
+      src/plugins/xml/attr.hpp
+      src/plugins/xml/char_data.cpp
+      src/plugins/xml/char_data.hpp
+      src/plugins/xml/doctype.cpp
+      src/plugins/xml/doctype.hpp
+      src/plugins/xml/document.cpp
+      src/plugins/xml/document.hpp
+      src/plugins/xml/dom_exception.cpp
+      src/plugins/xml/dom_exception.hpp
+      src/plugins/xml/dom_implementation.cpp
+      src/plugins/xml/dom_implementation.hpp
+      src/plugins/xml/element.cpp
+      src/plugins/xml/element.hpp
+      src/plugins/xml/misc_nodes.hpp
+      src/plugins/xml/named_node_map.cpp
+      src/plugins/xml/named_node_map.hpp
+      src/plugins/xml/node.cpp
+      src/plugins/xml/node.hpp
+      src/plugins/xml/node_list.cpp
+      src/plugins/xml/node_list.hpp
+      src/plugins/xml/node_map.cpp
+      src/plugins/xml/node_map.hpp
+      src/plugins/xml/parser.cpp
+      src/plugins/xml/parser.hpp
+      src/plugins/xml/types.hpp
+      src/plugins/xml/xml.cpp
+    )
+    set(
+      xml_JS_FILES
+      #empty
+    )
 endif()
 
 foreach(PLUGIN ${PLUGINS})
