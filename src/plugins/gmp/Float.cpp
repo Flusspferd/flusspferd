@@ -1,5 +1,7 @@
 #include "Float.hpp"
 
+#include "exception.hpp"
+
 #include "Integer.hpp"
 #include "Rational.hpp"
 
@@ -13,32 +15,42 @@ namespace multi_precision {
   Float::Float(flusspferd::object const &self, flusspferd::call_context &x)
     : base_type(self)
   {
-    if(x.arg.size() == 1) {
-      init_with_value(x.arg.front());
-    }
-    else if(x.arg.size() == 2) {
-      value v = x.arg.front();
-      value u = x.arg.back();
-      if(v.is_string() && u.is_int())
-        mp.set_str(v.to_std_string(), u.get_int());
-      else {
-        mp.set_prec(u.get_int());
-        init_with_value(v);
+    try {
+      if(x.arg.size() == 1) {
+        init_with_value(x.arg.front());
       }
-    }
-    else if(x.arg.size() == 3) {
-      value v = x.arg[0];
-      value u = x.arg[1];
-      value w = x.arg[2];
-      if(v.is_string() && u.is_int() && w.is_int()) {
-        mp.set_prec(u.get_int());
-        mp.set_str(v.to_std_string(), w.get_int());
+      else if(x.arg.size() == 2) {
+        value v = x.arg.front();
+        value u = x.arg.back();
+        if(v.is_string() && u.is_int()) {
+          if(mp.set_str(v.to_std_string(), u.get_int()) != 0) {
+            throw runtime_error("string representation not valid");
+          }
+        }
+        else {
+          mp.set_prec(u.get_int());
+          init_with_value(v);
+        }
+      }
+      else if(x.arg.size() == 3) {
+        value v = x.arg[0];
+        value u = x.arg[1];
+        value w = x.arg[2];
+        if(v.is_string() && u.is_int() && w.is_int()) {
+          mp.set_prec(u.get_int());
+          if(mp.set_str(v.to_std_string(), w.get_int()) != 0) {
+            throw runtime_error("string representation not valid");
+          }
+        }
+        else
+          throw argument_error("Wrong arguments! (string, int, int) expected.");
       }
       else
-        throw flusspferd::exception("Wrong arguments! (string, int, int) expected.");
+        throw argument_error("Wrong number of arguments!");
     }
-    else
-      throw flusspferd::exception("Wrong number of arguments!");
+    catch(std::invalid_argument &e) {
+      throw runtime_error(e.what());
+    }
   }
 
   bool Float::fits_int() /*const*/ {
@@ -46,7 +58,9 @@ namespace multi_precision {
   }
 
   int Float::get_int() /*const*/ {
-    assert(fits_int());
+    if(!fits_int()) {
+      throw runtime_error("gmp.Float does not fit into Javascript Number!");
+    }
     return mp.get_si();
   }
 
@@ -54,34 +68,47 @@ namespace multi_precision {
     return mp.get_d();
   }
 
-  std::string Float::toString() /* const */ {
+  std::pair<std::string,mp_exp_t>
+  Float::get_string_impl(flusspferd::call_context &cc) const {
     mp_exp_t expo;
-    std::string str = mp.get_str(expo);
-    assert(expo >= 0);
-    if(static_cast<std::size_t>(expo) >= str.size()) {
-      return str + ".0";
+    std::string str;
+    if(cc.arg.size() == 0) {
+      str = mp.get_str(expo);
+    }
+    else if(cc.arg.size() == 1) { // base parameter
+      if(!cc.arg[0].is_int()) {
+        throw type_error("gmp.Float#getString expects and Integer or none parameter.");
+      }
+      str = mp.get_str(expo, cc.arg[0].get_int());
     }
     else {
-      return str.substr(0, expo) + '.' + str.substr(expo);
+      throw argument_error("gmp.Float#getString expects one or zero parameters.");
+    }
+    return std::make_pair(str, expo);
+  }
+
+  void Float::toString(flusspferd::call_context &cc) /* const */ {
+    std::pair<std::string,mp_exp_t> p = get_string_impl(cc);
+    assert(p.second >= 0);
+    std::size_t const expo = static_cast<std::size_t>(p.second);
+    if(expo >= p.first.size()) {
+      for(std::size_t i = p.first.size(); i < expo; ++i) {
+        p.first += '0';
+      }
+      p.first += ".0";
+      cc.result = p.first;
+    }
+    else {
+      cc.result = p.first.substr(0, expo) + '.' + p.first.substr(expo);
     }
   }
 
-  object Float::get_string() /*const*/ {
-    mp_exp_t expo;
-    std::string str = mp.get_str(expo);
+  void Float::get_string(flusspferd::call_context &cc) /*const*/ {
+    std::pair<std::string,mp_exp_t> p = get_string_impl(cc);
     object x = create<object>();
-    x.set_property("string", value(str));
-    x.set_property("exp", value(expo));
-    return x;
-  }
-
-  object Float::get_string_base(int base) /*const*/ {
-    mp_exp_t expo;
-    std::string str = mp.get_str(expo, base);
-    object x = create<object>();
-    x.set_property("string", value(str));
-    x.set_property("exp", value(expo));
-    return x;
+    x.set_property("string", value(p.first));
+    x.set_property("exp", value(p.second));
+    cc.result = x;
   }
 
   int Float::get_prec() /*const*/ {
@@ -117,41 +144,57 @@ namespace multi_precision {
   }
 
   void Float::cmp(flusspferd::call_context &x) /*const*/ {
-    if(x.arg.empty() || x.arg.size() > 1)
-      throw flusspferd::exception("Expected one parameter");
+    if(x.arg.empty() || x.arg.size() > 1) {
+      throw argument_error("Expected one argument");
+    }
     flusspferd::value v = x.arg.front();
-    if(v.is_int())
+    if(v.is_int()) {
       x.result = ::cmp(mp, v.get_int());
-    else if(v.is_double())
+    }
+    else if(v.is_double()) {
       x.result = ::cmp(mp, v.get_double());
-    else if(flusspferd::is_native<Integer>(v.get_object()))
-      x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
-    else if(flusspferd::is_native<Rational>(v.get_object()))
-      x.result = ::cmp(mp, flusspferd::get_native<Rational>(v.get_object()).mp);
-    else if(flusspferd::is_native<Float>(v.get_object()))
-      x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
-    else
-      throw flusspferd::exception("Wrong parameter type");
+    }
+    else if(v.is_object()) {
+      if(flusspferd::is_native<Integer>(v.get_object()))
+        x.result = ::cmp(mp, flusspferd::get_native<Integer>(v.get_object()).mp);
+      else if(flusspferd::is_native<Rational>(v.get_object()))
+        x.result = ::cmp(mp, flusspferd::get_native<Rational>(v.get_object()).mp);
+      else if(flusspferd::is_native<Float>(v.get_object()))
+        x.result = ::cmp(mp, flusspferd::get_native<Float>(v.get_object()).mp);
+      else
+        throw type_error("Wrong argument type");
+    }
+    else {
+      throw type_error("Wrong argument type");
+    }
   }
 
 #define OPERATOR(name, op)                                              \
   void Float:: name (flusspferd::call_context &x) /*const*/ {           \
-    if(x.arg.empty() || x.arg.size() > 1)                               \
-      throw flusspferd::exception("Expected on parameter");             \
+    if(x.arg.empty() || x.arg.size() > 1) {                             \
+      throw argument_error("Expected one argument");                    \
+    }                                                                   \
     flusspferd::value v = x.arg.front();                                \
-    if(v.is_int())                                                      \
+    if(v.is_int()) {                                                    \
       x.result = create_float(mp op v.get_int());                       \
-    else if(v.is_double())                                              \
+    }                                                                   \
+    else if(v.is_double()) {                                            \
       x.result = create_float(mp op v.get_double());                    \
-    else if(flusspferd::is_native<Integer>(v.get_object()))             \
-      x.result = create_float(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
-    else if(flusspferd::is_native<Rational>(v.get_object()))            \
-      x.result = create_float(mp op flusspferd::get_native<Rational>(v.get_object()).mp); \
-    else if(flusspferd::is_native<Float>(v.get_object()))               \
-      x.result = create_float(mp op flusspferd::get_native<Float>(v.get_object()).mp); \
-    else \
-      throw flusspferd::exception("Wrong parameter type");      \
-  } \
+    }                                                                   \
+    else if(v.is_object()) {                                            \
+      if(flusspferd::is_native<Integer>(v.get_object()))                \
+        x.result = create_float(mp op flusspferd::get_native<Integer>(v.get_object()).mp); \
+      else if(flusspferd::is_native<Rational>(v.get_object()))          \
+        x.result = create_float(mp op flusspferd::get_native<Rational>(v.get_object()).mp); \
+      else if(flusspferd::is_native<Float>(v.get_object()))             \
+        x.result = create_float(mp op flusspferd::get_native<Float>(v.get_object()).mp); \
+      else                                                              \
+        throw type_error("Wrong argument type");                        \
+    }                                                                   \
+    else {                                                              \
+      throw type_error("Wrong parameter type");                         \
+    }                                                                   \
+  }                                                                     \
   /**/
 
   OPERATOR(add, +)
@@ -168,14 +211,19 @@ namespace multi_precision {
       mp = v.get_int();
     else if(v.is_string())
       mp = v.to_std_string();
-    else if(flusspferd::is_native<Integer>(v.get_object()))
-      mp = flusspferd::get_native<Integer>(v.get_object()).mp;
-    else if(flusspferd::is_native<Rational>(v.get_object()))
-      mp = flusspferd::get_native<Rational>(v.get_object()).mp;
-    else if(flusspferd::is_native<Float>(v.get_object()))
-      mp = flusspferd::get_native<Float>(v.get_object()).mp;
-    else
-      throw flusspferd::exception("Wrong parameter type");
+    else if(v.is_object()) {
+      if(flusspferd::is_native<Integer>(v.get_object()))
+        mp = flusspferd::get_native<Integer>(v.get_object()).mp;
+      else if(flusspferd::is_native<Rational>(v.get_object()))
+        mp = flusspferd::get_native<Rational>(v.get_object()).mp;
+      else if(flusspferd::is_native<Float>(v.get_object()))
+        mp = flusspferd::get_native<Float>(v.get_object()).mp;
+      else
+        throw type_error("Wrong parameter type");
+    }
+    else {
+      throw type_error("Wrong parameter type");
+    }
   }
 }
 

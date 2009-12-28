@@ -82,9 +82,13 @@ public:
   /**
    * Run the garbage collector.
    *
+   * @param maybe Whether the engine may, at its discretion, choose whether
+   *              to actually garbage collect. Default: false, i.e., always
+   *              collect.
+   *
    * @see flusspferd::gc
    */
-  void gc();
+  void gc(bool maybe = false);
 
   /**
    * Tie the context to the current thread. Must be called

@@ -1,0 +1,45 @@
+
+Implement the following Options:
+see: http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+* CURLOPT_WRITEDATA - FILE*. But see writefunction
+* CURLOPT_READDATA - FILE*. But see readfunction
+* CURLOPT_IOCTLFUNCTION/CURLOPT_IOCTLDATA - unnecessary (atm?), Use seekfunction instead
+* CURLOPT_SOCKOPTFUNCTION/CURLOPT_SOCKOPTDATA - unnecessary (atm?)
+* CURLOPT_OPENSOCKETFUNCTION/CURLOPT_OPENSOCKETDATA - unnecessary (atm?)
+* CURLOPT_WRITEHEADER - FILE*. But see headerfunction
+* CURLOPT_SSL_CTX_FUNCTION/CURLOPT_SSL_CTX_DATA - unnecessary (only for OpenSSL)
+* CURLOPT_CONV_TO_NETWORK_FUNCTION/CURLOPT_CONV_FROM_NETWORK_FUNCTION/CURLOPT_CONV_FROM_UTF8_FUNCTION - not exportable due to lack of data parameter. But probably unnecessary anyway
+* CURLOPT_ERRORBUFFER - write to buffer? don't know how to implement that
+* CURLOPT_STDERR - FILE*
+* CURLOPT_POSTFIELDSIZE_LARGE - unnecessary
+* CURLOPT_COPYPOSTFIELDS - unnecessary
+* CURLOPT_RESUME_FROM_LARGE - unnecessary
+* CURLOPT_INFILESIZE_LARGE - unnecessary
+* CURLOPT_MAXFILESIZE_LARGE - unnecessary
+* CURLOPT_SSH_KEYFUNCTION/CURLOPT_SSH_KEYDATA - too new (7.19.6)
+* CURLOPT_PRIVATE - unnecessary
+* CURLOPT_SHARE - if curl shared stuff is implemented.
+
+- FILE* this would require to access the data inside the file object and use fdopen
+
+Formdata/cURL.Easy#options.httppost:
+Make objects immutable or just set when calling perform
+
+Doesn't work!
+  var foo = { name: "bar", contents: "moep" };
+  c.options.httppost = foo;
+  foo.name += 'baz';
+
+Functions:
+* curl_easy_pause http://curl.haxx.se/libcurl/c/curl_easy_pause.html (needed?)
+* curl_easy_getinfo (needed?)
+
+Documentation:
+* constants
+* add version dependency to docs
+
+Other:
+* Support older versione? (currently 7.19.0 (or even newer) required)
+
+and more :-)
+...

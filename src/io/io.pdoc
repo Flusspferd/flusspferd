@@ -158,3 +158,24 @@
  *
  *  Should [[io.Stream#flush]] be called every every write. Default false.
  **/
+
+/**
+ *  class io.BinaryStream
+ *    includes io.Stream
+ *
+ *  Wrap a blob in a stream API.
+ **/
+
+/**
+ *  new io.BinaryStream(blob)
+ *  - blob (io.Binary): blob
+ *
+ *  If `blob` is [[binary.ByteString]] then this stream will be readonly,
+ *  otherwise it will be writable
+ **/
+
+/**
+ *  io.BinaryStream#getBinary() -> io.Binary
+ *
+ *  Get the wrapped blob value.
+ **/

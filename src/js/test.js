@@ -155,11 +155,11 @@ const Suite = exports.Suite = function Suite(cases) {
   // TODO: setup and teardown methods
   for (let [k,t] in Iterator(cases)) {
 
-    if (/^test_/.test(k) == false)
+    if (/^test/.test(k) == false)
       continue;
 
     let testCase = {
-      name: k.replace(/^test_(.*)/, "$1"),
+      name: k.replace(/^test[_ ]?/, ""),
       index: this._state.cases.length,
       numAsserts: 0,
       assertsFailed: []
@@ -363,7 +363,7 @@ exports.prove = function prove() {
       var id  = fs.canonical(filename);
 
       var test = require('file://' + id);
-      testObject['test_' + id] = test;
+      testObject['test ' + id] = test;
     }
 
     return testObject;

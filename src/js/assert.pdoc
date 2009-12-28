@@ -1,0 +1,160 @@
+// -*- mode: js2; -*- vim: ft=javascript
+// PDoc in a separate file since the original is almost untouched from
+// narwhal/node version
+
+/** section: CommonJS Core
+ * assert
+ *
+ *  Test assertion methods and exception class.
+ *
+ *  All of the functions must throw an [[assert.AssertionError]] when a
+ *  corresponding condition is not met, with a message that may be undefined
+ *  if not provided. All assertion methods provide both the actual and
+ *  expected values to the assertion error for display purposes.
+ *
+ *  ##### Writing Custom Test Frameworks #
+ *
+ *  To promote compatibility between different test framework methodologies,
+ *  test writers are encouraged to make their own tests throw objects which
+ *  inherit from AssertionError. For example:
+ *
+ *      // file: my-check.js
+ *      exports.check = function(actual) {
+ *          return {
+ *              is: function(expect, message) {
+ *                  if (actual != expect)
+ *                      throw new AssertionError({actual: actual, expected: expected, message: message});
+ *              }
+ *          };
+ *      }
+ *
+ *  Which could then be used as follows:
+ *
+ *      var check = require('my-check').check;
+ *      exports.testSomething = function() {
+ *        var sq = Math.pow(3,2);
+ *        check(sq).is(9, "3 squared is 9");
+ *      }
+ *     
+ **/
+
+
+/**
+ *  class assert.AssertionError < Error
+ *
+ *  Exception which should be thrown by test functions when the condition under
+ *  test failed.
+ **/
+
+// asdfsd
+
+/**
+ *  new assert.AssertionError({message, actual, expected, operator})
+ *  - message (String): Human readable string of what failed
+ *  - expected (?): The expected value 
+ *  - actual (?): The actual
+ *  - operator (?): operator used to compare `actual` to `expected`.
+ *
+ *  Create a new assertion failure.
+ *
+ *  `operator` is an extension to the spec and is used in the default
+ *  stringification if no message is provided. It does not have to be a valid
+ *  javascript operator as it is only used for display purposes.
+ **/
+
+/**
+ *  assert.ok(guard[, message]) -> undefined
+ *  - guard (?): value to test
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that `guard` is a truthy value.
+ **/
+
+/**
+ *  assert.equal(actual, expected[, message]) -> undefined
+ *  - actual (?): value obtained
+ *  - expected (?): expected value to test against
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that `actual == expected`.
+ **/
+
+/**
+ *  assert.notEqual(actual, expected[, message]) -> undefined
+ *  - actual (?): value obtained
+ *  - expected (?): expected value to test against
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that `actual != expected`.
+ **/
+
+/**
+ *  assert.deepEqual(actual, expected[, message]) -> undefined
+ *  - actual (?): value obtained
+ *  - expected (?): expected value to test against
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that `actual` is "deeply equal" to `expected`. This objects are
+ *  examined recursively and the values are compared.
+ *
+ *  There is currently some discussion on [CommonJS] as to the exact behaviour
+ *  of this function.
+ *
+ *  Two values are considered by recursively applying the following rules:
+ *
+ *  1. All identical values are equivalent, as determined by ===.
+ *  2. If the expected value is a Date object, the actual value is equivalent
+ *     if it is also a Date object that refers to the same time.
+ *  3. Other pairs that do not both pass `typeof value == "object"`,
+ *     equivalence is determined by ==.
+ *  4.  For all other Object pairs, including Array objects, equivalence is
+ *      determined by having the same number of owned properties (as verified
+ *      with `Object.prototype.hasOwnProperty.call`), the same set of keys
+ *      (although not necessarily the same order), equivalent values for every
+ *      corresponding key, and an identical "prototype" property. Note: this
+ *      accounts for both named and indexed properties on Arrays.
+ *
+ * [CommonJS]: http://wiki.commonjs.org/wiki/Unit_Testing
+ **/
+
+/**
+ *  assert.notDeepEqual(actual, expected[, message]) -> undefined
+ *  - actual (?): value obtained
+ *  - expected (?): expected value to test against
+ *  - message (String): diagnostic message
+ * 
+ *  The inverse of `deepEqual`.
+ **/
+
+/**
+ *  assert.strictEqual(actual, expected[, message]) -> undefined
+ *  - actual (?): value obtained
+ *  - expected (?): expected value to test against
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that `actual === expected`.
+ **/
+
+/**
+ *  assert.notStrictEqual(actual, expected[, message]) -> undefined
+ *  - actual (?): value obtained
+ *  - expected (?): expected value to test against
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that `actual !== expected`.
+ **/
+
+/**
+ *  assert.throws(block, Error_class[, message]) -> undefined
+ *  assert.throws(block[, message]) -> undefined
+ *  - block (Function): code to run
+ *  - Error_class (Class): error type expected
+ *  - message (String): diagnostic message
+ * 
+ *  Assert that when `block` is run that it terminated by throwing an
+ *  exception.
+ *
+ *  If `Error_class` is provided, then the test will further assert that the
+ *  error thrown is an `instanceof Error_class`.
+ **/
+

@@ -34,8 +34,8 @@ THE SOFTWARE.
  *
  * - @subpage js-tutorial-invoke
  * - @subpage js-tutorial-io
- * - @subpage js-tutorial-xml
  * - @subpage js-tutorial-getopt
+ * - @subpage js-tutorial-curl
  *
  * @see
  *   - @ref cpp-tutorial-modules
@@ -120,7 +120,7 @@ Same.
  *
  * In fact, @c print is a short form for the latter syntax. However, the print
  * abbreviation is not available in modules. To spare you the hassle of typing
- * require("system").stdout.print everytime, you can assign the module to a
+ * require("system").stdout.print every time, you can assign the module to a
  * variable.
  *
  * @verbatim
@@ -150,68 +150,6 @@ bcd
  * There are many more things that you can do with this and the 'io' module,
  * see <a href="js/IO">the documentation for <code>io</code></a>.
  *
- * Next: \ref js-tutorial-xml
- *
- */
-
-/**
- * @page js-tutorial-xml Using XML
- *
- * Previous: \ref js-tutorial-io
- *
- * Let us begin by loading an XML document from Jeni Tennison's website:
- *
- * @verbatim
-> XML = require("XML")
-> doc = XML.parse("http://www.jenitennison.com/index.xml")
-<?xml version="1.0" encoding="UTF-16"?>
-<?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>
-<my:doc xmlns:my="http://www.jenitennison.com/" xmlns="http://www.w3.org/1999/xhtml" ...>
-  ...
-</my:doc>
-@endverbatim
- *
- * @note You may notice the encoding of UTF-16 above, because @c doc.toString()
- *       (which is implicitly called here) converts to a Javascript string, and
- *       in Javascript, strings are encoded in UTF-16, internally.
- *
- * Now let's look at that document in a few basic ways.
- *
- * @verbatim
-> doc.rootElement
-ELEMENT:doc
-> doc.rootElement.firstChild = null // => delete document contents
-null
-> doc
-<?xml version="1.0" encoding="UTF-16"?>
-<?xml-stylesheet type="text/xsl" href="resources/style/page.xsl"?>
-<my:doc xmlns:my="http://www.jenitennison.com/" xmlns="http://www.w3.org/1999/xhtml" ... />
-> doc.firstChild
-PI:xml-stylesheet
-> doc.type
-DOCUMENT
-@endverbatim
- *
- * Or, leveraging XPath:
- *
- * @verbatim
-> doc = XML.parse("http://www.jenitennison.com/index.xml")
-...
-> xpath = new XML.XPath(doc, {my: "http://www.jenitennison.com/"})
-[object NativeObject]
-> xpath.ns.html = "http://www.w3.org/1999/xhtml" // now, namespaces html and my can be accessed
-http://www.w3.org/1999/xhtml
-> links = xpath("//my:links/my:link")
-ELEMENT:link,ELEMENT:link,ELEMENT:link,ELEMENT:link
-> links.forEach(function(x) { print(x.getAttribute("href"), x.content); })
-www.w3.org/XML W3C XML Page
-www.xml.com XML.com
-www.xml.org XML.org from OASIS
-www.bayes.co.uk/xml Chris Bayes' XML Portal
-@endverbatim
- *
- * @note Reference documentation has not been written yet.
- *
  * Next: \ref js-tutorial-getopt
  *
  */
@@ -219,7 +157,7 @@ www.bayes.co.uk/xml Chris Bayes' XML Portal
 /**
  * @page js-tutorial-getopt Using Getopt
  *
- * Previous: \ref js-tutorial-xml
+ * Previous: \ref js-tutorial-io
  *
  * Flusspferd provides with getopt a module to parse command line parameters.
  * The module has a C++ and a Javascript API and is also used by the
@@ -426,5 +364,54 @@ var spec = {
  * See @p help/getopt-example.js or @p misc/replace-var.js for examples on
  * the usage of getopt with Javascript or take a look at
  * @p src/programs/flusspferd.cpp for the getopt usage with C++.
+ *
+ * Next: \ref js-tutorial-curl
+ *
+ */
+
+/**
+ * @page js-tutorial-curl Using the cURL module
+ *
+ * Previous: \ref js-tutorial-getopt
+ *
+ * Flusspferd provides an interface for <a href="http://curl.haxx.se/libcurl/">libcurl</a>.
+ * libcurl is a very extensive data transfer library. It supports HTTP(s), FTP, SSH and several
+ * other protocols with different authentication mechanisms and it is quite popular.
+ *
+ * Flusspferd's <a href="js/bundled modules/curl.html">cURL module</a> is very similar to the
+ * interface of libcurl and people familiar with using libcurl in other languages should feel
+ * right at home. But names are converted into Javascript style and some functions and options
+ * were omitted or hidden (see
+ * <a href="js/bundled modules/curl.html#implementation_notes">implementation notes</a>).
+ *
+ * Using the cURL module is straight forward
+ *
+ * @verbatim
+ const cURL = require('curl');
+
+ var c = new cURL.Easy();
+ c.options.url = 'http://www.google.com';
+ c.perform();
+@endverbatim
+ *
+ * This should print the html data from google.com. Of course you usually do not want to print
+ * the data. You can add a callback to handle the retrieved data
+ *
+ * @verbatim
+ var buffer;
+ c.options.writefunction = function(data,size) {
+   buffer = data.decodeToString();
+   return data.length; // return data.length if everything is ok.
+ }
+ c.options.url = 'http://www.google.com';
+ c.perform();
+
+ // do something with buffer
+ print("Got this: " + buffer);
+@endverbatim
+ *
+ * cURL provides a lot of options and you can fine tune your requests. See
+ * <a href="js/bundled modules/curl/easy.html#options-instance_property">cURL.Easy#options</a> for
+ * more.
  *
  */
