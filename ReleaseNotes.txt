@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Upcoming Release:
+-----------------
+
+Major features:
+- JIT is not enabled by default. use the ``--no-jit'' option to disavble it
+- API for creating objects/values massively overhauled to be much more
+  expresive. This is an API breaking change.
+- cURL module re-introduced after being improved to provide more of the
+  functionality of libcurl.
+- Removed support for older spidermonkeys. We now require a recent version of
+  spidermonkey. We define recent as no older than the version from Firefox 3.5
+
 0.8 Series
 ----------
 
