@@ -140,4 +140,15 @@ $ sudo apt-get install libsqlite3-dev
  * @verbatim
 $ sudo apt-get install libgmp3-dev
 @endverbatim
+ *
+ * @subsection curl Building Flusspferd with cURL support
+ * Support for cURL is enabled during configuration time when libcurl's dev-files
+ * are found. Youn can install them with
+ * @verbatim
+$ sudo apt-get install libcurl4-gnutls-dev
+@endverbatim
+ * or
+ * @verbatim
+$ sudo apt-get install libcurl4-openssl-dev
+@endverbatim
  */

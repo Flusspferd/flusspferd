@@ -3,7 +3,8 @@ Flusspferd
 
 Javascript bindings for C++, a Javascript interpreter and shell, and a
 Javascript/C++ module system. Also, Flusspferd includes a few Javascript classes
-and modules: binary blobs, XML, cURL, SQLite 3 and others.
+and modules: binary blobs, SQLite 3, GMP and others (most of these do not have
+to be installed).
 
 It supports Spidermonkey as its backend, and possibly support for other engines
 will be added later.

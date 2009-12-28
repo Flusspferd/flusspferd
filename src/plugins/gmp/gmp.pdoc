@@ -31,7 +31,7 @@
  **/
 
 /**
- *  gmp.Base#getDouble() -> Number
+ *  gmp.Base#toDouble() -> Number
  *
  *  Returns the value as a floating point number
  **/
@@ -125,21 +125,27 @@
  **/
 
 /**
- *  gmp.Integer#sqrt() -> gmp.Float
+ *  gmp.Integer#sqrt() -> gmp.Integer
  *
- *  Returns the square root of `this`.
+ *  Returns the **integer** square root of `this`.
+ *
+ *  See [[gmp.Float#sqrt]].
  **/
 
 /**
  *  gmp.Integer#fitsInt() -> Boolean
  *
  *  Checks if the value fits into an integer.
+ *
+ *  See [[gmp.Float#fitsInt]].
  **/
 
 /**
- *  gmp.Integer#getInt() -> Integer
+ *  gmp.Integer#toInt() -> Integer
  *
  *  Returns the value as an integer.
+ *
+ *  See [[gmp.Float#toInt]], [[gmp.Base#toDouble]], [[gmp.Base#toString]].
  **/
 
 
@@ -186,16 +192,16 @@
  *  common to the numerator and denominator, and make the denominator positive.
  **/
 
-/** deprecated
- *  gmp.Rational#get_num() -> gmp.Integer
+/**
+ *  gmp.Rational#numerator -> gmp.Integer
  *
- *  Returns the numerator
+ *  Numerator.
  **/
 
-/** deprecated
- *  gmp.Rational#get_den() -> gmp.Integer
+/**
+ *  gmp.Rational#denominator -> gmp.Integer
  *
- *  Returns the denominator
+ *  Denominator.
  **/
 
 
@@ -211,35 +217,51 @@
  **/
 
 /**
- *  gmp.Float#fitsInt() -> Boolean
+ *  new gmp.Float(value)
+ *  new gmp.Float(str, base)
+ *  new gmp.Float(prec, value)
+ *  new gmp.Float(prec, str, base)
+ *  - value (Number | String | gmp.Base): initial value
+ *  - str (String): value in a string
+ *  - base (Integer): base to interpret `str` in
+ *  - prec (Integer): initial precision in bits
  *
- *  Checks if the value fits into an integer.
+ * Construct a new GMP float value, either from a primitive value, form an
+ * existing [[gmp.Base]] or via a string representation.
+ *
+ * `prec` is the initial precision in bits. If no `prec` is given the default precision is used.
  **/
 
 /**
- *  gmp.Float#getInt() -> Integer
+ *  gmp.Float#fitsInt() -> Boolean
+ *
+ *  Checks if the value fits into an integer.
+ *
+ *  See [[gmp.Integer#fitsInt]].
+ **/
+
+/**
+ *  gmp.Float#toInt() -> Integer
  *
  *  Returns the value as an integer.
+ *
+ *  See [[gmp.Integer#toInt]], [[gmp.Base#toDouble]], [[gmp.Base#toString]].
  **/
 
-/** deprecated
- *  gmp.Float#get_prec() -> Integer
+/**
+ *  gmp.Float#precision -> Integer
  *
- *  Return the current precision of `this`, in number of bits.
- **/
-
-/** deprecated
- *  gmp.Float#set_prec(prec) -> undefined
- *  - prec (Integer): desired minimum precision.
+ * Precision in bits. (rw)
  *
- *  Set the precision of `this` to be at least `prec` bits. The value will be
- *  truncated to the new precision.
+ * Replaces get_prec/set_prec.
  **/
 
 /**
  *  gmp.Float#sqrt() -> gmp.Float
  *
  *  Returns the square root of `this`.
+ *
+ *  See [[gmp.Integer#sqrt]].
  **/
 
 /**
@@ -259,3 +281,10 @@
  *  Return the integral value nearest to but not larger in magnitude then `this`.
  **/
 
+/**
+ *  gmp.Float#getString([base = 10]) -> Object
+ *  - base (Number): base to represent value in.
+ *
+ *  Returns an object containing the string as property `string` and the exponential as `exp`.
+ *  See [[gmp.Base#toString]].
+ **/

@@ -126,7 +126,8 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     argv(argv)
 {
   flusspferd::object g = flusspferd::global();
-
+  // Default to on.
+  co.set_jit(true);
   // g.prototype() is available everywhere
 
   flusspferd::security::create(g);
@@ -485,6 +486,14 @@ flusspferd::object flusspferd_repl::option_spec() {
     phoenix::ref(history_file) = args::arg2,
     flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
     flusspferd::param::_container = history_file_);
+
+  flusspferd::object no_jit_(flusspferd::create<flusspferd::object>());
+  spec.set_property("no-jit", no_jit_);
+  no_jit_.set_property("doc", "Disables JIT mode");
+  flusspferd::create<flusspferd::function>(
+    "callback",
+    phoenix::bind(&flusspferd::context::set_jit, this->co, false),
+    flusspferd::param::_container = no_jit_);
 
   // Hidden Options for Generator Purpose
   flusspferd::object man_gen_(flusspferd::create<flusspferd::object>());

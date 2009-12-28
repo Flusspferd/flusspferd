@@ -237,8 +237,11 @@ object context::constructor(std::string const &name) const {
   return ptr ? *ptr : object();
 }
 
-void context::gc() {
-  JS_GC(p->context);
+void context::gc(bool maybe) {
+  if (!maybe)
+    JS_GC(p->context);
+  else
+    JS_MaybeGC(p->context);
 }
 
 void context::set_thread() {

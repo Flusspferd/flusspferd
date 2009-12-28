@@ -153,7 +153,7 @@ var equiv = function () {
 
                     aProperties.push(i); // collect a's properties
 
-                    if ( ! innerEquiv(a[i], b[i])) {
+                    if ( (i in b) == false || ! innerEquiv(a[i], b[i])) {
                         eq = false;
                     }
                 }

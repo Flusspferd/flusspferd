@@ -37,16 +37,18 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   (constructor_name, "Float")
   (full_name, "gmp.Float")
   (methods,
-    ("fits_int",         bind,    fits_int)
-    ("get_int",          bind,    get_int)
+    ("fits_int",         bind,    fits_int) // deprecated
+    ("fitsInt",          alias,   "fits_int")
+    ("get_int",          bind,    get_int) // deprecated
     ("toInt",            alias,   "get_int")
-    ("get_double",       bind,    get_double)
+    ("get_double",       bind,    get_double) // deprecated
     ("toDouble",         alias,   "get_double")
-    ("get_string",       bind,    get_string)
+    ("get_string",       bind,    get_string) // deprecated
+    ("getString",        alias,   "get_string")
     ("toString",         bind,    toString)
-    ("get_string_base",  bind,    get_string_base)
-    ("get_prec",         bind,    get_prec)
-    ("set_prec",         bind,    set_prec)
+    ("get_string_base",  alias,   "get_string") // deprecated
+    ("get_prec",         bind,    get_prec) // deprecated
+    ("set_prec",         bind,    set_prec) // deprecated
     ("sqrt",             bind,    sqrt)
     ("sgn",              bind,    sgn)
     ("abs",              bind,    abs)
@@ -57,7 +59,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("add",              bind,    add)
     ("sub",              bind,    sub)
     ("mul",              bind,    mul)
-    ("div",              bind,    div)))
+    ("div",              bind,    div))
+  (properties,
+   ("precision", getter_setter, (get_prec, set_prec))))
 {
 public:
   mpf_class mp;
@@ -68,9 +72,8 @@ public:
   bool fits_int() /*const*/;
   int get_int() /*const*/;
   double get_double() /*const*/;
-  std::string toString() /* const */;
-  object get_string() /*const*/;
-  object get_string_base(int base) /*const*/;
+  void toString(flusspferd::call_context &x) /* const */;
+  void get_string(flusspferd::call_context &x) /*const*/;
   int get_prec() /*const*/;
   void set_prec(int p);
 
@@ -99,6 +102,7 @@ public:
   
 private:
   void init_with_value(flusspferd::value v);
+  std::pair<std::string,mp_exp_t> get_string_impl(flusspferd::call_context &cc) const;
 };
 
 }

@@ -23,14 +23,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#include <flusspferd.hpp>
+
+#include <flusspferd/create_on.hpp>
+#include <flusspferd/evaluate.hpp>
+
 #include <iostream>
 #include "test_environment.hpp"
 
 using namespace flusspferd;
 using namespace std;
 
-void callback(function fn){
+void callback(flusspferd::function fn){
   fn.call(global());
 }
 
@@ -45,8 +48,8 @@ BOOST_AUTO_TEST_CASE(bug_159) {
     load_core(g, "bug159");
     
     create_on(g)
-      .create<function>("gc", &gc)
-      .create<function>("execute", &callback);
+      .create<flusspferd::function>("gc", &gc)
+      .create<flusspferd::function>("execute", &callback);
 
     g.get_property_object("require")
       .get_property_object("paths")

@@ -52,7 +52,7 @@ Impl::string_impl::string_impl(char const *s, std::size_t n)
     throw exception("Could not create string");
 }
 
-Impl::string_impl::string_impl(char16_t const *s, std::size_t n)
+Impl::string_impl::string_impl(js_char16_t const *s, std::size_t n)
   : str(JS_NewUCStringCopyN(Impl::current_context(), s, n))
 {
   if (!str)
@@ -77,11 +77,11 @@ string::string() { }
 string::string(value const &v) : Impl::string_impl(v) { }
 string::string(char const *s, std::size_t n)
   : Impl::string_impl(s, n ? n : std::strlen(s)) { }
-string::string(char16_t const *s, std::size_t n)
+string::string(js_char16_t const *s, std::size_t n)
   : Impl::string_impl(s, n) { }
 string::string(std::string const &s)
   : Impl::string_impl(s.data(), s.size()) { }
-string::string(std::basic_string<char16_t> const &s)
+string::string(std::basic_string<js_char16_t> const &s)
   : Impl::string_impl(s.data(), s.size()) { }
 string::~string() { }
 
@@ -95,7 +95,7 @@ std::size_t string::length() const {
   return JS_GetStringLength(get_string(*this));
 }
 
-char16_t const *string::data() const {
+js_char16_t const *string::data() const {
   assert(get_string(*this));
   return JS_GetStringChars(get_string(*this));
 }
@@ -110,12 +110,12 @@ std::string string::to_string() const {
   return JS_GetStringBytes(get_string(*this));
 }
 
-std::basic_string<char16_t> string::to_utf16_string() const {
+std::basic_string<js_char16_t> string::to_utf16_string() const {
   JSString *str = get_string(*this);
   assert(str);
   std::size_t len = JS_GetStringLength(str);
   jschar *text = JS_GetStringChars(str);
-  return std::basic_string<char16_t>(text, len);
+  return std::basic_string<js_char16_t>(text, len);
 }
 
 bool flusspferd::operator==(string const &lhs, string const &rhs) {

@@ -26,7 +26,7 @@
 
 project(Flusspferd)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
@@ -120,18 +120,20 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     # MinGW doesn't set this by default
     if(WIN32)
         add_definitions(-DWIN32)
+    else()
+        # This causes problems with MinGW and #include <string>. swprintf on
+        # windows has a non-standard signature
+        add_definitions("-ansi")
+        # Boost 1.39 on mingw seems to produce a lot of these - they are very
+        # noisy
+        add_definitions("-Wstrict-aliasing=1")
     endif()
 
     option(ENABLE_DEBUG_WARNINGS "Enable -Wpadded and -Weffc++" OFF)
 
     add_definitions("-pedantic-errors -Wall -Wextra"
-    "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo")
-
-    if (NOT WIN32)
-        # Boost 1.39 on mingw seems to produce a lot of these - they are very
-        # noisy
-        add_definitions("-Wstrict-aliasing=1")
-    endif()
+        "-Winit-self -Woverloaded-virtual -Wnon-virtual-dtor -Wsign-promo"
+        "-Wno-long-long")
 
     if(ENABLE_DEBUG_WARNINGS)
         add_definitions("-Wpadded -Weffc++")
@@ -142,7 +144,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
-    add_definitions("-Wno-long-long -ansi")
 
     set(CMAKE_REQUIRED_FLAGS "")
 
@@ -170,6 +171,7 @@ option(
     FORCE_PLUGINS
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
+option(PLUGIN_CURL "Build cURL plugin" ON)
 option(PLUGIN_SQLITE3 "Build SQLite3 plugin" ON)
 option(PLUGIN_GMP "Build GMP plugin" ON)
 option(PLUGIN_XML "Build xml plugin" ON)
@@ -330,6 +332,40 @@ if(LINE_EDITOR STREQUAL "readline")
   endif()
 endif()
 
+## libcurl ##################################################################
+
+if(PLUGIN_CURL)
+    find_package(CURL)
+
+    if(CURL_FOUND)
+      set(TMP_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+      set(CMAKE_REQUIRED_LIBRARIES ${CURL_LIBRARIES})
+
+      set(TMP_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
+      set(CMAKE_REQUIRED_INCLUDES ${CURL_INCLUDE_DIRS})
+      check_cxx_source_runs(
+        "#include <curl/curl.h>
+         #include <cstdlib>
+         int main() {
+           return (LIBCURL_VERSION_MAJOR >= 7 && LIBCURL_VERSION_MINOR >= 19) ?
+                  EXIT_SUCCESS :
+                  EXIT_FAILURE; 
+         }"
+         CURL_CORRECT_VERSION)
+       set(CMAKE_REQUIRED_LIBRARIES ${TMP_CMAKE_REQUIRED_LIBRARIES})
+       set(CMAKE_REQUIRED_INCLUDES ${TMP_CMAKE_REQUIRED_INCLUDES})
+
+       if(NOT CURL_CORRECT_VERSION)
+         message(STATUS "CURL version too old (7.19.0 or better required) or error during compilation")
+         set(CURL_FOUND FALSE)
+       endif()
+     endif()
+
+    if(FORCE_PLUGINS AND NOT CURL_FOUND)
+        message(SEND_ERROR "CURL plugin required but cURL not found")
+    endif()
+endif()
+
 ## sqlite3 ##################################################################
 
 if(PLUGIN_SQLITE3)
@@ -386,17 +422,97 @@ endif()
 
 ## Library ##################################################################
 
-file(
-    GLOB
+set(
     flusspferd_library_sources
-    ${Flusspferd_SOURCE_DIR}/src/core/*.cpp
-    ${Flusspferd_SOURCE_DIR}/src/spidermonkey/*.cpp
-    ${Flusspferd_SOURCE_DIR}/src/io/*.cpp
-    ${Flusspferd_SOURCE_DIR}/include/*.hpp
-    ${Flusspferd_SOURCE_DIR}/include/flusspferd/*.hpp
-    ${Flusspferd_SOURCE_DIR}/include/flusspferd/io/*.hpp
-    ${Flusspferd_SOURCE_DIR}/include/flusspferd/detail/*.hpp
-    ${Flusspferd_SOURCE_DIR}/include/flusspferd/spidermonkey/*.hpp)
+    include/flusspferd/aliases.hpp
+    include/flusspferd/arguments.hpp
+    include/flusspferd/array.hpp
+    include/flusspferd/binary.hpp
+    include/flusspferd/call_context.hpp
+    include/flusspferd/class_description.hpp
+    include/flusspferd/class.hpp
+    include/flusspferd/context.hpp
+    include/flusspferd/convert.hpp
+    include/flusspferd/create.hpp
+    include/flusspferd/create_on.hpp
+    include/flusspferd/current_context_scope.hpp
+    include/flusspferd/detail/limit.hpp
+    include/flusspferd/encodings.hpp
+    include/flusspferd/evaluate.hpp
+    include/flusspferd/exception.hpp
+    include/flusspferd/function_adapter.hpp
+    include/flusspferd/function.hpp
+    include/flusspferd/getopt.hpp
+    include/flusspferd.hpp
+    include/flusspferd/init.hpp
+    include/flusspferd/io/binary_stream.hpp
+    include/flusspferd/io/file.hpp
+    include/flusspferd/io/filesystem-base.hpp
+    include/flusspferd/io/io.hpp
+    include/flusspferd/io/stream.hpp
+    include/flusspferd/load_core.hpp
+    include/flusspferd/local_root_scope.hpp
+    include/flusspferd/modules.hpp
+    include/flusspferd/native_function_base.hpp
+    include/flusspferd/native_function.hpp
+    include/flusspferd/native_object_base.hpp
+    include/flusspferd/object.hpp
+    include/flusspferd/properties_functions.hpp
+    include/flusspferd/property_attributes.hpp
+    include/flusspferd/property_iterator.hpp
+    include/flusspferd/root.hpp
+    include/flusspferd/security.hpp
+    include/flusspferd/spidermonkey/arguments.hpp
+    include/flusspferd/spidermonkey/context.hpp
+    include/flusspferd/spidermonkey/function.hpp
+    include/flusspferd/spidermonkey/init.hpp
+    include/flusspferd/spidermonkey/object.hpp
+    include/flusspferd/spidermonkey/runtime.hpp
+    include/flusspferd/spidermonkey/string.hpp
+    include/flusspferd/spidermonkey/value.hpp
+    include/flusspferd/string.hpp
+    include/flusspferd/string_io.hpp
+    include/flusspferd/system.hpp
+    include/flusspferd/tracer.hpp
+    include/flusspferd/value.hpp
+    include/flusspferd/value_io.hpp
+    include/flusspferd/version.hpp
+    src/core/binary.cpp
+    src/core/class.cpp
+    src/core/convert.cpp
+    src/core/encodings.cpp
+    src/core/flusspferd_module.cpp
+    src/core/function_adapter.cpp
+    src/core/getopt.cpp
+    src/core/load_core.cpp
+    src/core/modules.cpp
+    src/core/properties_functions.cpp
+    src/core/property_attributes.cpp
+    src/core/security.cpp
+    src/core/system.cpp
+    src/io/binary_stream.cpp
+    src/io/file.cpp
+    src/io/filesystem-base.cpp
+    src/io/io.cpp
+    src/io/stream.cpp
+    src/spidermonkey/arguments.cpp
+    src/spidermonkey/array.cpp
+    src/spidermonkey/context.cpp
+    src/spidermonkey/create.cpp
+    src/spidermonkey/evaluate.cpp
+    src/spidermonkey/exception.cpp
+    src/spidermonkey/function.cpp
+    src/spidermonkey/init.cpp
+    src/spidermonkey/local_root_scope.cpp
+    src/spidermonkey/native_function_base.cpp
+    src/spidermonkey/native_object_base.cpp
+    src/spidermonkey/object.cpp
+    src/spidermonkey/property_iterator.cpp
+    src/spidermonkey/root.cpp
+    src/spidermonkey/string.cpp
+    src/spidermonkey/tracer.cpp
+    src/spidermonkey/value.cpp
+)
 
 if(MSVC)
     # Build static lib for MSVC
@@ -499,17 +615,31 @@ install(TARGETS
 ## Tests ###################################################################
 
 if(ENABLE_TESTS)
-
-    file(GLOB
-        TESTS
-        test/test_*.cpp
-        #test/*.hpp
-        )
+    set(
+      TESTS
+      test/test_arguments.cpp
+      test/test_array.cpp
+      test/test_class_description.cpp
+      test/test_context.cpp
+      test/test_create.cpp
+      test/test_current_context_scope.cpp
+      test/test_evaluate.cpp
+      test/test_exception.cpp
+      test/test_function.cpp
+      test/test_init.cpp
+      test/test_io.cpp
+      test/test_object.cpp
+      test/test_property_iterator.cpp
+      test/test_regression_159.cpp
+      test/test_string.cpp
+      test/test_value.cpp
+    )
 
     foreach(TEST_SOURCE ${TESTS})
         string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
         string(REGEX REPLACE "^test_" "" TEST_NAME TEST_OUTPUT)
-        add_executable(${TEST_OUTPUT} ${TEST_SOURCE})
+        set(TEST_SOURCES ${TEST_SOURCE} test/test_environment.hpp)
+        add_executable(${TEST_OUTPUT} ${TEST_SOURCES})
         set_property(
             TARGET ${TEST_OUTPUT}
             PROPERTY COMPILE_FLAGS
@@ -524,15 +654,70 @@ endif()
 
 ## Plugins #################################################################
 
+if(PLUGIN_CURL AND CURL_FOUND)
+    set(PLUGINS ${PLUGINS} curl)
+    set(curl_LIBRARIES ${CURL_LIBRARIES})
+    set(curl_SOURCES
+      src/plugins/curl/exception.hpp
+      src/plugins/curl/exception.cpp
+      src/plugins/curl/handle_option.hpp
+      src/plugins/curl/handle_option.cpp
+      src/plugins/curl/get_options.hpp
+      src/plugins/curl/get_options.cpp
+      src/plugins/curl/integer_option.hpp
+      src/plugins/curl/string_option.hpp
+      src/plugins/curl/list_option.hpp
+      src/plugins/curl/function_option.hpp
+      src/plugins/curl/http_post_option.hpp
+      src/plugins/curl/http_post_option.cpp
+      src/plugins/curl/EasyOpt.hpp
+      src/plugins/curl/EasyOpt.cpp
+      src/plugins/curl/Easy.hpp
+      src/plugins/curl/Easy.cpp
+      src/plugins/curl/defines.hpp
+      src/plugins/curl/curl_cookie.hpp
+      src/plugins/curl/curl_cookie.cpp
+      src/plugins/curl/curl.cpp
+    )
+    include_directories(${CURL_INCLUDE_DIR})
+endif()
+
 if(PLUGIN_SQLITE3 AND SQLITE3_FOUND)
     set(PLUGINS ${PLUGINS} sqlite3)
     set(sqlite3_DEFINITIONS ${SQLITE3_DEFINITIONS})
     set(sqlite3_LIBRARIES ${SQLITE3_LIBRARIES})
+    set(
+      sqlite3_SOURCES
+      src/plugins/sqlite3/sqlite.cpp
+      src/plugins/sqlite3/sqlite_cursor.cpp
+      src/plugins/sqlite3/sqlite_cursor.hpp
+      src/plugins/sqlite3/sqlite.hpp
+      src/plugins/sqlite3/sqlite_plugin.cpp
+    )
+    set(
+      sqlite3_JS_FILES
+      src/plugins/sqlite3/sqlite3.js
+    )
 endif()
 
 if(PLUGIN_GMP AND GMP_FOUND AND GMPXX_FOUND)
     set(PLUGINS ${PLUGINS} gmp)
     set(gmp_LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
+    set(
+      gmp_SOURCES
+      src/plugins/gmp/exception.hpp
+      src/plugins/gmp/Float.cpp
+      src/plugins/gmp/Float.hpp
+      src/plugins/gmp/gmp.cpp
+      src/plugins/gmp/Integer.cpp
+      src/plugins/gmp/Integer.hpp
+      src/plugins/gmp/Rational.cpp
+      src/plugins/gmp/Rational.hpp
+    )
+    set(
+      gmp_JS_FILES
+      #empty
+    )
     include_directories(${GMP_INCLUDE_DIR})
 endif()
 
@@ -545,16 +730,11 @@ endif()
 foreach(PLUGIN ${PLUGINS})
     message(STATUS "Plugin: ${PLUGIN} (will be built)")
 
-    file(GLOB
-        ${PLUGIN}_sources
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.cpp
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/*.hpp)
-
     # OSX doesn't work properly with this as MODULE (something about --flat-namespace)
     if (APPLE)
-        add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_sources})
+        add_library(${PLUGIN}_PLUGIN SHARED ${${PLUGIN}_SOURCES})
     else()
-        add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_sources})
+        add_library(${PLUGIN}_PLUGIN MODULE ${${PLUGIN}_SOURCES})
     endif()
 
     set_property(
@@ -588,16 +768,11 @@ foreach(PLUGIN ${PLUGINS})
         ${PLUGIN}_PLUGIN
         LIBRARY DESTINATION ${INSTALL_MODULES_PATH})
 
-    file(GLOB
-        ${PLUGIN}_JS_FILES
-        ${Flusspferd_SOURCE_DIR}/src/plugins/${PLUGIN}/${PLUGIN}.js)
-
     if(${PLUGIN}_JS_FILES)
         install(FILES
             ${${PLUGIN}_JS_FILES}
             DESTINATION ${INSTALL_MODULES_PATH})
     endif()
-
 endforeach()
 
 install(
