@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "document.hpp"
 #include "dom_implementation.hpp"
 
+#include <SAX/helpers/CatchErrorHandler.hpp>
+#include <DOM/io/Stream.hpp>
 #include <Taggle/Taggle.hpp>
 
 
@@ -178,9 +180,23 @@ object html_parser::static_parse_string(std::string &source) {
 
 
 arabica_document html_parser::_parse(sax_source &is) {
-  Arabica::SAX2DOM::Parser<string_type, Arabica::SAX::Taggle<string_type> > parser;
+  typedef Arabica::SAX::Taggle<string_type> Taggle;
+  Arabica::SAX2DOM::Parser<string_type, Taggle> parser;
   Arabica::SAX::CatchErrorHandler<string_type> eh;
   parser.setErrorHandler(eh);
+
+  // Dont explicitly set default attributes.
+  // Without this:
+  //   <a href="foo">bar</a>
+  // gets turned into
+  //   <a href="foo" shape="rect">bar</a>
+  parser.setFeature(Taggle::defaultAttributesFeature, false);
+
+  // This one disabled the xmlns attr on the html element
+  parser.setFeature(Taggle::useSchemaNSFeature, false);
+
+  // This one lets 'inline' contain blocks: <a><div>foo</div></a>
+  parser.setFeature(Taggle::flexibleElementHierarchyFeautre, true);
 
   parser.parse(is);
 
