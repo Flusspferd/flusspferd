@@ -28,8 +28,6 @@ THE SOFTWARE.
 #define FLUSSPFERD_XML_DOM_PARSER_HPP
 
 #include <DOM/SAX2DOM/SAX2DOM.hpp>
-#include <SAX/helpers/CatchErrorHandler.hpp>
-#include <DOM/io/Stream.hpp>
 
 #include "types.hpp"
 
