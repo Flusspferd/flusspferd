@@ -21,8 +21,8 @@
  **/
 
 /**
- *  JSON.parse(json[, replacer[, space]]) -> ?
- *  - json (String): json string to parse
+ *  JSON.stringify(val[, replacer[, space]]) -> ?
+ *  - val (?): value to turn into JSON
  *  - replacer (Array | Function): change stringification behaviour
  *  - space (String | Numer): indentation control
  *

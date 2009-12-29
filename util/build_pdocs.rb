@@ -21,8 +21,10 @@ module HippoDocsHelper
 
     rm_rf DOC_DIR
     begin
-      files = Dir.glob( File.join(ROOT_DIR, "src", "**","*.pdoc") )
-      files << Dir.glob( File.join(ROOT_DIR, "src","**","*.js") )
+      files = Dir.glob( File.join(ROOT_DIR, "libflusspferd", "**","*.pdoc") )
+      files << Dir.glob( File.join(ROOT_DIR, "plugins","**","*.js") )
+      files << Dir.glob( File.join(ROOT_DIR, "plugins","**","*.pdoc") )
+      files << Dir.glob( File.join(ROOT_DIR, "js","**","*.js") )
       files << extras
       files.flatten!
 
