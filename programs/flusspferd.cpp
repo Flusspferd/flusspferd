@@ -81,7 +81,7 @@ class flusspferd_repl {
 
   std::list<std::pair<std::string, Type> > files;
 
-  flusspferd::object option_spec();
+  flusspferd::object option_spec(bool for_main_repl = true);
 
   // Returns list of files / expressions to execute
   void parse_cmdline();
@@ -91,6 +91,9 @@ class flusspferd_repl {
   void print_bash();
   void add_file(std::string const &path, Type type, bool del_interactive);
   void load_config();
+
+  // Handle options from "// flusspferd: opts" lines
+  void handle_file_options(const flusspferd::root_object &opts);
 
   bool getline(std::string &source, const char* prompt = "> ");
 
@@ -183,14 +186,11 @@ void flusspferd_repl::run_cmdline() {
   if (!config_loaded)
     load_config();
 
-  flusspferd::object require_obj =
-    flusspferd::global()
-      .get_property_object("require");
+  flusspferd::object require_obj = flusspferd::global() .get_property_object("require");
 
   flusspferd::require &require = flusspferd::get_native<flusspferd::require>(require_obj);
 
   flusspferd::object module_obj = require_obj.get_property_object("main");
-
 
   bool first = true;
 
@@ -198,14 +198,18 @@ void flusspferd_repl::run_cmdline() {
   for (iter i = files.begin(), e = files.end(); i != e; ++i) {
     switch (i->second) {
     case File:
+    {
       if (first) {
         first = false;
-        std::string id = "file://"
-                       + flusspferd::io::fs_base::canonicalize(i->first).string();
+        std::string id = "file://" + flusspferd::io::fs_base::canonicalize(i->first).string();
         require.set_main_module(id);
       }
-      flusspferd::execute(i->first.c_str());
+      flusspferd::root_object opts( flusspferd::create<flusspferd::object>() );
+      flusspferd::root_string src( require.load_module_text(i->first.c_str(), opts) );
+      handle_file_options(opts);
+      flusspferd::evaluate( src, i->first.c_str(), 1 );
       break;
+    }
     case Expression:
       flusspferd::evaluate(i->first, "[command line]", 0);
       break;
@@ -342,43 +346,46 @@ void flusspferd_repl::load_config() {
   }
 }
 
-flusspferd::object flusspferd_repl::option_spec() {
+// Get the option spec for either the main loop, or for source files.
+flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
   flusspferd::root_object spec(flusspferd::create<flusspferd::object>());
 
   flusspferd::object options(flusspferd::create<flusspferd::object>());
   spec.set_property("[options]", options);
   options.set_property("stop-early", true);
 
-  flusspferd::object help(flusspferd::create<flusspferd::object>());
-  spec.set_property("help", help);
-  help.set_property("alias", "h");
-  help.set_property("doc", "Displays this message.");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::print_help, this, true),
-    flusspferd::param::_container = help);
+  if (for_main_repl) {
+    flusspferd::object help(flusspferd::create<flusspferd::object>());
+    spec.set_property("help", help);
+    help.set_property("alias", "h");
+    help.set_property("doc", "Displays this message.");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_help, this, true),
+      flusspferd::param::_container = help);
 
-  flusspferd::object version(flusspferd::create<flusspferd::object>());
-  spec.set_property("version", version);
-  version.set_property("alias", "v");
-  version.set_property("doc", "Print version and exit.");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::print_version, this),
-    flusspferd::param::_container = version);
+    flusspferd::object version(flusspferd::create<flusspferd::object>());
+    spec.set_property("version", version);
+    version.set_property("alias", "v");
+    version.set_property("doc", "Print version and exit.");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_version, this),
+      flusspferd::param::_container = version);
 
-  flusspferd::object config(flusspferd::create<flusspferd::object>());
-  spec.set_property("config", config);
-  config.set_property("alias", "c");
-  config.set_property("doc", "Load config from file.");
-  config.set_property("argument", "required");
-  config.set_property("argument_type", "file");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::ref(config_file) = args::arg2,
-    flusspferd::param::_signature =
-      flusspferd::param::type<void (flusspferd::value, std::string)>(),
-    flusspferd::param::_container = config);
+    flusspferd::object config(flusspferd::create<flusspferd::object>());
+    spec.set_property("config", config);
+    config.set_property("alias", "c");
+    config.set_property("doc", "Load config from file.");
+    config.set_property("argument", "required");
+    config.set_property("argument_type", "file");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::ref(config_file) = args::arg2,
+      flusspferd::param::_signature =
+        flusspferd::param::type<void (flusspferd::value, std::string)>(),
+      flusspferd::param::_container = config);
+  }
 
   flusspferd::object interactive_(flusspferd::create<flusspferd::object>());
   spec.set_property("interactive", interactive_);
@@ -393,43 +400,45 @@ flusspferd::object flusspferd_repl::option_spec() {
     flusspferd::param::_signature = flusspferd::param::type<void ()>(),
     flusspferd::param::_container = interactive_);
 
-  flusspferd::object machine_mode_(flusspferd::create<flusspferd::object>());
-  spec.set_property("machine-mode", machine_mode_);
-  machine_mode_.set_property("alias", "0");
-  machine_mode_.set_property("doc", "(Interactive) machine command mode (separator '\\0').");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    (
-      phoenix::ref(machine_mode) = true,
-      phoenix::ref(interactive) = true,
-      phoenix::ref(interactive_set) = true
-    ),
-    flusspferd::param::_signature = flusspferd::param::type<void ()>(),
-    flusspferd::param::_container = machine_mode_);
+  if (for_main_repl) {
+    flusspferd::object machine_mode_(flusspferd::create<flusspferd::object>());
+    spec.set_property("machine-mode", machine_mode_);
+    machine_mode_.set_property("alias", "0");
+    machine_mode_.set_property("doc", "(Interactive) machine command mode (separator '\\0').");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      (
+        phoenix::ref(machine_mode) = true,
+        phoenix::ref(interactive) = true,
+        phoenix::ref(interactive_set) = true
+      ),
+      flusspferd::param::_signature = flusspferd::param::type<void ()>(),
+      flusspferd::param::_container = machine_mode_);
 
-  flusspferd::object file(flusspferd::create<flusspferd::object>());
-  spec.set_property("file", file);
-  file.set_property("alias", "f");
-  file.set_property("doc", "Run this file before standard script handling.");
-  file.set_property("argument", "required");
-  file.set_property("argument_type", "file");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, File, true),
-    flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
-    flusspferd::param::_container = file);
+    flusspferd::object file(flusspferd::create<flusspferd::object>());
+    spec.set_property("file", file);
+    file.set_property("alias", "f");
+    file.set_property("doc", "Run this file before standard script handling.");
+    file.set_property("argument", "required");
+    file.set_property("argument_type", "file");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, File, true),
+      flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
+      flusspferd::param::_container = file);
 
-  flusspferd::object expression(flusspferd::create<flusspferd::object>());
-  spec.set_property("expression", expression);
-  expression.set_property("alias", "e");
-  expression.set_property("doc", "Evaluate the expression.");
-  expression.set_property("argument", "required");
-  expression.set_property("argument_type", "expr");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, Expression, true),
-    flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
-    flusspferd::param::_container = expression);
+    flusspferd::object expression(flusspferd::create<flusspferd::object>());
+    spec.set_property("expression", expression);
+    expression.set_property("alias", "e");
+    expression.set_property("doc", "Evaluate the expression.");
+    expression.set_property("argument", "required");
+    expression.set_property("argument_type", "expr");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, Expression, true),
+      flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
+      flusspferd::param::_container = expression);
+  }
 
   flusspferd::object include_path(flusspferd::create<flusspferd::object>());
   spec.set_property("include-path", include_path);
@@ -455,18 +464,21 @@ flusspferd::object flusspferd_repl::option_spec() {
     flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
     flusspferd::param::_container = module);
 
-  flusspferd::object main_module(flusspferd::create<flusspferd::object>());
-  spec.set_property("main", main_module);
-  main_module.set_property("alias", "m");
-  main_module.set_property("doc", "Load module as the main module.");
-  main_module.set_property("argument", "required");
-  main_module.set_property("argument_type", "module");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, MainModule, true),
-    flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
-    flusspferd::param::_container = main_module);
+  if (for_main_repl) {
+    flusspferd::object main_module(flusspferd::create<flusspferd::object>());
+    spec.set_property("main", main_module);
+    main_module.set_property("alias", "m");
+    main_module.set_property("doc", "Load module as the main module.");
+    main_module.set_property("argument", "required");
+    main_module.set_property("argument_type", "module");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, MainModule, true),
+      flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
+      flusspferd::param::_container = main_module);
+  }
 
+  // These two make sense to be able to have 'custom' repls
   flusspferd::object no_global_history(flusspferd::create<flusspferd::object>());
   spec.set_property("no-global-history", no_global_history);
   no_global_history.set_property("doc", "Do not use a global history in interactive mode.");
@@ -495,22 +507,24 @@ flusspferd::object flusspferd_repl::option_spec() {
     phoenix::bind(&flusspferd::context::set_jit, this->co, false),
     flusspferd::param::_container = no_jit_);
 
-  // Hidden Options for Generator Purpose
-  flusspferd::object man_gen_(flusspferd::create<flusspferd::object>());
-  spec.set_property("hidden-man", man_gen_);
-  man_gen_.set_property("hidden", "true");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::print_man, this),
-    flusspferd::param::_container = man_gen_);
+  if (for_main_repl) {
+    // Hidden Options for Generator Purpose
+    flusspferd::object man_gen_(flusspferd::create<flusspferd::object>());
+    spec.set_property("hidden-man", man_gen_);
+    man_gen_.set_property("hidden", "true");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_man, this),
+      flusspferd::param::_container = man_gen_);
 
-  flusspferd::object bash_gen_(flusspferd::create<flusspferd::object>());
-  spec.set_property("hidden-bash", bash_gen_);
-  bash_gen_.set_property("hidden", "true");
-  flusspferd::create<flusspferd::function>(
-    "callback",
-    phoenix::bind(&flusspferd_repl::print_bash, this),
-    flusspferd::param::_container = bash_gen_);
+    flusspferd::object bash_gen_(flusspferd::create<flusspferd::object>());
+    spec.set_property("hidden-bash", bash_gen_);
+    bash_gen_.set_property("hidden", "true");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_bash, this),
+      flusspferd::param::_container = bash_gen_);
+  }
 
   return spec;
 }
@@ -551,6 +565,19 @@ void flusspferd_repl::parse_cmdline() {
   sys.define_property("args", arguments,
                       flusspferd::read_only_property |
                       flusspferd::permanent_property);
+}
+
+
+void flusspferd_repl::handle_file_options(const flusspferd::root_object &opts) {
+  flusspferd::value v = opts.get_property("flusspferd");
+  if (v.is_undefined_or_null())
+    return;
+
+  flusspferd::root_object spec(option_spec(false));
+  flusspferd::array args(v.to_object());
+
+  // Dont care about result - its all handled inline via phoenix callbacks
+  flusspferd::getopt(spec, args);
 }
 
 namespace {
