@@ -26,11 +26,11 @@ THE SOFTWARE.
 
 // Set default paths to the plugin dirs
 require.paths.push(
-  'src/js',
-  'src/plugins/sqlite3',
-  'src/plugins/curl',
+  'js',
+  'plugins/sqlite3',
+  'plugins/curl',
   'build/modules',
   'build/lib'
 );
 
-prelude = 'src/js/prelude.js';
+prelude = 'js/prelude.js';
