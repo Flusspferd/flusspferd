@@ -175,6 +175,8 @@ void require::call(call_context &x) {
   gc(true); // maybe-gc
 }
 
+// Helper method that returns the cache object. Doing this makes various code
+// paths a lot easier
 object require::call_helper(std::string const &id_) {
 
   // If what ever they require is already loaded, give it to them
@@ -230,7 +232,7 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
   binary::vector_type::iterator i, s;
 
   if (buf[0] == '#' && buf[1] == '!') {
-    // Shebang line - skip the line, but insert an empty one in there to keep
+    // Shebang line - skip the line, but insert a comment line here to keep
     // source line numbers right
     buf.clear();
     buf.push_back('/');
@@ -239,19 +241,19 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
   f.read_whole_binary(blob);
 
 
-  // Look for option lines. An option line looks like
-  // "// -*- coding=utf-8 -*-
+  // Look for coding and option lines. An coding line looks like one of
+  // "// -*- coding:utf-8 -*-"
+  // "// vim:fileencoding=utf-8:"
   //
-  // or
-  //
+  // An option line looks like
   // "// flusspferd: -xboo"
+  //
   // We continue looking until we see a blank comment or a non comment line
-
-  std::string options, warnings;
 
   using namespace boost::xpressive;
   sregex opt_re = sregex::compile("^\\s*([-\\w.]+):\\s*(.*)$");
   sregex coding_re = sregex::compile("^.*coding[:=]\\s*([-\\w.]+)");
+  sregex empty_line_re = bos >> *_s >> eos;
 
   // We only want to look for a coding comment on line 1 or 2
   int look_for_coding = 2;
@@ -259,7 +261,7 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
 
   for (i = buf.begin(); i != buf.end(); ++i) {
     if (*(i++) != '/' || *(i++) != '/') {
-      // Not a comment line, or an empty comment - stop!
+      // Not a comment line - stop!
       break;
     }
     binary::vector_type::iterator e;
@@ -267,43 +269,30 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
     if (e == buf.end())
       break;
 
-    std::string line(
-      reinterpret_cast<char const *>(&*i),
-      size_t(e-i));
+    std::string line( reinterpret_cast<char const *>(&*i), size_t(e-i) );
 
     // Move onto next line
     i = e;
 
-    if (look_for_coding--) {
-      smatch m;
-      if (regex_match(line, m, coding_re)) {
-        // Huzzah! We have an encoding!
-        encoding = m[1];
-        look_for_coding = 0;
-
-        continue;
-      }
-    } if (!opts) {
-      // If no cache to store options, stop looking for then
-      break;
-    }
-
-    // Empty comment line - stop looking
-    sregex empty = bos >> *_s >> eos;
-    if (regex_match(line, empty))
-      break;
-
     smatch m;
-    if (!regex_match(line, m, opt_re)) {
-      // Not a line we are interested in. skip
+    if (look_for_coding-- && regex_match(line, m, coding_re)) {
+      // Huzzah! We have an encoding!
+      encoding = m[1];
+      look_for_coding = 0;
+
       continue;
     }
 
-    if (opts)
+    // Empty comment line - stop looking
+    if (regex_match(line, empty_line_re))
+      break;
+
+    if (opts && regex_match(line, m, opt_re)) {
+      // A line we are interested in, and we have somewhere to store the result
       opts->set_property(m[1].str(), m[2].str());
+    }
   }
 
-  // TODO: Some way of supporting other encodings is probably useful
   return encodings::convert_to_string(encoding, blob);
 
 }
