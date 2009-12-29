@@ -24,6 +24,13 @@
 # THE SOFTWARE.
 #
 
+if (APPLE)
+  # Enable -flat_namespace so that symbols are resolved transitatively
+  SET(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
+      "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -Wl,-x -flat_namespace")
+  MESSAGE("module create: ${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS}")
+endif()
+
 # Helper function to make/compile a flusspferd plugin.
 # use like:
 #
@@ -50,12 +57,7 @@ function(flusspferd_plugin PLUGIN)
   endif()
 
 
-  # OSX doesn't work properly with this as MODULE (something about --flat-namespace)
-  if (APPLE)
-      add_library(${PLUGIN}_PLUGIN SHARED ${PLUGIN_SOURCES})
-  else()
-      add_library(${PLUGIN}_PLUGIN MODULE ${PLUGIN_SOURCES})
-  endif()
+  add_library(${PLUGIN}_PLUGIN MODULE ${PLUGIN_SOURCES})
 
   list(APPEND props
     OUTPUT_NAME ${PLUGIN}

@@ -56,7 +56,7 @@ if(PLUGIN_CURL)
                 curl_cookie.cpp
                 curl.cpp
 
-        LIBRARIES ${CURL_LIBRARIES} ${Boost_SYSTEM_LIBRARY}
+        LIBRARIES ${CURL_LIBRARIES}
       )
     endif()
 endif()

@@ -27,7 +27,7 @@ if(PLUGIN_SQLITE3)
     flusspferd_plugin(
       "sqlite3"
       DEFINITIONS ${SQLITE3_DEFINITIONS}
-      LIBRARIES ${SQLITE3_LIBRARIES} ${Boost_SYSTEM_LIBRARY}
+      LIBRARIES ${SQLITE3_LIBRARIES}
       SOURCES sqlite.cpp
               sqlite_cursor.cpp
               sqlite_cursor.hpp

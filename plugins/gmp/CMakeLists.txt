@@ -20,9 +20,7 @@ if(PLUGIN_GMP)
               Integer.hpp
               Rational.cpp
               Rational.hpp
-      # boost-system might not be needed, but it was for other plugins, and I
-      # (Ash) dont have gmpxx to test compiling this plugin.
-      LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY} ${Boost_SYSTEM_LIBRARY})
+      LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
   endif()
 endif()
 
