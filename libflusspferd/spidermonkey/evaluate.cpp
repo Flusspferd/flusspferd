@@ -44,6 +44,14 @@ value flusspferd::evaluate(
   return evaluate_in_scope(source, n, file, line, global());
 }
 
+// Unicode version of the above
+value flusspferd::evaluate(
+  string const &source, char const *file, unsigned int line)
+{
+  return evaluate_in_scope(source, file, line, global());
+}
+
+
 value flusspferd::evaluate_in_scope(
   char const* source,
   std::size_t n,
@@ -56,6 +64,27 @@ value flusspferd::evaluate_in_scope(
   jsval rval;
   JSBool ok = JS_EvaluateScript(cx, Impl::get_object(scope),
                                 source, n, file, line, &rval);
+  if(!ok) {
+    exception e("Could not evaluate script");
+    if (!e.is_js_exception())
+      throw e;
+  }
+  return Impl::wrap_jsval(rval);
+}
+
+// Unicode version of the above
+value flusspferd::evaluate_in_scope(
+  string const &source,
+  char const* file,
+  unsigned int line,
+  object const &scope)
+{
+  JSContext *cx = Impl::current_context();
+
+  jsval rval;
+  JSBool ok = JS_EvaluateUCScript(cx, Impl::get_object(scope),
+                                source.data(), source.length(), file, line,
+                                &rval);
   if(!ok) {
     exception e("Could not evaluate script");
     if (!e.is_js_exception())
