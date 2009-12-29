@@ -46,11 +46,11 @@ function(flusspferd_plugin PLUGIN)
   #  Creates variabvles PLUGIN_SOURCE etc.
   PARSE_ARGUMENTS("PLUGIN" "SOURCES;JS;LIBRARIES;DEFINITIONS" "" ${ARGN})
 
-  #MESSAGE("*** Arguments for ${PLUGIN}")
+  MESSAGE("*** Arguments for ${PLUGIN}")
   #MESSAGE("Sources: ${PLUGIN_SOURCES}")
   #MESSAGE("JS files: ${PLUGIN_JS}")
   #MESSAGE("Defintions: ${PLUGIN_DEFINITIONS}")
-  #MESSAGE("Link libraries: ${PLUGIN_LIBRARIES}")
+  MESSAGE("Link libraries: ${PLUGIN_LIBRARIES}")
 
   if("${PLUGIN_SOURCES}" STREQUAL "")
     message(FATAL_ERROR "flusspferd_plugin called for ${PLUGIN} with no SOURCES argument")
@@ -74,7 +74,8 @@ function(flusspferd_plugin PLUGIN)
 
   set_target_properties( ${PLUGIN}_PLUGIN PROPERTIES ${props} )
 
-  target_link_libraries( ${PLUGIN}_PLUGIN flusspferd ${PLUGIN_LIBRARIES} )
+  # Every plugin seems to need libboost_system. Wonder why...
+  target_link_libraries( ${PLUGIN}_PLUGIN flusspferd ${Boost_SYSTEM_LIBRARY} ${PLUGIN_LIBRARIES} )
 
   install( TARGETS ${PLUGIN}_PLUGIN LIBRARY DESTINATION ${INSTALL_MODULES_PATH} )
 
