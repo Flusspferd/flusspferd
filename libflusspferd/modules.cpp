@@ -70,6 +70,9 @@ static void setup_module_resolve_fns(object &module, fs::path const &id);
 static std::string module_resource_resolve(fs::path const &module_dir, std::string const &x);
 static object module_resource(const fs::path &module_dir, std::string const &x_, value mode);
 
+// This function based largley on one from boost/program_options. See end of file for its license
+static array split_args_string(const value& input);
+
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
   container.set_property("require", require::create_require());
@@ -290,6 +293,20 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
     if (opts && regex_match(line, m, opt_re)) {
       // A line we are interested in, and we have somewhere to store the result
       opts->set_property(m[1].str(), m[2].str());
+    }
+  }
+
+  // If we have "flusspferd" or "warnings" in the option, split them on
+  // whitespace like shells do. TODO: Should we just split everything?
+  if (opts) {
+    value v = opts->get_property("flusspferd");
+    if (v.is_string()) {
+      opts->set_property( "flusspferd", split_args_string(v) );
+    }
+
+    v = opts->get_property("warnings");
+    if (v.is_string()) {
+      opts->set_property( "warnings", split_args_string(v) );
     }
   }
 
@@ -671,3 +688,81 @@ static object module_resource(const fs::path &module_dir, std::string const &x_,
 
   return create<io::file>(fusion::make_vector(path.c_str(), mode));
 }
+
+// This function adapted to use js array by Ash
+//
+// Original from :
+//   http://svn.boost.org/svn/boost/trunk/libs/program_options/src/winmain.cpp
+// Copyright Vladimir Prus 2002-2004.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt
+// or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+array split_args_string(const value& v)
+{
+  std::string const &input = v.to_std_string();
+
+  array result = create<array>();
+  root_object root(result);
+
+  std::string::const_iterator i = input.begin(), e = input.end();
+  for(;i != e; ++i) {
+    if (!isspace((unsigned char)*i))
+      break;
+  }
+
+  // Empty string.
+  if (i == e)
+    return result;
+
+  std::string current;
+  bool inside_quoted = false;
+  int backslash_count = 0;
+
+  for(; i != e; ++i) {
+    if (*i == '"') {
+      // '"' preceded by even number (n) of backslashes generates
+      // n/2 backslashes and is a quoted block delimiter
+      if (backslash_count % 2 == 0) {
+          current.append(backslash_count / 2, '\\');
+          inside_quoted = !inside_quoted;
+          // '"' preceded by odd number (n) of backslashes generates
+          // (n-1)/2 backslashes and is literal quote.
+      } else {
+          current.append(backslash_count / 2, '\\');
+          current += '"';
+      }
+      backslash_count = 0;
+    } else if (*i == '\\') {
+      ++backslash_count;
+    } else {
+      // Not quote or backslash. All accumulated backslashes should be
+      // added
+      if (backslash_count) {
+          current.append(backslash_count, '\\');
+          backslash_count = 0;
+      }
+      if (isspace((unsigned char)*i) && !inside_quoted) {
+          // Space outside quoted section terminate the current argument
+          result.push(current);
+          current.resize(0);
+          for(;i != e && isspace((unsigned char)*i); ++i)
+              ;
+          --i;
+      } else {
+          current += *i;
+      }
+    }
+  }
+
+  // If we have trailing backslashes, add them
+  if (backslash_count)
+    current.append(backslash_count, '\\');
+
+  // If we have non-empty 'current' or we're still in quoted
+  // section (even if 'current' is empty), add the last token.
+  if (!current.empty() || inside_quoted)
+    result.push(current);
+  return result;
+}
+

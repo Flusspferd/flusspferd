@@ -156,7 +156,7 @@ public:
         }
         v = o.get_property(key);
       }
-      if (v.is_string() && v.to_std_string() == "no")
+      if (!v.is_undefined_or_null() && v.to_std_string() == "no")
         should_warn = false;
     }
 
