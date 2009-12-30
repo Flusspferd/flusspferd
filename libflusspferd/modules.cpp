@@ -29,11 +29,9 @@ THE SOFTWARE.
 #include "flusspferd/security.hpp"
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/value_io.hpp"
-#include "flusspferd/create/object.hpp"
+#include "flusspferd/create_on.hpp"
 #include "flusspferd/create/array.hpp"
-#include "flusspferd/create/function.hpp"
-#include "flusspferd/create/native_object.hpp"
-#include "flusspferd/create/native_function.hpp"
+#include "flusspferd/create/object.hpp"
 #include "flusspferd/io/file.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
 #include "flusspferd/binary.hpp"
@@ -44,7 +42,9 @@ THE SOFTWARE.
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/xpressive/xpressive.hpp>
 #include <sstream>
+#include <algorithm>
 
 #ifdef WIN32
 #include <windows.h>
@@ -69,6 +69,9 @@ static void setup_module_resolve_fns(object &module, fs::path const &id);
 
 static std::string module_resource_resolve(fs::path const &module_dir, std::string const &x);
 static object module_resource(const fs::path &module_dir, std::string const &x_, value mode);
+
+// This function based largley on one from boost/program_options. See end of file for its license
+static array split_args_string(const value& input);
 
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
@@ -168,26 +171,33 @@ void require::set_main_module(std::string const &id_) {
 
 // The implementation of the |require()| function that is available to JS
 void require::call(call_context &x) {
-  gc(true); // maybe-gc
 
   std::string id = x.arg[0].to_std_string();
+  x.result = call_helper(id).get_property("exports");
+
+  gc(true); // maybe-gc
+}
+
+// Helper method that returns the cache object. Doing this makes various code
+// paths a lot easier
+object require::call_helper(std::string const &id_) {
 
   // If what ever they require is already loaded, give it to them
-  if (module_cache.has_own_property(id)) {
-    x.result = module_cache.get_property(id);
-    return;
+  if (module_cache.has_own_property(id_)) {
+    return module_cache.get_property_object(id_);
   }
 
-  id_classification type = classify_id(id);
+  id_classification type = classify_id(id_);
 
   if (type == top_level) {
-    x.result = load_top_level_module(id);
-    return;
+    return load_top_level_module(id_);
   }
+
+  std::string id = id_;
 
   fs::path module_path;
   if (type == relative) {
-    module_path = resolve_relative_id( id );
+    module_path = resolve_relative_id( id_ );
     id = module_path.string();
   }
   else if (type == fully_qualified) {
@@ -199,17 +209,14 @@ void require::call(call_context &x) {
 
   // If what ever the file resolves to is already loaded, give it to them
   if (module_cache.has_own_property(id)) {
-    x.result = module_cache.get_property(id);
-    return;
+    return module_cache.get_property_object(id);
   }
 
-  x.result = load_absolute_js_file(module_path, id);
-
-  gc(true); //maybe-gc
+  return load_absolute_js_file(module_path, id);
 }
 
 
-string require::load_module_text(fs::path filename) {
+string require::load_module_text(fs::path filename, boost::optional<object> opts) {
   root_string read_only("r");
 
   io::file &f = create<io::file>(
@@ -225,21 +232,90 @@ string require::load_module_text(fs::path filename) {
   // Look for a shebang line
   f.read_binary(2, blob);
 
+  binary::vector_type::iterator i, s;
+
   if (buf[0] == '#' && buf[1] == '!') {
-    // Shebang line - skip the line, but insert an empty one in there to keep
+    // Shebang line - skip the line, but insert a comment line here to keep
     // source line numbers right
     buf.clear();
-    buf.push_back('\n');
-    f.read_line(value("\n"));
+    buf.push_back('/');
+    buf.push_back('/');
   }
   f.read_whole_binary(blob);
 
-  // TODO: Some way of supporting other encodings is probably useful
-  return encodings::convert_to_string("UTF-8", blob);
+
+  // Look for coding and option lines. An coding line looks like one of
+  // "// -*- coding:utf-8 -*-"
+  // "// vim:fileencoding=utf-8:"
+  //
+  // An option line looks like
+  // "// flusspferd: -xboo"
+  //
+  // We continue looking until we see a blank comment or a non comment line
+
+  using namespace boost::xpressive;
+  sregex opt_re = sregex::compile("^\\s*([-\\w.]+):\\s*(.*)$");
+  sregex coding_re = sregex::compile("^.*coding[:=]\\s*([-\\w.]+)");
+  sregex empty_line_re = bos >> *_s >> eos;
+
+  // We only want to look for a coding comment on line 1 or 2
+  int look_for_coding = 2;
+  std::string encoding = "UTF-8";
+
+  for (i = buf.begin(); i != buf.end(); ++i) {
+    if (*(i++) != '/' || *(i++) != '/') {
+      // Not a comment line - stop!
+      break;
+    }
+    binary::vector_type::iterator e;
+    e = std::find(i, buf.end(), '\n');
+    if (e == buf.end())
+      break;
+
+    std::string line( reinterpret_cast<char const *>(&*i), size_t(e-i) );
+
+    // Move onto next line
+    i = e;
+
+    smatch m;
+    if (look_for_coding-- && regex_match(line, m, coding_re)) {
+      // Huzzah! We have an encoding!
+      encoding = m[1];
+      look_for_coding = 0;
+
+      continue;
+    }
+
+    // Empty comment line - stop looking
+    if (regex_match(line, empty_line_re))
+      break;
+
+    if (opts && regex_match(line, m, opt_re)) {
+      // A line we are interested in, and we have somewhere to store the result
+      opts->set_property(m[1].str(), m[2].str());
+    }
+  }
+
+  // If we have "flusspferd" or "warnings" in the option, split them on
+  // whitespace like shells do. TODO: Should we just split everything?
+  if (opts) {
+    value v = opts->get_property("flusspferd");
+    if (v.is_string()) {
+      opts->set_property( "flusspferd", split_args_string(v) );
+    }
+
+    v = opts->get_property("warnings");
+    if (v.is_string()) {
+      opts->set_property( "warnings", split_args_string(v) );
+    }
+  }
+
+  return encodings::convert_to_string(encoding, blob);
+
 }
 
 /// Load the given @c filename as a module
-void require::require_js(fs::path filename, std::string const &id, object exports) {
+void require::require_js(fs::path filename, std::string const &id, object cache) {
   class StrictModeScopeGuard {
       bool old_strict;
     public:
@@ -252,7 +328,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
   // Reset the strict mode when we leave (the REPL might have it off)
   StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
 
-  root_string module_text(load_module_text(filename));
+  root_string module_text(load_module_text(filename, cache.get_property_object("options")));
 
   std::vector<std::string> argnames;
   argnames.push_back("exports");
@@ -260,7 +336,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
   argnames.push_back("module");
 
   std::string fname = filename.string();
-  root_function fn(flusspferd::create<flusspferd::function>(
+  root_function fn(create<function>(
       _name = fname,
       _argument_names = argnames,
       _function = module_text,
@@ -270,7 +346,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
   root_object module;
 
   // Are we requring the main module?
-  if (main.get_property("id")== id) {
+  if (main.get_property("id") == id) {
     module = main;
   }
   else {
@@ -282,7 +358,7 @@ void require::require_js(fs::path filename, std::string const &id, object export
 
   root_object require(new_require_function(id));
 
-  fn.call(fn, exports, require, module);
+  fn.call(fn, cache.get_property("exports"), require, module);
 }
 
 /// What type of require id is @c id
@@ -333,12 +409,12 @@ class ExportsScopeGuard {
 
 
 
-object load_native_module(fs::path const &dso_name, object exports) {
+void load_native_module(fs::path const &dso_name, object exports) {
   std::string const &fullpath = dso_name.string();
 #ifdef WIN32
   HMODULE module = LoadLibrary(fullpath.c_str());
 
-  // TODO: Imrpove error message
+  // TODO: Improve error message
   if (!module)
     throw exception(("Unable to load library '" +fullpath+"'"));
 
@@ -375,8 +451,6 @@ object load_native_module(fs::path const &dso_name, object exports) {
 
   root_object context(global());
   func(exports, context);
-
-  return exports;
 }
 
 std::string require::current_id() {
@@ -387,7 +461,7 @@ std::string require::current_id() {
 // Loading of top-level IDs is more complex then relative or abs uris
 // We need to check alias and prelaod, and also search the require paths for
 // .js files and DSOs
-object require::load_top_level_module(std::string &id) {
+object require::load_top_level_module(std::string const &id) {
   root_array paths(this->paths);
 
   if (alias.has_own_property(id)) {
@@ -407,40 +481,26 @@ object require::load_top_level_module(std::string &id) {
 
   security &sec = security::get();
 
-  root_object classes_object(flusspferd::global());
-  root_object ctx(flusspferd::create<object>(classes_object));
-  ctx.set_parent(classes_object);
-
-  root_object exports(flusspferd::create<object>());
-  
-  flusspferd::create<function>(
-    "toString",
-    boost::phoenix::val("[module " + id + "]"),
-    flusspferd::param::_signature = flusspferd::param::type<std::string ()>(),
-    flusspferd::param::_container = exports);
-  flusspferd::create<function>(
-    "toSource",
-    boost::phoenix::val("(require('" + id + "'))"),
-    flusspferd::param::_signature = flusspferd::param::type<std::string ()>(),
-    flusspferd::param::_container = exports);
-
-  ctx.define_property(
-    "exports",
-    exports,
-    read_only_property | permanent_property);
-
   ExportsScopeGuard scope_guard(module_cache, id);
-  module_cache.set_property(id, exports);
+
+  // The object we store in module_cache
+  object cache = create_cache_entry(id);
 
   if (!preload.is_null()) {
     // Check for 'preloaded' module
     value loader = preload.get_property(id);
     if (loader.is_object() && !loader.is_null()) {
       object o = loader.get_object();
+
+      root_object classes_object(flusspferd::global());
+      root_object ctx(flusspferd::create<object>(classes_object));
+      ctx.set_parent(classes_object);
+      ctx.set_property("exports", cache.get_property("exports"));
+
       o.call(ctx);
       scope_guard.exit_cleanly();
 
-      return exports;
+      return cache;
     }
   }
 
@@ -456,7 +516,7 @@ object require::load_top_level_module(std::string &id) {
         fs::exists(native_path) )
     {
       found = true;
-      load_native_module(native_path, exports);
+      load_native_module(native_path, cache.get_property_object("exports"));
       break;
     }
   }
@@ -469,21 +529,21 @@ object require::load_top_level_module(std::string &id) {
     // Check if we loaded something by this name previously, even if the file
     // doesn't exist anymore
     if (module_cache.has_own_property(new_id)) {
-      exports = module_cache.get_property_object(new_id);
+      cache = module_cache.get_property_object(new_id);
     }
     else {
       // Cache it under the top-level and fully-qualified ids
       ExportsScopeGuard scope_guard2(module_cache, new_id);
-      module_cache.set_property(new_id, exports);
+      module_cache.set_property(new_id, cache);
 
-      require_js(js_name.get(), new_id, exports);
+      require_js(js_name.get(), new_id, cache);
       scope_guard2.exit_cleanly();
     }
   }
 
   scope_guard.exit_cleanly();
 
-  return exports;
+  return cache;
 }
 
 boost::optional<fs::path>
@@ -518,19 +578,53 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
   return boost::none;
 }
 
-object require::load_absolute_js_file(fs::path path, std::string &id) {
+object require::create_cache_entry(std::string const &id) {
+
+  // module_cache[id] = {};
+  object cache = create<object>(
+    _name = id,
+    _container = module_cache,
+    _attributes = no_property_flag
+  );
+
+  // module_cache[id].exports = ...
+  object exports = create<object>(
+    _name = "exports",
+    _container = cache,
+    _attributes = read_only_property | permanent_property
+  );
+
+  create_on(exports)
+    .create<function>(
+      "toString",
+      boost::phoenix::val("[module " + id + "]"),
+      _signature = param::type<std::string ()>() )
+    .create<function>(
+      "toSource",
+      boost::phoenix::val("(require('" + id + "'))"),
+      _signature = flusspferd::param::type<std::string ()>() );
+
+  // module_cache[id].options
+  create<array>(
+    _name = "options",
+    _container = cache
+  );
+
+  return cache;
+}
+
+object require::load_absolute_js_file(fs::path path, std::string const &id) {
   security &sec = security::get();
 
   ExportsScopeGuard scope_guard(module_cache, id);
   if (sec.check_path(path.string(), security::READ) &&
       fs::exists(path))
   {
-    root_object exports(flusspferd::create<object>());
+    object cache = create_cache_entry(id);
 
-    module_cache.set_property(id, exports);
-    require_js(path, id, exports);
+    require_js(path, id, cache);
     scope_guard.exit_cleanly();
-    return exports;
+    return cache;
   }
 
   std::stringstream ss;
@@ -594,3 +688,81 @@ static object module_resource(const fs::path &module_dir, std::string const &x_,
 
   return create<io::file>(fusion::make_vector(path.c_str(), mode));
 }
+
+// This function adapted to use js array by Ash
+//
+// Original from :
+//   http://svn.boost.org/svn/boost/trunk/libs/program_options/src/winmain.cpp
+// Copyright Vladimir Prus 2002-2004.
+// Distributed under the Boost Software License, Version 1.0.
+// (See accompanying file LICENSE_1_0.txt
+// or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+array split_args_string(const value& v)
+{
+  std::string const &input = v.to_std_string();
+
+  array result = create<array>();
+  root_object root(result);
+
+  std::string::const_iterator i = input.begin(), e = input.end();
+  for(;i != e; ++i) {
+    if (!isspace((unsigned char)*i))
+      break;
+  }
+
+  // Empty string.
+  if (i == e)
+    return result;
+
+  std::string current;
+  bool inside_quoted = false;
+  int backslash_count = 0;
+
+  for(; i != e; ++i) {
+    if (*i == '"') {
+      // '"' preceded by even number (n) of backslashes generates
+      // n/2 backslashes and is a quoted block delimiter
+      if (backslash_count % 2 == 0) {
+          current.append(backslash_count / 2, '\\');
+          inside_quoted = !inside_quoted;
+          // '"' preceded by odd number (n) of backslashes generates
+          // (n-1)/2 backslashes and is literal quote.
+      } else {
+          current.append(backslash_count / 2, '\\');
+          current += '"';
+      }
+      backslash_count = 0;
+    } else if (*i == '\\') {
+      ++backslash_count;
+    } else {
+      // Not quote or backslash. All accumulated backslashes should be
+      // added
+      if (backslash_count) {
+          current.append(backslash_count, '\\');
+          backslash_count = 0;
+      }
+      if (isspace((unsigned char)*i) && !inside_quoted) {
+          // Space outside quoted section terminate the current argument
+          result.push(current);
+          current.resize(0);
+          for(;i != e && isspace((unsigned char)*i); ++i)
+              ;
+          --i;
+      } else {
+          current += *i;
+      }
+    }
+  }
+
+  // If we have trailing backslashes, add them
+  if (backslash_count)
+    current.append(backslash_count, '\\');
+
+  // If we have non-empty 'current' or we're still in quoted
+  // section (even if 'current' is empty), add the last token.
+  if (!current.empty() || inside_quoted)
+    result.push(current);
+  return result;
+}
+
