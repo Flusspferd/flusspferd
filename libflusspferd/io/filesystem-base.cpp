@@ -445,7 +445,7 @@ array fs_base::list(std::string const &dir) {
   fs::basic_directory_iterator<fs::path> it(dir);
 
   for (;  it != fs::directory_iterator(); ++it) {
-    ret.push(it->path().string());
+    ret.push(it->path().filename());
   }
 
   return ret;

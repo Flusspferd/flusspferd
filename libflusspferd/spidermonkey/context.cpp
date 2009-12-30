@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/object.hpp"
 #include "flusspferd/spidermonkey/runtime.hpp"
 #include "flusspferd/current_context_scope.hpp"
+#include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
 #include <cstring>
 #include <cstdio>
@@ -127,10 +128,41 @@ public:
   }
 
   static void spidermonkey_error_reporter(JSContext *cx, char const *message, JSErrorReport *report) {
-
     if (!report || JSREPORT_IS_EXCEPTION(report->flags)) {
       return;
     }
+
+    bool should_warn = true;
+
+    // Check for erro options on the file. Stored in the
+    // `require.module_cache[id].options.warnings` field
+    if (report->filename) {
+
+      // Keys to iterator over, any of them dont eixst and we abort and fall
+      // back to warning.
+      std::string keys[] = {
+        "require", "module_cache", std::string("file://") + report->filename,
+        "options", "warnings"
+      };
+
+      value v = Impl::wrap_context(cx).global();
+      BOOST_FOREACH(std::string key, keys) {
+        object o;
+        if (v.is_undefined_or_null() || !v.is_object() ||
+            (o = v.get_object(), !o.has_property(key)))
+        {
+          v = value();
+          break;
+        }
+        v = o.get_property(key);
+      }
+      if (!v.is_undefined_or_null() && v.to_std_string() == "no")
+        should_warn = false;
+    }
+
+    // TODO: We should always warn for "assiging to X without var"
+    if (!should_warn)
+      return;
 
     std::cerr << (JSREPORT_IS_STRICT(report->flags) ? "Strict warning: " : "Warning: ")
               << message;
