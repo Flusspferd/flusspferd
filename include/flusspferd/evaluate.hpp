@@ -51,6 +51,17 @@ class value;
  */
 value evaluate(char const *source, std::size_t n,
                char const *file = 0x0, unsigned int line = 0);
+/**
+ * Evaluate Javascript code.
+ *
+ * Uses the global object as scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ */
+value evaluate(string const &source,
+               char const *file = 0x0, unsigned int line = 0);
 
 /**
  * Evaluate Javascript code in a scope.
@@ -95,6 +106,19 @@ value evaluate_in_scope(char const *source,
                         char const* file, unsigned int line,
                         object const &scope);
 
+/**
+ * Evaluate Javascript code in a scope.
+ *
+ * @param source The source code.
+ * @param file The file name to use.
+ * @param line The initial line number.
+ * @param scope The scope
+ *
+ * @warning evalaute_in_scope might deactivate jitting.
+ */
+value evaluate_in_scope(string const &source,
+                        char const* file, unsigned int line,
+                        object const &scope);
 /**
  * Evaluate Javascript code.
  *
