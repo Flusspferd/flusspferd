@@ -46,11 +46,11 @@ function(flusspferd_plugin PLUGIN)
   #  Creates variabvles PLUGIN_SOURCE etc.
   PARSE_ARGUMENTS("PLUGIN" "SOURCES;JS;LIBRARIES;DEFINITIONS" "" ${ARGN})
 
-  MESSAGE("*** Arguments for ${PLUGIN}")
+  #MESSAGE("*** Arguments for ${PLUGIN}")
   #MESSAGE("Sources: ${PLUGIN_SOURCES}")
   #MESSAGE("JS files: ${PLUGIN_JS}")
   #MESSAGE("Defintions: ${PLUGIN_DEFINITIONS}")
-  MESSAGE("Link libraries: ${PLUGIN_LIBRARIES}")
+  #MESSAGE("Link libraries: ${PLUGIN_LIBRARIES}")
 
   if("${PLUGIN_SOURCES}" STREQUAL "")
     message(FATAL_ERROR "flusspferd_plugin called for ${PLUGIN} with no SOURCES argument")
