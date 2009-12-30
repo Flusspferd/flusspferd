@@ -63,6 +63,10 @@ status=$(($status + $?))
 ./util/jsrepl.sh ./test/js/modules.t.js
 status=$(($status + $?))
 
+# This one needs to be run as the main process to work
+./util/jsrepl.sh ./test/js/optline-handling.t.js
+status=$(($status + $?))
+
 #echo "PROGRESS: Analyzing test coverage" 1>&2
 #
 #./util/lcov.sh

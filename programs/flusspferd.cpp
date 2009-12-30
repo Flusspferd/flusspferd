@@ -79,17 +79,19 @@ class flusspferd_repl {
 
   enum Type { File, Expression, IncludePath, Module, MainModule };
 
-  std::list<std::pair<std::string, Type> > files;
+  typedef std::list<std::pair<std::string, Type> > RunableCommandLine;
+  RunableCommandLine runnables;
 
   flusspferd::object option_spec(bool for_main_repl = true);
 
-  // Returns list of files / expressions to execute
+  // Populates runnables variable with list of files / expressions to execute
   void parse_cmdline();
+
   void print_help(bool do_quit = false);
   void print_version();
   void print_man();
   void print_bash();
-  void add_file(std::string const &path, Type type, bool del_interactive);
+  void add_runnable(std::string const &path, Type type, bool del_interactive);
   void load_config();
 
   // Handle options from "// flusspferd: opts" lines
@@ -164,6 +166,7 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
 int flusspferd_repl::run() {
   try {
+    parse_cmdline();
     run_cmdline();
   } catch (flusspferd::js_quit&) {
     if (!interactive)
@@ -181,12 +184,11 @@ int flusspferd_repl::run() {
 }
 
 void flusspferd_repl::run_cmdline() {
-  parse_cmdline();
 
   if (!config_loaded)
     load_config();
 
-  flusspferd::object require_obj = flusspferd::global() .get_property_object("require");
+  flusspferd::object require_obj = flusspferd::global().get_property_object("require");
 
   flusspferd::require &require = flusspferd::get_native<flusspferd::require>(require_obj);
 
@@ -195,10 +197,11 @@ void flusspferd_repl::run_cmdline() {
   bool first = true;
 
   typedef std::list<std::pair<std::string, Type> >::const_iterator iter;
-  for (iter i = files.begin(), e = files.end(); i != e; ++i) {
+  for (iter i = runnables.begin(), e = runnables.end(); i != e; ++i) {
     switch (i->second) {
     case File:
     {
+      std::cout << "File" << i->first << "\n";
       if (first) {
         first = false;
         std::string id = "file://" + flusspferd::io::fs_base::canonicalize(i->first).string();
@@ -214,9 +217,11 @@ void flusspferd_repl::run_cmdline() {
       flusspferd::evaluate(i->first, "[command line]", 0);
       break;
     case IncludePath:
+      std::cout << "IncludePath " << i->first << "\n";
       require_obj.get_property_object("paths").call("unshift", i->first);
       break;
     case Module:
+      std::cout << "Module" << i->first << "\n";
       require_obj.call(flusspferd::global(), i->first);
       break;
     case MainModule:
@@ -321,12 +326,12 @@ void flusspferd_repl::print_version() {
   throw flusspferd::js_quit();
 }
 
-void flusspferd_repl::add_file(
+void flusspferd_repl::add_runnable(
     std::string const &file, Type type, bool del_interactive)
 {
   if (del_interactive && !interactive_set)
     interactive = false;
-  files.push_back(std::make_pair(file, type));
+  runnables.push_back(std::make_pair(file, type));
 }
 
 void flusspferd_repl::load_config() {
@@ -423,7 +428,7 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
     file.set_property("argument_type", "file");
     flusspferd::create<flusspferd::function>(
       "callback",
-      phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, File, true),
+      phoenix::bind(&flusspferd_repl::add_runnable, this, args::arg2, File, true),
       flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
       flusspferd::param::_container = file);
 
@@ -435,7 +440,7 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
     expression.set_property("argument_type", "expr");
     flusspferd::create<flusspferd::function>(
       "callback",
-      phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, Expression, true),
+      phoenix::bind(&flusspferd_repl::add_runnable, this, args::arg2, Expression, true),
       flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
       flusspferd::param::_container = expression);
   }
@@ -448,7 +453,7 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
   include_path.set_property("argument_type", "path");
   flusspferd::create<flusspferd::function>(
     "callback",
-    phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, IncludePath, false),
+    phoenix::bind(&flusspferd_repl::add_runnable, this, args::arg2, IncludePath, false),
     flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
     flusspferd::param::_container = include_path);
 
@@ -460,7 +465,7 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
   module.set_property("argument_type", "module");
   flusspferd::create<flusspferd::function>(
     "callback",
-    phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, Module, false),
+    phoenix::bind(&flusspferd_repl::add_runnable, this, args::arg2, Module, false),
     flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
     flusspferd::param::_container = module);
 
@@ -473,7 +478,7 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
     main_module.set_property("argument_type", "module");
     flusspferd::create<flusspferd::function>(
       "callback",
-      phoenix::bind(&flusspferd_repl::add_file, this, args::arg2, MainModule, true),
+      phoenix::bind(&flusspferd_repl::add_runnable, this, args::arg2, MainModule, true),
       flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
       flusspferd::param::_container = main_module);
   }
@@ -550,7 +555,7 @@ void flusspferd_repl::parse_cmdline() {
     file = arguments.call("shift").to_std_string();
     // TODO: Maybe check if stdin is actualy connected to a terminal?
     if (file != "-") {
-      files.push_back(std::make_pair(file, File));
+      runnables.push_back(std::make_pair(file, File));
       if (!interactive_set)
         interactive = false;
     } else {
@@ -573,11 +578,22 @@ void flusspferd_repl::handle_file_options(const flusspferd::root_object &opts) {
   if (v.is_undefined_or_null())
     return;
 
+  // We need to process these now so that include path changes happen before
+  // the file itself gets processed
+
+  // Store the old state
+  RunableCommandLine old;
+  old.swap(runnables);
+
   flusspferd::root_object spec(option_spec(false));
   flusspferd::array args(v.to_object());
 
   // Dont care about result - its all handled inline via phoenix callbacks
   flusspferd::getopt(spec, args);
+
+  // Process these options then restore old list
+  run_cmdline();
+  runnables.swap(old);
 }
 
 namespace {
