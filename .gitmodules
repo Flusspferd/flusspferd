@@ -4,3 +4,6 @@
 [submodule "vendor/pdoc-template"]
 	path = vendor/pdoc-template
 	url = git://github.com/ashb/flusspferd-pdoc-template.git
+[submodule "vendor/arabica"]
+	path = vendor/arabica
+	url = git@github.com:ashb/Arabica.git

@@ -10,7 +10,8 @@ if(PLUGIN_XML)
       remove_definitions(-Woverloaded-virtual -Wnon-virtual-dtor)
     endif()
 
-    include_directories( ${ARABICA_INCLUDEDIR})
+    # Use the inlcudes from vendor to, We've made some header only changes
+    include_directories( ${CMAKE_SOURCE_DIR}/vendor/arabica/include ${ARABICA_INCLUDEDIR})
     flusspferd_plugin(
       "xml"
       SOURCES attr.cpp
