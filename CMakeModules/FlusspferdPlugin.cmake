@@ -28,7 +28,6 @@ if (APPLE)
   # Enable -flat_namespace so that symbols are resolved transitatively
   SET(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
       "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -Wl,-x -flat_namespace")
-  MESSAGE("module create: ${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS}")
 endif()
 
 # Helper function to make/compile a flusspferd plugin.
