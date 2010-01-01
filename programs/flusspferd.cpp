@@ -201,7 +201,6 @@ void flusspferd_repl::run_cmdline() {
     switch (i->second) {
     case File:
     {
-      std::cout << "File" << i->first << "\n";
       if (first) {
         first = false;
         std::string id = "file://" + flusspferd::io::fs_base::canonicalize(i->first).string();
@@ -217,11 +216,9 @@ void flusspferd_repl::run_cmdline() {
       flusspferd::evaluate(i->first, "[command line]", 0);
       break;
     case IncludePath:
-      std::cout << "IncludePath " << i->first << "\n";
       require_obj.get_property_object("paths").call("unshift", i->first);
       break;
     case Module:
-      std::cout << "Module" << i->first << "\n";
       require_obj.call(flusspferd::global(), i->first);
       break;
     case MainModule:
