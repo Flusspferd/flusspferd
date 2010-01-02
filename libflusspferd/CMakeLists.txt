@@ -228,7 +228,7 @@ set_source_files_properties(${HEADERFILES}
   HEADER_FILE_ONLY TRUE)
 
 install(
-    DIRECTORY include/
+    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
     DESTINATION ${INSTALL_HEADERS_PATH}
     FILES_MATCHING PATTERN "*.hpp")
 
