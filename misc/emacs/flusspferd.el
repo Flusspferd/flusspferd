@@ -59,17 +59,17 @@
   :type '(string))
 
 (defun flusspferd-is-running-p ()
-  "Checks if Flusspferd is already running"
+  "Check if Flusspferd is already running."
   (comint-check-proc flusspferd-buffer-name))
 
 (defun flusspferd-switch-to ()
-  "Switch to Flusspferd buffer"
+  "Switch to Flusspferd buffer."
   (interactive)
   (switch-to-buffer flusspferd-buffer-name))
 
 (defmacro flusspferd-defun-and-go (name arglist docstring &rest body)
-  "defun a function with name NAME and NAME-and-go which calls
- (switch-to-buffer flusspferd-buffer-name) when finished."
+  "Create two function with name NAME and NAME-and-go.
+The NAME-and-go version calls (switch-to-buffer flusspferd-buffer-name) when done."
   (let ((name-and-go (intern (concat (symbol-name name) "-and-go")))
         (new-docstring
          (concat docstring " Switches to Flusspferd buffer when finished.")))
@@ -87,7 +87,7 @@
   (comint-send-string flusspferd-buffer-name "\n"))
 
 (flusspferd-defun-and-go flusspferd-eval-last-defun ()
-  "Evaluate the function definition as determined by c-mark-function."
+  "Evaluate the function definition as determined by c-mark-function/js2-mark-defun."
   (interactive)
   (save-excursion
     (if (functionp 'js2-mark-defun)
@@ -122,7 +122,7 @@
     map))
 
 (defun flusspferd-helper-mark-active ()
-  "Checks if there is an active region"
+  "Check if there is an active region."
   (if (functionp 'use-region-p)
       (use-region-p)
       (and transient-mark-mode mark-active)))
@@ -135,7 +135,7 @@
      :active (flusspferd-helper-mark-active)]
     ["Evaluate Buffer" flusspferd-eval-buffer t]
     ["Evaluate Line" flusspferd-eval-line t :active (not (and (eolp) (bolp)))]
-;    ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
+    ["Evaluate Last Function Definition" flusspferd-eval-last-defun t]
     "--"
     ["Go to Flusspferd buffer" flusspferd-switch-to
      :visible (flusspferd-is-running-p)
@@ -154,13 +154,13 @@
 (define-derived-mode inferior-flusspferd-mode comint-mode "Inferior Flusspferd"
                      "Embeds Flusspferd as a Javascript REPL into Emacs."
                      :group 'flusspferd
-                     (setq comint-prompt-regexp "^> ")
+                     (setq comint-prompt-regexp "^[>\\?] ")
                      (setq comint-use-prompt-regexp t)
                      (setq comint-process-echoes t))
 
 ;;;###autoload
 (defun flusspferd ()
-  "Flusspferd (Javascript interpreter) REPL"
+  "Flusspferd (Javascript interpreter) REPL."
   (interactive)
   (unless (flusspferd-is-running-p)
     (let ((flusspferd-buffer
@@ -175,3 +175,4 @@
       (switch-to-buffer flusspferd-buffer-name)))
 
 (provide 'flusspferd)
+;;; flusspferd.el ends here
