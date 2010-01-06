@@ -65,7 +65,9 @@ $ sudo apt-get install git-core   # optional
  * writing Spidermonkey 1.8.1 was not released. You either have
  * to build Spidermonkey tip (from the HG repository mozilla-central) or
  * you can fetch an inofficial snapshot from
- * http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2 .
+ * http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2 . See
+ * http://redmine.flusspferd.org/wiki/flusspferd/Spidermonkey
+ * for more information on the subject.
  *
  * <a href="https://developer.mozilla.org/en/SpiderMonkey/Build_Documentation">
  * There is a detailed build documentation over at the Mozilla Developer
