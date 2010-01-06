@@ -76,7 +76,7 @@
     `(progn
        (defun ,name ,arglist ,docstring ,@body)
        (defun ,name-and-go ,arglist ,new-docstring
-              ,@body (list flusspferd-switch-to)))))
+              ,@body (list 'flusspferd-switch-to)))))
 
 (flusspferd-defun-and-go flusspferd-eval-region (start end)
   "Evaluates the region between START and END with flusspferd."
@@ -90,7 +90,9 @@
   "Evaluate the function definition as determined by c-mark-function."
   (interactive)
   (save-excursion
-    (c-mark-function)
+    (if (functionp 'js2-mark-defun)
+        (js2-mark-defun)
+        (c-mark-function))
     (flusspferd-eval-region (point) (mark))))
 
 (flusspferd-defun-and-go flusspferd-eval-last-sexp ()
