@@ -13,8 +13,7 @@ Major features:
 - Improved GMP module to be more JavaScript like.
 - Removed support for older spidermonkeys. We now require a recent version of
   spidermonkey. We define recent as no older than the version from Firefox 3.5!
-  See http://flusspferd.org/vendor/spidermonkey-hg.tar.bz2 for a supported
-  version.
+  See http://redmine.flusspferd.org/wiki/flusspferd/Spidermonkey
 - Boost 1.40 or newer required.
 - Fixed a lot of bugs and many minor improvements. See ChangeLog.txt for more
   details.
