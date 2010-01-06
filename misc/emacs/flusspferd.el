@@ -151,12 +151,31 @@ The NAME-and-go version calls (switch-to-buffer flusspferd-buffer-name) when don
   :keymap flusspferd-minor-mode-map
   (easy-menu-add flusspferd-minor-mode-menu))
 
+(defvar inferior-flusspferd-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-a" 'comint-bol)
+    map))
+
+(defun inferior-flusspferd-mode-quit (&optional arg)
+  "Quit inferior flusspferd mode."
+  (interactive "P")
+  (when (and (or arg (y-or-n-p "Really quit Flusspferd? "))
+             (flusspferd-is-running-p))
+    (delete-process flusspferd-buffer-name)
+    (kill-buffer flusspferd-buffer-name)))
+
+(easy-menu-define inferior-flusspferd-mode-menu inferior-flusspferd-mode-map
+  "Inferior Flusspferd Mode menu."
+  '("Inferior Flusspferd"
+    ["Quit Flusspferd" inferior-flusspferd-mode-quit t]))
+
 (define-derived-mode inferior-flusspferd-mode comint-mode "Inferior Flusspferd"
                      "Embeds Flusspferd as a Javascript REPL into Emacs."
                      :group 'flusspferd
                      (setq comint-prompt-regexp "^[>\\?] ")
                      (setq comint-use-prompt-regexp t)
-                     (setq comint-process-echoes t))
+                     (setq comint-process-echoes t)
+                     (easy-menu-add inferior-flusspferd-mode-menu))
 
 ;;;###autoload
 (defun flusspferd ()
@@ -169,7 +188,6 @@ The NAME-and-go version calls (switch-to-buffer flusspferd-buffer-name) when don
                   (split-string flusspferd-options))))
       (save-excursion
         (set-buffer flusspferd-buffer)
-		(local-set-key "\C-a" 'comint-bol)
         (inferior-flusspferd-mode))))
   (when (interactive-p)
       (switch-to-buffer flusspferd-buffer-name)))
