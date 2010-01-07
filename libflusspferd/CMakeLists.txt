@@ -106,6 +106,7 @@ set(
     ../include/flusspferd/spidermonkey/value.hpp
     ../include/flusspferd/string.hpp
     ../include/flusspferd/string_io.hpp
+    ../include/flusspferd/subprocess.hpp
     ../include/flusspferd/system.hpp
     ../include/flusspferd/tracer.hpp
     ../include/flusspferd/value.hpp
@@ -123,6 +124,7 @@ set(
     properties_functions.cpp
     property_attributes.cpp
     security.cpp
+    subprocess.cpp
     system.cpp
     io/binary_stream.cpp
     io/file.cpp
