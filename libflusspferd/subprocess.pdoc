@@ -1,9 +1,12 @@
 // -*- mode:js2; -*-
-/** section: Core
+
+/** section: Flusspferd Core
  * subprocess
  * 
  * Module to start and handle subprocesses. (popen)
- */
+ * 
+ * This module is very similar to [Python's subprocess module](http://docs.python.org/library/subprocess.html). Currently only a implementation for UNIX-like systems is available.
+ **/
 
 /**
  * subprocess.SIGKILL -> Integer
@@ -11,7 +14,7 @@
  * Signal number to kill a process.
  * 
  * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#kill]].
- */
+ **/
 
 /**
  * subprocess.SIGTERM -> Integer
@@ -19,25 +22,25 @@
  * Signal number to terminate a process.
  * 
  * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]].
- */
+ **/
 
 /**
  * subprocess.popen(command[, option]) -> subprocess.subprocess
  * subprocess.popen(args[, option]) -> subprocess.subprocess
  * subprocess.popen(obj) -> subprocess.subprocess
- * - command (String): a command passed to `sh -c` (similar to popen(3)).
- * - option (String): "w" or "r" (similar to popen(3)).
- * - args (Array): an array containing a command as first param (argv[0]) and arguments passed to the command. This directly uses execve and doesn't pass the command to a shell first.
+ * - command (String): a command passed to `sh -c` (similar to [popen(3)](http://www.kernel.org/doc/man-pages/online/pages/man3/popen.3.html)).
+ * - option (String): "w" or "r" (similar to popen(3)). If no option is passed pipes for stdin, stdout and stderr are opened.
+ * - args (Array): an array containing a command as first param (`argv[0]`) and arguments passed to the command. This uses execve directly and doesn't pass the command to a shell first.
  * - obj (Object): an object containing ...
  * 
  * Create a new subprocess.
- */
+ **/
 
 /**
  * class subprocess.subprocess
  * 
- * Provides an interface to a subprocess.
- */
+ * Provides an interface to a subprocess. Use [[subprocess.popen]] for construction.
+ **/
 
 /**
  * subprocess.subprocess#poll() -> null|Integer
@@ -46,7 +49,7 @@
  * else the returncode as an Integer.
  * 
  * See [[subprocess.subprocess#returncode]] and [[subprocess.subprocess#wait]].
- */
+ **/
 
 /**
  * subprocess.subprocess#wait() -> Integer
@@ -54,7 +57,7 @@
  * Waits until the subprocess is finished and returns the returncode as an Integer.
  * 
  * See [[subprocess.subprocess#returncode]] and [[subprocess.subprocess#poll]].
- */
+ **/
 
 /**
  * subprocess.subprocess#communicate([input]) -> Object
@@ -64,7 +67,7 @@
  * opened. Returns an object containing the output of stdout and stderr and the returncode.
  * 
  * This is a safe and fast way to handle the communication.
- */
+ **/
 
 /**
  * subprocess.subprocess#sendSignal(signal) -> undefined
@@ -72,41 +75,51 @@
  * 
  * Sends a signal to the subprocess. At least [[subprocess.SIGTERM]] and [[subprocess.SIGKILL]]
  * are supported.
- */
+ **/
 
 /**
  * subprocess.subprocess#terminate() -> undefined
  * 
- * Terminate subprocess (similar to sendSignal(SIGTERM))
+ * Terminate subprocess (similar to `sendSignal(SIGTERM)`).
  * 
  * See [[subprocess.subprocess#sendSignal]], [[subprocess.subprocess#kill]] and [[subprocess.SIGTERM]]
- */
+ **/
 
 /**
  * subprocess.subprocess#kill() -> undefined
  * 
- * Kill subprocess (similar to `sendSignal(SIGKILL)`)
+ * Kill subprocess (similar to `sendSignal(SIGKILL)`).
  * 
  * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]] and [[subprocess.SIGKILL]]
- */
+ **/
 
 /**
  * subprocess.subprocess#pid -> Integer
  * 
  * Process ID
- */
+ **/
 
 /**
  * subprocess.subprocess#returncode -> Integer
  * 
  * The return code if the subprocess has finished. If the subprocess was terminated by a signal
- * returncode is -SIG.
- */
+ * returncode is `-signalcode`.
+ **/
 
 /**
- * subprocess.subprocess#stdin -> IO.Stream
- * subprocess.subprocess#stdout -> IO.Stream
- * subprocess.subprocess#stderr -> IO.Stream
+ * subprocess.subprocess#stdin -> io.Stream
  * 
- * Stream interface to stdin, stdout and stderr or `null` if no appropriate pipe was created.
- */
+ * Writeable [[io.Stream]] interface to stdin or `null` if no stdin pipe was created.
+ **/
+
+/**
+ * subprocess.subprocess#stdout -> io.Stream
+ * 
+ * Readable [[io.Stream]] interface to stdout or `null` if no stdout pipe was created.
+ **/
+
+/**
+ * subprocess.subprocess#stderr -> io.Stream
+ * 
+ * Readable [[io.Stream]] interface to stderr or `null` if no stderr pipe was created.
+ **/
