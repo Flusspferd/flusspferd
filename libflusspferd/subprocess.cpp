@@ -34,13 +34,16 @@ void flusspferd::load_subprocess_module(object &ctx) {
 
 #else // POSIX/UNIX
 
-//#include "flusspferd/io/stream.hpp"
+#include "flusspferd/io/stream.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/function.hpp"
 #include "flusspferd/class_description.hpp"
 #include "flusspferd/property_iterator.hpp"
+
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -65,6 +68,8 @@ void flusspferd::load_subprocess_module(object &ctx) {
 #include "flusspferd/value_io.hpp" // DEBUG
 #include <iostream> // DEBUG
 
+namespace bio = boost::iostreams;
+namespace bf = boost::fusion;
 using namespace flusspferd;
 
 namespace {
@@ -254,6 +259,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   int stdoutfd;
   int stderrfd;
 
+  bio::stream_buffer<bio::file_descriptor> stdinstream;
+  bio::stream_buffer<bio::file_descriptor_source> stdoutstream;
+  bio::stream_buffer<bio::file_descriptor_source> stderrstream;
+
   void close_stdin() {
     if(stdinfd != -1) {
       stdinstream.close();
@@ -438,7 +447,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       return value(object());
     }
   }
-  object get_stdin()  { return object(); } // TODO
+  object get_stdin()  {
+    if(stdinfd == -1) {
+      return object();
+    }
+    else {
+      stdinstream.open(bio::file_descriptor(stdinfd));
+      return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdinstream));
+    }
+  }
   object get_stderr() { return object(); } // TODO
   object get_stdout() { return object(); } // TODO
 
