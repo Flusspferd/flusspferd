@@ -34,8 +34,11 @@ void flusspferd::load_subprocess_module(object &ctx) {
 
 #else // POSIX/UNIX
 
-#include "flusspferd/io/stream.hpp"
+//#include "flusspferd/io/stream.hpp"
+#include "flusspferd/array.hpp"
+#include "flusspferd/create.hpp"
 #include "flusspferd/create/function.hpp"
+#include "flusspferd/class_description.hpp"
 #include "flusspferd/property_iterator.hpp"
 
 #include <sys/types.h>
@@ -79,10 +82,14 @@ FLUSSPFERD_CLASS_DESCRIPTION(
    ("stdout", getter, get_stdout)))
 {
   pid_t pid;
+  bool finished;
   int returncode;
 
   value wait_impl(bool poll = false) {
-    if(pid != 0) {
+    if(finished) {
+      return value(returncode);
+    }
+    else if(pid != 0) {
       int status;
       pid_t const ret = waitpid(pid, &status, poll ? WNOHANG : 0);
       int const errno_ = errno;
@@ -95,12 +102,12 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       else {
         if(WIFSIGNALED(status)) {
           returncode = -WTERMSIG(status);
-          pid = 0;
+          finished = true;
           return value(returncode);
         }
         else if(WIFEXITED(status)) {
           returncode = WEXITSTATUS(status);
-          pid = 0;
+          finished = true;
           return value(returncode);
         }
       }
@@ -108,6 +115,10 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     return value(object());
   }
  public:
+  subprocess(object const &self, pid_t pid)
+    : base_type(self), pid(pid), finished(false)
+  { }
+
   value poll() {
     return wait_impl(true);
   }
@@ -134,16 +145,20 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   }
   int get_pid() { return static_cast<int>(pid); }
   value get_returncode() {
-    if(pid != 0) {
+    if(finished) {
       return value(returncode);
     }
     else {
       return value(object());
     }
   }
-  /*io::stream*/object get_stdin() { return object(); }
+  object get_stdin()  { return object(); }
   object get_stderr() { return object(); }
   object get_stdout() { return object(); }
+
+  static subprocess &create(pid_t p) {
+    return flusspferd::create<subprocess>(boost::fusion::vector1<pid_t>(p));
+  }
 };
 
 namespace {
@@ -154,15 +169,18 @@ namespace {
     }
   }
 
-  subprocess do_popen(char const *cmd,
-                      std::vector<char const*> const &args,
-                      std::vector<char const*> const &env,
-                      bool stdin_, bool stdout_, bool stderr_,
-                      char const *cwd = 0x0)
+  subprocess &do_popen(char const *cmd,
+                       std::vector<char const*> const &args,
+                       std::vector<char const*> const &env,
+                       bool stdin_, bool stdout_, bool stderr_,
+                       char const *cwd = 0x0)
   {
-    assert(cmd);
     assert(!args.empty() && args.back() == 0x0);
     assert(env.empty() || env.back() == 0x0);
+    if(!cmd) {
+      cmd = args[0];
+    }
+
     int stdinp[2];
     if(stdin_) {
       do_pipe(stdinp);
@@ -176,10 +194,10 @@ namespace {
       do_pipe(stderrp);
     }
 
-    pid_t pid = vfork();
+    pid_t pid = fork(); // could use vfork!
     if(pid == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("vfork: ") + std::strerror(errno_));
+      throw flusspferd::exception(std::string("fork: ") + std::strerror(errno_));
     }
     else if(pid == 0) {
       if(stdin_) {
@@ -208,15 +226,15 @@ namespace {
         }
       }
       if(cwd) {
-        //chdir(cwd); // TODO check if this is allowed in vfork!
+        chdir(cwd);
       }
-      execve(cmd, const_cast<char *const*>(&args[0]),
-             env.empty() ? environ : const_cast<char *const*>(&env[0]));
-      // TODO This shouldn't use environ but system.env instead! (BUG)
+      // TODO environ stuff!
+      execvp(cmd, const_cast<char *const*>(&args[0]));
       _exit(127);
     }
 
     // ...
+    return subprocess::create(pid);
   }
 }
 
@@ -255,6 +273,7 @@ void Popen(flusspferd::call_context &x) {
       args.push_back("sh");
       args.push_back("-c");
       args.push_back(x.arg[0].get_string().c_str());
+      args.push_back(0x0);
 
       std::vector<char const*> env;
 
@@ -266,12 +285,36 @@ void Popen(flusspferd::call_context &x) {
         throw flusspferd::exception("popen: second parameter should be \"r\" or \"w\"");
       }
 
-      x.result = do_popen("sh", args, env, in, !in, false);
+      x.result = do_popen("/bin/sh", args, env, in, !in, false);
       return;
     }
     else if(x.arg[0].is_object() && x.arg[0].get_object().is_array() && x.arg[1].is_string()) {
+      array a(x.arg[0].get_object());
+      std::vector<char const*> args;
+      array::iterator const end = a.end();
+      for(array::iterator i = a.begin(); i != end; ++i) {
+        if(!i->is_string()) {
+          throw flusspferd::exception("popen first arg: array elements must be strings",
+                                      "TypeError");
+        }
+        args.push_back(i->get_string().c_str());
+      }
+      args.push_back(0x0);
+
+      std::vector<char const*> env;
+
+      bool in = false;
+      if(x.arg[1].get_string() == "w") {
+        in = true;
+      }
+      else if(!(x.arg[1].get_string() == "r")) {
+        throw flusspferd::exception("popen: second parameter should be \"r\" or \"w\"");
+      }
+      x.result = do_popen(0x0, args, env, in, !in, false);
+      return;
     }
     else {
+      throw flusspferd::exception("popen: got wrong parameter type. Expected string,string or array,string", "TypeError");
     }
   }
   else {

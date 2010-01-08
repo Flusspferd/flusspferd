@@ -1,0 +1,86 @@
+
+/** section: Core
+ * subprocess
+ * 
+ * Module to start and handle subprocesses. (popen)
+ */
+
+/**
+ * subprocess.popen(command[, option]) -> subprocess.subprocess
+ * subprocess.popen(args[, option]) -> subprocess.subprocess
+ * subprocess.popen(obj) -> subprocess.subprocess
+ * - command (String): a command passed to `sh -c` (similar to popen(3)).
+ * - option (String): "w" or "r" (similar to popen(3)).
+ * - args (Array): an array containing a command as first param (argv[0]) and arguments passed to the command. This directly uses execve and doesn't pass the command to a shell first.
+ * - obj (Object): an object containing ...
+ * 
+ * Create a new subprocess.
+ */
+
+/**
+ * class subprocess.subprocess
+ * 
+ * Provides an interface to a subprocess.
+ */
+
+/**
+ * subprocess.subprocess#poll() -> null|Integer
+ * 
+ * Checks if the subprocess is still running. Returns null if the subprocess is still running or
+ * else the returncode as an Integer.
+ * 
+ * See [[subprocess.subprocess#returncode]] and [[subprocess.subprocess#wait]].
+ */
+
+/**
+ * subprocess.subprocess#wait() -> Integer
+ * 
+ * Waits until the subprocess is finished and returns the returncode as an Integer.
+ * 
+ * See [[subprocess.subprocess#returncode]] and [[subprocess.subprocess#poll]].
+ */
+
+/**
+ * subprocess.subprocess#communicate([input]) -> Object
+ * 
+ */
+
+/**
+ * subprocess.subprocess#sendSignal(signal) -> undefined
+ * - signal (Integer): sends a signal to the subprocess
+ */
+
+/**
+ * subprocess.subprocess#terminate() -> undefined
+ * 
+ * Terminate subprocess (similar to sendSignal(SIGTERM))
+ * 
+ * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#kill]]
+ */
+
+/**
+ * subprocess.subprocess#kill() -> undefined
+ * 
+ * Kill subprocess (similar to sendSignal(SIGKILL))
+ * 
+ * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]]
+ */
+
+/**
+ * subprocess.subprocess#pid -> Integer
+ * 
+ * Process ID
+ */
+
+/**
+ * subprocess.subprocess#returncode -> Integer
+ * 
+ * The return code if the subprocess has finished. If the subprocess was terminated by a signal
+ * returncode is -SIG.
+ */
+
+/**
+ * subprocess.subprocess#stdin -> Object
+ * subprocess.subprocess#stdout -> Object
+ * subprocess.subprocess#stderr -> Object
+ */
