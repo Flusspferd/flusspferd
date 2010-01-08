@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "flusspferd/binary.hpp"
 #include "flusspferd/encodings.hpp"
 #include "flusspferd/system.hpp"
+#include "flusspferd/subprocess.hpp"
 #include "flusspferd/getopt.hpp"
 #include "flusspferd/io/io.hpp"
 #include "flusspferd/io/filesystem-base.hpp"
@@ -86,6 +87,11 @@ void flusspferd::load_core(object const &scope_, std::string const &argv0) {
   flusspferd::create<method>(
     "system",
     &flusspferd::load_system_module,
+    _container = preload);
+
+  flusspferd::create<method>(
+    "subprocess",
+    &flusspferd::load_subprocess_module,
     _container = preload);
 
   flusspferd::create<method>(

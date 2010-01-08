@@ -36,13 +36,26 @@ void flusspferd::load_subprocess_module(object &ctx) {
 
 #include "flusspferd/io/stream.hpp"
 #include "flusspferd/create/function.hpp"
+#include "flusspferd/property_iterator.hpp"
 
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
+
+#include <vector>
 #include <cstdio>
+
+#include "flusspferd/value_io.hpp" // DEBUG
+#include <iostream> // DEBUG
+
+#if defined(__APPLE__)
+#  include <crt_externs.h>
+#  define environ (*_NSGetEnviron())
+#else
+extern char** environ;
+# endif
 
 using namespace flusspferd;
 
@@ -133,8 +146,84 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   object get_stdout() { return object(); }
 };
 
+namespace {
+  void do_pipe(int pipefd[2]) {
+    if(::pipe(pipefd) == -1) {
+      int const errno_ = errno;
+      throw flusspferd::exception(std::string("pipe: ") + std::strerror(errno_));
+    }
+  }
+
+  subprocess do_popen(char const *cmd,
+                      std::vector<char const*> const &args,
+                      std::vector<char const*> const &env,
+                      bool stdin_, bool stdout_, bool stderr_,
+                      char const *cwd = 0x0)
+  {
+    assert(cmd);
+    assert(!args.empty() && args.back() == 0x0);
+    assert(env.empty() || env.back() == 0x0);
+    int stdinp[2];
+    if(stdin_) {
+      do_pipe(stdinp);
+    }
+    int stdoutp[2];
+    if(stdout_) {
+      do_pipe(stdoutp);
+    }
+    int stderrp[2];
+    if(stderr_) {
+      do_pipe(stderrp);
+    }
+
+    pid_t pid = vfork();
+    if(pid == -1) {
+      int const errno_ = errno;
+      throw flusspferd::exception(std::string("vfork: ") + std::strerror(errno_));
+    }
+    else if(pid == 0) {
+      if(stdin_) {
+        close(stdinp[1]);
+        if(stdinp[0] != STDIN_FILENO) {
+          dup2(stdinp[0], STDIN_FILENO);
+          close(stdinp[0]);
+        }
+      }
+      if(stdout_) {
+        int tp1 = stdoutp[1];
+        close(stdoutp[0]);
+        if(tp1 != STDOUT_FILENO) {
+          dup2(tp1, STDOUT_FILENO);
+          close(tp1);
+          tp1 = STDOUT_FILENO;
+        }
+      }
+      if(stderr_) {
+        int tp1 = stderrp[1];
+        close(stderrp[0]);
+        if(tp1 != STDERR_FILENO) {
+          dup2(tp1, STDERR_FILENO);
+          close(tp1);
+          tp1 = STDERR_FILENO;
+        }
+      }
+      if(cwd) {
+        //chdir(cwd); // TODO check if this is allowed in vfork!
+      }
+      execve(cmd, const_cast<char *const*>(&args[0]),
+             env.empty() ? environ : const_cast<char *const*>(&env[0]));
+      // TODO This shouldn't use environ but system.env instead! (BUG)
+      _exit(127);
+    }
+
+    // ...
+  }
+}
+
 /*
 call style:
+
+"w","r"
 
 popen("foo", "w"); // popen(3)
 
@@ -146,10 +235,10 @@ obj = {
   executable : optString - The name of the executable,
   shell : optBoolean - true -> use shell to invoke program or false -> call execve? (default: false)
   cwd : optString - Working Directory
-  env : ...
-  stdin : ...
-  stdout : ...
-  stderr : ...
+  env : optEnumeratableObject containing the environment (default: system.env)
+  stdin : optBoolean - true -> open pipe for stdin (default: true)
+  stdout : optBoolean
+  stderr : optBoolean
 };
 
  */
@@ -161,6 +250,29 @@ void Popen(flusspferd::call_context &x) {
     }
   }
   else if(x.arg.size() == 2) {
+    if(x.arg[0].is_string() && x.arg[1].is_string()) {
+      std::vector<char const*> args;
+      args.push_back("sh");
+      args.push_back("-c");
+      args.push_back(x.arg[0].get_string().c_str());
+
+      std::vector<char const*> env;
+
+      bool in = false;
+      if(x.arg[1].get_string() == "w") {
+        in = true;
+      }
+      else if(!(x.arg[1].get_string() == "r")) {
+        throw flusspferd::exception("popen: second parameter should be \"r\" or \"w\"");
+      }
+
+      x.result = do_popen("sh", args, env, in, !in, false);
+      return;
+    }
+    else if(x.arg[0].is_object() && x.arg[0].get_object().is_array() && x.arg[1].is_string()) {
+    }
+    else {
+    }
   }
   else {
     throw flusspferd::exception("popen: wrong number of parameters");
