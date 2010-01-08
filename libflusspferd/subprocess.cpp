@@ -259,13 +259,15 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   int stdoutfd;
   int stderrfd;
 
-  bio::stream_buffer<bio::file_descriptor> stdinstream;
+  bio::stream_buffer<bio::file_descriptor_sink> stdinstream;
   bio::stream_buffer<bio::file_descriptor_source> stdoutstream;
   bio::stream_buffer<bio::file_descriptor_source> stderrstream;
 
   void close_stdin() {
     if(stdinfd != -1) {
-      stdinstream.close();
+      if(stdinstream.is_open()) {
+        stdinstream.close();
+      }
       ::close(stdinfd);
       stdinfd = -1;
     }
@@ -273,7 +275,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 
   void close_stdout() {
     if(stdoutfd != -1) {
-      stdoutstream.close();
+      if(stdoutstream.is_open()) {
+        stdoutstream.close();
+      }
       ::close(stdoutfd);
       stdoutfd = -1;
     }
@@ -281,7 +285,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 
   void close_stderr() {
     if(stderrfd != -1) {
-      stderrstream.close();
+      if(stderrstream.is_open()) {
+        stderrstream.close();
+      }
       ::close(stderrfd);
       stderrfd = -1;
     }
@@ -452,12 +458,34 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       return object();
     }
     else {
-      stdinstream.open(bio::file_descriptor(stdinfd));
+      if(!stdinstream.is_open()) {
+        stdinstream.open(bio::file_descriptor_sink(stdinfd));
+      }
       return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdinstream));
     }
   }
-  object get_stderr() { return object(); } // TODO
-  object get_stdout() { return object(); } // TODO
+  object get_stdout() {
+    if(stdoutfd == -1) {
+      return object();
+    }
+    else {
+      if(!stdoutstream.is_open()) {
+        stdoutstream.open(bio::file_descriptor_source(stdoutfd));
+      }
+      return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdoutstream));
+    }
+  }
+  object get_stderr() {
+    if(stderrfd == -1) {
+      return object();
+    }
+    else {
+      if(!stderrstream.is_open()) {
+        stderrstream.open(bio::file_descriptor_source(stderrfd));
+      }
+      return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stderrstream));
+    }
+  }
 
   static subprocess &create(pid_t p, int in, int out, int err) {
     return flusspferd::create<subprocess>(boost::fusion::make_vector(p, in, out, err));
