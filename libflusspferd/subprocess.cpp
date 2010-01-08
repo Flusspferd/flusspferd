@@ -182,7 +182,7 @@ namespace {
   }
   std::vector< std::pair<int, unsigned> > fdpoll::wait(int timeout_ms) {
     fd_set rfds, wfds, efds;
-    int nfds;
+    int nfds = 0;
     FD_ZERO(&rfds);
     FD_ZERO(&wfds);
     FD_ZERO(&efds);
@@ -204,8 +204,8 @@ namespace {
       tv.tv_sec = timeout_ms / 1000;
       tv.tv_usec = (timeout_ms % 1000) * 1000;
     }
-    int retfds = select(nfds+1, &rfds, &wfds, &efds,
-                        timeout_ms != fdpoll::indefinitely ? &tv : 0x0);
+    int const retfds = select(nfds+1, &rfds, &wfds, &efds,
+                              timeout_ms != fdpoll::indefinitely ? &tv : 0x0);
     if(retfds == -1) {
       int const errno_ = errno;
       throw flusspferd::exception(std::string("epoll_ctl: ") + std::strerror(errno_));
@@ -305,7 +305,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       poll.remove(fd);
       return true; // done
     }
-    buffer += buf;
+    buffer.append(buf, buf+n);
     return false;
   }
  public:
@@ -348,7 +348,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     std::string stdoutbuf;
     std::string stderrbuf;
 
-    while( !(done_stdin || done_stdout || done_stderr) ) {
+    while( !done_stdin || !done_stdout || !done_stderr ) {
       std::vector< std::pair<int, unsigned> > ret = poll.wait(fdpoll::indefinitely);
       for(std::vector< std::pair<int, unsigned> >::const_iterator i = ret.begin();
           i != ret.end();
@@ -416,9 +416,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       return value(object());
     }
   }
-  object get_stdin()  { return object(); }
-  object get_stderr() { return object(); }
-  object get_stdout() { return object(); }
+  object get_stdin()  { return object(); } // TODO
+  object get_stderr() { return object(); } // TODO
+  object get_stdout() { return object(); } // TODO
 
   static subprocess &create(pid_t p, int in, int out, int err) {
     return flusspferd::create<subprocess>(boost::fusion::make_vector(p, in, out, err));
