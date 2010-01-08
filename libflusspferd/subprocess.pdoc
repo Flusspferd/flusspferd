@@ -1,8 +1,24 @@
-
+// -*- mode:js2; -*-
 /** section: Core
  * subprocess
  * 
  * Module to start and handle subprocesses. (popen)
+ */
+
+/**
+ * subprocess.SIGKILL -> Integer
+ * 
+ * Signal number to kill a process.
+ * 
+ * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#kill]].
+ */
+
+/**
+ * subprocess.SIGTERM -> Integer
+ * 
+ * Signal number to terminate a process.
+ * 
+ * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]].
  */
 
 /**
@@ -42,12 +58,20 @@
 
 /**
  * subprocess.subprocess#communicate([input]) -> Object
+ * - input (String): data to send to the subprocess.
  * 
+ * Write `input` to stdin of the process (if stdin pipe was opened) and read stdout/stderr if
+ * opened. Returns an object containing the output of stdout and stderr and the returncode.
+ * 
+ * This is a safe and fast way to handle the communication.
  */
 
 /**
  * subprocess.subprocess#sendSignal(signal) -> undefined
- * - signal (Integer): sends a signal to the subprocess
+ * - signal (Integer): sends a signal to the subprocess.
+ * 
+ * Sends a signal to the subprocess. At least [[subprocess.SIGTERM]] and [[subprocess.SIGKILL]]
+ * are supported.
  */
 
 /**
@@ -55,15 +79,15 @@
  * 
  * Terminate subprocess (similar to sendSignal(SIGTERM))
  * 
- * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#kill]]
+ * See [[subprocess.subprocess#sendSignal]], [[subprocess.subprocess#kill]] and [[subprocess.SIGTERM]]
  */
 
 /**
  * subprocess.subprocess#kill() -> undefined
  * 
- * Kill subprocess (similar to sendSignal(SIGKILL))
+ * Kill subprocess (similar to `sendSignal(SIGKILL)`)
  * 
- * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]]
+ * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]] and [[subprocess.SIGKILL]]
  */
 
 /**
@@ -80,7 +104,9 @@
  */
 
 /**
- * subprocess.subprocess#stdin -> Object
- * subprocess.subprocess#stdout -> Object
- * subprocess.subprocess#stderr -> Object
+ * subprocess.subprocess#stdin -> IO.Stream
+ * subprocess.subprocess#stdout -> IO.Stream
+ * subprocess.subprocess#stderr -> IO.Stream
+ * 
+ * Stream interface to stdin, stdout and stderr or `null` if no appropriate pipe was created.
  */
