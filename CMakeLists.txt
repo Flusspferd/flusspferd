@@ -192,7 +192,7 @@ endif()
 
 set(Boost_FIND_REQUIRED TRUE)
 
-set(FLUSSPFERD_BOOST_LIBRARIES thread filesystem system)
+set(FLUSSPFERD_BOOST_LIBRARIES thread filesystem system iostreams)
 
 if(ENABLE_TESTS)
     set(FLUSSPFERD_BOOST_LIBRARIES unit_test_framework ${FLUSSPFERD_BOOST_LIBRARIES})
