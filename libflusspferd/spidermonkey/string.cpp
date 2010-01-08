@@ -122,6 +122,10 @@ bool flusspferd::operator==(string const &lhs, string const &rhs) {
   return JS_CompareStrings(get_string(lhs), get_string(rhs)) == 0;
 }
 
+bool flusspferd::operator!=(string const &lhs, string const &rhs) {
+  return JS_CompareStrings(get_string(lhs), get_string(rhs)) != 0;
+}
+
 bool flusspferd::operator<(string const &lhs, string const &rhs) {
   return JS_CompareStrings(get_string(lhs), get_string(rhs)) < 0;
 }
