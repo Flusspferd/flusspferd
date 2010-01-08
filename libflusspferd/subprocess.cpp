@@ -254,6 +254,30 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   int stdoutfd;
   int stderrfd;
 
+  void close_stdin() {
+    if(stdinfd != -1) {
+      stdinstream.close();
+      ::close(stdinfd);
+      stdinfd = -1;
+    }
+  }
+
+  void close_stdout() {
+    if(stdoutfd != -1) {
+      stdoutstream.close();
+      ::close(stdoutfd);
+      stdoutfd = -1;
+    }
+  }
+
+  void close_stderr() {
+    if(stderrfd != -1) {
+      stderrstream.close();
+      ::close(stderrfd);
+      stderrfd = -1;
+    }
+  }
+
   value wait_impl(bool poll = false) {
     if(finished) {
       return value(returncode);
@@ -306,6 +330,11 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     : base_type(self), pid(pid), finished(false), stdinfd(stdinfd), stdoutfd(stdoutfd),
       stderrfd(stderrfd)
   { }
+  ~subprocess() {
+    close_stdin();
+    close_stdout();
+    close_stderr();
+  }
 
   value poll() {
     return wait_impl(true);
@@ -356,7 +385,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
             }
             else if(errno_ == EPIPE) {
               poll.remove(stdinfd);
-              stdinfd = -1;
+              close_stdin();
               done_stdin = true;
               continue;
             }
