@@ -98,11 +98,6 @@ public:
       throw exception("Could not initialize Global Object");
 
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
-
-#ifdef DEBUG
-    // This might want to be conditional on something else too
-    JS_SetGCZeal(context, 2);
-#endif
 }
 
   explicit impl(JSContext *context)
@@ -330,3 +325,12 @@ bool context::set_jit(bool jit) {
   return old;
 }
 
+bool context::set_gc_zeal(unsigned int mode) {
+#ifdef SPIDERMONKEY_HAS_GCZEAL
+  JS_SetGCZeal(p->context, mode);
+  return true;
+#else
+  // If mode is anything but off, then it 'failed' as we have no JS_SetGCZeal
+  return mode == 0;
+#endif
+}

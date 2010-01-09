@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -92,6 +93,7 @@ class flusspferd_repl {
   void print_man();
   void print_bash();
   void add_runnable(std::string const &path, Type type, bool del_interactive);
+  void set_gc_zeal(std::string const &s);
   void load_config();
 
   // Handle options from "// flusspferd: opts" lines
@@ -172,7 +174,7 @@ int flusspferd_repl::run() {
     if (!interactive)
       throw;
   } catch (std::exception &e) {
-    if (interactive)
+    if (interactive_set && interactive)
       std::cerr << "ERROR: " << e.what() << '\n';
     else
       throw;
@@ -330,6 +332,23 @@ void flusspferd_repl::add_runnable(
     interactive = false;
   runnables.push_back(std::make_pair(file, type));
 }
+
+void flusspferd_repl::set_gc_zeal(std::string const &s) {
+  try {
+    int mode = boost::lexical_cast<int>(s);
+
+    if (!co.set_gc_zeal(mode)) {
+      std::cerr << "Warning: Unable to set GC Zeal mode to " << mode << std::endl;
+    }
+  }
+  catch(...) {
+    interactive_set = true;
+    interactive = false;
+    std::cerr << "ERROR: Invalid gc-zeal option: " << s << std::endl;
+    throw flusspferd::js_quit();
+  }
+}
+
 
 void flusspferd_repl::load_config() {
   // Define the prelude property so its not a strict warning to assign to it.
@@ -508,6 +527,18 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
     "callback",
     phoenix::bind(&flusspferd::context::set_jit, this->co, false),
     flusspferd::param::_container = no_jit_);
+
+  flusspferd::object gc_zeal(flusspferd::create<flusspferd::object>());
+  spec.set_property("gc-zeal", gc_zeal);
+  gc_zeal.set_property("doc", "Set zealous GC mode: 0, 1 or 2");
+  gc_zeal.set_property("argument_type", "int");
+  gc_zeal.set_property("argument", "required");
+  gc_zeal.set_property("alias", "z");
+  flusspferd::create<flusspferd::function>(
+    "callback",
+    phoenix::bind(&flusspferd_repl::set_gc_zeal, this, args::arg2 ),
+    flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
+    flusspferd::param::_container = gc_zeal);
 
   if (for_main_repl) {
     // Hidden Options for Generator Purpose
