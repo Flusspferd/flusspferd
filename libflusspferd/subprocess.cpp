@@ -1,8 +1,8 @@
 /*
 The MIT License
 
-Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
-                                       http://flusspferd.org/contributors.txt)
+Copyright (c) 2010 Flusspferd contributors (see "CONTRIBUTORS" or
+                                     http://flusspferd.org/contributors.txt)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,7 @@ namespace {
 
 #ifdef HAVE_EPOLL
   fdpoll::fdpoll() {
-    epollfd = ::epoll_create1(FD_CLOEXEC);
+    epollfd = ::epoll_create1(EPOLL_CLOEXEC);
     if(epollfd == -1) {
       int const errno_ = errno;
       throw flusspferd::exception(std::string("epoll_create: ") + std::strerror(errno_));
@@ -166,7 +166,7 @@ namespace {
       if(flagset(EPOLLERR, events[i].events)) {
         what |= fdpoll::error;
       }
-      ret.push_back( std::make_pair(events[i].fd, what) );
+      ret.push_back( std::make_pair(events[i].data.fd, what) );
     }
     return ret;
   }
