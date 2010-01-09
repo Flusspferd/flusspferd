@@ -12,8 +12,22 @@ exports.test_cat = function() {
     asserts.same(p.stdout.read(data.length), data);
     asserts.ok(p.poll() === null);
     p.terminate();
-    p.wait();
-    asserts.ok(p.poll() !== null);
+    var ret = p.wait();
+    asserts.same(p.returncode, ret);
+    asserts.same(p.poll(), ret);
+};
+
+exports.test_communicate = function() {
+    var args = [ require('flusspferd').executableName, '-e',
+                 'const out = require("system").stdout; out.write("hello world\\n"); out.flush();',
+                 '-c', '/dev/null'
+               ];
+    var p = subprocess.popen(args, "r");
+    var r = p.communicate();
+    asserts.same(p.poll(), r.returncode);
+    asserts.same(r.returncode, p.returncode);
+    asserts.same(r.stdout, "hello world\n");
+    asserts.same(r.stderr, "");
 };
 
 if (require.main === module)
