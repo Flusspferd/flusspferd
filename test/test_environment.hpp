@@ -35,6 +35,10 @@ THE SOFTWARE.
 class context_fixture {
 public:
   context_fixture() : scope(flusspferd::context::create()) {
+#ifdef DEBUG
+    // Run all tests with GC zeal on. Slower but makes tests better
+    flusspferd::current_context().set_gc_zeal(2);
+#endif
     flusspferd::security::create(flusspferd::current_context().global());
     flusspferd::load_core(flusspferd::current_context().global(), "exeName");
     flusspferd::gc();

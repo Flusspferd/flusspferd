@@ -140,6 +140,20 @@ if(SPIDERMONKEY_FOUND)
       ${SPIDERMONKEY_LIBRARY}
       PATH)
     link_directories(${SPIDERMONKEY_LIBDIR})
+
+    # Check if we have GC_Zeal
+    check_cxx_source_compiles(
+        "#define DEBUG
+         #include <js/jsapi.h>
+         int main() {
+           JS_SetGCZeal((JSContext*)(0), 1);
+         }"
+        SPIDERMONKEY_HAS_GCZEAL
+    )
+
+    if(SPIDERMONKEY_HAS_GCZEAL)
+      add_definitions(-DSPIDERMONKEY_HAS_GCZEAL)
+    endif()
 endif()
 
 list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})
