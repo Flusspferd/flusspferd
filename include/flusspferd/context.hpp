@@ -201,6 +201,24 @@ public:
    * @return       The old value of the JIT setting
    */
   bool set_jit(bool jit);
+
+  /**
+   * Enable or disable zealous garbage collection.
+   *
+   * set_gc_zeal sets the level of garbage collection for a runtime. At level 0
+   * (the default) garbage collection rarely happens unless the application
+   * explicitly requests it. At level 1, SpiderMonkey collects very frequently,
+   * and at level 2 it collects extremely frequently.
+   *
+   * With GC zeal enabled, GC-related crashes are much easier to reproduce
+   * (they happen more reliably) and debug (they happen sooner, closer to the
+   * source of the bug). The drawback is that GC zeal causes JavaScript code to
+   * run very (or extremely) slowly.
+   *
+   * @return  true if the mode was set, false otherwise (i.e. GCZeal is not
+   *          available for the current JS engine.)
+   */
+  bool set_gc_zeal(unsigned int mode);
 };
 
 /**
