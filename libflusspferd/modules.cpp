@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/xpressive/xpressive.hpp>
-#include <sstream>
 #include <algorithm>
 
 #ifdef WIN32
@@ -72,6 +71,9 @@ static object module_resource(const fs::path &module_dir, std::string const &x_,
 
 // This function based largley on one from boost/program_options. See end of file for its license
 static array split_args_string(const value& input);
+
+
+const format load_error_fmt("Unable to load module '%1%': %2%");
 
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
@@ -167,6 +169,11 @@ void require::set_main_module(std::string const &id_) {
   main.set_property("uri", id);
   setup_module_resolve_fns(main, mod);
   set_property("id", id);
+}
+
+// require.id
+std::string require::current_id() {
+  return get_property("id").to_std_string();
 }
 
 // The implementation of the |require()| function that is available to JS
@@ -416,21 +423,17 @@ void load_native_module(fs::path const &dso_name, object exports) {
 
   // TODO: Improve error message
   if (!module)
-    throw exception(("Unable to load library '" +fullpath+"'"));
+    throw exception(format(load_error_fmt) % fullpath % "can't open DLL");
 
   FARPROC symbol = GetProcAddress(module, "flusspferd_load");
 
   if (!symbol)
-    throw exception(("Unable to load library '" + fullpath + "': symbol "
-                    "not found"));
+    throw exception(format(load_error_fmt) % fullpath % "symbol not found");
 #else
   // Load the .so
   void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
   if (!module) {
-    std::stringstream ss;
-    ss << "Unable to load library '" << fullpath
-       << "': " << dlerror();
-    throw exception(ss.str());
+    throw exception(format(load_error_fmt) % fullpath % dlerror());
   }
 
   dlerror(); // clear error state
@@ -439,22 +442,15 @@ void load_native_module(fs::path const &dso_name, object exports) {
 
   char const *const error_string = dlerror();
 
-    if (error_string) {
-      std::stringstream ss;
-      ss << "Unable to load library '" << fullpath
-         << "': " << error_string;
-      throw exception(ss.str());
-    }
+  if (error_string) {
+    throw exception(format(load_error_fmt) % fullpath % error_string);
+  }
 #endif
 
   flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
   root_object context(global());
   func(exports, context);
-}
-
-std::string require::current_id() {
-  return get_property("id").to_std_string();
 }
 
 
@@ -571,9 +567,10 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
   }
 
   if (fatal) {
-    std::stringstream ss;
-    ss << "Unable to find library '" << id << "' in [" << paths << "]";
-    throw exception(ss.str());
+    throw exception(
+      format(load_error_fmt)
+          % id % ("can't locate it in [" + value(paths).to_std_string() + "]")
+    );
   }
   return boost::none;
 }
@@ -627,9 +624,7 @@ object require::load_absolute_js_file(fs::path path, std::string const &id) {
     return cache;
   }
 
-  std::stringstream ss;
-  ss << "Unable to load library '" << id;
-  throw exception(ss.str());
+  throw exception(format(load_error_fmt) % id % "file not found");
 }
 
 
@@ -670,13 +665,13 @@ static void setup_module_resolve_fns(object &module, fs::path const &path) {
 }
 
 // owner: No such file or directory "foo/bar"
-const format error_fmt("module.resource.resolve: %1% \"%2%\"");
+const format resolve_error_fmt("module.resource.resolve: %1% \"%2%\"");
 
 static std::string module_resource_resolve(const fs::path &module_dir, std::string const &x_) {
   fs::path x = x_;
 
   if (x.has_root_path() || x.has_root_name()) {
-    throw exception(format(error_fmt) % "absolute paths are not allowed" % x_);
+    throw exception(format(resolve_error_fmt) % "absolute paths are not allowed" % x_);
   }
 
   return io::fs_base::canonicalize(module_dir / x).string();
