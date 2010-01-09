@@ -29,6 +29,7 @@ THE SOFTWARE.
 #ifdef WIN32
 
 void flusspferd::load_subprocess_module(object &ctx) {
+  // TODO
   throw flusspferd::exception("Subprocess Module Not Yet Supported On Windows", "Error");
 }
 
@@ -612,6 +613,27 @@ namespace {
     args.push_back(0x0);
     return args;
   }
+
+  void getbool(object &o, char const *name, bool &p) {
+    if(o.has_property(name)) {
+      if(!o.get_property(name).is_boolean()) {
+        throw flusspferd::exception(std::string("popen expected `") + name + "' to be a boolean",
+                                    "TypeError");
+      }
+      p = o.get_property(name).get_boolean();
+    }
+  }
+
+  char const *getcstring(object &o, char const *name) {
+    if(o.has_property(name)) {
+      if(!o.get_property(name).is_string()) {
+        throw flusspferd::exception(std::string("popen expected `") + name + "' to be a string",
+                                    "TypeError");
+      }
+      return o.get_property(name).get_string().c_str();
+    }
+    return 0x0;
+  }
 }
 
 /*
@@ -639,6 +661,8 @@ obj = {
 };
 if shell is true then args[0] ist passed to the shell and the rest as arguments to the shell(!)
 
+TODO stdin/stdout/stderr could also be existing streams
+
  */
 
 void Popen(flusspferd::call_context &x) {
@@ -662,21 +686,22 @@ void Popen(flusspferd::call_context &x) {
         std::vector<char const*> args = array2args(o.get_property("args").get_object());
 
         // executable
-        char const *cmd = 0x0;
-        if(o.has_property("executable") && o.get_property("executable").is_string()) {
-          cmd = o.get_property("executable").get_string().c_str();
-        }
+        char const *cmd = getcstring(o, "executable");
 
-        // shell TODO
+        // shell
         bool shell = false;
+        getbool(o, "shell", shell);
 
-        // cwd TODO
-        char const *cwd = 0x0;
+        // cwd
+        char const *cwd = getcstring(o, "cwd");
 
-        // stdin, stderr, stdout TODO
+        // stdin, stderr, stdout
         bool stdin_ = true;
+        getbool(o, "stdin", stdin_);
         bool stderr_ = true;
+        getbool(o, "stderr", stderr_);
         bool stdout_ = true;
+        getbool(o, "stdout", stdout_);
 
         // env TODO
         std::vector<char const*> env;
@@ -714,7 +739,7 @@ void Popen(flusspferd::call_context &x) {
       if(x.arg[1].get_string() == "w") {
         in = true;
       }
-      else if(!(x.arg[1].get_string() == "r")) {
+      else if(x.arg[1].get_string() != "r") {
         throw flusspferd::exception("popen: second parameter should be \"r\" or \"w\"");
       }
 
