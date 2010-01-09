@@ -51,5 +51,20 @@ exports.test_retcode = function() {
     asserts.same(p.stderr, null);
 };
 
+exports.test_shell = function() {
+    const data = "hello world";
+    const cmd = require('flusspferd').executableName +
+        ' -e \'require("system").stdout.write("' + data + '\\n");\' -c /dev/null';
+    var p = subprocess.popen(cmd, "r");
+    asserts.same(p.stdin, null);
+    asserts.same(p.stderr, null);
+    asserts.ok(p.stdout !== null);
+    var r = p.communicate();
+    asserts.same(p.poll(), r.returncode);
+    asserts.same(r.returncode, p.returncode);
+    asserts.same(r.stdout, data + '\n');
+    asserts.same(r.stderr, "");
+};
+
 if (require.main === module)
   require('test').runner(exports);
