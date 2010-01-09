@@ -30,5 +30,17 @@ exports.test_communicate = function() {
     asserts.same(r.stderr, "");
 };
 
+exports.test_retcode = function() {
+    const retval = 12;
+    const args = [ require('flusspferd').executableName, '-e',
+                   'quit(' + retval + ');',
+                   '-c', '/dev/null'
+                 ];
+    var p = subprocess.popen({ args : args, stdin : false, stderr : false, stdout : false });
+    asserts.same(p.wait(), retval);
+    asserts.same(p.poll(), retval);
+    asserts.same(p.returncode, retval);
+};
+
 if (require.main === module)
   require('test').runner(exports);
