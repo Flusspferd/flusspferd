@@ -6,6 +6,9 @@ exports.test_cat = function() {
                  'var line, sys = require("system"); while( (line = sys.stdin.readLine()) ) { sys.stdout.write(line); sys.stdout.flush(); }',
                  '-c', '/dev/null' ];
     var p = subprocess.popen(args);
+    asserts.ok(p.stdin !== null);
+    asserts.ok(p.stdout !== null);
+    asserts.ok(p.stderr !== null);
     const data = 'hello world\n';
     p.stdin.write(data);
     p.stdin.flush();
@@ -23,6 +26,9 @@ exports.test_communicate = function() {
                  '-c', '/dev/null'
                ];
     var p = subprocess.popen(args, "r");
+    asserts.same(p.stdin, null);
+    asserts.same(p.stderr, null);
+    asserts.ok(p.stdout !== null);
     var r = p.communicate();
     asserts.same(p.poll(), r.returncode);
     asserts.same(r.returncode, p.returncode);
@@ -40,6 +46,9 @@ exports.test_retcode = function() {
     asserts.same(p.wait(), retval);
     asserts.same(p.poll(), retval);
     asserts.same(p.returncode, retval);
+    asserts.same(p.stdin, null);
+    asserts.same(p.stdout, null);
+    asserts.same(p.stderr, null);
 };
 
 if (require.main === module)
