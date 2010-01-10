@@ -5,7 +5,9 @@
  * 
  * Module to start and handle subprocesses. (popen)
  * 
- * This module is very similar to [Python's subprocess module](http://docs.python.org/library/subprocess.html). Currently only a implementation for UNIX-like systems is available.
+ * This module is very similar to 
+ * [Python's subprocess module](http://docs.python.org/library/subprocess.html).
+ * Currently only a implementation for UNIX-like systems is available.
  * 
  * ## Example #
  * 
@@ -28,30 +30,48 @@
  * 
  * Signal number to terminate a process.
  * 
- * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]].
+ * See [[subprocess.subprocess#sendSignal]] and
+ * [[subprocess.subprocess#terminate]].
  **/
 
 /**
  * subprocess.popen(command[, mode]) -> subprocess.Subprocess
  * subprocess.popen(args[, mode]) -> subprocess.Subprocess
  * subprocess.popen(obj) -> subprocess.Subprocess
- * - command (String): a command passed to `sh -c` (Similar to [popen(3)](http://www.kernel.org/doc/man-pages/online/pages/man3/popen.3.html)).
- * - mode (String): `"w"` or `"r"` (see below. Similar to popen(3)). If no `mode` parameter is passed pipes for stdin, stdout and stderr are opened.
- * - args (Array): an array containing a command as first param (`argv[0]`) and arguments passed to the command. This uses execve directly and doesn't pass the command to a shell first.
- * - obj (Object): an object containing the parameters as properties. (see below)
+ * - command (String): a command passed to `sh -c`
+ *   (Similar to
+ *   [popen(3)](http://www.kernel.org/doc/man-pages/online/pages/man3/popen.3.html)).
+ * - mode (String): `"w"` or `"r"` (see below. Similar to popen(3)).
+ *   If no `mode` parameter is passed pipes for stdin, stdout and stderr are
+ *   opened.
+ * - args (Array): an array containing a command as first param (`argv[0]`) and
+ *   arguments passed to the command. This uses execve directly and doesn't pass
+ *   the command to a shell first.
+ * - obj (Object): an object containing the parameters as properties.
+ *   (see below)
  * 
- * Create a new subprocess. Default is to open pipes for `stdin`, `stdout` and `stderr`.
- * Passing `"w"` as `mode` parameter means that *only* a pipe to the subprocess' `stdin` is opened.
- * Passing `"r"` means that *only* a pipe to the subprocess' `stdout` is opened.
+ * Create a new subprocess. Default is to open pipes for stdin, stdout and
+ * stderr. Passing `"w"` as `mode` parameter means that *only* a pipe to the
+ * subprocess' stdin is opened. Passing `"r"` means that *only* a pipe to the
+ * subprocess' stdout is opened.
  * 
- * `popen` accepts an object as parameter and interprets the following properties:
+ * `popen` accepts an object as parameter and interprets the following
+ * properties:
  * - args (`Array`, required): an array like `args` parameter.
- * - executable (`String`, optional): the name of the executable if it differs from `args[0]`.
- * - cwd (`String`, optional): a pathname. `popen` tries to change to that directory before executing the subprocess. (Does not fail if it changing the directory fails!)
+ * - executable (`String`, optional): the name of the executable if it
+ *   differs from `args[0]`.
+ * - cwd (`String`, optional): a pathname. `popen` tries to change to
+ *   that directory before executing the subprocess. (Does not fail if
+ *   it changing the directory fails!)
  * - stdin (`Boolean`, optional): if true (default) a pipe for stdin is opened.
- * - stdout (`Boolean`, optional): if true (default) a pipe for stdout is opened.
- * - stderr (`Boolean`, optional): if true (default) a pipe for stderr is opened.
- * - shell (`Boolean`, optional): if false (default) args is used to directly start the subprocess (execve). If true a shell is started and `args[0]` interpreted as command. The rest of the `args` are passed as arguments to the shell.
+ * - stdout (`Boolean`, optional): if true (default) a pipe for stdout is
+ *   opened.
+ * - stderr (`Boolean`, optional): if true (default) a pipe for stderr is
+ *   opened.
+ * - shell (`Boolean`, optional): if false (default) args is used to directly
+ *   start the subprocess (execve). If true a shell is started and `args[0]` 
+ *   interpreted as command. The rest of the `args` are passed as arguments to
+ *   the shell.
  * 
  * Example
  * 
@@ -67,8 +87,8 @@
 /**
  * subprocess.Subprocess#poll() -> null|Integer
  * 
- * Checks if the subprocess is still running. Returns null if the subprocess is still running or
- * else the returncode as an Integer.
+ * Checks if the subprocess is still running. Returns null if the subprocess is
+ * still running or else the returncode as an Integer.
  * 
  * See [[subprocess.Subprocess#returncode]] and [[subprocess.Subprocess#wait]].
  **/
@@ -76,7 +96,8 @@
 /**
  * subprocess.Subprocess#wait() -> Integer
  * 
- * Waits until the subprocess is finished and returns the returncode as an Integer.
+ * Waits until the subprocess is finished and returns the returncode as an
+ * Integer.
  * 
  * See [[subprocess.Subprocess#returncode]] and [[subprocess.Subprocess#poll]].
  **/
@@ -85,8 +106,9 @@
  * subprocess.Subprocess#communicate([input]) -> Object
  * - input (String): data to send to the subprocess.
  * 
- * Write `input` to stdin of the process (if stdin pipe was opened) and read stdout/stderr if
- * opened. Returns an object containing the output of stdout and stderr and the returncode.
+ * Write `input` to stdin of the process (if stdin pipe was opened) and read
+ * stdout/stderr if opened. Returns an object containing the output of stdout
+ * and stderr and the returncode.
  * 
  * This is a safe and fast way to handle the communication.
  **/
@@ -95,8 +117,8 @@
  * subprocess.Subprocess#sendSignal(signal) -> undefined
  * - signal (Integer): sends a signal to the subprocess.
  * 
- * Sends a signal to the subprocess. At least [[subprocess.SIGTERM]] and [[subprocess.SIGKILL]]
- * are supported.
+ * Sends a signal to the subprocess. At least [[subprocess.SIGTERM]] and
+ * [[subprocess.SIGKILL]] are supported.
  **/
 
 /**
@@ -104,7 +126,8 @@
  * 
  * Terminate subprocess (similar to `sendSignal(SIGTERM)`).
  * 
- * See [[subprocess.Subprocess#sendSignal]], [[subprocess.Subprocess#kill]] and [[subprocess.SIGTERM]]
+ * See [[subprocess.Subprocess#sendSignal]], [[subprocess.Subprocess#kill]]
+ * and [[subprocess.SIGTERM]]
  **/
 
 /**
@@ -112,7 +135,8 @@
  * 
  * Kill subprocess (similar to `sendSignal(SIGKILL)`).
  * 
- * See [[subprocess.Subprocess#sendSignal]] and [[subprocess.Subprocess#terminate]] and [[subprocess.SIGKILL]]
+ * See [[subprocess.Subprocess#sendSignal]] and
+ * [[subprocess.Subprocess#terminate]] and [[subprocess.SIGKILL]]
  **/
 
 /**
@@ -124,24 +148,26 @@
 /**
  * subprocess.Subprocess#returncode -> Integer
  * 
- * The return code if the subprocess has finished. If the subprocess was terminated by a signal
- * returncode is `-signalcode`.
+ * The return code if the subprocess has finished. If the subprocess
+ * was terminated by a signal returncode is `-signalcode`. Only has a meaning
+ * after a call to [[subprocess.Subprocess#poll]],
+ * [[subprocess.Subprocess#wait]] or [[subprocess.Subprocess#communicate]].
  **/
 
 /**
  * subprocess.Subprocess#stdin -> io.Stream
  * 
- * Writeable [[io.Stream]] interface to stdin or `null` if no stdin pipe was created.
+ * Writeable [[io.Stream]] interface to stdin if pipe was opened.
  **/
 
 /**
  * subprocess.Subprocess#stdout -> io.Stream
  * 
- * Readable [[io.Stream]] interface to stdout or `null` if no stdout pipe was created.
+ * Readable [[io.Stream]] interface to stdout if pipe was opened.
  **/
 
 /**
  * subprocess.Subprocess#stderr -> io.Stream
  * 
- * Readable [[io.Stream]] interface to stderr or `null` if no stderr pipe was created.
+ * Readable [[io.Stream]] interface to stderr if pipe was opened.
  **/
