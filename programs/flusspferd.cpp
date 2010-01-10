@@ -90,6 +90,7 @@ class flusspferd_repl {
   void print_version();
   void print_man();
   void print_bash();
+  void print_cmakefile();
   void add_runnable(std::string const &path, Type type, bool del_interactive);
   void set_gc_zeal(std::string const &s);
   void load_config();
@@ -318,6 +319,23 @@ void flusspferd_repl::print_version() {
   throw flusspferd::js_quit();
 }
 
+void flusspferd_repl::print_cmakefile() {
+  if (!interactive_set)
+    interactive = false;
+
+  boost::filesystem::path p = flusspferd::global()
+                               .call("require", "flusspferd")
+                               .to_object()
+                               .get_property("installPrefix")
+                               .to_std_string();
+  p /=  boost::filesystem::path(REL_LIBDATA_PATH)
+    /   std::string("Flusspferd.cmake");
+
+  std::cout << p;
+  std::cout.flush();
+  throw flusspferd::js_quit();
+}
+
 void flusspferd_repl::add_runnable(
     std::string const &file, Type type, bool del_interactive)
 {
@@ -386,6 +404,14 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
       "callback",
       phoenix::bind(&flusspferd_repl::print_version, this),
       flusspferd::param::_container = version);
+
+    flusspferd::object cmake(flusspferd::create<flusspferd::object>());
+    spec.set_property("cmake", cmake);
+    cmake.set_property("doc", "Print location to Flusspferd.cmake file and exit.");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_cmakefile, this),
+      flusspferd::param::_container = cmake);
 
     flusspferd::object config(flusspferd::create<flusspferd::object>());
     spec.set_property("config", config);
