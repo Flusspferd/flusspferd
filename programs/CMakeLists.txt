@@ -51,7 +51,8 @@ endif()
 
 ## Programs #################################################################
 
-add_definitions("-DREL_ETC_PATH=\"${REL_ETC_PATH}\"")
+add_definitions("-DREL_ETC_PATH=\"${REL_ETC_PATH}\""
+                "-DREL_LIBDATA_PATH=\"${REL_LIBDATA_PATH}\"")
 
 add_executable(
     flusspferd-shell
