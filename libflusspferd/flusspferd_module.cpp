@@ -33,12 +33,12 @@ THE SOFTWARE.
 #include <vector>
 #include <stdlib.h>
 
-using boost::optional;
-static optional<std::string> get_exe_name();
-static std::string get_exe_name_from_argv(std::string const &argv0);
-
 using namespace flusspferd;
 namespace fs = boost::filesystem;
+
+using boost::optional;
+static optional<std::string> get_exe_name();
+static fs::path get_exe_name_from_argv(std::string const &argv0);
 
 void flusspferd::load_flusspferd_module(object container, std::string const &argv0) {
   object exports = container.get_property_object("exports");
@@ -53,27 +53,42 @@ void flusspferd::load_flusspferd_module(object container, std::string const &arg
     value(is_relocatable()),
     read_only_property | permanent_property);
 
-  // Warning: This might not be right if the binary has been relocated!
   exports.define_property(
-    "installPrefix",
+    "configuredInstallPrefix",
     value(INSTALL_PREFIX),
     read_only_property | permanent_property);
 
   optional<std::string> exe = get_exe_name();
 
+  boost::filesystem::path bin_dir;
   if (exe) {
+    bin_dir = io::fs_base::canonicalize(*exe);
     exports.define_property(
       "executableName",
-      value(io::fs_base::canonicalize(*exe).string()),
+      value(bin_dir.string()),
       read_only_property | permanent_property);
   }
   else {
     // Fall back to processing argv[0]
+    bin_dir = get_exe_name_from_argv(argv0);
     exports.define_property(
       "executableName",
-      value(get_exe_name_from_argv(argv0)),
+      value(bin_dir.string()),
       read_only_property | permanent_property);
   }
+
+  // corrected install prefix
+  fs::path prefix(io::fs_base::canonicalize( bin_dir.remove_filename() / REL_BIN_TO_ROOT ));
+  exports.define_property(
+    "installPrefix",
+    value(prefix.string()),
+    read_only_property | permanent_property);
+
+  exports.define_property(
+    "systemModuleDir",
+    value( (prefix / REL_MODULES_PATH).string()),
+    read_only_property | permanent_property);
+
 }
 
 bool flusspferd::is_relocatable() {
@@ -92,7 +107,7 @@ std::string flusspferd::version() {
 // 1. see if the file exists - if so canonicalize it
 // 2. failing that, search in the path for binary named argv0
 // 3. set it to argv0. Probably not usable, but oh well
-std::string get_exe_name_from_argv(std::string const &argv0) {
+fs::path get_exe_name_from_argv(std::string const &argv0) {
   fs::path name(argv0);
 
   // 1. See if the file exists
@@ -103,7 +118,7 @@ std::string get_exe_name_from_argv(std::string const &argv0) {
 
   fs::file_status s = fs::status(name);
   if (fs::exists(s) && !fs::is_directory(s)) {
-    return io::fs_base::canonicalize(name).string();
+    return io::fs_base::canonicalize(name);
   }
 
   // 2. search on the path
@@ -129,7 +144,7 @@ std::string get_exe_name_from_argv(std::string const &argv0) {
     fs::path candidate = fs::path(d) / name;
     fs::file_status s = fs::status(candidate);
     if (fs::exists(s) && !fs::is_directory(s)) {
-      return io::fs_base::canonicalize(candidate).string();
+      return io::fs_base::canonicalize(candidate);
     }
   }
 
