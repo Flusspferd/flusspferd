@@ -238,9 +238,24 @@ install(
 
 ## Configured files #########################################################
 
+set(FLUSSPFERD_LIB_NAME "${CMAKE_SHARED_MODULE_PREFIX}flusspferd${CMAKE_SHARED_MODULE_SUFFIX}")
+set(FLUSSPFERD_INCLUDE_DIRS ${Boost_INCLUDE_DIR} ${SPIDERMONKEY_INCLUDE_DIR})
+configure_file(
+    Flusspferd.cmake.in
+    ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
+    ESCAPE_QUOTES @ONLY)
+unset(FLUSSPFERD_LIB_NAME)
+unset(FLUSSPFERD_INCLUDE_DIRS)
+
+install(
+  FILES ${CMAKE_SOURCE_DIR}/CMakeModules/FlusspferdPlugin.cmake
+        ${CMAKE_SOURCE_DIR}/CMakeModules/FindBoost.cmake
+        ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
+  DESTINATION ${INSTALL_LIBDATA_PATH})
+
 if(NOT MSVC)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
-        "${FLUSSPFERD_EXTERNAL_CFLAGS} -I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
+        "${FLUSSPFERD_EXTERNAL_CFLAGS} -D${BOOST_PARAMETER_MAX_ARITY} -I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
     configure_file(
         flusspferd.pc.in
@@ -252,13 +267,3 @@ if(NOT MSVC)
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 endif()
 
-configure_file(
-    Flusspferd.cmake.in
-    ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
-    ESCAPE_QUOTES @ONLY)
-
-install(
-  FILES ${CMAKE_SOURCE_DIR}/CMakeModules/FlusspferdPlugin.cmake
-        ${CMAKE_SOURCE_DIR}/CMakeModules/FindBoost.cmake
-        ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
-  DESTINATION ${INSTALL_LIBDATA_PATH})
