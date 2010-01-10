@@ -6,6 +6,13 @@
  * Module to start and handle subprocesses. (popen)
  * 
  * This module is very similar to [Python's subprocess module](http://docs.python.org/library/subprocess.html). Currently only a implementation for UNIX-like systems is available.
+ * 
+ * ## Example #
+ * 
+ *     const subprocess = require('subprocess');
+ *     var p = subprocess.popen(["echo", "foo", "bar"], "r")
+ *     print(p.communicate().stdout); // -> "foo bar\n"
+ *     print(p.poll()); // -> 0 (ok)
  **/
 
 /**
@@ -25,15 +32,30 @@
  **/
 
 /**
- * subprocess.popen(command[, option]) -> subprocess.subprocess
- * subprocess.popen(args[, option]) -> subprocess.subprocess
+ * subprocess.popen(command[, mode]) -> subprocess.subprocess
+ * subprocess.popen(args[, mode]) -> subprocess.subprocess
  * subprocess.popen(obj) -> subprocess.subprocess
- * - command (String): a command passed to `sh -c` (similar to [popen(3)](http://www.kernel.org/doc/man-pages/online/pages/man3/popen.3.html)).
- * - option (String): "w" or "r" (similar to popen(3)). If no option is passed pipes for stdin, stdout and stderr are opened.
+ * - command (String): a command passed to `sh -c` (Similar to [popen(3)](http://www.kernel.org/doc/man-pages/online/pages/man3/popen.3.html)).
+ * - mode (String): `"w"` or `"r"` (see below. Similar to popen(3)). If no `mode` parameter is passed pipes for stdin, stdout and stderr are opened.
  * - args (Array): an array containing a command as first param (`argv[0]`) and arguments passed to the command. This uses execve directly and doesn't pass the command to a shell first.
- * - obj (Object): an object containing ...
+ * - obj (Object): an object containing the parameters as properties. (see below)
  * 
- * Create a new subprocess.
+ * Create a new subprocess. Default is to open pipes for `stdin`, `stdout` and `stderr`.
+ * Passing `"w"` as `mode` parameter means that *only* a pipe to the subprocess' `stdin` is opened.
+ * Passing `"r"` means that *only* a pipe to the subprocess' `stdout` is opened.
+ * 
+ * `popen` accepts an object as parameter and interprets the following properties:
+ * - args (`Array`, required): an array like `args` parameter.
+ * - executable (`String`, optional): the name of the executable if it differs from `args[0]`.
+ * - cwd (`String`, optional): a pathname. `popen` tries to change to that directory before executing the subprocess. (Does not fail if it changing the directory fails!)
+ * - stdin (`Boolean`, optional): if true (default) a pipe for stdin is opened.
+ * - stdout (`Boolean`, optional): if true (default) a pipe for stdout is opened.
+ * - stderr (`Boolean`, optional): if true (default) a pipe for stderr is opened.
+ * - shell (`Boolean`, optional): if false (default) args is used to directly start the subprocess (execve). If true a shell is started and `args[0]` interpreted as command. The rest of the `args` are passed as arguments to the shell.
+ * 
+ * Example
+ * 
+ *     subprocess.popen({args : [ "echo", "foo", "bar" ], stdin: false, stderr: false })
  **/
 
 /**
