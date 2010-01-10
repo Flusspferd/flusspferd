@@ -56,13 +56,18 @@ set(INSTALL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX}/lib)
 set(INSTALL_LIBDATA_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd)
 set(INSTALL_MODULES_PATH ${CMAKE_INSTALL_PREFIX}/lib/flusspferd/modules)
 set(INSTALL_HEADERS_PATH ${CMAKE_INSTALL_PREFIX}/include)
-set(INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc)
+set(INSTALL_ETC_PATH ${CMAKE_INSTALL_PREFIX}/etc/flusspferd)
+
 
 file(RELATIVE_PATH REL_EXECUTABLES_PATH ${CMAKE_INSTALL_PREFIX} ${INSTALL_EXECUTABLES_PATH})
 file(RELATIVE_PATH REL_LIBRARIES_PATH ${CMAKE_INSTALL_PREFIX} ${INSTALL_LIBRARIES_PATH})
 file(RELATIVE_PATH REL_LIBDATA_PATH ${CMAKE_INSTALL_PREFIX} ${INSTALL_LIBDATA_PATH})
 file(RELATIVE_PATH REL_MODULES_PATH ${CMAKE_INSTALL_PREFIX} ${INSTALL_MODULES_PATH})
 file(RELATIVE_PATH REL_ETC_PATH ${CMAKE_INSTALL_PREFIX} ${INSTALL_ETC_PATH})
+
+# work out the sequence of "../../" needed to go from X up to the root
+string(REGEX REPLACE "(^|/)[^/]+" "\\1.." REL_BIN_TO_ROOT ${REL_EXECUTABLES_PATH})
+string(REGEX REPLACE "(^|/)[^/]+" "\\1.." REL_LIBDATA_TO_ROOT ${REL_LIBDATA_PATH})
 
 if(NOT WIN32 AND NOT FLUSSPFERD_VERSION)
     execute_process(
@@ -87,18 +92,6 @@ option(
     FORCE_PLUGINS
     "Fail configuration if some enabled plugins could not be configured"
     OFF)
-
-
-if(RELOCATABLE)
-    add_definitions("-DFLUSSPFERD_RELOCATABLE")
-    # TODO: should should probably use some relative_to funciton to be smarter
-    # That or being settable from a cmake option
-    add_definitions("-DFLUSSPFERD_ETC_PATH=\"../etc/flusspferd\"")
-    set(INSTALL_RELATIVE_MODULES_PATH "../lib/flusspferd/modules")
-    set(INSTALL_RELATIVE_LIBDATA_PATH "../lib/flusspferd")
-else()
-    add_definitions("-DFLUSSPFERD_ETC_PATH=\"${INSTALL_ETC_PATH}\"")
-endif()
 
 set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 

@@ -22,10 +22,19 @@
 /**
  *  flusspferd.installPrefix -> String
  *
- *  The compile time install prefix, under which `bin/`, `lib/` and `etc/`
- *  and similar directories should be found. If the binary has been relocated
- *  then this directory might not be in use. Use with caution in this case.
+ *  The run time install prefix, under which `bin/`, `lib/` and `etc/`
+ *  and similar directories should be found. If the install tree has been
+ *  relocated then this directory will reflect that. `configuredInstallPrefix`
+ *  contains the install prefix at initial install time.
  **/
+
+/**
+ *  flusspferd.configuredIstallPrefix -> String
+ *
+ *  The compile time install prefix, under which `bin/`, `lib/` and `etc/`
+ *  and similar directories should be found. Might not be correct at runtime.
+ **/
+
 
 /**
  *  flusspferd.executableName -> String
@@ -33,4 +42,28 @@
  *  The full path to the running executable. Flusspferd will do its best to
  *  canonicalize this and turn it into an absolute path, but on some platforms
  *  this might not be possible.
+ **/
+
+/**
+ *  flusspferd.systemModuleDir -> String
+ *
+ *  Location of system-wide directory under which modules can be found.
+ **/
+
+/**
+ *  flusspferd.userModuleDir -> String
+ *
+ *  Location of user-specific directory under which modules can be found. This
+ *  directory is controlled by various environment variables. The first
+ *  variable found from the list below will be used:
+ *
+ *  - `FLUSSPFERD_USER_MOUDLES`: specifies the module directory itself
+ *  - `HOME`: modules are stored in a `.flusspferd/modules` subdirectory
+ *    (typically for unix-like evnironments)
+ *  - `APPDATA`: modules are stored in a 'flusspferd/modules` subdirectory
+ *    (typically for Windows evnironments)
+ *
+ *  *Note:* this value is set by `jsrepl.js` on interpreter load so if you use
+ *  a `--config` option to specify a different file make sure that file sets it
+ *  as well.
  **/
