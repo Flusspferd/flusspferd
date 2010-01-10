@@ -97,4 +97,12 @@ BOOST_AUTO_TEST_CASE( string_io ) {
   BOOST_CHECK_EQUAL(s.to_string(), ss.str());
 }
 
+BOOST_AUTO_TEST_CASE( string_concat ) {
+  std::string const lhs("Hello ");
+  std::string const rhs("World!");
+  flusspferd::string const a(lhs);
+  flusspferd::string const b(rhs);
+  BOOST_CHECK_EQUAL(flusspferd::string::concat(a, b), lhs + rhs);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
