@@ -454,9 +454,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       return value(object());
     }
   }
-  object get_stdin()  {
+  value get_stdin()  {
     if(stdinfd == -1) {
-      return object();
+      return value();
     }
     else {
       if(!stdinstream.is_open()) {
@@ -465,9 +465,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdinstream));
     }
   }
-  object get_stdout() {
+  value get_stdout() {
     if(stdoutfd == -1) {
-      return object();
+      return value();
     }
     else {
       if(!stdoutstream.is_open()) {
@@ -476,9 +476,9 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdoutstream));
     }
   }
-  object get_stderr() {
+  value get_stderr() {
     if(stderrfd == -1) {
-      return object();
+      return value();
     }
     else {
       if(!stderrstream.is_open()) {
