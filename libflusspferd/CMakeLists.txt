@@ -177,14 +177,15 @@ target_link_libraries(flusspferd ${flusspferd_LIBS})
 # Libraries linking against the flusspferd DSO dont need to link to all the above.
 set_property(TARGET flusspferd PROPERTY LINK_INTERFACE_LIBRARIES "")
 
-
 if(WIN32)
     # .dll goes in bin/
-    install(TARGETS flusspferd RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
     # .lib goes in lib/
-    install(TARGETS flusspferd ARCHIVE DESTINATION ${INSTALL_LIBRARIES_PATH})
+    install(TARGETS flusspferd
+            RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH}
+            ARCHIVE DESTINATION ${INSTALL_LIBRARIES_PATH})
 else()
-    install(TARGETS flusspferd LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+    install(TARGETS flusspferd
+            LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 endif()
 
 ## Library - coverage variant ###############################################
@@ -241,12 +242,8 @@ if(NOT MSVC)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
         "${FLUSSPFERD_EXTERNAL_CFLAGS} -I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
-    foreach(_FLAG @SPIDERMONKEY_DEFINITIONS@)
-        set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")
-    endforeach()
-
     configure_file(
-        ${Flusspferd_SOURCE_DIR}/flusspferd.pc.in
+        flusspferd.pc.in
         ${Flusspferd_BINARY_DIR}/flusspferd.pc
         @ONLY)
 
@@ -254,3 +251,14 @@ if(NOT MSVC)
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 endif()
+
+configure_file(
+    Flusspferd.cmake.in
+    ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
+    ESCAPE_QUOTES @ONLY)
+
+install(
+  FILES ${CMAKE_SOURCE_DIR}/CMakeModules/FlusspferdPlugin.cmake
+        ${CMAKE_SOURCE_DIR}/CMakeModules/FindBoost.cmake
+        ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
+  DESTINATION ${INSTALL_LIBDATA_PATH})
