@@ -150,6 +150,12 @@ set(
     spidermonkey/value.cpp
 )
 
+set_property(SOURCE flusspferd_module.cpp
+  PROPERTY COMPILE_DEFINITIONS
+    "REL_BIN_TO_ROOT=\"${REL_BIN_TO_ROOT}\""
+    "REL_MODULES_PATH=\"${REL_MODULES_PATH}\""
+    )
+
 if(MSVC)
     # Build static lib for MSVC
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)

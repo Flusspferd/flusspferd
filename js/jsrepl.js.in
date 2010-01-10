@@ -26,33 +26,34 @@ THE SOFTWARE.
 
 // We're not running as a module here, so everything is in global scope
 (function() {
-  var canon = require('fs-base').canonical;
-  var paths = require.paths;
+  var canon = require('fs-base').canonical,
+      paths = require.paths,
+      flusspferd = require('flusspferd'),
+      env = require('system').env;
 
-  if (require('flusspferd').relocatable) {
-    var binDir = require('flusspferd').executableName
-                                      .replace(/flusspferd(?:\.exe)?$/, '');
+  paths.push( flusspferd.systemModuleDir );
 
-
-    paths.push( canon(binDir + '@INSTALL_RELATIVE_MODULES_PATH@') );
-
-    prelude = binDir + '@INSTALL_RELATIVE_LIBDATA_PATH@/prelude.js';
+  if (flusspferd.relocatable) {
+    prelude = flusspferd.installPrefix + '@REL_LIBDATA_PATH@/prelude.js';
   } else {
-    paths.push( canon('@INSTALL_MODULES_PATH@') );
-
     prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
   }
 
-  var env = require('system').env;
-
   if ("FLUSSPFERD_USER_MOUDLES" in env)
-    paths.push(env["FLUSSPFERD_USER_MODULES"]);
+    paths.push(flusspferd.userModuleDir = env["FLUSSPFERD_USER_MODULES"]);
   else if ("HOME" in env)
-    paths.unshift(env["HOME"] + "/.flusspferd/modules");
+    paths.unshift(flusspferd.userModuleDir = env["HOME"] + "/.flusspferd/modules");
   else if ("APPDATA" in env)
     // Windows
-    paths.unshift(env["APPDATA"] + "/flusspferd/modules");
+    paths.unshift(flusspferd.userModuleDir = env["APPDATA"] + "/flusspferd/modules");
 
-  // Finally put '.' at the from of the search path
+  if (flusspferd.userModuleDir) {
+    Object.defineProperty(flusspferd, "userModuleDir", { 
+      configurable: false,
+      writable: false
+    });
+  }
+
+  // Finally put '.' at the front of the search path
   paths.unshift(".");
 })();

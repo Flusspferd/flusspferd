@@ -51,9 +51,7 @@ THE SOFTWARE.
 #define HISTORY_FILE_DEFAULT "~/.flusspferd-history"
 #endif
 
-#ifdef FLUSSPFERD_RELOCATABLE
 #include <boost/filesystem.hpp>
-#endif
 
 namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
@@ -122,8 +120,6 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     //file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
-    // Default - can be changed by -c cmd line option
-    config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
     running(false),
@@ -141,17 +137,14 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::load_core(g, argv[0]);
 
-#ifdef FLUSSPFERD_RELOCATABLE
-  // Change the config to use the relative version
+  // Default - can be changed by -c cmd line option
   boost::filesystem::path p = g.call("require", "flusspferd")
                                .to_object()
-                               .get_property("executableName")
+                               .get_property("installPrefix")
                                .to_std_string();
-  p.remove_filename();
-  p /=  boost::filesystem::path(FLUSSPFERD_ETC_PATH)
+  p /=  boost::filesystem::path(REL_ETC_PATH)
     /   std::string("jsrepl.js");
   config_file = p.string();
-#endif
 
   flusspferd::create<flusspferd::function>(
     "quit",
