@@ -66,6 +66,14 @@ BOOST_AUTO_TEST_CASE( copy_op ) {
   BOOST_CHECK_EQUAL(a, b);
 }
 
+BOOST_AUTO_TEST_CASE( op_ne ) {
+  flusspferd::string const a("Test String\n");
+  flusspferd::string const b(a);
+  BOOST_CHECK( !(a == b) == (a != b) );
+  flusspferd::string const c("sth. completly different\n");
+  BOOST_CHECK( !(a == c) == (a != c) );
+}
+
 BOOST_AUTO_TEST_CASE( op_less ) {
   std::string const ss1 = "aaa";
   std::string const ss2 = "aab";
