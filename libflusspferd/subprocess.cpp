@@ -234,9 +234,9 @@ namespace {
 }
 
 FLUSSPFERD_CLASS_DESCRIPTION(
-  subprocess,
-  (constructor_name, "subprocess")
-  (full_name, "subprocess.subprocess")
+  Subprocess,
+  (constructor_name, "Subprocess")
+  (full_name, "subprocess.Subprocess")
   (constructible, false)
   (methods,
    ("poll", bind, poll)
@@ -342,11 +342,11 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     return false;
   }
  public:
-  subprocess(object const &self, pid_t pid, int stdinfd, int stdoutfd, int stderrfd)
+  Subprocess(object const &self, pid_t pid, int stdinfd, int stdoutfd, int stderrfd)
     : base_type(self), pid(pid), finished(false), stdinfd(stdinfd), stdoutfd(stdoutfd),
       stderrfd(stderrfd)
   { }
-  ~subprocess() {
+  ~Subprocess() {
     close_stdin();
     close_stdout();
     close_stderr();
@@ -360,7 +360,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   }
   object communicate(boost::optional<std::string> const &in) {
     if(in && stdinfd == -1) {
-      throw flusspferd::exception("subprocess:communicate: No stdin pipe open but got input");
+      throw flusspferd::exception("Subprocess#communicate: No stdin pipe open but got input");
     }
 
     bool done_stdin = stdinfd == -1 || !in;
@@ -488,8 +488,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     }
   }
 
-  static subprocess &create(pid_t p, int in, int out, int err) {
-    return flusspferd::create<subprocess>(boost::fusion::make_vector(p, in, out, err));
+  static Subprocess &create(pid_t p, int in, int out, int err) {
+    return flusspferd::create<Subprocess>(boost::fusion::make_vector(p, in, out, err));
   }
 };
 
@@ -501,7 +501,7 @@ namespace {
     }
   }
 
-  subprocess &do_popen(char const *cmd,
+  Subprocess &do_popen(char const *cmd,
                        std::vector<char const*> const &args,
                        std::vector<char const*> const &env,
                        bool stdin_, bool stdout_, bool stderr_,
@@ -585,7 +585,7 @@ namespace {
     else {
       stderrp[0] = -1;
     }
-    return subprocess::create(pid, stdinp[1], stdoutp[0], stderrp[0]);
+    return Subprocess::create(pid, stdinp[1], stdoutp[0], stderrp[0]);
   }
 
   std::vector<char const*> array2args(object o) {
@@ -776,7 +776,7 @@ void flusspferd::load_subprocess_module(object &ctx) {
   flusspferd::create<flusspferd::function>(
     "popen", &Popen,
     param::_container = exports);
-  load_class<subprocess>(exports);
+  load_class<Subprocess>(exports);
   exports.define_properties(read_only_property | permanent_property)
     ("SIGABRT", value(static_cast<int>(SIGABRT))) // Process abort signal. (A)
     ("SIGALRM", value(static_cast<int>(SIGALRM))) // Alarm clock. (T)

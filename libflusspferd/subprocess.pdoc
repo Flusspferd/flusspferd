@@ -32,9 +32,9 @@
  **/
 
 /**
- * subprocess.popen(command[, mode]) -> subprocess.subprocess
- * subprocess.popen(args[, mode]) -> subprocess.subprocess
- * subprocess.popen(obj) -> subprocess.subprocess
+ * subprocess.popen(command[, mode]) -> subprocess.Subprocess
+ * subprocess.popen(args[, mode]) -> subprocess.Subprocess
+ * subprocess.popen(obj) -> subprocess.Subprocess
  * - command (String): a command passed to `sh -c` (Similar to [popen(3)](http://www.kernel.org/doc/man-pages/online/pages/man3/popen.3.html)).
  * - mode (String): `"w"` or `"r"` (see below. Similar to popen(3)). If no `mode` parameter is passed pipes for stdin, stdout and stderr are opened.
  * - args (Array): an array containing a command as first param (`argv[0]`) and arguments passed to the command. This uses execve directly and doesn't pass the command to a shell first.
@@ -59,30 +59,30 @@
  **/
 
 /**
- * class subprocess.subprocess
+ * class subprocess.Subprocess
  * 
  * Provides an interface to a subprocess. Use [[subprocess.popen]] for construction.
  **/
 
 /**
- * subprocess.subprocess#poll() -> null|Integer
+ * subprocess.Subprocess#poll() -> null|Integer
  * 
  * Checks if the subprocess is still running. Returns null if the subprocess is still running or
  * else the returncode as an Integer.
  * 
- * See [[subprocess.subprocess#returncode]] and [[subprocess.subprocess#wait]].
+ * See [[subprocess.Subprocess#returncode]] and [[subprocess.Subprocess#wait]].
  **/
 
 /**
- * subprocess.subprocess#wait() -> Integer
+ * subprocess.Subprocess#wait() -> Integer
  * 
  * Waits until the subprocess is finished and returns the returncode as an Integer.
  * 
- * See [[subprocess.subprocess#returncode]] and [[subprocess.subprocess#poll]].
+ * See [[subprocess.Subprocess#returncode]] and [[subprocess.Subprocess#poll]].
  **/
 
 /**
- * subprocess.subprocess#communicate([input]) -> Object
+ * subprocess.Subprocess#communicate([input]) -> Object
  * - input (String): data to send to the subprocess.
  * 
  * Write `input` to stdin of the process (if stdin pipe was opened) and read stdout/stderr if
@@ -92,7 +92,7 @@
  **/
 
 /**
- * subprocess.subprocess#sendSignal(signal) -> undefined
+ * subprocess.Subprocess#sendSignal(signal) -> undefined
  * - signal (Integer): sends a signal to the subprocess.
  * 
  * Sends a signal to the subprocess. At least [[subprocess.SIGTERM]] and [[subprocess.SIGKILL]]
@@ -100,48 +100,48 @@
  **/
 
 /**
- * subprocess.subprocess#terminate() -> undefined
+ * subprocess.Subprocess#terminate() -> undefined
  * 
  * Terminate subprocess (similar to `sendSignal(SIGTERM)`).
  * 
- * See [[subprocess.subprocess#sendSignal]], [[subprocess.subprocess#kill]] and [[subprocess.SIGTERM]]
+ * See [[subprocess.Subprocess#sendSignal]], [[subprocess.Subprocess#kill]] and [[subprocess.SIGTERM]]
  **/
 
 /**
- * subprocess.subprocess#kill() -> undefined
+ * subprocess.Subprocess#kill() -> undefined
  * 
  * Kill subprocess (similar to `sendSignal(SIGKILL)`).
  * 
- * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#terminate]] and [[subprocess.SIGKILL]]
+ * See [[subprocess.Subprocess#sendSignal]] and [[subprocess.Subprocess#terminate]] and [[subprocess.SIGKILL]]
  **/
 
 /**
- * subprocess.subprocess#pid -> Integer
+ * subprocess.Subprocess#pid -> Integer
  * 
  * Process ID
  **/
 
 /**
- * subprocess.subprocess#returncode -> Integer
+ * subprocess.Subprocess#returncode -> Integer
  * 
  * The return code if the subprocess has finished. If the subprocess was terminated by a signal
  * returncode is `-signalcode`.
  **/
 
 /**
- * subprocess.subprocess#stdin -> io.Stream
+ * subprocess.Subprocess#stdin -> io.Stream
  * 
  * Writeable [[io.Stream]] interface to stdin or `null` if no stdin pipe was created.
  **/
 
 /**
- * subprocess.subprocess#stdout -> io.Stream
+ * subprocess.Subprocess#stdout -> io.Stream
  * 
  * Readable [[io.Stream]] interface to stdout or `null` if no stdout pipe was created.
  **/
 
 /**
- * subprocess.subprocess#stderr -> io.Stream
+ * subprocess.Subprocess#stderr -> io.Stream
  * 
  * Readable [[io.Stream]] interface to stderr or `null` if no stderr pipe was created.
  **/
