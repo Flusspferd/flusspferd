@@ -26,9 +26,9 @@ exports.test_communicate = function() {
                  '-c', '/dev/null'
                ];
     var p = subprocess.popen(args, "r");
-    asserts.same(p.stdin, null);
-    asserts.same(p.stderr, null);
-    asserts.ok(p.stdout !== null);
+    asserts.same(p.stdin, undefined);
+    asserts.same(p.stderr, undefined);
+    asserts.ok(p.stdout !== undefined);
     var r = p.communicate();
     asserts.same(p.poll(), r.returncode);
     asserts.same(r.returncode, p.returncode);
@@ -46,9 +46,9 @@ exports.test_retcode = function() {
     asserts.same(p.wait(), retval);
     asserts.same(p.poll(), retval);
     asserts.same(p.returncode, retval);
-    asserts.same(p.stdin, null);
-    asserts.same(p.stdout, null);
-    asserts.same(p.stderr, null);
+    asserts.same(p.stdin, undefined);
+    asserts.same(p.stdout, undefined);
+    asserts.same(p.stderr, undefined);
 };
 
 exports.test_shell = function() {
@@ -56,9 +56,9 @@ exports.test_shell = function() {
     const cmd = require('flusspferd').executableName +
         ' -e \'require("system").stdout.write("' + data + '\\n");\' -c /dev/null';
     var p = subprocess.popen(cmd, "r");
-    asserts.same(p.stdin, null);
-    asserts.same(p.stderr, null);
-    asserts.ok(p.stdout !== null);
+    asserts.same(p.stdin, undefined);
+    asserts.same(p.stderr, undefined);
+    asserts.ok(p.stdout !== undefined);
     var r = p.communicate();
     asserts.same(p.poll(), r.returncode);
     asserts.same(r.returncode, p.returncode);
