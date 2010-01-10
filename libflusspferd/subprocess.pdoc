@@ -22,7 +22,7 @@
  * 
  * Signal number to kill a process.
  * 
- * See [[subprocess.subprocess#sendSignal]] and [[subprocess.subprocess#kill]].
+ * See [[subprocess.Subprocess#sendSignal]] and [[subprocess.Subprocess#kill]].
  **/
 
 /**
@@ -30,8 +30,8 @@
  * 
  * Signal number to terminate a process.
  * 
- * See [[subprocess.subprocess#sendSignal]] and
- * [[subprocess.subprocess#terminate]].
+ * See [[subprocess.Subprocess#sendSignal]] and
+ * [[subprocess.Subprocess#terminate]].
  **/
 
 /**
