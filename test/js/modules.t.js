@@ -45,5 +45,24 @@ exports.test_module_resouce = function() {
   asserts.same(a1.module.resource("a1.js").readLine(), "// First line of a1.js\n");
 }
 
+// Test that you can load DSO modules via relative require. This test might be
+// better if we had a dedicated DSO module to load. Since right now we dont
+// always have any built :(
+//
+// This test is also fragile: it's dependant on where exactly modules built
+// to
+exports.test_relative_dso = function() {
+  try {
+    var curl = require('curl');
+  }
+  catch (e) {
+    if (e.match(/^Unable to load module 'curl' /))
+      return;
+  }
+
+  asserts.same(require('../../build/modules/curl'), curl,
+               "Can load curl DSO by relative include");
+}
+
 if (require.main === module)
   test.prove(module.id);
