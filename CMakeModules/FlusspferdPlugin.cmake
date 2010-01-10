@@ -55,18 +55,13 @@ function(flusspferd_plugin PLUGIN)
     message(FATAL_ERROR "flusspferd_plugin called for ${PLUGIN} with no SOURCES argument")
   endif()
 
-
   add_library(${PLUGIN}_PLUGIN MODULE ${PLUGIN_SOURCES})
 
-  list(APPEND props
-    OUTPUT_NAME ${PLUGIN}
-    LIBRARY_OUTPUT_DIRECTORY ${Flusspferd_BINARY_DIR}/modules )
+  list(APPEND props OUTPUT_NAME ${PLUGIN})
 
-  if(${PLUGIN_DEFINITIONS})
-    list(APPEND props COMPILE_DEFINITIONS ${PLUGIN_DEFINITIONS})
-  endif()
-  if(DEFINED FLUSSPFERD_PLUGIN_DEFINITIONS)
-    list(APPEND props COMPILE_DEFINITIONS ${FLUSSPFERD_PLUGIN_DEFINITIONS})
+  if(DEFINED Flusspferd_BINARY_DIR)
+    # Only defined in flusspferd build trees
+    list(APPEND props LIBRARY_OUTPUT_DIRECTORY ${Flusspferd_BINARY_DIR}/modules )
   endif()
 
   if(WIN32)
@@ -75,6 +70,16 @@ function(flusspferd_plugin PLUGIN)
   endif()
 
   set_target_properties( ${PLUGIN}_PLUGIN PROPERTIES ${props} )
+
+  if(DEFINED FLUSSPFERD_PLUGIN_DEFINITIONS)
+    list(APPEND PLUGIN_DEFINITIONS ${FLUSSPFERD_PLUGIN_DEFINITIONS})
+  endif()
+
+  if(DEFINED PLUGIN_DEFINITIONS)
+    # set_target_properties doesn't work when the value is a list itself
+    set_property(TARGET ${PLUGIN}_PLUGIN
+                 PROPERTY COMPILE_DEFINITIONS ${PLUGIN_DEFINITIONS})
+  endif()
 
   target_link_libraries( ${PLUGIN}_PLUGIN flusspferd ${PLUGIN_LIBRARIES} )
 

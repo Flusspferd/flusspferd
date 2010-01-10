@@ -26,10 +26,9 @@
 
 cmake_minimum_required(VERSION 2.6.4 FATAL_ERROR)
 include_directories(@FLUSSPFERD_INCLUDE_DIRS@)
-set(FLUSSPFERD_PLUGIN_DEFINITIONS "@BOOST_PARAMETER_MAX_ARITY@"
+set(FLUSSPFERD_PLUGIN_DEFINITIONS
+    "@BOOST_PARAMETER_MAX_ARITY@;FLUSSPFERD_VERSION=\"@FLUSSPFERD_VERSION@\""
     CACHE INTERNAL "Flags needed when compiling flusspferd modules" FORCE)
-
-message(${FLUSSPFERD_PLUGIN_DEFINITIONS})
 
 set(FLUSSPFERD_EXECUTABLES_REL @REL_EXECUTABLES_PATH@)
 set(FLUSSPFERD_LIBRARIES_REL @REL_LIBRARIES_PATH@)
@@ -38,9 +37,7 @@ set(FLUSSPFERD_MODULES_REL @REL_MODULES_PATH@)
 set(FLUSSPFERD_ETC_REL @REL_ETC_PATH@)
 
 get_filename_component(FLUSSPFERD_ROOT ${CMAKE_CURRENT_LIST_FILE} PATH)
-# work out the sequence of "../../" needed to go up to the root
-string(REGEX REPLACE "(^|/)[^/]+" "\\1.." __x ${FLUSSPFERD_LIBDATA_REL})
-get_filename_component(FLUSSPFERD_ROOT "${FLUSSPFERD_ROOT}/${__x}" ABSOLUTE)
+get_filename_component(FLUSSPFERD_ROOT "${FLUSSPFERD_ROOT}/@REL_LIBDATA_TO_ROOT@" ABSOLUTE)
 
 
 add_library(flusspferd SHARED IMPORTED)
@@ -55,6 +52,22 @@ include(FlusspferdPlugin)
 
 set(CMAKE_SHARED_MODULE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
 
-# Hmmm - should this use the module dir in HOME if its set?
-set(INSTALL_MODULES_PATH ${FLUSSPFERD_ROOT}/${FLUSSPFERD_MODULES_REL})
-set(EXECUTABLE_OUTPUT_PATH ${FLUSSPFERD_ROOT}/${FLUSSPFERD_EXECUTABLES_REL})
+# Work out if we should install into the user or system module dirs:
+# Use the userModuleDir if it exists or if the system one isn't writable
+execute_process(
+  COMMAND flusspferd -e "
+var f = require('flusspferd'),
+    fs = require('fs-base');
+print( 'userModuleDir' in f &&
+          (fs.isDirectory(f.userModuleDir) || !fs.isWriteable(f.systemModuleDir))
+     ?  f.userModuleDir
+     :  f.systemModuleDir
+     )
+"
+  WORKING_DIRECTORY "${FLUSSPFERD_ROOT}/@REL_EXECUTABLES_PATH@/"
+  OUTPUT_VARIABLE INSTALL_MODULES_PATH
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+MESSAGE(STATUS "")
+MESSAGE(STATUS " Installing into ${INSTALL_MODULES_PATH}")
+MESSAGE(STATUS "")
