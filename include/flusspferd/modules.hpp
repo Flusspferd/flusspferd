@@ -149,9 +149,8 @@ protected:
   object create_cache_entry(std::string const &id);
 
   object load_top_level_module(std::string const &id);
-  object load_absolute_js_file(boost::filesystem::path path, std::string const &id);
-
-  boost::filesystem::path resolve_relative_id(std::string const &id);
+  object load_absolute_module(std::string id);
+  object load_relative_module(std::string id);
 
   void require_js(boost::filesystem::path filename,
                   std::string const &id,
