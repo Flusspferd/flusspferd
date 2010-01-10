@@ -35,9 +35,10 @@ void flusspferd::load_subprocess_module(object &ctx) {
 
 #else // POSIX/UNIX
 
-#include "flusspferd/io/stream.hpp"
 #include "flusspferd/array.hpp"
+#include "flusspferd/tracer.hpp"
 #include "flusspferd/create.hpp"
+#include "flusspferd/io/stream.hpp"
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/create/function.hpp"
 #include "flusspferd/class_description.hpp"
@@ -260,14 +261,17 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   int stdoutfd;
   int stderrfd;
 
-  bio::stream_buffer<bio::file_descriptor_sink> stdinstream;
-  bio::stream_buffer<bio::file_descriptor_source> stdoutstream;
-  bio::stream_buffer<bio::file_descriptor_source> stderrstream;
+  bio::stream_buffer<bio::file_descriptor_sink> stdinstreambuf;
+  io::stream *stdinstream;
+  bio::stream_buffer<bio::file_descriptor_source> stdoutstreambuf;
+  io::stream *stdoutstream;
+  bio::stream_buffer<bio::file_descriptor_source> stderrstreambuf;
+  io::stream *stderrstream;
 
   void close_stdin() {
     if(stdinfd != -1) {
-      if(stdinstream.is_open()) {
-        stdinstream.close();
+      if(stdinstreambuf.is_open()) {
+        stdinstreambuf.close();
       }
       ::close(stdinfd);
       stdinfd = -1;
@@ -276,8 +280,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 
   void close_stdout() {
     if(stdoutfd != -1) {
-      if(stdoutstream.is_open()) {
-        stdoutstream.close();
+      if(stdoutstreambuf.is_open()) {
+        stdoutstreambuf.close();
       }
       ::close(stdoutfd);
       stdoutfd = -1;
@@ -286,8 +290,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
 
   void close_stderr() {
     if(stderrfd != -1) {
-      if(stderrstream.is_open()) {
-        stderrstream.close();
+      if(stderrstreambuf.is_open()) {
+        stderrstreambuf.close();
       }
       ::close(stderrfd);
       stderrfd = -1;
@@ -341,10 +345,23 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     buffer.append(buf, buf+n);
     return false;
   }
+ protected:
+  void trace(flusspferd::tracer &trc) {
+    if(stdinstream) {
+      trc("Subprocess#stdin", *stdinstream);
+    }
+    if(stdoutstream) {
+      trc("Subprocess#stdout", *stdoutstream);
+    }
+    if(stderrstream) {
+      trc("Subprocess#stderr", *stderrstream);
+    }
+  }
+
  public:
   Subprocess(object const &self, pid_t pid, int stdinfd, int stdoutfd, int stderrfd)
     : base_type(self), pid(pid), finished(false), stdinfd(stdinfd), stdoutfd(stdoutfd),
-      stderrfd(stderrfd)
+      stderrfd(stderrfd), stdinstream(0x0), stdoutstream(0x0), stderrstream(0x0)
   { }
   ~Subprocess() {
     close_stdin();
@@ -455,36 +472,48 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     }
   }
   value get_stdin()  {
-    if(stdinfd == -1) {
+    if(stdinfd == -1 && !stdinstream) {
       return value();
     }
     else {
-      if(!stdinstream.is_open()) {
-        stdinstream.open(bio::file_descriptor_sink(stdinfd));
+      if(!stdinstream) {
+        if(!stdinstreambuf.is_open()) {
+          stdinstreambuf.open(bio::file_descriptor_sink(stdinfd));
+        }
+        stdinstream = &flusspferd::create<io::stream>(
+          bf::vector1<std::streambuf*>(&stdinstreambuf));
       }
-      return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdinstream));
+      return *stdinstream;
     }
   }
   value get_stdout() {
-    if(stdoutfd == -1) {
+    if(stdoutfd == -1 && !stdoutstream) {
       return value();
     }
     else {
-      if(!stdoutstream.is_open()) {
-        stdoutstream.open(bio::file_descriptor_source(stdoutfd));
+      if(!stdoutstream) {
+        if(!stdoutstreambuf.is_open()) {
+          stdoutstreambuf.open(bio::file_descriptor_source(stdoutfd));
+        }
+        stdoutstream = &flusspferd::create<io::stream>(
+          bf::vector1<std::streambuf*>(&stdoutstreambuf));
       }
-      return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stdoutstream));
+      return *stdoutstream;
     }
   }
   value get_stderr() {
-    if(stderrfd == -1) {
+    if(stderrfd == -1 && !stderrstream) {
       return value();
     }
     else {
-      if(!stderrstream.is_open()) {
-        stderrstream.open(bio::file_descriptor_source(stderrfd));
+      if(!stderrstream) {
+        if(!stderrstreambuf.is_open()) {
+          stderrstreambuf.open(bio::file_descriptor_source(stderrfd));
+        }
+        stderrstream = &flusspferd::create<io::stream>(
+          bf::vector1<std::streambuf*>(&stderrstreambuf));
       }
-      return flusspferd::create<io::stream>(bf::vector1<std::streambuf*>(&stderrstream));
+      return *stderrstream;
     }
   }
 
