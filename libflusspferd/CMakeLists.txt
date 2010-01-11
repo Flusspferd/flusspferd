@@ -148,6 +148,12 @@ set(
     spidermonkey/value.cpp
 )
 
+set_property(SOURCE flusspferd_module.cpp
+  PROPERTY COMPILE_DEFINITIONS
+    "REL_BIN_TO_ROOT=\"${REL_BIN_TO_ROOT}\""
+    "REL_MODULES_PATH=\"${REL_MODULES_PATH}\""
+    )
+
 if(MSVC)
     # Build static lib for MSVC
     set(FLUSSPFERD_LIBRARY_TYPE STATIC)
@@ -174,14 +180,15 @@ target_link_libraries(flusspferd ${flusspferd_LIBS})
 # Libraries linking against the flusspferd DSO dont need to link to all the above.
 set_property(TARGET flusspferd PROPERTY LINK_INTERFACE_LIBRARIES "")
 
-
 if(WIN32)
     # .dll goes in bin/
-    install(TARGETS flusspferd RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH})
     # .lib goes in lib/
-    install(TARGETS flusspferd ARCHIVE DESTINATION ${INSTALL_LIBRARIES_PATH})
+    install(TARGETS flusspferd
+            RUNTIME DESTINATION ${INSTALL_EXECUTABLES_PATH}
+            ARCHIVE DESTINATION ${INSTALL_LIBRARIES_PATH})
 else()
-    install(TARGETS flusspferd LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
+    install(TARGETS flusspferd
+            LIBRARY DESTINATION ${INSTALL_LIBRARIES_PATH})
 endif()
 
 ## Library - coverage variant ###############################################
@@ -234,16 +241,27 @@ install(
 
 ## Configured files #########################################################
 
+set(FLUSSPFERD_LIB_NAME "${CMAKE_SHARED_MODULE_PREFIX}flusspferd${CMAKE_SHARED_MODULE_SUFFIX}")
+set(FLUSSPFERD_INCLUDE_DIRS ${Boost_INCLUDE_DIR} ${SPIDERMONKEY_INCLUDE_DIR})
+configure_file(
+    Flusspferd.cmake.in
+    ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
+    ESCAPE_QUOTES @ONLY)
+unset(FLUSSPFERD_LIB_NAME)
+unset(FLUSSPFERD_INCLUDE_DIRS)
+
+install(
+  FILES ${CMAKE_SOURCE_DIR}/CMakeModules/FlusspferdPlugin.cmake
+        ${CMAKE_SOURCE_DIR}/CMakeModules/FindBoost.cmake
+        ${Flusspferd_BINARY_DIR}/Flusspferd.cmake
+  DESTINATION ${INSTALL_LIBDATA_PATH})
+
 if(NOT MSVC)
     set(FLUSSPFERD_EXTERNAL_CFLAGS
-        "${FLUSSPFERD_EXTERNAL_CFLAGS} -I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
-
-    foreach(_FLAG @SPIDERMONKEY_DEFINITIONS@)
-        set(FLUSSPFERD_EXTERNAL_CFLAGS "${FLUSSPFERD_EXTERNAL_CFLAGS} ${_FLAG}")
-    endforeach()
+        "${FLUSSPFERD_EXTERNAL_CFLAGS} -D${BOOST_PARAMETER_MAX_ARITY} -I${Boost_INCLUDE_DIR} -I${SPIDERMONKEY_INCLUDE_DIR}")
 
     configure_file(
-        ${Flusspferd_SOURCE_DIR}/flusspferd.pc.in
+        flusspferd.pc.in
         ${Flusspferd_BINARY_DIR}/flusspferd.pc
         @ONLY)
 
@@ -251,3 +269,4 @@ if(NOT MSVC)
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 endif()
+

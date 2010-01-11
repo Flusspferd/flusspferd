@@ -42,6 +42,7 @@ THE SOFTWARE.
  *   - @ref cpp-tutorial-classes
  *     - @ref cpp-tutorial-classes-without-macro
  *   - @ref cpp-tutorial-modules
+ *     - @ref cpp-tutorial-modules-compiling
  *
  * - @subpage js-tutorial
  *   - @ref js-tutorial-invoke

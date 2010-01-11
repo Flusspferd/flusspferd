@@ -51,9 +51,7 @@ THE SOFTWARE.
 #define HISTORY_FILE_DEFAULT "~/.flusspferd-history"
 #endif
 
-#ifdef FLUSSPFERD_RELOCATABLE
 #include <boost/filesystem.hpp>
-#endif
 
 namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
@@ -92,6 +90,7 @@ class flusspferd_repl {
   void print_version();
   void print_man();
   void print_bash();
+  void print_cmakefile();
   void add_runnable(std::string const &path, Type type, bool del_interactive);
   void set_gc_zeal(std::string const &s);
   void load_config();
@@ -122,8 +121,6 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     //file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
-    // Default - can be changed by -c cmd line option
-    config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
     running(false),
@@ -141,17 +138,14 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::load_core(g, argv[0]);
 
-#ifdef FLUSSPFERD_RELOCATABLE
-  // Change the config to use the relative version
+  // Default - can be changed by -c cmd line option
   boost::filesystem::path p = g.call("require", "flusspferd")
                                .to_object()
-                               .get_property("executableName")
+                               .get_property("installPrefix")
                                .to_std_string();
-  p.remove_filename();
-  p /=  boost::filesystem::path(FLUSSPFERD_ETC_PATH)
+  p /=  boost::filesystem::path(REL_ETC_PATH)
     /   std::string("jsrepl.js");
   config_file = p.string();
-#endif
 
   flusspferd::create<flusspferd::function>(
     "quit",
@@ -325,6 +319,23 @@ void flusspferd_repl::print_version() {
   throw flusspferd::js_quit();
 }
 
+void flusspferd_repl::print_cmakefile() {
+  if (!interactive_set)
+    interactive = false;
+
+  boost::filesystem::path p = flusspferd::global()
+                               .call("require", "flusspferd")
+                               .to_object()
+                               .get_property("installPrefix")
+                               .to_std_string();
+  p /=  boost::filesystem::path(REL_LIBDATA_PATH)
+    /   std::string("Flusspferd.cmake");
+
+  std::cout << p;
+  std::cout.flush();
+  throw flusspferd::js_quit();
+}
+
 void flusspferd_repl::add_runnable(
     std::string const &file, Type type, bool del_interactive)
 {
@@ -393,6 +404,14 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
       "callback",
       phoenix::bind(&flusspferd_repl::print_version, this),
       flusspferd::param::_container = version);
+
+    flusspferd::object cmake(flusspferd::create<flusspferd::object>());
+    spec.set_property("cmake", cmake);
+    cmake.set_property("doc", "Print location to Flusspferd.cmake file and exit.");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_cmakefile, this),
+      flusspferd::param::_container = cmake);
 
     flusspferd::object config(flusspferd::create<flusspferd::object>());
     spec.set_property("config", config);
