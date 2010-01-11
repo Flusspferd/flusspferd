@@ -10,6 +10,13 @@ if(PLUGIN_XML)
       remove_definitions(-Woverloaded-virtual -Wnon-virtual-dtor)
     endif()
 
+    if(NOT EXISTS ${CMAKE_SOURCE_DIR}/vendor/arabica/include/)
+      message(FATAL_ERROR "Arabica git submodule not found. Please run\n"
+                          "   git submodule init\n"
+                          "   git submodule update\n"
+                          "from the root of the git checkout")
+    endif()
+
     # Use the inlcudes from vendor to, We've made some header only changes
     include_directories( ${CMAKE_SOURCE_DIR}/vendor/arabica/include ${ARABICA_INCLUDEDIR})
     flusspferd_plugin(
