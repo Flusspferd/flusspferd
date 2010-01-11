@@ -28,6 +28,7 @@
 
 #include <flusspferd/exception.hpp>
 #include <boost/exception/get_error_info.hpp>
+#include <boost/exception/info.hpp>
 #include <curl/curl.h>
 #include <string>
 
