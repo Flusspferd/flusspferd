@@ -116,8 +116,7 @@ namespace curl {
     void do_setopt(CURLoption what, T data) {
       CURLcode res = curl_easy_setopt(get(), what, data);
       if(res != 0) {
-        throw exception(std::string("curl_easy_setopt: ") +
-                        curl_easy_strerror(res));
+        throw curl::exception("curl_easy_setopt") << curlcode_info(res);
       }
     }
   };
