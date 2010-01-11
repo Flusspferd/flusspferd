@@ -36,8 +36,7 @@ curl::cURL_cookie::cURL_cookie(object const &obj)
   boost::mutex::scoped_lock lock(cookie);
   CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
   if(ret != 0)
-    throw curl::exception(std::string("curl_global_init: ")
-                          + curl_easy_strerror(ret));
+    throw curl::exception("curl_global_init") << curlcode_info(ret);
 }
 
 curl::cURL_cookie::~cURL_cookie() {
