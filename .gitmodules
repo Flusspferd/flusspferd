@@ -6,4 +6,4 @@
 	url = git://github.com/ashb/flusspferd-pdoc-template.git
 [submodule "vendor/arabica"]
 	path = vendor/arabica
-	url = git@github.com:ashb/Arabica.git
+	url = git://github.com/ashb/Arabica.git
