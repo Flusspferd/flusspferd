@@ -83,12 +83,12 @@ namespace curl {
              i != d.first.end();
              ++i) {
           if(!i->is_string()) {
-            throw exception("array data not a string");
+            throw curl::exception("array data not a string");
           }
           curl_slist *r = curl_slist_append(
               d.second, i->get_string().c_str());
           if(!r) {
-            throw exception("curl_slist_append");
+            throw curl::exception("curl_slist_append");
           }
           d.second = r;
         }

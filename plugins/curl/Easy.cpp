@@ -67,7 +67,7 @@ size_t Easy::readfunction(void *ptr, size_t size, size_t nmemb, void *stream) {
     arg.push_back(flusspferd::value(nmemb));
     flusspferd::root_value v(self.readfunction_callback.call(arg));
     if(data.get_length() > size*nmemb) {
-      throw exception("Out of Range");
+      throw curl::exception("Out of Range");
     }
     std::copy(data.get_data().begin(), data.get_data().end(),
               static_cast<flusspferd::binary::element_type*>(ptr));
@@ -165,7 +165,7 @@ bool Easy::valid() {
 
 CURL *Easy::get() {
   if (!handle)
-    throw exception("CURL handle not valid!");
+    throw curl::exception("CURL handle not valid!");
   return handle;
 }
 
@@ -177,7 +177,7 @@ Easy::Easy(flusspferd::object const &self, flusspferd::call_context&)
   : base_type(self), handle(curl_easy_init()), opt(EasyOpt::create(*this))
 {
   if(!handle)
-    throw exception("curl_easy_init");
+    throw curl::exception("curl_easy_init");
 }
 
 Easy::Easy(flusspferd::object const &self, CURL *hnd)
@@ -199,9 +199,9 @@ Easy::~Easy() {
 
 void Easy::perform() {
   CURLcode res = curl_easy_perform(get());
-  if (res != 0)
-    throw exception(std::string("curl_easy_perform: ") +
-                                curl_easy_strerror(res));
+  if(res != 0) {
+    throw curl::exception("curl_easy_perform") << curlcode_info(res);
+  }
 }
 
 void Easy::reset() {
@@ -213,7 +213,7 @@ std::string Easy::unescape(char const *input) {
   int len;
   char *const uesc = curl_easy_unescape(get(), input, 0, &len);
   if(!uesc) {
-    throw exception("curl_easy_unescape");
+    throw curl::exception("curl_easy_unescape");
   }
   std::string ret(uesc, len);
   curl_free(uesc);
@@ -223,7 +223,7 @@ std::string Easy::unescape(char const *input) {
 std::string Easy::escape(char const *input) {
   char *const esc = curl_easy_escape(get(), input, 0);
   if(!esc) {
-    throw exception("curl_easy_escape");
+    throw curl::exception("curl_easy_escape");
   }
   std::string ret(esc);
   curl_free(esc);
