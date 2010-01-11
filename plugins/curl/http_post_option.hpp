@@ -71,7 +71,7 @@ namespace curl {
 
     static char const *get_data_ptr(flusspferd::value v) {
       if(!v.is_string()) { // TODO binary stuff
-        throw flusspferd::exception("data is not a string", "TypeError");
+        throw exception("data is not a string", "TypeError");
       }
       return v.get_string().c_str();
     }
@@ -100,7 +100,7 @@ namespace curl {
       form.option = option;
       flusspferd::value v = o.get_property(name);
       if(!v.is_int()) {
-        throw flusspferd::exception("data is not an int", "TypeError");
+        throw exception("data is not an int", "TypeError");
       }
       // yay curl's api is weird
       form.value = reinterpret_cast<char const*>(v.get_int());
@@ -110,7 +110,7 @@ namespace curl {
     static void object2form(
         flusspferd::object o, curl_httppost *&post, curl_httppost *&last) {
       if(!o.has_property("name")) {
-        throw flusspferd::exception("object has no `name' property", "TypeError");
+        throw exception("object has no `name' property", "TypeError");
       }
       std::vector<curl_forms> forms;
       curl_forms form;
@@ -135,7 +135,7 @@ namespace curl {
       if(ret != 0) {
         std::stringstream sstr;
         sstr << "curl_formadd failed! " << static_cast<unsigned>(ret);
-        throw flusspferd::exception(sstr.str());
+        throw exception(sstr.str());
       }
     }
     static void set(EasyOpt *o, flusspferd::object val) {
@@ -150,7 +150,7 @@ namespace curl {
                 boost::make_iterator_range(ain.begin(), ain.end())));
         for (flusspferd::array::iterator i = a.begin(); i != a.end(); ++i) {
           if(!i->is_object()) {
-            throw flusspferd::exception("array member not an object", "TypeError");
+            throw exception("array member not an object", "TypeError");
           }
           object2form(i->get_object(), post, last);
         }

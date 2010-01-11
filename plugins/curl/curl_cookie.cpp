@@ -23,6 +23,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
+#include "exception.hpp"
 #include "curl_cookie.hpp"
 #include <curl/curl.h>
 #include <boost/thread.hpp>
@@ -35,8 +36,8 @@ curl::cURL_cookie::cURL_cookie(object const &obj)
   boost::mutex::scoped_lock lock(cookie);
   CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
   if(ret != 0)
-    throw flusspferd::exception(std::string("curl_global_init: ")
-                                + curl_easy_strerror(ret));
+    throw curl::exception(std::string("curl_global_init: ")
+                          + curl_easy_strerror(ret));
 }
 
 curl::cURL_cookie::~cURL_cookie() {
