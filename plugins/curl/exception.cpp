@@ -33,10 +33,12 @@ curl::exception::~exception() throw() {}
 
 char const *curl::exception::what() const throw() {
   if (CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
-    std::string what_ = flusspferd::exception::what();
-    what_ += ": ";
-    what_ += curl_easy_strerror(*code);
-    return what_.c_str();
+    if(what_m.empty()) {
+      what_m = flusspferd::exception::what();
+      what_m += ": ";
+      what_m += curl_easy_strerror(*code);
+    }
+    return what_m.c_str();
   } else {
     return flusspferd::exception::what();
   }

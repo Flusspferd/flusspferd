@@ -29,6 +29,7 @@
 #include <flusspferd/exception.hpp>
 #include <boost/exception/get_error_info.hpp>
 #include <curl/curl.h>
+#include <string>
 
 namespace curl {
   typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
@@ -37,10 +38,11 @@ namespace curl {
     : flusspferd::exception
   {
     exception(std::string const &what, char const *type = "Error");
-
     ~exception() throw();
 
     char const *what() const throw();
+  private:
+    mutable std::string what_m;
   };
 }
 
