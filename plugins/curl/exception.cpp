@@ -25,18 +25,20 @@
 */
 #include "exception.hpp"
 
-curl::exception::exception(std::string const &what)
-  : std::runtime_error(what), flusspferd::exception(what)
+curl::exception::exception(std::string const &what, char const *type)
+  : std::runtime_error(what), flusspferd::exception(what, type)
 { }
 
 curl::exception::~exception() throw() {}
 
 char const *curl::exception::what() const throw() {
   if (CURLcode const *code = ::boost::get_error_info<curlcode_info>(*this)) {
-    std::string what_ = flusspferd::exception::what();
-    what_ += ": ";
-    what_ += curl_easy_strerror(*code);
-    return what_.c_str();
+    if(what_m.empty()) {
+      what_m = flusspferd::exception::what();
+      what_m += ": ";
+      what_m += curl_easy_strerror(*code);
+    }
+    return what_m.c_str();
   } else {
     return flusspferd::exception::what();
   }

@@ -43,7 +43,6 @@ THE SOFTWARE.
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/xpressive/xpressive.hpp>
-#include <sstream>
 #include <algorithm>
 
 #ifdef WIN32
@@ -65,6 +64,7 @@ namespace fusion = boost::fusion;
 using boost::format;
 
 static fs::path make_dsoname(std::string const &id);
+static void load_native_module(fs::path const &dso_name, object exports);
 static void setup_module_resolve_fns(object &module, fs::path const &id);
 
 static std::string module_resource_resolve(fs::path const &module_dir, std::string const &x);
@@ -72,6 +72,9 @@ static object module_resource(const fs::path &module_dir, std::string const &x_,
 
 // This function based largley on one from boost/program_options. See end of file for its license
 static array split_args_string(const value& input);
+
+
+const format load_error_fmt("Unable to load module '%1%': %2%");
 
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
@@ -169,6 +172,11 @@ void require::set_main_module(std::string const &id_) {
   set_property("id", id);
 }
 
+// require.id
+std::string require::current_id() {
+  return get_property("id").to_std_string();
+}
+
 // The implementation of the |require()| function that is available to JS
 void require::call(call_context &x) {
 
@@ -187,32 +195,16 @@ object require::call_helper(std::string const &id_) {
     return module_cache.get_property_object(id_);
   }
 
-  id_classification type = classify_id(id_);
-
-  if (type == top_level) {
-    return load_top_level_module(id_);
+  switch (classify_id(id_)) {
+    default:
+    case top_level:
+      return load_top_level_module(id_);
+    case relative:
+      return load_relative_module(id_);
+    case fully_qualified:
+      return load_absolute_module(id_);
   }
 
-  std::string id = id_;
-
-  fs::path module_path;
-  if (type == relative) {
-    module_path = resolve_relative_id( id_ );
-    id = module_path.string();
-  }
-  else if (type == fully_qualified) {
-    id = id.substr(strlen("file://"));
-    module_path = io::fs_base::canonicalize( id );
-  }
-  id = "file://" + id;
-
-
-  // If what ever the file resolves to is already loaded, give it to them
-  if (module_cache.has_own_property(id)) {
-    return module_cache.get_property_object(id);
-  }
-
-  return load_absolute_js_file(module_path, id);
 }
 
 
@@ -370,27 +362,13 @@ require::id_classification require::classify_id(std::string const &id) {
   return top_level;
 }
 
-/**
- * Resolve a realtive ID (as passed to require) using the current module id
- * returning a canonical filename
- *
- * @param id The require id to resolve into an absolute path
- * @return boost::filesystem::path object
- */
-fs::path require::resolve_relative_id(std::string const &id) {
-
-  fs::path module(current_id().substr(strlen("file://")));
-  module = module.parent_path();
-
-  return io::fs_base::canonicalize( module / (id +".js") );
-}
-
 
 // Utility class to remove |module_cache[id]| in case of an exception
 class ExportsScopeGuard {
+  public:
     object module_cache;
     std::string id;
-  public:
+
     ExportsScopeGuard(object _cache, std::string _id)
       : module_cache(_cache),
         id(_id)
@@ -409,6 +387,55 @@ class ExportsScopeGuard {
 
 
 
+
+object require::load_relative_module(std::string id) {
+
+  fs::path module(current_id().substr(strlen("file://")));
+
+  module = io::fs_base::canonicalize( module.parent_path() / (id + ".js") );
+  id = module.string();
+  fs::path dso_path = make_dsoname(module.string());
+  id = "file://" + id;
+  std::string dso_id = "file://" + dso_path.string();
+
+
+  // If either of the JS or DSO is already cached then just return it
+  if (module_cache.has_own_property(id) )
+    return module_cache.get_property_object(id);
+  else if (module_cache.has_own_property(dso_id) )
+    return module_cache.get_property_object(dso_id);
+
+  bool js = false, dso = false;
+  security &sec = security::get();
+  if (sec.check_path(module.string(), security::READ) && fs::exists(module)) {
+    js = true;
+  }
+  if (sec.check_path(dso_path.string(), security::READ) && fs::exists(dso_path)) {
+    dso = true;
+  }
+
+  if (!js && !dso)
+    throw exception(format(load_error_fmt) % id % "file not found");
+  else if (!js)
+    id = dso_id;
+
+
+  ExportsScopeGuard scope_guard(module_cache, id);
+
+  // The object we store in module_cache
+  object cache = create_cache_entry(id);
+
+  if (dso)
+    load_native_module(dso_path, cache.get_property_object("exports"));
+  if (js)
+    require_js(module, id, cache);
+
+  scope_guard.exit_cleanly();
+
+  return cache;
+}
+
+
 void load_native_module(fs::path const &dso_name, object exports) {
   std::string const &fullpath = dso_name.string();
 #ifdef WIN32
@@ -416,21 +443,17 @@ void load_native_module(fs::path const &dso_name, object exports) {
 
   // TODO: Improve error message
   if (!module)
-    throw exception(("Unable to load library '" +fullpath+"'"));
+    throw exception(format(load_error_fmt) % fullpath % "can't open DLL");
 
   FARPROC symbol = GetProcAddress(module, "flusspferd_load");
 
   if (!symbol)
-    throw exception(("Unable to load library '" + fullpath + "': symbol "
-                    "not found"));
+    throw exception(format(load_error_fmt) % fullpath % "symbol not found");
 #else
   // Load the .so
   void *module = dlopen(fullpath.c_str(), RTLD_LAZY);
   if (!module) {
-    std::stringstream ss;
-    ss << "Unable to load library '" << fullpath
-       << "': " << dlerror();
-    throw exception(ss.str());
+    throw exception(format(load_error_fmt) % fullpath % dlerror());
   }
 
   dlerror(); // clear error state
@@ -439,22 +462,15 @@ void load_native_module(fs::path const &dso_name, object exports) {
 
   char const *const error_string = dlerror();
 
-    if (error_string) {
-      std::stringstream ss;
-      ss << "Unable to load library '" << fullpath
-         << "': " << error_string;
-      throw exception(ss.str());
-    }
+  if (error_string) {
+    throw exception(format(load_error_fmt) % fullpath % error_string);
+  }
 #endif
 
   flusspferd_load_t func = *(flusspferd_load_t*) &symbol;
 
   root_object context(global());
   func(exports, context);
-}
-
-std::string require::current_id() {
-  return get_property("id").to_std_string();
 }
 
 
@@ -512,10 +528,22 @@ object require::load_top_level_module(std::string const &id) {
   for (size_t i = 0; i < len; i++) {
     fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
     fs::path native_path = path / dso_name;
-    if (sec.check_path(native_path.string(), security::READ) &&
+
+    std::string new_id = "file://" + native_path.string();
+    if (module_cache.has_own_property(new_id)) {
+      // This dso is already cached.
+      cache = module_cache.get_property_object(new_id);
+      // Cache it under the top level name
+      module_cache.set_property(id, cache);
+      // Short-circuit and return it
+      scope_guard.exit_cleanly();
+      return cache;
+    }
+    else if (sec.check_path(native_path.string(), security::READ) &&
         fs::exists(native_path) )
     {
       found = true;
+      dso_name = native_path;
       load_native_module(native_path, cache.get_property_object("exports"));
       break;
     }
@@ -530,6 +558,8 @@ object require::load_top_level_module(std::string const &id) {
     // doesn't exist anymore
     if (module_cache.has_own_property(new_id)) {
       cache = module_cache.get_property_object(new_id);
+      // And cache it under the top level name
+      module_cache.set_property(id, cache);
     }
     else {
       // Cache it under the top-level and fully-qualified ids
@@ -539,6 +569,10 @@ object require::load_top_level_module(std::string const &id) {
       require_js(js_name.get(), new_id, cache);
       scope_guard2.exit_cleanly();
     }
+  }
+  else {
+    // We loaded just a dso, cache that under its full name too.
+    module_cache.set_property("file://" + dso_name.string(), cache);
   }
 
   scope_guard.exit_cleanly();
@@ -571,9 +605,10 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
   }
 
   if (fatal) {
-    std::stringstream ss;
-    ss << "Unable to find library '" << id << "' in [" << paths << "]";
-    throw exception(ss.str());
+    throw exception(
+      format(load_error_fmt)
+          % id % ("can't locate it in [" + value(paths).to_std_string() + "]")
+    );
   }
   return boost::none;
 }
@@ -613,8 +648,17 @@ object require::create_cache_entry(std::string const &id) {
   return cache;
 }
 
-object require::load_absolute_js_file(fs::path path, std::string const &id) {
+object require::load_absolute_module(std::string id) {
   security &sec = security::get();
+
+  id = id.substr(strlen("file://"));
+  fs::path path = io::fs_base::canonicalize( id );
+  id = "file://" + id;
+
+  // If what ever the file resolves to is already loaded, give it to them
+  if (module_cache.has_own_property(id)) {
+    return module_cache.get_property_object(id);
+  }
 
   ExportsScopeGuard scope_guard(module_cache, id);
   if (sec.check_path(path.string(), security::READ) &&
@@ -622,14 +666,15 @@ object require::load_absolute_js_file(fs::path path, std::string const &id) {
   {
     object cache = create_cache_entry(id);
 
-    require_js(path, id, cache);
+    if (path.extension() == FLUSSPFERD_MODULE_SUFFIX)
+      load_native_module(path, cache.get_property_object("exports"));
+    else
+      require_js(path, id, cache);
     scope_guard.exit_cleanly();
     return cache;
   }
 
-  std::stringstream ss;
-  ss << "Unable to load library '" << id;
-  throw exception(ss.str());
+  throw exception(format(load_error_fmt) % id % "file not found");
 }
 
 
@@ -670,13 +715,13 @@ static void setup_module_resolve_fns(object &module, fs::path const &path) {
 }
 
 // owner: No such file or directory "foo/bar"
-const format error_fmt("module.resource.resolve: %1% \"%2%\"");
+const format resolve_error_fmt("module.resource.resolve: %1% \"%2%\"");
 
 static std::string module_resource_resolve(const fs::path &module_dir, std::string const &x_) {
   fs::path x = x_;
 
   if (x.has_root_path() || x.has_root_name()) {
-    throw exception(format(error_fmt) % "absolute paths are not allowed" % x_);
+    throw exception(format(resolve_error_fmt) % "absolute paths are not allowed" % x_);
   }
 
   return io::fs_base::canonicalize(module_dir / x).string();

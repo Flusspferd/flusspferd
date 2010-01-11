@@ -26,6 +26,7 @@
 #ifndef FLUSSPFERD_PLUGIN_CURL_EASY_HPP
 #define FLUSSPFERD_PLUGIN_CURL_EASY_HPP
 
+#include "exception.hpp"
 #include "flusspferd/class_description.hpp"
 #include <curl/curl.h>
 
@@ -115,8 +116,7 @@ namespace curl {
     void do_setopt(CURLoption what, T data) {
       CURLcode res = curl_easy_setopt(get(), what, data);
       if(res != 0) {
-        throw flusspferd::exception(std::string("curl_easy_setopt: ") +
-                                    curl_easy_strerror(res));
+        throw curl::exception("curl_easy_setopt") << curlcode_info(res);
       }
     }
   };

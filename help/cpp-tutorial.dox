@@ -36,6 +36,7 @@ THE SOFTWARE.
  * - \subpage cpp-tutorial-classes
  *   - \ref cpp-tutorial-classes-without-macro
  * - \subpage cpp-tutorial-modules
+ *   - \ref cpp-tutorial-modules-compiling
  *
  */
 
@@ -426,8 +427,8 @@ require('somemodule');
  * And you can also write your own modules. Either by simply putting a file
  * named @c <module-name>.js in a directory in <code>require.paths</code> -
  * or, more relevant to this tutorial, by compiling a shared object or dynamic
- * library (the name pattern is lib<module-name>.so or lib<module-name>.dylib
- * there).
+ * library (the name pattern is lib<module-name>.so, lib<module-name>.dylib
+ * <module-name>.dll here).
  *
  * @include "dummy_module.cpp"
  *
@@ -443,17 +444,62 @@ require('somemodule');
 2
 > require('dummy_module')
 Module loaded!
-[object Object]
+(require('dummy_module'))
 > mod = require('dummy_module')
-[object Object]
+(require('dummy_module'))
 > mod.doNothingUseful()
 Yup, this is a function that does nothing useful.
 > mod.variable
 true
 @endverbatim
  *
- * @see <a href="https://wiki.mozilla.org/ServerJS/Modules/SecurableModules">
+ * @see <a href="http://wiki.commonjs.org/wiki/Modules/SecurableModules">
  *      SecurableModules</a>, which is the foundation of Flusspferd's module
  *      support.
  *
+ * Next: \subpage cpp-tutorial-modules-compiling
+ */
+
+/**
+ * Previous: \ref cpp-tutorial-modules
+ *
+ * @page cpp-tutorial-modules-compiling Compiling C++ modules
+ *
+ * We showed you in the previous example how to write a simple native module,
+ * but we failed to mention exactly how to compile it. If you use CMake, its
+ * not all that hard:
+ *
+ * @include "dummy_module.cmake"
+ *
+ * @note You can find this module in
+ *       <code>help/examples/dummy_module.cmake</code>.
+ *
+ * Simple create a file called @c CMakeLists.txt containing the above and place
+ * it in your the directory of your project. Don't forget to correct the list
+ * of source files appropriately. If you also need to install @c .js files to
+ * go with the native module, you can pass a list of files in the @c JS named
+ * argument to <code>flusspferd_plugin</code>.
+ *
+ * Then simply configure and make it using CMake - it will get installed to the
+ * right place automatically.
+ * 
+ * The output should look something like this:
+ * @verbatim
+$ cmake .
+...
+-- 
+--  Installing into /Users/ash/.flusspferd/modules
+-- 
+-- Bulding dummy-module plugin
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/ash/code/js/dummy-module
+$ make install
+Scanning dependencies of target dummy-module_PLUGIN
+[ 1%] Building CXX object CMakeFiles/dummy-module_PLUGIN.dir/src/dummy-module.cpp.o
+...
+@endverbatim
+ *
+ * Thats all there is to it. The module will automatically be installed into
+ * the right directory by make install.
  */

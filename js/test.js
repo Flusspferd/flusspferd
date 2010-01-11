@@ -327,7 +327,7 @@ exports.prove = function prove() {
       throw new TypeError("Cannot determine test source for " + uneval(x));
 
     if (fs.isDirectory(x))
-      findTests(fs.list(x));
+      findTests( fs.list(x).map(function(f) x + "/" + f) );
     else
       findTests([x]);
   }

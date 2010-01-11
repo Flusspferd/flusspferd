@@ -28,7 +28,6 @@ if (APPLE)
   # Enable -flat_namespace so that symbols are resolved transitatively
   SET(CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS
       "${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS} -Wl,-x -flat_namespace")
-  MESSAGE("module create: ${CMAKE_SHARED_MODULE_CREATE_CXX_FLAGS}")
 endif()
 
 # Helper function to make/compile a flusspferd plugin.
@@ -56,15 +55,13 @@ function(flusspferd_plugin PLUGIN)
     message(FATAL_ERROR "flusspferd_plugin called for ${PLUGIN} with no SOURCES argument")
   endif()
 
-
   add_library(${PLUGIN}_PLUGIN MODULE ${PLUGIN_SOURCES})
 
-  list(APPEND props
-    OUTPUT_NAME ${PLUGIN}
-    LIBRARY_OUTPUT_DIRECTORY ${Flusspferd_BINARY_DIR}/modules )
+  list(APPEND props OUTPUT_NAME ${PLUGIN})
 
-  if(${PLUGIN_DEFINITIONS})
-    list(APPEND props DEFINITIONS ${PLUGIN_DEFINITIONS})
+  if(DEFINED Flusspferd_BINARY_DIR)
+    # Only defined in flusspferd build trees
+    list(APPEND props LIBRARY_OUTPUT_DIRECTORY ${Flusspferd_BINARY_DIR}/modules )
   endif()
 
   if(WIN32)
@@ -74,8 +71,17 @@ function(flusspferd_plugin PLUGIN)
 
   set_target_properties( ${PLUGIN}_PLUGIN PROPERTIES ${props} )
 
-  # Every plugin seems to need libboost_system. Wonder why...
-  target_link_libraries( ${PLUGIN}_PLUGIN flusspferd ${Boost_SYSTEM_LIBRARY} ${PLUGIN_LIBRARIES} )
+  if(DEFINED FLUSSPFERD_PLUGIN_DEFINITIONS)
+    list(APPEND PLUGIN_DEFINITIONS ${FLUSSPFERD_PLUGIN_DEFINITIONS})
+  endif()
+
+  if(DEFINED PLUGIN_DEFINITIONS)
+    # set_target_properties doesn't work when the value is a list itself
+    set_property(TARGET ${PLUGIN}_PLUGIN
+                 PROPERTY COMPILE_DEFINITIONS ${PLUGIN_DEFINITIONS})
+  endif()
+
+  target_link_libraries( ${PLUGIN}_PLUGIN flusspferd ${PLUGIN_LIBRARIES} )
 
   install( TARGETS ${PLUGIN}_PLUGIN LIBRARY DESTINATION ${INSTALL_MODULES_PATH} )
 

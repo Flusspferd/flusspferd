@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/object.hpp"
 #include <boost/spirit/include/phoenix.hpp>
+#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <fstream>
 #include <cstring>
@@ -50,9 +51,7 @@ THE SOFTWARE.
 #define HISTORY_FILE_DEFAULT "~/.flusspferd-history"
 #endif
 
-#ifdef FLUSSPFERD_RELOCATABLE
 #include <boost/filesystem.hpp>
-#endif
 
 namespace phoenix = boost::phoenix;
 namespace args = phoenix::arg_names;
@@ -91,7 +90,9 @@ class flusspferd_repl {
   void print_version();
   void print_man();
   void print_bash();
+  void print_cmakefile();
   void add_runnable(std::string const &path, Type type, bool del_interactive);
+  void set_gc_zeal(std::string const &s);
   void load_config();
 
   // Handle options from "// flusspferd: opts" lines
@@ -120,8 +121,6 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
     //file("typein"),
     in(std::cin.rdbuf()),
     config_loaded(false),
-    // Default - can be changed by -c cmd line option
-    config_file(INSTALL_PREFIX "/etc/flusspferd/jsrepl.js"),
     co(flusspferd::context::create()),
     scope(flusspferd::current_context_scope(co)),
     running(false),
@@ -139,17 +138,14 @@ flusspferd_repl::flusspferd_repl(int argc, char **argv)
 
   flusspferd::load_core(g, argv[0]);
 
-#ifdef FLUSSPFERD_RELOCATABLE
-  // Change the config to use the relative version
+  // Default - can be changed by -c cmd line option
   boost::filesystem::path p = g.call("require", "flusspferd")
                                .to_object()
-                               .get_property("executableName")
+                               .get_property("installPrefix")
                                .to_std_string();
-  p.remove_filename();
-  p /=  boost::filesystem::path(FLUSSPFERD_ETC_PATH)
+  p /=  boost::filesystem::path(REL_ETC_PATH)
     /   std::string("jsrepl.js");
   config_file = p.string();
-#endif
 
   flusspferd::create<flusspferd::function>(
     "quit",
@@ -172,7 +168,7 @@ int flusspferd_repl::run() {
     if (!interactive)
       throw;
   } catch (std::exception &e) {
-    if (interactive)
+    if (interactive_set && interactive)
       std::cerr << "ERROR: " << e.what() << '\n';
     else
       throw;
@@ -201,7 +197,6 @@ void flusspferd_repl::run_cmdline() {
     switch (i->second) {
     case File:
     {
-      std::cout << "File" << i->first << "\n";
       if (first) {
         first = false;
         std::string id = "file://" + flusspferd::io::fs_base::canonicalize(i->first).string();
@@ -217,11 +212,9 @@ void flusspferd_repl::run_cmdline() {
       flusspferd::evaluate(i->first, "[command line]", 0);
       break;
     case IncludePath:
-      std::cout << "IncludePath " << i->first << "\n";
       require_obj.get_property_object("paths").call("unshift", i->first);
       break;
     case Module:
-      std::cout << "Module" << i->first << "\n";
       require_obj.call(flusspferd::global(), i->first);
       break;
     case MainModule:
@@ -326,6 +319,23 @@ void flusspferd_repl::print_version() {
   throw flusspferd::js_quit();
 }
 
+void flusspferd_repl::print_cmakefile() {
+  if (!interactive_set)
+    interactive = false;
+
+  boost::filesystem::path p = flusspferd::global()
+                               .call("require", "flusspferd")
+                               .to_object()
+                               .get_property("installPrefix")
+                               .to_std_string();
+  p /=  boost::filesystem::path(REL_LIBDATA_PATH)
+    /   std::string("Flusspferd.cmake");
+
+  std::cout << p;
+  std::cout.flush();
+  throw flusspferd::js_quit();
+}
+
 void flusspferd_repl::add_runnable(
     std::string const &file, Type type, bool del_interactive)
 {
@@ -333,6 +343,23 @@ void flusspferd_repl::add_runnable(
     interactive = false;
   runnables.push_back(std::make_pair(file, type));
 }
+
+void flusspferd_repl::set_gc_zeal(std::string const &s) {
+  try {
+    int mode = boost::lexical_cast<int>(s);
+
+    if (!co.set_gc_zeal(mode)) {
+      std::cerr << "Warning: Unable to set GC Zeal mode to " << mode << std::endl;
+    }
+  }
+  catch(...) {
+    interactive_set = true;
+    interactive = false;
+    std::cerr << "ERROR: Invalid gc-zeal option: " << s << std::endl;
+    throw flusspferd::js_quit();
+  }
+}
+
 
 void flusspferd_repl::load_config() {
   // Define the prelude property so its not a strict warning to assign to it.
@@ -377,6 +404,14 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
       "callback",
       phoenix::bind(&flusspferd_repl::print_version, this),
       flusspferd::param::_container = version);
+
+    flusspferd::object cmake(flusspferd::create<flusspferd::object>());
+    spec.set_property("cmake", cmake);
+    cmake.set_property("doc", "Print location to Flusspferd.cmake file and exit.");
+    flusspferd::create<flusspferd::function>(
+      "callback",
+      phoenix::bind(&flusspferd_repl::print_cmakefile, this),
+      flusspferd::param::_container = cmake);
 
     flusspferd::object config(flusspferd::create<flusspferd::object>());
     spec.set_property("config", config);
@@ -511,6 +546,18 @@ flusspferd::object flusspferd_repl::option_spec(bool for_main_repl) {
     "callback",
     phoenix::bind(&flusspferd::context::set_jit, this->co, false),
     flusspferd::param::_container = no_jit_);
+
+  flusspferd::object gc_zeal(flusspferd::create<flusspferd::object>());
+  spec.set_property("gc-zeal", gc_zeal);
+  gc_zeal.set_property("doc", "Set zealous GC mode: 0, 1 or 2");
+  gc_zeal.set_property("argument_type", "int");
+  gc_zeal.set_property("argument", "required");
+  gc_zeal.set_property("alias", "z");
+  flusspferd::create<flusspferd::function>(
+    "callback",
+    phoenix::bind(&flusspferd_repl::set_gc_zeal, this, args::arg2 ),
+    flusspferd::param::_signature = flusspferd::param::type<void (flusspferd::value, std::string)>(),
+    flusspferd::param::_container = gc_zeal);
 
   if (for_main_repl) {
     // Hidden Options for Generator Purpose
