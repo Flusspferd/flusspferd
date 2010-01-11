@@ -30,15 +30,13 @@
 #include <boost/exception/get_error_info.hpp>
 #include <curl/curl.h>
 
-/* TODO: UNUSED!!! */
-
 namespace curl {
   typedef boost::error_info<struct tag_curlcode, CURLcode> curlcode_info;
 
   struct exception
     : flusspferd::exception
   {
-    exception(std::string const &what);
+    exception(std::string const &what, char const *type = "Error");
 
     ~exception() throw();
 

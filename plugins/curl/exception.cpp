@@ -25,8 +25,8 @@
 */
 #include "exception.hpp"
 
-curl::exception::exception(std::string const &what)
-  : std::runtime_error(what), flusspferd::exception(what)
+curl::exception::exception(std::string const &what, char const *type)
+  : std::runtime_error(what), flusspferd::exception(what, type)
 { }
 
 curl::exception::~exception() throw() {}

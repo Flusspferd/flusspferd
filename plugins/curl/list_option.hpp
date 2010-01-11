@@ -83,12 +83,12 @@ namespace curl {
              i != d.first.end();
              ++i) {
           if(!i->is_string()) {
-            throw flusspferd::exception("array data not a string");
+            throw exception("array data not a string");
           }
           curl_slist *r = curl_slist_append(
               d.second, i->get_string().c_str());
           if(!r) {
-            throw flusspferd::exception("curl_slist_append");
+            throw exception("curl_slist_append");
           }
           d.second = r;
         }
