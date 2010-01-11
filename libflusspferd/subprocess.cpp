@@ -26,11 +26,33 @@ THE SOFTWARE.
 #include "flusspferd/subprocess.hpp"
 #include "flusspferd/exception.hpp"
 
+#include <boost/exception/get_error_info.hpp>
+#include <boost/exception/info.hpp>
+
+namespace subprocess {
+  struct exception
+    : flusspferd::exception
+  {
+    exception(std::string const &what, char const *type = "Error")
+      : std::runtime_error(what), flusspferd::exception(what, type)
+    { }
+    ~exception() throw() { }
+
+    char const *what() const throw();
+  private:
+    mutable std::string what_m;
+  };
+}
+
 #ifdef WIN32
+
+char const *subprocess::exception::what() const throw() {
+  return flusspferd::exception::what();
+}
 
 void flusspferd::load_subprocess_module(object &ctx) {
   // TODO
-  throw flusspferd::exception("Subprocess Module Not Yet Supported On Windows", "Error");
+  throw subprocess::exception("Subprocess Module Not Yet Supported On Windows");
 }
 
 #else // POSIX/UNIX
@@ -74,17 +96,34 @@ namespace bio = boost::iostreams;
 namespace bf = boost::fusion;
 using namespace flusspferd;
 
+namespace subprocess {
+  typedef boost::error_info<struct tag_errno, int> errno_info;
+
+  char const *subprocess::exception::what() const throw() {
+    if(int const *errno_ = ::boost::get_error_info<errno_info>(*this)) {
+      if(what_m.empty()) {
+        what_m = flusspferd::exception::what();
+        what_m += ": ";
+        what_m += std::strerror(*errno_);
+      }
+      return what_m.c_str();
+    } else {
+      return flusspferd::exception::what();
+    }
+  }
+}
+
 namespace {
   void setnonblock(int fd) {
     int flags = fcntl(fd, F_GETFL, 0);
     if(flags == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("fcntl: ") + std::strerror(errno_));
+      throw subprocess::exception("fcntl") << subprocess::errno_info(errno_);
     }
     flags |= O_NONBLOCK;
     if(fcntl(fd, F_SETFL, flags) == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("fcntl: ") + std::strerror(errno_));
+      throw subprocess::exception("fcntl") << subprocess::errno_info(errno_);
     }
   }
 
@@ -114,7 +153,7 @@ namespace {
     epollfd = ::epoll_create1(EPOLL_CLOEXEC);
     if(epollfd == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("epoll_create: ") + std::strerror(errno_));
+      throw subprocess::exception("epoll_create") << subprocess::errno_info(errno_);
     }
   }
   fdpoll::~fdpoll() {
@@ -134,7 +173,7 @@ namespace {
     ev.data.fd = fd;
     if(epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev) == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("epoll_ctl: ") + std::strerror(errno_));
+      throw subprocess::exception("epoll_ctl") << subprocess::errno_info(errno_);
     }
   }
 
@@ -142,7 +181,7 @@ namespace {
     epoll_event ev;
     if(epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, &ev) == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("epoll_ctl: ") + std::strerror(errno_));
+      throw subprocess::exception("epoll_ctl") << subprocess::errno_info(errno_);
     }
   }
 
@@ -152,7 +191,7 @@ namespace {
     int nfds = epoll_wait(epollfd, events, EVENTS_N, timeout_ms);
     if(nfds == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("epoll_wait: ") + std::strerror(errno_));
+      throw subprocess::exception("epoll_wait") << subprocess::errno_info(errno_);
     }
     std::vector< std::pair<int, unsigned> > ret;
     ret.reserve(nfds);
@@ -208,7 +247,7 @@ namespace {
                               timeout_ms != fdpoll::indefinitely ? &tv : 0x0);
     if(retfds == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("epoll_ctl: ") + std::strerror(errno_));
+      throw subprocess::exception("select") << subprocess::errno_info(errno_);
     }
     else if(retfds == 0) { // timeout
       return std::vector< std::pair<int, unsigned> >();
@@ -307,7 +346,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       pid_t const ret = waitpid(pid, &status, poll ? WNOHANG : 0);
       int const errno_ = errno;
       if(ret == -1) {
-        throw flusspferd::exception(std::string("waitpid: ") + std::strerror(errno_));
+        throw subprocess::exception("waitpid") << subprocess::errno_info(errno_);
       }
       else if(ret == 0) {
         return value(object());
@@ -336,7 +375,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
       if(errno_ == EAGAIN || errno_ == EWOULDBLOCK) {
         return false;
       }
-      throw flusspferd::exception(std::string("write: ") + std::strerror(errno_));
+      throw subprocess::exception("read") << subprocess::errno_info(errno_);
     }
     else if(n == 0) { // eof
       poll.remove(fd);
@@ -375,84 +414,13 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   value wait() {
     return wait_impl(false);
   }
-  object communicate(boost::optional<std::string> const &in) {
-    if(in && stdinfd == -1) {
-      throw flusspferd::exception("Subprocess#communicate: No stdin pipe open but got input");
-    }
+  object communicate(boost::optional<std::string> const &in);
 
-    bool done_stdin = stdinfd == -1 || !in;
-    bool done_stdout = stdoutfd == -1;
-    bool done_stderr = stderrfd == -1;
-
-    fdpoll poll;
-    if(!done_stdin) {
-      setnonblock(stdinfd);
-      poll.add(stdinfd, fdpoll::write);
-    }
-    if(!done_stdout) {
-      setnonblock(stdoutfd);
-      poll.add(stdoutfd, fdpoll::read);
-    }
-    if(!done_stderr) {
-      setnonblock(stderrfd);
-      poll.add(stderrfd, fdpoll::read);
-    }
-
-    std::size_t bufpos = 0; // what part of `in` to write next
-
-    std::string stdoutbuf;
-    std::string stderrbuf;
-
-    while( !done_stdin || !done_stdout || !done_stderr ) {
-      std::vector< std::pair<int, unsigned> > ret = poll.wait(fdpoll::indefinitely);
-      for(std::vector< std::pair<int, unsigned> >::const_iterator i = ret.begin();
-          i != ret.end();
-          ++i)
-      {
-        if(!done_stdin && i->first == stdinfd && flagset(i->second, fdpoll::write)) {
-          ssize_t n = ::write(stdinfd, &(*in)[0] + bufpos, in->size() - bufpos);
-          if(n < 0) {
-            int const errno_ = errno;
-            if(errno_ == EAGAIN || errno_ == EWOULDBLOCK) {
-              continue;
-            }
-            else if(errno_ == EPIPE) {
-              poll.remove(stdinfd);
-              close_stdin();
-              done_stdin = true;
-              continue;
-            }
-            throw flusspferd::exception(std::string("write: ") + std::strerror(errno_));
-          }
-          bufpos += std::size_t(n);
-          if(bufpos >= in->size()) {
-            poll.remove(stdinfd);
-            done_stdin = true;
-          }
-        }
-        else if(!done_stdout && i->first == stdoutfd && flagset(i->second, fdpoll::read)) {
-          done_stdout = read_impl(stdoutfd, stdoutbuf, poll);
-        }
-        else if(!done_stderr && i->first == stderrfd && flagset(i->second, fdpoll::read)) {
-          done_stderr = read_impl(stderrfd, stderrbuf, poll);
-        }
-      }
-    }
-
-    value rc = wait();
-
-    object ret = flusspferd::create<flusspferd::object>();
-    ret.define_property("returncode", rc);
-    ret.define_property("stdout", value(stdoutbuf));
-    ret.define_property("stderr", value(stderrbuf));
-
-    return ret;
-  }
   void send_signal(int sig) {
     if(pid != 0) {
       if(::kill(pid, sig) == -1) {
         int const errno_ = errno;
-        throw flusspferd::exception(std::string("kill: ") + std::strerror(errno_));
+        throw subprocess::exception("kill") << subprocess::errno_info(errno_);
       }
     }
   }
@@ -522,11 +490,85 @@ FLUSSPFERD_CLASS_DESCRIPTION(
   }
 };
 
+object Subprocess::communicate(boost::optional<std::string> const &in) {
+  if(in && stdinfd == -1) {
+    throw subprocess::exception("Subprocess#communicate: No stdin pipe open but got input");
+  }
+
+  bool done_stdin = stdinfd == -1 || !in;
+  bool done_stdout = stdoutfd == -1;
+  bool done_stderr = stderrfd == -1;
+
+  fdpoll poll;
+  if(!done_stdin) {
+    setnonblock(stdinfd);
+    poll.add(stdinfd, fdpoll::write);
+  }
+  if(!done_stdout) {
+    setnonblock(stdoutfd);
+    poll.add(stdoutfd, fdpoll::read);
+  }
+  if(!done_stderr) {
+    setnonblock(stderrfd);
+    poll.add(stderrfd, fdpoll::read);
+  }
+
+  std::size_t bufpos = 0; // what part of `in` to write next
+
+  std::string stdoutbuf;
+  std::string stderrbuf;
+
+  while( !done_stdin || !done_stdout || !done_stderr ) {
+    std::vector< std::pair<int, unsigned> > ret = poll.wait(fdpoll::indefinitely);
+    for(std::vector< std::pair<int, unsigned> >::const_iterator i = ret.begin();
+        i != ret.end();
+        ++i)
+      {
+        if(!done_stdin && i->first == stdinfd && flagset(i->second, fdpoll::write)) {
+          ssize_t n = ::write(stdinfd, &(*in)[0] + bufpos, in->size() - bufpos);
+          if(n < 0) {
+            int const errno_ = errno;
+            if(errno_ == EAGAIN || errno_ == EWOULDBLOCK) {
+              continue;
+            }
+            else if(errno_ == EPIPE) {
+              poll.remove(stdinfd);
+              close_stdin();
+              done_stdin = true;
+              continue;
+            }
+            throw subprocess::exception("write") << subprocess::errno_info(errno_);
+          }
+          bufpos += std::size_t(n);
+          if(bufpos >= in->size()) {
+            poll.remove(stdinfd);
+            done_stdin = true;
+          }
+        }
+        else if(!done_stdout && i->first == stdoutfd && flagset(i->second, fdpoll::read)) {
+          done_stdout = read_impl(stdoutfd, stdoutbuf, poll);
+        }
+        else if(!done_stderr && i->first == stderrfd && flagset(i->second, fdpoll::read)) {
+          done_stderr = read_impl(stderrfd, stderrbuf, poll);
+        }
+      }
+  }
+
+  value rc = wait();
+
+  object ret = flusspferd::create<flusspferd::object>();
+  ret.define_property("returncode", rc);
+  ret.define_property("stdout", value(stdoutbuf));
+  ret.define_property("stderr", value(stderrbuf));
+
+  return ret;
+}
+
 namespace {
   void do_pipe(int pipefd[2]) {
     if(::pipe(pipefd) == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("pipe: ") + std::strerror(errno_));
+      throw subprocess::exception("pipe") << subprocess::errno_info(errno_);
     }
   }
 
@@ -558,7 +600,7 @@ namespace {
     pid_t pid = fork(); // could use vfork!
     if(pid == -1) {
       int const errno_ = errno;
-      throw flusspferd::exception(std::string("fork: ") + std::strerror(errno_));
+      throw subprocess::exception("fork") << subprocess::errno_info(errno_);
     }
     else if(pid == 0) {
       if(stdin_) {
@@ -624,7 +666,7 @@ namespace {
     array::iterator const end = a.end();
     for(array::iterator i = a.begin(); i != end; ++i) {
       if(!i->is_string()) {
-        throw flusspferd::exception("popen array elements must be strings",
+        throw subprocess::exception("popen array elements must be strings",
                                     "TypeError");
       }
       args.push_back(i->get_string().c_str());
@@ -646,7 +688,7 @@ namespace {
   void getbool(object &o, char const *name, bool &p) {
     if(o.has_property(name)) {
       if(!o.get_property(name).is_boolean()) {
-        throw flusspferd::exception(std::string("popen expected `") + name + "' to be a boolean",
+        throw subprocess::exception(std::string("popen expected `") + name + "' to be a boolean",
                                     "TypeError");
       }
       p = o.get_property(name).get_boolean();
@@ -656,7 +698,7 @@ namespace {
   char const *getcstring(object &o, char const *name) {
     if(o.has_property(name)) {
       if(!o.get_property(name).is_string()) {
-        throw flusspferd::exception(std::string("popen expected `") + name + "' to be a string",
+        throw subprocess::exception(std::string("popen expected `") + name + "' to be a string",
                                     "TypeError");
       }
       return o.get_property(name).get_string().c_str();
@@ -710,7 +752,7 @@ void Popen(flusspferd::call_context &x) {
            !o.get_property("args").is_object() ||
            !o.get_property("args").get_object().is_array())
         {
-          throw flusspferd::exception("popen expectes Array args property", "TypeError");
+          throw subprocess::exception("popen expects args (Array) property", "TypeError");
         }
         std::vector<char const*> args = array2args(o.get_property("args").get_object());
 
@@ -756,7 +798,7 @@ void Popen(flusspferd::call_context &x) {
       return;
     }
     else {
-      throw flusspferd::exception("popen: expects object or string as parameter", "TypeError");
+      throw subprocess::exception("popen expects object or string as parameter", "TypeError");
     }
   }
   else if(x.arg.size() == 2) {
@@ -769,7 +811,7 @@ void Popen(flusspferd::call_context &x) {
         in = true;
       }
       else if(x.arg[1].get_string() != "r") {
-        throw flusspferd::exception("popen: second parameter should be \"r\" or \"w\"");
+        throw subprocess::exception("popen: second parameter should be \"r\" or \"w\"");
       }
 
       x.result = do_popen(0x0, args, env, in, !in, false);
@@ -784,18 +826,19 @@ void Popen(flusspferd::call_context &x) {
         in = true;
       }
       else if(!(x.arg[1].get_string() == "r")) {
-        throw flusspferd::exception("popen: second parameter should be \"r\" or \"w\"");
+        throw subprocess::exception("popen: second parameter should be \"r\" or \"w\"");
       }
 
       x.result = do_popen(0x0, args, env, in, !in, false);
       return;
     }
     else {
-      throw flusspferd::exception("popen: got wrong parameter type. Expected string,string or array,string", "TypeError");
+      throw subprocess::exception(
+        "popen: got wrong parameter type. Expects string,string or array,string", "TypeError");
     }
   }
   else {
-    throw flusspferd::exception("popen: wrong number of parameters");
+    throw subprocess::exception("popen: wrong number of parameters");
   }
 }
 
