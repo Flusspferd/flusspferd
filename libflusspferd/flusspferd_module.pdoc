@@ -59,11 +59,11 @@
  *
  *  - `FLUSSPFERD_USER_MOUDLES`: specifies the module directory itself
  *  - `HOME`: modules are stored in a `.flusspferd/modules` subdirectory
- *    (typically for unix-like evnironments)
- *  - `APPDATA`: modules are stored in a 'flusspferd/modules` subdirectory
- *    (typically for Windows evnironments)
+ *    (typically for unix-like environments)
+ *  - `APPDATA`: modules are stored in a `flusspferd/modules` subdirectory
+ *    (typically for Windows environments)
  *
  *  *Note:* this value is set by `jsrepl.js` on interpreter load so if you use
- *  a `--config` option to specify a different file make sure that file sets it
- *  as well.
+ *  a custom `--config` option to specify a different file make sure that file
+ *  sets this property as well.
  **/
