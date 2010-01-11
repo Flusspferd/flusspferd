@@ -51,6 +51,9 @@ endif()
 
 ## Programs #################################################################
 
+add_definitions("-DREL_ETC_PATH=\"${REL_ETC_PATH}\""
+                "-DREL_LIBDATA_PATH=\"${REL_LIBDATA_PATH}\"")
+
 add_executable(
     flusspferd-shell
     flusspferd.cpp)
@@ -91,7 +94,7 @@ configure_file(
 
 install(
     FILES ${Flusspferd_BINARY_DIR}/js/jsrepl.js
-    DESTINATION ${INSTALL_ETC_PATH}/flusspferd)
+    DESTINATION ${INSTALL_ETC_PATH})
 
 if (NOT WIN32)
 

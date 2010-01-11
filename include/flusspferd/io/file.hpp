@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_IO_FILE_CLASS_HPP
 
 #include "stream.hpp"
+#include "flusspferd/detail/compiler-attributes.hpp"
 
 namespace flusspferd { namespace io {
 
@@ -55,7 +56,7 @@ public: // javascript methods
 
 public: // constructor methods
   static void create(char const *name, boost::optional<int> mode);
-  static bool exists(char const *name);
+  static bool exists(char const *name) FLUSSPFERD_DEPRECATED;
 
 private:
   class impl;

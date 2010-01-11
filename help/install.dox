@@ -36,14 +36,14 @@ THE SOFTWARE.
  * @li <a href="http://www.boost.org/">Boost</a> 1.40 or higher,
  * @li <a href="https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> 
  *     1.8.1 or higher (NOT 1.8.0)
+ *     (See <a href="http://redmine.flusspferd.org/wiki/flusspferd/Spidermonkey">our wiki for an explanation</a>).
  * @li Depending on your platform, you need to install iconv.
  *
  * Recommended, but optional:
  *
  * @li <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell,
  * @li @b or GNU/readline (attention, GPL!),
- * @li <a href="http://xmlsoft.org/">libxml2</a> 2.6 or higher (for the XML plugin),
- * @li <a href="http://curl.haxx.se">cURL</a> (for the cURL plugin),
+ * @li <a href="http://curl.haxx.se">cURL</a> 7.19.0 or higher (for the cURL plugin),
  * @li <a href="http://www.sqlite.org">SQLite 3</a> 3.4 or higher (for the SQLite3 plugin).
  *
  * To get direct access to the development repository, you also need <a href="http://git-scm.com/">GIT</a>.
@@ -147,10 +147,10 @@ Hello world!
 $ sudo port install flusspferd
 @endverbatim
  *
- * Different modules are available as variants. E.g. you can install the Flusspferd with the XML module by using
+ * Different modules are available as variants. E.g. you can install the Flusspferd with the GMP module by using
  *
  * @verbatim
-$ sudo port install flusspferd +xml
+$ sudo port install flusspferd +gmp
 @endverbatim
  *
  * See the <a href="http://guide.macports.org/">Macports Manual</a> for more information.

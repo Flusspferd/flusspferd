@@ -26,4 +26,4 @@ _flusspferd() {
 @IMPL@
 }
 
-complete -F _flusspferd flusspferd
+complete -o filenames -F _flusspferd flusspferd

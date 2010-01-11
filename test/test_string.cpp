@@ -66,6 +66,14 @@ BOOST_AUTO_TEST_CASE( copy_op ) {
   BOOST_CHECK_EQUAL(a, b);
 }
 
+BOOST_AUTO_TEST_CASE( op_ne ) {
+  flusspferd::string const a("Test String\n");
+  flusspferd::string const b(a);
+  BOOST_CHECK( !(a == b) == (a != b) );
+  flusspferd::string const c("sth. completly different\n");
+  BOOST_CHECK( !(a == c) == (a != c) );
+}
+
 BOOST_AUTO_TEST_CASE( op_less ) {
   std::string const ss1 = "aaa";
   std::string const ss2 = "aab";
@@ -87,6 +95,14 @@ BOOST_AUTO_TEST_CASE( string_io ) {
   flusspferd::string s("Hallo Welt!");
   ss << s;
   BOOST_CHECK_EQUAL(s.to_string(), ss.str());
+}
+
+BOOST_AUTO_TEST_CASE( string_concat ) {
+  std::string const lhs("Hello ");
+  std::string const rhs("World!");
+  flusspferd::string const a(lhs);
+  flusspferd::string const b(rhs);
+  BOOST_CHECK_EQUAL(flusspferd::string::concat(a, b), lhs + rhs);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

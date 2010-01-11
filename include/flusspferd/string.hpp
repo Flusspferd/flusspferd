@@ -185,6 +185,13 @@ public:
 bool operator==(string const &lhs, string const &rhs);
 
 /**
+ * Compare two string%s for inequality.
+ *
+ * @relates string
+ */
+bool operator!=(string const &lhs, string const &rhs);
+
+/**
  * Compare two string%s lexicographically.
  *
  * @return Whether @p lhs is lexicographically smaller than @p rhs.

@@ -2,7 +2,7 @@
 /*
   The MIT License
 
-  Copyright (c) 2008, 2009 Flusspferd contributors (see "CONTRIBUTORS" or
+  Copyright (c) 2010 Flusspferd contributors (see "CONTRIBUTORS" or
   http://flusspferd.org/contributors.txt)
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,24 +23,20 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
-#include "exception.hpp"
-#include "curl_cookie.hpp"
-#include <curl/curl.h>
-#include <boost/thread.hpp>
+#ifndef FLUSSPFERD_DETAIL_COMPILER_ATTRIBUTES_HPP
+#define FLUSSPFERD_DETAIL_COMPILER_ATTRIBUTES_HPP
 
-namespace { boost::mutex cookie; }
+#ifdef __GNUC__
+// see http://gcc.gnu.org/onlinedocs/gcc-4.4.2/gcc/Function-Attributes.html#Function-Attributes
 
-curl::cURL_cookie::cURL_cookie(object const &obj)
-  : base_type(obj)
-{
-  boost::mutex::scoped_lock lock(cookie);
-  CURLcode ret = curl_global_init(CURL_GLOBAL_ALL);
-  if(ret != 0)
-    throw curl::exception("curl_global_init") << curlcode_info(ret);
-}
+#define FLUSSPFERD_DEPRECATED __attribute__ ((deprecated))
+#define FLUSSPFERD_PURE __attribute__ ((pure))
+#define FLUSSPFERD_CONST __attribute__ ((const))
+#else
+#define FLUSSPFERD_DEPRECATED
+#define FLUSSPFERD_PURE
+#define FLUSSPFERD_CONST
+#endif
 
-curl::cURL_cookie::~cURL_cookie() {
-  boost::mutex::scoped_lock lock(cookie);
-  curl_global_cleanup();
-}
+#endif
 
