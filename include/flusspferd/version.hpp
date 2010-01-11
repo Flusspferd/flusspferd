@@ -28,11 +28,12 @@ THE SOFTWARE.
 #define FLUSSPFERD_VERSION_HPP
 
 #include <string>
+#include "detail/compiler-attributes.hpp"
 
 namespace flusspferd {
 
-std::string version();
-bool is_relocatable();
+std::string version() FLUSSPFERD_PURE;
+bool is_relocatable() FLUSSPFERD_PURE;
 
 }
 
