@@ -180,19 +180,6 @@ check_cxx_source_runs(
      }"
     FLUSSPFERD_HAVE_POSIX)
 
-if(FLUSSPFERD_HAVE_POSIX)
-  check_cxx_source_compiles(
-    "#include <sys/epoll.h>
-     int main() {
-        epoll_create1(0);
-     }"
-     FLUSSPFERD_HAVE_EPOLL)
-
-   if(FLUSSPFERD_HAVE_EPOLL)
-     add_definitions(-DHAVE_EPOLL)
-   endif()
-endif()
-
 ## Boost ####################################################################
 
 set(Boost_USE_MULTITHREADED ON)
@@ -238,6 +225,7 @@ add_subdirectory(test)
 add_subdirectory(plugins/curl)
 add_subdirectory(plugins/gmp)
 add_subdirectory(plugins/sqlite3)
+add_subdirectory(plugins/subprocess)
 
 add_subdirectory(misc/emacs)
 
