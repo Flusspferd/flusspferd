@@ -22,46 +22,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#ifndef FLUSSPFERD_PLUGIN_SUBPROCESS_EXCEPTION_HPP
+#define FLUSSPFERD_PLUGIN_SUBPROCESS_EXCEPTION_HPP
 
+#include "flusspferd/exception.hpp"
+#include <boost/exception/get_error_info.hpp>
 
-#include "exception.hpp"
+namespace subprocess {
+  struct exception
+    : flusspferd::exception
+  {
+    exception(std::string const &what, char const *type = "Error")
+      : std::runtime_error(what), flusspferd::exception(what, type)
+    { }
+    ~exception() throw();
 
-#include "flusspferd/modules.hpp"
-
-#ifdef WIN32
-
-
-
-#else // POSIX/UNIX
-
-#include "flusspferd/array.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/io/stream.hpp"
-#include "flusspferd/create/object.hpp"
-#include "flusspferd/create/function.hpp"
-#include "flusspferd/class_description.hpp"
-#include "flusspferd/property_iterator.hpp"
-
-#include <boost/iostreams/device/file_descriptor.hpp>
-#include <boost/iostreams/stream_buffer.hpp>
-
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <unistd.h>
-#include <errno.h>
-
-#include <map>
-#include <vector>
-#include <cstdio>
-#include <iterator>
-#include <algorithm>
-
-#include "flusspferd/value_io.hpp" // DEBUG
-#include <iostream> // DEBUG
-
-
-
-
+    char const *what() const throw();
+  private:
+    mutable std::string what_m;
+  };
+}
 
 #endif
