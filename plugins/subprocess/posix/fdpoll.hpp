@@ -22,46 +22,40 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#ifndef FLUSSPFERD_PLUGIN_SUBPROCESS_POSIX_FDPOLL_HPP
+#define FLUSSPFERD_PLUGIN_SUBPROCESS_POSIX_FDPOLL_HPP
 
+#ifndef HAVE_POSIX
+#error "POSIX support required"
+#endif
 
-#include "exception.hpp"
-
-#include "flusspferd/modules.hpp"
-
-#ifdef WIN32
-
-
-
-#else // POSIX/UNIX
-
-#include "flusspferd/array.hpp"
-#include "flusspferd/create.hpp"
-#include "flusspferd/io/stream.hpp"
-#include "flusspferd/create/object.hpp"
-#include "flusspferd/create/function.hpp"
-#include "flusspferd/class_description.hpp"
-#include "flusspferd/property_iterator.hpp"
-
-#include <boost/iostreams/device/file_descriptor.hpp>
-#include <boost/iostreams/stream_buffer.hpp>
-
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <unistd.h>
-#include <errno.h>
-
-#include <map>
 #include <vector>
-#include <cstdio>
-#include <iterator>
-#include <algorithm>
+#include <utility>
+#ifndef HAVE_EPOLL
+#include <map>
+#endif
 
-#include "flusspferd/value_io.hpp" // DEBUG
-#include <iostream> // DEBUG
+namespace subprocess {
+  class fdpoll {
+#ifdef HAVE_EPOLL
+    int epollfd;
+#else // select
+    std::map<int, unsigned> fds;
+#endif
+  public:
+    fdpoll();
+    ~fdpoll();
 
+    enum { read = 1, write = 2, error = 4 };
+    void add(int fd, unsigned what);
+    void remove(int fd);
+    static int const indefinitely = -1;
+    std::vector< std::pair<int, unsigned> > wait(int timeout_ms = indefinitely);
+  };
 
-
-
+  inline bool flagset(unsigned f, unsigned in) {
+    return (in & f) == f;
+  }
+}
 
 #endif
