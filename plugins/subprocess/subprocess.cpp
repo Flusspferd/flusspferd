@@ -23,7 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/subprocess.hpp"
+#include "flusspferd/modules.hpp"
 #include "flusspferd/exception.hpp"
 
 #include <boost/exception/get_error_info.hpp>
@@ -50,7 +50,7 @@ char const *subprocess::exception::what() const throw() {
   return flusspferd::exception::what();
 }
 
-void flusspferd::load_subprocess_module(object &ctx) {
+FLUSSPFERD_LOADER_SIMPLE(subprocess) {
   // TODO
   throw subprocess::exception("Subprocess Module Not Yet Supported On Windows");
 }
@@ -842,14 +842,12 @@ void Popen(flusspferd::call_context &x) {
   }
 }
 
-void flusspferd::load_subprocess_module(object &ctx) {
-  object exports = ctx.get_property_object("exports");
-
+FLUSSPFERD_LOADER_SIMPLE(subprocess) {
   flusspferd::create<flusspferd::function>(
     "popen", &Popen,
-    param::_container = exports);
-  load_class<Subprocess>(exports);
-  exports.define_properties(read_only_property | permanent_property)
+    param::_container = subprocess);
+  load_class<Subprocess>(subprocess);
+  subprocess.define_properties(read_only_property | permanent_property)
     ("SIGABRT", value(static_cast<int>(SIGABRT))) // Process abort signal. (A)
     ("SIGALRM", value(static_cast<int>(SIGALRM))) // Alarm clock. (T)
     ("SIGBUS", value(static_cast<int>(SIGBUS))) // Access to an undefined portion of a memory object. (A)
