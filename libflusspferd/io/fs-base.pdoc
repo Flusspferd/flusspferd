@@ -93,7 +93,7 @@
  **/
 
 /**
- * fs_base.link(link_target, name) -> undefined
+ * fs_base.symbolicLink(link_target, name) -> undefined
  * - link_target (String): path the symbolic link should point to
  * - name (String): name of symbolic link to create
  *
