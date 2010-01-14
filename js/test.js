@@ -486,7 +486,7 @@ exports.asserts = {
         suite.do_assert( a );
       }
       else {
-        a.diag = "   Got: " + e.toString() + "\n"
+        a.diag = "   Got: " + e.toString() + "\n" +
                  "Wanted: " + expected;
         suite.do_assert( a );
       }
