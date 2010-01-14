@@ -80,6 +80,8 @@ void flusspferd::load_filesystem_base_module(object container) {
 
 
 #ifndef WIN32
+  create<function>("symbolicLink", &fs_base::link, param::_container = exports);
+  // Compat - spec changed to have symbolicLink instead of link. Keep for a bit
   create<function>("link", &fs_base::link, param::_container = exports);
   create<function>("hardLink", &fs_base::hard_link, param::_container = exports);
   create<function>("readLink", &fs_base::read_link, param::_container = exports);
