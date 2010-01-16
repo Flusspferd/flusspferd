@@ -18,30 +18,30 @@ Description: Shared library for flusspferd
 Package: flusspferd
 Architecture: any
 Section: interpreters
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Flusspferd excutable
 
 Package: libflusspferd-dev
 Architecture: any
 Section: libdevel
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Development files for lubflusspferd
 
 Package: flusspferd-curl
 Architecture: any
 Section: net
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Native cURL bindings for flusspferd
 
 Package: flusspferd-gmp
 Architecture: any
 Section: math
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Native GMP (Gnu multi-precision) bindings for flusspferd
 
 Package: flusspferd-sqlite3
 Architecture: any
 # Is this the right section? Does it matter?
 Section: devel
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Native SQLite3 bindings for flusspferd

@@ -1,3 +1,10 @@
+flusspferd (0.8+1f71f9e-2) karmic; urgency=low
+
+  * Fix packaging issue
+    + Add package dependancies on libflusspferd
+
+ -- Ash Berlin (Canonical PPA) <ash_launchpad@firemirror.com>  Sat, 16 Jan 2010 02:42:32 +0000
+
 flusspferd (0.8+1f71f9e-1) karmic; urgency=low
 
   * Initial release
