@@ -12,7 +12,7 @@ Homepage: http://flusspferd.org
 Package: libflusspferd
 Architecture: any
 Section: libs
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, libmozjs-1.9.2
 Description: Shared library for flusspferd
 
 Package: flusspferd
@@ -24,7 +24,8 @@ Description: Flusspferd excutable
 Package: libflusspferd-dev
 Architecture: any
 Section: libdevel
-Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version}),
+ libmozjs-1.9.2-dev
 Description: Development files for lubflusspferd
 
 Package: flusspferd-curl
