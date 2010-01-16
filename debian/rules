@@ -6,7 +6,7 @@ include /usr/share/cdbs/1/class/cmake.mk
 VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-.*/\1/p')
 DEB_CMAKE_EXTRA_FLAGS := -DENABLE_TESTS=OFF -DCMAKE_SKIP_RPATH=OFF -DCMAKE_BUILD_TYPE=Release
 
-sha1=1f71f9e
+sha1=cc49ca2
 
 get-orig-source:: get-orig-source-SHA
 
