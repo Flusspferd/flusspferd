@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/cmake.mk
+
+VERSION := $(shell dpkg-parsechangelog | sed -ne 's/^Version: \(.*\)-.*/\1/p')
+DEB_CMAKE_EXTRA_FLAGS := -DENABLE_TESTS=OFF -DCMAKE_SKIP_RPATH=OFF -DCMAKE_BUILD_TYPE=Release
+
+sha1=1f71f9e
+
+get-orig-source:: get-orig-source-SHA
+
+# Tempory version to build from a recent SHA1
+get-orig-source-SHA::
+	rm -rf $@
+	git clone git://github.com/ruediger/flusspferd.git $@/flusspferd
+	cd $@/flusspferd git checkout -b orig $(sha1) && git submodule update --init
+	find $@/flusspferd -depth  -type d -name .git -execdir rm -rf {} +
+	cd $@ && tar -cf - flusspferd | gzip -9f - > ../../flusspferd_$(VERSION).orig.tar.gz
+	rm -r $@

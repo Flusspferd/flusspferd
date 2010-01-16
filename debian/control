@@ -1,0 +1,47 @@
+Source: flusspferd
+Section: interpreters
+Priority: extra
+Maintainer: Ash Berlin <ash_launchpad@firemirror.com>
+Build-Depends: cdbs, debhelper (>= 7), libmozjs-1.9.2-dev, cmake,
+ libboost-filesystem1.40-dev, libboost-system1.40-dev, libboost-thread1.40-dev,
+ libboost-iostreams1.40-dev, libboost1.40-dev, libsqlite3-dev, libgmp3-dev, 
+ libcurl4-gnutls-dev | libcurl4-openssl-dev
+Standards-Version: 3.8.1
+Homepage: http://flusspferd.org
+
+Package: libflusspferd
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Shared library for flusspferd
+
+Package: flusspferd
+Architecture: any
+Section: interpreters
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Flusspferd excutable
+
+Package: libflusspferd-dev
+Architecture: any
+Section: libdevel
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Development files for lubflusspferd
+
+Package: flusspferd-curl
+Architecture: any
+Section: net
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Native cURL bindings for flusspferd
+
+Package: flusspferd-gmp
+Architecture: any
+Section: math
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Native GMP (Gnu multi-precision) bindings for flusspferd
+
+Package: flusspferd-sqlite3
+Architecture: any
+# Is this the right section? Does it matter?
+Section: devel
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Native SQLite3 bindings for flusspferd
