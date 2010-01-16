@@ -1,12 +1,13 @@
-flusspferd (0.8+1f71f9e-2) karmic; urgency=low
+flusspferd (0.8+cc49ca2-2) karmic; urgency=low
 
-  * Fix packaging issue
-    + Add package dependancies on libflusspferd
+  * Add missing dependancies on libmozjs-1.9.2
+    + libflusspferd now depends upon libmozjs-1.9.2
+    + libflusspferd-dev now depends upon libmozjs-1.9.2-dev
 
- -- Ash Berlin (Canonical PPA) <ash_launchpad@firemirror.com>  Sat, 16 Jan 2010 02:42:32 +0000
+ -- Ash Berlin (Canonical PPA) <ash_launchpad@firemirror.com>  Sat, 16 Jan 2010 19:35:11 +0000
 
-flusspferd (0.8+1f71f9e-1) karmic; urgency=low
+flusspferd (0.8+cc49ca2-1) karmic; urgency=low
 
-  * Initial release
+  * Initial release of a preview release of 0.9 
 
  -- Ash Berlin (Canonical PPA) <ash_launchpad@firemirror.com>  Fri, 15 Jan 2010 16:43:07 +0000
