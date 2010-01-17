@@ -39,7 +39,7 @@ THE SOFTWARE.
     prelude = '@INSTALL_LIBDATA_PATH@/prelude.js';
   }
 
-  if ("FLUSSPFERD_USER_MOUDLES" in env)
+  if ("FLUSSPFERD_USER_MODULES" in env)
     paths.push(flusspferd.userModuleDir = env["FLUSSPFERD_USER_MODULES"]);
   else if ("HOME" in env)
     paths.unshift(flusspferd.userModuleDir = env["HOME"] + "/.flusspferd/modules");
