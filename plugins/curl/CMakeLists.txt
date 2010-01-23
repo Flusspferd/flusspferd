@@ -35,26 +35,27 @@ if(PLUGIN_CURL)
       include_directories(${CURL_INCLUDE_DIR})
       flusspferd_plugin(
         "curl"
-        SOURCES exception.hpp
-                exception.cpp
-                handle_option.hpp
-                handle_option.cpp
-                get_options.hpp
-                get_options.cpp
-                integer_option.hpp
-                string_option.hpp
-                list_option.hpp
-                function_option.hpp
-                http_post_option.hpp
-                http_post_option.cpp
-                EasyOpt.hpp
-                EasyOpt.cpp
-                Easy.hpp
+        SOURCES
                 Easy.cpp
-                defines.hpp
-                curl_cookie.hpp
-                curl_cookie.cpp
+                Easy.hpp
+                EasyOpt.cpp
+                EasyOpt.hpp
                 curl.cpp
+                curl_cookie.cpp
+                curl_cookie.hpp
+                defines.hpp
+                exception.cpp
+                exception.hpp
+                function_option.hpp
+                get_options.cpp
+                get_options.hpp
+                handle_option.cpp
+                handle_option.hpp
+                http_post_option.cpp
+                http_post_option.hpp
+                integer_option.hpp
+                list_option.hpp
+                string_option.hpp
 
         LIBRARIES ${CURL_LIBRARIES}
       )
