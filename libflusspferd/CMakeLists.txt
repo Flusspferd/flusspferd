@@ -71,6 +71,7 @@ set(
     ../include/flusspferd/create_on.hpp
     ../include/flusspferd/current_context_scope.hpp
     ../include/flusspferd/detail/limit.hpp
+    ../include/flusspferd/detail/compiler-attributes.hpp
     ../include/flusspferd/encodings.hpp
     ../include/flusspferd/evaluate.hpp
     ../include/flusspferd/exception.hpp
