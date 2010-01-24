@@ -12,7 +12,7 @@
  **/
 
 /**
- *  fs_base.rawOpen(name[, mode[, perms]]) -> io.File
+ *  fs_base.openRaw(name[, mode[, perms]]) -> io.File
  *  - name (String): filename
  *  - mode (String | Object): file open mode (read/write etc)
  *  - perms (?): file creation permissions -- not currently supported.

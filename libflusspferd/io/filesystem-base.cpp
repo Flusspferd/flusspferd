@@ -62,7 +62,9 @@ const format error_sec("%1%: security deined operation on \"%2%\"");
 void flusspferd::load_filesystem_base_module(object container) {
   object exports = container.get_property_object("exports");
 
+  // rawOpen is the old incorrectly named one
   create<function>("rawOpen", &fs_base::raw_open, param::_container = exports);
+  create<function>("openRaw", &fs_base::raw_open, param::_container = exports);
 
   create<function>("canonical", &fs_base::canonical, param::_container = exports);
   create<function>("lastModified", &fs_base::last_modified, param::_container = exports);
