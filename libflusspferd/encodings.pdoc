@@ -33,7 +33,7 @@
  *
  *  Encode the characters from the encoding `from` into `to`. Uses a
  *  [[encodings.Transcoder]] internally.
- */
+ **/
 
 /**
  *  class encodings.Transcoder
