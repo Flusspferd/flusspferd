@@ -17,14 +17,14 @@ if(PLUGIN_SUBPROCESS)
 
      set(subprocess_sources
        exception.hpp
-       posix/Subprocess.hpp
-       posix/Subprocess.cpp
+       posix/subprocess.hpp
+       posix/subprocess.cpp
        posix/errno.hpp
        posix/exception.cpp
        posix/fdpoll.hpp
        posix/popen.hpp
        posix/popen.cpp
-       posix/subprocess.cpp)
+       posix/subprocess_module.cpp)
 
      check_cxx_source_compiles(
        "#include <sys/epoll.h>
