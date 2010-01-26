@@ -24,32 +24,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#include <flusspferd/aliases.hpp>
 
-#include "create.hpp"
+#include "attr.hpp"
+#include "dom_exception.hpp"
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+using namespace flusspferd;
+using namespace flusspferd::aliases;
+using namespace xml_plugin;
 
+namespace xml_plugin {
+  void load_attr_class(object &exports) {
+    load_class<attr>(exports);
+  }
+}
 
-namespace flusspferd { namespace aliases {
+attr::attr(object const &proto, wrapped_type const &node, weak_node_map map)
+  : base_type(proto, node, map),
+    impl_(node)
+{ }
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
-#endif
+string_type attr::getName() {
+  XML_CB_TRY {
+    return impl_.getName();
+  } XML_CB_CATCH
+}
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
+bool attr::getSpecified() {
+  XML_CB_TRY {
+    return impl_.getSpecified();
+  } XML_CB_CATCH
+}
 
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
+string_type attr::getValue() {
+  XML_CB_TRY {
+    return impl_.getValue();
+  } XML_CB_CATCH
+}
 
-#endif
+void attr::setValue(string_type s) {
+  XML_CB_TRY {
+    impl_.setValue(s);
+  } XML_CB_CATCH
+}
+
+object attr::getOwnerElement() {
+  XML_CB_TRY {
+    return get_node(impl_.getOwnerElement());
+  } XML_CB_CATCH
+}

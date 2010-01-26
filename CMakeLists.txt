@@ -226,6 +226,7 @@ add_subdirectory(plugins/curl)
 add_subdirectory(plugins/gmp)
 add_subdirectory(plugins/sqlite3)
 add_subdirectory(plugins/subprocess)
+add_subdirectory(plugins/xml)
 
 add_subdirectory(misc/emacs)
 

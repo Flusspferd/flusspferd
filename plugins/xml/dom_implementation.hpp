@@ -24,32 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#ifndef FLUSSPFERD_XML_DOM_IMPLEMENTATION_HPP
+#define FLUSSPFERD_XML_DOM_IMPLEMENTATION_HPP
 
-#include "create.hpp"
+#include "types.hpp"
+#include "doctype.hpp"
+#include <boost/optional.hpp>
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+namespace xml_plugin {
 
+FLUSSPFERD_CLASS_DESCRIPTION(
+    dom_implementation,
+    (constructible, false)
+    (full_name, "xml.DOMImplementation")
+    (constructor_name, "DOMImplementation")
+    (methods,
+      ("hasFeature", bind, hasFeature)
+      ("createDocumentType", bind, createDocumentType)
+      ("createDocument", bind, createDocument)
+    )
+) {
+public:
+  typedef arabica_dom_impl wrapped_type;
 
-namespace flusspferd { namespace aliases {
+  dom_implementation(flusspferd::object const &proto, wrapped_type const &impl);
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
-#endif
+  bool hasFeature(string_type feature, string_type ver);
+  object createDocumentType(string_type qname, string_type pub_id, string_type sys_id);
+  object createDocument(string_type ns_uri, string_type qname, boost::optional<doctype&> doctype);
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
+  static weak_node_map get_node_map() { return weak_node_map_; }
 
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
+protected:
+  wrapped_type impl_;
+
+  node_map_ptr master_node_map_;
+
+  // Uggh. I dont like using globals, but there isn't much option since Arabica
+  // DOMImplementation is a singleton.
+  static weak_node_map weak_node_map_;
+
+};
+
+}
 
 #endif

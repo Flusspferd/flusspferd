@@ -1,0 +1,109 @@
+// -*- mode: js2; -*- vim: ft=javascript
+
+/** section: Bundled Modules
+ * xml
+ *
+ * XML DOM classes with XML and HTML (tagsoup) parsers.
+ *
+ * This module exports all the DOM Level2 Core classes and behaviour for XML.
+ *
+ * The exported node and related classes are:
+ *
+ * * Node -- Base class for all nodes
+ * * Element -- Represents an element (i.e. a tag and its children)
+ * * Attribute
+ * * Text
+ * * CDataSection
+ * * EntityReference
+ * * Entity
+ * * ProcessingInstruction
+ * * Comment
+ * * Document
+ * * DocumentType
+ * * DocumentFragment
+ * * Notation
+ *
+ * For full documentation please consult
+ * [DOM-Level-2-Core](http://www.w3.org/TR/DOM-Level-2-Core/).
+ **/
+
+/**
+ *  xml.domImplementation -> xml.DOMImplementation
+ *
+ *  The [[xml.DOMImplementation]] singleton instance.
+ **/
+
+/**
+ *  class xml.XMLParser
+ *
+ *  Parse strict XML files.
+ **/
+
+/**
+ *  class xml.HTMLParser
+ *
+ *  Parse HTML files.
+ *
+ *  Do our best to parse tag-soup like html files. Parsed documents are output
+ *  as XHTML.
+ **/
+
+/**
+ *  xml.HTMLParser.parse(source) -> xml.Document
+ *  - source (String | io.Stream): document to parse
+ *
+ *  Parse `source`, which can either be a filename, a URL or an open file
+ *  stream; as HTML, returning a valid XHTML document.
+ **/
+
+/**
+ *  xml.HTMLParser.parseString(literal) -> xml.Document
+ *  - literal (String): text to parse
+ *
+ *  Parse `literal` as HTML returning a valid XHTML document.
+ **/
+
+/**
+ *  xml.XMLParser.parse(source) -> xml.Document
+ *  - source (String | io.Stream): document to parse
+ *
+ *  Parse `source`, which can either be a filename, a URL or an open file
+ *  stream; as XML. Malformed documents will result in excpetions being thrown.
+ **/
+
+/**
+ *  xml.XMLParser.parseString(literal) -> xml.Document
+ *  - literal (String): text to parse
+ *
+ *  Parse `literal` as XML returning a valid XML document.
+ **/
+
+/**
+ *  class xml.DOMImplementation
+ **/
+
+/**
+ *  xml.DOMImplementation#hasFeature(feature, version) -> Boolean
+ *  - feature (String): feature to test
+ *  - version (String): desired version
+ *
+ *  Return true of this implementation has the requested feature.
+ **/
+
+/**
+ *  xml.DOMImplementation#createDocument(ns, qname[, doctype]) -> xml.Document
+ *  - ns (String): URI of namespace for document
+ *  - qname (String): qualified name for the document element
+ *  - doctype (xml.DocumentType): doctype
+ *
+ *  Create a new document
+ **/
+
+/**
+ *  xml.DOMImplementation#createDocumentType(qname, publicId, systemId) -> xml.DocumentType
+ *  - qname (String): namespace-qualified name
+ *  - publicId (String): publid identifier
+ *  - sytemId (String): system identifier
+ *
+ *  Create a new document type node.
+ **/
