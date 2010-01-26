@@ -27,6 +27,15 @@
  **/
 
 /**
+ *  encodings.convert(from, to, blob) -> binary.ByteString
+ *  - from (String): character set of the source
+ *  - to (String): character set of the destination
+ *
+ *  Encode the characters from the encoding `from` into `to`. Uses a
+ *  [[encodings.Transcoder]] internally.
+ **/
+
+/**
  *  class encodings.Transcoder
  *
  *  Class to convert data from one character set to another.
