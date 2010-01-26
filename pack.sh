@@ -24,9 +24,16 @@
 # THE SOFTWARE.
 #
 
+set -e
+
 VER=`./flusspferd-version.sh`
-FILES=`git ls-files|egrep -v '^.git'`
-PREFIX="/tmp/flusspferd-$VER/"
+PREFIX="/tmp/flusspferd-$VER"
+
+module_list()
+{
+        git ls-files --error-unmatch --stage -- "$@" | grep '^160000 '
+}
+
 
 if [ -d $PREFIX ]
 then
@@ -36,15 +43,24 @@ fi
 mkdir $PREFIX
 echo $VER > $PREFIX/version
 
-for file in $FILES
+echo Bundling flusspferd
+git archive --format tar HEAD | tar -C $PREFIX -x
+rm $PREFIX/pack.sh
+
+git submodule update --init
+
+# Take from git submodule foreach
+module_list |
+while read mode sha1 stage path
 do
-	dir=`dirname $file`
-	dir="$PREFIX$dir"
-	mkdir -p $dir 2>/dev/null
-	cp $file $dir/
+  if test -e "$path"/.git
+  then
+    echo "Bundling $path"
+    (unset GIT_DIR && cd $path && git archive --format tar HEAD | tar -C "$PREFIX/$path" -x)
+  fi
 done
 
-rm $PREFIX/pack.sh
+
 
 cd /tmp
 
@@ -57,3 +73,5 @@ echo $PWD/flusspferd-$VER.tar.bz2
 rm -f flusspferd-$VER.zip
 zip -r -q flusspferd-$VER.zip flusspferd-$VER/
 echo $PWD/flusspferd-$VER.zip
+
+rm -rf $PREFIX
