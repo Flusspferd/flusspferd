@@ -58,26 +58,27 @@ add_definitions(${SPIDERMONKEY_DEFINITIONS})
 
 set(
     flusspferd_library_sources
+    ../include/flusspferd.hpp
     ../include/flusspferd/aliases.hpp
     ../include/flusspferd/arguments.hpp
     ../include/flusspferd/array.hpp
     ../include/flusspferd/binary.hpp
     ../include/flusspferd/call_context.hpp
-    ../include/flusspferd/class_description.hpp
     ../include/flusspferd/class.hpp
+    ../include/flusspferd/class_description.hpp
     ../include/flusspferd/context.hpp
     ../include/flusspferd/convert.hpp
     ../include/flusspferd/create.hpp
     ../include/flusspferd/create_on.hpp
     ../include/flusspferd/current_context_scope.hpp
+    ../include/flusspferd/detail/compiler-attributes.hpp
     ../include/flusspferd/detail/limit.hpp
     ../include/flusspferd/encodings.hpp
     ../include/flusspferd/evaluate.hpp
     ../include/flusspferd/exception.hpp
-    ../include/flusspferd/function_adapter.hpp
     ../include/flusspferd/function.hpp
+    ../include/flusspferd/function_adapter.hpp
     ../include/flusspferd/getopt.hpp
-    ../include/flusspferd.hpp
     ../include/flusspferd/init.hpp
     ../include/flusspferd/io/binary_stream.hpp
     ../include/flusspferd/io/file.hpp
@@ -87,8 +88,8 @@ set(
     ../include/flusspferd/load_core.hpp
     ../include/flusspferd/local_root_scope.hpp
     ../include/flusspferd/modules.hpp
-    ../include/flusspferd/native_function_base.hpp
     ../include/flusspferd/native_function.hpp
+    ../include/flusspferd/native_function_base.hpp
     ../include/flusspferd/native_object_base.hpp
     ../include/flusspferd/object.hpp
     ../include/flusspferd/properties_functions.hpp
@@ -118,17 +119,16 @@ set(
     flusspferd_module.cpp
     function_adapter.cpp
     getopt.cpp
-    load_core.cpp
-    modules.cpp
-    properties_functions.cpp
-    property_attributes.cpp
-    security.cpp
-    system.cpp
     io/binary_stream.cpp
     io/file.cpp
     io/filesystem-base.cpp
     io/io.cpp
     io/stream.cpp
+    load_core.cpp
+    modules.cpp
+    properties_functions.cpp
+    property_attributes.cpp
+    security.cpp
     spidermonkey/arguments.cpp
     spidermonkey/array.cpp
     spidermonkey/context.cpp
@@ -146,6 +146,7 @@ set(
     spidermonkey/string.cpp
     spidermonkey/tracer.cpp
     spidermonkey/value.cpp
+    system.cpp
 )
 
 set_property(SOURCE flusspferd_module.cpp

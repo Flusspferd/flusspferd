@@ -28,10 +28,11 @@ if(PLUGIN_SQLITE3)
       "sqlite3"
       DEFINITIONS ${SQLITE3_DEFINITIONS}
       LIBRARIES ${SQLITE3_LIBRARIES}
-      SOURCES sqlite.cpp
+      SOURCES
+              sqlite.cpp
+              sqlite.hpp
               sqlite_cursor.cpp
               sqlite_cursor.hpp
-              sqlite.hpp
               sqlite_plugin.cpp
       JS sqlite3.js)
   endif()

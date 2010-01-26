@@ -179,7 +179,7 @@ void file::open(char const *name, value options) {
     }
 
   }else if (options.is_undefined_or_null()) {
-    open_mode = std::ios::in | std::ios::out;
+    open_mode = std::ios::in;
   }else {
     throw exception("File.open: Invalid options argument", "TypeError");
   }

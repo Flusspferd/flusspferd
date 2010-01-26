@@ -12,14 +12,15 @@ if(PLUGIN_GMP)
     include_directories(${GMP_INCLUDE_DIR})
     flusspferd_plugin(
       "gmp"
-      SOURCES exception.hpp
+      SOURCES
               Float.cpp
               Float.hpp
-              gmp.cpp
               Integer.cpp
               Integer.hpp
               Rational.cpp
               Rational.hpp
+              exception.hpp
+              gmp.cpp
       LIBRARIES ${GMPXX_LIBRARY} ${GMP_LIBRARY})
   endif()
 endif()
