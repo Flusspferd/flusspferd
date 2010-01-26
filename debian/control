@@ -5,7 +5,7 @@ Maintainer: Ash Berlin <ash_launchpad@firemirror.com>
 Build-Depends: cdbs, debhelper (>= 7), libmozjs-1.9.2-dev, cmake,
  libboost-filesystem1.40-dev, libboost-system1.40-dev, libboost-thread1.40-dev,
  libboost-iostreams1.40-dev, libboost1.40-dev, libsqlite3-dev, libgmp3-dev, 
- libcurl4-gnutls-dev | libcurl4-openssl-dev
+ libcurl4-gnutls-dev | libcurl4-openssl-dev, libreadline-dev
 Standards-Version: 3.8.1
 Homepage: http://flusspferd.org
 
