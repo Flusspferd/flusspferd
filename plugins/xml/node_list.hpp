@@ -24,32 +24,50 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#ifndef FLUSSPFERD_XML_NODE_LIST_HPP
+#define FLUSSPFERD_XML_NODE_LIST_HPP
 
-#include "create.hpp"
+#include "node_map.hpp"
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+#include <DOM/NodeList.hpp>
+
+namespace xml_plugin {
 
 
-namespace flusspferd { namespace aliases {
+FLUSSPFERD_CLASS_DESCRIPTION(
+    node_list,
+    (constructible, false)
+    (full_name, "xml.NodeList")
+    (constructor_name, "NodeList")
+    (properties,
+      ("length", getter, get_length)
+    )
+    (methods,
+      ("item", bind, item)
+    )
+)
+{
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
+public:
+  typedef Arabica::DOM::NodeList<std::string> wrapped_type;
+
+  node_list(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
+  virtual ~node_list();
+
+  int get_length();
+
+  flusspferd::object item(int idx);
+
+protected:
+
+  void property_op(property_mode mode, flusspferd::value const &id, flusspferd::value &x);
+  bool property_resolve(flusspferd::value const &id, unsigned);
+
+  wrapped_type list_;
+  weak_node_map node_map_;
+};
+
+}
+
 #endif
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
-
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
-
-#endif

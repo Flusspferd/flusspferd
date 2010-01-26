@@ -24,32 +24,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#ifndef FLUSSPFERD_XML_ATTR_HPP
+#define FLUSSPFERD_XML_ATTR_HPP
 
-#include "create.hpp"
+#include "node.hpp"
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+namespace xml_plugin {
 
+FLUSSPFERD_CLASS_DESCRIPTION(
+    attr,
+    (base, node)
+    (constructible, false)
+    (full_name, "xml.Attr")
+    (constructor_name, "Attr")
+    (properties,
+      ("name", getter, getName)
+      ("specified", getter, getSpecified)
+      ("value", getter_setter, (getValue, setValue))
+      ("ownerElement", getter, getOwnerElement)
+    )
+)
+{
 
-namespace flusspferd { namespace aliases {
+public:
+  typedef arabica_attr wrapped_type;
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
+  attr(flusspferd::object const &proto, wrapped_type const &node, weak_node_map map);
+
+  // Property getters/setters
+  string_type getName();
+  bool getSpecified();
+  string_type getValue();
+  void setValue(string_type s);
+  object getOwnerElement();
+
+protected:
+  wrapped_type impl_;
+};
+
+}
+
 #endif
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
 
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
-
-#endif

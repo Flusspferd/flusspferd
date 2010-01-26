@@ -24,32 +24,59 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#include <flusspferd/aliases.hpp>
 
-#include "create.hpp"
+#include "named_node_map.hpp"
+#include "doctype.hpp"
+#include "dom_exception.hpp"
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+using namespace flusspferd;
+using namespace flusspferd::aliases;
+using namespace xml_plugin;
 
+namespace xml_plugin {
+  void load_doctype_class(object &exports) {
+    load_class<doctype>(exports);
+  }
+}
 
-namespace flusspferd { namespace aliases {
+doctype::doctype(object const &proto, wrapped_type const &impl, weak_node_map map)
+  : base_type(proto, impl, map),
+    impl_(impl)
+{ }
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
-#endif
+string_type doctype::getName() {
+  XML_CB_TRY {
+    return impl_.getName();
+  } XML_CB_CATCH
+}
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
+object doctype::getEntities() {
+  XML_CB_TRY {
+    return create<named_node_map>( make_vector( impl_.getEntities(), node_map_) );
+  } XML_CB_CATCH
+}
 
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
+object doctype::getNotations() {
+  XML_CB_TRY {
+    return create<named_node_map>( make_vector( impl_.getNotations(), node_map_) );
+  } XML_CB_CATCH
+}
 
-#endif
+string_type doctype::getPublicId() {
+  XML_CB_TRY {
+    return impl_.getPublicId();
+  } XML_CB_CATCH
+}
+
+string_type doctype::getSystemId() {
+  XML_CB_TRY {
+    return impl_.getSystemId();
+  } XML_CB_CATCH
+}
+
+string_type doctype::getInternalSubset() {
+  XML_CB_TRY {
+    return impl_.getInternalSubset();
+  } XML_CB_CATCH
+}

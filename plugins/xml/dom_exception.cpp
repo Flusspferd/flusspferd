@@ -24,32 +24,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#include "dom_exception.hpp"
 
-#include "create.hpp"
+using namespace flusspferd;
+using namespace xml_plugin;
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+namespace xml_plugin {
+  void load_exception_class(object &exports) {
+    load_class<dom_exception>(exports);
+  }
+}
 
+dom_exception::dom_exception(object const &proto, wrapped_type e)
+  : base_type(proto)
+{ 
+  // Arabica DOM error codes are out by 1
+  set_properties("code", int(e.code()+1) )("message", e.what());
+}
 
-namespace flusspferd { namespace aliases {
+void dom_exception::augment_prototype(object &proto) {
+  // DOMException.prototype.__proto__ = Error.prototype
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
-#endif
+  // TODO: This can be nicer once #166 is done
+  // Get Error.prototype (which isn't the internal [[Prototype]]/prototype() value)
+  object const &error_proto = global().get_property_object("Error")
+                                      .get_property_object("prototype");
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
-
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
-
-#endif
+  proto.set_prototype(error_proto);
+  proto.set_property("name", "DOMException");
+}

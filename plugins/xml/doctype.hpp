@@ -24,32 +24,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HELPER_NS_HPP
-#define FLUSSPFERD_HELPER_NS_HPP
+#ifndef FLUSSPFERD_XML_DOCTYPE_HPP
+#define FLUSSPFERD_XML_DOCTYPE_HPP
 
-#include "create.hpp"
+#include "types.hpp"
+#include "node.hpp"
 
-#include <boost/version.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/fusion/container/generation/make_vector.hpp>
-#include <boost/fusion/container/vector.hpp>
-#include <boost/fusion/include/make_vector.hpp>
-#include <boost/fusion/include/vector.hpp>
+namespace xml_plugin {
 
 
-namespace flusspferd { namespace aliases {
+FLUSSPFERD_CLASS_DESCRIPTION(
+    doctype,
+    (base, node)
+    (constructible, false)
+    (full_name, "xml.DocumentType")
+    (constructor_name, "DocumentType")
+    (properties,
+      ("name", getter, getName)
+      ("entities", getter, getEntities)
+      ("notations", getter, getNotations)
+      ("publicId", getter, getPublicId)
+      ("systemId", getter, getSystemId)
+      ("internalSubset", getter, getInternalSubset)
+    )
+) {
+public:
+  typedef arabica_doctype wrapped_type;
 
-#if BOOST_VERSION < 104100
-  typedef boost::fusion::vector0 vector0;
-#else
-  typedef boost::fusion::vector0<> vector0;
+  doctype(flusspferd::object const &proto, wrapped_type const &impl, weak_node_map map);
+
+  // Property getters
+  string_type getName();
+  object getEntities();
+  object getNotations();
+  string_type getPublicId();
+  string_type getSystemId();
+  string_type getInternalSubset();
+
+protected:
+  wrapped_type impl_;
+};
+
+}
+
 #endif
 
-  using boost::fusion::make_vector;
-  using boost::assign::list_of;
-
-  // Get _container, _name et al.
-  using namespace flusspferd::param;
-} }
-
-#endif
