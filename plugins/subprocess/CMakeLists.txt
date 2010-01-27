@@ -1,16 +1,6 @@
 option(PLUGIN_SUBPROCESS "Build Subprocess plugin" ON)
 
 if(PLUGIN_SUBPROCESS)
-  check_cxx_source_runs(
-    "#include <unistd.h>
-     #include <cstdlib>
-     int main()
-     {
-       return _POSIX_VERSION >= 199506
-              ? EXIT_SUCCESS
-          : EXIT_FAILURE;
-     }"
-     FLUSSPFERD_HAVE_POSIX)
 
    if(FLUSSPFERD_HAVE_POSIX)
      add_definitions(-DHAVE_POSIX)

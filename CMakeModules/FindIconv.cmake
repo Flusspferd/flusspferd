@@ -87,6 +87,8 @@ endif()
 
 if(NOT ICONV_ACCEPTS_CONST_INPUT AND NOT ICONV_ACCEPTS_NONCONST_INPUT)
   MESSAGE(FATAL_ERROR "Unebale to determine iconv() signature")
+elseif(ICONV_ACCEPTS_CONST_INPUT AND ICONV_ACCEPTS_NONCONST_INPUT)
+  MESSAGE(FATAL_ERROR "Unebale to determine iconv() signature - both test cases passed!")
 endif()
 
 mark_as_advanced(ICONV_LIBRARY ICONV_INCLUDE_DIR)
