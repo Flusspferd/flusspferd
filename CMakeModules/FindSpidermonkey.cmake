@@ -143,7 +143,7 @@ if(SPIDERMONKEY_FOUND)
 
     # Check if we have GC_Zeal
     check_cxx_source_compiles(
-        "#define DEBUG
+        "
          #include <js/jsapi.h>
          int main() {
            JS_SetGCZeal((JSContext*)(0), 1);
