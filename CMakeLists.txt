@@ -169,7 +169,9 @@ include_directories(${Flusspferd_SOURCE_DIR}/include)
 
 ## POSIX ####################################################################
 
-check_cxx_source_runs(
+if (NOT WIN32)
+  # Windows claims to have this version if POSIX, but it isn't worht using it.
+  check_cxx_source_runs(
     "#include <unistd.h>
      #include <cstdlib>
      int main()
@@ -179,6 +181,7 @@ check_cxx_source_runs(
           : EXIT_FAILURE;
      }"
     FLUSSPFERD_HAVE_POSIX)
+endif()
 
 ## Boost ####################################################################
 
