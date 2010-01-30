@@ -43,6 +43,7 @@ endif()
 
 message(STATUS "Source: ${CMAKE_SOURCE_DIR}")
 message(STATUS "Binary: ${CMAKE_BINARY_DIR}")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 if(${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     message(FATAL_ERROR "In-source builds are not permitted. Make a separate folder for building:\nmkdir build; cd build; cmake ..\nBefore that, remove the files that cmake just created:\nrm -rf CMakeCache.txt CMakeFiles")
@@ -69,12 +70,17 @@ file(RELATIVE_PATH REL_ETC_PATH ${CMAKE_INSTALL_PREFIX} ${INSTALL_ETC_PATH})
 string(REGEX REPLACE "(^|/)[^/]+" "\\1.." REL_BIN_TO_ROOT ${REL_EXECUTABLES_PATH})
 string(REGEX REPLACE "(^|/)[^/]+" "\\1.." REL_LIBDATA_TO_ROOT ${REL_LIBDATA_PATH})
 
-if(NOT WIN32 AND NOT FLUSSPFERD_VERSION)
-    execute_process(
-        COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
-        WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
-        OUTPUT_VARIABLE FLUSSPFERD_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+if (NOT FLUSSPFERD_VERSION)
+    if(EXISTS ${Flusspferd_SOURCE_DIR}/version)
+        file(READ ${Flusspferd_SOURCE_DIR}/version FLUSSPFERD_VERSION)
+        STRING(REGEX REPLACE "\n" "" FLUSSPFERD_VERSION "${FLUSSPFERD_VERSION}")
+    elseif(NOT WIN32)
+        execute_process(
+            COMMAND "${Flusspferd_SOURCE_DIR}/flusspferd-version.sh"
+            WORKING_DIRECTORY "${Flusspferd_SOURCE_DIR}"
+            OUTPUT_VARIABLE FLUSSPFERD_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
 endif()
 
 if(NOT FLUSSPFERD_VERSION)
@@ -84,7 +90,7 @@ endif()
 add_definitions("-DFLUSSPFERD_VERSION=\"${FLUSSPFERD_VERSION}\"")
 add_definitions("-DINSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
 
-message(STATUS "Flusspferd Version " ${FLUSSPFERD_VERSION})
+message(STATUS "Flusspferd Version '${FLUSSPFERD_VERSION}'")
 
 option(RELOCATABLE "Whether the binary should be relocatable" ON)
 option(CREATE_DOCUMENTATION "Create Documentation for Flusspferd" OFF)
