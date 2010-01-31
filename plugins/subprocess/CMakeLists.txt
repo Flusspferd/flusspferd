@@ -21,28 +21,9 @@ if(PLUGIN_SUBPROCESS)
        posix/subprocess.cpp
        posix/errno.hpp
        posix/exception.cpp
-       posix/fdpoll.hpp
        posix/popen.hpp
        posix/popen.cpp
        posix/subprocess_module.cpp)
-
-     check_cxx_source_compiles(
-       "#include <sys/epoll.h>
-        int main() {
-          epoll_create1(0);
-        }"
-        FLUSSPFERD_HAVE_EPOLL)
-
-     if(FLUSSPFERD_HAVE_EPOLL)
-       add_definitions(-DHAVE_EPOLL)
-       set(subprocess_sources
-         ${subprocess_sources}
-         posix/fdpoll_epoll.cpp)
-     else()
-       set(subprocess_sources
-         ${subprocess_sources}
-         posix/fdpoll_select.cpp)
-     endif()
 
      flusspferd_plugin(
        "subprocess"

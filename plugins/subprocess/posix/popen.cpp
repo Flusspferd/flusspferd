@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include "popen.hpp"
 
 #include "errno.hpp"
-#include "Subprocess.hpp"
+#include "subprocess.hpp"
 
 #include "flusspferd/array.hpp"
 #include "flusspferd/value.hpp"

@@ -27,7 +27,7 @@ THE SOFTWARE.
 #include "flusspferd/create.hpp"
 #include "flusspferd/create/function.hpp"
 
-#include "Subprocess.hpp"
+#include "subprocess.hpp"
 #include "popen.hpp"
 
 #include <signal.h>

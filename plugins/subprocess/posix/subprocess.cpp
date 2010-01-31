@@ -23,17 +23,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "Subprocess.hpp"
+#include "subprocess.hpp"
 
 #include "errno.hpp"
-#include "fdpoll.hpp"
+
+#include <boost/system/system_error.hpp>
+#include <boost/asio.hpp> // TODO split up
+#include <boost/bind.hpp>
 
 #include <sys/wait.h>
 #include <signal.h>
 #include <unistd.h>
 #include <fcntl.h>
 
-namespace bf = boost::fusion;
+namespace bf = ::boost::fusion;
+namespace ba = ::boost::asio; 
 using namespace flusspferd;
 
 namespace subprocess {
@@ -97,38 +101,37 @@ value Subprocess::wait_impl(bool poll) {
   }
   return value(object());
 }
-bool Subprocess::read_impl(int fd, std::string &buffer, fdpoll &poll) {
-  enum { BUFSIZE = 2048 };
-  char buf[BUFSIZE];
-  ssize_t n = ::read(stdoutfd, buf, BUFSIZE);
-  if(n < 0) {
-    int const errno_ = errno;
-    if(errno_ == EAGAIN || errno_ == EWOULDBLOCK) {
-      return false;
-    }
-    throw subprocess::exception("read") << subprocess::errno_info(errno_);
-  }
-  else if(n == 0) { // eof
-    poll.remove(fd);
-    return true; // done
-  }
-  buffer.append(buf, buf+n);
-  return false;
-}
-  
-  // public
 
+// public
 namespace {
-  void setnonblock(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if(flags == -1) {
-      int const errno_ = errno;
-      throw subprocess::exception("fcntl") << subprocess::errno_info(errno_);
+  enum { buffer_size = 4096 };
+  typedef boost::array<char, buffer_size> buffer_t;
+  void do_read(ba::posix::stream_descriptor &in,
+               std::string &out,
+               buffer_t &buf,
+               boost::system::error_code const &error,
+               std::size_t bytes_transferred)
+  {
+    if(not error) {
+      out.append(buf.begin(), buf.begin() + bytes_transferred);
+      ba::async_read(
+        in, ba::buffer(buf),
+        boost::bind(&do_read, boost::ref(in), boost::ref(out), boost::ref(buf),
+                    ba::placeholders::error, ba::placeholders::bytes_transferred));
     }
-    flags |= O_NONBLOCK;
-    if(fcntl(fd, F_SETFL, flags) == -1) {
-      int const errno_ = errno;
-      throw subprocess::exception("fcntl") << subprocess::errno_info(errno_);
+    else if(error.value() == ba::error::eof) {
+      if(bytes_transferred > 0) {
+        out.append(buf.begin(), buf.begin() + bytes_transferred);
+      }
+    }
+    else {
+      throw boost::system::system_error(error, "while trying to read");
+    }
+  }
+
+  void write_handler(boost::system::error_code const &error, std::size_t) {
+    if(error) {
+      throw boost::system::system_error(error, "while trying to write");
     }
   }
 }
@@ -142,60 +145,37 @@ object Subprocess::communicate(boost::optional<std::string> const &in) {
   bool done_stdout = stdoutfd == -1;
   bool done_stderr = stderrfd == -1;
 
-  fdpoll poll;
-  if(!done_stdin) {
-    setnonblock(stdinfd);
-    poll.add(stdinfd, fdpoll::write);
-  }
-  if(!done_stdout) {
-    setnonblock(stdoutfd);
-    poll.add(stdoutfd, fdpoll::read);
-  }
-  if(!done_stderr) {
-    setnonblock(stderrfd);
-    poll.add(stderrfd, fdpoll::read);
-  }
-
-  std::size_t bufpos = 0; // what part of `in` to write next
-
+  buffer_t stdouttmp;
   std::string stdoutbuf;
+  buffer_t stderrtmp;
   std::string stderrbuf;
 
-  while( !done_stdin || !done_stdout || !done_stderr ) {
-    std::vector< std::pair<int, unsigned> > ret = poll.wait(fdpoll::indefinitely);
-    for(std::vector< std::pair<int, unsigned> >::const_iterator i = ret.begin();
-        i != ret.end();
-        ++i)
-      {
-        if(!done_stdin && i->first == stdinfd && flagset(i->second, fdpoll::write)) {
-          ssize_t n = ::write(stdinfd, &(*in)[0] + bufpos, in->size() - bufpos);
-          if(n < 0) {
-            int const errno_ = errno;
-            if(errno_ == EAGAIN || errno_ == EWOULDBLOCK) {
-              continue;
-            }
-            else if(errno_ == EPIPE) {
-              poll.remove(stdinfd);
-              close_stdin();
-              done_stdin = true;
-              continue;
-            }
-            throw subprocess::exception("write") << subprocess::errno_info(errno_);
-          }
-          bufpos += std::size_t(n);
-          if(bufpos >= in->size()) {
-            poll.remove(stdinfd);
-            done_stdin = true;
-          }
-        }
-        else if(!done_stdout && i->first == stdoutfd && flagset(i->second, fdpoll::read)) {
-          done_stdout = read_impl(stdoutfd, stdoutbuf, poll);
-        }
-        else if(!done_stderr && i->first == stderrfd && flagset(i->second, fdpoll::read)) {
-          done_stderr = read_impl(stderrfd, stderrbuf, poll);
-        }
-      }
+  ba::io_service io_service;
+  ba::posix::stream_descriptor stdind(io_service);
+  if(in && !done_stdin) {
+    stdind.assign(stdinfd);
+    ba::async_write(stdind, ba::buffer(*in), ba::transfer_all(), write_handler);
   }
+
+  ba::posix::stream_descriptor stdoutd(io_service);
+  if(!done_stdout) {
+    stdoutd.assign(stdoutfd);
+    ba::async_read(
+      stdoutd, ba::buffer(stdouttmp),
+      boost::bind(&do_read, boost::ref(stdoutd), boost::ref(stdoutbuf), boost::ref(stdouttmp),
+                  ba::placeholders::error, ba::placeholders::bytes_transferred));
+  }
+
+  ba::posix::stream_descriptor stderrd(io_service);
+  if(!done_stderr) {
+    stderrd.assign(stderrfd);
+    ba::async_read(
+      stderrd, ba::buffer(stderrtmp),
+      boost::bind(&do_read, boost::ref(stderrd), boost::ref(stderrbuf), boost::ref(stderrtmp),
+                  ba::placeholders::error, ba::placeholders::bytes_transferred));
+  }
+
+  io_service.run();
 
   value rc = wait();
 

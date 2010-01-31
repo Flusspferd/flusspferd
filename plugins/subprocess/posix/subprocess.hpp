@@ -48,8 +48,6 @@ THE SOFTWARE.
 namespace subprocess {
   namespace bio = boost::iostreams;
 
-  class fdpoll;
-
   FLUSSPFERD_CLASS_DESCRIPTION(
     Subprocess,
     (constructor_name, "Subprocess")
@@ -88,7 +86,6 @@ namespace subprocess {
     void close_stdout();
     void close_stderr();
     flusspferd::value wait_impl(bool poll = false);
-    bool read_impl(int fd, std::string &buffer, fdpoll &poll); // returns true when done
   protected:
     void trace(flusspferd::tracer &trc) {
       if(stdinstream) {
