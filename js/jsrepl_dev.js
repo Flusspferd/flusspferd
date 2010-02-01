@@ -25,12 +25,15 @@ THE SOFTWARE.
 */
 
 // Set default paths to the plugin dirs
+(function() {
+var build_path = require('flusspferd').executableName.replace( /bin\/flusspferd(?:\.exe)?$/, '' );
 require.paths.push(
   'js',
   'plugins/sqlite3',
   'plugins/curl',
-  'build/modules',
-  'build/lib'
+  build_path + 'modules',
+  build_path + 'lib'
 );
 
 prelude = 'js/prelude.js';
+})();
