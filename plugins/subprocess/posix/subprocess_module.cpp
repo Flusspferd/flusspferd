@@ -60,7 +60,9 @@ FLUSSPFERD_LOADER_SIMPLE(subprocess_) {
     ("SIGTTOU", value(static_cast<int>(SIGTTOU))) // Background process attempting write. (S)
     ("SIGUSR1", value(static_cast<int>(SIGUSR1))) // User-defined signal 1. (T)
     ("SIGUSR2", value(static_cast<int>(SIGUSR2))) // User-defined signal 2. (T)
+#ifdef SIGPOLL
     ("SIGPOLL", value(static_cast<int>(SIGPOLL))) // Pollable event. (T)
+#endif
     ("SIGPROF", value(static_cast<int>(SIGPROF))) // Profiling timer expired. (T)
     ("SIGSYS", value(static_cast<int>(SIGSYS))) // Bad system call. (A)
     ("SIGTRAP", value(static_cast<int>(SIGTRAP))) // Trace/breakpoint trap. (A)
