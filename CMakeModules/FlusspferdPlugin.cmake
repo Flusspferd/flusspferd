@@ -57,19 +57,17 @@ function(flusspferd_plugin PLUGIN)
 
   add_library(${PLUGIN}_PLUGIN MODULE ${PLUGIN_SOURCES})
 
-  list(APPEND props OUTPUT_NAME ${PLUGIN})
+  set_property( TARGET ${PLUGIN}_PLUGIN PROPERTY OUTPUT_NAME ${PLUGIN} )
 
   if(DEFINED Flusspferd_BINARY_DIR)
     # Only defined in flusspferd build trees
-    list(APPEND props LIBRARY_OUTPUT_DIRECTORY ${Flusspferd_BINARY_DIR}/modules )
+    set_property( TARGET ${PLUGIN}_PLUGIN PROPERTY LIBRARY_OUTPUT_DIRECTORY ${Flusspferd_BINARY_DIR}/modules )
   endif()
 
   if(WIN32)
     # Remove the 'lib' prefix from plugin modules on win32
-    list(APPEND props PREFIX "")
+    set_target_properties( ${PLUGIN}_PLUGIN PROPERTIES PREFIX "" )
   endif()
-
-  set_target_properties( ${PLUGIN}_PLUGIN PROPERTIES ${props} )
 
   if(DEFINED FLUSSPFERD_PLUGIN_DEFINITIONS)
     list(APPEND PLUGIN_DEFINITIONS ${FLUSSPFERD_PLUGIN_DEFINITIONS})
@@ -82,6 +80,9 @@ function(flusspferd_plugin PLUGIN)
   endif()
 
   target_link_libraries( ${PLUGIN}_PLUGIN flusspferd ${PLUGIN_LIBRARIES} )
+  if(WIN32)
+    target_link_libraries( ${PLUGIN}_PLUGIN ${Boost_SYSTEM_LIBRARY} )
+  endif()
 
   install( TARGETS ${PLUGIN}_PLUGIN LIBRARY DESTINATION ${INSTALL_MODULES_PATH} )
 
