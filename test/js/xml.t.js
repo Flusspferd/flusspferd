@@ -1,3 +1,4 @@
+try {
 const xml = require('xml');
 const asserts = require('test').asserts;
 
@@ -158,6 +159,13 @@ exports.test_DOMException = function() {
   asserts.same(err.code, 3, "err.code == HIERARCHY_REQUEST_ERR");
 
   teardown.call(this);
+}
+
+} catch(e if e.message && e.message.match(/'xml'/)) {
+  // this sucks we really should change the exception system (#44)
+  exports.test_skip = function() {
+    require('test').asserts.diag("Not running xml test (Module not built)");
+  }
 }
 
 if (require.main === module)
