@@ -4,6 +4,26 @@ if(PLUGIN_XML)
   FIND_PACKAGE(PkgConfig)
   pkg_check_modules(ARABICA arabica)
 
+  if(NOT ARABICA_FOUND)
+    message(STATUS "Searching for arabica")
+    # Not found, try looking in the vendor/arabica dir - they might have just
+    # made it but not installed, or it might be windows without a pkg-config
+    find_library(
+      ARABICA_LIBRARIES
+      NAMES libarabica.a arabica
+      PATHS ${CMAKE_SOURCE_DIR}/vendor/arabica/src/.libs
+    )
+
+    if (ARABICA_LIBRARIES)
+      message(STATUS "Found arabica: ${ARABICA_LIBRARIES}")
+      set(ARABICA_FOUND 1)
+
+      if (ARABICA_LIBRARIES MATCHES "src/\\.libs/libarabica\\.a$")
+        read_libtool(${ARABICA_LIBRARIES} "dependency_libs" ARABICA)
+      endif()
+    endif()
+  endif()
+
   if(ARABICA_FOUND)
     if(CMAKE_COMPILER_IS_GNUCXX)
       # These cause a lot of noise from arabica.
