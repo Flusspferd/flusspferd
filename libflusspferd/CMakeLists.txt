@@ -269,6 +269,6 @@ if(NOT MSVC)
 
     install(
         FILES ${Flusspferd_BINARY_DIR}/flusspferd.pc
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+        DESTINATION ${INSTALL_PC_PATH})
 endif()
 

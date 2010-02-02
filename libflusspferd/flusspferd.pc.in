@@ -24,10 +24,10 @@
 # THE SOFTWARE.
 #
 
-prefix=@CMAKE_INSTALL_PREFIX@
-libdir=@INSTALL_LIBRARIES_PATH@
-includedir=@INSTALL_HEADERS_PATH@
-modulesdir=@INSTALL_MODULES_PATH@
+prefix=${pcfiledir}/@REL_PC_PATH_TO_ROOT@
+libdir=${prefix}/@REL_LIBRARIES_PATH@
+includedir=${prefix}/@REL_HEADERS_PATH@
+modulesdir=${prefix}/@REL_MODULES_PATH@
 
 Name: Flusspferd
 Description: Javascript Bindings for C++
