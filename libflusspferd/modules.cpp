@@ -526,8 +526,8 @@ object require::load_top_level_module(std::string const &id) {
   fs::path dso_name = make_dsoname(id);
 
   for (size_t i = 0; i < len; i++) {
-    fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
-    fs::path native_path = path / dso_name;
+    fs::path path = paths.get_element(i).to_std_string();
+    fs::path native_path = io::fs_base::canonicalize( path / dso_name );
 
     std::string new_id = "file://" + native_path.string();
     if (module_cache.has_own_property(new_id)) {
@@ -589,9 +589,9 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
   size_t len = paths.length();
 
   for (size_t i = 0; i < len; i++) {
-    fs::path path = io::fs_base::canonicalize(paths.get_element(i).to_std_string());
+    fs::path path = paths.get_element(i).to_std_string();
 
-    fs::path js_path = path / js_name;
+    fs::path js_path = io::fs_base::canonicalize( path / js_name );
 
     // Check if we loaded something by this name previously, even if the file
     // doesn't exist anymore
