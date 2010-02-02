@@ -81,3 +81,4 @@ echo ""
 /bin/echo -n "Test Suite Status: "
 [  $status -ne 0 ] && echo 'failed' || echo 'success'
 echo
+exit $status
