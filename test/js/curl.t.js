@@ -1,3 +1,4 @@
+try {
 const cURL = require('curl');
 const asserts = require('test').asserts;
 
@@ -36,6 +37,13 @@ exports.test_options = function() {
     };
                  }, TypeError);
 };
+
+} catch(e if e.message && e.message.match(/'curl'/)) {
+  // this sucks we really should change the exception system (#44)
+  exports.test_skip = function() {
+    require('test').asserts.diag("Not running curl test (Module not built)");
+  }
+}
 
 if (require.main === module)
   require('test').runner(exports);
