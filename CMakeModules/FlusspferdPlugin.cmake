@@ -96,7 +96,7 @@ endfunction()
 # From http://www.cmake.org/Wiki/CMakeMacroParseArguments
 MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
   SET(DEFAULT_ARGS)
-  FOREACH(arg_name ${arg_names})    
+  FOREACH(arg_name ${arg_names})
     SET(${prefix}_${arg_name})
   ENDFOREACH(arg_name)
   FOREACH(option ${option_names})
@@ -105,16 +105,16 @@ MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
 
   SET(current_arg_name DEFAULT_ARGS)
   SET(current_arg_list)
-  FOREACH(arg ${ARGN})            
-    SET(larg_names ${arg_names})    
-    LIST(FIND larg_names "${arg}" is_arg_name)                   
+  FOREACH(arg ${ARGN})
+    SET(larg_names ${arg_names})
+    LIST(FIND larg_names "${arg}" is_arg_name)
     IF (is_arg_name GREATER -1)
       SET(${prefix}_${current_arg_name} ${current_arg_list})
       SET(current_arg_name ${arg})
       SET(current_arg_list)
     ELSE (is_arg_name GREATER -1)
-      SET(loption_names ${option_names})    
-      LIST(FIND loption_names "${arg}" is_option)            
+      SET(loption_names ${option_names})
+      LIST(FIND loption_names "${arg}" is_option)
       IF (is_option GREATER -1)
 	     SET(${prefix}_${arg} TRUE)
       ELSE (is_option GREATER -1)
@@ -125,3 +125,76 @@ MACRO(PARSE_ARGUMENTS prefix arg_names option_names)
   SET(${prefix}_${current_arg_name} ${current_arg_list})
 ENDMACRO(PARSE_ARGUMENTS)
 
+# Read something out of a libtool .la file.
+#
+# read_libtool("libfoo.la", "dependency_libs", FOO)
+#
+# will set FOO_FOUND to FOO_FOUND-NOTFOUND if can't find the file or the field.
+#
+# You can call this function with LAFIle being a .a or a .dylib/.so and the
+# extension will be changed to .la before reading the file.
+#
+function(read_libtool LAFILE FIELD OUTPUT)
+
+  get_filename_component(ext "${LAFILE}" EXT)
+  #message("ext ${ext}")
+  if (ext STREQUAL ${CMAKE_SHARED_MODULE_SUFFIX} OR ext STREQUAL ".a")
+    get_filename_component(path "${LAFILE}" PATH)
+    get_filename_component(namewe "${LAFILE}" NAME_WE)
+    set(LAFILE "${path}/${namewe}.la")
+  endif()
+
+  mark_as_advanced(${OUTPUT})
+
+  if(EXISTS "${LAFILE}")
+    file(STRINGS "${LAFILE}" FIELD_VALUE REGEX "^${FIELD}='(.*)'$")
+    #message("FIELD_VALUE: ${FIELD_VALUE}")
+    if(DEFINED FIELD_VALUE)
+      STRING(REGEX REPLACE "^${FIELD}='(.*)'$" "\\1" FIELD_VALUE "${FIELD_VALUE}")
+      STRING(STRIP FIELD_VALUE "${FIELD_VALUE}")
+      #message("FIELD_VALUE: ${FIELD_VALUE}")
+      #message("OUTPUT: ${OUTPUT}")
+      #message("${OUTPUT}: ${${OUTPUT}}")
+
+      separate_compiler_args(${OUTPUT} "${FIELD_VALUE}" "PARENT_SCOPE")
+      #SET(${OUTPUT} "${${OUTPUT}}" PARENT_SCOPE)
+      #mark_as_advanced(${OUTPUT})
+      return()
+    endif()
+  endif()
+
+  set(${OUTPUT}_FOUND ${OUTPUT}_FOUND-NOTFOUND)
+  #message("OUTPUT: ${OUTPUT} ${${OUTPUT}}")
+endfunction()
+
+# Split a string like "-L/usr/local/lib -lfoo" into "${NAME}_LIBRARIES" and "${NAME}_LIBDIR
+macro(separate_compiler_args NAME INPUT _parent_scope)
+  set(_separate_compiler_args_in "${INPUT}")
+  separate_arguments(_separate_compiler_args_in)
+
+  foreach(str ${_separate_compiler_args_in})
+    #message("str: " ${str})
+    if(str MATCHES "^-L")
+      _separate_compiler_args_type("^-L" "${str}" ${NAME}_LIBDIR ${_parent_scope})
+    elseif(str MATCHES "^-l")
+      _separate_compiler_args_type("^-l" "${str}" ${NAME}_LIBRARIES ${_parent_scope})
+    elseif(str MATCHES "^-I")
+      _separate_compiler_args_type("^-I" "${str}" ${NAME}_INCLUDEDIR ${_parent_scope})
+    endif()
+  endforeach()
+
+
+  set(_separate_compiler_args_tmp "" CACHE INTERNAL "")
+endmacro()
+
+macro(_separate_compiler_args_type _regex _input _output _parent_scope)
+  string(REGEX REPLACE "${_regex}" "" _separate_compiler_args_tmp "${_input}")
+  list(APPEND "${_output}" ${_separate_compiler_args_tmp})
+
+  #message("_separate_compiler_args_type: ${_output} -> ${_separate_compiler_args_tmp}")
+
+  if(NOT ${_parent_scope} STREQUAL "")
+    #message("setting ${_output} in PARENT_SCOPE")
+    set(${_output} "${${_output}}" PARENT_SCOPE)
+  endif()
+endmacro()
