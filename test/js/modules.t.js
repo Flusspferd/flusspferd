@@ -52,16 +52,19 @@ exports.test_module_resouce = function() {
 // This test is also fragile: it's dependant on where exactly modules built
 // to
 exports.test_relative_dso = function() {
-  try {
-    var curl = require('curl');
+  var dir = "../../build/modules/",
+      [m] = require('fs-base').list( module.resource.resolve( dir ) );
+
+  if ( !m ) {
+    asserts.ok( true, "SKIPPED: no native modules to load found" );
   }
-  catch (e) {
-    if (e.match(/^Unable to load module 'curl' /))
-      return;
+  else {
+    m = m.replace( /^lib(.*)\.(dylib|so|dll)/, "$1" );
   }
 
-  asserts.same(require('../../build/modules/curl'), curl,
-               "Can load curl DSO by relative include");
+  var dso = require( m );
+  asserts.same( require( dir + m ), dso,
+               "Can load " + m + " DSO by relative include");
 }
 
 if (require.main === module)
