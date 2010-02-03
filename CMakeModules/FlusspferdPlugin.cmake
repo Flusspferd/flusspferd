@@ -127,14 +127,15 @@ ENDMACRO(PARSE_ARGUMENTS)
 
 # Read something out of a libtool .la file.
 #
-# read_libtool("libfoo.la", "dependency_libs", FOO)
+# read_libtool("libfoo.la" FOO)
 #
-# will set FOO_FOUND to FOO_FOUND-NOTFOUND if can't find the file or the field.
+# will set FOO_FOUND to FOO_FOUND-NOTFOUND if can't find the file. On success
+# FOO_LIBDIR and FOO_LIBRARIES will be populated.
 #
 # You can call this function with LAFIle being a .a or a .dylib/.so and the
 # extension will be changed to .la before reading the file.
 #
-function(read_libtool LAFILE FIELD OUTPUT)
+function(read_libtool LAFILE OUTPUT)
 
   get_filename_component(ext "${LAFILE}" EXT)
   #message("ext ${ext}")
@@ -145,12 +146,13 @@ function(read_libtool LAFILE FIELD OUTPUT)
   endif()
 
   mark_as_advanced(${OUTPUT})
+  #message("LAFILE ${LAFILE}")
 
   if(EXISTS "${LAFILE}")
-    file(STRINGS "${LAFILE}" FIELD_VALUE REGEX "^${FIELD}='(.*)'$")
+    file(STRINGS "${LAFILE}" FIELD_VALUE REGEX "^dependency_libs='(.*)'$")
     #message("FIELD_VALUE: ${FIELD_VALUE}")
     if(DEFINED FIELD_VALUE)
-      STRING(REGEX REPLACE "^${FIELD}='(.*)'$" "\\1" FIELD_VALUE "${FIELD_VALUE}")
+      STRING(REGEX REPLACE "^dependency_libs='(.*)'$" "\\1" FIELD_VALUE "${FIELD_VALUE}")
       STRING(STRIP FIELD_VALUE "${FIELD_VALUE}")
       #message("FIELD_VALUE: ${FIELD_VALUE}")
       #message("OUTPUT: ${OUTPUT}")
@@ -180,6 +182,11 @@ macro(separate_compiler_args NAME INPUT _parent_scope)
       _separate_compiler_args_type("^-l" "${str}" ${NAME}_LIBRARIES ${_parent_scope})
     elseif(str MATCHES "^-I")
       _separate_compiler_args_type("^-I" "${str}" ${NAME}_INCLUDEDIR ${_parent_scope})
+    elseif(str MATCHES "\\.la$")
+      # TODO: This should really recruse and built up _STATIC and non versions
+      # read_libtool("${str}" ${NAME})
+      string(REGEX REPLACE "\\.la$" ".a" str "${str}")
+      _separate_compiler_args_type("" "${str}" ${NAME}_LIBRARIES ${_parent_scope})
     endif()
   endforeach()
 
@@ -188,7 +195,11 @@ macro(separate_compiler_args NAME INPUT _parent_scope)
 endmacro()
 
 macro(_separate_compiler_args_type _regex _input _output _parent_scope)
-  string(REGEX REPLACE "${_regex}" "" _separate_compiler_args_tmp "${_input}")
+  if(NOT "${_regex}" STREQUAL "")
+    string(REGEX REPLACE "${_regex}" "" _separate_compiler_args_tmp "${_input}")
+  else()
+    set(_separate_compiler_args_tmp "${str}")
+  endif()
   list(APPEND "${_output}" ${_separate_compiler_args_tmp})
 
   #message("_separate_compiler_args_type: ${_output} -> ${_separate_compiler_args_tmp}")

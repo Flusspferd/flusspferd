@@ -1,6 +1,13 @@
 option(PLUGIN_XML "Build xml plugin" ON)
 
 if(PLUGIN_XML)
+  if(NOT EXISTS ${CMAKE_SOURCE_DIR}/vendor/arabica/include/)
+    message(FATAL_ERROR "Arabica git submodule not found. Please run\n"
+			"   git submodule update --init\n"
+			"from the root of the git checkout")
+  endif()
+
+
   FIND_PACKAGE(PkgConfig)
   pkg_check_modules(ARABICA arabica)
 
@@ -19,7 +26,7 @@ if(PLUGIN_XML)
       set(ARABICA_FOUND 1)
 
       if (ARABICA_LIBRARIES MATCHES "src/\\.libs/libarabica\\.a$")
-        read_libtool(${ARABICA_LIBRARIES} "dependency_libs" ARABICA)
+        read_libtool(${ARABICA_LIBRARIES} ARABICA)
       endif()
     endif()
   endif()
@@ -30,15 +37,8 @@ if(PLUGIN_XML)
       remove_definitions(-Woverloaded-virtual -Wnon-virtual-dtor)
     endif()
 
-    if(NOT EXISTS ${CMAKE_SOURCE_DIR}/vendor/arabica/include/)
-      message(FATAL_ERROR "Arabica git submodule not found. Please run\n"
-                          "   git submodule init\n"
-                          "   git submodule update\n"
-                          "from the root of the git checkout")
-    endif()
-
     # Use the inlcudes from vendor to, We've made some header only changes
-    include_directories( ${CMAKE_SOURCE_DIR}/vendor/arabica/include ${ARABICA_INCLUDEDIR})
+    include_directories( ${CMAKE_SOURCE_DIR}/vendor/arabica/include ${ARABICA_INCLUDE_DIRS})
     flusspferd_plugin(
       "xml"
       SOURCES attr.cpp
