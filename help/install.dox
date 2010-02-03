@@ -129,7 +129,9 @@ Hello world!
  *
  * @subsection ubu Install on Ubuntu 9.10
  *
- * There is a seperate page on @subpage ubuntu "how to build Flusspferd on Ubuntu 9.10" and similar distributions.
+ * Since Flusspferd 0.9 we provide .deb packages for Ubuntu. You can install
+ * them from <a href="https://launchpad.net/~commonjs/+archive/ppa">CommonJS'
+ * PPA</a> (see the instructions on that page).
  *
  * @subsection ebuild Install on Gentoo
  *
