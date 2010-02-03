@@ -4,8 +4,9 @@ Priority: extra
 Maintainer: Ash Berlin <ash_launchpad@firemirror.com>
 Build-Depends: cdbs, debhelper (>= 7), libmozjs-1.9.2-dev, cmake,
  libboost-filesystem1.40-dev, libboost-system1.40-dev, libboost-thread1.40-dev,
- libboost-iostreams1.40-dev, libboost1.40-dev, libsqlite3-dev, libgmp3-dev, 
- libcurl4-gnutls-dev | libcurl4-openssl-dev, libreadline-dev
+ libboost-iostreams1.40-dev, libboost1.40-dev, libsqlite3-dev, libgmp3-dev,
+ libcurl4-gnutls-dev | libcurl4-openssl-dev, libreadline-dev,
+ libarabica-dev (>= 20100203)
 Standards-Version: 3.8.1
 Homepage: http://flusspferd.org
 
@@ -15,11 +16,23 @@ Section: libs
 Depends: ${shlibs:Depends}, ${misc:Depends}, libmozjs-1.9.2
 Description: Shared library for flusspferd
 
+Package: flusspferd-all
+Architecture: any
+Section: interpreters
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version}),
+ flusspferd (>= ${source:Upstream-Version}),
+ flusspferd-curl (>= ${source:Upstream-Version}),
+ flusspferd-xml (>= ${source:Upstream-Version}),
+ flusspferd-subprocess (>= ${source:Upstream-Version}),
+ flusspferd-sqlite3 (>= ${source:Upstream-Version}),
+ flusspferd-gmp (>= ${source:Upstream-Version})
+Description: Flusspferd excutable/REPL and all modules
+
 Package: flusspferd
 Architecture: any
 Section: interpreters
 Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
-Description: Flusspferd excutable
+Description: Flusspferd excutable/REPL
 
 Package: libflusspferd-dev
 Architecture: any
@@ -30,19 +43,30 @@ Description: Development files for lubflusspferd
 
 Package: flusspferd-curl
 Architecture: any
-Section: net
+Section: interpreters
 Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Native cURL bindings for flusspferd
 
 Package: flusspferd-gmp
 Architecture: any
-Section: math
+Section: interpreters
 Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Native GMP (Gnu multi-precision) bindings for flusspferd
 
 Package: flusspferd-sqlite3
 Architecture: any
-# Is this the right section? Does it matter?
-Section: devel
+Section: interpreters
 Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
 Description: Native SQLite3 bindings for flusspferd
+
+Package: flusspferd-subprocess
+Architecture: any
+Section: interpreters
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
+Description: Communicate with subprocesses in flusspferd
+
+Package: flusspferd-xml
+Architecture: any
+Section: interpreters
+Depends: ${shlibs:Depends}, ${misc:Depends}, libflusspferd (>= ${source:Upstream-Version})
+Description: XML DOM bindings and XML/HTML parser for flusspferd

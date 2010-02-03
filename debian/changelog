@@ -1,3 +1,10 @@
+flusspferd (0.9~RC1-1) karmic; urgency=low
+
+  *  New upstream version
+     + New packages: flusspferd-xml, flusspferd-subprocess, flusspferd-all
+
+ -- Ash Berlin (Canonical PPA) <ash_launchpad@firemirror.com>  Wed, 03 Feb 2010 15:23:09 +0000
+
 flusspferd (0.9~492-6a4e7ca-1) karmic; urgency=low
 
   * Update source to upstream version v0.8-492-g6a4e7ca
