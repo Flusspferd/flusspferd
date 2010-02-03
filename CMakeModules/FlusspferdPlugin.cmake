@@ -90,7 +90,7 @@ function(flusspferd_plugin PLUGIN)
     install( FILES ${PLUGIN_JS} DESTINATION ${INSTALL_MODULES_PATH} )
   endif()
 
-  message(STATUS "Bulding ${PLUGIN} plugin")
+  message(STATUS "Building ${PLUGIN} plugin")
 endfunction()
 
 # From http://www.cmake.org/Wiki/CMakeMacroParseArguments
