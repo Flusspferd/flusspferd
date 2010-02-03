@@ -38,7 +38,7 @@
 ;; Options
 (defgroup flusspferd nil
   "Flusspferd (Javascript interpreter) REPL"
-  :version "0.9pre"
+  :version "0.9"
   :link '(url-link "http://flusspferd.org")
   :prefix "flusspferd-"
   :group 'external)
