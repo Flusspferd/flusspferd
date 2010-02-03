@@ -24,16 +24,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-require('./util/array');
-require('./util/function');
-require('./util/object');
-
-/** section: Flusspferd Core
- * util
- *
- * Utilities that are always avilable in flusspferd.
- **/
-
-exports.Range = require('./util/range').Range;
-
-exports.load = require('./util/load').load;
+if ("keys" in Object == false)
+  Object.defineProperty(Object, 'keys', {
+    enumerable: false,
+    value: function Object_keys(obj) {
+      return [ i for ( i in obj ) if ( obj.hasOwnProperty( i ) ) ]
+    }
+  });
