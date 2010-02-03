@@ -17,6 +17,7 @@ Major features:
 - Boost 1.40 or newer required.
 - Fixed a lot of bugs and many minor improvements. See ChangeLog.txt for more
   details.
+- Added Subprocess module
 
 0.8 Series
 ----------
