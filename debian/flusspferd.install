@@ -1,6 +1,0 @@
-usr/bin/*
-usr/lib/flusspferd/prelude.js
-usr/etc/bash_completion.d/flusspferd
-usr/etc/flusspferd/jsrepl.js
-usr/lib/flusspferd/modules/*.js
-usr/lib/flusspferd/modules/*/*.js
