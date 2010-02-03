@@ -1,8 +1,11 @@
 Release Notes
 =============
 
-Upcoming Release (0.9)
-----------------------
+0.9 Series
+----------
+
+0.9: Major release (git: v0.9)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Major features:
 - JIT is now enabled by default. use the ``--no-jit'' option to disable it.
@@ -15,9 +18,13 @@ Major features:
   spidermonkey. We define recent as no older than the version from Firefox 3.5!
   See http://redmine.flusspferd.org/wiki/flusspferd/Spidermonkey
 - Boost 1.40 or newer required.
+- Added subprocess module for communicating with sub-processes. This module
+  doesn't work on Windows in this release.
+- Re-introduces XML module using different XML backend.
+- Building plugins with cmake got a whole lot easier; See mailing list post for
+  more info.
 - Fixed a lot of bugs and many minor improvements. See ChangeLog.txt for more
   details.
-- Added Subprocess module
 
 0.8 Series
 ----------
