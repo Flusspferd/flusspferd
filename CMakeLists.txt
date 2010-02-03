@@ -242,25 +242,3 @@ add_subdirectory(plugins/subprocess)
 add_subdirectory(plugins/xml)
 
 add_subdirectory(misc/emacs)
-
-## Documentation ############################################################
-
-if(NOT WIN32 AND CREATE_DOCUMENTATION)
-  find_package(Doxygen)
-
-  if(NOT DOXYGEN_FOUND)
-    message(STATUS "Doxygen required to create documentation!")
-  else() # DOXYGEN FOUND
-    message(STATUS "WILL create and install documentation")
-    # set( ENV{DOXYGEN_EXECUTABLE} ${DOXYGEN_EXECUTABLE} ) # TODO
-    add_custom_target(DOCS ALL
-      COMMAND ${Flusspferd_SOURCE_DIR}/util/docs.sh
-      WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR}
-      DEPENDS flusspferd-shell
-#      DEPENDS MANPAGE # TODO
-      )
-    install(
-      DIRECTORY ${Flusspferd_BINARY_DIR}/html/
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/flusspferd/)
-  endif()
-endif()

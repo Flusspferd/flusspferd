@@ -132,5 +132,25 @@ if (NOT WIN32)
       FILES ${Flusspferd_BINARY_DIR}/bash_completion.sh
       DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d
       RENAME flusspferd)
+endif()
 
+## Documentation ############################################################
+
+if(NOT WIN32 AND CREATE_DOCUMENTATION)
+  find_package(Doxygen)
+
+  if(NOT DOXYGEN_FOUND)
+    message(STATUS "Doxygen required to create documentation!")
+  else() # DOXYGEN FOUND
+    message(STATUS "WILL create and install documentation")
+    # set( ENV{DOXYGEN_EXECUTABLE} ${DOXYGEN_EXECUTABLE} ) # TODO
+    add_custom_target(DOCS ALL
+      COMMAND ${Flusspferd_SOURCE_DIR}/util/docs.sh
+      WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR}
+      DEPENDS flusspferd-shell
+      DEPENDS flusspferd.1)
+    install(
+      DIRECTORY ${Flusspferd_BINARY_DIR}/html/
+      DESTINATION ${CMAKE_INSTALL_PREFIX}/share/doc/flusspferd/)
+  endif()
 endif()
