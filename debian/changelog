@@ -1,3 +1,9 @@
+flusspferd (0.9-1) karmic; urgency=low
+
+  *  New upstream version
+
+ -- Ash Berlin (Canonical PPA) <ash_launchpad@firemirror.com>  Wed, 04 Feb 2010 21:27:29 +0000
+
 flusspferd (0.9~RC1-1) karmic; urgency=low
 
   *  New upstream version
