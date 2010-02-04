@@ -4,8 +4,14 @@ Flusspferd Change Log
 Release 0.9
 -----------
 
-2009-01-07:
-- Added Subprocess module
+2010-01-26:
+- Merge xml and subprocess modules to trunk
+
+2010-01-24:
+- fs-base.rawOpen aliased to fs-base.openRaw
+
+2010-01-11:
+- Create and install cmake scripts for building plugin modules (#183)
 
 2009-12-28:
 - Enable JIT by default in flusspferd REPL
