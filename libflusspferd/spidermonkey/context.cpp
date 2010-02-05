@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/foreach.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/thread/tss.hpp>
 #include <cstring>
 #include <cstdio>
 #include <iostream>
@@ -44,6 +45,14 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_STACKCHUNKSIZE
 #define FLUSSPFERD_STACKCHUNKSIZE 8192
 #endif
+
+/* Assume that we can not use more than 5e5 bytes of C stack by default. */
+// TODO: Read this from config or command line.
+static size_t gMaxStackSize = 500000;
+
+// Used for recursion protection in JS
+static boost::thread_specific_ptr<size_t> p_stack_base;
+
 
 using namespace flusspferd;
 
@@ -60,6 +69,7 @@ struct context::context_private {
   typedef boost::shared_ptr<root_object> root_object_ptr;
   boost::unordered_map<std::string, root_object_ptr> prototypes;
   boost::unordered_map<std::string, root_object_ptr> constructors;
+  size_t stack_limit_bytes;
 };
 
 /// impl provides the hidden implementation part
@@ -72,6 +82,11 @@ public:
   {
     if(!context)
       throw exception("Could not create Spidermonkey Context");
+
+    if ( p_stack_base.get() == NULL ) {
+      size_t stackBase = (size_t)&stackBase;
+      p_stack_base.reset( new size_t(stackBase) );
+    }
 
     uint32 options = JS_GetOptions(context);
 
@@ -98,7 +113,7 @@ public:
       throw exception("Could not initialize Global Object");
 
     JS_SetContextPrivate(context, static_cast<void*>(new context_private));
-}
+  }
 
   explicit impl(JSContext *context)
     : context(context), destroy(false)
@@ -106,11 +121,9 @@ public:
 
   ~impl() {
     if (destroy) {
-      {
-        current_context_scope scope(Impl::wrap_context(context));
-        delete get_private();
-        JS_DestroyContext(context);
-      }
+      current_context_scope scope(Impl::wrap_context(context));
+      delete get_private();
+      JS_DestroyContext(context);
     }
   }
 
@@ -210,6 +223,9 @@ context context::create() {
   c.p.reset(new impl);
 
   current_context_scope scope(c);
+
+  c.set_stack_limit( gMaxStackSize );
+  c.get_stack_limit();
 
   // add standard prototype (for e.g. native_object_base)
   object std_proto = flusspferd::create<object>().prototype();
@@ -333,4 +349,24 @@ bool context::set_gc_zeal(unsigned int mode) {
   // If mode is anything but off, then it 'failed' as we have no JS_SetGCZeal
   return mode == 0;
 #endif
+}
+
+#include <iostream>
+void context::set_stack_limit( size_t bytes ) {
+
+  size_t stackBase = *p_stack_base;
+  assert(stackBase != 0);
+
+#if JS_STACK_GROWTH_DIRECTION > 0
+  size_t stackLimit = stackBase + bytes;
+#else
+  size_t stackLimit = stackBase - bytes;
+#endif
+
+  p->get_private()->stack_limit_bytes = bytes;
+  JS_SetThreadStackLimit( p->context, stackLimit );
+}
+
+size_t context::get_stack_limit() {
+  return p->get_private()->stack_limit_bytes;
 }

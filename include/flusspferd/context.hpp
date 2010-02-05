@@ -219,6 +219,10 @@ public:
    *          available for the current JS engine.)
    */
   bool set_gc_zeal(unsigned int mode);
+
+
+  void set_stack_limit(size_t bytes);
+  size_t get_stack_limit();
 };
 
 /**

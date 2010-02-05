@@ -85,18 +85,41 @@ exception::impl::~impl() {
 namespace {
 std::string exception_message(std::string what) {
   jsval v;
+  context c = ::flusspferd::current_context();
+
+  size_t old_limit = c.get_stack_limit();
+  // Lets hope 5k is enough! And not too much either :)
+  c.set_stack_limit( old_limit + 5000 );
+
   JSContext *const cx = Impl::current_context();
 
-  if (JS_GetPendingException(cx, &v)) {
-    value val = Impl::wrap_jsval(v);
-    what += ": exception `" + val.to_std_string() + '\'';
-    if (val.is_object()) {
-      object o = val.to_object();
-      if(o.has_property("fileName"))
-        what += " at " + o.get_property("fileName").to_std_string()
-             +  ':' + o.get_property("lineNumber").to_std_string();
+  if (JS_IsExceptionPending(cx) && JS_GetPendingException(cx, &v)) {
+    // Dont use the value API here just in case that fails by hitting the stack
+    // limit *again*. Blowing the stack is really bad.
+
+    JSString *str = JS_ValueToString(cx, v);
+    if (!str)
+      what += ": internal error - unable to get exception. (Stack too deep?)";
+    else {
+      what += ": exception `";
+      what += JS_GetStringBytes(str);
+      what += '\'';
+      JSObject* obj;
+      if (JS_TypeOfValue(cx, v) == JSTYPE_OBJECT && JS_ValueToObject(cx, v, &obj) &&
+          JS_GetProperty(cx, obj, "fileName", &v) && (str = JS_ValueToString(cx, v) ))
+      {
+        what += " at ";
+        what += JS_GetStringBytes(str);
+
+        if (JS_GetProperty(cx, obj, "lineNumber", &v) && (str = JS_ValueToString(cx, v)) ) {
+          what += ':';
+          what += JS_GetStringBytes(str);
+        }
+      }
     }
   }
+
+  c.set_stack_limit( old_limit );
 
   return what;
 }
