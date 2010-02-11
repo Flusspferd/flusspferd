@@ -147,6 +147,13 @@ public:
             stderr_.reset(new pistream(fhstderr)); 
     } 
 
+#if defined(BOOST_WINDOWS_API)
+    // This is slightly hacky. bp::launch should create a win32_child, not just a child process
+    void* get_process_handle() {
+        return process_handle_.get();
+    }
+#endif
+
 private: 
     /** 
      * The standard input stream attached to the child process. 
