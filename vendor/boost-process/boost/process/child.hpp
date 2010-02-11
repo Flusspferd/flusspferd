@@ -137,8 +137,11 @@ public:
         : process(id) 
 #if defined(BOOST_WINDOWS_API) 
         , process_handle_(fhprocess.release(), ::CloseHandle) 
-#endif 
     { 
+#else
+    {
+      (void)(fhprocess); // unused
+#endif
         if (fhstdin.valid()) 
             stdin_.reset(new postream(fhstdin)); 
         if (fhstdout.valid()) 
