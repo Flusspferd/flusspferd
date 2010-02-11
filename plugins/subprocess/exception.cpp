@@ -22,19 +22,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#ifndef FLUSSPFERD_PLUGIN_SUBPROCESS_POSIX_ERRNO_HPP
-#define FLUSSPFERD_PLUGIN_SUBPROCESS_POSIX_ERRNO_HPP
 
-#ifndef HAVE_POSIX
-#error "POSIX support required"
-#endif
+#include "exception.hpp"
+#include <cstring>
 
-#include "../exception.hpp"
-#include <boost/exception/info.hpp>
+#include <boost/exception/get_error_info.hpp>
+#include <boost/exception/errinfo_errno.hpp>
 #include <cerrno>
 
-namespace subprocess {
-  typedef boost::error_info<struct tag_errno, int> errno_info;
+char const *subprocess::exception::what() const throw() {
+  if(int const *errno_ = ::boost::get_error_info<boost::errinfo_errno>(*this)) {
+    if(what_m.empty()) {
+      what_m = flusspferd::exception::what();
+      what_m += ": ";
+      what_m += std::strerror(*errno_);
+    }
+    return what_m.c_str();
+  } else {
+    return flusspferd::exception::what();
+  }
 }
 
-#endif
+subprocess::exception::~exception() throw() { }

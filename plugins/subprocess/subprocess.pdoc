@@ -1,6 +1,6 @@
 // -*- mode:js2; -*-
 
-/** section: Flusspferd Core
+/** section: Bundled Modules
  * subprocess
  * 
  * Module to start and handle subprocesses. (popen)
@@ -158,16 +158,22 @@
  * subprocess.Subprocess#stdin -> io.Stream
  * 
  * Writeable [[io.Stream]] interface to stdin if pipe was opened.
+ *
+ * This stream also has a `close()` method.
  **/
 
 /**
  * subprocess.Subprocess#stdout -> io.Stream
  * 
  * Readable [[io.Stream]] interface to stdout if pipe was opened.
+ *
+ * This stream also has a `close()` method.
  **/
 
 /**
  * subprocess.Subprocess#stderr -> io.Stream
  * 
  * Readable [[io.Stream]] interface to stderr if pipe was opened.
+ *
+ * This stream also has a `close()` method.
  **/

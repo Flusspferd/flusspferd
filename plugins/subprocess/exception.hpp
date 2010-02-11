@@ -26,15 +26,17 @@ THE SOFTWARE.
 #define FLUSSPFERD_PLUGIN_SUBPROCESS_EXCEPTION_HPP
 
 #include "flusspferd/exception.hpp"
-#include <boost/exception/get_error_info.hpp>
+#include <boost/exception/errinfo_errno.hpp>
 
 namespace subprocess {
-  struct exception
-    : flusspferd::exception
+
+  struct exception : flusspferd::exception
   {
     exception(std::string const &what, char const *type = "Error")
-      : std::runtime_error(what), flusspferd::exception(what, type)
+      : std::runtime_error(""),
+        flusspferd::exception(what, type)
     { }
+
     ~exception() throw();
 
     char const *what() const throw();
