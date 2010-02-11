@@ -84,9 +84,10 @@ public:
          * the child is still able to write data. If we closed, e.g. 
          * stdout, the child might not work at all! 
          */ 
-        silence, 
+        silence
 
 #if defined(BOOST_POSIX_API) || defined(BOOST_PROCESS_DOXYGEN) 
+        ,
         /** 
          * The child redirects the stream's output to the provided file 
          * descriptor. This is a generalization of the portable 
