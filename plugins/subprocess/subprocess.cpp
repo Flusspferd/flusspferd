@@ -28,21 +28,26 @@ THE SOFTWARE.
 
 #include <flusspferd/io/stream.hpp>
 
+#include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #if defined(BOOST_POSIX_API)
 # include <boost/process/posix_status.hpp>
-#elif defined(BOOST_WINDOWS_API) 
+typedef boost::asio::posix::stream_descriptor asio_stream;
+#elif defined(BOOST_WINDOWS_API)
 # include <boost/process/win32_child.hpp>
+typedef boost::asio::windows::stream_handle asio_stream;
 #else
 # error Unsupported platform
 #endif
 
 #include <boost/bind.hpp>
 
-namespace bp = ::boost::process; 
+namespace ba = ::boost::asio;
 
 using namespace flusspferd;
 using namespace subprocess;
 using boost::optional;
+using boost::system::error_code;
 
 Subprocess::Subprocess( object const& o, bp::child child, bp::context ctx )
   : base_type(o),
@@ -131,6 +136,9 @@ void Subprocess::send_signal(int sig) {
 }
 
 value Subprocess::wait_impl(bool poll) {
+  if ( has_own_property("returncode") )
+    return get_property("returncode");
+
   // Stupidly, Boost.Process doesn't have an option to do non blocking, even
   // tho its trivially easy:
 
@@ -178,6 +186,122 @@ value Subprocess::wait_impl(bool poll) {
   return ret;
 }
 
-object Subprocess::communicate( optional<value> stdin_ ) {
+namespace {
+  ba::io_service &get_io_service() {
+    // TODO: ideally this wouldn't use its own io_service if there is one in the process already.
+    static ba::io_service svc;
+    return svc;
+  }
+}
 
+void Subprocess::handle_write( error_code const &ec, bool &done ) {
+  if (ec)
+    throw boost::system::system_error(ec, "Subprocess: writing to stdin");
+
+  std::cout << "stdin is done" << std::endl;
+  done = true;
+}
+
+namespace {
+  struct reader_state : public boost::enable_shared_from_this<reader_state> {
+    boost::array<char, 4096> buff;
+    bool &done;
+    boost::scoped_ptr<asio_stream> s;
+    string str;
+    object o;
+    std::string prop;
+
+    reader_state(bp::pistream &s_, ba::io_service &svc, bool &done_, object o_, std::string const &prop_)
+      : done(done_),
+        s(new asio_stream(svc)),
+        o(o_),
+        prop(prop_)
+    {
+      s->assign( s_.handle().get() );
+      o.set_property(prop, str);
+      done = false;
+    }
+
+    void handle_read( error_code const &ec, std::size_t n_read ) {
+      if (n_read) {
+        str = string::concat( str, string(buff.data(), n_read) );
+        o.set_property(prop, str);
+      }
+
+      if (ec == ba::error::eof) {
+        s->close();
+        done = true;
+      }
+      else if (ec)
+        throw boost::system::system_error(ec, std::string("Subprocess: reading from ") + prop + "pipe");
+      else
+        enqueue();
+    }
+
+
+    void enqueue() {
+      ba::async_read(
+        *s, ba::buffer(buff),
+        boost::bind( &reader_state::handle_read, shared_from_this(),
+          boost::asio::placeholders::error,
+          boost::asio::placeholders::bytes_transferred )
+      );
+    }
+  };
+}
+
+object Subprocess::communicate( optional<value> input_ ) {
+
+  // stupid non-copyable root<T> objects. Right PITA they are.
+  boost::scoped_ptr<root_string> root_input;
+
+  ba::io_service &svc = get_io_service();
+
+  bool done_stdout = true, done_stderr = true, done_stdin = true;
+
+  if ( input_ ) {
+    if ( stdin_ && stdin_->is_undefined() )
+      throw exception("Subprocess#communicate: input provided when child's stdin is closed");
+
+    done_stdin = false;
+
+    // We need the string to be rooted until the async_write compeltes.
+    root_input.reset( new root_string( input_->to_string() ) );
+    std::string const &s = root_input->to_string();
+
+    asio_stream in( svc );
+    in.assign( child_.get_stdin().handle().release() );
+
+    ba::async_write( in, ba::buffer( s.data(), s.size() ),
+      boost::bind( &Subprocess::handle_write, this, ba::placeholders::error, done_stdin )
+    );
+  }
+
+  object ret = create<object>();
+  root_object root_ret(ret);
+
+  if ( !stdout_ || !stdout_->is_undefined() ) {
+    boost::shared_ptr<reader_state> r(new reader_state(child_.get_stdout(), svc, done_stdout, ret, "stdout"));
+    r->enqueue();
+  }
+  else {
+    ret.set_property("stdout", object());
+  }
+
+  if ( !stderr_ || !stderr_->is_undefined() ) {
+    boost::shared_ptr<reader_state> r(new reader_state(child_.get_stderr(), svc, done_stderr, ret, "stderr"));
+    r->enqueue();
+  }
+  else {
+    ret.set_property("stderr", object());
+  }
+
+  while (!done_stderr || !done_stdout || !done_stderr) {
+    svc.run();
+  }
+  svc.reset();
+
+  ret.set_property("returncode", wait());
+
+  return ret;
 }

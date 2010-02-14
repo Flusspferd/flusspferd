@@ -119,6 +119,13 @@ namespace {
   }
 
   void apply_mode_string( bp::context &ctx, std::string const &mode ) {
+
+    if (mode != "") {
+      // This argform doesn't get stderr. Its an open stream, it just doesn't go
+      // anywhere (i.e. /dev/null or similar)
+      ctx.stderr_behavior = bp::silence_stream();
+    }
+
     if (mode == "r")
       ctx.stdin_behavior = bp::close_stream();
     else if (mode == "w")
@@ -235,7 +242,6 @@ void subprocess::popen(flusspferd::call_context &x) {
       //  popen( ["command"], "mode" )
       std::vector<std::string> args = array_to_vector( array( o ) );
 
-      std::cout << "Running array cmd " << args.front() << std::endl; 
       bp::child c = bp::launch( args.front(), args, ctx );
 
       apply_mode_string( ctx, mode );
@@ -249,10 +255,6 @@ void subprocess::popen(flusspferd::call_context &x) {
   else {
     //  popen( "command" )
     //  popen( "command", "mode" )
-
-    // This argform doesn't get stderr. Its an open stream, it just doesn't go
-    // anywhere (i.e. /dev/null or similar)
-    ctx.stderr_behavior = bp::silence_stream();
 
     apply_mode_string( ctx, mode );
 

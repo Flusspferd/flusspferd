@@ -29,6 +29,10 @@ THE SOFTWARE.
 #include "flusspferd/create/object.hpp"
 #include "flusspferd/class_description.hpp"
 
+#ifndef BOOST_POSIX_API
+#define BOOST_PROCESS_WINDOWS_USE_NAMED_PIPE
+#endif
+
 #include <boost/process/child.hpp>
 #include <boost/process/context.hpp>
 
@@ -46,6 +50,7 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     ("sendSignal", bind, send_signal)
     ("wait", bind, wait)
     ("poll", bind, poll)
+    ("communicate", bind, communicate)
   )
   (properties,
     ("pid", getter, get_pid)
@@ -86,6 +91,8 @@ FLUSSPFERD_CLASS_DESCRIPTION(
     flusspferd::value poll() { return wait_impl(true); }
 
     flusspferd::object communicate( boost::optional<flusspferd::value> stdin_ );
+
+    void handle_write( boost::system::error_code const &ec, bool &done );
 };
 
 } // namespace subprocess
