@@ -34,16 +34,16 @@ THE SOFTWARE.
 #ifndef WIN32
 # include <signal.h>
 #else
-# define BOOST_PROCESS_WINDOWS_USE_NAMED_PIPE 
+# define BOOST_PROCESS_WINDOWS_USE_NAMED_PIPE
 #endif
 
 #include <boost/format.hpp>
 #include <boost/logic/tribool.hpp>
 #include <boost/optional.hpp>
-#include <boost/process.hpp> 
+#include <boost/process.hpp>
 
 
-namespace bp = ::boost::process; 
+namespace bp = ::boost::process;
 using boost::optional;
 using boost::format;
 using boost::tribool;
@@ -108,7 +108,7 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
 namespace {
   std::vector<std::string> array_to_vector(array a) {
     std::vector<std::string> args;
-    
+
     array::iterator const end = a.end();
 
     for(array::iterator i = a.begin(); i != end; ++i) {
@@ -179,24 +179,24 @@ namespace {
       ctx.stderr_behavior = bp::close_stream();
 
     if ( get_bool( o, "shell") ) {
-#if defined(BOOST_POSIX_API) 
-      
+#if defined(BOOST_POSIX_API)
+
       exe = "/bin/sh";
       args.insert( args.begin(), 2, "");
       args[0] = "sh";
       args[1] = "-c";
-#elif defined(BOOST_WINDOWS_API) 
-      char sysdir[MAX_PATH]; 
-      UINT size = ::GetSystemDirectoryA(sysdir, sizeof(sysdir)); 
-      if (!size) 
-          boost::throw_exception(system::system_error(system::error_code(::GetLastError(), system::get_system_category()), "subprocess.popen: GetWindowsDirectory failed")); 
-      BOOST_ASSERT(size < MAX_PATH); 
+#elif defined(BOOST_WINDOWS_API)
+      char sysdir[MAX_PATH];
+      UINT size = ::GetSystemDirectoryA(sysdir, sizeof(sysdir));
+      if (!size)
+          boost::throw_exception(system::system_error(system::error_code(::GetLastError(), system::get_system_category()), "subprocess.popen: GetWindowsDirectory failed"));
+      BOOST_ASSERT(size < MAX_PATH);
 
-      exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe"); 
+      exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe");
       args.insert( args.begin(), 2, "");
-      args[0] = "cmd"; 
+      args[0] = "cmd";
       args[1] = "/c";
-#endif 
+#endif
     }
 
     bp::child c = bp::launch( exe.get(), args, ctx );
@@ -262,12 +262,5 @@ void subprocess::popen(flusspferd::call_context &x) {
     x.result = create<Subprocess>( boost::fusion::make_vector( child, ctx ) );
   }
 
-
-/*
-  bp::pistream &is = c.get_stdout(); 
-  std::string line; 
-  while (std::getline(is, line)) 
-    std::cout << "Line:" << line << std::endl; 
-*/
 }
 

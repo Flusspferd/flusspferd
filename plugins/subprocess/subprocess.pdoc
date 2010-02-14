@@ -1,4 +1,4 @@
-// -*- mode:js2; -*-
+// -*- mode:js2; -*- vim: ft=javascript:
 
 /** section: Bundled Modules
  * subprocess
@@ -85,10 +85,11 @@
  **/
 
 /**
- * subprocess.Subprocess#poll() -> null|Integer
+ * subprocess.Subprocess#poll() -> null | Number
  * 
- * Checks if the subprocess is still running. Returns null if the subprocess is
- * still running or else the returncode as an Integer.
+ * Checks if the subprocess has terminated. Returns null if the subprocess is
+ * still running or else sets and returns the `returncode` attribute as an
+ * Integer.
  * 
  * See [[subprocess.Subprocess#returncode]] and [[subprocess.Subprocess#wait]].
  **/
@@ -96,8 +97,8 @@
 /**
  * subprocess.Subprocess#wait() -> Integer
  * 
- * Waits until the subprocess is finished and returns the returncode as an
- * Integer.
+ * Waits until the subprocess is finished and sets and returns the `returncode`
+ * attribute.
  * 
  * See [[subprocess.Subprocess#returncode]] and [[subprocess.Subprocess#poll]].
  **/
@@ -107,10 +108,21 @@
  * - input (String): data to send to the subprocess.
  * 
  * Write `input` to stdin of the process (if stdin pipe was opened) and read
- * stdout/stderr if opened. Returns an object containing the output of stdout
- * and stderr and the returncode.
+ * stdout/stderr if opened. It is an error to provide input if the stdin stream
+ * was not opened fro writing.
+ *
+ * Returns an object with properties of `returncode` and output of stdout and stderr
+ * streams, or `null` if the streams were not opened.
+ *
+ * For example, the return could look something like:
+ *
+ *     {
+ *       stdout: "Hello world\n",
+ *       stderr: null,
+ *       returncode: 0
+ *     }
  * 
- * This is a safe and fast way to handle the communication.
+ * This is a safe and fast way to handle the communication without deadlocking.
  **/
 
 /**

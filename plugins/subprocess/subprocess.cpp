@@ -91,7 +91,6 @@ value Subprocess::get_stream( boost::optional<value> &s, T& (bp::child::* getter
     s.reset( o );
   }
   return *s;
-  //in.assign(.handle().release()); 
 }
 
 value Subprocess::get_stdin() {
@@ -120,9 +119,9 @@ void Subprocess::kill() {
 #include <boost/system/system_error.hpp>
 void Subprocess::send_signal(int sig) {
 #ifdef BOOST_POSIX_API
-  if (::kill(child_.get_id(), sig) == -1) 
+  if (::kill(child_.get_id(), sig) == -1)
     throw boost::system::system_error(
-      boost::system::error_code(errno, boost::system::get_system_category()),
+      error_code(errno, boost::system::get_system_category()),
       "Subprocess#sendSignal"
     );
 #else
@@ -144,12 +143,12 @@ value Subprocess::wait_impl(bool poll) {
 
   value ret;
   using namespace boost::system;
-#if defined(BOOST_POSIX_API) 
-  int s; 
+#if defined(BOOST_POSIX_API)
+  int s;
   pid_t wait = ::waitpid(child_.get_id(), &s, poll ? WNOHANG : 0);
-  
-  if (wait == -1) 
-      boost::throw_exception(system_error(error_code(errno, get_system_category()), "Subprocess: waitpid(2) failed")); 
+
+  if (wait == -1)
+      boost::throw_exception(system_error(error_code(errno, get_system_category()), "Subprocess: waitpid(2) failed"));
 
   if (wait == 0)
     return object();
@@ -164,19 +163,19 @@ value Subprocess::wait_impl(bool poll) {
   else
     ret = object();
 
-#elif defined(BOOST_WINDOWS_API) 
+#elif defined(BOOST_WINDOWS_API)
   DWORD ret = ::WaitForSingleObject(child_.get_process_handle(), poll? 0 : INFINITE);
-  
+
   if (ret == WAIT_FAILED)
-      boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: WaitForSingleObject failed")); 
+      boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: WaitForSingleObject failed"));
 
   if (ret == WAIT_TIMEOUT)
     ret = object();
   else {
 
-    DWORD code; 
+    DWORD code;
     if ( !GetExitCodeProcess(child_.get_process_handle(), &code) )
-        boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: GetExitCodeProcess failed")); 
+        boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: GetExitCodeProcess failed"));
 
     ret = value(code);
   }
