@@ -264,9 +264,9 @@ inline child launch(const Executable &exe, const Arguments &args, const Context 
  * 
  * This function behaves similarly to the system(3) system call. In a 
  * POSIX system, the command is fed to /bin/sh whereas under a Windows 
- * system, it is fed to cmd.exe. It is difficult to write portable 
- * commands as the first parameter, but this function comes in handy in 
- * multiple situations. 
+ * system, it is fed to COMPSEC environment variable faling back to cmd.exe. It
+ * is difficult to write portable commands as the first parameter, but this
+ * function comes in handy in multiple situations.
  */ 
 template <class Context> 
 inline child launch_shell(const std::string &command, const Context &ctx) 
@@ -284,7 +284,16 @@ inline child launch_shell(const std::string &command, const Context &ctx)
     UINT size = ::GetSystemDirectoryA(sysdir, sizeof(sysdir)); 
     if (!size) 
         boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::launch_shell: GetWindowsDirectory failed")); 
-    BOOST_ASSERT(size < MAX_PATH); 
+    exe = getenv("COMSPEC");
+    if (exe.empty()) {
+        // No COMSPEC env var, fall back to looking for cmd.exe
+        char sysdir[MAX_PATH];
+        UINT size = ::GetSystemDirectoryA(sysdir, sizeof(sysdir));
+        if (!size)
+            boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::launch_shell: GetWindowsDirectory failed"));
+        BOOST_ASSERT(size < MAX_PATH);
+        exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe");
+    }
 
     exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe"); 
     args.push_back("cmd"); 
