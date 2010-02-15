@@ -90,6 +90,46 @@ exports.test_retcode = function() {
     asserts.same(p.returncode, retval, "returncode correct");
 };
 
+// Test the behaviour of setting and deleting system.env, and the env arg to popen
+exports.test_env = function() {
+    var env = require('system').env;
+
+    if ("flusspferd_evn_test_param" in env)
+      throw new Error("flusspferd_evn_test_param is already present in environment!");
+
+    const args = [ require('flusspferd').executableName, '-e',
+                   'var s = require("system"); s.stdout.write(s.env.flusspferd_evn_test_param || "(void 0)")',
+                   '-c', dev_null
+                 ];
+
+    function do_test(val, msg, env) {
+        var p = { args: args };
+        if ( arguments.length >= 3 )
+          p.env = arguments[2];
+
+        var r = subprocess.popen( p ).communicate();
+
+        asserts.same(r.stdout, val, msg);
+        asserts.same(r.returncode, 0, "returncode is 0");
+        asserts.same(r.stderr, "", "no errors");
+    }
+
+    // Test 3 ways: implicit env, explicit env, and custom env
+    env.flusspferd_evn_test_param = "flusspferd_evn_test_param";
+
+    // Implict copy of the current env
+    do_test("flusspferd_evn_test_param", "env var propogated (implicit)");
+    do_test("flusspferd_evn_test_param", "env var propogated (explicit)", env);
+    do_test("flusspferd_evn_test_param", "env var propogated (custom)", {flusspferd_evn_test_param: "flusspferd_evn_test_param"});
+
+    delete env.flusspferd_evn_test_param;
+    // Implict copy of the current env
+
+    do_test("(void 0)", "env var delete propogated (implicit)");
+    do_test("(void 0)", "env var delete propogated (explicit)", env);
+    do_test("(void 0)", "env var delete propogated (custom)", {});
+};
+
 }
 catch(e if e.message && e.message.match(/'subprocess'/)) {
   // this sucks we really should change the exception system (#44)

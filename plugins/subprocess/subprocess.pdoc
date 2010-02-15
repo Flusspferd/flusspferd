@@ -72,6 +72,9 @@
  *   start the subprocess (execve). If true a shell is started and `args[0]` 
  *   interpreted as command. The rest of the `args` are passed as arguments to
  *   the shell.
+ * - env (`Object`, optional): if present, specifies the environment variables
+ *   to set for the child process. If not present, then the current environment
+ *   will be copied.
  * 
  * Example
  * 

@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/class.hpp"
 #include "flusspferd/create.hpp"
 #include "flusspferd/create/function.hpp"
+#include "flusspferd/property_iterator.hpp"
 
 #include "subprocess.hpp"
 
@@ -206,8 +207,21 @@ namespace {
 
     if (!o.has_own_property("env"))
       ctx.environment = bp::self::get_environment();
+    else if (o.get_property("env").is_object() == false)
+      throw exception("subprocess.popen: 'env' property must be an object","TypeError");
     else {
-      throw exception("subprocess.popen: TODO - use env");
+      bp::environment env;
+      object const &js_env = o.get_property("env").to_object();
+      for ( property_iterator i = js_env.begin(), end = js_env.end();
+            i != end; ++i )
+      {
+        if ( !js_env.has_own_property(*i) )
+          continue;
+        env.insert(boost::process::environment::value_type(
+          i->to_std_string(), js_env.get_property(*i).to_std_string()
+        ));
+      }
+      ctx.environment = env;
     }
 
     bp::child c = bp::launch( exe.get(), args, ctx );

@@ -68,6 +68,7 @@ protected:
   boost::any enumerate_start(int &n);
   value enumerate_next(boost::any &iter);
   bool property_resolve(value const &id, unsigned access);
+  void property_op(property_mode mode, value const &id, value &data);
 };
 
 
@@ -125,7 +126,7 @@ bool environment::property_resolve(value const &id, unsigned)
     return false;
 
   char *val = getenv(name.c_str());
-  if (!val) 
+  if (!val)
     return false;
 
   define_property(name, string(val));
@@ -163,7 +164,7 @@ value environment::enumerate_next(boost::any &iter) {
 
   if (*env == 0)
     return value();
-  
+
   char* eq_c = strchr(*env, '=');
   string s = string(*env, eq_c - *env);
 
@@ -175,4 +176,27 @@ value environment::enumerate_next(boost::any &iter) {
 
 string environment::to_string() {
   return "[object sys.Environment]";
+}
+
+void environment::property_op(property_mode mode, value const &id, value &data) {
+  switch (mode) {
+  case property_get:
+    // Not needed.
+    break;
+#ifdef WIN32
+  default:
+    SetEnvironmentVariable(
+      id.to_std_string().c_str(),
+      mode == property_delete ? NULL : data.to_std_string().c_str()
+    );
+#else
+  case property_add:
+  case property_set:
+    setenv( id.to_std_string().c_str(), data.to_std_string().c_str(), 1 );
+    break;
+  case property_delete:
+    unsetenv( id.to_std_string().c_str() );
+    break;
+#endif
+  }
 }
