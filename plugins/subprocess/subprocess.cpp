@@ -141,44 +141,27 @@ value Subprocess::wait_impl(bool poll) {
   // Stupidly, Boost.Process doesn't have an option to do non blocking, even
   // tho its trivially easy:
 
-  value ret;
-  using namespace boost::system;
-#if defined(BOOST_POSIX_API)
-  int s;
-  pid_t wait = ::waitpid(child_.get_id(), &s, poll ? WNOHANG : 0);
+  boost::optional<bp::status> s = child_.wait(poll);
 
-  if (wait == -1)
-      boost::throw_exception(system_error(error_code(errno, get_system_category()), "Subprocess: waitpid(2) failed"));
-
-  if (wait == 0)
+  if (!s)
     return object();
 
+  value ret;
+#if defined(BOOST_POSIX_API)
+
+  bp::posix_status p(s.get());
   // Stupid thing is protected. grr.
   //bp::posix_status status(s);
 
-  else if (WIFSIGNALED(s))
-    ret = value(-WTERMSIG(s));
-  else if (WIFEXITED(s))
-    ret = value(WEXITSTATUS(s));
+  if (p.signaled())
+    ret = value(-p.term_signal());
   else
-    ret = object();
-
-#elif defined(BOOST_WINDOWS_API)
-  DWORD wait = ::WaitForSingleObject(child_.get_process_handle(), poll? 0 : INFINITE);
-
-  if (wait == WAIT_FAILED)
-      boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: WaitForSingleObject failed"));
-
-  if (wait == WAIT_TIMEOUT)
-    ret = object();
-  else {
-    DWORD code;
-    if ( !GetExitCodeProcess(child_.get_process_handle(), &code) )
-        boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: GetExitCodeProcess failed"));
-
-    ret = value(code);
-  }
 #endif
+  if (s->exited())
+    ret = value(s->exit_status());
+  else
+    // This is unlikely to happen
+    ret = object();
 
   define_property("returncode", ret, read_only_property | permanent_property );
   return ret;

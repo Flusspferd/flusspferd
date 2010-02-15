@@ -39,6 +39,7 @@
 #include <boost/throw_exception.hpp> 
 #include <boost/shared_ptr.hpp> 
 #include <boost/assert.hpp> 
+#include <boost/optional.hpp>
 #include <vector> 
 
 namespace boost { 
@@ -93,28 +94,40 @@ public:
     } 
 
     /** 
-     * Blocks and waits for the child process to terminate. 
+     * Get the exit status of the child.
      * 
      * Returns a status object that represents the child process' 
      * finalization condition. The child process object ceases to be 
-     * valid after this call. 
-     * 
-     * \remark Blocking remarks: This call blocks if the child 
-     *         process has not finalized execution and waits until 
-     *         it terminates. 
+     * valid after this call.
+     *
+     * If the child has not yet exited and \a poll is false then \a bost::none
+     * will be returned. If \a poll is true, then this function will block
+     * until the child has terminated.
      */ 
-    status wait() 
+    boost::optional<status> wait(bool poll = false)
     { 
 #if defined(BOOST_POSIX_API) 
-        int s; 
-        if (::waitpid(get_id(), &s, 0) == -1) 
-            boost::throw_exception(boost::system::system_error(boost::system::error_code(errno, boost::system::get_system_category()), "boost::process::child::wait: waitpid(2) failed")); 
-        return status(s); 
+        int s;
+        pid_t wait = ::waitpid(get_id(), &s, poll ? WNOHANG : 0);
+
+        if (wait == -1)
+            boost::throw_exception(boost::system::system_error(boost::system::error_code(errno, boost::system::get_system_category()), "boost::process::posix_child: waitpid(2) failed"));
+
+        if (wait == 0)
+          return boost::none;
+
+        return status(s);
 #elif defined(BOOST_WINDOWS_API) 
-        ::WaitForSingleObject(process_handle_.get(), INFINITE); 
+        DWORD wait = ::WaitForSingleObject(process_handle_.get(), poll ? 0 : INFINITE);
+        if (wait == WAIT_FAILED)
+            boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost.process.win32_child: WaitForSingleObject failed"));
+
+        if (wait == WAIT_TIMEOUT)
+            return boost::none;
+
         DWORD code; 
         if (!::GetExitCodeProcess(process_handle_.get(), &code)) 
-            boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::child::wait: GetExitCodeProcess failed")); 
+            boost::throw_exception(boost::system::system_error(boost::system::error_code(::GetLastError(), boost::system::get_system_category()), "boost::process::win32_child::wait: GetExitCodeProcess failed")); 
         return status(code); 
 #endif 
     } 
