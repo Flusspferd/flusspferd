@@ -41,9 +41,11 @@ THE SOFTWARE.
 #include <boost/logic/tribool.hpp>
 #include <boost/optional.hpp>
 #include <boost/process.hpp>
+#include <boost/system/error_code.hpp>
 
 
 namespace bp = ::boost::process;
+namespace bs = ::boost::system;
 using boost::optional;
 using boost::format;
 using boost::tribool;
@@ -102,8 +104,6 @@ FLUSSPFERD_LOADER_SIMPLE(exports) {
 #endif
     ;
 }
-
-#include <iostream>
 
 namespace {
   std::vector<std::string> array_to_vector(array a) {
@@ -188,8 +188,13 @@ namespace {
 #elif defined(BOOST_WINDOWS_API)
       char sysdir[MAX_PATH];
       UINT size = ::GetSystemDirectoryA(sysdir, sizeof(sysdir));
-      if (!size)
-          boost::throw_exception(system::system_error(system::error_code(::GetLastError(), system::get_system_category()), "subprocess.popen: GetWindowsDirectory failed"));
+      if (!size) {
+        boost::throw_exception(
+          bs::system_error(bs::error_code(::GetLastError(), bs::get_system_category()),
+            "subprocess.popen: GetWindowsDirectory failed"
+          )
+        );
+      }
       BOOST_ASSERT(size < MAX_PATH);
 
       exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe");

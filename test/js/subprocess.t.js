@@ -1,12 +1,19 @@
 try {
 
-const subprocess = require('subprocess');
-const asserts = require('test').asserts;
+const subprocess = require('subprocess'),
+      asserts = require('test').asserts,
+      WIN32 = "APPDATA" in require('system').env,
+      dev_null = WIN32 ? "NUL" : "/dev/null";
+
+// Helper fn to deal with different line ending on various platforms
+function lines() {
+  return Array.join(arguments, WIN32 ? "\r\n" : "\n") + (WIN32 ? "\r\n" : "\n");
+}
 
 exports.test_shell = function() {
     const data = "hello world";
     const cmd = require('flusspferd').executableName +
-        ' -e \'const out = require("system").stdout; out.write("' + data + '"); out.flush()\' -c /dev/null';
+        ' -e \'const out = require("system").stdout; out.write("' + data + '"); out.flush()\' -c ' + dev_null;
 
   // Had some issues where spawning multiple process and calling communicate
   //would fail the second time round.
@@ -23,7 +30,7 @@ exports.test_shell = function() {
 exports.test_cat = function() {
     var args = [ require('flusspferd').executableName, '-e',
                  'var line, sys = require("system"); while( (line = sys.stdin.readLine()) ) { sys.stdout.write(line); sys.stdout.flush(); }',
-                 '-c', '/dev/null' ];
+                 '-c', dev_null ];
     var p = subprocess.popen(args);
     asserts.ok(p.stdin, "have stdin stream");
     asserts.ok(p.stdout, "have stdout stream");
@@ -31,7 +38,7 @@ exports.test_cat = function() {
 
     asserts.ok(p.poll() === null, "poll returns null when process still alive");
 
-    const data = 'hello world\nline 2\n';
+    const data = lines('hello world', 'line 2');
     p.stdin.write(data);
     p.stdin.flush();
     asserts.same(p.stdout.read(data.length), data);
@@ -48,7 +55,7 @@ exports.test_cat = function() {
 exports.test_communicate = function() {
     var args = [ require('flusspferd').executableName, '-e',
                  'const out = require("system").stdout; out.write("hello world\\n"); out.flush();',
-                 '-c', '/dev/null'
+                 '-c', dev_null
                ];
 
     var p = subprocess.popen(args, "r");
@@ -61,7 +68,7 @@ exports.test_communicate = function() {
     asserts.same(r.returncode, 0, "returncode is 0");
     asserts.same(p.poll(), r.returncode, "returncode returned from communicate");
     asserts.same(r.returncode, p.returncode, "returncode stored on object");
-    asserts.same(r.stdout, "hello world\n", "stdout correct");
+    asserts.same(r.stdout, lines("hello world"), "stdout correct");
     asserts.same(r.stderr, null, "stderr correct");
 };
 
@@ -69,7 +76,7 @@ exports.test_retcode = function() {
     const retval = 12;
     const args = [ require('flusspferd').executableName, '-e',
                    'quit(' + retval + ');',
-                   '-c', '/dev/null'
+                   '-c', dev_null
                  ];
     var p = subprocess.popen({ args : args, stdin : false, stderr : false, stdout : false });
 

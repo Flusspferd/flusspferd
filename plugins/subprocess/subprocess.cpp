@@ -164,15 +164,14 @@ value Subprocess::wait_impl(bool poll) {
     ret = object();
 
 #elif defined(BOOST_WINDOWS_API)
-  DWORD ret = ::WaitForSingleObject(child_.get_process_handle(), poll? 0 : INFINITE);
+  DWORD wait = ::WaitForSingleObject(child_.get_process_handle(), poll? 0 : INFINITE);
 
-  if (ret == WAIT_FAILED)
+  if (wait == WAIT_FAILED)
       boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: WaitForSingleObject failed"));
 
-  if (ret == WAIT_TIMEOUT)
+  if (wait == WAIT_TIMEOUT)
     ret = object();
   else {
-
     DWORD code;
     if ( !GetExitCodeProcess(child_.get_process_handle(), &code) )
         boost::throw_exception(system_error(error_code(::GetLastError(), get_system_category()), "Subprocess: GetExitCodeProcess failed"));
@@ -197,7 +196,6 @@ void Subprocess::handle_write( error_code const &ec, bool &done ) {
   if (ec)
     throw boost::system::system_error(ec, "Subprocess: writing to stdin");
 
-  std::cout << "stdin is done" << std::endl;
   done = true;
 }
 
@@ -227,12 +225,13 @@ namespace {
         o.set_property(prop, str);
       }
 
-      if (ec == ba::error::eof) {
+      // OSX gives EoF, Win32 gives EPIPE error.
+      if (ec == ba::error::eof || ec == ba::error::broken_pipe) {
         s->close();
         done = true;
       }
       else if (ec)
-        throw boost::system::system_error(ec, std::string("Subprocess: reading from ") + prop + "pipe");
+        throw boost::system::system_error(ec, std::string("Subprocess: reading from ") + prop + " pipe");
       else
         enqueue();
     }
