@@ -204,6 +204,12 @@ namespace {
 #endif
     }
 
+    if (!o.has_own_property("env"))
+      ctx.environment = bp::self::get_environment();
+    else {
+      throw exception("subprocess.popen: TODO - use env");
+    }
+
     bp::child c = bp::launch( exe.get(), args, ctx );
     return create<subprocess::Subprocess>( boost::fusion::make_vector( c, ctx ) );
   }
@@ -247,6 +253,9 @@ void subprocess::popen(flusspferd::call_context &x) {
       //  popen( ["command"], "mode" )
       std::vector<std::string> args = array_to_vector( array( o ) );
 
+      // Copy the current environment
+      ctx.environment = bp::self::get_environment();
+
       bp::child c = bp::launch( args.front(), args, ctx );
 
       apply_mode_string( ctx, mode );
@@ -254,6 +263,7 @@ void subprocess::popen(flusspferd::call_context &x) {
     }
     else {
       //  popen( { ... } )
+
       x.result = popen_from_obj( o, ctx );
     }
   }
@@ -262,6 +272,9 @@ void subprocess::popen(flusspferd::call_context &x) {
     //  popen( "command", "mode" )
 
     apply_mode_string( ctx, mode );
+
+    // Copy the current environment
+    ctx.environment = bp::self::get_environment();
 
     bp::child child = bp::launch_shell(v.to_std_string(), ctx );
     x.result = create<Subprocess>( boost::fusion::make_vector( child, ctx ) );
