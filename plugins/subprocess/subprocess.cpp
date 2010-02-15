@@ -24,7 +24,6 @@ THE SOFTWARE.
 */
 
 #include "subprocess.hpp"
-#include "exception.hpp"
 
 #include <flusspferd/io/stream.hpp>
 

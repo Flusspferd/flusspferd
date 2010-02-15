@@ -9,8 +9,6 @@ if(PLUGIN_SUBPROCESS)
   flusspferd_plugin(
     "subprocess"
     SOURCES
-      exception.cpp
-      exception.hpp
       subprocess.cpp
       subprocess.hpp
       subprocess_module.cpp
