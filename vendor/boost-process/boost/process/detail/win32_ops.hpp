@@ -324,14 +324,32 @@ inline PROCESS_INFORMATION win32_start(const Executable &exe, const Arguments &a
     PROCESS_INFORMATION pi; 
     ::ZeroMemory(&pi, sizeof(pi)); 
 
-    boost::shared_array<char> cmdline = collection_to_win32_cmdline(args); 
+    boost::shared_array<char> cmdline;
 
-    boost::scoped_array<char> executable(new char[exe.size() + 1]); 
+    boost::scoped_array<char> executable;
+    // exe could be "", in which case call CreateProcess with NULL first argument
+    if (exe.size()) {
+        executable.reset(new char[exe.size() + 1]);
+#if defined(__CYGWIN__) || defined(_SCL_SECURE_NO_DEPRECATE)
+        ::strcpy(executable.get(), exe.c_str());
+#else
+        ::strcpy_s(executable.get(), exe.size() + 1, exe.c_str());
+#endif
+        cmdline = collection_to_win32_cmdline(args);
+    }
+    else if (args.size() == 1) {
+        // No exe and just a single argument. Dont escape anything - pass it through unchanged.
+        std::string const &c = args.front();
+        cmdline.reset(new char[c.size() + 1]);
 #if defined(__CYGWIN__) || defined(_SCL_SECURE_NO_DEPRECATE) 
-    ::strcpy(executable.get(), exe.c_str()); 
+        ::strcpy(cmdline.get(), c.c_str());
 #else 
-    ::strcpy_s(executable.get(), exe.size() + 1, exe.c_str()); 
+        ::strcpy_s(cmdline.get(), c.size() + 1, c.c_str());
 #endif 
+    }
+    else {
+        cmdline = collection_to_win32_cmdline(args);
+    }
 
     boost::scoped_array<char> workdir(new char[setup.work_directory.size() + 1]); 
 #if defined(__CYGWIN__) || defined(_SCL_SECURE_NO_DEPRECATE) 

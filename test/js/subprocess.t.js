@@ -13,10 +13,10 @@ function lines() {
 exports.test_shell = function() {
     const data = "hello world";
     const cmd = require('flusspferd').executableName +
-        ' -e \'const out = require("system").stdout; out.write("' + data + '"); out.flush()\' -c ' + dev_null;
+        ' -e "const out = require(\'system\').stdout; out.write(\'' + data + '\'); out.flush()" -c ' + dev_null;
 
   // Had some issues where spawning multiple process and calling communicate
-  //would fail the second time round.
+  // would fail the second time round. So test it 3 times to make sure.
   for (var i =0; i < 3; i++) {
     var p = subprocess.popen(cmd);
 
@@ -24,6 +24,7 @@ exports.test_shell = function() {
     var r = p.communicate();
     asserts.same(r.returncode, 0, "exit code 0");
     asserts.same(r.stdout, data, "stdout ok");
+    asserts.same(r.stderr, "", "stderr ok");
   }
 };
 

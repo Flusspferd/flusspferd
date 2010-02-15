@@ -170,6 +170,12 @@ inline std::string executable_to_progname(const std::string &exe)
  * \remark Blocking remarks: This function may block if the device 
  * holding the executable blocks when loading the image. This might 
  * happen if, e.g., the binary is being loaded from a network share. 
+ *
+ * \remark Windows quoting: The windows CreateProcess function takes just a
+ * single parameter (rather than an array of args) \a launch will attempt to
+ * quote things correctly. If it gets it wrong or you want to do something
+ * specialized, pass an empty \a executable and just a single \a args string,
+ * in which case it will be passed through untouched.
  * 
  * \return A handle to the new child process. 
  */ 
@@ -295,10 +301,9 @@ inline child launch_shell(const std::string &command, const Context &ctx)
         exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe");
     }
 
-    exe = std::string(sysdir) + (sysdir[size - 1] != '\\' ? "\\cmd.exe" : "cmd.exe"); 
-    args.push_back("cmd"); 
-    args.push_back("/c"); 
-    args.push_back(command); 
+    // set exe to "" and have a single arg to prevent shell escaping later.
+    args.push_back(exe + " /c " + command);
+    exe = "";
 #endif 
 
     return launch(exe, args, ctx); 
