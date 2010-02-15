@@ -56,7 +56,8 @@ const TAPProducer = function TAPProducer() {
 merge(TAPProducer.prototype, {
   paddStr: '  ',
 
-  colourize: true,
+  // Dont colourize (by default) on Win32
+  colourize: "APPDATA" in require('system').env ? false : true,
 
   green: function green() {
     var a = Array.slice(arguments);
