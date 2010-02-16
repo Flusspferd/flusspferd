@@ -119,19 +119,23 @@ if (NOT WIN32)
         DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
 
     # Bash completion script
-    add_custom_command(
-      OUTPUT bash_completion.sh
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
-      COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
-      DEPENDS flusspferd-shell
-      COMMENT "Generating Bash Completion Script")
-    add_custom_target(
-      BASH_COMPLETION ALL
-      DEPENDS bash_completion.sh)
-    install(
-      FILES ${Flusspferd_BINARY_DIR}/bash_completion.sh
-      DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d
-      RENAME flusspferd)
+    option(BASH_COMPLETION "Create and install bash completion script" ON)
+
+    if(BASH_COMPLETION)
+      add_custom_command(
+        OUTPUT bash_completion.sh
+        COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null --hidden-bash > ${Flusspferd_BINARY_DIR}/bash_completion.impl
+        COMMAND ${Flusspferd_BINARY_DIR}/bin/flusspferd -c /dev/null -- ${Flusspferd_SOURCE_DIR}/util/replace-var.js --file-var IMPL=${Flusspferd_BINARY_DIR}/bash_completion.impl ${Flusspferd_SOURCE_DIR}/misc/bash_completion.sh.in > ${Flusspferd_BINARY_DIR}/bash_completion.sh
+        DEPENDS flusspferd-shell
+        COMMENT "Generating Bash Completion Script")
+      add_custom_target(
+        BASH_COMPLETION ALL
+        DEPENDS bash_completion.sh)
+      install(
+        FILES ${Flusspferd_BINARY_DIR}/bash_completion.sh
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/etc/bash_completion.d
+        RENAME flusspferd)
+    endif()
 endif()
 
 ## Documentation ############################################################
