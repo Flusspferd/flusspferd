@@ -40,6 +40,7 @@ if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
     echo '  PLUGIN_SUBPROCESS=ON|OFF              Build Subprocess plugin (default ON).'
     echo '  LINE_EDITOR=none|libedit|readline     Select line editor (readline is better but GPL) (default libedit).'
     echo '  FORCE_LINE_EDITOR=ON|OFF              Fail configuration if the specified line editor is not available (default OFF).'
+    echo '  BASH_COMPLETION=ON|OFF                Create and install bash completion script (default ON).'
     echo '  CREATE_DOCUMENATION=ON|OFF            Create and install documenation (default OFF).'
     echo '  RELOCATABLE=ON|OFF                    Whether the binary should be relocatable (default ON).'
     echo '\nRun "ccmake build" after ./configure to get a curses based configuration editor and run "cmake --help" to get help with CMake.'
