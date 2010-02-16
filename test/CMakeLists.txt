@@ -23,7 +23,7 @@ if(ENABLE_TESTS)
 
     foreach(TEST_SOURCE ${TESTS})
         string(REGEX MATCH "test_[a-zA-Z0-9_]*" TEST_OUTPUT ${TEST_SOURCE})
-        string(REGEX REPLACE "^test_" "" TEST_NAME TEST_OUTPUT)
+        string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_OUTPUT})
         set(TEST_SOURCES ${TEST_SOURCE} test_environment.hpp)
         add_executable(${TEST_OUTPUT} ${TEST_SOURCES})
         set_property(
@@ -37,4 +37,3 @@ if(ENABLE_TESTS)
     endforeach()
 
 endif()
-
