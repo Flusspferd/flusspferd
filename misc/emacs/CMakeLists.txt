@@ -1,7 +1,9 @@
 ## Configured files #########################################################
 
-if (NOT WIN32)
+if(NOT WIN32)
+  option(EMACS_MODE "Create and install Emacs mode if Emacs is found" ON)
 
+  if(EMACS_MODE)
     find_program(EMACS NAMES emacs)
     if(NOT EMACS STREQUAL "EMACS-NOTFOUND")
       message(STATUS "WILL install Emacs mode")
@@ -23,4 +25,5 @@ if (NOT WIN32)
     install(
       FILES ${Flusspferd_SOURCE_DIR}/misc/emacs/flusspferd.el
       DESTINATION ${CMAKE_INSTALL_PREFIX}/share/emacs/site-lisp)
+  endif()
 endif()
