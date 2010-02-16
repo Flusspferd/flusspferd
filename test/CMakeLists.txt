@@ -39,4 +39,7 @@ if(ENABLE_TESTS)
             flusspferd)
     endforeach()
 
+    add_test("javascript" ${Flusspferd_SOURCE_DIR}/util/cdjsrepl.sh ${Flusspferd_SOURCE_DIR} -z2 -e "require('test').prove('./test/js')")
+    add_test("javascript_modules" ${Flusspferd_SOURCE_DIR}/util/cdjsrepl.sh ${Flusspferd_SOURCE_DIR} -z2 ./test/js/modules.t.js)
+    add_test("javascript_optline" ${Flusspferd_SOURCE_DIR}/util/cdjsrepl.sh ${Flusspferd_SOURCE_DIR} -z2 ./test/js/optline-handling.t.js)
 endif()
