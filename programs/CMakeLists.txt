@@ -106,16 +106,11 @@ if (NOT WIN32)
       DEPENDS ${Flusspferd_SOURCE_DIR}/help/flusspferd.1.in
       DEPENDS flusspferd-shell
       COMMENT "Generating manpage")
-    add_custom_command(
-      OUTPUT flusspferd.1.gz
-      COMMAND gzip -9 -c ${Flusspferd_BINARY_DIR}/flusspferd.1 > ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
-      DEPENDS flusspferd.1
-      COMMENT "Compressing manpage")
     add_custom_target(
       MANPAGE ALL
-      DEPENDS flusspferd.1.gz)
+      DEPENDS flusspferd.1)
     install(
-        FILES ${Flusspferd_BINARY_DIR}/flusspferd.1.gz
+        FILES ${Flusspferd_BINARY_DIR}/flusspferd.1
         DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)
 
     # Bash completion script
