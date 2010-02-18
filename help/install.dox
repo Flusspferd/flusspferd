@@ -44,6 +44,7 @@ THE SOFTWARE.
  * @li <a href="https://sourceforge.net/projects/libedit/">libedit</a> (BSD libedit) can be used for the integrated Javascript shell,
  * @li @b or GNU/readline (attention, GPL!),
  * @li <a href="http://curl.haxx.se">cURL</a> 7.19.0 or higher (for the cURL plugin),
+ * @li <a href="http://gmplib.org/">GMP</a> (for the GMP plugin),
  * @li <a href="http://www.sqlite.org">SQLite 3</a> 3.4 or higher (for the SQLite3 plugin).
  *
  * To get direct access to the development repository, you also need <a href="http://git-scm.com/">GIT</a>.
