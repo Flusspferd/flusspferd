@@ -31,7 +31,6 @@ THE SOFTWARE.
  * designed to cope with that problem.
  *
  * - @subpage install
- *   - @ref ubuntu
  *   - @ref emacs-install
  *
  * - @subpage cpp-tutorial
