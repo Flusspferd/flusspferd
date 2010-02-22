@@ -1,13 +1,30 @@
 #!/bin/sh
-doxygen help/Doxyfile
+
+doxygen=doxygen
+builddir=./build
+sourcedir=.
+
+# This is a hack because CMake can't set environment vars for commands called via add_custom_command
+
+if [ "$1" ]; then
+    doxygen="$1"
+fi
+if [ "$2" ]; then
+    builddir="$2"
+fi
+if [ "$3" ]; then
+    sourcedir="$3"
+fi
+
+$doxygen help/Doxyfile
 
 # this is a hack. find sth. better
-./util/jsrepl.sh \
-    ./plugins/curl/gen-doc.js \
-    ./plugins/curl/get_options.cpp \
-    > ./plugins/curl/options.pdoc
+$sourcedir/util/jsrepl.sh \
+    $sourcedir/plugins/curl/gen-doc.js \
+    $sourcedir/plugins/curl/get_options.cpp \
+    > $sourcedir/plugins/curl/options.pdoc
 
-./util/build_pdocs.rb
-rm -f ./plugins/curl/options.pdoc
+$sourcedir/util/build_pdocs.rb
+rm -f $sourcedir/plugins/curl/options.pdoc
 
-groff -man -Thtml build/flusspferd.1 > build/html/flusspferd.1.html
+groff -man -Thtml $builddir/flusspferd.1 > $builddir/html/flusspferd.1.html
