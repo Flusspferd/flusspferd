@@ -1,6 +1,9 @@
 Flusspferd Change Log
 =====================
 
+2010-02-22:
+- Fixed problems when using a different build directory
+
 2010-02-05:
 - Fix segfault that happens sometimes with deep recursion
 
