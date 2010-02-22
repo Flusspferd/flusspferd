@@ -25,6 +25,6 @@ cp help/Doxyfile "$builddir/Doxyfile" && echo "OUTPUT_DIRECTORY       = $builddi
     "$sourcedir/plugins/curl/get_options.cpp" \
     > "$builddir/options.pdoc"
 
-"$sourcedir/util/build_pdocs.rb" "$builddir/options.pdoc"
+"$sourcedir/util/build_pdocs.rb" --builddir "$builddir" "$builddir/options.pdoc"
 
 groff -man -Thtml "$builddir/flusspferd.1" > "$builddir/html/flusspferd.1.html"

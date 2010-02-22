@@ -1,11 +1,9 @@
 #!/usr/bin/env ruby
 
-
-
 module HippoDocsHelper
-  ROOT_DIR      = File.join(File.expand_path(File.dirname(__FILE__)), '..')
-  DOC_DIR       = File.join(ROOT_DIR, 'build', 'html', 'js')
-  TEMPLATE_DIR  = File.join(ROOT_DIR, 'vendor', 'pdoc-template', 'html')
+  ROOT_DIR        = File.join(File.expand_path(File.dirname(__FILE__)), '..')
+  DOC_DIR_DEFAULT = File.join(ROOT_DIR, 'build', 'html', 'js')
+  TEMPLATE_DIR    = File.join(ROOT_DIR, 'vendor', 'pdoc-template', 'html')
 
 
   def self.require_pdoc
@@ -17,9 +15,10 @@ module HippoDocsHelper
   end
   
 
-  def self.build_docs(extras)
+  def self.build_docs(extras, doc_dir)
+    doc_dir = DOC_DIR_DEFAULT unless doc_dir
 
-    rm_rf DOC_DIR
+    rm_rf doc_dir
     begin
       files = Dir.glob( File.join(ROOT_DIR, "libflusspferd", "**","*.pdoc") )
       files << Dir.glob( File.join(ROOT_DIR, "plugins","**","*.js") )
@@ -33,7 +32,7 @@ module HippoDocsHelper
         exit 1;
       end
       files << {
-        :output => DOC_DIR,
+        :output => doc_dir,
         :templates => TEMPLATE_DIR,
         :syntax_highlighter => :none,
         #:index_page => 'README.markdown'
@@ -98,5 +97,18 @@ end
 if __FILE__ == $0
   HippoDocsHelper.require_gems
   HippoDocsHelper.require_pdoc
-  HippoDocsHelper.build_docs(ARGV)
+
+  doc_dir = nil
+  require 'getoptlong'
+  opts = GetoptLong.new(
+      ['--builddir', '-b', GetoptLong::REQUIRED_ARGUMENT]
+   )
+  opts.each do |opt, arg|
+    if opt == '--builddir'
+      puts "Using Builddir #{arg}"
+      doc_dir = File.join(arg, 'html', 'js')
+    end
+  end
+
+  HippoDocsHelper.build_docs(ARGV, doc_dir)
 end
