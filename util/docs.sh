@@ -17,10 +17,10 @@ if [ "$3" ]; then
 fi
 
 # this is yet another hack to set the builddir for doxygen
-cp help/Doxyfile $builddir/Doxyfile && echo "OUTPUT_DIRECTORY       = $builddir" >> $builddir/Doxyfile && $doxygen build/Doxyfile
+cp help/Doxyfile $builddir/Doxyfile && echo "OUTPUT_DIRECTORY       = $builddir" >> $builddir/Doxyfile && $doxygen $builddir/Doxyfile
 
 # this is a hack. find sth. better
-$sourcedir/util/jsrepl.sh \
+$builddir/bin/flusspferd -c /dev/null \
     $sourcedir/plugins/curl/gen-doc.js \
     $sourcedir/plugins/curl/get_options.cpp \
     > $sourcedir/plugins/curl/options.pdoc
