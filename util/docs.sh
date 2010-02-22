@@ -16,7 +16,8 @@ if [ "$3" ]; then
     sourcedir="$3"
 fi
 
-$doxygen help/Doxyfile
+# this is yet another hack to set the builddir for doxygen
+cp help/Doxyfile $builddir/Doxyfile && echo "OUTPUT_DIRECTORY       = $builddir" >> $builddir/Doxyfile && $doxygen build/Doxyfile
 
 # this is a hack. find sth. better
 $sourcedir/util/jsrepl.sh \
