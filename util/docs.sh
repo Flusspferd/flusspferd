@@ -23,9 +23,8 @@ cp help/Doxyfile $builddir/Doxyfile && echo "OUTPUT_DIRECTORY       = $builddir"
 $builddir/bin/flusspferd -c /dev/null \
     $sourcedir/plugins/curl/gen-doc.js \
     $sourcedir/plugins/curl/get_options.cpp \
-    > $sourcedir/plugins/curl/options.pdoc
+    > $builddir/options.pdoc
 
-$sourcedir/util/build_pdocs.rb
-rm -f $sourcedir/plugins/curl/options.pdoc
+$sourcedir/util/build_pdocs.rb $builddir/options.pdoc
 
 groff -man -Thtml $builddir/flusspferd.1 > $builddir/html/flusspferd.1.html
