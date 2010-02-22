@@ -1,6 +1,8 @@
 ## Tests ###################################################################
 
 if(ENABLE_TESTS)
+    enable_testing()
+
     set(
       TESTS
       test_arguments.cpp
@@ -26,6 +28,7 @@ if(ENABLE_TESTS)
         string(REGEX REPLACE "^test_" "" TEST_NAME ${TEST_OUTPUT})
         set(TEST_SOURCES ${TEST_SOURCE} test_environment.hpp)
         add_executable(${TEST_OUTPUT} ${TEST_SOURCES})
+        add_test(${TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${TEST_OUTPUT})
         set_property(
             TARGET ${TEST_OUTPUT}
             PROPERTY COMPILE_FLAGS
@@ -36,4 +39,7 @@ if(ENABLE_TESTS)
             flusspferd)
     endforeach()
 
+    add_test("javascript" ${Flusspferd_SOURCE_DIR}/util/cdjsrepl.sh ${Flusspferd_SOURCE_DIR} -z2 -e "require('test').prove('./test/js')")
+    add_test("javascript_modules" ${Flusspferd_SOURCE_DIR}/util/cdjsrepl.sh ${Flusspferd_SOURCE_DIR} -z2 ./test/js/modules.t.js)
+    add_test("javascript_optline" ${Flusspferd_SOURCE_DIR}/util/cdjsrepl.sh ${Flusspferd_SOURCE_DIR} -z2 ./test/js/optline-handling.t.js)
 endif()
