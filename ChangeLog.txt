@@ -2,6 +2,9 @@ Flusspferd Change Log
 =====================
 
 2010-02-22:
+- Using CMake's CTest instead of own script
+
+2010-02-22:
 - Fixed problems when using a different build directory
 
 2010-02-05:
