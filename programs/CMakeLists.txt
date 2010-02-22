@@ -142,7 +142,6 @@ if(NOT WIN32 AND CREATE_DOCUMENTATION)
     message(STATUS "Doxygen required to create documentation!")
   else() # DOXYGEN FOUND
     message(STATUS "WILL create and install documentation")
-    # set( ENV{DOXYGEN_EXECUTABLE} ${DOXYGEN_EXECUTABLE} ) # TODO
     add_custom_target(DOCS ALL
       COMMAND ${Flusspferd_SOURCE_DIR}/util/docs.sh ${DOXYGEN_EXECUTABLE} ${Flusspferd_BINARY_DIR} ${Flusspferd_SOURCE_DIR}
       WORKING_DIRECTORY ${Flusspferd_SOURCE_DIR}
