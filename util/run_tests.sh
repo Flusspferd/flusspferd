@@ -32,7 +32,7 @@ then
 fi
 
 options='--output-on-failure'
-if [ "$@" ]; then
+if [ 0 -lt "$#" ]; then
     options="$@"
 fi
-cd ./build/test/ && ctest "$options"
+cd ./build/test/ && ctest $options
