@@ -1,6 +1,12 @@
 Flusspferd Change Log
 =====================
 
+Release 0.10:
+-------------
+
+2010-02-23:
+- Add readline module.
+
 2010-02-22:
 - Using CMake's CTest instead of own script
 
