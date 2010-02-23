@@ -17,38 +17,6 @@ if(NOT LINE_EDITOR STREQUAL "none" AND
  message(FATAL_ERROR "Invalid option given for LINE_EDTIOR: ${LINE_EDITOR}")
 endif()
 
-## libedit ##################################################################
-
-if(LINE_EDITOR STREQUAL "libedit")
-  find_package(Libedit)
-
-  if(LIBEDIT_FOUND)
-    add_definitions(-DHAVE_EDITLINE)
-    include_directories(${LIBEDIT_INCLUDE_DIR})
-  endif()
-
-  if(FORCE_LINE_EDITOR AND NOT LIBEDIT_FOUND)
-        message(SEND_ERROR "libedit required but it was not found")
-  endif()
-endif()
-
-## GNU/readline #############################################################
-
-if(LINE_EDITOR STREQUAL "readline")
-  message("WARNING: GNU/readline is GPL licensed.")
-
-  find_package(Readline)
-
-  if(READLINE_FOUND)
-    add_definitions(-DHAVE_READLINE)
-    include_directories(${READLINE_INCLUDE_DIR})
-  endif()
-
-  if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
-        message(SEND_ERROR "readline required but it was not found")
-  endif()
-endif()
-
 ## Programs #################################################################
 
 add_definitions("-DREL_ETC_PATH=\"${REL_ETC_PATH}\""

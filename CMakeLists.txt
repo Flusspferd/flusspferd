@@ -230,6 +230,38 @@ endif()
 set(BOOST_PARAMETER_MAX_ARITY "BOOST_PARAMETER_MAX_ARITY=10")
 add_definitions(-D${BOOST_PARAMETER_MAX_ARITY})
 
+## libedit ##################################################################
+
+if(LINE_EDITOR STREQUAL "libedit")
+  find_package(Libedit)
+
+  if(LIBEDIT_FOUND)
+    add_definitions(-DHAVE_EDITLINE)
+    include_directories(${LIBEDIT_INCLUDE_DIR})
+  endif()
+
+  if(FORCE_LINE_EDITOR AND NOT LIBEDIT_FOUND)
+        message(SEND_ERROR "libedit required but it was not found")
+  endif()
+endif()
+
+## GNU/readline #############################################################
+
+if(LINE_EDITOR STREQUAL "readline")
+  message("WARNING: GNU/readline is GPL licensed.")
+
+  find_package(Readline)
+
+  if(READLINE_FOUND)
+    add_definitions(-DHAVE_READLINE)
+    include_directories(${READLINE_INCLUDE_DIR})
+  endif()
+
+  if(FORCE_LINE_EDITOR AND NOT READLINE_FOUND)
+        message(SEND_ERROR "readline required but it was not found")
+  endif()
+endif()
+
 ## sub-CMakeLists.txt #######################################################
 
 add_subdirectory(libflusspferd)
@@ -240,5 +272,5 @@ add_subdirectory(plugins/gmp)
 add_subdirectory(plugins/sqlite3)
 add_subdirectory(plugins/subprocess)
 add_subdirectory(plugins/xml)
-
+add_subdirectory(plugins/readline)
 add_subdirectory(misc/emacs)
