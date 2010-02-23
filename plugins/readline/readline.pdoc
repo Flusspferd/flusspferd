@@ -1,0 +1,42 @@
+// -*- mode:js2; -*- vim: ft=javascript:
+
+/** section: Bundled Modules
+ * readline
+ * 
+ * Module for using readline / libedit.
+ * 
+ * ## Example #
+ * 
+ *     const readline = required('readline');
+ *     line = readline.readline();
+ **/
+
+/**
+ * readline.readline() -> string or undefined
+ *
+ * Read a line using readline / libedit.
+ **/
+
+/**
+ * readline.usingHistory() -> ???
+ *
+ * ???
+ **/
+
+/**
+ * readline.readHistory() -> ???
+ *
+ * ???
+ **/
+
+/**
+ * readline.addHistory() -> ???
+ *
+ * ???
+ **/
+
+/**
+ * readline.writeHistory() -> ???
+ *
+ * ???
+ **/
