@@ -196,7 +196,7 @@ namespace {
         o(o_),
         prop(prop_)
     {
-      s->assign( s_.handle().get() );
+      s->assign( s_.handle().release() );
       o.set_property(prop, str);
       done = false;
     }
