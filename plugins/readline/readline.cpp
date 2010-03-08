@@ -39,8 +39,15 @@ THE SOFTWARE.
 #include <cstdlib>
 
 namespace {
-  flusspferd::value readline_(char const *prompt) {
-    char *read = ::readline(prompt);
+  flusspferd::value readline_(flusspferd::value prompt) {
+    char *read;
+    if(prompt.is_undefined_or_null()) {
+      read = ::readline(0x0);
+    }
+    else {
+      flusspferd::string const s = prompt.to_string();
+      read = ::readline(s.c_str());
+    }
     if(read) {
       std::string const ret = read;
       std::free(read);
