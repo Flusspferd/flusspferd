@@ -10,7 +10,7 @@
  * 
  * Libedit is a BSD licensed alternative for the GNU/Readline library but it is
  * inferior to GNU/Readline (e.g. no UTF-8 support!). We recommend using
- * GNU/Readline (Configure Flusspferd with `-DLINE_EDITOR=readline` set) but it
+ * GNU/Readline (Configure Flusspferd with `-DLINE_EDITOR=readline`) but it
  * might not be feasible for everyone due to the GPL.
  * 
  * ## Example #
@@ -41,7 +41,7 @@
  * readline.readline([prompt]) -> string or undefined
  * - prompt (String): The prompt is displayed at the beginning of the input line (default: none).
  *
- * Read a line using readline / libedit.
+ * Read a line from the user.
  **/
 
 /**
