@@ -56,16 +56,30 @@ namespace {
     return flusspferd::value();
   }
 
-  void read_history_(char const *file) {
-    int const err = ::read_history(file);
+  void read_history_(flusspferd::value file) {    
+    int err;
+    if(file.is_undefined_or_null()) {
+      err = ::read_history(0x0);
+    }
+    else {
+      flusspferd::string const s = file.to_string();
+      err = ::read_history(s.c_str());
+    }
     if(err != 0) {
       throw flusspferd::exception(std::string("readline.readHistory: failed to read history `")
                                   + std::strerror(err) + "`");
     }
   }
 
-  void write_history_(char const *file) {
-    int const err = ::write_history(file);
+  void write_history_(flusspferd::value file) {
+    int err;
+    if(file.is_undefined_or_null()) {
+      err = ::write_history(0x0);
+    }
+    else {
+      flusspferd::string const s = file.to_string();
+      err = ::write_history(s.c_str());
+    }
     if(err != 0) {
       throw flusspferd::exception(std::string("readline.writeHistory: failed to write history `")
                                   + std::strerror(err) + "`");
