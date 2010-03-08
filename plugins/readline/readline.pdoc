@@ -5,16 +5,18 @@
  * 
  * Readline is a very simple wrapper for the
  * [GNU/Readline](http://tiswww.case.edu/php/chet/readline/rltop.html) or
- * libedit library. Currently only a few functions are exported. But it is easy
- * to add more.
+ * [libedit](http://www.thrysoee.dk/editline/) library. Currently only a
+ * few functions are exported. But it is easy to add more.
  * 
  * Libedit is a BSD licensed alternative for the GNU/Readline library but it is
  * inferior to GNU/Readline (e.g. no UTF-8 support!). We recommend using
- * GNU/Readline (Configure Flusspferd with -DLINE_EDITOR=readline set) but it
+ * GNU/Readline (Configure Flusspferd with `-DLINE_EDITOR=readline` set) but it
  * might not be feasible for everyone due to the GPL.
  * 
  * ## Example #
  *
+ * A simple JavaScript REPL in Flusspferd.
+ * 
  *     const Readline = require('readline');
  *
  *     Readline.usingHistory();
