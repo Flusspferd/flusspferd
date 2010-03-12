@@ -29,9 +29,52 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
+namespace detail {
+  class handle_base {
+  public:
+  };
+
+  template<typename T>
+  class handle : public handle_base {
+  public:
+    T *get() {
+      return &value;
+    }
+
+  private:
+    T value;
+  };
+}
+
 template<typename T>
 class handle {
+private:
+  typedef T &reference;
+  typedef T const &const_reference;
+  typedef T *pointer;
+  typedef T const *const_pointer;
+
+  typedef detail::handle<T> internal_type;
+  typedef boost::shared_ptr<internal_type> pointer_type;
+
 public:
+  handle(T const &value)
+    : p(new internal_type(value))
+    {}
+
+  ~handle()
+    {}
+
+  reference operator*() const {
+    return *p->get();
+  }
+
+  pointer operator->() const {
+    return p->get();
+  }
+
+private:
+  pointer_type p;
 };
 
 }
