@@ -3,30 +3,33 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
+  <meta name="generator" content=
+  "HTML Tidy for Linux/x86 (vers 7 December 2008), see www.w3.org" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
   <title>Flusspferd - CommonJS platform | Javascript bindings for C++</title>
-
-  <meta name="description" content="Flusspferd - binding and embedding Javascript in C++, based on Spidermonkey. Can also be used as an extensible Javascript interpreter (with module system)." />
-  <meta name="keywords" content="opensource javascript c++ cpp library bindings spidermonkey embedding embed commonjs" />
-
+  <meta name="description" content=
+  "Flusspferd - binding and embedding Javascript in C++, based on Spidermonkey. Can also be used as an extensible Javascript interpreter (with module system)." />
+  <meta name="keywords" content=
+  "opensource javascript c++ cpp library bindings spidermonkey embedding embed commonjs" />
   <link rel="stylesheet" type="text/css" media="screen" href="screen.css" />
-
-  <link rel="alternate" type="application/atom+xml" title="Flusspferd Mailing List" 
-        href="http://groups.google.com/group/flusspferd/feed/atom_v1_0_msgs.xml" />
-
-  <link rel="alternate" title="Flusspferd News" type="application/atom+xml" 
-        href="http://redmine.flusspferd.org/projects/flusspferd/news?format=atom&amp;key=ESNNYJwKrlFrftGoOOtJc4F7MQSkppMUqJ5MmNB6" />
-
-  <link rel="alternate" title="github: Recent Commits to flusspferd [master]" type="application/atom+xml"
-        href="https://github.com/feeds/ruediger/commits/flusspferd/master" />
-
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.3/dojo/dojo.xd.js"></script>
-  <script type="text/javascript" src="toc.js"></script>
+  <link rel="alternate" type="application/atom+xml" title="Flusspferd Mailing List" href=
+  "http://groups.google.com/group/flusspferd/feed/atom_v1_0_msgs.xml" />
+  <link rel="alternate" title="Flusspferd News" type="application/atom+xml" href=
+  "http://redmine.flusspferd.org/projects/flusspferd/news?format=atom&amp;key=ESNNYJwKrlFrftGoOOtJc4F7MQSkppMUqJ5MmNB6" />
+  <link rel="alternate" title="github: Recent Commits to flusspferd [master]" type=
+  "application/atom+xml" href=
+  "https://github.com/feeds/ruediger/commits/flusspferd/master" />
+  <script type="text/javascript" src=
+  "http://ajax.googleapis.com/ajax/libs/dojo/1.3/dojo/dojo.xd.js">
+</script>
+  <script type="text/javascript" src="toc.js">
+</script>
 </head>
 
 <body>
   <script type="text/javascript">
+//<![CDATA[
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-7744305-1']);
     _gaq.push(['_trackPageview']);
@@ -36,18 +39,20 @@
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
     })();
+  //]]>
   </script>
-
 
   <div id="page">
     <div id="header">
       <h1 class="heading"><a class="inthead" href="#">Flusspferd</a></h1>
 
-      <p style="font-size: 110%;">Javascript scripting platform | Javascript bindings for C++</p>
+      <p style="font-size: 110%;">Javascript scripting platform | Javascript bindings for
+      C++</p>
     </div>
 
     <div id="body">
-      <img id="logo" src="flusspferd-logo.png" alt="Flusspferd Logo" height="192" width="188" />
+      <img id="logo" src="flusspferd-logo.png" alt="Flusspferd Logo" height="192" width=
+      "188" />
 
       <div id="content">
         <h2 id="overview" class="heading"><a class="inthead" href=
@@ -55,24 +60,26 @@
 
         <div class="subcontent">
           <p><em>Flusspferd</em>: Javascript bindings for C++, a Javascript interpreter
-          and shell, and a CommonJS module system supporting native C++ modules. Flusspferd
-          includes a few Javascript classes and <a href="#bindings">modules</a>: binary 
-          blobs, <a href="http://curl.haxx.se/">cURL</a>, <a href="http://gmplib.org/">GMP</a>
-          and others. It is designed to support easy embedding of Javascript in C++ - and
-          vice versa. It supports <a href=
+          and shell, and a CommonJS module system supporting native C++ modules.
+          Flusspferd includes a few Javascript classes and <a href=
+          "#bindings">modules</a>: binary blobs, <a href="http://curl.haxx.se/">cURL</a>,
+          <a href="http://gmplib.org/">GMP</a> and others. It is designed to support easy
+          embedding of Javascript in C++ - and vice versa. It supports <a href=
           "https://developer.mozilla.org/en/SpiderMonkey">Spidermonkey</a> as its
           backend, and possibly support for other engines will be added later.</p>
-          
-          <p>Read the <a href="http://redmine.flusspferd.org/projects/flusspferd/news">latest News</a> 
-          on Flusspferd or follow us on <a href="https://twitter.com/flusspferdjs">Twitter</a>.</p>
+
+          <p>Read the <a href=
+          "http://redmine.flusspferd.org/projects/flusspferd/news">latest News</a> on
+          Flusspferd or follow us on <a href=
+          "https://twitter.com/flusspferdjs">Twitter</a>.</p>
 
           <p>Flusspferd is licensed under the <a href=
           "http://redmine.flusspferd.org/wiki/flusspferd/MIT_License">MIT license</a>
           (open source).</p>
 
-          <p>Flusspferd compiles and runs on POSIX OSes such as Mac OS&nbsp;X
-            and Linux, and also on Windows via MinGW &#x2014; check the releases
-            section for links to MinGW bundles.</p>
+          <p>Flusspferd compiles and runs on POSIX OSes such as Mac OS&nbsp;X and Linux,
+          and also on Windows via MinGW — check the releases section for links to MinGW
+          bundles.</p>
 
           <div style="width: 280px; float: left">
             <script type="text/javascript" src=
@@ -120,61 +127,84 @@
           is enabled.</span>
         </div>
 
-        <h2 id="getflusspferd" class="heading"><a class="inthead" href="#getflusspferd">Get Flusspferd</a></h2>
+        <h2 id="getflusspferd" class="heading"><a class="inthead" href=
+        "#getflusspferd">Get Flusspferd</a></h2>
 
-          <p>You can obtain the code for any release by using the link below or by checking out the <span class=
-          "tt">v<i>RELEASE</i></span> tag in our <a href="#git">git repository</a>. You can find <a href="#releases">Older Releases</a> below.</p>
+        <p>You can obtain the code for any release by using the link below or by checking
+        out the <span class="tt">v<i>RELEASE</i></span> tag in our <a href="#git">git
+        repository</a>. You can find <a href="#releases">Older Releases</a> below.</p>
 
-          <h3 id="v0.9" class="heading"><a class="inthead" href="#v0.9">Major: 0.9
-          <small>(2010-02-04)</small></a></h3>
+        <h3 id="v0.9" class="heading"><a class="inthead" href="#v0.9">Major: 0.9
+        <small>(2010-02-04)</small></a></h3>
 
-          <p>Download Sources:</p>
-          <ul>
-            <li><a href="http://flusspferd.org/downloads/flusspferd-0.9.tar.bz2">flusspferd.tar.bz2</a> (2.6Mb)</li>
-            <li><a href="http://flusspferd.org/downloads/flusspferd-0.9.tar.gz">flusspferd.tar.gz</a> (3.3Mb)</li>
-            <li><a href="http://flusspferd.org/downloads/flusspferd-0.9.zip">flusspferd.zip</a> (8.0Mb)</li>
-          </ul>
+        <p>Download Sources:</p>
 
-          <p>Binaries:</p>
-          <ul>
-            <li>OS&nbsp;X via <a href="http://github.com/ashb/homebrew">homebrew</a>: <tt>brew install flusspferd</tt> (until the formula is in master, make sure you are using the linked version.)</li>
-            <li>Ubuntu via <a href="https://launchpad.net/~commonjs/+archive/ppa">the CommonJS PPA</a></li>
-            <li>Windows: <a href="http://flusspferd.org/downloads/flusspferd-0.9-mingw-bin.zip">binaries</a> (9.9Mb) and
-                <a href="http://flusspferd.org/downloads/flusspferd-0.9-mingw-dev.zip">MinGW development environment</a> (50Mb)</li>
-          </ul>
+        <ul>
+          <li><a href=
+          "http://flusspferd.org/downloads/flusspferd-0.9.tar.bz2">flusspferd.tar.bz2</a>
+          (2.6Mb)</li>
 
-          <p>Major features:</p>
+          <li><a href=
+          "http://flusspferd.org/downloads/flusspferd-0.9.tar.gz">flusspferd.tar.gz</a>
+          (3.3Mb)</li>
 
-          <ul>
-            <li>JIT is now enabled by default. use the <tt>--no-jit</tt> option
-              to disable it.</li>
+          <li><a href=
+          "http://flusspferd.org/downloads/flusspferd-0.9.zip">flusspferd.zip</a>
+          (8.0Mb)</li>
+        </ul>
 
-            <li>API for creating objects/values massively overhauled to be much
-            more expresive. This is an API breaking change. See <a href=
-            "http://redmine.flusspferd.org/wiki/flusspferd/Upgrading_v08_to_v09">the wiki</a> for details.</li>
+        <p>Binaries:</p>
 
-            <li>cURL module re-introduced after being improved to provide more
-            of the functionality of libcurl.</li>
+        <ul>
+          <li>OS&nbsp;X via <a href="http://github.com/ashb/homebrew">homebrew</a>:
+          <tt>brew install flusspferd</tt> (until the formula is in master, make sure you
+          are using the linked version.)</li>
 
-            <li>Improved GMP module to be more JavaScript like.</li>
+          <li>Ubuntu via <a href="https://launchpad.net/~commonjs/+archive/ppa">the
+          CommonJS PPA</a></li>
 
-            <li>Removed support for older spidermonkeys. We now require a
-            recent version of spidermonkey. We define recent as no older than
-            the version from Firefox 3.5!  See the
-            <a href="http://redmine.flusspferd.org/wiki/flusspferd/Spidermonkey">Spidermonkey wiki page</a></li>
+          <li>Windows: <a href=
+          "http://flusspferd.org/downloads/flusspferd-0.9-mingw-bin.zip">binaries</a>
+          (9.9Mb) and <a href=
+          "http://flusspferd.org/downloads/flusspferd-0.9-mingw-dev.zip">MinGW
+          development environment</a> (50Mb)</li>
+        </ul>
 
-            <li>Boost 1.40 or newer required.</li>
+        <p>Major features:</p>
 
-            <li>Added subprocess module for communicating with sub-processes.
-            This module doesn't work on Windows in this release.</li>
+        <ul>
+          <li>JIT is now enabled by default. use the <tt>--no-jit</tt> option to disable
+          it.</li>
 
-            <li>Re-introduces XML module using different XML backend.</li>
+          <li>API for creating objects/values massively overhauled to be much more
+          expresive. This is an API breaking change. See <a href=
+          "http://redmine.flusspferd.org/wiki/flusspferd/Upgrading_v08_to_v09">the
+          wiki</a> for details.</li>
 
-            <li>Building plugins with cmake got a whole lot easier; See
-              <a href="http://groups.google.com/group/flusspferd/browse_thread/thread/dd9b76d637545240">this mailing list post</a> for more info.</li>
-          </ul>
+          <li>cURL module re-introduced after being improved to provide more of the
+          functionality of libcurl.</li>
 
-          <p>As always, other small features and a lot of bug fixes.</p>
+          <li>Improved GMP module to be more JavaScript like.</li>
+
+          <li>Removed support for older spidermonkeys. We now require a recent version of
+          spidermonkey. We define recent as no older than the version from Firefox 3.5!
+          See the <a href=
+          "http://redmine.flusspferd.org/wiki/flusspferd/Spidermonkey">Spidermonkey wiki
+          page</a></li>
+
+          <li>Boost 1.40 or newer required.</li>
+
+          <li>Added subprocess module for communicating with sub-processes. This module
+          doesn't work on Windows in this release.</li>
+
+          <li>Re-introduces XML module using different XML backend.</li>
+
+          <li>Building plugins with cmake got a whole lot easier; See <a href=
+          "http://groups.google.com/group/flusspferd/browse_thread/thread/dd9b76d637545240">
+          this mailing list post</a> for more info.</li>
+        </ul>
+
+        <p>As always, other small features and a lot of bug fixes.</p>
 
         <h3 id="code" class="heading"><a class="inthead" href="#code">Code</a></h3>
 
@@ -197,47 +227,74 @@
           instructions</a> on how to build Flusspferd and its requirements.</p>
         </div>
 
-        <h2 id="bindings" class="heading"><a href="#bindings" class="inthead">Modules</a></h2>
+        <h2 id="bindings" class="heading"><a href="#bindings" class=
+        "inthead">Modules</a></h2>
 
-        <h3 id="supported_commonjs" class="heading"><a class="inthead" href="#supported_commonjs">
-            Supported CommonJS Specifications</a></h3>
+        <h3 id="supported_commonjs" class="heading"><a class="inthead" href=
+        "#supported_commonjs">Supported CommonJS Specifications</a></h3>
+
         <div class="subcontent">
-          See also the <a href="http://wiki.commonjs.org/wiki/CommonJS#Implementations">list of implementations</a> on the CommonJS Wiki.
+          See also the <a href=
+          "http://wiki.commonjs.org/wiki/CommonJS#Implementations">list of
+          implementations</a> on the CommonJS Wiki.
+
           <ul>
             <li><a href="http://jshq.org/commonjs/0.1/modules.html">Modules</a></li>
+
             <li><a href="http://wiki.commonjs.org/wiki/System">System/1.0</a></li>
-            <li><a href="http://wiki.commonjs.org/wiki/Unit_Testing">Unit Testing/1.0</a></li>
-            <li><a href="http://wiki.commonjs.org/wiki/Binary/B">Binary/B</a> (proposal)</li>
-            <li><a href="http://wiki.commonjs.org/wiki/Encodings">Encodings/A</a> (proposal)</li>
-            <li><a href="http://wiki.commonjs.org/wiki/Filesystem/A/0">Filesystem/A/0</a> (proposal)</li>
+
+            <li><a href="http://wiki.commonjs.org/wiki/Unit_Testing">Unit
+            Testing/1.0</a></li>
+
+            <li><a href="http://wiki.commonjs.org/wiki/Binary/B">Binary/B</a>
+            (proposal)</li>
+
+            <li><a href="http://wiki.commonjs.org/wiki/Encodings">Encodings/A</a>
+            (proposal)</li>
+
+            <li><a href="http://wiki.commonjs.org/wiki/Filesystem/A/0">Filesystem/A/0</a>
+            (proposal)</li>
           </ul>
         </div>
 
-        <h3 id="included_bindings" class="heading"><a class="inthead" href="#included_bindings">
-            Core/Bundled with Releases</a></h3>
+        <h3 id="included_bindings" class="heading"><a class="inthead" href=
+        "#included_bindings">Core/Bundled with Releases</a></h3>
+
         <div class="subcontent">
           <ul>
-            <li>gmp - Bignum arithmetic. Bindings for <a href="http://gmplib.org">
-                GNU Multiple Precision Arithmetic Library (<i>GMP</i>)</a></li>
-            <li>sqlite3 - single-file, embeddable relational database: <a href="http://www.sqlite.org/">SQLite</a>.</li>
-            <li>curl - HTTP/network access via <a href="http://curl.haxx.se/">cURL</a>.</li>
+            <li>gmp - Bignum arithmetic. Bindings for <a href="http://gmplib.org">GNU
+            Multiple Precision Arithmetic Library (<i>GMP</i>)</a></li>
+
+            <li>sqlite3 - single-file, embeddable relational database: <a href=
+            "http://www.sqlite.org/">SQLite</a>.</li>
+
+            <li>curl - HTTP/network access via <a href=
+            "http://curl.haxx.se/">cURL</a>.</li>
+
             <li>xml - XML and HMTL (tag soup) parsing and DOM Level 2 core.</li>
           </ul>
         </div>
 
-        <h3 id="external_bindings" class="heading"><a class="inthead" href="#external_bindings">
-            External</a></h3>
+        <h3 id="external_bindings" class="heading"><a class="inthead" href=
+        "#external_bindings">External</a></h3>
+
         <div class="subcontent">
           <ul>
-            <li><a href="http://github.com/ruediger/sdl-flusspferd">SDL-Flusspferd</a> - bindings
-              for <a href="http://www.libsdl.org">SDL</a>.</li>
-            <li><a href="http://juicejs.org/">Juice</a> - a webframework based on Flusspferd.</li>
-            <li><a href="http://github.com/ashb/Zest">Zest</a> - Simple HTTP server that speaks
-              JSGI (primarily for use with Juice)</li>
-            <li><a href="http://github.com/ashb/mongodb-flusspferd">MongoDB-Flusspferd</a> -
-              bindings for <a href="http://www.mongodb.org">MongoDB</a>.</li>
-            <li><a href="http://github.com/evilstreak/http-fetch">http-fetch</a> -
-              User friendly http fetcher module (based on the cURL module).</li>
+            <li><a href="http://github.com/ruediger/sdl-flusspferd">SDL-Flusspferd</a> -
+            bindings for <a href="http://www.libsdl.org">SDL</a>.</li>
+
+            <li><a href="http://juicejs.org/">Juice</a> - a webframework based on
+            Flusspferd.</li>
+
+            <li><a href="http://github.com/ashb/Zest">Zest</a> - Simple HTTP server that
+            speaks JSGI (primarily for use with Juice)</li>
+
+            <li><a href=
+            "http://github.com/ashb/mongodb-flusspferd">MongoDB-Flusspferd</a> - bindings
+            for <a href="http://www.mongodb.org">MongoDB</a>.</li>
+
+            <li><a href="http://github.com/evilstreak/http-fetch">http-fetch</a> - User
+            friendly http fetcher module (based on the cURL module).</li>
           </ul>
         </div>
 
@@ -252,7 +309,8 @@
           documentation</a> which is generated for the current release (0.9):</p>
 
           <ul>
-            <li><a href="http://flusspferd.org/0.9/docs/tutorials.html">Tutorials</a>,</li>
+            <li><a href=
+            "http://flusspferd.org/0.9/docs/tutorials.html">Tutorials</a>,</li>
 
             <li><a href="http://flusspferd.org/0.9/docs/namespaces.html">C++
             documentation</a>,</li>
@@ -261,8 +319,9 @@
             documentation</a>.</li>
           </ul>
 
-          <p>We also have online documentation for <a href="http://docs.flusspferd.org/">git master (the next release)</a>
-            and previous releases:</p>
+          <p>We also have online documentation for <a href=
+          "http://docs.flusspferd.org/">git master (the next release)</a> and previous
+          releases:</p>
 
           <ul>
             <li><a href="http://flusspferd.org/0.8/docs/index.html">Release 0.8</a></li>
@@ -299,7 +358,6 @@
             and analysis)</li>
           </ul>
         </div>
-        
 
         <h2 id="related" class="heading"><a class="inthead" href="#related">Related
         projects</a></h2>
@@ -388,137 +446,135 @@
         </div>
       </div>
 
+      <h2 id="releases" class="heading"><a class="inthead" href="#releases">Old
+      Releases</a></h2>
 
-      <h2 id="releases" class="heading"><a class="inthead" href="#releases">Old Releases</a></h2>
+      <div class="subcontent">
+        <h4 id="v0.8" class="heading"><a class="inthead" href="#v0.8">Major: 0.8
+        <small>(2009-10-20)</small></a></h4>
 
-        <div class="subcontent">
+        <p>Major features:</p>
 
-          <h4 id="v0.8" class="heading"><a class="inthead" href="#v0.8">Major: 0.8
-          <small>(2009-10-20)</small></a></h4>
+        <ul>
+          <li>Build trees are now relocatable – you can move the built tree to a
+          different place on the filesystem and module loading will do the right
+          thing.</li>
 
-          <p>Major features:</p>
+          <li>Refactor of require() handling – this means modules are now JITable.</li>
 
-          <ul>
-            <li>Build trees are now relocatable – you can move the built tree to a
-            different place on the filesystem and module loading will do the right
-            thing.</li>
+          <li>Implement most of the CommonJS `fs-base' (Filesystem/A/0) module (no
+          permissions functions yet).</li>
 
-            <li>Refactor of require() handling – this means modules are now JITable.</li>
+          <li>Treat source files as UTF-8 – this means you can have unicode literals in
+          .js source files now.</li>
 
-            <li>Implement most of the CommonJS `fs-base' (Filesystem/A/0) module (no
-            permissions functions yet).</li>
+          <li>REPL now prints debug/uneval representation, rather than .toString().</li>
 
-            <li>Treat source files as UTF-8 – this means you can have unicode literals in
-            .js source files now.</li>
+          <li>Enable Spidermonkey strict warnings for all modules.</li>
 
-            <li>REPL now prints debug/uneval representation, rather than
-            .toString().</li>
+          <li>SQLite3 plugin got an overhaul.</li>
 
-            <li>Enable Spidermonkey strict warnings for all modules.</li>
+          <li>Immature plugins are no longer part of the main tree. This means no cURL,
+          or XML plugins for now. If you want them back sooner, help us finish
+          (designing) their APIs.</li>
 
-            <li>SQLite3 plugin got an overhaul.</li>
+          <li>JSON top-level-object is now always available.</li>
+        </ul>
 
-            <li>Immature plugins are no longer part of the main tree. This means no cURL,
-            or XML plugins for now. If you want them back sooner, help us finish
-            (designing) their APIs.</li>
+        <p>As always, other small features and a lot of bug fixes.</p>
 
-            <li>JSON top-level-object is now always available.</li>
-          </ul>
+        <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
+        from Sourceforge.</a></small></p>
 
-          <p>As always, other small features and a lot of bug fixes.</p>
+        <h4 id="v0.7" class="heading"><a href="#v0.7" class="inthead">Major: 0.7
+        <small>(2009-09-11)</small></a></h4>
 
-          <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
-          from Sourceforge.</a></small></p>
+        <p>Major features:</p>
 
-          <h4 id="v0.7" class="heading"><a href="#v0.7" class="inthead">Major: 0.7
-          <small>(2009-09-11)</small></a></h4>
+        <ul>
+          <li>Changed Flusspferd module system C++ API.</li>
 
-          <p>Major features:</p>
+          <li>Dropped old proprietary 'blob' module in favor of 'binary' (conforming with
+          CommonJS Binary/B).</li>
 
-          <ul>
-            <li>Changed Flusspferd module system C++ API.</li>
+          <li>Add CommonJS 'system' module, moving some functionality from other modules
+          to it.</li>
 
-            <li>Dropped old proprietary 'blob' module in favor of 'binary' (conforming
-            with CommonJS Binary/B).</li>
+          <li>Replace option parsing with new 'getopt' module, which can also be used
+          from Javascript.</li>
 
-            <li>Add CommonJS 'system' module, moving some functionality from other
-            modules to it.</li>
+          <li>Add support for permanent history to the shell.</li>
 
-            <li>Replace option parsing with new 'getopt' module, which can also be used
-            from Javascript.</li>
+          <li>Add optional support for GNU readline.</li>
+        </ul>
 
-            <li>Add support for permanent history to the shell.</li>
+        <p>And other features and a lot of bug fixes.</p>
 
-            <li>Add optional support for GNU readline.</li>
-          </ul>
+        <p><small><a href=
+        "https://sourceforge.net/projects/flusspferd/files/Flusspferd/0.7/">Download from
+        Sourceforge.</a></small></p>
 
-          <p>And other features and a lot of bug fixes.</p>
+        <h4 id="v0.6.1" class="heading"><a href="#v0.6.1" class="inthead">Minor: 0.6.1
+        <small>(2009-06-18)</small></a></h4>
 
-          <p><small><a href=
-          "https://sourceforge.net/projects/flusspferd/files/Flusspferd/0.7/">Download
-          from Sourceforge.</a></small></p>
+        <p>Apart from some very minor tweaks, this release mainly brings the ability to
+        manually enable and disable plugins in the build system.</p>
 
-          <h4 id="v0.6.1" class="heading"><a href="#v0.6.1" class="inthead">Minor: 0.6.1
-          <small>(2009-06-18)</small></a></h4>
+        <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
+        from Sourceforge.</a></small></p>
 
-          <p>Apart from some very minor tweaks, this release mainly brings the ability to
-          manually enable and disable plugins in the build system.</p>
+        <h4 id="v0.6" class="heading"><a href="#v0.6" class="inthead">Major: 0.6
+        <small>(2009-06-08)</small></a></h4>
 
-          <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
-          from Sourceforge.</a></small></p>
+        <p>Major features:</p>
 
-          <h4 id="v0.6" class="heading"><a href="#v0.6" class="inthead">Major: 0.6
-          <small>(2009-06-08)</small></a></h4>
+        <ul>
+          <li>FLUSSPFERD_CLASS_DESCRIPTION - an easy way of defining Javascript
+          classes.</li>
 
-          <p>Major features:</p>
+          <li>Improved value and type conversions.</li>
 
-          <ul>
-            <li>FLUSSPFERD_CLASS_DESCRIPTION - an easy way of defining Javascript
-            classes.</li>
+          <li>More ServerJS compatible modules: 'binary' and 'encodings'.</li>
 
-            <li>Improved value and type conversions.</li>
+          <li>Changed build system to cmake (this should make it easier to get Windows
+          support).</li>
 
-            <li>More ServerJS compatible modules: 'binary' and 'encodings'.</li>
+          <li>Other new modules, like (rudimentary) GMP support.</li>
+        </ul>
 
-            <li>Changed build system to cmake (this should make it easier to get Windows
-            support).</li>
+        <p>This list is not necessarily a complete list of features.</p>
 
-            <li>Other new modules, like (rudimentary) GMP support.</li>
-          </ul>
+        <p>Also, there are many more bugfixes and some API breaking changes.</p>
 
-          <p>This list is not necessarily a complete list of features.</p>
+        <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
+        from Sourceforge.</a></small></p>
 
-          <p>Also, there are many more bugfixes and some API breaking changes.</p>
+        <h4 id="v0.5.1" class="heading"><a href="#v0.5.1" class="inthead">Bugfix: 0.5.1
+        <small>(2009-04-28)</small></a></h4>
 
-          <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
-          from Sourceforge.</a></small></p>
+        <p>Changes since 0.5:</p>
 
-          <h4 id="v0.5.1" class="heading"><a href="#v0.5.1" class="inthead">Bugfix: 0.5.1
-          <small>(2009-04-28)</small></a></h4>
+        <ul>
+          <li>Fix bug that made flusspferd not compile when spidermonkey was not compiled
+          with JS_THREADSAFE.</li>
 
-          <p>Changes since 0.5:</p>
+          <li>Change set of distributed files (include Makefile, don't include
+          .configure).</li>
 
-          <ul>
-            <li>Fix bug that made flusspferd not compile when spidermonkey was not
-            compiled with JS_THREADSAFE.</li>
+          <li>Documentation improvements.</li>
+        </ul>
 
-            <li>Change set of distributed files (include Makefile, don't include
-            .configure).</li>
+        <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
+        from Sourceforge.</a></small></p>
 
-            <li>Documentation improvements.</li>
-          </ul>
+        <h4 id="v0.5" class="heading"><a href="#v0.5" class="inthead">Major: 0.5
+        <small>(2009-04-27)</small></a></h4>
 
-          <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
-          from Sourceforge.</a></small></p>
+        <p>0.5 was released on April 27, 2009. It is our first release.</p>
 
-          <h4 id="v0.5" class="heading"><a href="#v0.5" class="inthead">Major: 0.5
-          <small>(2009-04-27)</small></a></h4>
-
-          <p>0.5 was released on April 27, 2009. It is our first release.</p>
-
-          <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
-          from Sourceforge.</a></small></p>
-        </div>
+        <p><small><a href="https://sourceforge.net/projects/flusspferd/files/">Download
+        from Sourceforge.</a></small></p>
+      </div>
 
       <div class="clear">
         <span style="float: left;"><!-- AddThis Button BEGIN -->
