@@ -27,7 +27,6 @@
 #define FLUSSPFERD_PLUGINS_CURL_HANDLE_OPTION_HPP
 
 #include "flusspferd/tracer.hpp"
-#include "flusspferd/function.hpp"
 #include <boost/any.hpp>
 #include <curl/curl.h>
 
@@ -46,8 +45,8 @@
 namespace curl {
   struct handle_option {
     virtual ~handle_option() =0;
-    virtual flusspferd::function getter() const =0;
-    virtual flusspferd::function setter() const =0;
+    virtual flusspferd::object getter() const =0;
+    virtual flusspferd::object setter() const =0;
     // initial data
     virtual boost::any data() const =0;
     virtual CURLoption what() const =0;

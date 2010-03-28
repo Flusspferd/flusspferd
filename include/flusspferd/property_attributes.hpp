@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 namespace flusspferd {
 
-class function;
+class object;
 
 /*
  * Property flags.
@@ -95,14 +95,14 @@ struct property_attributes {
    *
    *  A function returning the property's value.
    */
-  boost::optional<function const &> getter;
+  boost::optional<object const &> getter;
 
   /**
    * The property's setter.
    *
    * A function taking the property's value.
    */
-  boost::optional<function const &> setter;
+  boost::optional<object const &> setter;
 
   /// Construct default attributes.
   property_attributes();
@@ -115,8 +115,8 @@ struct property_attributes {
    * @param setter The setter.
    */
   property_attributes(property_flag flags, 
-    boost::optional<function const &> getter = boost::none,
-    boost::optional<function const &> setter = boost::none);
+    boost::optional<object const &> getter = boost::none,
+    boost::optional<object const &> setter = boost::none);
 };
 
 }

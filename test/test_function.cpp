@@ -24,10 +24,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "flusspferd/function.hpp"
 #include "flusspferd/native_function.hpp"
 #include "flusspferd/native_function_base.hpp"
-
 #include "flusspferd/create.hpp"
 #include "flusspferd/string.hpp"
 #include "flusspferd/string_io.hpp"
@@ -40,7 +38,7 @@ namespace {
   }
 
   struct function_struct : flusspferd::native_function_base {
-    function_struct(flusspferd::function const &obj)
+    function_struct(flusspferd::object const &obj)
       : flusspferd::native_function_base(obj)
     {
       v = 1234;
@@ -57,28 +55,28 @@ namespace {
 BOOST_FIXTURE_TEST_SUITE( with_context, context_fixture )
 
 BOOST_AUTO_TEST_CASE( root_native_function ) {
-  flusspferd::root_function f_x(
+  flusspferd::root_object f_x(
       flusspferd::create<flusspferd::method>(
         "rnf", &root_native_function_));
 
   BOOST_CHECK(!f_x.is_null());
   
-  BOOST_CHECK_EQUAL(f_x.arity(), 1ul);
-  BOOST_CHECK_EQUAL(f_x.name(), "rnf");
+  BOOST_CHECK_EQUAL(f_x.function_arity(), 1ul);
+  BOOST_CHECK_EQUAL(f_x.function_name(), "rnf");
 }
 
 BOOST_AUTO_TEST_CASE( is_null ) {
-  flusspferd::function f;
+  flusspferd::object f;
   BOOST_CHECK(f.is_null());
 }
 
 BOOST_AUTO_TEST_CASE( fn_struct ) {
-  flusspferd::root_function f(
+  flusspferd::root_object f(
       flusspferd::create<function_struct>(
           flusspferd::param::_name = "my_function"));
   BOOST_CHECK(!f.is_null());
-  BOOST_CHECK_EQUAL(f.arity(), 0ul);
-  BOOST_CHECK_EQUAL(f.name(), "my_function");
+  BOOST_CHECK_EQUAL(f.function_arity(), 0ul);
+  BOOST_CHECK_EQUAL(f.function_name(), "my_function");
   BOOST_CHECK_EQUAL(f.call(flusspferd::global()), flusspferd::value(387));
   BOOST_CHECK(flusspferd::is_native<function_struct>(f));
   BOOST_CHECK_EQUAL(flusspferd::get_native<function_struct>(f).v, 1234);

@@ -52,7 +52,6 @@ THE SOFTWARE.
 #include "flusspferd/evaluate.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/function_adapter.hpp"
-#include "flusspferd/function.hpp"
 #include "flusspferd/getopt.hpp"
 #include "flusspferd/modules.hpp"
 #include "flusspferd/init.hpp"

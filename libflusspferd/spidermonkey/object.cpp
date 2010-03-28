@@ -26,7 +26,6 @@ THE SOFTWARE.
 
 #include "flusspferd/object.hpp"
 #include "flusspferd/property_iterator.hpp"
-#include "flusspferd/function.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/local_root_scope.hpp"
 #include "flusspferd/root.hpp"
@@ -221,8 +220,8 @@ namespace {
   /// common function of define_property
   void extract_attributes(
     property_attributes const &attrs,
-    function &getter,
-    function &setter,
+    object &getter,
+    object &setter,
     unsigned &sm_flags)
   {
     if (attrs.getter) getter = attrs.getter.get();
@@ -250,8 +249,8 @@ void object::define_property(
   root_value id_r(id);
   root_value v(init_value);
 
-  root_function getter;
-  root_function setter;
+  root_object getter;
+  root_object setter;
   unsigned sm_flags = 0;
   extract_attributes(attrs, getter, setter, sm_flags);
 
@@ -279,8 +278,8 @@ void object::define_property(
   root_string name_r(name);
   root_value v(init_value);
 
-  root_function getter;
-  root_function setter;
+  root_object getter;
+  root_object setter;
   unsigned sm_flags = 0;
   extract_attributes(attrs, getter, setter, sm_flags);
 
@@ -331,6 +330,31 @@ value object::apply(object const &fn, arguments const &arg_) {
   }
 
   return result;
+}
+
+bool object::is_function() const {
+  return JS_ObjectIsFunction(Impl::current_context(), get_const());
+}
+
+string object::function_name() const {
+  JSContext *cx = Impl::current_context();
+  JSFunction *fun = JS_ValueToFunction(cx, OBJECT_TO_JSVAL(get_const()));
+  if (!fun)
+    throw exception("Could not convert object to function");
+  JSString *name = JS_GetFunctionId(fun);
+  if (!name)
+    return string();
+  else
+    return Impl::wrap_string(name);
+}
+
+unsigned object::function_arity() const {
+  JSContext *cx = Impl::current_context();
+  JSFunction *fun = JS_ValueToFunction(cx, OBJECT_TO_JSVAL(get_const()));
+  if (!fun)
+    throw exception("Could not convert object to function");
+  uint16 arity = JS_GetFunctionArity(fun);
+  return arity;
 }
 
 value object::call(char const *fn, arguments const &arg_) {

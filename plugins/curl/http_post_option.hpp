@@ -36,10 +36,10 @@
 namespace curl {
   struct http_post_option : handle_option {
     static CURLoption const What;
-    flusspferd::function getter() const {
+    flusspferd::object getter() const {
       return flusspferd::create<flusspferd::method>("$get_httppost", &get);
     }
-    flusspferd::function setter() const {
+    flusspferd::object setter() const {
       return flusspferd::create<flusspferd::method>("$set_httppost", &set);
     }
     boost::any data() const {

@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "flusspferd/tracer.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/context.hpp"
-#include "flusspferd/spidermonkey/function.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include <boost/foreach.hpp>
 #include <js/jsapi.h>
@@ -53,7 +52,7 @@ public:
   static JSClass function_priv_class;
 };
 
-native_function_base::native_function_base(function const &obj)
+native_function_base::native_function_base(object const &obj)
   : p(new impl)
 {
   load_into(obj);
@@ -84,7 +83,7 @@ JSClass native_function_base::impl::function_priv_class = {
 
 #undef MARK_TRACE_OP
 
-function native_function_base::create_function(
+object native_function_base::create_function(
     unsigned arity, std::string const &name)
 {
   JSContext *ctx = Impl::current_context();
@@ -103,23 +102,21 @@ function native_function_base::create_function(
   if (!fun)
     throw exception("Could not create native function");
 
-  function funx(Impl::wrap_function(fun));
-
-  JSObject *obj = Impl::get_object(funx);
+  JSObject *obj = JS_GetFunctionObject(fun);
 
   JS_SetReservedSlot(ctx, obj, 0, OBJECT_TO_JSVAL(priv));
 
-  return funx;
+  return Impl::wrap_object(obj);
 }
 
-void native_function_base::load_into(function const &fun) {
+void native_function_base::load_into(object const &fun) {
   if (fun.is_null())
     throw exception("Cannot initalise native_function_base "
                     "with a null function");
 
   JSContext *ctx = Impl::current_context();
 
-  function::operator=(fun);
+  object::operator=(fun);
 
   JSObject *obj = Impl::get_object(*this);
 
@@ -174,7 +171,8 @@ void native_function_base::impl::trace_op(
 
   native_function_base *self = 0;
 
-  self = (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
+  self = (native_function_base *)
+    JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
 
   if (!self) {
     if (JS_ObjectIsFunction(ctx, p)) {
@@ -184,8 +182,8 @@ void native_function_base::impl::trace_op(
         p = JSVAL_TO_OBJECT(p_val);
 
         if (p)
-          self =
-            (native_function_base *) JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
+          self = (native_function_base *)
+            JS_GetInstancePrivate(ctx, p, &impl::function_priv_class, 0);
       }
     }
   }
@@ -200,8 +198,8 @@ void native_function_base::impl::trace_op(
 void native_function_base::impl::finalize(JSContext *ctx, JSObject *priv) {
   current_context_scope scope(Impl::wrap_context(ctx));
 
-  native_function_base *self =
-    (native_function_base *) JS_GetInstancePrivate(ctx, priv, &function_priv_class, 0);
+  native_function_base *self = (native_function_base *)
+    JS_GetInstancePrivate(ctx, priv, &function_priv_class, 0);
 
   if (!self)
     throw exception("Could not finalize native function");

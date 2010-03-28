@@ -207,14 +207,14 @@ public:
   void displace(call_context &x);
   void insert(call_context &x);
   void splice(call_context &x);
-  byte_array &filter(function callback, object thisObj);
-  void for_each(function callback, object thisObj);
-  bool every(function callback, object thisObj);
-  bool some(function callback, object thisObj);
-  int count(function callback, object thisObj);
-  byte_array &map(function callback, object thisObj);
-  value reduce(function callback, value initial_value);
-  value reduce_right(function callback, value initial_value);
+  byte_array &filter(object callback, object thisObj);
+  void for_each(object callback, object thisObj);
+  bool every(object callback, object thisObj);
+  bool some(object callback, object thisObj);
+  int count(object callback, object thisObj);
+  byte_array &map(object callback, object thisObj);
+  value reduce(object callback, value initial_value);
+  value reduce_right(object callback, value initial_value);
   std::string to_source();
 };
 

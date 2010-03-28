@@ -76,7 +76,6 @@ set(
     ../include/flusspferd/encodings.hpp
     ../include/flusspferd/evaluate.hpp
     ../include/flusspferd/exception.hpp
-    ../include/flusspferd/function.hpp
     ../include/flusspferd/function_adapter.hpp
     ../include/flusspferd/getopt.hpp
     ../include/flusspferd/init.hpp
@@ -99,7 +98,6 @@ set(
     ../include/flusspferd/security.hpp
     ../include/flusspferd/spidermonkey/arguments.hpp
     ../include/flusspferd/spidermonkey/context.hpp
-    ../include/flusspferd/spidermonkey/function.hpp
     ../include/flusspferd/spidermonkey/init.hpp
     ../include/flusspferd/spidermonkey/object.hpp
     ../include/flusspferd/spidermonkey/runtime.hpp
@@ -135,7 +133,6 @@ set(
     spidermonkey/create.cpp
     spidermonkey/evaluate.cpp
     spidermonkey/exception.cpp
-    spidermonkey/function.cpp
     spidermonkey/init.cpp
     spidermonkey/local_root_scope.cpp
     spidermonkey/native_function_base.cpp

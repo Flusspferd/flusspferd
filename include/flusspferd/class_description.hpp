@@ -278,14 +278,14 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_CD_PROPERTY__getter_setter(p_property_name, p_param) \
   { \
-    flusspferd::root_function getter( \
+    flusspferd::root_object getter( \
         ::flusspferd::create< ::flusspferd::method>( \
           "$get_" p_property_name, \
           & Class :: \
           BOOST_PP_TUPLE_ELEM(2, 0, p_param) \
         ) \
       ); \
-    flusspferd::root_function setter( \
+    flusspferd::root_object setter( \
         ::flusspferd::create< ::flusspferd::method>( \
           "$set_" p_property_name, \
           & Class :: \
@@ -301,12 +301,12 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_CD_PROPERTY__getter_setter_expression(p_property_name, p_expr) \
   { \
-    ::flusspferd::root_function getter(::flusspferd::create< ::flusspferd::method>( \
+    ::flusspferd::root_object getter(::flusspferd::create< ::flusspferd::method>( \
       ::flusspferd::param::_name = (p_property_name), \
       ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(4, 1, p_expr), \
       ::flusspferd::param::_signature = \
       ::flusspferd::param::type<BOOST_PP_TUPLE_ELEM(4, 0, p_expr)>())); \
-    ::flusspferd::root_function setter(::flusspferd::create< ::flusspferd::method>( \
+    ::flusspferd::root_object setter(::flusspferd::create< ::flusspferd::method>( \
       ::flusspferd::param::_name = (p_property_name), \
       ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(4, 3, p_expr), \
       ::flusspferd::param::_signature = \
@@ -320,7 +320,7 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_CD_PROPERTY__getter(p_property_name, p_param) \
   { \
-    ::flusspferd::root_function getter( \
+    ::flusspferd::root_object getter( \
         ::flusspferd::create< ::flusspferd::method>( \
           "$get_" p_property_name, \
           & Class :: p_param \
@@ -339,7 +339,7 @@ THE SOFTWARE.
 
 #define FLUSSPFERD_CD_PROPERTY__getter_expression(p_property_name, p_expr) \
   { \
-    ::flusspferd::root_function getter(::flusspferd::create< ::flusspferd::method>( \
+    ::flusspferd::root_object getter(::flusspferd::create< ::flusspferd::method>( \
       ::flusspferd::param::_name = (p_property_name), \
       ::flusspferd::param::_function = BOOST_PP_TUPLE_ELEM(2, 1, p_expr), \
       ::flusspferd::param::_signature = \

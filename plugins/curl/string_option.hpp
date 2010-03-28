@@ -34,10 +34,10 @@
 namespace curl {
   template<CURLoption What>
   struct string_option : handle_option {
-    flusspferd::function getter() const {
+    flusspferd::object getter() const {
       return flusspferd::create<flusspferd::method>("$get_", &get);
     }
-    flusspferd::function setter() const {
+    flusspferd::object setter() const {
       return flusspferd::create<flusspferd::method>("$set_", &set);
     }
     boost::any data() const { return std::string(); }
