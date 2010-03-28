@@ -47,7 +47,6 @@ namespace flusspferd {
 #ifndef PREPROC_DEBUG
 class value;
 class context;
-class function;
 class native_object_base;
 class property_iterator;
 template<typename> class convert;
@@ -150,6 +149,20 @@ public:
    * Calling methods and functions.
    */
 //@{
+  /**
+   * Check whether the object is a function.
+   */
+  bool is_function() const;
+
+  /**
+   * Determine the arity.
+   */
+  unsigned function_arity() const;
+
+  /**
+   * Determine the function name.
+   */
+  string function_name() const;
 
   /**
    * Apply a function to this object.

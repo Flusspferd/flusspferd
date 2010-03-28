@@ -139,7 +139,7 @@ void binary::augment_prototype(object &proto) {
     "  ++i;"
     "}"
     ;
-  root_function values_fn(
+  root_object values_fn(
     flusspferd::create<function>(
       param::_name = "values",
       param::_function = js_val_iter,
@@ -158,7 +158,7 @@ void binary::augment_prototype(object &proto) {
     "  }"
     "}";
 
-  root_function pairs_fn(
+  root_object pairs_fn(
       evaluate(js_pairs_iter, strlen(js_pairs_iter)).get_object());
 
   proto.define_property("pairs", value(),
@@ -699,7 +699,7 @@ void byte_array::splice(call_context &x) {
   x.result = o;
 }
 
-byte_array &byte_array::filter(function callback, object thisObj) {
+byte_array &byte_array::filter(object callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
 
@@ -718,7 +718,7 @@ byte_array &byte_array::filter(function callback, object thisObj) {
   return result;
 }
 
-void byte_array::for_each(function callback, object thisObj) {
+void byte_array::for_each(object callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
 
@@ -728,7 +728,7 @@ void byte_array::for_each(function callback, object thisObj) {
     callback.call(thisObj, v[i], i, *this);
 }
 
-bool byte_array::every(function callback, object thisObj) {
+bool byte_array::every(object callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
 
@@ -741,7 +741,7 @@ bool byte_array::every(function callback, object thisObj) {
   return true;
 }
 
-bool byte_array::some(function callback, object thisObj) {
+bool byte_array::some(object callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
 
@@ -754,7 +754,7 @@ bool byte_array::some(function callback, object thisObj) {
   return false;
 }
 
-int byte_array::count(function callback, object thisObj) {
+int byte_array::count(object callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
 
@@ -769,7 +769,7 @@ int byte_array::count(function callback, object thisObj) {
   return n;
 }
 
-byte_array &byte_array::map(function callback, object thisObj) {
+byte_array &byte_array::map(object callback, object thisObj) {
   if (thisObj.is_null())
     thisObj = flusspferd::scope_chain();
 
@@ -794,7 +794,7 @@ byte_array &byte_array::map(function callback, object thisObj) {
   return result;
 }
 
-value byte_array::reduce(function callback, value initial_value) {
+value byte_array::reduce(object callback, value initial_value) {
   root_value result(initial_value);
 
   vector_type &v = get_data();
@@ -806,7 +806,7 @@ value byte_array::reduce(function callback, value initial_value) {
   return result;
 }
 
-value byte_array::reduce_right(function callback, value initial_value) {
+value byte_array::reduce_right(object callback, value initial_value) {
   root_value result(initial_value);
 
   vector_type &v = get_data();

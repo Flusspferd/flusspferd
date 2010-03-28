@@ -70,7 +70,7 @@ struct optspec {
     enum argument_type { required = 1, optional = 2, none = 0 };
     std::string canonical_name;
     argument_type argument;
-    root_function callback;
+    root_object callback;
 
     item_type() : argument(none) {}
   };
@@ -124,7 +124,7 @@ struct optspec {
 
         object callback = item.get_property_object("callback");
         if (!callback.is_null()) {
-          data->callback = function(callback);
+          data->callback = callback;
         }
 
         if (item.has_property("argument")) {

@@ -33,7 +33,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace std;
 
-void callback(flusspferd::function fn){
+void callback(flusspferd::object fn){
   fn.call(global());
 }
 

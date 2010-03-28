@@ -80,9 +80,9 @@ struct my_functor : flusspferd::native_function_base {
 
   bool x;
 
-  my_functor(flusspferd::function const &obj)
+  my_functor(flusspferd::object const &obj)
     : flusspferd::native_function_base(obj), x(true) {}
-  my_functor(flusspferd::function const &obj, int)
+  my_functor(flusspferd::object const &obj, int)
     : flusspferd::native_function_base(obj), x(false) {}
 
   void call(flusspferd::call_context &) {
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE( array ) {
 }
 
 BOOST_AUTO_TEST_CASE( function ) {
-  flusspferd::root_function f;
+  flusspferd::root_object f;
   f = flusspferd::create<flusspferd::function>();
   flusspferd::root_value v;
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
@@ -178,8 +178,8 @@ BOOST_AUTO_TEST_CASE( function ) {
     list_of("x")("y"),
     "file",
     666);    
-  BOOST_CHECK_EQUAL(f.name(), "name");
-  BOOST_CHECK_EQUAL(f.arity(), 2);
+  BOOST_CHECK_EQUAL(f.function_name(), "name");
+  BOOST_CHECK_EQUAL(f.function_arity(), 2);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 1, 2));
   BOOST_CHECK_EQUAL(v, flusspferd::value(3));
 
@@ -188,32 +188,32 @@ BOOST_AUTO_TEST_CASE( function ) {
     my_func_1,
     flusspferd::param::_signature =
       flusspferd::param::type< void (flusspferd::call_context&) >());
-  BOOST_CHECK_EQUAL(f.name(), "name2");
-  BOOST_CHECK_EQUAL(f.arity(), 0);
+  BOOST_CHECK_EQUAL(f.function_name(), "name2");
+  BOOST_CHECK_EQUAL(f.function_arity(), 0);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
   BOOST_CHECK_EQUAL(v, flusspferd::value());
 
   f = flusspferd::create<flusspferd::function>(
     "name3",
     my_func_2);
-  BOOST_CHECK_EQUAL(f.name(), "name3");
-  BOOST_CHECK_EQUAL(f.arity(), 0);
+  BOOST_CHECK_EQUAL(f.function_name(), "name3");
+  BOOST_CHECK_EQUAL(f.function_arity(), 0);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global()));
   BOOST_CHECK_EQUAL(v, flusspferd::value());
 
   f = flusspferd::create<flusspferd::function>(
     "name4",
     my_func_3);
-  BOOST_CHECK_EQUAL(f.name(), "name4");
-  BOOST_CHECK_EQUAL(f.arity(), 1);
+  BOOST_CHECK_EQUAL(f.function_name(), "name4");
+  BOOST_CHECK_EQUAL(f.function_arity(), 1);
   BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 12345));
   BOOST_CHECK_EQUAL(v, flusspferd::value(12345));
 
   f = flusspferd::create<flusspferd::method>(
     "name5",
     &my_class::my_method_1);
-  BOOST_CHECK_EQUAL(f.name(), "name5");
-  BOOST_CHECK_EQUAL(f.arity(), 0);
+  BOOST_CHECK_EQUAL(f.function_name(), "name5");
+  BOOST_CHECK_EQUAL(f.function_arity(), 0);
   BOOST_CHECK_NO_THROW(v = f.call(
     flusspferd::create<my_class>()));
   BOOST_CHECK_EQUAL(v, flusspferd::value());
@@ -221,8 +221,8 @@ BOOST_AUTO_TEST_CASE( function ) {
   f = flusspferd::create<flusspferd::method>(
     "name6",
     &my_class::my_method_2);
-  BOOST_CHECK_EQUAL(f.name(), "name6");
-  BOOST_CHECK_EQUAL(f.arity(), 1);
+  BOOST_CHECK_EQUAL(f.function_name(), "name6");
+  BOOST_CHECK_EQUAL(f.function_arity(), 1);
   BOOST_CHECK_NO_THROW(v = f.call(
     flusspferd::create<my_class>(),
     5));
@@ -291,7 +291,7 @@ BOOST_AUTO_TEST_CASE( container ) {
   BOOST_CHECK(attr = cont.get_property_attributes("a"));
   BOOST_CHECK_EQUAL(attr->flags, flusspferd::no_property_flag);
 
-  flusspferd::function f =
+  flusspferd::object f =
     flusspferd::create<flusspferd::function>(
       "f",
       _container = cont,
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(native_function) {
   flusspferd::create_on(flusspferd::global())
     .create<my_functor>("name", boost::fusion::make_vector(0));
   try {
-    flusspferd::function f(flusspferd::global().get_property_object("name"));
+    flusspferd::object f(flusspferd::global().get_property_object("name"));
     BOOST_CHECK(!f.is_null());
     BOOST_CHECK_EQUAL(f.get_property("called"), flusspferd::value());
     BOOST_CHECK_NO_THROW(f.call(flusspferd::global()));
@@ -375,9 +375,9 @@ BOOST_AUTO_TEST_CASE(function) {
         "file",
         666);
   try {
-    flusspferd::function f(flusspferd::global().get_property_object("name"));
-    BOOST_CHECK_EQUAL(f.name(), "name");
-    BOOST_CHECK_EQUAL(f.arity(), 2);
+    flusspferd::object f(flusspferd::global().get_property_object("name"));
+    BOOST_CHECK_EQUAL(f.function_name(), "name");
+    BOOST_CHECK_EQUAL(f.function_arity(), 2);
     flusspferd::root_value v;
     BOOST_CHECK_NO_THROW(v = f.call(flusspferd::global(), 1, 2));
     BOOST_CHECK_EQUAL(v, flusspferd::value(3));

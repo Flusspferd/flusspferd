@@ -105,8 +105,8 @@ class require : public flusspferd::native_function_base {
 public:
   typedef boost::mpl::true_ ignore_name_arity;
 
-  require(function const &fun);
-  require(function const &fun, require const &rhs);
+  require(object const &fun);
+  require(object const &fun, require const &rhs);
   ~require();
 
   /// The different types of IDs understood by require

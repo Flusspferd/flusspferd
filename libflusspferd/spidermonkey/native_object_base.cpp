@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "flusspferd/call_context.hpp"
 #include "flusspferd/root.hpp"
 #include "flusspferd/exception.hpp"
-#include "flusspferd/function.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include <boost/unordered_map.hpp>

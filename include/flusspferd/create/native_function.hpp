@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
 
 #include "../create.hpp"
+#include "../root.hpp"
 #include <boost/version.hpp>
 #include <boost/fusion/include/invoke.hpp>
 #include <boost/fusion/include/joint_view.hpp>
@@ -79,7 +80,7 @@ namespace detail {
       if (determined_arity)
         arity = determined_arity.get();
 
-      root_function fun(
+      root_object fun(
           native_function_base::create_function(arity, std::string()));
       return *new Class(fun);
     }
@@ -96,7 +97,7 @@ namespace detail {
         arity = args[param::_arity | 0u];
 
       flusspferd::root_string name(args[param::_name | flusspferd::string()]);
-      root_function fun(
+      root_object fun(
           native_function_base::create_function(
               arity,
               name.to_string()));
@@ -111,7 +112,7 @@ namespace detail {
           args[param::_arguments | VECTOR0()]);
 
       typedef
-        boost::fusion::vector1<function>
+        boost::fusion::vector1<object>
         obj_seq_type;
 
       obj_seq_type obj_seq(fun);

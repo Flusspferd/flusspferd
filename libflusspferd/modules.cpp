@@ -82,12 +82,12 @@ void flusspferd::load_require_function(object container) {
 }
 
 
-require::require(function const &fun)
+require::require(object const &fun)
   : native_function_base(fun)
 { }
 
 // Copy constructor. Keep the same JS objects for the state variables
-require::require(function const &fun, require const &rhs)
+require::require(object const &fun, require const &rhs)
   : native_function_base(fun),
     module_cache(rhs.module_cache),
     paths(rhs.paths),
@@ -328,7 +328,7 @@ void require::require_js(fs::path filename, std::string const &id, object cache)
   argnames.push_back("module");
 
   std::string fname = filename.string();
-  root_function fn(create<function>(
+  root_object fn(create<function>(
       _name = fname,
       _argument_names = argnames,
       _function = module_text,
