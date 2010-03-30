@@ -33,7 +33,7 @@ THE SOFTWARE.
 using namespace flusspferd;
 using namespace std;
 
-void callback(flusspferd::function fn){
+void callback(flusspferd::object fn){
   fn.call(global());
 }
 
@@ -51,13 +51,16 @@ BOOST_AUTO_TEST_CASE(bug_159) {
       .create<flusspferd::function>("gc", &gc)
       .create<flusspferd::function>("execute", &callback);
 
+    /* FIXME path finding */
+    #define P "../../test/fixtures/bug159"
+
     g.get_property_object("require")
       .get_property_object("paths")
-      .call("unshift", "test/fixtures/bug159");
+      .call("unshift", P);
 
     gc();
     
-    execute("test/fixtures/bug159/test.js");   
+    execute(P "/test.js");   
   } catch (flusspferd::exception &fe) {
     std::cerr << fe.what();
     BOOST_CHECK(!"Flusspferd exception");

@@ -112,7 +112,7 @@ void ecma_define_own_property(object o, string p, object desc) {
   else
     flags = flags | read_only_property;
 
-  boost::optional<function> getter_fn = boost::none, 
+  boost::optional<object> getter_fn = boost::none, 
                             setter_fn = boost::none;
   v = desc.get_property("getter");
   try {
@@ -157,8 +157,8 @@ void ecma_define_own_property(object o, string p, object desc) {
       p,
       property_attributes(
         flags,
-        boost::optional<function const &>(getter_fn),
-        boost::optional<function const &>(setter_fn)));
+        boost::optional<object const &>(getter_fn),
+        boost::optional<object const &>(setter_fn)));
   } else {
     value val = desc.has_property("value")
               ? desc.get_property("value") 

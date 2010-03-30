@@ -73,13 +73,13 @@ namespace curl {
 
   template<CURLoption What, CURLoption WhatData, flusspferd::object (Easy::*Obj)>
   struct function_option : handle_option {
-    flusspferd::function getter() const {
+    flusspferd::object getter() const {
       return flusspferd::create<flusspferd::method>("$get_", &get);
     }
-    flusspferd::function setter() const {
+    flusspferd::object setter() const {
       return flusspferd::create<flusspferd::method>("$set_", &set);
     }
-    boost::any data() const { return flusspferd::function(); }
+    boost::any data() const { return flusspferd::object(); }
     CURLoption what() const { return What; }
   private:
     static flusspferd::object get(EasyOpt *o) {

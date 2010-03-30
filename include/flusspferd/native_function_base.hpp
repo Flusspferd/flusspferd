@@ -28,7 +28,6 @@ THE SOFTWARE.
 #define FLUSSPFERD_NATIVE_FUNCTION_BASE_HPP
 
 #include "init.hpp"
-#include "function.hpp"
 #include "convert.hpp"
 #include <boost/type_traits/is_base_of.hpp>
 #include <boost/type_traits/is_member_function_pointer.hpp>
@@ -52,9 +51,9 @@ namespace detail {
  *
  * @ingroup functions
  */
-class native_function_base : public function, private boost::noncopyable {
+class native_function_base : public object, private boost::noncopyable {
 public:
-  native_function_base(function const &obj);
+  native_function_base(object const &obj);
   virtual ~native_function_base();
 
   static native_function_base *get_native(object const &o);
@@ -87,10 +86,10 @@ protected:
 
 public:
 #ifndef IN_DOXYGEN
-  static function create_function(
+  static object create_function(
       unsigned arity, std::string const &name);
 
-  void load_into(function const &obj);
+  void load_into(object const &obj);
 #endif
 
 private:

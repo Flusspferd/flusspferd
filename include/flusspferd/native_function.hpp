@@ -46,7 +46,7 @@ private:
 public:
   typedef boost::function<T> callback_type;
 
-  native_function(function const &obj, callback_type const &cb)
+  native_function(object const &obj, callback_type const &cb)
     : native_function_base(obj), adapter(cb)
   {}
 
@@ -68,7 +68,7 @@ class native_function<void, false> : public native_function_base {
 public:
   typedef boost::function<void (call_context &)> callback_type;
 
-  native_function(function const &obj, callback_type const &cb)
+  native_function(object const &obj, callback_type const &cb)
     : native_function_base(obj), cb(cb)
   {}
 
@@ -94,7 +94,7 @@ private:
 public:
   typedef R T::*callback_type;
 
-  native_member_function(function const &obj, callback_type const &cb)
+  native_member_function(object const &obj, callback_type const &cb)
     : native_function_base(obj), adapter(cb)
   {}
 
@@ -116,7 +116,7 @@ class native_member_function<void, T> : public native_function_base {
 public:
   typedef void (T::*callback_type)(call_context &);
 
-  native_member_function(function const &obj, callback_type const &cb)
+  native_member_function(object const &obj, callback_type const &cb)
     : native_function_base(obj), cb(cb)
   {}
 

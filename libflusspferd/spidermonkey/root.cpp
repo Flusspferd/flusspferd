@@ -30,7 +30,6 @@ THE SOFTWARE.
 #include "flusspferd/value.hpp"
 #include "flusspferd/object.hpp"
 #include "flusspferd/string.hpp"
-#include "flusspferd/function.hpp"
 #include "flusspferd/array.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/context.hpp"
@@ -64,7 +63,6 @@ root<T>::~root() {
 template class root<value>;
 template class root<object>;
 template class root<string>;
-template class root<function>;
 template class root<array>;
 
 }}

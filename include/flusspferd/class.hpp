@@ -47,7 +47,7 @@ namespace flusspferd {
 namespace detail {
 
 struct unconstructible_class_constructor : native_function_base {
-  unconstructible_class_constructor(function const &obj)
+  unconstructible_class_constructor(object const &obj)
     : native_function_base(obj)
   {}
 
@@ -56,7 +56,7 @@ struct unconstructible_class_constructor : native_function_base {
 
 template<typename T>
 struct class_constructor : native_function_base {
-  class_constructor(function const &obj)
+  class_constructor(object const &obj)
     : native_function_base(obj)
   {}
 

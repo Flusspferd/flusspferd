@@ -67,7 +67,7 @@ public:
  * The above example would work just the same if to_root as a string, value,
  * function or an array.
  *
- * @see root_value, root_object, root_string, root_function, root_array,
+ * @see root_value, root_object, root_string, root_object, root_array,
  *      local_root_scope
  *
  * @ingroup gc
@@ -110,9 +110,6 @@ typedef detail::root<object> root_object;
 
 /// Javascript root scope for a flusspferd::string.
 typedef detail::root<string> root_string;
-
-/// Javascript root scope for a flusspferd::function.
-typedef detail::root<function> root_function;
 
 /// Javascript root scope for a flusspferd::array.
 typedef detail::root<array> root_array;

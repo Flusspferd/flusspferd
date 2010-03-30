@@ -38,6 +38,16 @@ namespace flusspferd {
 /**
  * Tag class for flusspferd::create.
  *
+ * Used as an alternative to flusspferd::method when the first C++ parameter
+ * should <b>not</b> be the Javascript 'this' object.
+ *
+ * @ingroup create
+ */
+struct function {};
+
+/**
+ * Tag class for flusspferd::create.
+ *
  * Used as an alternative to flusspferd::function when the first C++
  * parameter should be the Javascript 'this' object.
  *
@@ -48,7 +58,7 @@ struct method {};
 #ifndef IN_DOXYGEN
 
 namespace detail {
-  function create_source_function(
+  object create_source_function(
     flusspferd::string const &name,
     std::vector<flusspferd::string> const &argnames,
     flusspferd::string const &body,
@@ -57,7 +67,7 @@ namespace detail {
 
   template<bool Method, typename ArgPack>
   struct create_function_helper {
-    typedef function result_type;
+    typedef object result_type;
 
     typedef typename boost::parameter::value_type<
         ArgPack,
@@ -140,7 +150,7 @@ namespace detail {
 
   template<bool Method>
   struct create_function_traits {
-    typedef function result_type;
+    typedef object result_type;
 
     typedef boost::parameter::parameters<
         param::tag::name,

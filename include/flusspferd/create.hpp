@@ -29,7 +29,6 @@ THE SOFTWARE.
 
 #ifndef PREPROC_DEBUG
 #include "object.hpp"
-#include "function.hpp"
 #include "native_function.hpp"
 #include "root.hpp"
 #include <boost/type_traits/is_function.hpp>

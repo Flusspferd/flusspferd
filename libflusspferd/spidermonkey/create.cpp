@@ -77,7 +77,7 @@ object flusspferd::detail::create_native_enumerable_object(
   return native_object_base::do_create_enumerable_object(proto, parent);
 }
 
-function flusspferd::detail::create_source_function(
+object flusspferd::detail::create_source_function(
     flusspferd::string const &name,
     std::vector<flusspferd::string> const &argnames,
     flusspferd::string const &body,
@@ -109,5 +109,7 @@ function flusspferd::detail::create_source_function(
   if (!fun)
     throw exception("Could not compile function");
 
-  return Impl::wrap_function(fun);
+  JSObject *obj = JS_GetFunctionObject(fun);
+
+  return Impl::wrap_object(obj);
 }

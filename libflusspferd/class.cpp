@@ -30,7 +30,7 @@ using namespace flusspferd;
 
 void detail::unconstructible_class_constructor::call(call_context &) {
   std::string msg = "Instances of " 
-                  + name().to_string()
+                  + function_name().to_string()
                   + " cannot be created directly";
   throw exception(msg.c_str());
 }
