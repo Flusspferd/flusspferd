@@ -24,55 +24,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifndef FLUSSPFERD_HANDLE_HPP
-#define FLUSSPFERD_HANDLE_HPP
+#ifndef FLUSSPFERD_SPIDERMONKEY_HANDLE_BASE_HPP
+#define FLUSSPFERD_SPIDERMONKEY_HANDLE_BASE_HPP
 
 namespace flusspferd {
+namespace Impl {
 
-namespace detail {
-  template<typename T>
-  class handle : public Impl::handle_base {
-  public:
-    T *get() {
-      return &value;
-    }
-
-  private:
-    T value;
-  };
-}
-
-template<typename T>
-class handle {
-private:
-  typedef T &reference;
-  typedef T const &const_reference;
-  typedef T *pointer;
-  typedef T const *const_pointer;
-
-  typedef detail::handle<T> internal_type;
-  typedef boost::shared_ptr<internal_type> pointer_type;
-
+class handle_base {
 public:
-  handle(T const &value)
-    : p(new internal_type(value))
-    {}
-
-  ~handle()
-    {}
-
-  reference operator*() const {
-    return *p->get();
-  }
-
-  pointer operator->() const {
-    return p->get();
-  }
 
 private:
-  pointer_type p;
+  void *gcptr;
 };
 
+}
 }
 
 #endif
