@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include <boost/fusion/include/make_vector.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/xpressive/xpressive.hpp>
+#include <boost/scope_exit.hpp>
 #include <algorithm>
 
 #ifdef WIN32
@@ -63,6 +64,7 @@ namespace fs = boost::filesystem;
 namespace fusion = boost::fusion;
 using boost::format;
 
+namespace {
 static fs::path make_dsoname(std::string const &id);
 static void load_native_module(fs::path const &dso_name, object exports);
 static void setup_module_resolve_fns(object &module, fs::path const &id);
@@ -73,8 +75,8 @@ static object module_resource(const fs::path &module_dir, std::string const &x_,
 // This function based largley on one from boost/program_options. See end of file for its license
 static array split_args_string(const value& input);
 
-
-const format load_error_fmt("Unable to load module '%1%': %2%");
+static const format load_error_fmt("Unable to load module '%1%': %2%");
+}
 
 // Create |require| function on container.
 void flusspferd::load_require_function(object container) {
@@ -147,7 +149,7 @@ object require::new_require_function(string const &id_) {
 }
 
 void require::set_main_module(std::string const &id_) {
-  id_classification type = classify_id(id_);
+  id_classification const type = classify_id(id_);
 
   if (type == relative)
     throw exception("require.main cannot be set using a relative id", "TypeError");
@@ -162,7 +164,7 @@ void require::set_main_module(std::string const &id_) {
     mod = *mod_;
   }
   else {
-    mod = io::fs_base::canonicalize( id_.substr(strlen("file://")) );
+    mod = io::fs_base::canonicalize( id_.substr(sizeof("file://")-1) );
   }
 
   std::string id = "file://" + mod.string();
@@ -308,17 +310,11 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
 
 /// Load the given @c filename as a module
 void require::require_js(fs::path filename, std::string const &id, object cache) {
-  class StrictModeScopeGuard {
-      bool old_strict;
-    public:
-      StrictModeScopeGuard(bool v) : old_strict(v) {}
-
-      ~StrictModeScopeGuard() {
-        flusspferd::current_context().set_strict(old_strict);
-      }
-  };
-  // Reset the strict mode when we leave (the REPL might have it off)
-  StrictModeScopeGuard guard(flusspferd::current_context().set_strict(true));
+  bool const old_strict = flusspferd::current_context().set_strict(true);
+  BOOST_SCOPE_EXIT((old_strict)) {
+    // Reset the strict mode when we leave (the REPL might have it off)
+    flusspferd::current_context().set_strict(old_strict);
+  } BOOST_SCOPE_EXIT_END;
 
   root_string module_text(load_module_text(filename, cache.get_property_object("options")));
 
@@ -385,18 +381,15 @@ class ExportsScopeGuard {
     }
 };
 
-
-
-
 object require::load_relative_module(std::string id) {
 
-  fs::path module(current_id().substr(strlen("file://")));
+  fs::path module(current_id().substr(sizeof("file://")-1));
 
   module = io::fs_base::canonicalize( module.parent_path() / (id + ".js") );
   id = module.string();
   fs::path dso_path = make_dsoname(module.string());
   id = "file://" + id;
-  std::string dso_id = "file://" + dso_path.string();
+  std::string const dso_id = "file://" + dso_path.string();
 
 
   // If either of the JS or DSO is already cached then just return it
@@ -435,8 +428,8 @@ object require::load_relative_module(std::string id) {
   return cache;
 }
 
-
-void load_native_module(fs::path const &dso_name, object exports) {
+namespace {
+static void load_native_module(fs::path const &dso_name, object exports) {
   std::string const &fullpath = dso_name.string();
 #ifdef WIN32
   HMODULE module = LoadLibrary(fullpath.c_str());
@@ -472,7 +465,7 @@ void load_native_module(fs::path const &dso_name, object exports) {
   root_object context(global());
   func(exports, context);
 }
-
+}
 
 // Loading of top-level IDs is more complex then relative or abs uris
 // We need to check alias and prelaod, and also search the require paths for
@@ -481,7 +474,7 @@ object require::load_top_level_module(std::string const &id) {
   root_array paths(this->paths);
 
   if (alias.has_own_property(id)) {
-    std::string new_id = alias.get_property(id).to_std_string();
+    std::string const new_id = alias.get_property(id).to_std_string();
 
     // Sanity check - aliased ID should be toplevel too
     if (classify_id(new_id) != top_level) {
@@ -520,7 +513,7 @@ object require::load_top_level_module(std::string const &id) {
     }
   }
 
-  size_t len = paths.length();
+  std::size_t const len = paths.length();
   bool found = false;
 
   fs::path dso_name = make_dsoname(id);
@@ -586,7 +579,7 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
 
   fs::path js_name = fs::path(id + ".js");
 
-  size_t len = paths.length();
+  std::size_t const len = paths.length();
 
   for (size_t i = 0; i < len; i++) {
     fs::path path = paths.get_element(i).to_std_string();
@@ -595,7 +588,7 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
 
     // Check if we loaded something by this name previously, even if the file
     // doesn't exist anymore
-    std::string new_id = "file://" + js_path.string();
+    std::string const new_id = "file://" + js_path.string();
     if (module_cache.has_own_property(new_id)) {
       return js_path;
     }
@@ -651,7 +644,7 @@ object require::create_cache_entry(std::string const &id) {
 object require::load_absolute_module(std::string id) {
   security &sec = security::get();
 
-  id = id.substr(strlen("file://"));
+  id = id.substr(sizeof("file://")-1);
   fs::path path = io::fs_base::canonicalize( id );
   id = "file://" + id;
 
@@ -677,7 +670,7 @@ object require::load_absolute_module(std::string id) {
   throw exception(format(load_error_fmt) % id % "file not found");
 }
 
-
+namespace {
 static fs::path make_dsoname(std::string const &id) {
   fs::path p(id);
 
@@ -715,7 +708,7 @@ static void setup_module_resolve_fns(object &module, fs::path const &path) {
 }
 
 // owner: No such file or directory "foo/bar"
-const format resolve_error_fmt("module.resource.resolve: %1% \"%2%\"");
+static const format resolve_error_fmt("module.resource.resolve: %1% \"%2%\"");
 
 static std::string module_resource_resolve(const fs::path &module_dir, std::string const &x_) {
   fs::path x = x_;
@@ -743,16 +736,16 @@ static object module_resource(const fs::path &module_dir, std::string const &x_,
 // (See accompanying file LICENSE_1_0.txt
 // or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-array split_args_string(const value& v)
-{
+static array split_args_string(value const &v) {
   std::string const &input = v.to_std_string();
 
   array result = create<array>();
   root_object root(result);
 
-  std::string::const_iterator i = input.begin(), e = input.end();
+  std::string::const_iterator i = input.begin();
+  std::string::const_iterator const e = input.end();
   for(;i != e; ++i) {
-    if (!isspace((unsigned char)*i))
+    if (!std::isspace(*i))
       break;
   }
 
@@ -762,7 +755,7 @@ array split_args_string(const value& v)
 
   std::string current;
   bool inside_quoted = false;
-  int backslash_count = 0;
+  unsigned backslash_count = 0;
 
   for(; i != e; ++i) {
     if (*i == '"') {
@@ -787,11 +780,11 @@ array split_args_string(const value& v)
           current.append(backslash_count, '\\');
           backslash_count = 0;
       }
-      if (isspace((unsigned char)*i) && !inside_quoted) {
+      if (std::isspace(*i) && !inside_quoted) {
           // Space outside quoted section terminate the current argument
           result.push(current);
           current.resize(0);
-          for(;i != e && isspace((unsigned char)*i); ++i)
+          for(;i != e && std::isspace(*i); ++i)
               ;
           --i;
       } else {
@@ -811,3 +804,4 @@ array split_args_string(const value& v)
   return result;
 }
 
+}
