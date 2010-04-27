@@ -266,7 +266,7 @@ string require::load_module_text(fs::path filename, boost::optional<object> opts
     if (e == buf.end())
       break;
 
-    std::string line( reinterpret_cast<char const *>(&*i), size_t(e-i) );
+    std::string line( reinterpret_cast<char const *>(&*i), std::size_t(e-i) );
 
     // Move onto next line
     i = e;
@@ -518,7 +518,7 @@ object require::load_top_level_module(std::string const &id) {
 
   fs::path dso_name = make_dsoname(id);
 
-  for (size_t i = 0; i < len; i++) {
+  for (std::size_t i = 0; i < len; i++) {
     fs::path path = paths.get_element(i).to_std_string();
     fs::path native_path = io::fs_base::canonicalize( path / dso_name );
 
@@ -581,7 +581,7 @@ require::find_top_level_js_module(std::string const &id, bool fatal) {
 
   std::size_t const len = paths.length();
 
-  for (size_t i = 0; i < len; i++) {
+  for (std::size_t i = 0; i < len; i++) {
     fs::path path = paths.get_element(i).to_std_string();
 
     fs::path js_path = io::fs_base::canonicalize( path / js_name );
