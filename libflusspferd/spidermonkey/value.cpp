@@ -103,9 +103,9 @@ double value::to_integral_number(int bits, bool signedness) const {
   if (!std::isfinite(value))
     return 0;
 #endif
-  long double maxU = powl(2, bits);
-  value = value < 0 ? ceill(value) : floorl(value);
-  value = fmodl(value, maxU);
+  long double maxU = std::pow(2.0L, bits);
+  value = value < 0 ? std::ceil(value) : std::floor(value);
+  value = std::fmod(value, maxU);
   if (value < 0)
     value += maxU;
   if (signedness) {
