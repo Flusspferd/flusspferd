@@ -4,6 +4,9 @@ Flusspferd Change Log
 Release 0.10:
 -------------
 
+2010-05-08:
+- FreeBSD support
+
 2010-02-23:
 - Add readline module.
 
