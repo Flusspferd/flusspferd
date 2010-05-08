@@ -211,9 +211,9 @@ fs::path get_exe_name_from_argv(std::string const &argv0) {
     mib[1] = KERN_PROC;
     mib[2] = KERN_PROC_PATHNAME;
     mib[3] = -1;
-    char buf[MAX_PATH];
+    char buf[PATH_MAX];
     size_t cb = sizeof(buf);
-    if (sysctl(mib, 4, &cb, NULL, 0) == 0)
+    if (sysctl(mib, 4, buf, &cb, NULL, 0) == 0)
       return std::string(buf);
     else
       return boost::none;

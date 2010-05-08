@@ -88,6 +88,7 @@ if(NOT FLUSSPFERD_HAVE_SELF_EXE)
     check_cxx_source_runs(
         "#include <sys/types.h>
         #include <sys/sysctl.h>
+        #include <cstdlib>
         int main() {
           int mib[4];
           mib[0] = CTL_KERN;
@@ -96,7 +97,7 @@ if(NOT FLUSSPFERD_HAVE_SELF_EXE)
           mib[3] = -1;
           char buf[1024];
           size_t cb = sizeof(buf);
-          if (sysctl(mib, 4, &cb, NULL, 0) == 0)
+          if (sysctl(mib, 4, buf, &cb, NULL, 0) == 0)
             return EXIT_SUCCESS;
           else
             return EXIT_FAILURE;
