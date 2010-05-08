@@ -19,8 +19,11 @@ endif()
 ## libdl ####################################################################
 
 if(FLUSSPFERD_HAVE_POSIX)
-    find_package(DL REQUIRED)
     add_definitions(-DFLUSSPFERD_HAVE_POSIX)
+endif()
+
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    find_package(DL REQUIRED)
     include_directories(${DL_INCLUDE_DIR})
 endif()
 
