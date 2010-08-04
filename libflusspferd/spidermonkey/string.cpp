@@ -38,8 +38,8 @@ Impl::string_impl::string_impl()
   : str(JSVAL_TO_STRING(JS_GetEmptyStringValue(Impl::current_context())))
 { }
 
-Impl::string_impl::string_impl(char const *s)
- : str(JS_NewStringCopyZ(Impl::current_context(), s))
+Impl::string_impl::string_impl(char const *s, string_tag)
+  : str(JS_NewStringCopyZ(Impl::current_context(), s))
 {
   if (!str)
     throw exception("Could not create string");
@@ -59,7 +59,7 @@ Impl::string_impl::string_impl(js_char16_t const *s, std::size_t n)
     throw exception("Could not create string");
 }
 
-Impl::string_impl::string_impl(value const &v)
+Impl::string_impl::string_impl(value const &v, value_tag)
   : str(JS_ValueToString(Impl::current_context(),
                          Impl::get_jsval(const_cast<value&>(v))))
 {
@@ -74,7 +74,7 @@ namespace {
 }
 
 string::string() { }
-string::string(value const &v) : Impl::string_impl(v) { }
+string::string(value const &v) : Impl::string_impl(v, Impl::value_tag()) { }
 string::string(char const *s, std::size_t n)
   : Impl::string_impl(s, n ? n : std::strlen(s)) { }
 string::string(js_char16_t const *s, std::size_t n)
