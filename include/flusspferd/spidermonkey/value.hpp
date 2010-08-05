@@ -84,6 +84,12 @@ public:
     *ref = *o.ref;
     return *this;
   }
+
+#ifndef FLUSSPFERD_JS_IS_JAEGERMONKEY
+  void *get_gcptr() {
+    return getp();
+  }
+#endif
 };
 
 jsid get_jsid(value_impl const &v);

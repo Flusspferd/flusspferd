@@ -61,9 +61,15 @@ protected:
   friend string_impl wrap_string(JSString *s);
 
 public:
+#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
   void **get_gcptr() {
     return reinterpret_cast<void**>(&str);
   }
+#else
+  void *get_gcptr() {
+    return &str;
+  }
+#endif
 };
 
 inline JSString *get_string(string_impl &s) {
