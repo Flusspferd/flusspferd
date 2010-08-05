@@ -109,6 +109,14 @@ inline value_impl wrap_jsvalp(jsval *p) {
   return value_impl(p);
 }
 
+#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+ // Jägermonkey has real 32bit integers http://blog.mozilla.com/rob-sayre/2010/08/02/mozillas-new-javascript-value-representation/
+template<typename T>
+value_impl value_impl::from_integer(T const &num) {
+  // TODO if the value of num is larger than 32 bits should double be used?
+  return from_int(num);
+}
+#else
 template<typename T>
 value_impl value_impl::from_integer(T const &num) {
   if (INT_FITS_IN_JSVAL(num)) {
@@ -118,6 +126,7 @@ value_impl value_impl::from_integer(T const &num) {
     return from_double(num);
   }
 }
+#endif
 
 }
 
