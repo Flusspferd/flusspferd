@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "flusspferd/exception.hpp"
 #include "flusspferd/current_context_scope.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
+#include "flusspferd/spidermonkey/jsid.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/variant.hpp>
 
@@ -46,7 +47,11 @@ public:
   static void trace_op(JSTracer *trc, JSObject *obj);
 
   template<property_mode>
+#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+  static JSBool property_op(JSContext *, JSObject *, jsid, jsval *);
+#else
   static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
+#endif
 
   static JSBool new_resolve(JSContext *, JSObject *, jsval, uintN, JSObject **);
 
@@ -245,9 +250,15 @@ JSBool native_object_base::impl::call_helper(
   } FLUSSPFERD_CALLBACK_END;
 }
 
+#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+template<native_object_base::property_mode mode>
+JSBool native_object_base::impl::property_op(
+    JSContext *ctx, JSObject *obj, jsid id, jsval *vp)
+#else
 template<native_object_base::property_mode mode>
 JSBool native_object_base::impl::property_op(
     JSContext *ctx, JSObject *obj, jsval id, jsval *vp)
+#endif
 {
   FLUSSPFERD_CALLBACK_BEGIN {
     current_context_scope scope(Impl::wrap_context(ctx));
@@ -256,7 +267,7 @@ JSBool native_object_base::impl::property_op(
       native_object_base::get_native(Impl::wrap_object(obj));
 
     value data(Impl::wrap_jsvalp(vp));
-    self.property_op(mode, Impl::wrap_jsval(id), data);
+    self.property_op(mode, Impl::wrap_jsid(id), data);
   } FLUSSPFERD_CALLBACK_END;
 }
 
@@ -306,8 +317,13 @@ JSBool native_object_base::impl::new_enumerate(
         int num = 0;
         *iter = self.enumerate_start(num);
         *statep = PRIVATE_TO_JSVAL(iter);
-        if (idp)
+        if (idp) {
+#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+          *idp = INT_TO_JSID(num);
+#else
           *idp = INT_TO_JSVAL(num);
+#endif
+        }
         return JS_TRUE;
       }
     case JSENUMERATE_NEXT:

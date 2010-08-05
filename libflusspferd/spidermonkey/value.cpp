@@ -66,9 +66,13 @@ int value::get_int() const {
 }
 double value::get_double() const {
   assert(is_double());
+#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+  return JSVAL_TO_DOUBLE(get());
+#else
   jsdouble *d = JSVAL_TO_DOUBLE(get());
   assert(d);
   return *d;
+#endif
 }
 object value::get_object() const {
   assert(is_object());

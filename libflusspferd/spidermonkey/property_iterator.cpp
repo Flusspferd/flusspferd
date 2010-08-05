@@ -34,12 +34,18 @@ THE SOFTWARE.
 #include <boost/utility/in_place_factory.hpp>
 #include <js/jsapi.h>
 
+#ifndef FLUSSPFERD_JS_IS_JAEGERMONKEY
+#ifndef JSID_VOID
+#define JSID_VOID JSVAL_VOID
+#endif
+#endif
+
 using namespace flusspferd;
 
 class property_iterator::impl {
 public:
   impl()
-    : id(JSVAL_VOID) 
+    : id(JSID_VOID)
   {}
 
   root_value root_iterator;
@@ -92,7 +98,7 @@ void property_iterator::increment() {
         Impl::current_context(), Impl::get_object(p->iterator), &p->id))
     throw exception("Could not load / increment property iterator");
 
-  if (p->id != JSVAL_VOID) {
+  if (p->id != JSID_VOID) {
     if (!JS_IdToValue(
           Impl::current_context(), p->id, Impl::get_jsvalp(p->root_cache)))
       throw exception("Could not load / increment property iterator");
