@@ -54,13 +54,13 @@ THE SOFTWARE.
  * If you haven't done so already, get the newest version of Flusspferd with
  *
  * @verbatim
-$ git clone git://github.com/ruediger/flusspferd.git
+$ git clone git://github.com/Flusspferd/flusspferd.git
 @endverbatim
  *
  * Alternatively, you can download a release from
  * <a href="https://sourceforge.net/project/showfiles.php?group_id=255938">
  * Sourceforge</a> or a snapshot from
- * <a href="http://github.com/ruediger/flusspferd">Github</a>.
+ * <a href="http://github.com/Flusspferd/flusspferd">Github</a>.
  *
  * @section Build
  *
