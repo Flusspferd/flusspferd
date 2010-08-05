@@ -57,8 +57,8 @@ protected:
 
 public:
 
-  void *get_gcptr() {
-    return &obj;
+  void **get_gcptr() {
+    return reinterpret_cast<void**>(&obj);
   }
 };
 

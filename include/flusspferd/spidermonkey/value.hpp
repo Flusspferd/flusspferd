@@ -84,10 +84,6 @@ public:
     *ref = *o.ref;
     return *this;
   }
-
-  void *get_gcptr() {
-    return getp();
-  }
 };
 
 jsid get_jsid(value_impl const &v);

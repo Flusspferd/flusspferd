@@ -92,7 +92,7 @@ public:
   }
 
 private:
-  void *get_gcptr();
+  void **get_gcptr();
 };
 
 }

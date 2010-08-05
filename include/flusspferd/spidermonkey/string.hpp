@@ -61,8 +61,8 @@ protected:
   friend string_impl wrap_string(JSString *s);
 
 public:
-  void *get_gcptr() {
-    return &str;
+  void **get_gcptr() {
+    return reinterpret_cast<void**>(&str);
   }
 };
 

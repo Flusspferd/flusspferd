@@ -54,11 +54,11 @@ public:
 #endif
 
   void operator()(char const *name, value val) {
-    trace_gcptr(name, val.get_gcptr());
+    trace_gcptr(name, get_jsvalp(val));
   }
 
   void operator()(std::string const &name, value val) {
-    trace_gcptr(name.c_str(), val.get_gcptr());
+    trace_gcptr(name.c_str(), get_jsvalp(val));
   }
 
 public: //internal
