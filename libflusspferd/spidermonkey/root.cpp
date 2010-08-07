@@ -37,7 +37,14 @@ THE SOFTWARE.
 #include <js/jsapi.h>
 
 namespace flusspferd { namespace detail {
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+
+#ifndef JS_TYPED_ROOTING_API
+#define JS_AddValueRoot(cx, ptr)       JS_AddRoot(cx, ptr)
+#define JS_AddGCThingRoot(cx, ptr)     JS_AddRoot(cx, ptr)
+#define JS_RemoveValueRoot(cx, ptr)    JS_RemoveRoot(cx, ptr)
+#define JS_RemoveGCThingRoot(cx, ptr)  JS_RemoveRoot(cx, ptr)
+#endif
+
 template<typename T>
 root<T>::root(T const &o)
   : T(o)
@@ -78,27 +85,6 @@ root<value>::~root() {
     Impl::current_context(),
     Impl::value_impl::getp());
 }
-#else
-template<typename T>
-root<T>::root(T const &o)
-  : T(o)
-{
-  JSBool status = JS_AddRoot(
-    Impl::current_context(),
-    T::get_gcptr());
-
-  if (status == JS_FALSE) {
-    throw exception("Cannot root Javascript value");
-  }
-}
-
-template<typename T>
-root<T>::~root() {
-  JS_RemoveRoot(
-    Impl::current_context(),
-    T::get_gcptr());
-}
-#endif
 
 template class root<value>;
 template class root<object>;

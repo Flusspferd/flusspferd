@@ -56,15 +56,9 @@ protected:
   friend object_impl wrap_object(JSObject *o);
 
 public:
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
   void **get_gcptr() {
     return reinterpret_cast<void**>(&obj);
   }
-#else
-  void *get_gcptr() {
-    return &obj;
-  }
-#endif
 };
 
 inline JSObject *get_object(object_impl const &o) {
