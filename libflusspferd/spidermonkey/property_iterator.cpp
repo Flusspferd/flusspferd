@@ -34,10 +34,8 @@ THE SOFTWARE.
 #include <boost/utility/in_place_factory.hpp>
 #include <js/jsapi.h>
 
-#ifndef FLUSSPFERD_JS_IS_JAEGERMONKEY
-#ifndef JSID_VOID
+#if !defined(JSID_VOID) && !defined(JS_USE_JSVAL_JSID_STRUCT_TYPES)
 #define JSID_VOID JSVAL_VOID
-#endif
 #endif
 
 using namespace flusspferd;

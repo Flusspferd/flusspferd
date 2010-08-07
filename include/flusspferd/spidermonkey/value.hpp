@@ -105,7 +105,7 @@ inline value_impl wrap_jsvalp(jsval *p) {
   return value_impl(p);
 }
 
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+#if defined(JSID_VOID) || defined(JS_USE_JSVAL_JSID_STRUCT_TYPES) // TODO add better check for new jsid/jsvalue API
  // Jägermonkey has real 32bit integers http://blog.mozilla.com/rob-sayre/2010/08/02/mozillas-new-javascript-value-representation/
 template<typename T>
 value_impl value_impl::from_integer(T const &num) {

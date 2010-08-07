@@ -154,23 +154,6 @@ if(SPIDERMONKEY_FOUND)
     if(SPIDERMONKEY_HAS_GCZEAL)
       add_definitions(-DSPIDERMONKEY_HAS_GCZEAL)
     endif()
-
-    # Check for JägerMonkey
-    # TODO "if JS_VERSION >= 185" might not be correct or the best way!
-    check_cxx_source_compiles(
-      "#include <js/jsapi.h>
-       int main() {
-         #if JS_VERSION >= 185
-           return 0; // everything ok
-         #else
-           #error \"no jägermonkey\"
-         #endif
-       }"
-      SPIDERMONKEY_IS_JAEGERMONKEY)
-
-    if(SPIDERMONKEY_IS_JAEGERMONKEY)
-      add_definitions(-DFLUSSPFERD_JS_IS_JAEGERMONKEY)
-    endif()
 endif()
 
 list(REMOVE_ITEM CMAKE_REQUIRED_LIBRARIES ${SPIDERMONKEY_LIBRARY})

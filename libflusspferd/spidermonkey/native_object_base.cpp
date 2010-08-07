@@ -47,7 +47,7 @@ public:
   static void trace_op(JSTracer *trc, JSObject *obj);
 
   template<property_mode>
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+#if defined(JSID_VOID) || defined(JS_USE_JSVAL_JSID_STRUCT_TYPES) // TODO add better check for new jsid/jsvalue API
   static JSBool property_op(JSContext *, JSObject *, jsid, jsval *);
 #else
   static JSBool property_op(JSContext *, JSObject *, jsval, jsval *);
@@ -249,8 +249,7 @@ JSBool native_object_base::impl::call_helper(
     self->self_call(x);
   } FLUSSPFERD_CALLBACK_END;
 }
-
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+#if defined(JSID_VOID) || defined(JS_USE_JSVAL_JSID_STRUCT_TYPES) // TODO add better check for new jsid/jsvalue API
 template<native_object_base::property_mode mode>
 JSBool native_object_base::impl::property_op(
     JSContext *ctx, JSObject *obj, jsid id, jsval *vp)
@@ -318,7 +317,7 @@ JSBool native_object_base::impl::new_enumerate(
         *iter = self.enumerate_start(num);
         *statep = PRIVATE_TO_JSVAL(iter);
         if (idp) {
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+#if defined(JSID_VOID) || defined(JS_USE_JSVAL_JSID_STRUCT_TYPES) // TODO add better check for new jsid/jsvalue API
           *idp = INT_TO_JSID(num);
 #else
           *idp = INT_TO_JSVAL(num);

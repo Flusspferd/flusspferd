@@ -66,7 +66,7 @@ int value::get_int() const {
 }
 double value::get_double() const {
   assert(is_double());
-#ifdef FLUSSPFERD_JS_IS_JAEGERMONKEY
+#if defined(JSID_VOID) || defined(JS_USE_JSVAL_JSID_STRUCT_TYPES) // TODO add better check for new jsid/jsvalue API
   return JSVAL_TO_DOUBLE(get());
 #else
   jsdouble *d = JSVAL_TO_DOUBLE(get());
