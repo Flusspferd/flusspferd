@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/scope_exit.hpp>
 #include <algorithm>
+#include <cctype>
 
 #ifdef WIN32
 #include <windows.h>
