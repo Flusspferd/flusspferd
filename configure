@@ -44,6 +44,8 @@ if [ "$1" = '--help' ] || [ "$1" = '-h' ]; then
     echo '  EMACS_MODE=ON|OFF                     Create and install Emacs mode if Emacs is found (default ON).'
     echo '  CREATE_DOCUMENATION=ON|OFF            Create and install documenation (default OFF).'
     echo '  RELOCATABLE=ON|OFF                    Whether the binary should be relocatable (default ON).'
+    echo '  SPIDERMONKEY_INCLUDE_DIR=<path>       Set Spidermonkey include directory (default auto detected).'
+    echo '  SPIDERMONKEY_ROOT=<path>              Set Spidermonkey root directory. Libraries are expected in <root path>/lib and includes in <root path>/include (default auto detected).'
     echo '\nRun "ccmake build" after ./configure to get a curses based configuration editor and run "cmake --help" to get help with CMake.'
 
     exit 2
