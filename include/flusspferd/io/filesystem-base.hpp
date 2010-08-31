@@ -27,8 +27,8 @@ THE SOFTWARE.
 #ifndef FLUSSPFERD_IO_FILESYSTEM_BASE_HPP
 #define FLUSSPFERD_IO_FILESYSTEM_BASE_HPP
 
-#include "../string.hpp"
 #include "../object.hpp"
+#include "../string.hpp"
 #include <boost/filesystem.hpp>
 
 namespace flusspferd {

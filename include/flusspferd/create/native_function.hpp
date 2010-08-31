@@ -28,6 +28,7 @@ THE SOFTWARE.
 #define FLUSSPFERD_CREATE_NATIVE_FUNCTION_HPP
 
 #include "../create.hpp"
+#include "../string.hpp"
 #include "../root.hpp"
 #include <boost/version.hpp>
 #include <boost/fusion/include/invoke.hpp>

@@ -25,6 +25,7 @@ THE SOFTWARE.
 */
 
 #include "flusspferd/string.hpp"
+#include "flusspferd/object.hpp"
 #include "flusspferd/exception.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/spidermonkey/value.hpp"

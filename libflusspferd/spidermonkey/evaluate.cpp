@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "flusspferd/init.hpp"
 #include "flusspferd/spidermonkey/init.hpp"
 #include "flusspferd/modules.hpp"
+#include "flusspferd/string.hpp"
 
 #include <js/jsapi.h>
 
