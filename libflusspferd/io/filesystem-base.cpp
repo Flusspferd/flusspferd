@@ -240,7 +240,7 @@ double fs_base::size(std::string const &file) {
   if (!security::get().check_path(file, security::ACCESS)) {
     throw exception(format(error_sec) % "size" % file);
   }
-  uintmax_t fsize = fs::file_size(file);
+  boost::uintmax_t fsize = fs::file_size(file);
   return fsize;
 }
 
