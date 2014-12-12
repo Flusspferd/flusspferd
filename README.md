@@ -25,7 +25,7 @@ Requirements
   then you're on your own. Sorry, but we don't intend to spend our unpaid time
   writing work-arounds for broken compilers.
 
-Optionally:
+#### Optionally:
 - libedit (BSD)
 - libxml2 2.6+ (for the XML plugin)
 - SQLite3 3.4+(for the SQLite3 plugin)
@@ -37,35 +37,34 @@ Building & installing Flusspferd
 
 You can build Flusspferd (thanks to our wrappers) with
 
-$ ./configure && make && sudo make install
+```$ ./configure && make && sudo make install```
 
-as you probably are accustomed to. You might have to pass some parameters to
-./configure:
-
+as you probably are accustomed to.   
+You might have to pass some parameters to
+```./configure: ```
+```
   -DBOOST_ROOT=/path/to/boost
   -DSPIDERMONKEY_ROOT=/path/to/spidermonkey
   -DLINE_EDITOR=readline (if you want to use GNU/readline instead of editline)
-
+```
 These parameters are passed directly to cmake, i.e. you can also pass other
 parameters that cmake understands.
 
-You can generate the documentation with
+You can generate the documentation with: ```$ ./util/docs.sh ```
 
-$ ./util/docs.sh
-
-The generated documentation is in ./build/html/.
+The generated documentation is in ```./build/html/.```
 
 Using Flusspferd
 ----------------
 
-We have tutorials at http://flusspferd.org/docs/tutorials.html. Just a quick
-peek:
-
+We have tutorials at http://flusspferd.org/docs/tutorials.html.    
+Just a quick peek:
+```
 > const GMP = require('gmp');
 > f = GMP.Float(2);
 2.0
 > print(f.sqrt())
 1.41421356237309504876
 >
-
+```
 (The text after ">" in each line is input.)
